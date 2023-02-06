@@ -1,0 +1,57 @@
+{
+  "name": "botbuilder-m365",
+  "author": "Microsoft Corp.",
+  "description": "M365 extensions for Microsoft BotBuilder.",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [
+    "botbuilder",
+    "botframework",
+    "bots",
+    "chatbots",
+    "teams",
+    "m365"
+  ],
+  "bugs": {
+    "url": "https://github.com/Microsoft/botbuilder-m365/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/botbuilder-m365.git"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "typesVersions": {
+    "<3.9": {
+      "*": [
+        "_ts3.4/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "botbuilder-core": "^4.19.0",
+    "botbuilder-dialogs": "^4.19.0",
+    "openai": "^3.1.0"
+  },
+  "resolutions": {
+    "follow-redirects": "1.14.7"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "build-docs": "typedoc --theme markdown --entryPoint botbuilder-m365 --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
+    "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
+    "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo",
+    "depcheck": "depcheck --config ../../.depcheckrc",
+    "lint": "eslint . --ext .js,.ts",
+    "test": "npm-run-all build test:mocha",
+    "test:mocha": "nyc mocha tests",
+    "test:compat": "api-extractor run --verbose"
+  },
+  "files": [
+    "_ts3.4",
+    "lib",
+    "src"
+  ]
+}
