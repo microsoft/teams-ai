@@ -58,7 +58,7 @@ const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
     prompt: path.join(__dirname, '../src/prompt.txt'),
     promptConfig: {
         model: "text-davinci-003",
-        temperature: 0.4,
+        temperature: 0.0,
         max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
@@ -82,6 +82,10 @@ const app = new botbuilder_m365_1.Application({
     storage,
     predictionEngine
 });
+app.message('/history', (context, state) => __awaiter(void 0, void 0, void 0, function* () {
+    const history = botbuilder_m365_1.ConversationHistoryTracker.getHistoryAsText(context, state);
+    yield context.sendActivity(history);
+}));
 // Register action handlers
 app.ai.action('LightsOn', (context, state) => __awaiter(void 0, void 0, void 0, function* () {
     state.conversation.value.lightsOn = true;
