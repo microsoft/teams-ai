@@ -1,0 +1,15 @@
+The following is a conversation with an AI assistant. 
+
+Human: lights on
+AI: DO LightsOn THEN SAY Ok the lights are on.
+Human: lights off
+AI: DO LightsOff THEN SAY Ok the lights are off.
+Human: toggle the lights
+AI: DO LightsOff THEN DO LightsOn THEN SAY Ok
+Human: pause for 30 seconds
+AI: DO Pause time=30000
+Human: what's the status of the lights?
+AI: DO LightStatus
+
+{{conversation.history}}
+Human: {{activity.text}}
