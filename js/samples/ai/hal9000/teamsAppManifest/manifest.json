@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
+  "version": "1.0.0",
+  "manifestVersion": "1.15",
+  "id": "c44a142a-4af2-436e-a596-df551f7be230",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "HAL9000",
+    "full": "HAL 9000 Computer"
+  },
+  "developer": {
+    "name": "HAL Laboratories",
+    "mpnId": "",
+    "websiteUrl": "https://en.wikipedia.org/wiki/HAL_9000",
+    "privacyUrl": "https://en.wikipedia.org/wiki/HAL_9000",
+    "termsOfUseUrl": "https://en.wikipedia.org/wiki/HAL_9000"
+  },
+  "description": {
+    "short": "Sample bot that thinks it's HAL 9000",
+    "full": "Sample bot that thinks it's HAL 9000"
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#FFFFFF",
+  "staticTabs": [
+    {
+      "entityId": "conversations",
+      "scopes": [
+        "personal"
+      ]
+    },
+    {
+      "entityId": "about",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "bots": [
+    {
+      "botId": "___YOUR BOTS ID___",
+      "scopes": [
+        "personal",
+        "team",
+        "groupChat"
+      ],
+      "isNotificationOnly": false,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": false
+    }
+  ],
+  "validDomains": []
+}

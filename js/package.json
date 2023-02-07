@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "workspaces": [
     "./packages/*",
-    "./samples/*"
+    "./samples/ai/*"
   ],
   "scripts": {
     "build": "wsrun -e -m -t build",
