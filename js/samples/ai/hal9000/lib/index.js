@@ -64,7 +64,8 @@ const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
         frequency_penalty: 0,
         presence_penalty: 0.6,
         stop: [" Human:", " AI:"],
-    }
+    },
+    logRequests: true
 });
 // Define storage and application
 const storage = new botbuilder_1.MemoryStorage();

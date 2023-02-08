@@ -89,9 +89,9 @@ export class ConversationHistoryTracker {
         if (Array.isArray(history)) {
             for (let i = history.length - 1; i >= 0; i--) {
                 // Create a turn chunk
-                let turn = `${o.userPrefix} ${history[i].user}\n`.trimLeft();
+                let turn = `${o.userPrefix} ${history[i].user}\n`.trimStart();
                 history[i].bot.forEach((response) => {
-                    turn += `${o.botPrefix} ${response}\n`.trimLeft();
+                    turn += `${o.botPrefix} ${response}\n`.trimStart();
                 });
                 
                 // Enforce max character length
@@ -104,7 +104,7 @@ export class ConversationHistoryTracker {
             }
         }
 
-        return text;
+        return text.trimEnd();
     }
 
     public static getOptions(options?: Partial<ConversationHistoryOptions>): ConversationHistoryOptions {

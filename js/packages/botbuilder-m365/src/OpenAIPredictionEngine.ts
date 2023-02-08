@@ -62,45 +62,55 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         // Request base prompt completion
         const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];
         const promptRequest = await this.createCompletionRequest(app, context, state, data, options.prompt, options.promptConfig);
-        promises.push(this._openai.createCompletion(promptRequest) as any);
+        promises.push(this.createCompletion(promptRequest, 'PROMPT') as any);
     
         // Add optional topic filter completion
-        let topicFilterRequest: CreateCompletionRequest;
         if (options.topicFilter) {
             if (!options.topicFilterConfig) {
                 throw new Error(`OpenAIPredictionEngine: a "topicFilter" prompt was specified but the "topicFilterConfig" is missing.`);
             }
 
-            topicFilterRequest = await this.createCompletionRequest(app, context, state, data, options.topicFilter, options.topicFilterConfig);
-            promises.push(this._openai.createCompletion(topicFilterRequest) as any);
+            const topicFilterRequest = await this.createCompletionRequest(app, context, state, data, options.topicFilter, options.topicFilterConfig);
+            promises.push(this.createCompletion(topicFilterRequest, 'TOPIC FILTER') as any);
         }
 
         // Wait for completions to finish
         const results = await Promise.all(promises);
 
-        
-        // Check topic filter
-        if (results.length > 1) {
-            console.log(JSON.stringify(results[1]?.data));
-            // Look for the word "yes" to be in the topic filters response.
-            let allowed = false;
-            if (results[1]?.data?.choices && results[1].data.choices.length > 0) {
-                allowed = results[1].data.choices[0].text.toLowerCase().indexOf('yes') >= 0;
-            }
-
-            // Redirect to OffTopic action if not allowed
-            if (!allowed) {
+        // Ensure we weren't rate limited
+        for (let i = 0; i < results.length; i++) {
+            if (results[i].status == 429) {
                 return [{
                     type: 'DO',
-                    action: AI.OffTopicActionName,
+                    action: AI.RateLimitedActionName,
                     data: {}
                 } as PredictedDoCommand];
             }
         }
 
+        
+        // Check topic filter
+        if (results.length > 1) {
+            if (results[1].status != 429) {
+                // Look for the word "yes" to be in the topic filters response.
+                let allowed = false;
+                if (results[1]?.data?.choices && results[1].data.choices.length > 0) {
+                    allowed = results[1].data.choices[0].text.toLowerCase().indexOf('yes') >= 0;
+                }
+
+                // Redirect to OffTopic action if not allowed
+                if (!allowed) {
+                    return [{
+                        type: 'DO',
+                        action: AI.OffTopicActionName,
+                        data: {}
+                    } as PredictedDoCommand];
+                }
+            }
+        }
+
         // Parse returned prompt response
-        console.log(JSON.stringify(results[0]?.data));
-        if (results[0]?.data?.choices && results[0].data.choices.length > 0) {
+        if (Array.isArray(results[0]?.data?.choices) && results[0].data.choices.length > 0) {
             // Remove response prefix
             let response = results[0].data.choices[0].text;
             const historyOptions = ConversationHistoryTracker.getOptions(app.options.conversationHistory);
@@ -122,8 +132,38 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
         // Expand prompt template
         request.prompt = await PromptParser.expandPromptTemplate(app, context, state, data, prompt);
-        console.log(`prompt: ${request.prompt}`);
 
         return request;
+    }
+
+    private async createCompletion(request: CreateCompletionRequest, promptType: string): Promise<AxiosResponse<CreateCompletionResponse>> {
+        let response: AxiosResponse<CreateCompletionResponse>;
+        let error: { status?: number; };
+        const startTime = new Date().getTime();
+        try {
+            response = await this._openai.createCompletion(request, {
+                validateStatus: (status) => status < 400 || status == 429
+            }) as any;
+        } catch (err: any) {
+            error = err;
+            throw err;
+        } finally {
+            if (this._options.logRequests) {
+                const duration = new Date().getTime() - startTime;
+                console.log(`\n${promptType} REQUEST:\n\`\`\`\n${request.prompt}\`\`\``);
+                if (response) {
+                    if (response.status != 429) {
+                        const choice = Array.isArray(response?.data?.choices) && response.data.choices.length > 0 ? response.data.choices[0].text : '';
+                        console.log(`${promptType} SUCCEEDED: status=${response.status} duration=${duration} response=${choice}`);
+                    } else {
+                        console.error(`${promptType} FAILED: status=${response.status} duration=${duration} headers=${JSON.stringify(response.headers)}`);
+                    }
+                } else {
+                    console.error(`${promptType} FAILED: status=${error?.status} duration=${duration} message=${error?.toString()}`);
+                } 
+            }
+        }
+
+        return response;
     }
 }

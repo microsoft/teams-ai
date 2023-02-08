@@ -81,7 +81,8 @@ const predictionEngine = new OpenAIPredictionEngine({
         frequency_penalty: 0,
         presence_penalty: 0.6,
         stop: [" Human:", " AI:"],
-    }
+    },
+    logRequests: true
 });
 
 // Define storage and application

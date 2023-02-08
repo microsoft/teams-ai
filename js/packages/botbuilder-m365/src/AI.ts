@@ -19,6 +19,7 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
 
     public static readonly UnknownActionName = '___UnknownAction___';
     public static readonly OffTopicActionName = '___OffTopic___';
+    public static readonly RateLimitedActionName = '___RateLimited___';
 
     public constructor(app: Application<TState>, predictionEngine: TPredictionEngine) {
         this._app = app;
@@ -34,6 +35,11 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
         this.action(AI.OffTopicActionName, (context, state, data, action) => {
             console.error(`A Topic Filter was configured but no handler was registered for 'AI.OffTopicActionName'.`);
             return Promise.resolve(true);
+        }, true);
+
+        // Register default RateLimitedActionName
+        this.action(AI.RateLimitedActionName, (context, state, data, action) => {
+            throw new Error(`An AI request failed because it was rate limited`);
         }, true);
     }
 
@@ -71,12 +77,10 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
         try {
             // Start tracking history
             if (!ConversationHistoryTracker.hasStartedTurn(context, state)) {
-                console.log(`starting tracking: ${JSON.stringify(state.temp.value)}`);
                 trackingHistory = true;
                 ConversationHistoryTracker.startTurn(context, state);
                 context.onSendActivities(async (ctx, activities, next) => {
                     if (trackingHistory) {
-                        console.log(`logging response`);
                         for (let i = 0; i < activities.length; i++) {
                             const activity = activities[i];
                             switch (activity.type) {
@@ -133,7 +137,6 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
             }
         } finally {
             if (trackingHistory) {
-                console.log(`ending tracking: ${JSON.stringify(state.temp.value)}`);
                 ConversationHistoryTracker.endTurn(context, state, this._app.options.conversationHistory);
                 trackingHistory = false;    // <-- IMPORTANT as this will prevent further logging attempts above
             }
