@@ -114,8 +114,12 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             // Remove response prefix
             let response = results[0].data.choices[0].text;
             const historyOptions = ConversationHistoryTracker.getOptions(app.options.conversationHistory);
-            if (historyOptions.botPrefix && response.toLowerCase().startsWith(historyOptions.botPrefix.toLowerCase())) {
-                response = response.substring(historyOptions.botPrefix.length);
+            if (historyOptions.botPrefix) {
+                // The model sometimes predicts additional text for the human side of things so skip that.
+                const pos = response.toLowerCase().indexOf(historyOptions.botPrefix.toLowerCase());
+                if (pos >= 0) {
+                    response = response.substring(pos + historyOptions.botPrefix.length);
+                }
             }
 
             // Parse response into commands
