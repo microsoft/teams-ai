@@ -171,6 +171,16 @@ export class ResponseParser {
                 }
             }
 
+            // Create command if not created
+            // - This happens when a DO command without any entities is at the end of the response.
+            if (!command && actionName) {
+                command = {
+                    type: 'DO',
+                    action: actionName,
+                    data: {}
+                };
+            }
+
             // Append final entity
             if (command && entityName) {
                 command.data[entityName] = entityValue;

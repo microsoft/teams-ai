@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage, StoreItems } from "botbuilder-core";
+import { TurnContext, Storage, StoreItems } from "botbuilder";
 import { TurnState, TurnStateEntry, TurnStateManager } from "./TurnState";
 
 export interface DefaultTurnState<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}> extends TurnState {

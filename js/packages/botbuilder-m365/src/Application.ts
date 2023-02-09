@@ -6,9 +6,9 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage, ActivityTypes } from 'botbuilder-core';
+import { TurnContext, Storage, ActivityTypes, TeamsInfo, Channels} from 'botbuilder';
 import { TurnState, TurnStateManager } from './TurnState';
-import { DefaultTurnState, DefaultTurnStateManager} from './DefaultTurnStateManager';
+import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { PredictionEngine } from './PredictionEngine';
@@ -27,6 +27,7 @@ export interface ApplicationOptions<TState extends TurnState, TPredictionOptions
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
     conversationHistory?: Partial<ConversationHistoryOptions>;
+    removeRecipientMention?: boolean;
 }
 
 export type RouteSelector = (context: TurnContext) => Promise<boolean>;
@@ -40,8 +41,10 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _ai?: AI<TState, TPredictionOptions, TPredictionEngine>;
 
-    public constructor(options?: Partial<ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>>) {
-        this._options = Object.assign({}, options) as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
+    public constructor(options?: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>) {
+        this._options = Object.assign({
+            removeRecipientMention: true
+        } as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>, options) as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
         
         // Create default turn state manager if needed
         if (!this._options.turnStateManager) {
@@ -127,6 +130,11 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     }
 
     public async run(context: TurnContext): Promise<boolean> {
+        // Remove @mentions
+        if (this._options.removeRecipientMention && context.activity.type == ActivityTypes.Message) {
+            context.activity.text = TurnContext.removeRecipientMention(context.activity);
+        }
+
         // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
         // Invoke Activities from Teams need to be responded to in less than 5 seconds.
         if (context.activity.type === ActivityTypes.Invoke) {

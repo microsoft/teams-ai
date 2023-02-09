@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder-core';
+import { TurnContext } from 'botbuilder';
 import { TurnState } from './TurnState';
 import { readFile } from 'fs/promises';
 import { ConversationHistoryOptions, ConversationHistoryTracker } from './ConversationHistoryTracker';
@@ -79,13 +79,16 @@ export class PromptParser {
         }
 
         // Check for special cased variables first
+        let value: any;
         switch (parts[0]) {
             case 'activity':
                 // Return activity field
-                return (context.activity as any)[parts[1]] ?? '';
+                value = (context.activity as any)[parts[1]] ?? '';
+                break;
             case 'data':
                 // Return referenced data entry
-                return data[parts[1]] ?? '';
+                value = data[parts[1]] ?? '';
+                break;
             default:
                 // Find referenced state entry
                 const entry = state[parts[0]];
@@ -95,12 +98,17 @@ export class PromptParser {
 
                 // Special case `conversation.history` reference
                 if (parts[0] == 'conversation' && parts[1] == 'history') {
-                    return ConversationHistoryTracker.getHistoryAsText(context, state, app.options.conversationHistory);
+                    value = ConversationHistoryTracker.getHistoryAsText(context, state, app.options.conversationHistory);
+                } else {
+                    // Return state field
+                    value = entry.value[parts[1]] ?? '';
                 }
+                break;
 
-                // Return state field
-                return entry.value[parts[1]] ?? '';
         }
+
+        // Return value
+        return typeof value == 'object' || Array.isArray(value) ? JSON.stringify(value) : value.toString();
     }
 }
 

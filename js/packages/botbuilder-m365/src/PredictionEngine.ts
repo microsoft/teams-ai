@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder-core';
+import { TurnContext } from 'botbuilder';
 import { Application } from './Application';
 import { TurnState } from './TurnState';
 

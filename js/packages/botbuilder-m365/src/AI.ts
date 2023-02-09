@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { ActivityTypes, TurnContext } from 'botbuilder-core';
+import { ActivityTypes, TurnContext } from 'botbuilder';
 import { Application } from './Application';
 import { ConversationHistoryTracker } from './ConversationHistoryTracker';
 import { PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';

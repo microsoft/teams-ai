@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, TaskModuleTaskInfo, ActivityTypes, InvokeResponse, INVOKE_RESPONSE_KEY, TaskModuleResponse, MessagingExtensionResult, MessagingExtensionActionResponse, MessagingExtensionParameter, MessagingExtensionQuery } from 'botbuilder-core';
+import { TurnContext, TaskModuleTaskInfo, ActivityTypes, InvokeResponse, INVOKE_RESPONSE_KEY, TaskModuleResponse, MessagingExtensionResult, MessagingExtensionActionResponse, MessagingExtensionParameter, MessagingExtensionQuery } from 'botbuilder';
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 

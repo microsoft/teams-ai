@@ -9,7 +9,7 @@
 import { PredictedCommand, PredictedDoCommand, PredictionEngine } from './PredictionEngine';
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
-import { TurnContext } from 'botbuilder-core';
+import { TurnContext } from 'botbuilder';
 import { Configuration, ConfigurationParameters, OpenAIApi, CreateCompletionRequest, CreateCompletionResponse } from 'openai';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { ResponseParser } from './ResponseParser';

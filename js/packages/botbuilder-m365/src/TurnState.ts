@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage } from 'botbuilder-core';
+import { TurnContext, Storage } from 'botbuilder';
 
 export interface TurnState {
     [key: string]: TurnStateEntry;
