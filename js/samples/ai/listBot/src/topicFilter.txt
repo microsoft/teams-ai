@@ -1,0 +1,30 @@
+This chat bot manages lists of items. 
+Some basic greetings and chit chat are allowed. 
+The AI can also respond to questions asking for help.
+
+The AI should only ever respond with Yes or No.
+
+Here are some example queries:
+
+Human: Hello
+AI: Yes
+Human: what can you do?
+AI: Yes
+Human: help
+AI: Yes
+Human: who is John Wayne?
+AI: No
+Human: add an item to a list
+AI: Yes
+Human: give me a top 10 list of movies
+AI: No
+Human: remind me to watch star wars
+AI: Yes
+Human: buy stuff to make manhattans
+AI: Yes
+Human: I need milk
+AI: Yes
+
+Is this query on topic?
+
+Human: {{activity.text}}

@@ -73,6 +73,10 @@ const app = new botbuilder_m365_1.Application({
     storage,
     predictionEngine
 });
+app.message('/history', (context, state) => __awaiter(void 0, void 0, void 0, function* () {
+    const history = botbuilder_m365_1.ConversationHistoryTracker.getHistoryAsText(context, state);
+    yield context.sendActivity(history);
+}));
 // Listen for incoming server requests.
 server.post('/api/messages', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Route received a request to adapter for processing

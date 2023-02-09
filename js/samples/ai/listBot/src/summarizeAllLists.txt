@@ -1,0 +1,5 @@
+Here are collection of lists and their contents:
+
+{{data.lists}}
+
+Write a friendly summary of the lists and their contents. Break down each list and its contents separately.
