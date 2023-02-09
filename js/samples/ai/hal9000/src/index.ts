@@ -61,7 +61,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log( '\nTo talk to your bot, open the emulator select "Open Bot"' );
 });
 
-import { Application, ConversationHistoryTracker, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
 
 interface ConversationState {
 }
@@ -93,7 +93,7 @@ const app = new Application<ApplicationTurnState>({
 });
 
 app.message('/history', async (context, state) => {
-    const history = ConversationHistoryTracker.getHistoryAsText(context, state);
+    const history = ConversationHistory.toString(state, 10000, '\n\n');
     await context.sendActivity(history);
 });
 

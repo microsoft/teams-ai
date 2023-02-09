@@ -6,14 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage, ActivityTypes, TeamsInfo, Channels} from 'botbuilder';
+import { TurnContext, Storage, ActivityTypes} from 'botbuilder';
 import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { PredictionEngine } from './PredictionEngine';
 import { AI } from './AI';
-import { ConversationHistoryOptions } from './ConversationHistoryTracker';
 
 export interface Query<TParams extends Record<string, any>> {
     count: number;
@@ -26,7 +25,6 @@ export interface ApplicationOptions<TState extends TurnState, TPredictionOptions
     predictionEngine?: TPredictionEngine; 
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
-    conversationHistory?: Partial<ConversationHistoryOptions>;
     removeRecipientMention?: boolean;
 }
 

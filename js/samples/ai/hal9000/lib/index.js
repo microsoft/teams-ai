@@ -74,7 +74,7 @@ const app = new botbuilder_m365_1.Application({
     predictionEngine
 });
 app.message('/history', (context, state) => __awaiter(void 0, void 0, void 0, function* () {
-    const history = botbuilder_m365_1.ConversationHistoryTracker.getHistoryAsText(context, state);
+    const history = botbuilder_m365_1.ConversationHistory.toString(state, 10000, '\n\n');
     yield context.sendActivity(history);
 }));
 // Listen for incoming server requests.

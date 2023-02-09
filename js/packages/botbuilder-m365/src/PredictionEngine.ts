@@ -11,7 +11,7 @@ import { Application } from './Application';
 import { TurnState } from './TurnState';
 
 export interface PredictionEngine<TState extends TurnState, TPredictionOptions> {
-    predictCommands(app: Application, context: TurnContext, state: TState, data?: Record<string, any>, options?: TPredictionOptions): Promise<PredictedCommand[]>;
+    predictCommands(context: TurnContext, state: TState, data?: Record<string, any>, options?: TPredictionOptions): Promise<PredictedCommand[]>;
 }
 
 export interface PredictedCommand {
