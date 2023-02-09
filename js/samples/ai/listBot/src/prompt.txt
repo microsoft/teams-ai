@@ -35,4 +35,7 @@ AI: DO summarizeAllLists
 Conversation history:
 
 {{conversation.history}}
+
+Current query:
+
 Human: {{activity.text}}

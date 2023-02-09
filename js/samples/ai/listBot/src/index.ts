@@ -74,22 +74,22 @@ const predictionEngine = new OpenAIPredictionEngine({
     promptConfig: {
         model: "text-davinci-003",
         temperature: 0.0,
-        max_tokens: 2048,
+        max_tokens: 256,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
         stop: [" Human:", " AI:"],
     },
-    // topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
-    // topicFilterConfig: {
-    //     model: "text-davinci-003",
-    //     temperature: 0.0,
-    //     max_tokens: 2048,
-    //     top_p: 1,
-    //     frequency_penalty: 0,
-    //     presence_penalty: 0.6,
-    //     stop: [" Human:", " AI:"],
-    // },
+    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
+    topicFilterConfig: {
+        model: "text-davinci-003",
+        temperature: 0.0,
+        max_tokens: 256,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.6,
+        stop: [" Human:", " AI:"],
+    },
     logRequests: true
 });
 
@@ -168,10 +168,16 @@ app.ai.action('summarizeList', async (context, state, data: EntityData) => {
 });
 
 app.ai.action('summarizeAllLists', async (context, state, data: EntityData) => {
-    data.lists = state.conversation.value.lists ?? {};
-
-    // Chain into a new summarization prompt
-    await callPrompt(context, state, '../src/summarizeAllLists.txt', data);
+    data.lists = state.conversation.value.lists;
+    if (data.lists) {
+        // Chain into a new summarization prompt
+        await callPrompt(context, state, '../src/summarizeAllLists.txt', data);
+    } else {
+        await sendActivity(context, [
+            `I couldn't find any lists.`,
+            `Hmm... You don't seem to have any lists yet.`
+        ]);
+    }
 
     // End the current chain
     return false;

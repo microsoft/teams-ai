@@ -130,10 +130,17 @@ app.ai.action('summarizeList', (context, state, data) => __awaiter(void 0, void 
     return false;
 }));
 app.ai.action('summarizeAllLists', (context, state, data) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    data.lists = (_a = state.conversation.value.lists) !== null && _a !== void 0 ? _a : {};
-    // Chain into a new summarization prompt
-    yield callPrompt(context, state, '../src/summarizeAllLists.txt', data);
+    data.lists = state.conversation.value.lists;
+    if (data.lists) {
+        // Chain into a new summarization prompt
+        yield callPrompt(context, state, '../src/summarizeAllLists.txt', data);
+    }
+    else {
+        yield sendActivity(context, [
+            `I couldn't find any lists.`,
+            `Hmm... You don't seem to have any lists yet.`
+        ]);
+    }
     // End the current chain
     return false;
 }));
