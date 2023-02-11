@@ -14,6 +14,8 @@ import { MessageExtensions } from './MessageExtensions';
 import { PredictionEngine } from './PredictionEngine';
 import { AI } from './AI';
 
+const TYPING_TIMER_DELAY = 1000;
+
 export interface Query<TParams extends Record<string, any>> {
     count: number;
     skip: number;
@@ -26,6 +28,7 @@ export interface ApplicationOptions<TState extends TurnState, TPredictionOptions
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
     removeRecipientMention?: boolean;
+    startTypingTimer?: boolean;
 }
 
 export type RouteSelector = (context: TurnContext) => Promise<boolean>;
@@ -38,10 +41,12 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _ai?: AI<TState, TPredictionOptions, TPredictionEngine>;
+    private _typingTimer: any;
 
     public constructor(options?: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>) {
         this._options = Object.assign({
-            removeRecipientMention: true
+            removeRecipientMention: true,
+            startTypingTimer: true
         } as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>, options) as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
         
         // Create default turn state manager if needed
@@ -128,9 +133,16 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     }
 
     public async run(context: TurnContext): Promise<boolean> {
-        // Remove @mentions
-        if (this._options.removeRecipientMention && context.activity.type == ActivityTypes.Message) {
-            context.activity.text = TurnContext.removeRecipientMention(context.activity);
+        if (context.activity.type == ActivityTypes.Message) {
+            // Remove @mentions
+            if (this._options.removeRecipientMention) {
+                context.activity.text = TurnContext.removeRecipientMention(context.activity);
+            }
+
+            // Start typing indicator timer
+            if (this._options.startTypingTimer) {
+                this.startTypingTimer(context);
+            }
         }
 
         // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
@@ -192,6 +204,53 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
 
         // activity wasn't handled
         return false;
+    }
+
+    /**
+     * Manually start a timer to periodically send "typing" activities.
+     * @remarks
+     * The timer will automatically end once an outgoing activity has been sent. If the timer is 
+     * already running or the current activity, is not a "message" the call is ignored.
+     * @param context The context for the current turn with the user.
+     */
+    public startTypingTimer(context: TurnContext): void {
+        if (context.activity.type == ActivityTypes.Message && !this._typingTimer) {
+            // Listen for outgoing activities
+            context.onSendActivities((context, activities, next) => {
+                // Listen for any messages to be sent from the bot
+                if (timerRunning) {
+                    for (let i = 0; i < activities.length; i++) {
+                        if (activities[i].type == ActivityTypes.Message) {
+                            // Stop the timer
+                            if (!sendingTyping) {
+                                clearTimeout(this._typingTimer);
+                            }
+
+                            this._typingTimer = undefined;
+                            timerRunning = false;
+                            break;
+                        }
+                    }
+                }
+
+                return next();
+            });
+            
+            let sendingTyping = false;
+            let timerRunning = true;
+            const onTimeout = async () => {
+                // Send typing activity
+                sendingTyping = true;
+                await context.sendActivity({ type: ActivityTypes.Typing });
+                sendingTyping = false;
+
+                // Restart timer
+                if (timerRunning) {
+                    this._typingTimer = setTimeout(onTimeout, TYPING_TIMER_DELAY);
+                }
+            };
+            this._typingTimer = setTimeout(onTimeout, TYPING_TIMER_DELAY);
+        }
     }
 }
 
