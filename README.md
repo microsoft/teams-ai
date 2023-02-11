@@ -6,7 +6,7 @@ The new Bot Framework M365 SDK makes it easier than ever to create powerful appl
 
 > **FHL Participants** clone the repo locally and follow the link to the guide above to build the project and samples. 
 > You can simply add your project to the samples tree and it will automatically be built with the other samples. 
-> The guide provides instructions for running your bot locally via ngrok but to deploy it to a server you'll likely need to include the `botbuilder-m365` package as a bundled dependency. 
+> The guide provides instructions for running your bot locally via ngrok but to deploy it to a server you'll likely need to include the `botbuilder-m365` package as a [bundled dependency](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#bundledependencies). 
 > If this doesn't work we can look into publishing the library as a preview package to NPM but please try the bundled dependency approach first.    
 
 ## Contributing
