@@ -1,14 +1,9 @@
-# Project
+# Bot Framework M365 SDK
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+The new Bot Framework M365 SDK makes it easier than ever to create powerful applications and extensions for M365 hubs like Teams and Outlook. With the existing v4 Bot Framework SDK and the new M365 SDK, you can build message extensions, task modules, adaptive card applications, and more with ease. Plus, the SDK includes an experimental AI system that simplifies building conversation bots using Large Language Models like GPT-3. Ready to get started? Follow the links below and unlock the world of possibilities!
 
-As the maintainer of this project, please make a few updates:
+- [Building the JavaScript SDK and Samples](../js/README.md)
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
 
 ## Contributing
 
