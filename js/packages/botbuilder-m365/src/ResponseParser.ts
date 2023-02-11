@@ -21,6 +21,25 @@ export interface ParsedCommandResult {
 }
 
 export class ResponseParser {
+    public static parseAdaptiveCard(text?: string): Record<string, any>|undefined {
+        let card: Record<string, any>;
+        try {
+            const startJson = text.indexOf('{');
+            const endJson = text.lastIndexOf('}');
+            if (startJson >= 0 && endJson > startJson) {
+                const txt = text.substring(startJson, endJson + 1);
+                const obj: Record<string, any> = JSON.parse(txt);
+                if (obj['type'] === 'AdaptiveCard') {
+                    card = obj;
+                }
+            }
+        } catch (err) {
+            // no action
+        }
+
+        return card;
+    }
+
     public static parseResponse(text?: string): PredictedCommand[] {
         const commands: PredictedCommand[] = [];
         let tokens = this.tokenizeText(text);

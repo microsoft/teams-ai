@@ -6,9 +6,10 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder';
+import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
 import { Application } from './Application';
 import { PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
+import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
 export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>> {
@@ -92,7 +93,15 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
                         break;
                     case 'SAY':
                         const response = (cmd as PredictedSayCommand).response;
-                        await context.sendActivity(response);
+                        const card = ResponseParser.parseAdaptiveCard(response);
+                        if (card) {
+                            const attachment = CardFactory.adaptiveCard(card);
+                            const activity = MessageFactory.attachment(attachment);
+                            await context.sendActivity(activity);
+
+                        } else {
+                            await context.sendActivity(response);
+                        }
                         break;
                     default:
                         throw new Error(`Application.run(): unknown command of '${cmd.type}' predicted.`);
