@@ -81,16 +81,16 @@ const predictionEngine = new OpenAIPredictionEngine({
         presence_penalty: 0.6,
         stop: [" Human:", " AI:"],
     },
-    // topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
-    // topicFilterConfig: {
-    //     model: "text-davinci-003",
-    //     temperature: 0.0,
-    //     max_tokens: 256,
-    //     top_p: 1,
-    //     frequency_penalty: 0,
-    //     presence_penalty: 0.6,
-    //     stop: [" Human:", " AI:"],
-    // },
+    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
+    topicFilterConfig: {
+        model: "text-davinci-003",
+        temperature: 0.0,
+        max_tokens: 256,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.0,
+        stop: [" Human:", " AI:"],
+    },
     logRequests: true
 });
 
