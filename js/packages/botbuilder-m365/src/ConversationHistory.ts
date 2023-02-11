@@ -43,6 +43,71 @@ export class ConversationHistory {
         }
     }
 
+    public static appendToLastLine(state: TurnState, text: string): void {
+        const line = ConversationHistory.getLastLine(state);
+        ConversationHistory.replaceLastLine(state, line + text);
+    }
+
+    public static getLastLine(state: TurnState): string {
+        if (state.conversation) {
+            // Create history array if it doesn't exist 
+            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            if (!Array.isArray(history)) {
+                history = [];
+            }
+
+            // Return the last line or an empty string
+            return history.length > 0 ? history[history.length - 1] : '';
+        } else {
+            throw new Error(`ConversationHistory.getLastLine() was passed a state object without a 'conversation' state member.`);
+        }
+    }
+
+    public static removeLastLine(state: TurnState): string|undefined {
+        if (state.conversation) {
+            // Create history array if it doesn't exist 
+            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            if (!Array.isArray(history)) {
+                history = [];
+            }
+
+            // Remove last line
+            // - undefined is returned if the array is empty
+            const line = history.pop();
+
+            // Save history back to conversation state
+            state.conversation.value[ConversationHistory.StatePropertyName] = history;
+
+            // Return removed line
+            return line;
+        } else {
+            throw new Error(`ConversationHistory.removeLastLine() was passed a state object without a 'conversation' state member.`);
+        }
+    }
+
+    public static replaceLastLine(state: TurnState, line: string): void {
+        if (state.conversation) {
+            // Create history array if it doesn't exist 
+            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            if (!Array.isArray(history)) {
+                history = [];
+            }
+
+            // Replace the last line or add a new one
+            if (history.length > 0) {
+                history[history.length - 1] = line;
+            } else {
+                history.push(line);
+            }
+
+            // Save history back to conversation state
+            state.conversation.value[ConversationHistory.StatePropertyName] = history;
+        } else {
+            throw new Error(`ConversationHistory.replaceLastLine() was passed a state object without a 'conversation' state member.`);
+        }
+    }
+
+
     /**
      * Returns the current conversation history as a string of text.
      * @remarks

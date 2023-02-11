@@ -61,7 +61,8 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log( '\nTo talk to your bot, open the emulator select "Open Bot"' );
 });
 
-import { Application, DefaultTurnState, OpenAIPredictionEngine, AI } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPredictionEngine, AI, ConversationHistory } from 'botbuilder-m365';
+import * as responses from './responses';
 
 interface ConversationState {
     lightsOn: boolean;
@@ -87,12 +88,13 @@ const predictionEngine = new OpenAIPredictionEngine({
     topicFilterConfig: {
         model: "text-davinci-003",
         temperature: 0.0,
-        max_tokens: 2048,
+        max_tokens: 128,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6,
+        presence_penalty: 0.0,
         stop: [" Human:", " AI:"],
-    }
+    },
+    logRequests: true
 });
 
 // Define storage and application
@@ -123,41 +125,29 @@ app.ai.action('Pause', async (context, state, data) => {
 });
 
 app.ai.action('LightStatus', async (context, state) => {
-    // Create data to pass into prompt
-    const data = {
-        lightStatus: state.conversation.value.lightsOn ? 'on' : 'off'
-    };
+    // Send the user a static response with the status of the lights.
+    const response = responses.lightStatus(state.conversation.value.lightsOn);
+    await context.sendActivity(response);
 
-    // Chain into a new prompt
-    await app.ai.chain(
-        context, 
-        state, 
-        data, 
-        {
-            prompt: path.join(__dirname, '../src/lightStatus.txt'),
-            promptConfig: {
-                model: "text-davinci-003",
-                temperature: 0.7,
-                max_tokens: 256,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0
-            }
-        });
+    // Since we might be prompting the user with a followup question, we need to do
+    // some surgery on the {{conversation.history}} to append a THEN SAY command. This
+    // lets the model know we just asked the user a question and it can predict the
+    // next action based on their response.
+    ConversationHistory.appendToLastLine(state, ` THEN SAY ${response}`);
 
-    // End the previous chain
+    // End the current chain since we've manually just prompted the user for input.
     return false;
 });
 
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(`I don't know how to do '${action}'.`);
+    await context.sendActivity(responses.unknownAction(action));
     return false;
 });
 
 // Register a handler to deal with a user asking something off topic
 app.ai.action(AI.OffTopicActionName, async (context, state) => {
-    await context.sendActivity(`I'm sorry, I'm not allowed to talk about such things...`);
+    await context.sendActivity(responses.offTopic());
     return false;
 });
 

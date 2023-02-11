@@ -13,32 +13,29 @@ The following actions are supported:
 
 All entities are required parameters to actions
 
-Example 1: 
+Examples: 
 
 Human: lights on
 AI: DO LightsOn THEN SAY Ok the lights are on.
-
-example 2:
-
 Human: lights off
 AI: DO LightsOff THEN SAY Ok the lights are off.
-
-Example 3:
-
 Human: toggle the lights
 AI: DO LightsOff THEN DO LightsOn THEN SAY Ok
-
-Example 4:
-
 Human: pause for 30 seconds
 AI: DO Pause time=30000
-
-Example 5:
-
 Human: what's the status of the lights?
 AI: DO LightStatus
+Human: are the lights on?
+AI: DO LightStatus
 
-Here is the current conversation history:
+Conversation history:
 
+```
 {{conversation.history}}
+```
+
+Current query:
+
+```
 Human: {{activity.text}}
+```

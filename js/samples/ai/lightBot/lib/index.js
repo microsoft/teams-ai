@@ -50,6 +50,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
 });
 const botbuilder_m365_1 = require("botbuilder-m365");
+const responses = require("./responses");
 // Create prediction engine
 const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
     configuration: {
@@ -69,12 +70,13 @@ const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
     topicFilterConfig: {
         model: "text-davinci-003",
         temperature: 0.0,
-        max_tokens: 2048,
+        max_tokens: 128,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6,
+        presence_penalty: 0.0,
         stop: [" Human:", " AI:"],
-    }
+    },
+    logRequests: true
 });
 // Define storage and application
 const storage = new botbuilder_1.MemoryStorage();
@@ -100,33 +102,25 @@ app.ai.action('Pause', (context, state, data) => __awaiter(void 0, void 0, void 
     return true;
 }));
 app.ai.action('LightStatus', (context, state) => __awaiter(void 0, void 0, void 0, function* () {
-    // Create data to pass into prompt
-    const data = {
-        lightStatus: state.conversation.value.lightsOn ? 'on' : 'off'
-    };
-    // Chain into a new prompt
-    yield app.ai.chain(context, state, data, {
-        prompt: path.join(__dirname, '../src/lightStatus.txt'),
-        promptConfig: {
-            model: "text-davinci-003",
-            temperature: 0.7,
-            max_tokens: 256,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0
-        }
-    });
-    // End the previous chain
+    // Send the user a static response with the status of the lights.
+    const response = responses.lightStatus(state.conversation.value.lightsOn);
+    yield context.sendActivity(response);
+    // Since we might be prompting the user with a followup question, we need to do
+    // some surgery on the {{conversation.history}} to append a THEN SAY command. This
+    // lets the model know we just asked the user a question and it can predict the
+    // next action based on their response.
+    botbuilder_m365_1.ConversationHistory.appendToLastLine(state, ` THEN SAY ${response}`);
+    // End the current chain since we've manually just prompted the user for input.
     return false;
 }));
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(botbuilder_m365_1.AI.UnknownActionName, (context, state, data, action) => __awaiter(void 0, void 0, void 0, function* () {
-    yield context.sendActivity(`I don't know how to do '${action}'.`);
+    yield context.sendActivity(responses.unknownAction(action));
     return false;
 }));
 // Register a handler to deal with a user asking something off topic
 app.ai.action(botbuilder_m365_1.AI.OffTopicActionName, (context, state) => __awaiter(void 0, void 0, void 0, function* () {
-    yield context.sendActivity(`I'm sorry, I'm not allowed to talk about such things...`);
+    yield context.sendActivity(responses.offTopic());
     return false;
 }));
 // Listen for incoming server requests.

@@ -1,28 +1,39 @@
-This chat bot can only turn on and off lights. 
-Some basic greetings and chit chat are allowed. 
-The AI can also respond to questions asking for help.
+This AI can only turn on and off lights. 
+Some basic greetings and chit chat are allowed.
+The Human can ask for help.
+The Human can answer the AIs questions.
 
-The AI should only ever respond with Yes or No.
-
-Here are some example query:
+Examples:
 
 Human: Hello
-AI: Yes
+OnTopic: Yes
 Human: what can you do?
-AI: Yes
+OnTopic: Yes
 Human: help
-AI: Yes
+OnTopic: Yes
 Human: who is John Wayne?
-AI: No
+OnTopic: No
 Human: turn on lights
-AI: Yes
+OnTopic: Yes
 Human: tell me about light bulbs.
-AI: No
+OnTopic: No
 Human: are the lights on?
-AI: Yes
+OnTopic: Yes
 Human: turn the lights on, pause for 5 seconds, and then turn them back off
-AI: Yes
+OnTopic: Yes
+
+Conversation history:
+
+```
+{{conversation.history}}
+```
+
+Current query:
+
+```
+Human: {{activity.text}}
+```
 
 Is this query on topic?
 
-Human: {{activity.text}}
+OnTopic: 

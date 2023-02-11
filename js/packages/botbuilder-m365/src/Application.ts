@@ -133,23 +133,39 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     }
 
     public async run(context: TurnContext): Promise<boolean> {
-        if (context.activity.type == ActivityTypes.Message) {
+        // Start typing indicator timer
+        this.startTypingTimer(context);
+        try {
             // Remove @mentions
-            if (this._options.removeRecipientMention) {
+            if (this._options.removeRecipientMention && context.activity.type == ActivityTypes.Message) {
                 context.activity.text = TurnContext.removeRecipientMention(context.activity);
             }
 
-            // Start typing indicator timer
-            if (this._options.startTypingTimer) {
-                this.startTypingTimer(context);
-            }
-        }
+            // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
+            // Invoke Activities from Teams need to be responded to in less than 5 seconds.
+            if (context.activity.type === ActivityTypes.Invoke) {
+                for (let i = 0; i < this._invokeRoutes.length; i++) {
+                    const route = this._invokeRoutes[i];
+                    if (await route.selector(context)) {
+                        // Load turn state
+                        const { storage, turnStateManager } = this._options;
+                        const state = await turnStateManager!.loadState(storage, context);
 
-        // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
-        // Invoke Activities from Teams need to be responded to in less than 5 seconds.
-        if (context.activity.type === ActivityTypes.Invoke) {
-            for (let i = 0; i < this._invokeRoutes.length; i++) {
-                const route = this._invokeRoutes[i];
+                        // Execute route handler
+                        await route.handler(context, state);
+
+                        // Save turn state
+                        await turnStateManager!.saveState(storage, context, state);
+
+                        // End dispatch
+                        return true;
+                    }
+                }
+            }
+
+            // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
+            for (let i = 0; i < this._routes.length; i++) {
+                const route = this._routes[i];
                 if (await route.selector(context)) {
                     // Load turn state
                     const { storage, turnStateManager } = this._options;
@@ -165,45 +181,28 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
                     return true;
                 }
             }
-        }
 
-        // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
-        for (let i = 0; i < this._routes.length; i++) {
-            const route = this._routes[i];
-            if (await route.selector(context)) {
+            // Call AI module if configured
+            if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
                 // Load turn state
                 const { storage, turnStateManager } = this._options;
                 const state = await turnStateManager!.loadState(storage, context);
 
-                // Execute route handler
-                await route.handler(context, state);
+                // Begin a new chain of AI calls
+                await this._ai.chain(context, state);
 
                 // Save turn state
                 await turnStateManager!.saveState(storage, context, state);
 
                 // End dispatch
                 return true;
-            }
+            } 
+
+            // activity wasn't handled
+            return false;
+        } finally {
+            this.stopTypingTimer();
         }
-
-        // Call AI module if configured
-        if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
-            // Load turn state
-            const { storage, turnStateManager } = this._options;
-            const state = await turnStateManager!.loadState(storage, context);
-
-            // Begin a new chain of AI calls
-            await this._ai.chain(context, state);
-
-            // Save turn state
-            await turnStateManager!.saveState(storage, context, state);
-
-            // End dispatch
-            return true;
-        } 
-
-        // activity wasn't handled
-        return false;
     }
 
     /**
@@ -222,11 +221,7 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
                     for (let i = 0; i < activities.length; i++) {
                         if (activities[i].type == ActivityTypes.Message) {
                             // Stop the timer
-                            if (!sendingTyping) {
-                                clearTimeout(this._typingTimer);
-                            }
-
-                            this._typingTimer = undefined;
+                            this.stopTypingTimer();
                             timerRunning = false;
                             break;
                         }
@@ -236,13 +231,19 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
                 return next();
             });
             
-            let sendingTyping = false;
             let timerRunning = true;
             const onTimeout = async () => {
-                // Send typing activity
-                sendingTyping = true;
-                await context.sendActivity({ type: ActivityTypes.Typing });
-                sendingTyping = false;
+                try {
+                    // Send typing activity
+                    await context.sendActivity({ type: ActivityTypes.Typing });
+                } catch (err) {
+                    // Seeing a random proxy violation error from the context object. This is because 
+                    // we're in the middle of sending an activity on a background thread when the turn ends.
+                    // The context object throws when we try to update "this.responded = true". We can just 
+                    // eat the error but lets make sure our states cleaned up a bit.
+                    this._typingTimer = undefined;
+                    timerRunning = false;
+                }
 
                 // Restart timer
                 if (timerRunning) {
@@ -250,6 +251,18 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
                 }
             };
             this._typingTimer = setTimeout(onTimeout, TYPING_TIMER_DELAY);
+        }
+    }
+
+    /**
+     * Manually stop the typing timer.
+     * @remarks
+     * If the timer isn't running nothing happens.
+     */
+    public stopTypingTimer(): void {
+        if (this._typingTimer) {
+            clearTimeout(this._typingTimer);
+            this._typingTimer = undefined;
         }
     }
 }
