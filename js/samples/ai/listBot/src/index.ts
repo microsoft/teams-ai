@@ -64,6 +64,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import { Application, DefaultTurnState, OpenAIPredictionEngine, AI } from 'botbuilder-m365';
+import * as responses from './responses';
 
 // Create prediction engine
 const predictionEngine = new OpenAIPredictionEngine({
@@ -74,22 +75,22 @@ const predictionEngine = new OpenAIPredictionEngine({
     promptConfig: {
         model: "text-davinci-003",
         temperature: 0.0,
-        max_tokens: 256,
+        max_tokens: 1024,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
         stop: [" Human:", " AI:"],
     },
-    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
-    topicFilterConfig: {
-        model: "text-davinci-003",
-        temperature: 0.0,
-        max_tokens: 256,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [" Human:", " AI:"],
-    },
+    // topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
+    // topicFilterConfig: {
+    //     model: "text-davinci-003",
+    //     temperature: 0.0,
+    //     max_tokens: 256,
+    //     top_p: 1,
+    //     frequency_penalty: 0,
+    //     presence_penalty: 0.6,
+    //     stop: [" Human:", " AI:"],
+    // },
     logRequests: true
 });
 
@@ -131,10 +132,7 @@ app.ai.action('removeItem', async (context, state, data: EntityData) => {
         setItems(state, data.list, items);
         return true;
     } else {
-        await sendActivity(context, [
-            `I couldn't find that item in the list.`,
-            `Hmm... Can't find it. Sure you spelled it right?`
-        ]);
+        await context.sendActivity(responses.itemNotFound(data.list, data.item));
 
         // End the current chain
         return false;
@@ -145,12 +143,9 @@ app.ai.action('findItem', async (context, state, data: EntityData) => {
     const items = getItems(state, data.list);
     const index = items.indexOf(data.item);
     if (index >= 0) {
-        await sendActivity(context, `I found ${data.item} in your ${data.list} list.`);
+        await context.sendActivity(responses.itemFound(data.list, data.item));
     } else {
-        await sendActivity(context, [
-            `I couldn't find ${data.item} in your ${data.list} list.`,
-            `Hmm... I don't see ${data.item} in your ${data.list} list.`
-        ]);
+        await context.sendActivity(responses.itemNotFound(data.list, data.item));
     }
 
     // End the current chain
@@ -173,10 +168,7 @@ app.ai.action('summarizeAllLists', async (context, state, data: EntityData) => {
         // Chain into a new summarization prompt
         await callPrompt(context, state, '../src/summarizeAllLists.txt', data);
     } else {
-        await sendActivity(context, [
-            `I couldn't find any lists.`,
-            `Hmm... You don't seem to have any lists yet.`
-        ]);
+        await context.sendActivity(responses.noListsFound());
     }
 
     // End the current chain
@@ -185,13 +177,13 @@ app.ai.action('summarizeAllLists', async (context, state, data: EntityData) => {
 
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(`I don't know how to do '${action}'.`);
+    await context.sendActivity(responses.unknownAction(action));
     return false;
 });
 
 // Register a handler to deal with a user asking something off topic
 app.ai.action(AI.OffTopicActionName, async (context, state) => {
-    await context.sendActivity(`I'm sorry, I'm not allowed to talk about such things...`);
+    await context.sendActivity(responses.offTopic());
     return false;
 });
 
@@ -204,7 +196,7 @@ server.post('/api/messages', async (req, res) => {
     });
 });
 
-function callPrompt(context: TurnContext, state: ApplicationTurnState, prompt: string, data: Record<string, any>): Promise<boolean> {
+function callPrompt(context: TurnContext, state: ApplicationTurnState, prompt: string, data: Record<string, any>, temperature = 0.7): Promise<boolean> {
     return app.ai.chain(
         context, 
         state, 
@@ -213,22 +205,13 @@ function callPrompt(context: TurnContext, state: ApplicationTurnState, prompt: s
             prompt: path.join(__dirname, prompt),
             promptConfig: {
                 model: "text-davinci-003",
-                temperature: 0.7,
-                max_tokens: 256,
+                temperature: temperature,
+                max_tokens: 1024,
                 top_p: 1,
                 frequency_penalty: 0,
                 presence_penalty: 0
             }
         });
-}
-
-function sendActivity(context: TurnContext, message: string|string[]): Promise<ResourceResponse> {
-    if (Array.isArray(message)) {
-        const index = Math.floor(Math.random() * (message.length - 1));
-        return context.sendActivity(message[index]);
-    } else {
-        return context.sendActivity(message);
-    }
 }
 
 function getItems(state: ApplicationTurnState, list: string): string[] {

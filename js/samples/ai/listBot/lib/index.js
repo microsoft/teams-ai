@@ -50,6 +50,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
 });
 const botbuilder_m365_1 = require("botbuilder-m365");
+const responses = require("./responses");
 // Create prediction engine
 const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
     configuration: {
@@ -59,7 +60,7 @@ const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
     promptConfig: {
         model: "text-davinci-003",
         temperature: 0.0,
-        max_tokens: 2048,
+        max_tokens: 1024,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
@@ -69,7 +70,7 @@ const predictionEngine = new botbuilder_m365_1.OpenAIPredictionEngine({
     // topicFilterConfig: {
     //     model: "text-davinci-003",
     //     temperature: 0.0,
-    //     max_tokens: 2048,
+    //     max_tokens: 256,
     //     top_p: 1,
     //     frequency_penalty: 0,
     //     presence_penalty: 0.6,
@@ -99,10 +100,7 @@ app.ai.action('removeItem', (context, state, data) => __awaiter(void 0, void 0, 
         return true;
     }
     else {
-        yield sendActivity(context, [
-            `I couldn't find that item in the list.`,
-            `Hmm... Can't find it. Sure you spelled it right?`
-        ]);
+        yield context.sendActivity(responses.itemNotFound(data.list, data.item));
         // End the current chain
         return false;
     }
@@ -111,13 +109,10 @@ app.ai.action('findItem', (context, state, data) => __awaiter(void 0, void 0, vo
     const items = getItems(state, data.list);
     const index = items.indexOf(data.item);
     if (index >= 0) {
-        yield sendActivity(context, `I found ${data.item} in your ${data.list} list.`);
+        yield context.sendActivity(responses.itemFound(data.list, data.item));
     }
     else {
-        yield sendActivity(context, [
-            `I couldn't find ${data.item} in your ${data.list} list.`,
-            `Hmm... I don't see ${data.item} in your ${data.list} list.`
-        ]);
+        yield context.sendActivity(responses.itemNotFound(data.list, data.item));
     }
     // End the current chain
     return false;
@@ -136,22 +131,19 @@ app.ai.action('summarizeAllLists', (context, state, data) => __awaiter(void 0, v
         yield callPrompt(context, state, '../src/summarizeAllLists.txt', data);
     }
     else {
-        yield sendActivity(context, [
-            `I couldn't find any lists.`,
-            `Hmm... You don't seem to have any lists yet.`
-        ]);
+        yield context.sendActivity(responses.noListsFound());
     }
     // End the current chain
     return false;
 }));
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(botbuilder_m365_1.AI.UnknownActionName, (context, state, data, action) => __awaiter(void 0, void 0, void 0, function* () {
-    yield context.sendActivity(`I don't know how to do '${action}'.`);
+    yield context.sendActivity(responses.unknownAction(action));
     return false;
 }));
 // Register a handler to deal with a user asking something off topic
 app.ai.action(botbuilder_m365_1.AI.OffTopicActionName, (context, state) => __awaiter(void 0, void 0, void 0, function* () {
-    yield context.sendActivity(`I'm sorry, I'm not allowed to talk about such things...`);
+    yield context.sendActivity(responses.offTopic());
     return false;
 }));
 // Listen for incoming server requests.
@@ -162,27 +154,18 @@ server.post('/api/messages', (req, res) => __awaiter(void 0, void 0, void 0, fun
         yield app.run(context);
     }));
 }));
-function callPrompt(context, state, prompt, data) {
+function callPrompt(context, state, prompt, data, temperature = 0.7) {
     return app.ai.chain(context, state, data, {
         prompt: path.join(__dirname, prompt),
         promptConfig: {
             model: "text-davinci-003",
-            temperature: 0.7,
-            max_tokens: 256,
+            temperature: temperature,
+            max_tokens: 1024,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0
         }
     });
-}
-function sendActivity(context, message) {
-    if (Array.isArray(message)) {
-        const index = Math.floor(Math.random() * (message.length - 1));
-        return context.sendActivity(message[index]);
-    }
-    else {
-        return context.sendActivity(message);
-    }
 }
 function getItems(state, list) {
     ensureListExists(state, list);

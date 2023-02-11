@@ -27,4 +27,6 @@ AI: Yes
 
 Is this query on topic?
 
+```
 Human: {{activity.text}}
+```
