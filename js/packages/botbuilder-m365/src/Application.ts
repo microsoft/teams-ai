@@ -34,6 +34,8 @@ export interface ApplicationOptions<TState extends TurnState, TPredictionOptions
 export type RouteSelector = (context: TurnContext) => Promise<boolean>;
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
+export type ConversationUpdateEvents = 'channelCreated' | 'channelRenamed' | 'channelDeleted' | 'channelRestored' | 'membersAdded' | 'membersRemoved' | 'teamRenamed' | 'teamDeleted' | 'teamArchived' | 'teamUnarchived' | 'teamRestored';
+
 export class Application<TState extends TurnState = DefaultTurnState, TPredictionOptions = any, TPredictionEngine extends PredictionEngine<TState, TPredictionOptions> = PredictionEngine<TState, TPredictionOptions>> {
     private readonly _options: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
     private readonly _routes: AppRoute<TState>[] = [];
@@ -113,6 +115,20 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     public activity(type: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
         (Array.isArray(type) ? type : [type]).forEach((t) => {
             const selector = createActivitySelector(t);
+            this.addRoute(selector, handler);
+        });
+        return this;
+    }
+
+    /**
+     * Handles conversation update events.
+     * @param event Name of the conversation update event to handle.
+     * @param handler Function to call when the route is triggered.
+     * @returns The application instance for chaining purposes.
+     */
+    public conversationUpdate(event: ConversationUpdateEvents|ConversationUpdateEvents[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
+        (Array.isArray(event) ? event : [event]).forEach((e) => {
+            const selector = createConversationUpdateSelector(e);
             this.addRoute(selector, handler);
         });
         return this;
@@ -287,6 +303,23 @@ function createActivitySelector(type: string|RegExp|RouteSelector): RouteSelecto
         return (context: TurnContext) => {
             return Promise.resolve(context?.activity?.type ? context.activity.type.toLocaleLowerCase() === typeName : false);
         };
+    }
+}
+
+function createConversationUpdateSelector(event: ConversationUpdateEvents): RouteSelector {
+    switch (event) {
+        case 'membersAdded':
+            return (context: TurnContext) => {
+                return Promise.resolve(context?.activity?.type == ActivityTypes.ConversationUpdate && Array.isArray(context?.activity?.membersAdded) && context.activity.membersAdded.length > 0);
+            };
+        case 'membersRemoved':
+            return (context: TurnContext) => {
+                return Promise.resolve(context?.activity?.type == ActivityTypes.ConversationUpdate && Array.isArray(context?.activity?.membersRemoved) && context.activity.membersRemoved.length > 0);
+            };
+        default: 
+            return (context: TurnContext) => {
+                return Promise.resolve(context?.activity?.type == ActivityTypes.ConversationUpdate && context?.activity?.channelData?.eventType == event);
+            };
     }
 }
 
