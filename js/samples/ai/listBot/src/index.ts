@@ -200,7 +200,6 @@ function callPrompt(context: TurnContext, state: ApplicationTurnState, prompt: s
     return app.ai.chain(
         context, 
         state, 
-        data, 
         {
             prompt: path.join(__dirname, prompt),
             promptConfig: {
@@ -211,7 +210,8 @@ function callPrompt(context: TurnContext, state: ApplicationTurnState, prompt: s
                 frequency_penalty: 0,
                 presence_penalty: 0
             }
-        });
+        },
+        data);
 }
 
 function getItems(state: ApplicationTurnState, list: string): string[] {

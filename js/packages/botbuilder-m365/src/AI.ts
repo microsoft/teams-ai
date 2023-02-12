@@ -71,7 +71,7 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
         return this;
     }
 
-    public async chain(context: TurnContext, state: TState, data?: Record<string, any>, options?: TPredictionOptions): Promise<boolean> {
+    public async chain(context: TurnContext, state: TState, options?: TPredictionOptions, data?: Record<string, any>): Promise<boolean> {
         // Call prediction engine
         let continueChain = true;
         const commands = await this._predictionEngine.predictCommands(context, state, data, options);

@@ -15,15 +15,27 @@ import { AxiosInstance, AxiosResponse } from 'axios';
 import { ResponseParser } from './ResponseParser';
 import { PromptParser, PromptTemplate } from './PromptParser';
 import { ConversationHistory } from './ConversationHistory';
-import { Application } from './Application';
 import { AI } from './AI';
 
+
+export interface OpenAIPromptOptions {
+    prompt: PromptTemplate;
+    promptConfig: CreateCompletionRequest;
+    conversationHistory?: OpenAIConversationHistoryOptions;
+    logRequests?: boolean;
+}
+
+export interface OpenAIPredictionOptions extends OpenAIPromptOptions {
+    topicFilter?: PromptTemplate; 
+    topicFilterConfig?: CreateCompletionRequest;
+}
 
 export interface OpenAIPredictionEngineOptions extends OpenAIPredictionOptions {
     configuration: ConfigurationParameters;
     basePath?: string;
     axios?: AxiosInstance;
 }
+
 
 export interface OpenAIConversationHistoryOptions {
     addTurnToHistory?: boolean;
@@ -34,22 +46,13 @@ export interface OpenAIConversationHistoryOptions {
     lineSeparator?: string;
 }
 
-export interface OpenAIPredictionOptions {
-    prompt: PromptTemplate;
-    promptConfig: CreateCompletionRequest;
-    topicFilter?: PromptTemplate; 
-    topicFilterConfig?: CreateCompletionRequest;
-    conversationHistory?: OpenAIConversationHistoryOptions;
-    logRequests?: boolean;
-}
-
 export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState> implements PredictionEngine<TState, OpenAIPredictionOptions> {
     private readonly _options: OpenAIPredictionEngineOptions;
     private readonly _configuration: Configuration;
     private readonly _openai: OpenAIApi;
 
 
-    public constructor(options?: OpenAIPredictionEngineOptions) {
+    public constructor(options: OpenAIPredictionEngineOptions) {
         this._options = Object.assign({} as OpenAIPredictionEngineOptions, options);
         this._configuration = new Configuration(options.configuration);
         this._openai = new OpenAIApi(this._configuration, options.basePath, options.axios as any);
@@ -68,6 +71,15 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
     public get openai(): OpenAIApi {
         return this._openai;
+    }
+
+    public async prompt(context: TurnContext, state: TState, options: OpenAIPromptOptions, data?: Record<string, any>): Promise<AxiosResponse<CreateCompletionResponse>> {
+        data = data ?? {};
+
+        // Request base prompt completion
+        const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];
+        const promptRequest = await this.createCompletionRequest(context, state, data, options.prompt, options.promptConfig, options.conversationHistory);
+        return await this.createCompletion(promptRequest, 'PROMPT') as any;
     }
 
     public async predictCommands(context: TurnContext, state: TState, data?: Record<string, any>, options?: OpenAIPredictionOptions): Promise<PredictedCommand[]> {
