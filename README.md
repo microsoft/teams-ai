@@ -1,14 +1,13 @@
-# Project
+# Bot Framework M365 SDK
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+The new Bot Framework M365 SDK makes it easier than ever to create powerful applications and extensions for M365 hubs like Teams and Outlook. With the existing v4 Bot Framework SDK and the new M365 SDK, you can build message extensions, task modules, adaptive card applications, and more with even greater ease. Plus, the SDK includes an experimental AI system that simplifies building conversational bots using Large Language Models (LLMs) like GPT-3. Ready to get started? Follow the links below and unlock the world of possibilities!
 
-As the maintainer of this project, please make a few updates:
+- [Building the JavaScript SDK and Samples](./js/README.md)
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+> **FHL Participants** clone the repo locally and follow the link to the guide above to build the project and samples. 
+> You can simply add your project to the samples tree and it will automatically be built with the other samples. 
+> The guide provides instructions for running your bot locally via ngrok but to deploy it to a server you'll likely need to include the `botbuilder-m365` package as a [bundled dependency](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#bundledependencies). 
+> If this doesn't work we can look into publishing the library as a preview package to NPM but please try the bundled dependency approach first.    
 
 ## Contributing
 
