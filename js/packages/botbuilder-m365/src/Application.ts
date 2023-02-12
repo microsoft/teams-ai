@@ -35,6 +35,7 @@ export type RouteSelector = (context: TurnContext) => Promise<boolean>;
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
 export type ConversationUpdateEvents = 'channelCreated' | 'channelRenamed' | 'channelDeleted' | 'channelRestored' | 'membersAdded' | 'membersRemoved' | 'teamRenamed' | 'teamDeleted' | 'teamArchived' | 'teamUnarchived' | 'teamRestored';
+export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 
 export class Application<TState extends TurnState = DefaultTurnState, TPredictionOptions = any, TPredictionEngine extends PredictionEngine<TState, TPredictionOptions> = PredictionEngine<TState, TPredictionOptions>> {
     private readonly _options: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
@@ -143,6 +144,20 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     public message(keyword: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
         (Array.isArray(keyword) ? keyword : [keyword]).forEach((k) => {
             const selector = createMessageSelector(k);
+            this.addRoute(selector, handler);
+        });
+        return this;
+    }
+
+    /**
+     * Handles message reaction events.
+     * @param event Name of the message reaction event to handle.
+     * @param handler Function to call when the route is triggered.
+     * @returns The application instance for chaining purposes.
+     */
+    public messageReactions(event: MessageReactionEvents|MessageReactionEvents[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
+        (Array.isArray(event) ? event : [event]).forEach((e) => {
+            const selector = createMessageReactionSelector(e);
             this.addRoute(selector, handler);
         });
         return this;
@@ -346,5 +361,19 @@ function createMessageSelector(keyword: string|RegExp|RouteSelector): RouteSelec
                 return Promise.resolve(false);
             }
         };
+    }
+}
+
+function createMessageReactionSelector(event: MessageReactionEvents): RouteSelector {
+    switch (event) {
+        case 'reactionsAdded':
+        default:
+            return (context: TurnContext) => {
+                return Promise.resolve(context?.activity?.type == ActivityTypes.MessageReaction && Array.isArray(context?.activity?.reactionsAdded) && context.activity.reactionsAdded.length > 0);
+            };
+        case 'reactionsRemoved':
+            return (context: TurnContext) => {
+                return Promise.resolve(context?.activity?.type == ActivityTypes.MessageReaction && Array.isArray(context?.activity?.reactionsRemoved) && context.activity.reactionsRemoved.length > 0);
+            };
     }
 }
