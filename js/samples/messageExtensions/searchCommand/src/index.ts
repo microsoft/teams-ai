@@ -13,7 +13,6 @@ import {
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
     MemoryStorage,
-    ActivityTypes,
     MessagingExtensionAttachment
 } from 'botbuilder';
 
@@ -63,7 +62,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log( '\nTo talk to your bot, open the emulator select "Open Bot"' );
 });
 
-import { AdaptiveCardSearchResult, Application } from 'botbuilder-m365';
+import { Application } from 'botbuilder-m365';
 import { createNpmSearchResultCard, createNpmPackageCard } from './cards';
 import axios from 'axios';
 
@@ -75,13 +74,13 @@ const app = new Application({
 
 // Listen for search actions
 app.messageExtensions.query('searchCmd', async (context, state, query) => {
-    const searchQuery = query.parameters['searchKeyword'] ?? '';
+    const searchQuery = query.parameters['queryText'] ?? '';
     const count = query.count ?? 10;
     const response = await axios.get(`http://registry.npmjs.com/-/v1/search?${new URLSearchParams({ text: searchQuery, size: count.toString() }).toString()}`);
 
     // Format search results
     const results: MessagingExtensionAttachment[] = [];
-    response?.data?.objects?.forEach(result => results.push(createNpmSearchResultCard(result)));
+    response?.data?.objects?.forEach(obj => results.push(createNpmSearchResultCard(obj.package)));
 
     // Return results as a list
     return {

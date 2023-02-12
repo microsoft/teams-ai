@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
   "version": "1.0.0",
   "manifestVersion": "1.15",
-  "id": "220c0c26-59c0-44b1-8c3c-5ee7d5c5b981",
+  "id": "220c0c26-59c0-33b1-8c3c-5ee7d5c5b981",
   "packageName": "com.package.name",
   "name": {
     "short": "NpmSearch",
@@ -63,9 +63,9 @@
           "title": "Search",
           "initialRun": false,
           "parameters": [{
-            "name": "searchKeyword",
-            "description": "Enter your search keywords",
-            "title": "Keywords"
+            "name": "queryText",
+            "description": "Enter your search query",
+            "title": "Query"
           }]
         }
       ]

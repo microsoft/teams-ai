@@ -97,8 +97,9 @@ app.message(/static/i, async (context, state) => {
 // Listen for query from dynamic search card
 app.adaptiveCards.search('npmpackages', async (context, state, query) => {
     // Execute query
-    const searchQuery = query.parameters.queryText;
-    const response = await axios.get(`http://registry.npmjs.com/-/v1/search?${new URLSearchParams({ text: searchQuery, size: '8' }).toString()}`);
+    const searchQuery = query.parameters['queryText'] ?? '';
+    const count = query.count ?? 10;
+    const response = await axios.get(`http://registry.npmjs.com/-/v1/search?${new URLSearchParams({ text: searchQuery, size: count.toString() }).toString()}`);
     
     // Format search results
     const npmPackages: AdaptiveCardSearchResult[] = [];
