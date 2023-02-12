@@ -6,6 +6,7 @@
     "./packages/*",
     "./samples/adaptiveCards/*",
     "./samples/ai/*",
+    "./samples/messageExtensions/*",
     "./samples/messaging/*"
   ],
   "scripts": {

@@ -1,0 +1,4 @@
+lib
+.vscode
+.env
+*.zip
