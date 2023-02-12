@@ -3345,15 +3345,15 @@ execa@^1.0.0:
     signal-exit "^3.0.0"
     strip-eof "^1.0.0"
 
-exorcist@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/exorcist/-/exorcist-1.0.1.tgz"
-  integrity sha512-YsUNvZ456n2BlgoAqQuroyla+4LyQAo7OUBVS2vUBW3CJWwQvEjtr3CKeka9RpkEFvKWecH41Mt6zZIjel54JQ==
+exorcist@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/exorcist/-/exorcist-2.0.0.tgz#a732ac62d4ea9413b0508e246b564d01fee62c4b"
+  integrity sha512-+c63SvhBq/HjmbV9cu9vkDkjXFiuI4lpqOZU5Y3t5GSV2l4TQCqVli9c7nIASHxkUL4THaOZDUcb6XNBI/eYjw==
   dependencies:
-    is-stream "~1.1.0"
-    minimist "0.0.5"
-    mkdirp "~0.5.1"
-    mold-source-map "~0.4.0"
+    is-stream "^2.0.0"
+    minimist "^1.2.5"
+    mkdirp "^1.0.4"
+    mold-source-map "^0.4.0"
 
 expand-brackets@^2.1.4:
   version "2.1.4"
@@ -4574,7 +4574,7 @@ is-shared-array-buffer@^1.0.2:
   dependencies:
     call-bind "^1.0.2"
 
-is-stream@^1.0.0, is-stream@^1.1.0, is-stream@~1.1.0:
+is-stream@^1.0.0, is-stream@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/is-stream/-/is-stream-1.1.0.tgz"
   integrity sha512-uQPm8kcs47jx38atAcWTVxyltQYoPT68y9aWYdV6yWXSyW8mzSat0TL6CiWdZeCdF3KrAvpVtnHbTv4RN+rqdQ==
@@ -5303,11 +5303,6 @@ minimatch@3.0.5:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@0.0.5:
-  version "0.0.5"
-  resolved "https://registry.npmjs.org/minimist/-/minimist-0.0.5.tgz"
-  integrity sha512-rSJ0cdmCj3qmKdObcnMcWgPVOyaOWlazLhZAJW0s6G6lx1ZEuFkraWmEH5LTvX90btkfHPclQBjvjU7A/kYRFg==
-
 minimist@^1.1.0, minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.5, minimist@^1.2.6:
   version "1.2.7"
   resolved "https://registry.npmjs.org/minimist/-/minimist-1.2.7.tgz"
@@ -5345,7 +5340,7 @@ mkdirp@^0.5.1, mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.6"
 
-mkdirp@~1.0.4:
+mkdirp@^1.0.4, mkdirp@~1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
@@ -5411,9 +5406,9 @@ module-deps@^6.2.3:
     through2 "^2.0.0"
     xtend "^4.0.0"
 
-mold-source-map@~0.4.0:
+mold-source-map@^0.4.0:
   version "0.4.1"
-  resolved "https://registry.npmjs.org/mold-source-map/-/mold-source-map-0.4.1.tgz"
+  resolved "https://registry.yarnpkg.com/mold-source-map/-/mold-source-map-0.4.1.tgz#92e206393f9a3a7af0eb0c330493062f19dfe511"
   integrity sha512-oPowVpTm8p3jsK2AKI+NzoS6TBKv7gWY/Hj4ZNh5YWiB3S4eP54y8vSEEgVUdrqgTbjwEzIunNAVQJGRW0bakQ==
   dependencies:
     convert-source-map "^1.1.0"
@@ -6266,11 +6261,6 @@ querystring@0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/querystring/-/querystring-0.2.0.tgz"
   integrity sha512-X/xY82scca2tau62i9mDyU9K+I+djTMUsvwf7xnUX5GLvVzgJybOJf4Y6o9Zx3oJK/LSXg5tTZBjwzqVPaPO2g==
-
-querystring@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.1.tgz#40d77615bb09d16902a85c3e38aa8b5ed761c2dd"
-  integrity sha512-wkvS7mL/JMugcup3/rMitHmd9ecIGd2lhFhK9N3UUQ450h66d1r3Y9nvXzQAW1Lq+wyx61k/1pfKS5KuKiyEbg==
 
 queue-microtask@^1.2.2:
   version "1.2.3"
