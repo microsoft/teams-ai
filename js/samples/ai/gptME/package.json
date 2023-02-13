@@ -1,7 +1,7 @@
 {
-    "name": "hal9000-demo",
+    "name": "gpt-me",
     "version": "1.0.0",
-    "description": "Sample bot that thinks it's HAL 9000",
+    "description": "for GPT",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",
