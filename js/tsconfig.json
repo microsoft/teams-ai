@@ -3,8 +3,10 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "forceConsistentCasingInFileNames": true,
     "module": "commonjs",
     "sourceMap": true,
+    "strict": true,
     "target": "es6"
   }
 }
