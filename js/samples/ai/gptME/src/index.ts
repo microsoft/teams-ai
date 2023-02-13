@@ -149,7 +149,6 @@ async function updatePost(context: TurnContext, state: DefaultTurnState, prompt:
     return createTaskInfo(card);
 }
 
-
 async function callPrompt(context: TurnContext, state: DefaultTurnState, prompt: string, data?: Record<string, any>): Promise<string> {
     const response = await predictionEngine.prompt(
         context, 
