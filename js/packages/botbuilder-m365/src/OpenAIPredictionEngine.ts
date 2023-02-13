@@ -30,10 +30,16 @@ export interface OpenAIPredictionOptions extends OpenAIPromptOptions {
     topicFilterConfig?: CreateCompletionRequest;
 }
 
-export interface OpenAIPredictionEngineOptions extends OpenAIPredictionOptions {
+export interface OpenAIPredictionEngineOptions {
     configuration: ConfigurationParameters;
     basePath?: string;
     axios?: AxiosInstance;
+    prompt?: PromptTemplate;
+    promptConfig?: CreateCompletionRequest;
+    topicFilter?: PromptTemplate; 
+    topicFilterConfig?: CreateCompletionRequest;
+    conversationHistory?: OpenAIConversationHistoryOptions;
+    logRequests?: boolean;
 }
 
 
@@ -84,7 +90,11 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
     public async predictCommands(context: TurnContext, state: TState, data?: Record<string, any>, options?: OpenAIPredictionOptions): Promise<PredictedCommand[]> {
         data = data ?? {};
-        options = options ?? this._options;
+        options = options ?? this._options as OpenAIPredictionOptions;
+
+        if (!options.prompt || !options.promptConfig) {
+            throw new Error(`OpenAIPredictionEngine: "prompt" or "promptConfiguration" not specified.`);
+        }
     
         // Request base prompt completion
         const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];

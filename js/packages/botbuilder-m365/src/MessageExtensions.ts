@@ -177,7 +177,7 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-    public submitAction(commandId: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult|TaskModuleTaskInfo|string|null|undefined>): Application<TState> {
+    public submitAction(commandId: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState, data?: Record<string, any>) => Promise<MessagingExtensionResult|TaskModuleTaskInfo|string|null|undefined>): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME);
             this._app.addRoute(selector, async (context, state) => {
@@ -187,7 +187,7 @@ export class MessageExtensions<TState extends TurnState> {
                 }
 
                 // Call handler and then check to see if an invoke response has already been added 
-                const result = await handler(context, state);
+                const result = await handler(context, state, context.activity.value?.data ?? {});
                 if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                     // Format invoke response
                     let response: MessagingExtensionActionResponse;

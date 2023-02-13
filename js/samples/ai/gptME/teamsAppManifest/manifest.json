@@ -1,0 +1,54 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "version": "1.0.0",
+  "manifestVersion": "1.16",
+  "id": "1b8376a6-906c-4df7-9b43-9214cbb3207d",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "GPT ME",
+    "full": "GPT Message Extensions"
+  },
+  "developer": {
+    "name": "Microsoft Teams",
+    "mpnId": "",
+    "websiteUrl": "https://teams.microsoft.com",
+    "privacyUrl": "https://privacy.microsoft.com/en-us/privacystatement",
+    "termsOfUseUrl": "https://www.microsoft.com/en-us/legal/terms-of-use"
+  },
+  "description": {
+    "short": "Sample Message Extension that lets you add GPT snippets to posts ",
+    "full": "Sample Message Extension that lets you add GPT snippets to posts "
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#FFFFFF",
+  "composeExtensions": [
+    {
+      "botId": "___YOUR BOTS ID___",
+      "commands": [
+        {
+          "id": "CreatePost",
+          "type": "action",
+          "title": "Create Post",
+          "description": "Use GPT to create a post",
+          "initialRun": true,
+          "fetchTask": true,
+          "context": [
+            "commandBox",
+            "compose"
+          ],
+          "taskInfo": {
+            "title": "Create Post",
+            "width": "medium",
+            "height": "medium",
+            "url": "https://teams.microsoft.com"
+          }
+        }
+      ],
+      "canUpdateConfiguration": true
+    }
+  ],
+  "validDomains": []
+}
