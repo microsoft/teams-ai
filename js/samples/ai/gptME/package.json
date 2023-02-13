@@ -1,7 +1,7 @@
 {
-    "name": "hal9000-demo",
+    "name": "gptME-demo",
     "version": "1.0.0",
-    "description": "Sample bot that thinks it's HAL 9000",
+    "description": "Sample Message Extension that leverages GPT to create posts",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",
