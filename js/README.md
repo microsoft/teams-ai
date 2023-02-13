@@ -17,7 +17,7 @@ MicrosoftAppId=<your bot's ID>
 MicrosoftAppPassword=<your bot's secret>
 MicrosoftAppTenantId=
 OPENAI_API_KEY=<your OpenAI key>
-``` 
+```
 
 3. Now start the sample using the following command:
 
@@ -33,7 +33,7 @@ ngrok.exe http 3978 -host-header="localhost:3978"
 
 Now you're ready to talk to your bot using either the [Bot Framework Emulator](https://github.com/Microsoft/BotFramework-Emulator/releases/latest) or via teams itself as a personal app.
 
-To chat with your but using teams:
+To chat with your bot using teams:
 
 1. Modify the `teamsAppManifest/manifest.json` file for the sample to include the ID of the bot you created. Then compress all the files found in the `teamsAppManifest` folder to a .zip file. The name doesn't really matter so `manifest.zip` is fine.
 
