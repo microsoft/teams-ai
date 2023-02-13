@@ -1,17 +1,22 @@
-# Bot Framework M365 SDK
+# BotBuilder-m365
 
-The new Bot Framework M365 SDK makes it easier than ever to create powerful applications and extensions for M365 hubs like Teams and Outlook. With the existing v4 Bot Framework SDK and the new M365 SDK, you can build message extensions, task modules, adaptive card applications, and more with even greater ease. Plus, the SDK includes an experimental AI system that simplifies building conversational bots using Large Language Models (LLMs) like GPT-3. Ready to get started? Follow the links below and unlock the world of possibilities!
+This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams and M365-interacting bots.
 
-- [Building the JavaScript SDK and Samples](./js/README.md)
+The SDK also facilitates the creation of bots that uses an [OpenAI](https://openai.com/api/) API key to provide an AI-driven conversational experience, or the same using Azure Foundry.
 
-> **FHL Participants** clone the repo locally and follow the link to the guide above to build the project and samples. 
-> You can simply add your project to the samples tree and it will automatically be built with the other samples. 
-> The guide provides instructions for running your bot locally via ngrok but to deploy it to a server you'll likely need to include the `botbuilder-m365` package as a [bundled dependency](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#bundledependencies). 
-> If this doesn't work we can look into publishing the library as a preview package to NPM but please try the bundled dependency approach first.    
+This SDK is currently in preview and is subject to change. We welcome your feedback and contributions!
+
+## Getting Started
+
+Head over to the js folder to see the SDK code and try out our samples.
+
+During FHL, we're looking for feedback and robust samples that can showcase best practices and common scenarios for using this SDK with OpenAI. The [OfficeDev](https://github.com/orgs/OfficeDev/repositories?language=&q=microsoft-teams-apps&sort=&type=all) repo has many Teams samples that we should re-engineer to use this SDK.
+
+FHL samples will be considered for adding to our samples category in this repo.
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
@@ -25,8 +30,8 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 ## Trademarks
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
+trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
