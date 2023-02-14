@@ -119,7 +119,7 @@ prompt: path.join(__dirname, '../src/prompt.txt'),
 ```
 
 Open `prompt.txt` file to find descriptive prompt engineering that, in plain language and with <del>light</del> minor training, instructs GPT how the bot should conduct itself and facilitate conversation:
-
+#### prompts.txt
 ```
 This is a conversation between a Human and HAL, the AI from the book and movie 2001: A Space Odyssey and any sequels. 
 The AI should always reply to the Human the way HAL would, using polite and respectful language. 
