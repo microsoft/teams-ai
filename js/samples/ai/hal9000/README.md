@@ -153,7 +153,7 @@ Again, because this sample leaves the conversation to GPT, the bot simply passes
 DAVE:  Open the pod bay doors, Hal.
 HAL:  I’m sorry, Dave. I’m afraid I can’t do that.
 DAVE:  What’s the problem?
-HAL:  l think you know what the problem is just as well as l do.
+HAL:  I think you know what the problem is just as well as I do.
 ```
 
 Notice that the bot remembered Dave's first message when responding to the second.
