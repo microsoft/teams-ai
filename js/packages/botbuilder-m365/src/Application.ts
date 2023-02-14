@@ -132,7 +132,7 @@ export class Application<
      * @param isInvokeRoute boolean indicating if the RouteSelector checks for "Invoke" Activities as part of its routing logic. Defaults to `false`.
      * @returns The application instance for chaining purposes.
      */
-    public addRoute(selector: RouteSelector, handler: RouteHandler<TState>, isInvokeRoute: boolean = false): this {
+    public addRoute(selector: RouteSelector, handler: RouteHandler<TState>, isInvokeRoute = false): this {
         if (isInvokeRoute) {
             this._invokeRoutes.push({ selector, handler });
         } else {
@@ -143,6 +143,7 @@ export class Application<
 
     /**
      * Handles incoming activities of a given type.
+     *
      * @param type Name of the activity type to match or a regular expression to match against the incoming activity type. An array of type names or expression can also be passed in.
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
@@ -160,6 +161,7 @@ export class Application<
 
     /**
      * Handles conversation update events.
+     *
      * @param event Name of the conversation update event to handle.
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
@@ -177,6 +179,7 @@ export class Application<
 
     /**
      * Starts a new "proactive" session with a conversation the bot is already a member of.
+     *
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bots logic that should be run using the new proactive turn context.
      */
@@ -223,6 +226,7 @@ export class Application<
 
     /**
      * Handles incoming messages with a given keyword.
+     *
      * @param keyword Substring of text or a regular expression to match against the text of an incoming message. An array of keywords or expression can also be passed in.
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
@@ -240,6 +244,7 @@ export class Application<
 
     /**
      * Handles message reaction events.
+     *
      * @param event Name of the message reaction event to handle.
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
@@ -257,6 +262,7 @@ export class Application<
 
     /**
      * Dispatches an incoming activity to a handler registered with the application.
+     *
      * @param context Context for the current turn of conversation with the user.
      * @returns True if the activity was successfully dispatched to a handler. False if no matching handlers could be found.
      */
@@ -335,6 +341,7 @@ export class Application<
 
     /**
      * Sends a proactive activity to an existing conversation the bot is a member of.
+     *
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param activityOrText Activity or message to send to the conversation.
      * @param speak Optional. Text to speak for channels that support voice.
@@ -375,6 +382,7 @@ export class Application<
 
     /**
      * Manually start a timer to periodically send "typing" activities.
+     *
      * @remarks
      * The timer will automatically end once an outgoing activity has been sent. If the timer is
      * already running or the current activity, is not a "message" the call is ignored.
@@ -424,6 +432,7 @@ export class Application<
 
     /**
      * Manually stop the typing timer.
+     *
      * @remarks
      * If the timer isn't running nothing happens.
      */
@@ -440,6 +449,9 @@ interface AppRoute<TState extends TurnState> {
     handler: RouteHandler<TState>;
 }
 
+/**
+ * @param type
+ */
 function createActivitySelector(type: string | RegExp | RouteSelector): RouteSelector {
     if (typeof type == 'function') {
         // Return the passed in selector function
@@ -460,6 +472,9 @@ function createActivitySelector(type: string | RegExp | RouteSelector): RouteSel
     }
 }
 
+/**
+ * @param event
+ */
 function createConversationUpdateSelector(event: ConversationUpdateEvents): RouteSelector {
     switch (event) {
         case 'membersAdded':
@@ -488,6 +503,9 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
     }
 }
 
+/**
+ * @param keyword
+ */
 function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteSelector {
     if (typeof keyword == 'function') {
         // Return the passed in selector function
@@ -514,6 +532,9 @@ function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteS
     }
 }
 
+/**
+ * @param event
+ */
 function createMessageReactionSelector(event: MessageReactionEvents): RouteSelector {
     switch (event) {
         case 'reactionsAdded':

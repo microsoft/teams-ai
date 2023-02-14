@@ -16,6 +16,7 @@ export class ConversationHistory {
 
     /**
      * Adds a new line of text to conversation history
+     *
      * @param state Applications turn state.
      * @param line Line of text to add to history.
      * @param maxLines Optional. Maximum number of lines to store. Defaults to 30.
@@ -117,6 +118,7 @@ export class ConversationHistory {
 
     /**
      * Returns the current conversation history as a string of text.
+     *
      * @remarks
      * The length of the returned text is gated by `maxCharacterLength` and only whole lines of
      * history entries will be returned. That means that if the length of the most recent history

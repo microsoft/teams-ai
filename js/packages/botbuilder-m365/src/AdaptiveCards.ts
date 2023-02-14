@@ -177,6 +177,9 @@ export class AdaptiveCards<TState extends TurnState> {
     }
 }
 
+/**
+ * @param verb
+ */
 function createActionExecuteSelector(verb: string | RegExp | RouteSelector): RouteSelector {
     if (typeof verb == 'function') {
         // Return the passed in selector function
@@ -208,6 +211,10 @@ function createActionExecuteSelector(verb: string | RegExp | RouteSelector): Rou
     }
 }
 
+/**
+ * @param verb
+ * @param filter
+ */
 function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filter: string): RouteSelector {
     if (typeof verb == 'function') {
         // Return the passed in selector function
@@ -233,6 +240,9 @@ function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filte
     }
 }
 
+/**
+ * @param dataset
+ */
 function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSelector {
     if (typeof dataset == 'function') {
         // Return the passed in selector function

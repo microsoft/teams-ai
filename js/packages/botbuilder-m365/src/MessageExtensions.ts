@@ -327,6 +327,10 @@ export class MessageExtensions<TState extends TurnState> {
     }
 }
 
+/**
+ * @param commandId
+ * @param invokeName
+ */
 function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeName: string): RouteSelector {
     if (typeof commandId == 'function') {
         // Return the passed in selector function

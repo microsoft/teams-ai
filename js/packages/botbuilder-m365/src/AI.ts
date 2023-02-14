@@ -32,7 +32,7 @@ export class AI<
         // Register default UnknownAction handler
         this.action(
             AI.UnknownActionName,
-            (context, state, data, action) => {
+            (_context, _state, _data, action) => {
                 console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
                 return Promise.resolve(true);
             },
@@ -42,7 +42,7 @@ export class AI<
         // Register default OffTopicAction handler
         this.action(
             AI.OffTopicActionName,
-            (context, state, data, action) => {
+            (_context, _state, _data, _action) => {
                 console.error(
                     `A Topic Filter was configured but no handler was registered for 'AI.OffTopicActionName'.`
                 );
@@ -54,7 +54,7 @@ export class AI<
         // Register default RateLimitedActionName
         this.action(
             AI.RateLimitedActionName,
-            (context, state, data, action) => {
+            (_context, _state, _data, _action) => {
                 throw new Error(`An AI request failed because it was rate limited`);
             },
             true
@@ -117,7 +117,9 @@ export class AI<
                             continueChain = await handler(context, state, data, action);
                         } else {
                             // Redirect to UnknownAction handler
-                            continueChain = await this._actions.get(AI.UnknownActionName)!.handler(context, state, data, action);
+                            continueChain = await this._actions
+                                .get(AI.UnknownActionName)!
+                                .handler(context, state, data, action);
                         }
                         break;
                     case 'SAY':

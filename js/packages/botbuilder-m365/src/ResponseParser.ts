@@ -253,6 +253,7 @@ export class ResponseParser {
 
     /**
      * Simple text tokenizer. Breaking characters are added to list as separate tokens.
+     *
      * @param text Optional. Text string to tokenize.
      * @returns Array of tokens.
      */
