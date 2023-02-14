@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage, ActivityTypes} from 'botbuilder';
+import { TurnContext, Storage, ActivityTypes, BotAdapter, ConversationReference, Activity, ResourceResponse } from 'botbuilder';
 import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
@@ -23,6 +23,8 @@ export interface Query<TParams extends Record<string, any>> {
 }
 
 export interface ApplicationOptions<TState extends TurnState, TPredictionOptions, TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>> {
+    adapter?: BotAdapter;
+    botAppId?: string;
     storage?: Storage;
     predictionEngine?: TPredictionEngine; 
     turnStateManager?: TurnStateManager<TState>;
@@ -131,8 +133,38 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             const selector = createConversationUpdateSelector(e);
             this.addRoute(selector, handler);
-        });
+        }); 
         return this;
+    }
+
+    /**
+     * Starts a new "proactive" session with a conversation the bot is already a member of.
+     * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
+     * @param logic The bots logic that should be run using the new proactive turn context.
+     */
+    public continueConversationAsync(context: TurnContext, logic: (context: TurnContext) => Promise<void>): Promise<void>;
+    public continueConversationAsync(conversationReference: Partial<ConversationReference>, logic: (context: TurnContext) => Promise<void>): Promise<void>;
+    public continueConversationAsync(activity: Partial<Activity>, logic: (context: TurnContext) => Promise<void>): Promise<void>;
+    public async continueConversationAsync(context: TurnContext | Partial<ConversationReference> | Partial<Activity>, logic: (context: TurnContext) => Promise<void>): Promise<void> {
+        if (!this._options.adapter) {
+            throw new Error(`You must configure the Application with an 'adapter' before calling Application.continueConversationAsync()`);
+        }
+
+        if (!this._options.botAppId) {
+            console.warn(`Calling Application.continueConversationAsync() without a configured 'botAppId'. In production environments a 'botAppId' is required.`);
+        }
+
+        // Identify conversation reference
+        let reference: Partial<ConversationReference>;
+        if (typeof (context as TurnContext).activity == 'object') {
+            reference = TurnContext.getConversationReference((context as TurnContext).activity);
+        } else if (typeof (context as Partial<Activity>).type == 'string') {
+            reference = TurnContext.getConversationReference((context as Partial<Activity>));
+        } else {
+            reference = context as Partial<ConversationReference>;
+        }
+
+        await this._options.adapter.continueConversationAsync(this._options.botAppId ?? '', reference, logic);
     }
 
     /**
@@ -163,6 +195,11 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
         return this;
     }
 
+    /**
+     * Dispatches an incoming activity to a handler registered with the application.
+     * @param context Context for the current turn of conversation with the user.
+     * @returns True if the activity was successfully dispatched to a handler. False if no matching handlers could be found.
+     */
     public async run(context: TurnContext): Promise<boolean> {
         // Start typing indicator timer
         this.startTypingTimer(context);
@@ -234,6 +271,26 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
         } finally {
             this.stopTypingTimer();
         }
+    }
+
+    /**
+     * Sends a proactive activity to an existing conversation the bot is a member of.
+     * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
+     * @param activityOrText Activity or message to send to the conversation.
+     * @param speak Optional. Text to speak for channels that support voice.
+     * @param inputHint Optional. Input hint for channels that support voice.
+     * @returns A Resource response containing the ID of the activity that was sent.
+     */
+    public sendProactiveActivity(context: TurnContext, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
+    public sendProactiveActivity(conversationReference: Partial<ConversationReference>, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
+    public sendProactiveActivity(activity: Partial<Activity>, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
+    public async sendProactiveActivity(context: TurnContext | Partial<ConversationReference> | Partial<Activity>, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined> {
+        let response: ResourceResponse | undefined;
+        await this.continueConversationAsync(context, async (ctx) => {
+            response = await ctx.sendActivity(activityOrText, speak, inputHint);
+        });
+
+        return response;
     }
 
     /**

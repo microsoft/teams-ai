@@ -22,15 +22,17 @@ export interface ParsedCommandResult {
 
 export class ResponseParser {
     public static parseAdaptiveCard(text?: string): Record<string, any>|undefined {
-        let card: Record<string, any>;
+        let card: Record<string, any> | undefined;
         try {
-            const startJson = text.indexOf('{');
-            const endJson = text.lastIndexOf('}');
-            if (startJson >= 0 && endJson > startJson) {
-                const txt = text.substring(startJson, endJson + 1);
-                const obj: Record<string, any> = JSON.parse(txt);
-                if (obj['type'] === 'AdaptiveCard') {
-                    card = obj;
+            if (text) {
+                const startJson = text.indexOf('{');
+                const endJson = text.lastIndexOf('}');
+                if (startJson >= 0 && endJson > startJson) {
+                    const txt = text.substring(startJson, endJson + 1);
+                    const obj: Record<string, any> = JSON.parse(txt);
+                    if (obj['type'] === 'AdaptiveCard') {
+                        card = obj;
+                    }
                 }
             }
         } catch (err) {
@@ -84,7 +86,7 @@ export class ResponseParser {
 
     public static parseDoCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
-        let command: PredictedDoCommand;
+        let command: PredictedDoCommand | undefined;
         if (tokens.length > 1) {
             if (tokens[0] != 'DO') {
                 throw new Error(`ResponseParse.parseDoCommand(): token list passed in doesn't start with 'DO' token.`);
@@ -169,7 +171,7 @@ export class ResponseParser {
                         // Accumulate tokens until end of string is hit
                         if (token == quoteType) {
                             // Save pair and look for additional pairs
-                            command.data[entityName] = entityValue;
+                            command!.data[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -180,7 +182,7 @@ export class ResponseParser {
                         // Accumulate tokens until you hit a space
                         if (SPACE_CHARACTERS.indexOf(token) >= 0) {
                             // Save pair and look for additional pairs
-                            command.data[entityName] = entityValue;
+                            command!.data[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -211,7 +213,7 @@ export class ResponseParser {
 
     public static parseSayCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
-        let command: PredictedSayCommand;
+        let command: PredictedSayCommand | undefined;
         if (tokens.length > 1) {
             if (tokens[0] != 'SAY') {
                 throw new Error(`ResponseParse.parseSayCommand(): token list passed in doesn't start with 'SAY' token.`);
