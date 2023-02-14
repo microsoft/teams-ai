@@ -1,12 +1,14 @@
 {
-  "compilerOptions": {
-    "declaration": true,
-    "target": "es2016",
-    "module": "commonjs",
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "sourceMap": true,
-    "incremental": true,
-    "tsBuildInfoFile": "./lib/.tsbuildinfo"
-  }
+    "compilerOptions": {
+        "declaration": true,
+        "forceConsistentCasingInFileNames": true,
+        "target": "es2016",
+        "module": "commonjs",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "sourceMap": true,
+        "strict": false,
+        "incremental": true,
+        "tsBuildInfoFile": "./lib/.tsbuildinfo"
+    }
 }

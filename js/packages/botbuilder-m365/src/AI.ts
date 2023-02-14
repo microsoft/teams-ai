@@ -62,8 +62,8 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
             this._actions.set(name, { handler, allowOverrides });
         } else {
             const entry = this._actions.get(name);
-            if (entry.allowOverrides) {
-                entry.handler = handler;
+            if (entry!.allowOverrides) {
+                entry!.handler = handler;
             } else {
                 throw new Error(`The AI.action() method was called with a previously registered action named "${name}".`);
             }
@@ -84,11 +84,11 @@ export class AI<TState extends TurnState, TPredictionOptions, TPredictionEngine 
                         const { action, data } = (cmd as PredictedDoCommand);
                         if (this._actions.has(action)) {
                             // Call action handler
-                            const handler = this._actions.get(action).handler;
+                            const handler = this._actions.get(action)!.handler;
                             continueChain = await handler(context, state, data, action);
                         } else {
                             // Redirect to UnknownAction handler
-                            continueChain = await this._actions.get(AI.UnknownActionName).handler(context, state, data, action);
+                            continueChain = await this._actions.get(AI.UnknownActionName)!.handler(context, state, data, action);
                         }
                         break;
                     case 'SAY':

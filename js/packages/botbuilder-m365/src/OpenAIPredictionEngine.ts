@@ -132,7 +132,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                 // Look for the word "yes" to be in the topic filters response.
                 let allowed = false;
                 if (results[1]?.data?.choices && results[1].data.choices.length > 0) {
-                    allowed = results[1].data.choices[0].text.toLowerCase().indexOf('yes') >= 0;
+                    allowed = (results[1].data.choices[0].text ?? '').toLowerCase().indexOf('yes') >= 0;
                 }
 
                 // Redirect to OffTopic action if not allowed
@@ -149,7 +149,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         // Parse returned prompt response
         if (Array.isArray(results[0]?.data?.choices) && results[0].data.choices.length > 0) {
             // Remove response prefix
-            let response = results[0].data.choices[0].text;
+            let response = results[0].data.choices[0].text ?? '';
             const historyOptions = options.conversationHistory ?? {};
             if (historyOptions.botPrefix) {
                 // The model sometimes predicts additional text for the human side of things so skip that.
@@ -177,7 +177,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return [];
     }
 
-    private async createCompletionRequest(context: TurnContext, state: TState, data: Record<string, any>, prompt: PromptTemplate, config: CreateCompletionRequest, historyOptions: OpenAIConversationHistoryOptions): Promise<CreateCompletionRequest> {
+    private async createCompletionRequest(context: TurnContext, state: TState, data: Record<string, any>, prompt: PromptTemplate, config: CreateCompletionRequest, historyOptions?: OpenAIConversationHistoryOptions): Promise<CreateCompletionRequest> {
         // Clone prompt config
         const request = Object.assign({}, config);
 
@@ -191,7 +191,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
     private async createCompletion(request: CreateCompletionRequest, promptType: string): Promise<AxiosResponse<CreateCompletionResponse>> {
         let response: AxiosResponse<CreateCompletionResponse>;
-        let error: { status?: number; };
+        let error: { status?: number; } = {};
         const startTime = new Date().getTime();
         try {
             response = await this._openai.createCompletion(request, {
@@ -204,7 +204,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             if (this._options.logRequests) {
                 const duration = new Date().getTime() - startTime;
                 console.log(`\n${promptType} REQUEST:\n\`\`\`\n${request.prompt}\`\`\``);
-                if (response) {
+                if (response!) {
                     if (response.status != 429) {
                         const choice = Array.isArray(response?.data?.choices) && response.data.choices.length > 0 ? response.data.choices[0].text : '';
                         console.log(`${promptType} SUCCEEDED: status=${response.status} duration=${duration} response=${choice}`);
@@ -217,6 +217,6 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             }
         }
 
-        return response;
+        return response!;
     }
 }

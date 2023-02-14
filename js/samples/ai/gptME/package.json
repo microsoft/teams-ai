@@ -1,5 +1,5 @@
 {
-    "name": "gptME-demo",
+    "name": "gptme-demo",
     "version": "1.0.0",
     "description": "Sample Message Extension that leverages GPT to create posts",
     "author": "Microsoft",
