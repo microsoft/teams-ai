@@ -4,12 +4,12 @@
 import { CardAction, CardFactory, MessagingExtensionAttachment } from 'botbuilder';
 
 export function createNpmSearchResultCard(result: any): MessagingExtensionAttachment {
-    const card = CardFactory.heroCard(result.name, [], [], { 
-        text: result.description 
+    const card = CardFactory.heroCard(result.name, [], [], {
+        text: result.description
     }) as MessagingExtensionAttachment;
     card.preview = CardFactory.heroCard(result.name, [], [], {
-        text: result.description,
-        tap: { type: 'invoke', value: result } as CardAction
+        tap: { type: 'invoke', value: result } as CardAction,
+        text: result.description
     });
     return card;
 }

@@ -9,11 +9,11 @@ import * as restify from 'restify';
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
+    ActivityTypes,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage,
-    ActivityTypes
+    MemoryStorage
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -27,9 +27,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
-
-// Create storage to use
-//const storage = new MemoryStorage();
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context, error) => {

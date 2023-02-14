@@ -28,9 +28,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
-// Create storage to use
-//const storage = new MemoryStorage();
-
 // Catch-all for errors.
 const onTurnErrorHandler = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
@@ -64,9 +61,9 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application } from 'botbuilder-m365';
-import { createNpmSearchResultCard, createNpmPackageCard } from './cards';
 import axios from 'axios';
+import { Application } from 'botbuilder-m365';
+import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -76,12 +73,12 @@ const app = new Application({
 
 // Listen for search actions
 app.messageExtensions.query('searchCmd', async (context, state, query) => {
-    const searchQuery = query.parameters['queryText'] ?? '';
+    const searchQuery = query.parameters.queryText ?? '';
     const count = query.count ?? 10;
     const response = await axios.get(
         `http://registry.npmjs.com/-/v1/search?${new URLSearchParams({
-            text: searchQuery,
-            size: count.toString()
+            size: count.toString(),
+            text: searchQuery
         }).toString()}`
     );
 
@@ -91,9 +88,9 @@ app.messageExtensions.query('searchCmd', async (context, state, query) => {
 
     // Return results as a list
     return {
-        type: 'result',
         attachmentLayout: 'list',
-        attachments: results
+        attachments: results,
+        type: 'result'
     };
 });
 
@@ -104,9 +101,9 @@ app.messageExtensions.selectItem(async (context, state, item) => {
 
     // Return results
     return {
-        type: 'result',
         attachmentLayout: 'list',
-        attachments: [card]
+        attachments: [card],
+        type: 'result'
     };
 });
 
