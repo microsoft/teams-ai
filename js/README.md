@@ -1,4 +1,4 @@
-TTo build the packages and samples do the following from the root directory:
+To build the packages and samples do the following from the root directory:
 
 ```bash
 yarn install
