@@ -29,7 +29,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/Microsoft/botbuilder-samples.git
+    git clone https://github.com/Microsoft/botbuilder-m365.git
     ```
 
 1. In a terminal, navigate to `samples/javascript_nodejs/57.teams-conversation-bot`
@@ -37,7 +37,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 1. Install modules
 
     ```bash
-    npm install
+    yarn install
     ```
 
 1. Run ngrok - point to port 3978
@@ -58,7 +58,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 
     - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`)
     - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
-    - **Upload** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
+    - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
 
 1. Run your bot at the command line:
 

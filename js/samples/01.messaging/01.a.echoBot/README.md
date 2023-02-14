@@ -24,7 +24,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 1. In the root JavaScript folder, install and build all dependencies
 
     ```bash
-    cd botbuilder-samples/js
+    cd botbuilder-m365/js
     yarn install
     yarn build
     ```
@@ -35,9 +35,6 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
     ```bash
     cd samples/js/samples/messaging/echoBot
-    ``
-
-
     ```
 
 1. Run ngrok tunneling service - point to port 3978
@@ -58,7 +55,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
     - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `___YOUR BOTS ID___`
     - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
-    - **Upload** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
+    - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
 
 1. Run your bot at the command line:
 

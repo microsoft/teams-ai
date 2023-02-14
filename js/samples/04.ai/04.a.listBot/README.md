@@ -19,18 +19,22 @@ how to incorporate basic conversational flow into a Teams application. It also i
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/Microsoft/botbuilder-samples.git
+    git clone https://github.com/Microsoft/botbuilder-m365.git
     ```
 
-1. In a terminal, navigate to `samples/javascript_nodejs/57.teams-conversation-bot`
-
-1. Install modules
+1. In the root JavaScript folder, install and build all dependencies
 
     ```bash
-    npm install
+    cd botbuilder-m365/js
+    yarn install
+    yarn build
     ```
 
-1. Run ngrok - point to port 3978
+    - If you already ran `yarn install` and `yarn build` in the `js` folder, you are ready to get started with ngrok. Otherwise, you need to run `yarn install` and `yarn build` in the `js` folder.
+
+1. In a terminal, navigate to `cd` into this directory.
+
+1. Run ngrok tunneling service - point to port 3978
 
     ```bash
     ngrok http --host-header=rewrite 3978
@@ -38,7 +42,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
 1. Create [Bot Framework registration resource](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration) in Azure
 
-    - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample
+    - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample.
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
     - **_If you don't have an Azure account_** you can use this [Bot Framework registration](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/how-to/create-a-bot-for-teams#register-your-web-service-with-the-bot-framework)
 
@@ -46,15 +50,17 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
 1. **_This step is specific to Teams._**
 
-    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`)
+    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `___YOUR BOTS ID___`
     - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
-    - **Upload** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
+    - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
 
 1. Run your bot at the command line:
 
     ```bash
-    npm start
+    yarn start
     ```
+
+1. [Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file in Teams.
 
 ## Interacting with the bot
 
