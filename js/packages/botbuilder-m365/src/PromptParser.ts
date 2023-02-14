@@ -11,19 +11,28 @@ import { TurnState } from './TurnState';
 import { readFile } from 'fs/promises';
 import { ConversationHistory } from './ConversationHistory';
 
-enum PromptParseState { inText, inVariable }
+enum PromptParseState {
+    inText,
+    inVariable
+}
 
-export type PromptTemplate = string|((context: TurnContext, state: TurnState) => Promise<string>);
+export type PromptTemplate = string | ((context: TurnContext, state: TurnState) => Promise<string>);
 
 export interface PromptParserOptions {
     conversationHistory?: {
         maxCharacterLength?: number;
         lineSeparator?: string;
-    }
+    };
 }
 
 export class PromptParser {
-    public static async expandPromptTemplate(context: TurnContext, state: TurnState, data: Record<string, any>, prompt: PromptTemplate, options?: PromptParserOptions): Promise<string> {
+    public static async expandPromptTemplate(
+        context: TurnContext,
+        state: TurnState,
+        data: Record<string, any>,
+        prompt: PromptTemplate,
+        options?: PromptParserOptions
+    ): Promise<string> {
         // Get template
         let promptTemplate: string;
         if (typeof prompt == 'function') {
@@ -44,7 +53,7 @@ export class PromptParser {
             switch (parseState) {
                 case PromptParseState.inText:
                 default:
-                    if (ch == '{' && (i+1) < promptTemplate.length && promptTemplate[i+1] == '{') {
+                    if (ch == '{' && i + 1 < promptTemplate.length && promptTemplate[i + 1] == '{') {
                         // Skip next character and change parse state
                         i++;
                         variableName = '';
@@ -57,7 +66,7 @@ export class PromptParser {
                 case PromptParseState.inVariable:
                     if (ch == '}') {
                         // Skip next character and change state
-                        if ((i+1) < promptTemplate.length && promptTemplate[i+1] == '}') {
+                        if (i + 1 < promptTemplate.length && promptTemplate[i + 1] == '}') {
                             i++;
                             parseState = PromptParseState.inText;
                         }
@@ -74,9 +83,14 @@ export class PromptParser {
 
         return outputPrompt;
     }
- 
 
-    public static lookupPromptVariable(context: TurnContext, state: TurnState, data: Record<string, any>, variableName: string, options?: PromptParserOptions): string {
+    public static lookupPromptVariable(
+        context: TurnContext,
+        state: TurnState,
+        data: Record<string, any>,
+        variableName: string,
+        options?: PromptParserOptions
+    ): string {
         // Split variable name into parts and validate
         // TODO: Add support for longer dotted path variable names
         const parts = variableName.trim().split('.');
@@ -99,18 +113,23 @@ export class PromptParser {
                 // Find referenced state entry
                 const entry = state[parts[0]];
                 if (!entry) {
-                    throw new Error(`OpenAIPredictionEngine: invalid variable name of "${variableName}" specified. Couldn't find a state named "${parts[0]}".`);
+                    throw new Error(
+                        `OpenAIPredictionEngine: invalid variable name of "${variableName}" specified. Couldn't find a state named "${parts[0]}".`
+                    );
                 }
 
                 // Special case `conversation.history` reference
                 if (parts[0] == 'conversation' && parts[1] == 'history') {
-                    value = ConversationHistory.toString(state, options?.conversationHistory?.maxCharacterLength, options?.conversationHistory?.lineSeparator);
+                    value = ConversationHistory.toString(
+                        state,
+                        options?.conversationHistory?.maxCharacterLength,
+                        options?.conversationHistory?.lineSeparator
+                    );
                 } else {
                     // Return state field
                     value = entry.value[parts[1]] ?? '';
                 }
                 break;
-
         }
 
         // Return value

@@ -6,7 +6,15 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage, ActivityTypes, BotAdapter, ConversationReference, Activity, ResourceResponse } from 'botbuilder';
+import {
+    TurnContext,
+    Storage,
+    ActivityTypes,
+    BotAdapter,
+    ConversationReference,
+    Activity,
+    ResourceResponse
+} from 'botbuilder';
 import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
@@ -22,11 +30,15 @@ export interface Query<TParams extends Record<string, any>> {
     parameters: TParams;
 }
 
-export interface ApplicationOptions<TState extends TurnState, TPredictionOptions, TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>> {
+export interface ApplicationOptions<
+    TState extends TurnState,
+    TPredictionOptions,
+    TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>
+> {
     adapter?: BotAdapter;
     botAppId?: string;
     storage?: Storage;
-    predictionEngine?: TPredictionEngine; 
+    predictionEngine?: TPredictionEngine;
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
     removeRecipientMention?: boolean;
@@ -36,10 +48,28 @@ export interface ApplicationOptions<TState extends TurnState, TPredictionOptions
 export type RouteSelector = (context: TurnContext) => Promise<boolean>;
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
-export type ConversationUpdateEvents = 'channelCreated' | 'channelRenamed' | 'channelDeleted' | 'channelRestored' | 'membersAdded' | 'membersRemoved' | 'teamRenamed' | 'teamDeleted' | 'teamArchived' | 'teamUnarchived' | 'teamRestored';
+export type ConversationUpdateEvents =
+    | 'channelCreated'
+    | 'channelRenamed'
+    | 'channelDeleted'
+    | 'channelRestored'
+    | 'membersAdded'
+    | 'membersRemoved'
+    | 'teamRenamed'
+    | 'teamDeleted'
+    | 'teamArchived'
+    | 'teamUnarchived'
+    | 'teamRestored';
 export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 
-export class Application<TState extends TurnState = DefaultTurnState, TPredictionOptions = any, TPredictionEngine extends PredictionEngine<TState, TPredictionOptions> = PredictionEngine<TState, TPredictionOptions>> {
+export class Application<
+    TState extends TurnState = DefaultTurnState,
+    TPredictionOptions = any,
+    TPredictionEngine extends PredictionEngine<TState, TPredictionOptions> = PredictionEngine<
+        TState,
+        TPredictionOptions
+    >
+> {
     private readonly _options: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
@@ -49,11 +79,14 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     private _typingTimer: any;
 
     public constructor(options?: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>) {
-        this._options = Object.assign({
-            removeRecipientMention: true,
-            startTypingTimer: true
-        } as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>, options) as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
-        
+        this._options = Object.assign(
+            {
+                removeRecipientMention: true,
+                startTypingTimer: true
+            } as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>,
+            options
+        ) as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
+
         // Create default turn state manager if needed
         if (!this._options.turnStateManager) {
             this._options.turnStateManager = new DefaultTurnStateManager() as any;
@@ -88,7 +121,6 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
         return this._options;
     }
 
-
     /**
      * Adds a new route to the application.
      *
@@ -115,7 +147,10 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
      */
-    public activity(type: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
+    public activity(
+        type: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
         (Array.isArray(type) ? type : [type]).forEach((t) => {
             const selector = createActivitySelector(t);
             this.addRoute(selector, handler);
@@ -129,11 +164,14 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
      */
-    public conversationUpdate(event: ConversationUpdateEvents|ConversationUpdateEvents[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
+    public conversationUpdate(
+        event: ConversationUpdateEvents | ConversationUpdateEvents[],
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             const selector = createConversationUpdateSelector(e);
             this.addRoute(selector, handler);
-        }); 
+        });
         return this;
     }
 
@@ -142,16 +180,32 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bots logic that should be run using the new proactive turn context.
      */
-    public continueConversationAsync(context: TurnContext, logic: (context: TurnContext) => Promise<void>): Promise<void>;
-    public continueConversationAsync(conversationReference: Partial<ConversationReference>, logic: (context: TurnContext) => Promise<void>): Promise<void>;
-    public continueConversationAsync(activity: Partial<Activity>, logic: (context: TurnContext) => Promise<void>): Promise<void>;
-    public async continueConversationAsync(context: TurnContext | Partial<ConversationReference> | Partial<Activity>, logic: (context: TurnContext) => Promise<void>): Promise<void> {
+    public continueConversationAsync(
+        context: TurnContext,
+        logic: (context: TurnContext) => Promise<void>
+    ): Promise<void>;
+    public continueConversationAsync(
+        conversationReference: Partial<ConversationReference>,
+        logic: (context: TurnContext) => Promise<void>
+    ): Promise<void>;
+    public continueConversationAsync(
+        activity: Partial<Activity>,
+        logic: (context: TurnContext) => Promise<void>
+    ): Promise<void>;
+    public async continueConversationAsync(
+        context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
+        logic: (context: TurnContext) => Promise<void>
+    ): Promise<void> {
         if (!this._options.adapter) {
-            throw new Error(`You must configure the Application with an 'adapter' before calling Application.continueConversationAsync()`);
+            throw new Error(
+                `You must configure the Application with an 'adapter' before calling Application.continueConversationAsync()`
+            );
         }
 
         if (!this._options.botAppId) {
-            console.warn(`Calling Application.continueConversationAsync() without a configured 'botAppId'. In production environments a 'botAppId' is required.`);
+            console.warn(
+                `Calling Application.continueConversationAsync() without a configured 'botAppId'. In production environments a 'botAppId' is required.`
+            );
         }
 
         // Identify conversation reference
@@ -159,7 +213,7 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
         if (typeof (context as TurnContext).activity == 'object') {
             reference = TurnContext.getConversationReference((context as TurnContext).activity);
         } else if (typeof (context as Partial<Activity>).type == 'string') {
-            reference = TurnContext.getConversationReference((context as Partial<Activity>));
+            reference = TurnContext.getConversationReference(context as Partial<Activity>);
         } else {
             reference = context as Partial<ConversationReference>;
         }
@@ -173,7 +227,10 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
      */
-    public message(keyword: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
+    public message(
+        keyword: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
         (Array.isArray(keyword) ? keyword : [keyword]).forEach((k) => {
             const selector = createMessageSelector(k);
             this.addRoute(selector, handler);
@@ -187,7 +244,10 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
      */
-    public messageReactions(event: MessageReactionEvents|MessageReactionEvents[], handler: (context: TurnContext, state: TState) => Promise<void>): this {
+    public messageReactions(
+        event: MessageReactionEvents | MessageReactionEvents[],
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             const selector = createMessageReactionSelector(e);
             this.addRoute(selector, handler);
@@ -264,7 +324,7 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
 
                 // End dispatch
                 return true;
-            } 
+            }
 
             // activity wasn't handled
             return false;
@@ -281,10 +341,30 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
      * @param inputHint Optional. Input hint for channels that support voice.
      * @returns A Resource response containing the ID of the activity that was sent.
      */
-    public sendProactiveActivity(context: TurnContext, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
-    public sendProactiveActivity(conversationReference: Partial<ConversationReference>, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
-    public sendProactiveActivity(activity: Partial<Activity>, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
-    public async sendProactiveActivity(context: TurnContext | Partial<ConversationReference> | Partial<Activity>, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined> {
+    public sendProactiveActivity(
+        context: TurnContext,
+        activityOrText: string | Partial<Activity>,
+        speak?: string,
+        inputHint?: string
+    ): Promise<ResourceResponse | undefined>;
+    public sendProactiveActivity(
+        conversationReference: Partial<ConversationReference>,
+        activityOrText: string | Partial<Activity>,
+        speak?: string,
+        inputHint?: string
+    ): Promise<ResourceResponse | undefined>;
+    public sendProactiveActivity(
+        activity: Partial<Activity>,
+        activityOrText: string | Partial<Activity>,
+        speak?: string,
+        inputHint?: string
+    ): Promise<ResourceResponse | undefined>;
+    public async sendProactiveActivity(
+        context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
+        activityOrText: string | Partial<Activity>,
+        speak?: string,
+        inputHint?: string
+    ): Promise<ResourceResponse | undefined> {
         let response: ResourceResponse | undefined;
         await this.continueConversationAsync(context, async (ctx) => {
             response = await ctx.sendActivity(activityOrText, speak, inputHint);
@@ -296,7 +376,7 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
     /**
      * Manually start a timer to periodically send "typing" activities.
      * @remarks
-     * The timer will automatically end once an outgoing activity has been sent. If the timer is 
+     * The timer will automatically end once an outgoing activity has been sent. If the timer is
      * already running or the current activity, is not a "message" the call is ignored.
      * @param context The context for the current turn with the user.
      */
@@ -318,16 +398,16 @@ export class Application<TState extends TurnState = DefaultTurnState, TPredictio
 
                 return next();
             });
-            
+
             let timerRunning = true;
             const onTimeout = async () => {
                 try {
                     // Send typing activity
                     await context.sendActivity({ type: ActivityTypes.Typing });
                 } catch (err) {
-                    // Seeing a random proxy violation error from the context object. This is because 
+                    // Seeing a random proxy violation error from the context object. This is because
                     // we're in the middle of sending an activity on a background thread when the turn ends.
-                    // The context object throws when we try to update "this.responded = true". We can just 
+                    // The context object throws when we try to update "this.responded = true". We can just
                     // eat the error but lets make sure our states cleaned up a bit.
                     this._typingTimer = undefined;
                     timerRunning = false;
@@ -360,7 +440,7 @@ interface AppRoute<TState extends TurnState> {
     handler: RouteHandler<TState>;
 }
 
-function createActivitySelector(type: string|RegExp|RouteSelector): RouteSelector {
+function createActivitySelector(type: string | RegExp | RouteSelector): RouteSelector {
     if (typeof type == 'function') {
         // Return the passed in selector function
         return type;
@@ -373,7 +453,9 @@ function createActivitySelector(type: string|RegExp|RouteSelector): RouteSelecto
         // Return a function that attempts to match type name
         const typeName = type.toString().toLocaleLowerCase();
         return (context: TurnContext) => {
-            return Promise.resolve(context?.activity?.type ? context.activity.type.toLocaleLowerCase() === typeName : false);
+            return Promise.resolve(
+                context?.activity?.type ? context.activity.type.toLocaleLowerCase() === typeName : false
+            );
         };
     }
 }
@@ -382,20 +464,31 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
     switch (event) {
         case 'membersAdded':
             return (context: TurnContext) => {
-                return Promise.resolve(context?.activity?.type == ActivityTypes.ConversationUpdate && Array.isArray(context?.activity?.membersAdded) && context.activity.membersAdded.length > 0);
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        Array.isArray(context?.activity?.membersAdded) &&
+                        context.activity.membersAdded.length > 0
+                );
             };
         case 'membersRemoved':
             return (context: TurnContext) => {
-                return Promise.resolve(context?.activity?.type == ActivityTypes.ConversationUpdate && Array.isArray(context?.activity?.membersRemoved) && context.activity.membersRemoved.length > 0);
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        Array.isArray(context?.activity?.membersRemoved) &&
+                        context.activity.membersRemoved.length > 0
+                );
             };
-        default: 
+        default:
             return (context: TurnContext) => {
-                return Promise.resolve(context?.activity?.type == ActivityTypes.ConversationUpdate && context?.activity?.channelData?.eventType == event);
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
             };
     }
 }
 
-function createMessageSelector(keyword: string|RegExp|RouteSelector): RouteSelector {
+function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteSelector {
     if (typeof keyword == 'function') {
         // Return the passed in selector function
         return keyword;
@@ -426,11 +519,19 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
         case 'reactionsAdded':
         default:
             return (context: TurnContext) => {
-                return Promise.resolve(context?.activity?.type == ActivityTypes.MessageReaction && Array.isArray(context?.activity?.reactionsAdded) && context.activity.reactionsAdded.length > 0);
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageReaction &&
+                        Array.isArray(context?.activity?.reactionsAdded) &&
+                        context.activity.reactionsAdded.length > 0
+                );
             };
         case 'reactionsRemoved':
             return (context: TurnContext) => {
-                return Promise.resolve(context?.activity?.type == ActivityTypes.MessageReaction && Array.isArray(context?.activity?.reactionsRemoved) && context.activity.reactionsRemoved.length > 0);
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageReaction &&
+                        Array.isArray(context?.activity?.reactionsRemoved) &&
+                        context.activity.reactionsRemoved.length > 0
+                );
             };
     }
 }
