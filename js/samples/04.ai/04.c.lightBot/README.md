@@ -22,7 +22,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
     git clone https://github.com/Microsoft/botbuilder-m365.git
     ```
 
-1. In a terminal, navigate to `samples/javascript_nodejs/57.teams-conversation-bot`
+1. In a terminal, `cd` into this directory
 
 1. Install modules
 
