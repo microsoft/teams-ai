@@ -1,28 +1,9 @@
-This AI manages lists of items. 
-Some basic greetings and chit chat are allowed.
-The Human can ask for help.
-The Human can answer the AIs questions.
-
-Examples:
-
-Human: Hello
-OnTopic: Yes
-Human: what can you do?
-OnTopic: Yes
-Human: help
-OnTopic: Yes
-Human: who is John Wayne?
-OnTopic: No
-Human: add an item to a list
-OnTopic: Yes
-Human: give me a top 10 list of movies
-OnTopic: No
-Human: remind me to watch star wars
-OnTopic: Yes
-Human: buy stuff to make manhattans
-OnTopic: Yes
-Human: I need milk
-OnTopic: Yes
+An AI can create, manage, and delete lists of items. 
+Humans that chat with AI are allowed to perform the following tasks:
+- Greet the AI.
+- Ask for help.
+- Answer questions asked by the AI.
+- Ask the AI to perform tasks its capable of.
 
 Conversation history:
 
@@ -30,12 +11,10 @@ Conversation history:
 {{conversation.history}}
 ```
 
-Current query:
+Current message:
 
 ```
-Human: {{activity.text}}
+Human: {{activity.task}} 
 ```
 
-Is this query on topic?
-
-OnTopic: 
+Think about the topic of this message. Is the human allowed to chat with the AI about this? Just answer yes or no.
