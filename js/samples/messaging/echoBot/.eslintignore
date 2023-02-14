@@ -2,6 +2,7 @@ bin
 build
 demo-packages
 dist
+lib
 manifest
 node_modules
 package-lock.json

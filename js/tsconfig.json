@@ -6,7 +6,7 @@
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
         "sourceMap": true,
-        "strict": true,
+        "strict": false,
         "target": "es6"
     }
 }

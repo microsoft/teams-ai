@@ -7,7 +7,7 @@
         "outDir": "./lib",
         "rootDir": "./src",
         "sourceMap": true,
-        "strict": true,
+        "strict": false,
         "incremental": true,
         "tsBuildInfoFile": "./lib/.tsbuildinfo"
     }
