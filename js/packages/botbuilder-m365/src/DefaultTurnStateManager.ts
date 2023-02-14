@@ -6,8 +6,8 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage, StoreItems } from "botbuilder";
-import { TurnState, TurnStateEntry, TurnStateManager } from "./TurnState";
+import { TurnContext, Storage, StoreItems } from 'botbuilder';
+import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
 export interface DefaultTurnState<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}> extends TurnState {
     conversation: TurnStateEntry<TCS>;
@@ -15,8 +15,10 @@ export interface DefaultTurnState<TCS extends {} = {}, TUS extends {} = {}, TTS 
     temp: TurnStateEntry<TTS>;
 }
 
-export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}> implements TurnStateManager<DefaultTurnState<TCS,TUS,TTS>> {
-    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TCS,TUS,TTS>> {
+export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}>
+    implements TurnStateManager<DefaultTurnState<TCS, TUS, TTS>>
+{
+    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TCS, TUS, TTS>> {
         // Compute state keys
         const activity = context.activity;
         const channelId = activity?.channelId;
@@ -47,7 +49,7 @@ export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, T
         const items = storage ? await storage.read([conversationKey, userKey]) : {};
 
         // Map items to state object
-        const state: DefaultTurnState<TCS,TUS,TTS> = {
+        const state: DefaultTurnState<TCS, TUS, TTS> = {
             conversation: new TurnStateEntry(items[conversationKey], conversationKey),
             user: new TurnStateEntry(items[userKey], userKey),
             temp: new TurnStateEntry({} as TTS)
@@ -56,52 +58,54 @@ export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, T
         return state;
     }
 
-    public async saveState(storage: Storage, context: TurnContext, state: DefaultTurnState<TCS,TUS,TTS>): Promise<void> {
-       // Find changes and deletions
-       let changes: StoreItems | undefined;
-       let deletions: string[] | undefined;
-       for (const key in state) {
-           if (state.hasOwnProperty(key)) {
-               const entry = state[key];
-               if (entry.storageKey) {
-                   if (entry.isDeleted) {
-                       // Add to deletion list
-                       if (deletions) {
-                           deletions.push(entry.storageKey);
-                       } else {
-                           deletions = [entry.storageKey];
-                       }
-                   } else if (entry.hasChanged) {
-                       // Add to change set
-                       if (!changes) {
-                           changes = {};
-                       }
-                       
-                       changes[entry.storageKey] = entry.value;
-                   }
-               } 
-           }
-       }
+    public async saveState(
+        storage: Storage,
+        context: TurnContext,
+        state: DefaultTurnState<TCS, TUS, TTS>
+    ): Promise<void> {
+        // Find changes and deletions
+        let changes: StoreItems | undefined;
+        let deletions: string[] | undefined;
+        for (const key in state) {
+            if (state.hasOwnProperty(key)) {
+                const entry = state[key];
+                if (entry.storageKey) {
+                    if (entry.isDeleted) {
+                        // Add to deletion list
+                        if (deletions) {
+                            deletions.push(entry.storageKey);
+                        } else {
+                            deletions = [entry.storageKey];
+                        }
+                    } else if (entry.hasChanged) {
+                        // Add to change set
+                        if (!changes) {
+                            changes = {};
+                        }
 
-       // Do we have a storage provider?
-       if (storage) {
-           // Apply changes
-           const promises: Promise<void>[] = [];
-           if (changes) {
-               promises.push(storage.write(changes));
-           }
+                        changes[entry.storageKey] = entry.value;
+                    }
+                }
+            }
+        }
 
-           // Apply deletions
-           if (deletions) {
-               promises.push(storage.delete(deletions));
-           }
+        // Do we have a storage provider?
+        if (storage) {
+            // Apply changes
+            const promises: Promise<void>[] = [];
+            if (changes) {
+                promises.push(storage.write(changes));
+            }
 
-           // Wait for completion
-           if (promises.length > 0) {
-               await Promise.all(promises);
-           }
-       }
+            // Apply deletions
+            if (deletions) {
+                promises.push(storage.delete(deletions));
+            }
+
+            // Wait for completion
+            if (promises.length > 0) {
+                await Promise.all(promises);
+            }
+        }
     }
-
-
 }

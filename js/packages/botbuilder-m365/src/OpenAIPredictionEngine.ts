@@ -10,13 +10,18 @@ import { PredictedCommand, PredictedDoCommand, PredictionEngine } from './Predic
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
-import { Configuration, ConfigurationParameters, OpenAIApi, CreateCompletionRequest, CreateCompletionResponse } from 'openai';
+import {
+    Configuration,
+    ConfigurationParameters,
+    OpenAIApi,
+    CreateCompletionRequest,
+    CreateCompletionResponse
+} from 'openai';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { ResponseParser } from './ResponseParser';
 import { PromptParser, PromptTemplate } from './PromptParser';
 import { ConversationHistory } from './ConversationHistory';
 import { AI } from './AI';
-
 
 export interface OpenAIPromptOptions {
     prompt: PromptTemplate;
@@ -26,7 +31,7 @@ export interface OpenAIPromptOptions {
 }
 
 export interface OpenAIPredictionOptions extends OpenAIPromptOptions {
-    topicFilter?: PromptTemplate; 
+    topicFilter?: PromptTemplate;
     topicFilterConfig?: CreateCompletionRequest;
 }
 
@@ -36,12 +41,11 @@ export interface OpenAIPredictionEngineOptions {
     axios?: AxiosInstance;
     prompt?: PromptTemplate;
     promptConfig?: CreateCompletionRequest;
-    topicFilter?: PromptTemplate; 
+    topicFilter?: PromptTemplate;
     topicFilterConfig?: CreateCompletionRequest;
     conversationHistory?: OpenAIConversationHistoryOptions;
     logRequests?: boolean;
 }
-
 
 export interface OpenAIConversationHistoryOptions {
     addTurnToHistory?: boolean;
@@ -52,11 +56,12 @@ export interface OpenAIConversationHistoryOptions {
     lineSeparator?: string;
 }
 
-export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState> implements PredictionEngine<TState, OpenAIPredictionOptions> {
+export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
+    implements PredictionEngine<TState, OpenAIPredictionOptions>
+{
     private readonly _options: OpenAIPredictionEngineOptions;
     private readonly _configuration: Configuration;
     private readonly _openai: OpenAIApi;
-
 
     public constructor(options: OpenAIPredictionEngineOptions) {
         this._options = Object.assign({} as OpenAIPredictionEngineOptions, options);
@@ -64,11 +69,14 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         this._openai = new OpenAIApi(this._configuration, options.basePath, options.axios as any);
 
         // Initialize conversation history
-        this._options.conversationHistory = Object.assign({
-            addTurnToHistory: true,
-            userPrefix: 'Human: ',
-            botPrefix: 'AI: '
-        } as OpenAIConversationHistoryOptions, this._options.conversationHistory);
+        this._options.conversationHistory = Object.assign(
+            {
+                addTurnToHistory: true,
+                userPrefix: 'Human: ',
+                botPrefix: 'AI: '
+            } as OpenAIConversationHistoryOptions,
+            this._options.conversationHistory
+        );
     }
 
     public get configuration(): Configuration {
@@ -79,35 +87,68 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return this._openai;
     }
 
-    public async prompt(context: TurnContext, state: TState, options: OpenAIPromptOptions, data?: Record<string, any>): Promise<AxiosResponse<CreateCompletionResponse>> {
+    public async prompt(
+        context: TurnContext,
+        state: TState,
+        options: OpenAIPromptOptions,
+        data?: Record<string, any>
+    ): Promise<AxiosResponse<CreateCompletionResponse>> {
         data = data ?? {};
 
         // Request base prompt completion
         const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];
-        const promptRequest = await this.createCompletionRequest(context, state, data, options.prompt, options.promptConfig, options.conversationHistory);
-        return await this.createCompletion(promptRequest, 'PROMPT') as any;
+        const promptRequest = await this.createCompletionRequest(
+            context,
+            state,
+            data,
+            options.prompt,
+            options.promptConfig,
+            options.conversationHistory
+        );
+        return (await this.createCompletion(promptRequest, 'PROMPT')) as any;
     }
 
-    public async predictCommands(context: TurnContext, state: TState, data?: Record<string, any>, options?: OpenAIPredictionOptions): Promise<PredictedCommand[]> {
+    public async predictCommands(
+        context: TurnContext,
+        state: TState,
+        data?: Record<string, any>,
+        options?: OpenAIPredictionOptions
+    ): Promise<PredictedCommand[]> {
         data = data ?? {};
-        options = options ?? this._options as OpenAIPredictionOptions;
+        options = options ?? (this._options as OpenAIPredictionOptions);
 
         if (!options.prompt || !options.promptConfig) {
             throw new Error(`OpenAIPredictionEngine: "prompt" or "promptConfiguration" not specified.`);
         }
-    
+
         // Request base prompt completion
         const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];
-        const promptRequest = await this.createCompletionRequest(context, state, data, options.prompt, options.promptConfig, options.conversationHistory);
+        const promptRequest = await this.createCompletionRequest(
+            context,
+            state,
+            data,
+            options.prompt,
+            options.promptConfig,
+            options.conversationHistory
+        );
         promises.push(this.createCompletion(promptRequest, 'PROMPT') as any);
-    
+
         // Add optional topic filter completion
         if (options.topicFilter) {
             if (!options.topicFilterConfig) {
-                throw new Error(`OpenAIPredictionEngine: a "topicFilter" prompt was specified but the "topicFilterConfig" is missing.`);
+                throw new Error(
+                    `OpenAIPredictionEngine: a "topicFilter" prompt was specified but the "topicFilterConfig" is missing.`
+                );
             }
 
-            const topicFilterRequest = await this.createCompletionRequest(context, state, data, options.topicFilter, options.topicFilterConfig, options.conversationHistory);
+            const topicFilterRequest = await this.createCompletionRequest(
+                context,
+                state,
+                data,
+                options.topicFilter,
+                options.topicFilterConfig,
+                options.conversationHistory
+            );
             promises.push(this.createCompletion(topicFilterRequest, 'TOPIC FILTER') as any);
         }
 
@@ -117,15 +158,16 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         // Ensure we weren't rate limited
         for (let i = 0; i < results.length; i++) {
             if (results[i].status == 429) {
-                return [{
-                    type: 'DO',
-                    action: AI.RateLimitedActionName,
-                    data: {}
-                } as PredictedDoCommand];
+                return [
+                    {
+                        type: 'DO',
+                        action: AI.RateLimitedActionName,
+                        data: {}
+                    } as PredictedDoCommand
+                ];
             }
         }
 
-        
         // Check topic filter
         if (results.length > 1) {
             if (results[1].status != 429) {
@@ -137,11 +179,13 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
                 // Redirect to OffTopic action if not allowed
                 if (!allowed) {
-                    return [{
-                        type: 'DO',
-                        action: AI.OffTopicActionName,
-                        data: {}
-                    } as PredictedDoCommand];
+                    return [
+                        {
+                            type: 'DO',
+                            action: AI.OffTopicActionName,
+                            data: {}
+                        } as PredictedDoCommand
+                    ];
                 }
             }
         }
@@ -165,10 +209,18 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             // Add turn to conversation history
             if (historyOptions.addTurnToHistory) {
                 if (context.activity.text) {
-                    ConversationHistory.addLine(state, `${historyOptions.userPrefix ?? ''}${context.activity.text}`, historyOptions.maxLines);
+                    ConversationHistory.addLine(
+                        state,
+                        `${historyOptions.userPrefix ?? ''}${context.activity.text}`,
+                        historyOptions.maxLines
+                    );
                 }
                 if (response) {
-                    ConversationHistory.addLine(state, `${historyOptions.botPrefix ?? ''}${response}`, historyOptions.maxLines);
+                    ConversationHistory.addLine(
+                        state,
+                        `${historyOptions.botPrefix ?? ''}${response}`,
+                        historyOptions.maxLines
+                    );
                 }
             }
             return commands;
@@ -177,26 +229,38 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return [];
     }
 
-    private async createCompletionRequest(context: TurnContext, state: TState, data: Record<string, any>, prompt: PromptTemplate, config: CreateCompletionRequest, historyOptions?: OpenAIConversationHistoryOptions): Promise<CreateCompletionRequest> {
+    private async createCompletionRequest(
+        context: TurnContext,
+        state: TState,
+        data: Record<string, any>,
+        prompt: PromptTemplate,
+        config: CreateCompletionRequest,
+        historyOptions?: OpenAIConversationHistoryOptions
+    ): Promise<CreateCompletionRequest> {
         // Clone prompt config
         const request = Object.assign({}, config);
 
         // Expand prompt template
-        // - NOTE: While the local history options and the prompts expected history options are 
-        //         different types, they're compatible via duck typing. This could impact porting. 
-        request.prompt = await PromptParser.expandPromptTemplate(context, state, data, prompt, { conversationHistory: historyOptions });
+        // - NOTE: While the local history options and the prompts expected history options are
+        //         different types, they're compatible via duck typing. This could impact porting.
+        request.prompt = await PromptParser.expandPromptTemplate(context, state, data, prompt, {
+            conversationHistory: historyOptions
+        });
 
         return request;
     }
 
-    private async createCompletion(request: CreateCompletionRequest, promptType: string): Promise<AxiosResponse<CreateCompletionResponse>> {
+    private async createCompletion(
+        request: CreateCompletionRequest,
+        promptType: string
+    ): Promise<AxiosResponse<CreateCompletionResponse>> {
         let response: AxiosResponse<CreateCompletionResponse>;
-        let error: { status?: number; } = {};
+        let error: { status?: number } = {};
         const startTime = new Date().getTime();
         try {
-            response = await this._openai.createCompletion(request, {
+            response = (await this._openai.createCompletion(request, {
                 validateStatus: (status) => status < 400 || status == 429
-            }) as any;
+            })) as any;
         } catch (err: any) {
             error = err;
             throw err;
@@ -206,14 +270,27 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                 console.log(`\n${promptType} REQUEST:\n\`\`\`\n${request.prompt}\`\`\``);
                 if (response!) {
                     if (response.status != 429) {
-                        const choice = Array.isArray(response?.data?.choices) && response.data.choices.length > 0 ? response.data.choices[0].text : '';
-                        console.log(`${promptType} SUCCEEDED: status=${response.status} duration=${duration} response=${choice}`);
+                        const choice =
+                            Array.isArray(response?.data?.choices) && response.data.choices.length > 0
+                                ? response.data.choices[0].text
+                                : '';
+                        console.log(
+                            `${promptType} SUCCEEDED: status=${response.status} duration=${duration} response=${choice}`
+                        );
                     } else {
-                        console.error(`${promptType} FAILED: status=${response.status} duration=${duration} headers=${JSON.stringify(response.headers)}`);
+                        console.error(
+                            `${promptType} FAILED: status=${
+                                response.status
+                            } duration=${duration} headers=${JSON.stringify(response.headers)}`
+                        );
                     }
                 } else {
-                    console.error(`${promptType} FAILED: status=${error?.status} duration=${duration} message=${error?.toString()}`);
-                } 
+                    console.error(
+                        `${promptType} FAILED: status=${
+                            error?.status
+                        } duration=${duration} message=${error?.toString()}`
+                    );
+                }
             }
         }
 

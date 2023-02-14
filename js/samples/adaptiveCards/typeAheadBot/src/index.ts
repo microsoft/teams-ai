@@ -20,7 +20,9 @@ import {
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(process.env as ConfigurationBotFrameworkAuthenticationOptions);
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+    process.env as ConfigurationBotFrameworkAuthenticationOptions
+);
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
@@ -30,23 +32,23 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async ( context, error ) => {
+const onTurnErrorHandler = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error( `\n [onTurnError] unhandled error: ${ error }` );
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${ error }`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
 
     // Send a message to the user
-    await context.sendActivity( 'The bot encountered an error or bug.' );
-    await context.sendActivity( 'To continue to run this bot, please fix the bot source code.' );
+    await context.sendActivity('The bot encountered an error or bug.');
+    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 };
 
 // Set the onTurnError for the singleton CloudAdapter.
@@ -57,9 +59,9 @@ const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log( `\n${ server.name } listening to ${ server.url }` );
-    console.log( '\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator' );
-    console.log( '\nTo talk to your bot, open the emulator select "Open Bot"' );
+    console.log(`\n${server.name} listening to ${server.url}`);
+    console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
+    console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
 });
 
 import { AdaptiveCardSearchResult, Application } from 'botbuilder-m365';
@@ -78,7 +80,9 @@ app.conversationUpdate('membersAdded', async (context, state) => {
     for (let member = 0; member < membersAdded.length; member++) {
         // Ignore the bot joining the conversation
         if (membersAdded[member].id !== context.activity.recipient.id) {
-            await context.sendActivity(`Hello and welcome! With this sample you can see the functionality of static and dynamic search in adaptive card`);
+            await context.sendActivity(
+                `Hello and welcome! With this sample you can see the functionality of static and dynamic search in adaptive card`
+            );
         }
     }
 });
@@ -99,11 +103,16 @@ app.adaptiveCards.search('npmpackages', async (context, state, query) => {
     // Execute query
     const searchQuery = query.parameters['queryText'] ?? '';
     const count = query.count ?? 10;
-    const response = await axios.get(`http://registry.npmjs.com/-/v1/search?${new URLSearchParams({ text: searchQuery, size: count.toString() }).toString()}`);
-    
+    const response = await axios.get(
+        `http://registry.npmjs.com/-/v1/search?${new URLSearchParams({
+            text: searchQuery,
+            size: count.toString()
+        }).toString()}`
+    );
+
     // Format search results
     const npmPackages: AdaptiveCardSearchResult[] = [];
-    response.data.objects.forEach(obj => {
+    response.data.objects.forEach((obj) => {
         const result: AdaptiveCardSearchResult = {
             title: obj.package.name,
             value: `${obj.package.name} - ${obj.package.description}`

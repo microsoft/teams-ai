@@ -6,7 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, ActivityTypes, InvokeResponse, INVOKE_RESPONSE_KEY, AdaptiveCardInvokeResponse } from 'botbuilder';
+import {
+    TurnContext,
+    ActivityTypes,
+    InvokeResponse,
+    INVOKE_RESPONSE_KEY,
+    AdaptiveCardInvokeResponse
+} from 'botbuilder';
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
@@ -32,7 +38,7 @@ export interface AdaptiveCardsSearchParams {
 export interface AdaptiveCardSearchResult {
     title: string;
     value: string;
-} 
+}
 
 export class AdaptiveCards<TState extends TurnState> {
     private readonly _app: Application<TState>;
@@ -41,46 +47,65 @@ export class AdaptiveCards<TState extends TurnState> {
         this._app = app;
     }
 
-    public actionExecute(verb: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<AdaptiveCard|string>): Application<TState> {
+    public actionExecute(
+        verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<AdaptiveCard | string>
+    ): Application<TState> {
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
             const selector = createActionExecuteSelector(v);
-            this._app.addRoute(selector, async (context, state) => {
-                // Insure that we're in an Action.Execute as expected
-                const a = context?.activity;
-                if (a?.type !== ActivityTypes.Invoke || a?.name !== ACTION_INVOKE_NAME || a?.value?.action?.type !== ACTION_EXECUTE_TYPE) {
-                    throw new Error(`Unexpected AdaptiveCards.actionExecute() triggered for activity type: ${a?.type}`);
-                }
-
-                // Call handler and then check to see if an invoke response has already been added 
-                const result = await handler(context, state, a.value?.action?.data ?? {});
-                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                    // Format invoke response
-                    let response: AdaptiveCardInvokeResponse;
-                    if (typeof result == 'string') {
-                        // Return message
-                        response = {
-                            statusCode: 200,
-                            type: 'application/vnd.microsoft.activity.message',
-                            value: result as any
-                        };
-                    } else {
-                        // Return card
-                        response = {
-                            statusCode: 200,
-                            type: 'application/vnd.microsoft.card.adaptive',
-                            value: result
-                        }
+            this._app.addRoute(
+                selector,
+                async (context, state) => {
+                    // Insure that we're in an Action.Execute as expected
+                    const a = context?.activity;
+                    if (
+                        a?.type !== ActivityTypes.Invoke ||
+                        a?.name !== ACTION_INVOKE_NAME ||
+                        a?.value?.action?.type !== ACTION_EXECUTE_TYPE
+                    ) {
+                        throw new Error(
+                            `Unexpected AdaptiveCards.actionExecute() triggered for activity type: ${a?.type}`
+                        );
                     }
 
-                    // Queue up invoke response
-                    await context.sendActivity({ value: { body: response, status: 200 } as InvokeResponse, type: ActivityTypes.InvokeResponse })
-                }
-            }, true);
+                    // Call handler and then check to see if an invoke response has already been added
+                    const result = await handler(context, state, a.value?.action?.data ?? {});
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Format invoke response
+                        let response: AdaptiveCardInvokeResponse;
+                        if (typeof result == 'string') {
+                            // Return message
+                            response = {
+                                statusCode: 200,
+                                type: 'application/vnd.microsoft.activity.message',
+                                value: result as any
+                            };
+                        } else {
+                            // Return card
+                            response = {
+                                statusCode: 200,
+                                type: 'application/vnd.microsoft.card.adaptive',
+                                value: result
+                            };
+                        }
+
+                        // Queue up invoke response
+                        await context.sendActivity({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                },
+                true
+            );
         });
         return this._app;
     }
 
-    public actionSubmit(verb: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<void>): Application<TState> {
+    public actionSubmit(
+        verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<void>
+    ): Application<TState> {
         const filter = this._app.options.adaptiveCards?.actionSubmitFilter ?? DEFAULT_ACTION_SUBMIT_FILTER;
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
             const selector = createActionSubmitSelector(v, filter);
@@ -98,47 +123,64 @@ export class AdaptiveCards<TState extends TurnState> {
         return this._app;
     }
 
-    public search(dataset: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState, query: Query<AdaptiveCardsSearchParams>) => Promise<AdaptiveCardSearchResult[]>): Application<TState> {
+    public search(
+        dataset: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (
+            context: TurnContext,
+            state: TState,
+            query: Query<AdaptiveCardsSearchParams>
+        ) => Promise<AdaptiveCardSearchResult[]>
+    ): Application<TState> {
         (Array.isArray(dataset) ? dataset : [dataset]).forEach((ds) => {
             const selector = createSearchSelector(ds);
-            this._app.addRoute(selector, async (context, state) => {
-                // Insure that we're in an Action.Execute as expected
-                const a = context?.activity;
-                if (a?.type !== ActivityTypes.Invoke || a?.name !== SEARCH_INvOKE_NAME) {
-                    throw new Error(`Unexpected AdaptiveCards.search() triggered for activity type: ${a?.type}`);
-                }
-
-                // Flatten search parameters
-                const query: Query<AdaptiveCardsSearchParams> = {
-                    count: a?.value?.queryOptions?.top ?? 25,
-                    skip: a?.value?.queryOptions?.skip ?? 0,
-                    parameters: {
-                        queryText: a?.value?.queryText ?? '',
-                        dataset: a?.value?.dataset ?? ''
+            this._app.addRoute(
+                selector,
+                async (context, state) => {
+                    // Insure that we're in an Action.Execute as expected
+                    const a = context?.activity;
+                    if (a?.type !== ActivityTypes.Invoke || a?.name !== SEARCH_INvOKE_NAME) {
+                        throw new Error(`Unexpected AdaptiveCards.search() triggered for activity type: ${a?.type}`);
                     }
-                };
 
-                // Call handler and then check to see if an invoke response has already been added 
-                const results = await handler(context, state, query);
-                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                    // Format invoke response
-                    const response = {
-                        type: 'application/vnd.microsoft.search.searchResponse',
-                        value: {
-                            results: results
+                    // Flatten search parameters
+                    const query: Query<AdaptiveCardsSearchParams> = {
+                        count: a?.value?.queryOptions?.top ?? 25,
+                        skip: a?.value?.queryOptions?.skip ?? 0,
+                        parameters: {
+                            queryText: a?.value?.queryText ?? '',
+                            dataset: a?.value?.dataset ?? ''
                         }
                     };
 
-                    // Queue up invoke response
-                    await context.sendActivity({ value: { body: response, status: 200 } as InvokeResponse, type: ActivityTypes.InvokeResponse })
-                }
-            }, true);
+                    // Call handler and then check to see if an invoke response has already been added
+                    const results = await handler(context, state, query);
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Format invoke response
+                        const response = {
+                            type: 'application/vnd.microsoft.search.searchResponse',
+                            value: {
+                                results: results
+                            }
+                        };
+
+                        // Queue up invoke response
+                        await context.sendActivity({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                },
+                true
+            );
         });
         return this._app;
     }
 }
 
-function createActionExecuteSelector(verb: string|RegExp|RouteSelector): RouteSelector {
+/**
+ * @param verb
+ */
+function createActionExecuteSelector(verb: string | RegExp | RouteSelector): RouteSelector {
     if (typeof verb == 'function') {
         // Return the passed in selector function
         return verb;
@@ -146,7 +188,10 @@ function createActionExecuteSelector(verb: string|RegExp|RouteSelector): RouteSe
         // Return a function that matches the verb using a RegExp
         return (context: TurnContext) => {
             const a = context?.activity;
-            const isInvoke = a?.type == ActivityTypes.Invoke && a?.name === ACTION_INVOKE_NAME && a?.value?.action?.type === ACTION_EXECUTE_TYPE;
+            const isInvoke =
+                a?.type == ActivityTypes.Invoke &&
+                a?.name === ACTION_INVOKE_NAME &&
+                a?.value?.action?.type === ACTION_EXECUTE_TYPE;
             if (isInvoke && typeof a?.value?.action?.verb == 'string') {
                 return Promise.resolve(verb.test(a.value.action.verb));
             } else {
@@ -157,13 +202,20 @@ function createActionExecuteSelector(verb: string|RegExp|RouteSelector): RouteSe
         // Return a function that attempts to match verb
         return (context: TurnContext) => {
             const a = context?.activity;
-            const isInvoke = a?.type == ActivityTypes.Invoke && a?.name === ACTION_INVOKE_NAME && a?.value?.action?.type === ACTION_EXECUTE_TYPE;
+            const isInvoke =
+                a?.type == ActivityTypes.Invoke &&
+                a?.name === ACTION_INVOKE_NAME &&
+                a?.value?.action?.type === ACTION_EXECUTE_TYPE;
             return Promise.resolve(isInvoke && a?.value?.action?.verb === verb);
         };
     }
 }
 
-function createActionSubmitSelector(verb: string|RegExp|RouteSelector, filter: string): RouteSelector {
+/**
+ * @param verb
+ * @param filter
+ */
+function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filter: string): RouteSelector {
     if (typeof verb == 'function') {
         // Return the passed in selector function
         return verb;
@@ -188,7 +240,10 @@ function createActionSubmitSelector(verb: string|RegExp|RouteSelector, filter: s
     }
 }
 
-function createSearchSelector(dataset: string|RegExp|RouteSelector): RouteSelector {
+/**
+ * @param dataset
+ */
+function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSelector {
     if (typeof dataset == 'function') {
         // Return the passed in selector function
         return dataset;

@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnState } from "./TurnState";
+import { TurnState } from './TurnState';
 
 export class ConversationHistory {
     /**
@@ -16,13 +16,14 @@ export class ConversationHistory {
 
     /**
      * Adds a new line of text to conversation history
+     *
      * @param state Applications turn state.
      * @param line Line of text to add to history.
      * @param maxLines Optional. Maximum number of lines to store. Defaults to 30.
      */
     public static addLine(state: TurnState, line: string, maxLines = 30): void {
         if (state.conversation) {
-            // Create history array if it doesn't exist 
+            // Create history array if it doesn't exist
             let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
             if (!Array.isArray(history)) {
                 history = [];
@@ -39,7 +40,9 @@ export class ConversationHistory {
             // Save history back to conversation state
             state.conversation.value[ConversationHistory.StatePropertyName] = history;
         } else {
-            throw new Error(`ConversationHistory.addLine() was passed a state object without a 'conversation' state member.`);
+            throw new Error(
+                `ConversationHistory.addLine() was passed a state object without a 'conversation' state member.`
+            );
         }
     }
 
@@ -50,7 +53,7 @@ export class ConversationHistory {
 
     public static getLastLine(state: TurnState): string {
         if (state.conversation) {
-            // Create history array if it doesn't exist 
+            // Create history array if it doesn't exist
             let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
             if (!Array.isArray(history)) {
                 history = [];
@@ -59,13 +62,15 @@ export class ConversationHistory {
             // Return the last line or an empty string
             return history.length > 0 ? history[history.length - 1] : '';
         } else {
-            throw new Error(`ConversationHistory.getLastLine() was passed a state object without a 'conversation' state member.`);
+            throw new Error(
+                `ConversationHistory.getLastLine() was passed a state object without a 'conversation' state member.`
+            );
         }
     }
 
-    public static removeLastLine(state: TurnState): string|undefined {
+    public static removeLastLine(state: TurnState): string | undefined {
         if (state.conversation) {
-            // Create history array if it doesn't exist 
+            // Create history array if it doesn't exist
             let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
             if (!Array.isArray(history)) {
                 history = [];
@@ -81,13 +86,15 @@ export class ConversationHistory {
             // Return removed line
             return line;
         } else {
-            throw new Error(`ConversationHistory.removeLastLine() was passed a state object without a 'conversation' state member.`);
+            throw new Error(
+                `ConversationHistory.removeLastLine() was passed a state object without a 'conversation' state member.`
+            );
         }
     }
 
     public static replaceLastLine(state: TurnState, line: string): void {
         if (state.conversation) {
-            // Create history array if it doesn't exist 
+            // Create history array if it doesn't exist
             let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
             if (!Array.isArray(history)) {
                 history = [];
@@ -103,15 +110,17 @@ export class ConversationHistory {
             // Save history back to conversation state
             state.conversation.value[ConversationHistory.StatePropertyName] = history;
         } else {
-            throw new Error(`ConversationHistory.replaceLastLine() was passed a state object without a 'conversation' state member.`);
+            throw new Error(
+                `ConversationHistory.replaceLastLine() was passed a state object without a 'conversation' state member.`
+            );
         }
     }
 
-
     /**
      * Returns the current conversation history as a string of text.
+     *
      * @remarks
-     * The length of the returned text is gated by `maxCharacterLength` and only whole lines of 
+     * The length of the returned text is gated by `maxCharacterLength` and only whole lines of
      * history entries will be returned. That means that if the length of the most recent history
      * entry is greater then `maxCharacterLength` no text will be returned.
      * @param state Applications turn state.
@@ -121,7 +130,7 @@ export class ConversationHistory {
      */
     public static toString(state: TurnState, maxCharacterLength = 4000, lineSeparator = '\n'): string {
         if (state.conversation) {
-            // Get history array if it exists 
+            // Get history array if it exists
             const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName] ?? [];
 
             // Populate up to max chars
@@ -139,7 +148,9 @@ export class ConversationHistory {
 
             return text.trim();
         } else {
-            throw new Error(`ConversationHistory.toString() was passed a state object without a 'conversation' state member.`);
+            throw new Error(
+                `ConversationHistory.toString() was passed a state object without a 'conversation' state member.`
+            );
         }
     }
 }

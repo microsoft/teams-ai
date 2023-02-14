@@ -19,7 +19,9 @@ import {
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(process.env as ConfigurationBotFrameworkAuthenticationOptions);
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+    process.env as ConfigurationBotFrameworkAuthenticationOptions
+);
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
@@ -29,23 +31,23 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async ( context, error ) => {
+const onTurnErrorHandler = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error( `\n [onTurnError] unhandled error: ${ error }` );
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${ error }`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
 
     // Send a message to the user
-    await context.sendActivity( 'The bot encountered an error or bug.' );
-    await context.sendActivity( 'To continue to run this bot, please fix the bot source code.' );
+    await context.sendActivity('The bot encountered an error or bug.');
+    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 };
 
 // Set the onTurnError for the singleton CloudAdapter.
@@ -56,9 +58,9 @@ const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log( `\n${ server.name } listening to ${ server.url }` );
-    console.log( '\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator' );
-    console.log( '\nTo talk to your bot, open the emulator select "Open Bot"' );
+    console.log(`\n${server.name} listening to ${server.url}`);
+    console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
+    console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
 });
 
 import { Application, DefaultTurnState, OpenAIPredictionEngine, AI, ConversationHistory } from 'botbuilder-m365';
@@ -76,23 +78,23 @@ const predictionEngine = new OpenAIPredictionEngine({
     },
     prompt: path.join(__dirname, '../src/prompt.txt'),
     promptConfig: {
-        model: "text-davinci-003",
+        model: 'text-davinci-003',
         temperature: 0.0,
         max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
-        stop: [" Human:", " AI:"],
+        stop: [' Human:', ' AI:']
     },
     topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
     topicFilterConfig: {
-        model: "text-davinci-003",
+        model: 'text-davinci-003',
         temperature: 0.0,
         max_tokens: 128,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.0,
-        stop: [" Human:", " AI:"],
+        stop: [' Human:', ' AI:']
     },
     logRequests: true
 });
@@ -108,7 +110,7 @@ const app = new Application<ApplicationTurnState>({
 app.ai.action('LightsOn', async (context, state) => {
     state.conversation.value.lightsOn = true;
     await context.sendActivity(`[lights on]`);
-    return true;    
+    return true;
 });
 
 app.ai.action('LightsOff', async (context, state) => {

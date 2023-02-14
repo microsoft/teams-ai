@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedCommand, PredictedDoCommand, PredictedSayCommand} from './PredictionEngine';
+import { PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './PredictionEngine';
 
 const BREAKING_CHARACTERS = '`~!@#$%^&*()_+-={}|[]\\:";\'<>?,./ \r\n\t';
 const NAME_BREAKING_CHARACTERS = '`~!@#$%^&*()+={}|[]\\:";\'<>?,./ \r\n\t';
@@ -17,11 +17,11 @@ const IGNORED_TOKENS = ['THEN'];
 
 export interface ParsedCommandResult {
     length: number;
-    command?: PredictedCommand; 
+    command?: PredictedCommand;
 }
 
 export class ResponseParser {
-    public static parseAdaptiveCard(text?: string): Record<string, any>|undefined {
+    public static parseAdaptiveCard(text?: string): Record<string, any> | undefined {
         let card: Record<string, any> | undefined;
         try {
             if (text) {
@@ -72,7 +72,7 @@ export class ResponseParser {
                         commands.push(result.command);
                     }
 
-                    // Remove consumed tokens  
+                    // Remove consumed tokens
                     tokens = result.length < tokens.length ? tokens.slice(result.length) : [];
                 } else {
                     // Ignore remaining tokens as something is malformed
@@ -111,7 +111,7 @@ export class ResponseParser {
                     break;
                 }
 
-                // Check for beginning of another command 
+                // Check for beginning of another command
                 switch (parseState as DoCommandParseState) {
                     case DoCommandParseState.findActionName:
                     default:
@@ -216,7 +216,9 @@ export class ResponseParser {
         let command: PredictedSayCommand | undefined;
         if (tokens.length > 1) {
             if (tokens[0] != 'SAY') {
-                throw new Error(`ResponseParse.parseSayCommand(): token list passed in doesn't start with 'SAY' token.`);
+                throw new Error(
+                    `ResponseParse.parseSayCommand(): token list passed in doesn't start with 'SAY' token.`
+                );
             }
 
             // Parse command (skips initial DO token)
@@ -251,6 +253,7 @@ export class ResponseParser {
 
     /**
      * Simple text tokenizer. Breaking characters are added to list as separate tokens.
+     *
      * @param text Optional. Text string to tokenize.
      * @returns Array of tokens.
      */

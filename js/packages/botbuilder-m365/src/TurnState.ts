@@ -12,27 +12,25 @@ export interface TurnState {
     [key: string]: TurnStateEntry;
 }
 
-
 export interface TurnStateManager<TState extends TurnState> {
-    loadState(storage: Storage|undefined, context: TurnContext): Promise<TState>;
-    saveState(storage: Storage|undefined, context: TurnContext, state: TState): Promise<void>;
+    loadState(storage: Storage | undefined, context: TurnContext): Promise<TState>;
+    saveState(storage: Storage | undefined, context: TurnContext, state: TState): Promise<void>;
 }
 
-
-export class TurnStateEntry<TValue extends Record<string, any> = Record<string, any>>  {
+export class TurnStateEntry<TValue extends Record<string, any> = Record<string, any>> {
     private _value: TValue;
     private _storageKey?: string;
     private _deleted = false;
     private _hash: string;
 
     public constructor(value?: TValue, storageKey?: string) {
-        this._value = value || {} as TValue;
+        this._value = value || ({} as TValue);
         this._storageKey = storageKey;
         this._hash = JSON.stringify(this._value);
     }
 
     public get hasChanged(): boolean {
-        return JSON.stringify(this._value) != this._hash; 
+        return JSON.stringify(this._value) != this._hash;
     }
 
     public get isDeleted(): boolean {
@@ -56,6 +54,6 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
     }
 
     public replace(state?: TValue): void {
-        this._value = state || {} as TValue;
+        this._value = state || ({} as TValue);
     }
 }
