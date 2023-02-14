@@ -12,7 +12,8 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage
+    MemoryStorage,
+    ActivityTypes
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -59,43 +60,36 @@ server.use(restify.plugins.bodyParser());
 
 server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log(`\n${server.name} listening to ${server.url}`);
-    console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, DefaultTurnState } from 'botbuilder-m365';
 
-interface ConversationState {}
+interface ConversationState {
+    count: number;
+}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
-
-// Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 2048,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
-    logRequests: true
-});
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    storage,
-    predictionEngine
+    storage
 });
 
-app.message('/history', async (context, state) => {
-    const history = ConversationHistory.toString(state, 10000, '\n\n');
-    await context.sendActivity(history);
+// Listen for user to say '/reset' and then delete conversation state
+app.message('/reset', async (context, state) => {
+    state.conversation.delete();
+    await context.sendActivity(`Ok I've deleted the current conversation state.`);
+});
+
+// Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
+app.activity(ActivityTypes.Message, async (context, state) => {
+    // Increment count state
+    let count = state.conversation.value.count ?? 0;
+    state.conversation.value.count = ++count;
+
+    // Echo back users request
+    await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
 });
 
 // Listen for incoming server requests.

@@ -12,7 +12,8 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage
+    MemoryStorage,
+    MessagingExtensionAttachment
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -63,39 +64,50 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
-
-interface ConversationState {}
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
-
-// Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 2048,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
-    logRequests: true
-});
+import { Application } from 'botbuilder-m365';
+import { createNpmSearchResultCard, createNpmPackageCard } from './cards';
+import axios from 'axios';
 
 // Define storage and application
 const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
-    storage,
-    predictionEngine
+const app = new Application({
+    storage
 });
 
-app.message('/history', async (context, state) => {
-    const history = ConversationHistory.toString(state, 10000, '\n\n');
-    await context.sendActivity(history);
+// Listen for search actions
+app.messageExtensions.query('searchCmd', async (context, state, query) => {
+    const searchQuery = query.parameters['queryText'] ?? '';
+    const count = query.count ?? 10;
+    const response = await axios.get(
+        `http://registry.npmjs.com/-/v1/search?${new URLSearchParams({
+            text: searchQuery,
+            size: count.toString()
+        }).toString()}`
+    );
+
+    // Format search results
+    const results: MessagingExtensionAttachment[] = [];
+    response?.data?.objects?.forEach((obj) => results.push(createNpmSearchResultCard(obj.package)));
+
+    // Return results as a list
+    return {
+        type: 'result',
+        attachmentLayout: 'list',
+        attachments: results
+    };
+});
+
+// Listen for item tap
+app.messageExtensions.selectItem(async (context, state, item) => {
+    // Generate detailed result
+    const card = createNpmPackageCard(item);
+
+    // Return results
+    return {
+        type: 'result',
+        attachmentLayout: 'list',
+        attachments: [card]
+    };
 });
 
 // Listen for incoming server requests.

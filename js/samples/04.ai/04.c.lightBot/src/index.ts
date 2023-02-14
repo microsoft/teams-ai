@@ -63,9 +63,12 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPredictionEngine, AI, ConversationHistory } from 'botbuilder-m365';
+import * as responses from './responses';
 
-interface ConversationState {}
+interface ConversationState {
+    lightsOn: boolean;
+}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create prediction engine
@@ -76,11 +79,21 @@ const predictionEngine = new OpenAIPredictionEngine({
     prompt: path.join(__dirname, '../src/prompt.txt'),
     promptConfig: {
         model: 'text-davinci-003',
-        temperature: 0.4,
+        temperature: 0.0,
         max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
+        stop: [' Human:', ' AI:']
+    },
+    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
+    topicFilterConfig: {
+        model: 'text-davinci-003',
+        temperature: 0.0,
+        max_tokens: 128,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.0,
         stop: [' Human:', ' AI:']
     },
     logRequests: true
@@ -93,9 +106,51 @@ const app = new Application<ApplicationTurnState>({
     predictionEngine
 });
 
-app.message('/history', async (context, state) => {
-    const history = ConversationHistory.toString(state, 10000, '\n\n');
-    await context.sendActivity(history);
+// Register action handlers
+app.ai.action('LightsOn', async (context, state) => {
+    state.conversation.value.lightsOn = true;
+    await context.sendActivity(`[lights on]`);
+    return true;
+});
+
+app.ai.action('LightsOff', async (context, state) => {
+    state.conversation.value.lightsOn = false;
+    await context.sendActivity(`[lights off]`);
+    return true;
+});
+
+app.ai.action('Pause', async (context, state, data) => {
+    const time = data.time ? parseInt(data.time) : 1000;
+    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+    await new Promise((resolve) => setTimeout(resolve, time));
+    return true;
+});
+
+app.ai.action('LightStatus', async (context, state) => {
+    // Send the user a static response with the status of the lights.
+    const response = responses.lightStatus(state.conversation.value.lightsOn);
+    await context.sendActivity(response);
+
+    // Since we might be prompting the user with a followup question, we need to do
+    // some surgery on the {{conversation.history}} to append a THEN SAY command. This
+    // lets the model know we just asked the user a question and it can predict the
+    // next action based on their response.
+    ConversationHistory.appendToLastLine(state, ` THEN SAY ${response}`);
+
+    // End the current chain since we've manually just prompted the user for input.
+    return false;
+});
+
+// Register a handler to handle unknown actions that might be predicted
+app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
+    await context.sendActivity(responses.unknownAction(action));
+    return false;
+});
+
+// Register a handler to deal with a user asking something off topic
+app.ai.action(AI.OffTopicActionName, async (context, state) => {
+    await context.sendActivity(responses.offTopic());
+    return false;
 });
 
 // Listen for incoming server requests.
