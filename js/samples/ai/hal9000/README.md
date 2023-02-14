@@ -118,7 +118,7 @@ Inside the `predictionEngine`, a prompt file is defined:
 prompt: path.join(__dirname, '../src/prompt.txt'),
 ```
 
-Look for the `prompt.txt` file in the directory to find descriptive prompt engineering that, in plain language and with light training, instructs GPT how the bot should conduct itself and facilitate conversation:
+Open `prompt.txt` file to find descriptive prompt engineering that, in plain language and with <del>light</del> minor training, instructs GPT how the bot should conduct itself and facilitate conversation:
 
 ```
 This is a conversation between a Human and HAL, the AI from the book and movie 2001: A Space Odyssey and any sequels. 
