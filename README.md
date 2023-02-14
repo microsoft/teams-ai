@@ -1,4 +1,4 @@
-# BotBuilder-m365
+# BotBuilder-M365
 
 This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams and M365-interacting bots.
 
