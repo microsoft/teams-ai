@@ -12,8 +12,7 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage,
-    TurnContext
+    MemoryStorage
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -61,11 +60,16 @@ server.use(restify.plugins.bodyParser());
 server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log(`\n${server.name} listening to ${server.url}`);
     console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
-    console.log('\nTo talk to your bot, open the emulator select "Open Bot"');
+    console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPredictionEngine, AI } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPredictionEngine, AI, ConversationHistory } from 'botbuilder-m365';
 import * as responses from './responses';
+
+interface ConversationState {
+    lightsOn: boolean;
+}
+type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create prediction engine
 const predictionEngine = new OpenAIPredictionEngine({
@@ -76,7 +80,7 @@ const predictionEngine = new OpenAIPredictionEngine({
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.0,
-        max_tokens: 1024,
+        max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
@@ -86,7 +90,7 @@ const predictionEngine = new OpenAIPredictionEngine({
     topicFilterConfig: {
         model: 'text-davinci-003',
         temperature: 0.0,
-        max_tokens: 256,
+        max_tokens: 128,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.0,
@@ -95,13 +99,6 @@ const predictionEngine = new OpenAIPredictionEngine({
     logRequests: true
 });
 
-// Strongly type the applications turn state
-interface ConversationState {
-    listNames: string[];
-    lists: Record<string, string[]>;
-}
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
-
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
@@ -109,70 +106,38 @@ const app = new Application<ApplicationTurnState>({
     predictionEngine
 });
 
-// Define an interface to strongly type data parameters for actions
-interface EntityData {
-    list: string; // <- populated by GPT
-    item: string; // <- populated by GPT
-    items?: string[]; // <- populated by the summarizeList action
-    lists?: Record<string, string[]>;
-}
-
 // Register action handlers
-app.ai.action('addItem', async (context, state, data: EntityData) => {
-    const items = getItems(state, data.list);
-    items.push(data.item);
-    setItems(state, data.list, items);
+app.ai.action('LightsOn', async (context, state) => {
+    state.conversation.value.lightsOn = true;
+    await context.sendActivity(`[lights on]`);
     return true;
 });
 
-app.ai.action('removeItem', async (context, state, data: EntityData) => {
-    const items = getItems(state, data.list);
-    const index = items.indexOf(data.item);
-    if (index >= 0) {
-        items.splice(index, 1);
-        setItems(state, data.list, items);
-        return true;
-    } else {
-        await context.sendActivity(responses.itemNotFound(data.list, data.item));
-
-        // End the current chain
-        return false;
-    }
+app.ai.action('LightsOff', async (context, state) => {
+    state.conversation.value.lightsOn = false;
+    await context.sendActivity(`[lights off]`);
+    return true;
 });
 
-app.ai.action('findItem', async (context, state, data: EntityData) => {
-    const items = getItems(state, data.list);
-    const index = items.indexOf(data.item);
-    if (index >= 0) {
-        await context.sendActivity(responses.itemFound(data.list, data.item));
-    } else {
-        await context.sendActivity(responses.itemNotFound(data.list, data.item));
-    }
-
-    // End the current chain
-    return false;
+app.ai.action('Pause', async (context, state, data) => {
+    const time = data.time ? parseInt(data.time) : 1000;
+    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+    await new Promise((resolve) => setTimeout(resolve, time));
+    return true;
 });
 
-app.ai.action('summarizeList', async (context, state, data: EntityData) => {
-    data.items = getItems(state, data.list);
+app.ai.action('LightStatus', async (context, state) => {
+    // Send the user a static response with the status of the lights.
+    const response = responses.lightStatus(state.conversation.value.lightsOn);
+    await context.sendActivity(response);
 
-    // Chain into a new summarization prompt
-    await callPrompt(context, state, '../src/summarizeList.txt', data);
+    // Since we might be prompting the user with a followup question, we need to do
+    // some surgery on the {{conversation.history}} to append a THEN SAY command. This
+    // lets the model know we just asked the user a question and it can predict the
+    // next action based on their response.
+    ConversationHistory.appendToLastLine(state, ` THEN SAY ${response}`);
 
-    // End the current chain
-    return false;
-});
-
-app.ai.action('summarizeAllLists', async (context, state, data: EntityData) => {
-    data.lists = state.conversation.value.lists;
-    if (data.lists) {
-        // Chain into a new summarization prompt
-        await callPrompt(context, state, '../src/summarizeAllLists.txt', data);
-    } else {
-        await context.sendActivity(responses.noListsFound());
-    }
-
-    // End the current chain
+    // End the current chain since we've manually just prompted the user for input.
     return false;
 });
 
@@ -196,50 +161,3 @@ server.post('/api/messages', async (req, res) => {
         await app.run(context);
     });
 });
-
-function callPrompt(
-    context: TurnContext,
-    state: ApplicationTurnState,
-    prompt: string,
-    data: Record<string, any>,
-    temperature = 0.7
-): Promise<boolean> {
-    return app.ai.chain(
-        context,
-        state,
-        {
-            prompt: path.join(__dirname, prompt),
-            promptConfig: {
-                model: 'text-davinci-003',
-                temperature: temperature,
-                max_tokens: 1024,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0
-            }
-        },
-        data
-    );
-}
-
-function getItems(state: ApplicationTurnState, list: string): string[] {
-    ensureListExists(state, list);
-    return state.conversation.value.lists[list];
-}
-
-function setItems(state: ApplicationTurnState, list: string, items: string[]): void {
-    ensureListExists(state, list);
-    state.conversation.value.lists[list] = items ?? [];
-}
-
-function ensureListExists(state: ApplicationTurnState, listName: string): void {
-    if (typeof state.conversation.value.lists != 'object') {
-        state.conversation.value.lists = {};
-        state.conversation.value.listNames = [];
-    }
-
-    if (!state.conversation.value.lists.hasOwnProperty(listName)) {
-        state.conversation.value.lists[listName] = [];
-        state.conversation.value.listNames.push(listName);
-    }
-}
