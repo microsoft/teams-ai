@@ -177,7 +177,7 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-    public submitAction(commandId: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState, data?: Record<string, any>) => Promise<MessagingExtensionResult|TaskModuleTaskInfo|string|null|undefined>): Application<TState> {
+    public submitAction<TData = Record<string, any>>(commandId: string|RegExp|RouteSelector|(string|RegExp|RouteSelector)[], handler: (context: TurnContext, state: TState, data: TData) => Promise<MessagingExtensionResult|TaskModuleTaskInfo|string|null|undefined>): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME);
             this._app.addRoute(selector, async (context, state) => {

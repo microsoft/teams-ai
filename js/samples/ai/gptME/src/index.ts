@@ -34,7 +34,7 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async ( context, error ) => {
+const onTurnErrorHandler = async ( context: TurnContext, error: Error ) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -66,7 +66,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log( '\nTo talk to your bot, open the emulator select "Open Bot"' );
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
 interface ConversationState {
@@ -100,26 +100,26 @@ interface SubmitData {
     post?: string;
 }
 
-app.messageExtensions.submitAction('CreatePost', async (context, state, data: SubmitData) => {
+app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, state, data) => {
     try {
         switch (data.verb) {
             case 'generate':
                 // Call GPT and return response view
-                return await updatePost(context, state, '../src/generate.txt', data);
+                return await updatePost(context, state, '../src/generate.txt', data );
             case 'update': 
                 // Call GPT and return an updated response view
                 return await updatePost(context, state, '../src/update.txt', data);
             case 'post':
             default:
                 // Preview the post as an adaptive card
-                const card = createPostCard(data.post);
+                const card = createPostCard(data.post!);
                 return {
                     type: 'result',
                     attachmentLayout: 'list',
                     attachments: [card]
                 } as MessagingExtensionResult;
         }
-    } catch (err) {
+    } catch (err: any) {
         return `Something went wrong: ${err.toString()}`
     }
 });

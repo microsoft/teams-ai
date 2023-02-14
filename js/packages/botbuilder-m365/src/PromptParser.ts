@@ -29,7 +29,7 @@ export class PromptParser {
         if (typeof prompt == 'function') {
             promptTemplate = await prompt(context, state);
         } else if (promptFileCache.has(prompt)) {
-            promptTemplate = promptFileCache.get(prompt);
+            promptTemplate = promptFileCache.get(prompt)!;
         } else {
             promptTemplate = await readFile(prompt, { encoding: 'utf8' });
             promptFileCache.set(prompt, promptTemplate);
@@ -63,10 +63,10 @@ export class PromptParser {
                         }
 
                         // Append variable contents to output
-                        outputPrompt += PromptParser.lookupPromptVariable(context, state, data, variableName, options);
+                        outputPrompt += PromptParser.lookupPromptVariable(context, state, data, variableName!, options);
                     } else {
                         // Append character to variable name
-                        variableName += ch;
+                        variableName! += ch;
                     }
                     break;
             }
