@@ -4,10 +4,11 @@
     "version": "0.0.1",
     "workspaces": [
         "./packages/*",
-        "./samples/adaptiveCards/*",
-        "./samples/ai/*",
-        "./samples/messageExtensions/*",
-        "./samples/messaging/*"
+        "./samples/01.messaging/*",
+        "./samples/02.messageExtensions/*",
+        "./samples/03.adaptiveCards/*",
+        "./samples/04.ai/*",
+        "./samples/ai/*"
     ],
     "scripts": {
         "build": "wsrun -e -m -t build",
