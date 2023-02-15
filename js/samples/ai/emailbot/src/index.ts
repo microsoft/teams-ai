@@ -76,7 +76,7 @@ const predictionEngine = new OpenAIPredictionEngine({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
+    prompt: path.join(__dirname, '../src/emailPrompt.txt'),
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.0,
@@ -84,16 +84,6 @@ const predictionEngine = new OpenAIPredictionEngine({
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
-    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
-    topicFilterConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.0,
-        max_tokens: 128,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.0,
         stop: [' Human:', ' AI:']
     },
     logRequests: true
