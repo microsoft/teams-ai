@@ -18,6 +18,26 @@ The variations should always include ${item} and ${list} variables.
 7 variations were asked for so that we can remove the 2 we like the least.
 */
 
+export function greeting(): string {
+    return getRandomResponse([
+        "Welcome to List Bot! Type /reset to delete all existing lists.",
+        "Hello! I'm List Bot. Use /reset to delete all your lists.",
+        "Hi there! I'm here to help you manage your lists. Use /reset to delete all lists.",
+        "Greetings! I'm List Bot. Type /reset to delete all your list.",
+        "Hey there! List Bot here. You can use /reset to delete all lists."
+      ]);
+}
+
+export function reset(): string {
+    return getRandomResponse( [
+        "Resetting all lists. All lists have been deleted.",
+        "Starting fresh. All lists have been reset.",
+        "All lists have been cleared. Ready for new lists!",
+        "Cleaning slate. All lists have been reset.",
+        "All lists have been wiped. Ready for new lists!"
+      ]);
+}
+
 export function itemNotFound(list: string, item: string): string {
     return getRandomResponse([
         `I'm sorry, I couldn't locate a ${item} on your ${list} list.`,

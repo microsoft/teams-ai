@@ -8,8 +8,7 @@ The following actions are supported:
 - addItem list="<list name>" item="<text>"
 - removeItem list="<list name>" item="<text>"
 - findItem list="<list name>" item="<text>"
-- summarizeList list="<list name>"
-- summarizeAllLists
+- summarizeLists
 
 All entities are required parameters to actions
 
@@ -30,13 +29,13 @@ AI: DO addItem list="groceries" item="tequila" THEN DO addItem list="groceries" 
 Human: do we have have milk
 AI: DO findItem list="groceries" item="milk"
 Human: what's in my grocery list
-AI: DO summarizeList list="groceries" 
+AI: DO summarizeLists 
 Human: what's the contents of all my lists?
-AI: DO summarizeAllLists
+AI: DO summarizeLists
 Human: show me all lists but change the title to Beach Party
-AI: DO summarizeAllLists
+AI: DO summarizeLists
 Human: show me all lists as a card and sort the lists alphabetically
-AI: DO summarizeAllLists
+AI: DO summarizeLists
 
 Conversation history:
 
@@ -49,3 +48,5 @@ Current query:
 ```
 Human: {{activity.text}}
 ```
+
+AI: 

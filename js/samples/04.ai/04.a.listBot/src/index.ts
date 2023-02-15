@@ -97,6 +97,7 @@ const predictionEngine = new OpenAIPredictionEngine({
 
 // Strongly type the applications turn state
 interface ConversationState {
+    greeted: boolean;
     listNames: string[];
     lists: Record<string, string[]>;
 }
@@ -116,6 +117,20 @@ interface EntityData {
     items?: string[]; // <- populated by the summarizeList action
     lists?: Record<string, string[]>;
 }
+
+// Listen for new members to join the conversation
+app.conversationUpdate('membersAdded', async (context, state) => {
+    if (!state.conversation.value.greeted) {
+        state.conversation.value.greeted = true;
+        await context.sendActivity(responses.greeting());
+    }
+});
+
+// List for /reset command and then delete the conversation state
+app.message('/reset', async (context, state) => {
+    state.conversation.delete();
+    await context.sendActivity(responses.reset());
+});
 
 // Register action handlers
 app.ai.action('addItem', async (context, state, data: EntityData) => {
@@ -153,21 +168,26 @@ app.ai.action('findItem', async (context, state, data: EntityData) => {
     return false;
 });
 
-app.ai.action('summarizeList', async (context, state, data: EntityData) => {
-    data.items = getItems(state, data.list);
-
-    // Chain into a new summarization prompt
-    await callPrompt(context, state, '../src/summarizeList.txt', data);
-
-    // End the current chain
-    return false;
-});
-
-app.ai.action('summarizeAllLists', async (context, state, data: EntityData) => {
+app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
     data.lists = state.conversation.value.lists;
     if (data.lists) {
         // Chain into a new summarization prompt
-        await callPrompt(context, state, '../src/summarizeAllLists.txt', data);
+        await app.ai.chain(
+            context,
+            state,
+            {
+                prompt: path.join(__dirname, '../src/summarizeAllLists.txt'),
+                promptConfig: {
+                    model: 'text-davinci-003',
+                    temperature: 0.0,
+                    max_tokens: 2048,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0
+                }
+            },
+            data
+        );
     } else {
         await context.sendActivity(responses.noListsFound());
     }
@@ -196,31 +216,6 @@ server.post('/api/messages', async (req, res) => {
         await app.run(context);
     });
 });
-
-function callPrompt(
-    context: TurnContext,
-    state: ApplicationTurnState,
-    prompt: string,
-    data: Record<string, any>,
-    temperature = 0.7
-): Promise<boolean> {
-    return app.ai.chain(
-        context,
-        state,
-        {
-            prompt: path.join(__dirname, prompt),
-            promptConfig: {
-                model: 'text-davinci-003',
-                temperature: temperature,
-                max_tokens: 1024,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0
-            }
-        },
-        data
-    );
-}
 
 function getItems(state: ApplicationTurnState, list: string): string[] {
     ensureListExists(state, list);
