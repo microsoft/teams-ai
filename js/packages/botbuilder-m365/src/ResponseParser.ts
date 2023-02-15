@@ -157,7 +157,7 @@ export class ResponseParser {
                         break;
                     case DoCommandParseState.findEntityValue:
                         // Look for either string quotes first non-space or equals token
-                        if (token == '"' || token == "'") {
+                        if (token == '"' || token == "'" || token == "`") {
                             // Remember quote type and enter new state
                             quoteType = token;
                             parseState = DoCommandParseState.inEntityStringValue;
