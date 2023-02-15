@@ -36,7 +36,7 @@
     ],
     "bots": [
         {
-            "botId": "___YOUR BOTS ID___",
+            "botId": "c8b3f4cf-1b85-4f09-9112-8913635a73fd",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
