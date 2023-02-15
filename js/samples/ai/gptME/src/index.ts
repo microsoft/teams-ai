@@ -14,6 +14,7 @@ import {
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
     MemoryStorage,
+    MessageFactory,
     MessagingExtensionResult,
     TaskModuleTaskInfo,
     TurnContext
@@ -85,7 +86,9 @@ const predictionEngine = new OpenAIPredictionEngine({
 //   the app.
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    storage
+    storage,
+    adapter,
+    botAppId: process.env.MicrosoftAppId
 });
 
 app.messageExtensions.fetchTask('CreatePost', async (context, state) => {
@@ -95,7 +98,7 @@ app.messageExtensions.fetchTask('CreatePost', async (context, state) => {
 });
 
 interface SubmitData {
-    verb: 'generate' | 'update' | 'post';
+    verb: 'generate' | 'update' | 'preview';
     prompt?: string;
     post?: string;
 }
@@ -109,19 +112,40 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
             case 'update':
                 // Call GPT and return an updated response view
                 return await updatePost(context, state, '../src/update.txt', data);
-            case 'post':
+            case 'preview':
             default:
                 // Preview the post as an adaptive card
                 const card = createPostCard(data.post!);
+                const activity = MessageFactory.attachment(card);
                 return {
-                    type: 'result',
-                    attachmentLayout: 'list',
-                    attachments: [card]
+                    type: 'botMessagePreview',
+                    activityPreview: activity
                 } as MessagingExtensionResult;
         }
     } catch (err: any) {
         return `Something went wrong: ${err.toString()}`;
     }
+});
+
+app.messageExtensions.botMessagePreviewEdit('CreatePost', async (context, state, previewActivity) => {
+    // Get post text from previewed card
+    const post: string = previewActivity?.attachments[0]?.content?.body[0]?.text ?? '';
+    const card = createEditView(post);
+    return createTaskInfo(card);
+});
+
+app.messageExtensions.botMessagePreviewSend('CreatePost', async (context, state, previewActivity) => {
+    // Create a new activity using the card in the preview activity
+    const card = previewActivity?.attachments[0];
+    const activity = MessageFactory.attachment(card);
+    activity.channelData = {
+        onBehalfOf: [
+            { itemId: 0, mentionType: 'person', mri: context.activity.from.id, displayname: context.activity.from.name }
+        ]
+    };
+
+    // Proactively send new activity to chat
+    await app.sendProactiveActivity(context, activity);
 });
 
 // Listen for incoming server requests.

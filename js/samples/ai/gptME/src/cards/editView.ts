@@ -44,9 +44,9 @@ export function createEditView(post: string): Attachment {
             },
             {
                 type: 'Action.Submit',
-                title: 'Post',
+                title: 'Preview',
                 data: {
-                    verb: 'post'
+                    verb: 'preview'
                 }
             }
         ]
