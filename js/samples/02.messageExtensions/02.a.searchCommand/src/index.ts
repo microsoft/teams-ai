@@ -28,11 +28,8 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
-// Create storage to use
-//const storage = new MemoryStorage();
-
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: any, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -64,9 +61,9 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application } from 'botbuilder-m365';
-import { createNpmSearchResultCard, createNpmPackageCard } from './cards';
 import axios from 'axios';
+import { Application } from 'botbuilder-m365';
+import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -76,24 +73,24 @@ const app = new Application({
 
 // Listen for search actions
 app.messageExtensions.query('searchCmd', async (context, state, query) => {
-    const searchQuery = query.parameters['queryText'] ?? '';
+    const searchQuery = query.parameters.queryText ?? '';
     const count = query.count ?? 10;
     const response = await axios.get(
         `http://registry.npmjs.com/-/v1/search?${new URLSearchParams({
-            text: searchQuery,
-            size: count.toString()
+            size: count.toString(),
+            text: searchQuery
         }).toString()}`
     );
 
     // Format search results
     const results: MessagingExtensionAttachment[] = [];
-    response?.data?.objects?.forEach((obj) => results.push(createNpmSearchResultCard(obj.package)));
+    response?.data?.objects?.forEach((obj: any) => results.push(createNpmSearchResultCard(obj.package)));
 
     // Return results as a list
     return {
-        type: 'result',
         attachmentLayout: 'list',
-        attachments: results
+        attachments: results,
+        type: 'result'
     };
 });
 
@@ -104,9 +101,9 @@ app.messageExtensions.selectItem(async (context, state, item) => {
 
     // Return results
     return {
-        type: 'result',
         attachmentLayout: 'list',
-        attachments: [card]
+        attachments: [card],
+        type: 'result'
     };
 });
 

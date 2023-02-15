@@ -16,7 +16,7 @@
         "depcheck": "wsrun -m -l depcheck",
         "dev:link": "wsrun --if is-not-private --bin=yarn link",
         "dev:unlink": "wsrun --if is-not-private --bin=yarn unlink",
-        "lint": "wsrun -m -l lint --max-warnings=0",
+        "lint": "wsrun -m -l lint",
         "package": "wsrun -e -t -l --if is-not-private --bin yarn pack",
         "test": "npm-run-all build test:mocha test:nyc:report",
         "test:mocha": "nyc --silent mocha \"packages/@(bot*)/tests/**/*.test.js\" --exit --check-leaks",

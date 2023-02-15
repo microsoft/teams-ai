@@ -54,6 +54,7 @@
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
+        "object-literal-sort-keys": false,
         "prettier/prettier": "error"
         // Currently sample contains no frontend
         // "react/react-in-jsx-scope": "off",

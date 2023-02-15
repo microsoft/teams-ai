@@ -27,9 +27,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
-// Create storage to use
-//const storage = new MemoryStorage();
-
 // Catch-all for errors.
 const onTurnErrorHandler = async (context, error) => {
     // This check writes out errors to console log .vs. app insights.
@@ -65,6 +62,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 
 import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
@@ -73,24 +71,24 @@ const predictionEngine = new OpenAIPredictionEngine({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
+    logRequests: true,
     prompt: path.join(__dirname, '../src/prompt.txt'),
     promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 2048,
-        top_p: 1,
         frequency_penalty: 0,
+        max_tokens: 2048,
+        model: 'text-davinci-003',
         presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
-    logRequests: true
+        stop: [' Human:', ' AI:'],
+        temperature: 0.4,
+        top_p: 1
+    }
 });
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    storage,
-    predictionEngine
+    predictionEngine,
+    storage
 });
 
 app.message('/history', async (context, state) => {
