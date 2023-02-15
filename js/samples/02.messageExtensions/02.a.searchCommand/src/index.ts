@@ -29,7 +29,7 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: any, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -84,7 +84,7 @@ app.messageExtensions.query('searchCmd', async (context, state, query) => {
 
     // Format search results
     const results: MessagingExtensionAttachment[] = [];
-    response?.data?.objects?.forEach((obj) => results.push(createNpmSearchResultCard(obj.package)));
+    response?.data?.objects?.forEach((obj: any) => results.push(createNpmSearchResultCard(obj.package)));
 
     // Return results as a list
     return {

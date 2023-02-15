@@ -48,7 +48,7 @@ export function createNpmPackageCard(result: any): Attachment {
                     },
                     {
                         title: 'Maintainers',
-                        value: `${result.maintainers.map((v) => v.email).join(', ')}`
+                        value: `${result.maintainers.map((v: any) => v.email).join(', ')}`
                     }
                 ]
             }
