@@ -158,9 +158,15 @@ export class ResponseParser {
                     case DoCommandParseState.findEntityValue:
                         // Look for either string quotes first non-space or equals token
                         if (token == '"' || token == "'" || token == "`") {
-                            // Remember quote type and enter new state
-                            quoteType = token;
-                            parseState = DoCommandParseState.inEntityStringValue;
+                            // Check for content value
+                            if (token == "`" && tokens[length + 1] == "`" && tokens[length + 2] == "`") {
+                                length += 2;
+                                parseState = DoCommandParseState.inEntityContentValue;
+                            } else {
+                                // Remember quote type and enter new state
+                                quoteType = token;
+                                parseState = DoCommandParseState.inEntityStringValue;
+                            }
                         } else if (SPACE_CHARACTERS.indexOf(token) < 0 && token != '=') {
                             // Assign token to value and enter new state
                             entityValue = token;
@@ -171,6 +177,17 @@ export class ResponseParser {
                         // Accumulate tokens until end of string is hit
                         if (token == quoteType) {
                             // Save pair and look for additional pairs
+                            command!.data[entityName] = entityValue;
+                            parseState = DoCommandParseState.findEntityName;
+                            entityName = entityValue = '';
+                        } else {
+                            entityValue += token;
+                        }
+                        break;
+                    case DoCommandParseState.inEntityContentValue:
+                        if (token == "`" && tokens[length + 1] == "`" && tokens[length + 2] == "`") {
+                            // Save pair and look for additional pairs
+                            length += 2;
                             command!.data[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
@@ -298,5 +315,6 @@ enum DoCommandParseState {
     inEntityName,
     findEntityValue,
     inEntityValue,
-    inEntityStringValue
+    inEntityStringValue,
+    inEntityContentValue
 }
