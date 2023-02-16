@@ -1,4 +1,4 @@
-# BotBuilder-m365
+# BotBuilder-M365
 
 This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams and M365-interacting bots.
 
@@ -12,17 +12,17 @@ This SDK is currently in preview and is subject to change. We welcome your feedb
 
 Simple scaffolding for any conversational app component, inlcuding:
 
-* Chat bots
-* Message extensions
-* Link unfurling
-* Adaptive Cards
+- Chat bots
+- Message extensions
+- Link unfurling
+- Adaptive Cards
 
 Relevant samples:
 
-* [Type Ahead Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/adaptiveCards/typeAheadBot)
-* [Echo Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messaging/echoBot)
-* [Search Command](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messageExtensions/searchCommand)
-* [GPT ME](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/gptME)
+- [Type Ahead Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/adaptiveCards/typeAheadBot)
+- [Echo Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messaging/echoBot)
+- [Search Command](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messageExtensions/searchCommand)
+- [GPT ME](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/gptME)
 
 ### Natural Language Modelling
 
@@ -30,7 +30,7 @@ The SDK is built to leverage OpenAI Large Language Models so you don't have to c
 
 Relevant samples:
 
-* [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
 
 ### Prompt Engineering
 
@@ -38,9 +38,9 @@ With a simple text file written in human language, you can describe the function
 
 Relevant samples:
 
-* [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
-* [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-* [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
 
 ### Topic Filtering
 
@@ -48,8 +48,8 @@ A simple text file can also be used to steer OpenAI in the right direction and k
 
 Relevant samples:
 
-* [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-* [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
 
 ### Predictive Engine to Map Intents to Actions
 
@@ -57,16 +57,16 @@ Leveraging provided prompts and topic filters, it's simple to create a predictiv
 
 Relevant samples:
 
-* [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-* [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
 
 ### Conversational Session History
 
-The state of your user's session is not lost, allowing conversations to flow freely and arrive quickly at right outcome. 
+The state of your user's session is not lost, allowing conversations to flow freely and arrive quickly at right outcome.
 
 Relevant samples:
 
-* [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
 
 ### Localization
 
@@ -74,7 +74,7 @@ Because OpenAI's models are trained on the open internet, they're tuned to any l
 
 Relevant samples:
 
-* [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
 
 ### LLM modularity
 
@@ -82,9 +82,9 @@ While the SDK handles OpenAI's GPT models out of the box, you can choose to swap
 
 Relevant samples:
 
-* [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
-* [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-* [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
 
 ## Getting Started
 
@@ -100,13 +100,7 @@ This project welcomes contributions and suggestions. Most contributions require 
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+For more details, see [./CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Trademarks
 
