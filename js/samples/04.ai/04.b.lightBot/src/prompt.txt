@@ -39,3 +39,5 @@ Current query:
 ```
 Human: {{activity.text}}
 ```
+
+AI: 
