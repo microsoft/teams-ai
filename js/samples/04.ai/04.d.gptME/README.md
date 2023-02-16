@@ -1,15 +1,72 @@
-# Teams Conversation Bot
+# AI in Microsoft Teams Message Extensions: GPT-ME
 
-Bot Framework v4 Conversation Bot sample for Teams.
+This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
-how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.” 
+
+It shows M365 botbuilder SDK capabilities like:
+
+<details open>
+    <summary><h3>Message extension scaffolding</h3></summary>
+    Throughout the 'index.ts' file you'll see the scaffolding created to run a simple message extension, like storage, authentication, task modules, and action submits.
+</details>
+<details open>
+    <summary><h3>Prompt engineering</h3></summary>
+The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+    
+#### generate.txt
+```
+This is a Microsoft Teams extension that assists the user with creating posts.
+Using the prompt below, create a post that appropriate for a business environment.
+Prompt: {{data.prompt}}
+Post:
+```
+</details>
+<details open>
+    <summary><h3>Action mapping</h3></summary>
+Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
+    
+```javascript
+interface SubmitData {
+    verb: 'generate' | 'update' | 'post';
+    prompt?: string;
+    post?: string;
+}
+
+app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, state, data) => {
+    try {
+        switch (data.verb) {
+            case 'generate':
+                // Call GPT and return response view
+                return await updatePost(context, state, '../src/generate.txt', data);
+            case 'update':
+                // Call GPT and return an updated response view
+                return await updatePost(context, state, '../src/update.txt', data);
+            case 'post':
+            default:
+                // Preview the post as an adaptive card
+                const card = createPostCard(data.post!);
+                return {
+                    type: 'result',
+                    attachmentLayout: 'list',
+                    attachments: [card]
+                } as MessagingExtensionResult;
+        }
+    } catch (err: any) {
+        return `Something went wrong: ${err.toString()}`;
+    }
+}); 
+```
+</details>
+
+This bot has been created using [Bot Framework](https://dev.botframework.com). 
 
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
 -   [NodeJS](https://nodejs.org/en/)
 -   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
+-   [OpenAI](https://openai.com/api/) key for leveraging GPT
 
 ## To try this sample
 
@@ -45,7 +102,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
     - **_If you don't have an Azure account_** you can use this [Bot Framework registration](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/how-to/create-a-bot-for-teams#register-your-web-service-with-the-bot-framework)
 
-1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the azure portal and you can always create a new client secret anytime.)
+1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the azure portal and you can always create a new client secret anytime.) The configuration should include your OpenAI API Key in the `OPEN_API_KEY` property.
 
 1. **_This step is specific to Teams._**
 
@@ -59,26 +116,9 @@ how to incorporate basic conversational flow into a Teams application. It also i
     yarn start
     ```
 
-## Interacting with the bot
+## Interacting with the message extension
 
-You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
-
-1. **Show Welcome**
-
--   **Result:** The bot will send the welcome card for you to interact with
--   **Valid Scopes:** personal, group chat, team chat
-
-2. **MentionMe**
-
--   **Result:** The bot will respond to the message and mention the user
--   **Valid Scopes:** personal, group chat, team chat
-
-3. **MessageAllMembers**
-
--   **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
--   **Valid Scopes:** personal, group chat, team chat
-
-You can select an option from the command list by typing `@TeamsConversationBot` into the compose message area and `What can I do?` text above the compose area.
+You can interact with this message extension by finding the "GPT ME" extension beneath your compose area in chats and channels. This may be accessed in the '...' ellipses menu. 
 
 ## Deploy the bot to Azure
 
