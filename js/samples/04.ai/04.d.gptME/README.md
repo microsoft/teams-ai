@@ -119,6 +119,16 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 ## Interacting with the message extension
 
 You can interact with this message extension by finding the "GPT ME" extension beneath your compose area in chats and channels. This may be accessed in the '...' ellipses menu. 
+    
+The message extension provides the following functionality:
+* Create Post: Generates a post using the text-davinci-003 model, with a user-provided prompt.
+* Update Post: Updates a post using the text-davinci-003 model, with a user-provided prompt.
+* Preview Post: Previews a post as an adaptive card.
+    
+## Limitations
+The message extension has some limitations, including:
+* The bot is not able to perform tasks outside of generating and updating posts.
+* The bot is not able to provide inappropriate or offensive content.
 
 ## Deploy the bot to Azure
 
