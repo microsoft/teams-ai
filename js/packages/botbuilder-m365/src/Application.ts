@@ -47,6 +47,7 @@ export interface ApplicationOptions<
 
 export type RouteSelector = (context: TurnContext) => Promise<boolean>;
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
+export type ApplicationEventHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<boolean>;
 
 export type ConversationUpdateEvents =
     | 'channelCreated'
@@ -61,6 +62,7 @@ export type ConversationUpdateEvents =
     | 'teamUnarchived'
     | 'teamRestored';
 export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
+export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
 export class Application<
     TState extends TurnState = DefaultTurnState,
@@ -76,6 +78,8 @@ export class Application<
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _ai?: AI<TState, TPredictionOptions, TPredictionEngine>;
+    private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
+    private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
     private _typingTimer: any;
 
     public constructor(options?: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>) {
@@ -275,21 +279,29 @@ export class Application<
                 context.activity.text = TurnContext.removeRecipientMention(context.activity);
             }
 
+            // Load turn state
+            const { storage, turnStateManager } = this._options;
+            const state = await turnStateManager!.loadState(storage, context);
+
+            // Call beforeTurn event handlers
+            if (!this.callEventHandlers(context, state, this._beforeTurn)) {
+                return false;
+            } 
+
             // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
             // Invoke Activities from Teams need to be responded to in less than 5 seconds.
             if (context.activity.type === ActivityTypes.Invoke) {
                 for (let i = 0; i < this._invokeRoutes.length; i++) {
                     const route = this._invokeRoutes[i];
                     if (await route.selector(context)) {
-                        // Load turn state
-                        const { storage, turnStateManager } = this._options;
-                        const state = await turnStateManager!.loadState(storage, context);
-
                         // Execute route handler
                         await route.handler(context, state);
 
-                        // Save turn state
-                        await turnStateManager!.saveState(storage, context, state);
+                        // Call afterTurn event handlers
+                        if (this.callEventHandlers(context, state, this._afterTurn)) {
+                            // Save turn state
+                            await turnStateManager!.saveState(storage, context, state);
+                        }
 
                         // End dispatch
                         return true;
@@ -301,15 +313,14 @@ export class Application<
             for (let i = 0; i < this._routes.length; i++) {
                 const route = this._routes[i];
                 if (await route.selector(context)) {
-                    // Load turn state
-                    const { storage, turnStateManager } = this._options;
-                    const state = await turnStateManager!.loadState(storage, context);
-
                     // Execute route handler
                     await route.handler(context, state);
 
-                    // Save turn state
-                    await turnStateManager!.saveState(storage, context, state);
+                    // Call afterTurn event handlers
+                    if (this.callEventHandlers(context, state, this._afterTurn)) {
+                        // Save turn state
+                        await turnStateManager!.saveState(storage, context, state);
+                    }
 
                     // End dispatch
                     return true;
@@ -318,15 +329,14 @@ export class Application<
 
             // Call AI module if configured
             if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
-                // Load turn state
-                const { storage, turnStateManager } = this._options;
-                const state = await turnStateManager!.loadState(storage, context);
-
                 // Begin a new chain of AI calls
                 await this._ai.chain(context, state);
 
-                // Save turn state
-                await turnStateManager!.saveState(storage, context, state);
+                // Call afterTurn event handlers
+                if (this.callEventHandlers(context, state, this._afterTurn)) {
+                    // Save turn state
+                    await turnStateManager!.saveState(storage, context, state);
+                }
 
                 // End dispatch
                 return true;
@@ -441,6 +451,43 @@ export class Application<
             clearTimeout(this._typingTimer);
             this._typingTimer = undefined;
         }
+    }
+
+    /**
+     * Registers a turn event handler.
+     *
+     * @param event Name of the turn event to handle.
+     * @param handler Function to call when the event is triggered.
+     * @returns The application instance for chaining purposes.
+     */
+    public turn(
+        event: TurnEvents | TurnEvents[],
+        handler: ApplicationEventHandler<TState>
+    ): this {
+        (Array.isArray(event) ? event : [event]).forEach((e) => {
+            switch (event) {
+                case 'beforeTurn':
+                default:
+                    this._beforeTurn.push(handler);
+                    break;
+                case 'afterTurn':
+                    this._afterTurn.push(handler);
+                    break;
+            }
+        });
+        return this;
+    }
+
+    private async callEventHandlers(context: TurnContext, state: TState, handlers: ApplicationEventHandler<TState>[]): Promise<boolean> {
+        for (let i = 0; i < handlers.length; i++) {
+            const continueExecution = await handlers[i](context, state);
+            if (!continueExecution) {
+                return false;
+            }
+        }
+
+        // Continue execution
+        return true;
     }
 }
 
