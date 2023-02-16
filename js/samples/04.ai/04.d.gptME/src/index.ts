@@ -71,8 +71,10 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import { Application, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
-interface ConversationState {}
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+// This Message Extension can either drop the created card into the compose window (default.) 
+// Or use Teams botMessagePreview feature to post the activity directly to the feed onBehalf of the user.
+// Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
+const PREVIEW_MODE = false;
 
 // Create prediction engine
 const predictionEngine = new OpenAIPredictionEngine({
@@ -85,7 +87,7 @@ const predictionEngine = new OpenAIPredictionEngine({
 // - Not that we're not passing the application the prediction engine since we won't be chatting with
 //   the app.
 const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
+const app = new Application({
     storage,
     adapter,
     botAppId: process.env.MicrosoftAppId
@@ -98,7 +100,7 @@ app.messageExtensions.fetchTask('CreatePost', async (context, state) => {
 });
 
 interface SubmitData {
-    verb: 'generate' | 'update' | 'preview';
+    verb: 'generate' | 'update' | 'preview' | 'post';
     prompt?: string;
     post?: string;
 }
@@ -113,7 +115,6 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
                 // Call GPT and return an updated response view
                 return await updatePost(context, state, '../src/update.txt', data);
             case 'preview':
-            default:
                 // Preview the post as an adaptive card
                 const card = createPostCard(data.post!);
                 const activity = MessageFactory.attachment(card);
@@ -121,6 +122,8 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
                     type: 'botMessagePreview',
                     activityPreview: activity
                 } as MessagingExtensionResult;
+            case 'post':
+                break;
         }
     } catch (err: any) {
         return `Something went wrong: ${err.toString()}`;
@@ -130,7 +133,7 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
 app.messageExtensions.botMessagePreviewEdit('CreatePost', async (context, state, previewActivity) => {
     // Get post text from previewed card
     const post: string = previewActivity?.attachments[0]?.content?.body[0]?.text ?? '';
-    const card = createEditView(post);
+    const card = createEditView(post, PREVIEW_MODE);
     return createTaskInfo(card);
 });
 
@@ -144,8 +147,8 @@ app.messageExtensions.botMessagePreviewSend('CreatePost', async (context, state,
         ]
     };
 
-    // Proactively send new activity to chat
-    await app.sendProactiveActivity(context, activity);
+    // Send new activity to chat
+    await context.sendActivity(activity);
 });
 
 // Listen for incoming server requests.
@@ -173,7 +176,7 @@ async function updatePost(
     data: SubmitData
 ): Promise<TaskModuleTaskInfo> {
     const post = await callPrompt(context, state, prompt, data);
-    const card = createEditView(post);
+    const card = createEditView(post, PREVIEW_MODE);
     return createTaskInfo(card);
 }
 

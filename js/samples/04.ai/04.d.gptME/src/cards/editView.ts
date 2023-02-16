@@ -3,7 +3,7 @@
 
 import { Attachment, CardFactory } from 'botbuilder';
 
-export function createEditView(post: string): Attachment {
+export function createEditView(post: string, previewMode: boolean): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
         type: 'AdaptiveCard',
@@ -44,9 +44,9 @@ export function createEditView(post: string): Attachment {
             },
             {
                 type: 'Action.Submit',
-                title: 'Preview',
+                title: previewMode ? 'Preview' : 'Post',
                 data: {
-                    verb: 'preview'
+                    verb: previewMode ? 'preview' : 'post'
                 }
             }
         ]
