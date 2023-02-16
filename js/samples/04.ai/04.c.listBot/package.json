@@ -18,7 +18,7 @@
     },
     "dependencies": {
         "botbuilder": "^4.19.0",
-        "botbuilder-m365": "~0.0.1",
+        "botbuilder-m365": "file:./botbuilder-m365-v0.0.1.tgz",
         "dotenv": "^8.2.0",
         "replace": "~1.2.0",
         "restify": "~8.6.0"

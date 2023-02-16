@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.16",
-    "id": "1b8376a6-906c-4df7-9b43-9214cbb3207d",
+    "id": "1b8376a6-906c-5ef7-9b43-9214cbb3207d",
     "packageName": "com.package.name",
     "name": {
         "short": "GPT ME",
@@ -26,8 +26,8 @@
     "accentColor": "#FFFFFF",
     "composeExtensions": [
         {
-            "botId": "___YOUR BOTS ID___",
-            "commands": [
+            "botId": "49f71946-59e1-4099-96e1-90ef334795e8",
+              "commands": [
                 {
                     "id": "CreatePost",
                     "type": "action",
@@ -46,6 +46,20 @@
             ],
             "canUpdateConfiguration": true
         }
+    ],
+    "bots": [
+        {
+            "botId": "49f71946-59e1-4099-96e1-90ef334795e8",
+            "scopes": ["personal", "team", "groupChat"],
+            "isNotificationOnly": false,
+            "supportsCalling": false,
+            "supportsVideo": false,
+            "supportsFiles": false
+        }
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
     ],
     "validDomains": []
 }
