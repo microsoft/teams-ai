@@ -123,6 +123,12 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
                     activityPreview: activity
                 } as MessagingExtensionResult;
             case 'post':
+                // Drop the card into compose window
+                return {
+                    type: 'result',
+                    attachmentLayout: 'list',
+                    attachments: [createPostCard(data.post)]
+                } as MessagingExtensionResult;
                 break;
         }
     } catch (err: any) {
