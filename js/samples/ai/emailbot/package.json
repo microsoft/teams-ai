@@ -1,7 +1,7 @@
 {
-    "name": "lightBot-demo",
+    "name": "emailBot-demo",
     "version": "1.0.0",
-    "description": "A simple chat bot that can turn a light on and off",
+    "description": "A simple chat bot that can write and send emails",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",
