@@ -16,7 +16,8 @@ import {
     MessagingExtensionResult,
     MessagingExtensionActionResponse,
     MessagingExtensionParameter,
-    MessagingExtensionQuery
+    MessagingExtensionQuery,
+    Activity
 } from 'botbuilder';
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
@@ -65,6 +66,81 @@ export class MessageExtensions<TState extends TurnState> {
                         // Queue up invoke response
                         await context.sendActivity({
                             value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                },
+                true
+            );
+        });
+        return this._app;
+    }
+
+    public botMessagePreviewEdit(
+        commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (
+            context: TurnContext,
+            state: TState,
+            previewActivity: Partial<Activity>
+        ) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>
+    ): Application<TState> {
+        (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
+            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME, 'edit');
+            this._app.addRoute(
+                selector,
+                async (context, state) => {
+                    // Insure that we're in an invoke as expected
+                    if (
+                        context?.activity?.type !== ActivityTypes.Invoke ||
+                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
+                        context?.activity?.value?.botMessagePreviewAction !== 'edit'
+                    ) {
+                        throw new Error(
+                            `Unexpected MessageExtensions.botMessagePreviewEdit() triggered for activity type: ${context?.activity?.type}`
+                        );
+                    }
+
+                    // Call handler and then check to see if an invoke response has already been added
+                    const result = await handler(context, state, context.activity.value?.botActivityPreview[0] ?? {});
+                    await this.returnSubmitActionResponse(context, result);
+                },
+                true
+            );
+        });
+        return this._app;
+    }
+
+    public botMessagePreviewSend(
+        commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        handler: (
+            context: TurnContext,
+            state: TState,
+            previewActivity: Partial<Activity>
+        ) => Promise<void>
+    ): Application<TState> {
+        (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
+            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME, 'send');
+            this._app.addRoute(
+                selector,
+                async (context, state) => {
+                    // Insure that we're in an invoke as expected
+                    if (
+                        context?.activity?.type !== ActivityTypes.Invoke ||
+                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
+                        context?.activity?.value?.botMessagePreviewAction !== 'send'
+                    ) {
+                        throw new Error(
+                            `Unexpected MessageExtensions.botMessagePreviewSend() triggered for activity type: ${context?.activity?.type}`
+                        );
+                    }
+
+                    // Call handler and then check to see if an invoke response has already been added
+                    await handler(context, state, context.activity.value?.botActivityPreview[0] ?? {});
+
+                    // Queue up invoke response
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        await context.sendActivity({
+                            value: { body: {}, status: 200 } as InvokeResponse,
                             type: ActivityTypes.InvokeResponse
                         });
                     }
@@ -280,50 +356,54 @@ export class MessageExtensions<TState extends TurnState> {
 
                     // Call handler and then check to see if an invoke response has already been added
                     const result = await handler(context, state, context.activity.value?.data ?? {});
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        let response: MessagingExtensionActionResponse;
-                        if (typeof result == 'string') {
-                            // Return message
-                            response = {
-                                task: {
-                                    type: 'message',
-                                    value: result
-                                }
-                            };
-                        } else if (typeof result == 'object') {
-                            if ((result as TaskModuleTaskInfo).card) {
-                                // Return another task module
-                                response = {
-                                    task: {
-                                        type: 'continue',
-                                        value: result as TaskModuleTaskInfo
-                                    }
-                                };
-                            } else {
-                                // Return card to user
-                                response = {
-                                    composeExtension: result as MessagingExtensionResult
-                                };
-                            }
-                        } else {
-                            // No action taken
-                            response = {
-                                composeExtension: undefined
-                            };
-                        }
-
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
+                    await this.returnSubmitActionResponse(context, result);
                 },
                 true
             );
         });
         return this._app;
+    }
+
+    private async returnSubmitActionResponse(context: TurnContext, result: MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined): Promise<void> {
+        if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+            // Format invoke response
+            let response: MessagingExtensionActionResponse;
+            if (typeof result == 'string') {
+                // Return message
+                response = {
+                    task: {
+                        type: 'message',
+                        value: result
+                    }
+                };
+            } else if (typeof result == 'object') {
+                if ((result as TaskModuleTaskInfo).card) {
+                    // Return another task module
+                    response = {
+                        task: {
+                            type: 'continue',
+                            value: result as TaskModuleTaskInfo
+                        }
+                    };
+                } else {
+                    // Return card to user
+                    response = {
+                        composeExtension: result as MessagingExtensionResult
+                    };
+                }
+            } else {
+                // No action taken
+                response = {
+                    composeExtension: undefined
+                };
+            }
+
+            // Queue up invoke response
+            await context.sendActivity({
+                value: { body: response, status: 200 } as InvokeResponse,
+                type: ActivityTypes.InvokeResponse
+            });
+        }
     }
 }
 
@@ -331,7 +411,7 @@ export class MessageExtensions<TState extends TurnState> {
  * @param commandId
  * @param invokeName
  */
-function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeName: string): RouteSelector {
+function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeName: string, botMessagePreviewAction?: 'edit' | 'send'): RouteSelector {
     if (typeof commandId == 'function') {
         // Return the passed in selector function
         return commandId;
@@ -339,7 +419,7 @@ function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeNa
         // Return a function that matches the commandId using a RegExp
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
-            if (isInvoke && typeof context?.activity?.value?.commandId == 'string') {
+            if (isInvoke && typeof context?.activity?.value?.commandId == 'string' && matchesPreviewAction(context.activity, botMessagePreviewAction)) {
                 return Promise.resolve(commandId.test(context.activity.value.commandId));
             } else {
                 return Promise.resolve(false);
@@ -349,7 +429,15 @@ function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeNa
         // Return a function that attempts to match commandId
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
-            return Promise.resolve(isInvoke && context?.activity?.value?.commandId === commandId);
+            return Promise.resolve(isInvoke && context?.activity?.value?.commandId === commandId && matchesPreviewAction(context.activity, botMessagePreviewAction));
         };
+    }
+}
+
+function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edit' | 'send'): boolean {
+    if (typeof activity?.value?.botMessagePreviewAction == 'string') {
+        return activity.value.botMessagePreviewAction == botMessagePreviewAction;
+    } else {
+        return botMessagePreviewAction == undefined;
     }
 }

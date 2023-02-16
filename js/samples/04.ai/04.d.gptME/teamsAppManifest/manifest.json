@@ -26,7 +26,7 @@
     "accentColor": "#FFFFFF",
     "composeExtensions": [
         {
-            "botId": "49f71946-59e1-4099-96e1-90ef334795e8",
+            "botId": "___YOUR BOTS ID___",
               "commands": [
                 {
                     "id": "CreatePost",
@@ -49,7 +49,7 @@
     ],
     "bots": [
         {
-            "botId": "49f71946-59e1-4099-96e1-90ef334795e8",
+            "botId": "___YOUR BOTS ID___",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
