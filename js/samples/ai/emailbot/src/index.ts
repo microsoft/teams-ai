@@ -67,7 +67,7 @@ import { Application, DefaultTurnState, OpenAIPredictionEngine, AI, Conversation
 import * as responses from './responses';
 
 interface ConversationState {
-    lightsOn: boolean;
+    emailDraft?: string;
 }
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
@@ -96,39 +96,32 @@ const app = new Application<ApplicationTurnState>({
     predictionEngine
 });
 
+const getTextInDoubleQuotes = (str) => {
+    const regex = /"([^"]+)"/; // match any text contained between double quotes
+    const match = str.match(regex); // search for the regex pattern in the string
+
+    if (match) {
+        return match[1];
+    } else {
+        return '';
+    }
+};
+
 // Register action handlers
-app.ai.action('LightsOn', async (context, state) => {
-    state.conversation.value.lightsOn = true;
-    await context.sendActivity(`[lights on]`);
+app.ai.action('SendMail', async (context, state) => {
+    const emailBody = state.conversation.value.emailDraft;
+    const parsedEmail = getTextInDoubleQuotes(emailBody);
+    // TODO: Send email
+    console.log(parsedEmail);
+    state.conversation.delete();
     return true;
 });
 
-app.ai.action('LightsOff', async (context, state) => {
-    state.conversation.value.lightsOn = false;
-    await context.sendActivity(`[lights off]`);
+app.ai.action('SaveDraft', async (context, state) => {
+    const previousReplies = state.conversation.value[ConversationHistory.StatePropertyName];
+    const emailBody = previousReplies[previousReplies.length - 1];
+    state.conversation.value.emailDraft = emailBody;
     return true;
-});
-
-app.ai.action('Pause', async (context, state, data) => {
-    const time = data.time ? parseInt(data.time) : 1000;
-    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
-    await new Promise((resolve) => setTimeout(resolve, time));
-    return true;
-});
-
-app.ai.action('LightStatus', async (context, state) => {
-    // Send the user a static response with the status of the lights.
-    const response = responses.lightStatus(state.conversation.value.lightsOn);
-    await context.sendActivity(response);
-
-    // Since we might be prompting the user with a followup question, we need to do
-    // some surgery on the {{conversation.history}} to append a THEN SAY command. This
-    // lets the model know we just asked the user a question and it can predict the
-    // next action based on their response.
-    ConversationHistory.appendToLastLine(state, ` THEN SAY ${response}`);
-
-    // End the current chain since we've manually just prompted the user for input.
-    return false;
 });
 
 // Register a handler to handle unknown actions that might be predicted
