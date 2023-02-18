@@ -12,21 +12,25 @@ import { PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './Pre
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
+export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
+    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>
+}
+
 export class AI<
     TState extends TurnState,
     TPredictionOptions,
     TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>
 > {
-    private readonly _app: Application<TState>;
     private readonly _predictionEngine: TPredictionEngine;
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
 
     public static readonly UnknownActionName = '___UnknownAction___';
     public static readonly OffTopicActionName = '___OffTopic___';
     public static readonly RateLimitedActionName = '___RateLimited___';
+    public static readonly DoCommandActionName = '___DO___';
+    public static readonly SayCommandActionName = '___SAY___';
 
     public constructor(app: Application<TState>, predictionEngine: TPredictionEngine) {
-        this._app = app;
         this._predictionEngine = predictionEngine;
 
         // Register default UnknownAction handler
@@ -59,6 +63,36 @@ export class AI<
             },
             true
         );
+
+        // Register default DoCommandActionName
+        this.action<PredictedDoCommandAndHandler<TState>>(
+            AI.DoCommandActionName,
+            async (_context, _state, _data, _action) => {
+                const { data, handler } = _data;
+                return await handler(_context, _state, data, _action);
+            },
+            true
+        );
+
+        // Register default SayCommandActionName
+        this.action<PredictedSayCommand>(
+            AI.SayCommandActionName,
+            async (_context, _state, _data, _action) => {
+                const response = _data.response;
+                const card = ResponseParser.parseAdaptiveCard(response);
+                if (card) {
+                    const attachment = CardFactory.adaptiveCard(card);
+                    const activity = MessageFactory.attachment(attachment);
+                    await _context.sendActivity(activity);
+                } else {
+                    await _context.sendActivity(response);
+                }
+
+                return true;
+            },
+            true
+        );
+
     }
 
     public get predictionEngine(): TPredictionEngine {
@@ -75,9 +109,9 @@ export class AI<
      * @param allowOverrides Optional. If true
      * @returns The application instance for chaining purposes.
      */
-    public action(
+    public action<TData = Record<string, any>>(
         name: string,
-        handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>,
+        handler: (context: TurnContext, state: TState, data: TData, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
         if (!this._actions.has(name) || allowOverrides) {
@@ -110,11 +144,13 @@ export class AI<
                 const cmd = commands[i];
                 switch (cmd.type) {
                     case 'DO':
-                        const { action, data } = cmd as PredictedDoCommand;
+                        const { action } = cmd as PredictedDoCommand;
                         if (this._actions.has(action)) {
                             // Call action handler
                             const handler = this._actions.get(action)!.handler;
-                            continueChain = await handler(context, state, data, action);
+                            continueChain = await this._actions
+                                .get(AI.DoCommandActionName)!
+                                .handler(context, state, { handler, ...cmd as PredictedDoCommand }, action);
                         } else {
                             // Redirect to UnknownAction handler
                             continueChain = await this._actions
@@ -123,15 +159,9 @@ export class AI<
                         }
                         break;
                     case 'SAY':
-                        const response = (cmd as PredictedSayCommand).response;
-                        const card = ResponseParser.parseAdaptiveCard(response);
-                        if (card) {
-                            const attachment = CardFactory.adaptiveCard(card);
-                            const activity = MessageFactory.attachment(attachment);
-                            await context.sendActivity(activity);
-                        } else {
-                            await context.sendActivity(response);
-                        }
+                        continueChain = await this._actions
+                            .get(AI.SayCommandActionName)!
+                            .handler(context, state, cmd, AI.SayCommandActionName);
                         break;
                     default:
                         throw new Error(`Application.run(): unknown command of '${cmd.type}' predicted.`);
