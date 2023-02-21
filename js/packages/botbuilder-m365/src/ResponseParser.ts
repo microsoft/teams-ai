@@ -195,7 +195,7 @@ export class ResponseParser {
                             entityValue += token;
                         }
                         break;
-                    case DoCommandParseState.findEntityValue:
+                    case DoCommandParseState.inEntityValue:
                         // Accumulate tokens until you hit a space
                         if (SPACE_CHARACTERS.indexOf(token) >= 0) {
                             // Save pair and look for additional pairs
