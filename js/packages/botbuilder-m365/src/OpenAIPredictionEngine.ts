@@ -87,6 +87,16 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return this._openai;
     }
 
+    public get options(): OpenAIPredictionEngineOptions {
+        return this._options;
+    }
+
+    public async expandPromptTemplate(context: TurnContext, state: TState, prompt: string): Promise<string> {
+        return PromptParser.expandPromptTemplate(context, state, {}, prompt, {
+                conversationHistory: this._options.conversationHistory
+            });
+    }
+
     public async prompt(
         context: TurnContext,
         state: TState,

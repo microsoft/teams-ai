@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
+import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
 import { Application } from './Application';
 import { PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
 import { ResponseParser } from './ResponseParser';
@@ -84,6 +84,8 @@ export class AI<
                     const attachment = CardFactory.adaptiveCard(card);
                     const activity = MessageFactory.attachment(attachment);
                     await _context.sendActivity(activity);
+                } else if (_context.activity.channelId == Channels.Msteams) {
+                    await _context.sendActivity(response.split('\n').join('<br>'));
                 } else {
                     await _context.sendActivity(response);
                 }
@@ -110,22 +112,25 @@ export class AI<
      * @returns The application instance for chaining purposes.
      */
     public action<TData = Record<string, any>>(
-        name: string,
+        name: string|string[],
         handler: (context: TurnContext, state: TState, data: TData, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
-        if (!this._actions.has(name) || allowOverrides) {
-            this._actions.set(name, { handler, allowOverrides });
-        } else {
-            const entry = this._actions.get(name);
-            if (entry!.allowOverrides) {
-                entry!.handler = handler;
+        (Array.isArray(name) ? name : [name]).forEach(n => {
+            if (!this._actions.has(n) || allowOverrides) {
+                this._actions.set(n, { handler, allowOverrides });
             } else {
-                throw new Error(
-                    `The AI.action() method was called with a previously registered action named "${name}".`
-                );
+                const entry = this._actions.get(n);
+                if (entry!.allowOverrides) {
+                    entry!.handler = handler;
+                } else {
+                    throw new Error(
+                        `The AI.action() method was called with a previously registered action named "${n}".`
+                    );
+                }
             }
-        }
+        });
+
         return this;
     }
 
