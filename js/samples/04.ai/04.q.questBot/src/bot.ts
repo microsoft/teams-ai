@@ -3,12 +3,12 @@
 
 import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine, OpenAIPromptOptions } from 'botbuilder-m365';
 import { ActivityTypes, MemoryStorage, TurnContext } from 'botbuilder';
-import * as path from 'path';
 import * as responses from './responses';
 import { IItemList, IMapLocation, IQuest } from './interfaces';
 import { map, quests } from './ShadowFalls';
 import { baseDMActions, basePlayerActions, describeAction, describeMoveAction } from './actions';
 import { normalizeItemName } from './items';
+import * as prompts from './prompts';
 
 // Create prediction engine
 const predictionEngine = new OpenAIPredictionEngine({
@@ -16,15 +16,7 @@ const predictionEngine = new OpenAIPredictionEngine({
         apiKey: process.env.OPENAI_API_KEY
     },
     prompt: selectMainPrompt,
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 500,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Player:', ' DM:']
-    },
+    promptConfig: prompts.prompt.promptConfig,
     conversationHistory: {
         userPrefix: 'Player:',
         botPrefix: 'DM:',
@@ -33,32 +25,6 @@ const predictionEngine = new OpenAIPredictionEngine({
     },
     logRequests: true
 });
-
-// Define model settings for listItems prompt.
-const listItemsPromptOptions: OpenAIPromptOptions = {
-    prompt: promptPath('listItems.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 500,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0
-    }
-};
-
-// Define model settings for listItems prompt.
-const newLocationPromptOptions: OpenAIPromptOptions = {
-    prompt: promptPath('newLocation.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 500,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6
-    }
-};
 
 // Strongly type the applications turn state
 interface ConversationState {
@@ -78,6 +44,7 @@ interface UserState {
 interface TempState {
     quest: string;
     location: string;
+    mapPaths: string;
     surroundings: string;
     gameState: string;
     dynamicExamples: string;
@@ -136,6 +103,7 @@ app.turn('beforeTurn', async (context, state) => {
         const temp = state.temp.value;
         temp.quest = `\tTitle: "${quest.title}"\n\tBackstory: ${quest.backstory}`;
         temp.location = location.details;
+        temp.mapPaths = location.mapPaths;
         temp.surroundings = describeSurroundings(location);
         temp.gameState = describeGameState(conversation);
         temp.dynamicExamples = describeMoveExamples(location);
@@ -185,11 +153,11 @@ app.ai.action('buyItem', async (context, state, data: IDataEntities) => {
                 await context.sendActivity(`inventory: ${name} +${count}`);
                 return true;
             } else {
-                await replaceDMResponse(context, state, responses.notEnoughGold(gold));
+                await updateDMResponse(context, state, responses.notEnoughGold(gold));
                 return false;
             }
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError(), true);
             return false;
         }
     } finally {
@@ -221,11 +189,11 @@ app.ai.action('sellItem', async (context, state, data: IDataEntities) => {
                 await context.sendActivity(`inventory: ${name} -${count}`);
                 return true;
             } else {
-                await replaceDMResponse(context, state, responses.notInInventory(name));
+                await updateDMResponse(context, state, responses.notInInventory(name));
                 return false;
             }
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError(), true);
             return false;
         }
     } finally {
@@ -244,7 +212,7 @@ app.ai.action(['foundItem', 'takeItem'], async (context, state, data: IDataEntit
             await context.sendActivity(`inventory: ${name} +${count}`);
             return true;
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError(), true);
             return false;
         }
     } finally {
@@ -280,11 +248,11 @@ app.ai.action('dropItem', async (context, state, data: IDataEntities) => {
                 await context.sendActivity(`inventory: ${name} -${count}`);
                 return true;
             } else {
-                await replaceDMResponse(context, state, responses.notInInventory(data.name));
+                await updateDMResponse(context, state, responses.notInInventory(data.name));
                 return false;
             }
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError(), true);
             return false;
         }
     } finally {
@@ -320,11 +288,11 @@ app.ai.action('pickupItem', async (context, state, data: IDataEntities) => {
                 await context.sendActivity(`inventory: ${name} +${count}`);
                 return true;
             } else {
-                await replaceDMResponse(context, state, responses.notDropped(data.name));
+                await updateDMResponse(context, state, responses.notDropped(data.name));
                 return false;
             }
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError(), true);
             return false;
         }
     } finally {
@@ -338,14 +306,14 @@ app.ai.action('listInventory', async (context, state) => {
     if (Object.keys(items).length > 0) {
         state.temp.value.listItems = items;
         state.temp.value.listType = 'inventory';
-        const result = await predictionEngine.prompt(context, state, listItemsPromptOptions);
-        if (result?.data?.choices) {
-            await replaceDMResponse(context, state, result.data.choices[0].text);
+        const newResponse = await predictionEngine.prompt(context, state, prompts.listItems);
+        if (newResponse) {
+            await updateDMResponse(context, state, newResponse);
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError());
         }
     } else {
-        await replaceDMResponse(context, state, responses.emptyInventory());
+        await updateDMResponse(context, state, responses.emptyInventory());
         return false;
     }
 
@@ -357,14 +325,14 @@ app.ai.action('listDropped', async (context, state) => {
     if (Object.keys(items).length > 0) {
         state.temp.value.listItems = items;
         state.temp.value.listType = 'dropped';
-        const result = await predictionEngine.prompt(context, state, listItemsPromptOptions);
-        if (result?.data?.choices) {
-            await replaceDMResponse(context, state, result.data.choices[0].text);
+        const newResponse = await predictionEngine.prompt(context, state, prompts.listItems);
+        if (newResponse) {
+            await updateDMResponse(context, state, newResponse);
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError());
         }
     } else {
-        await replaceDMResponse(context, state, responses.emptyInventory());
+        await updateDMResponse(context, state, responses.emptyInventory());
         return false;
     }
 
@@ -379,10 +347,18 @@ app.ai.action('changeLocation', async (context, state, data: IDataEntities) => {
         return true;
     }
 
+    // GPT will sometimes generate a changeLocation for teh current location.
+    // Ignore that and just let the story play out.
+    if (newLocation == state.conversation.value.locationId) {
+        return true;
+    }
+
     // Does the current quest allow travel to this location?
     const conversation = state.conversation.value;
     const quest = quests[conversation.questIndex];
     if (quest.locations.indexOf(newLocation) >= 0) {
+        const origin = map.locations[conversation.locationId].description; 
+
         // Update state to point to new location
         conversation.dropped = {};
         conversation.droppedTurn = 0;
@@ -391,19 +367,30 @@ app.ai.action('changeLocation', async (context, state, data: IDataEntities) => {
 
         // Describe new location to player
         const location = map.locations[conversation.locationId];
-        state.temp.value.origin = state.temp.value.location;
+        state.temp.value.origin = origin;
         state.temp.value.location = location.details;
         state.temp.value.surroundings = describeSurroundings(location);
-        const result = await predictionEngine.prompt(context, state, newLocationPromptOptions);
-        if (result?.data?.choices) {
-            await replaceDMResponse(context, state, result.data.choices[0].text);
+        const newResponse = await predictionEngine.prompt(context, state, prompts.newLocation);
+        if (newResponse) {
+            await context.sendActivity(`<b>${location.name}</b>`);
+            await updateDMResponse(context, state, newResponse);
         } else {
-            await replaceDMResponse(context, state, responses.dataError());
+            await updateDMResponse(context, state, responses.dataError());
         }
     } else {
-        await replaceDMResponse(context, state, responses.moveBlocked());
+        await updateDMResponse(context, state, responses.moveBlocked());
     }
 
+    return false;
+});
+
+app.ai.action('useMap', async (context, state) => {
+    const newResponse = await predictionEngine.prompt(context, state, prompts.useMap);
+    if (newResponse) {
+        await updateDMResponse(context, state, newResponse);
+    } else {
+        await updateDMResponse(context, state, responses.dataError());
+    }
     return false;
 });
 
@@ -413,12 +400,9 @@ async function selectMainPrompt(context: TurnContext, state: ApplicationTurnStat
         prompt = 'startQuest.txt';
     }
 
-    return await predictionEngine.expandPromptTemplate(context, state, promptPath(prompt)); 
+    return await predictionEngine.expandPromptTemplate(context, state, prompts.getPromptPath(prompt)); 
 }
 
-function promptPath(name: string): string {
-    return path.join(__dirname, '../src/prompts/', name);
-}
 
 function describeSurroundings(location: IMapLocation): string {
     let text = '';
@@ -499,9 +483,15 @@ function describeActionList(actions: string[]): string {
     return text;
 }
 
-async function replaceDMResponse(context: TurnContext, state: ApplicationTurnState, response: string): Promise<void> {
-    ConversationHistory.replaceLastLine(state, `DM: ${response}`);
-    await context.sendActivity(response);
+async function updateDMResponse(context: TurnContext, state: ApplicationTurnState, newResponse: string, wholeLine = false): Promise<void> {
+    if (wholeLine) {
+        // The model likely hallucinated something and we don't want to encourage it to run the same DO again.
+        ConversationHistory.replaceLastLine(state, `DM: ${newResponse}`);
+    } else {
+        // This will replace the last SAY if there was one, otherwise it will append the response as a THEN SAY 
+        ConversationHistory.updateResponse(state, newResponse, 'DM: ');
+    }
+    await context.sendActivity(newResponse);
 }
 
 function parseNumber(text: string|undefined, minValue: number): number {

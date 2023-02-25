@@ -5,7 +5,7 @@ export const quests: IQuest[] = [
     {
         title: `The Dungeon of Shadow Falls: A Curse of Ancients`,
         backstory: `Long ago, in a forgotten age, an ancient evil was unleashed upon the land. The powerful entity cursed the surrounding area, transforming it into a dank and dangerous dungeon filled with powerful monsters and treacherous traps. Now, brave adventurers must venture into the depths of the Dungeon of Shadow Falls to rid the land of the curse and restore peace to the realm. Will you accept the challenge?`,
-        locations: ['village'],
+        locations: ['village', 'mountains', 'lake', 'forest', 'desert', 'river', 'swamp', 'valley', 'temple', 'cave', 'canyon', 'pyramids', 'oasis'],
         startLocation: 'village'
     },
     {

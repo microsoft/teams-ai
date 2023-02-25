@@ -102,11 +102,10 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         state: TState,
         options: OpenAIPromptOptions,
         data?: Record<string, any>
-    ): Promise<AxiosResponse<CreateCompletionResponse>> {
+    ): Promise<string|undefined> {
         data = data ?? {};
 
         // Request base prompt completion
-        const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];
         const promptRequest = await this.createCompletionRequest(
             context,
             state,
@@ -115,7 +114,9 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             options.promptConfig,
             options.conversationHistory
         );
-        return (await this.createCompletion(promptRequest, 'PROMPT')) as any;
+
+        const result = await this.createCompletion(promptRequest, 'PROMPT');
+        return result?.data?.choices ? result.data.choices[0]?.text : undefined;
     }
 
     public async predictCommands(

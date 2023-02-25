@@ -16,6 +16,7 @@ The following actions are supported:
 - changeLocation location="<LocationID>"
 - listInventory
 - listDropped
+- useMap
 
 Current quest:
 
@@ -74,6 +75,20 @@ Player: ready my sword and proceed forward
 DM: You draw your sword and proceed forward into the darkness.
 Player: take my sword out and move forward
 DM: You draw your sword and move forward into the darkness.
+
+Player: how far is it to the canyon?
+DM: DO useMap THE SAY the canyon is far.
+
+Player: tell me about Shadow Falls
+DM: DO useMap
+
+Player: how do I get to the swamp?
+DM: DO useMap THEN SAY go east from the river
+Player: let's go!
+DM DO changeLocation location="swamp"
+
+Player: look at map
+DM: DO useMap
 ```
 
 Current chat history:

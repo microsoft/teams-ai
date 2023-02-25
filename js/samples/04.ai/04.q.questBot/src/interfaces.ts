@@ -14,9 +14,11 @@ export interface IMap {
 
 export interface IMapLocation {
     id: string;
+    name: string;
     description: string;
     details: string;
     prompt: string;
+    mapPaths: string;
     north?: string;
     west?: string;
     south?: string;
