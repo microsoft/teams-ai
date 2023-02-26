@@ -10,6 +10,7 @@ export interface IItemList {
 
 export interface IMap {
     locations: { [id: string]: IMapLocation };
+    aliases: { [name: string]: string };
 }
 
 export interface IMapLocation {

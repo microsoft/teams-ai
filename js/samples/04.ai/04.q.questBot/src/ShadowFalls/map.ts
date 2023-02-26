@@ -1,4 +1,15 @@
-import { IMap } from "../interfaces";
+import { IMap, IMapLocation } from "../interfaces";
+
+export function findMapLocation(name: string): IMapLocation|undefined {
+    let key = name.toLowerCase().trim();
+    if (key.startsWith('the ')) {
+        key = key.substring('the '.length);
+    }
+    if (map.aliases.hasOwnProperty(key)) {
+        key = map.aliases[key];
+    }
+    return map.locations[key];
+}
 
 export const map: IMap = {
     locations: {
@@ -128,12 +139,66 @@ export const map: IMap = {
             },
         pyramids: {
                 id: 'pyramids',
-                name: 'Pyramids of teh Forgotten',
+                name: 'Pyramids of the Forgotten',
                 description: 'The ancient Pyramids of the Forgotten, built by the Anuket, are home to powerful magic, guarded by ancient and powerful creatures.',
                 details: `The ancient Pyramids of the Forgotten, built by the Anuket, have stood the test of time for ages. Their walls are covered in hieroglyphs, and the air is heavy with the smell of incense. It is said that these pyramids are home to powerful magic, wielded by the Anuket, and that those brave enough to enter may find great rewards. But be warned, the tombs are guarded by ancient and powerful creatures, so it is best to proceed with caution.`,
                 mapPaths: 'pyramids->N:desert\npyramids->N:desert->W:village\npyramids->N:desert->W:village->S:forest\npyramids->N:desert->W:village->W:lake->N:river\npyramids->N:desert->W:village->N:mountains\npyramids->N:desert->N:canyon\npyramids->N:desert->W:village->W:lake\npyramids->N:desert->W:village->W:lake->N:river->E:swamp\npyramids->N:desert->E:oasis\npyramids->N:desert->W:village->W:lake->N:river->N:valley\npyramids->N:desert->W:village->W:lake->N:river->N:valley->E:temple\npyramids->N:desert->W:village->S:forest->S:cave',
                 prompt: 'prompt.txt',
                 north: 'desert'
             }
+    },
+    aliases: {
+        'shadow falls': 'village',
+        'town': 'village',
+        'city': 'village',
+        'market': 'village',
+        'shops': 'village',
+        'home': 'village',
+        'base': 'village',
+        'shadowwood forest': 'forest',
+        'shadow forest': 'forest',
+        'shadow falls forest': 'forest',
+        'woods': 'forest',
+        'trees': 'forest',
+        'shadow falls river': 'river',
+        'shadow river': 'river',
+        'rivers': 'river',
+        'desert of shadows': 'desert',
+        'shadow falls desert': 'desert',
+        'shadow desert': 'desert',
+        'shadow mountains': 'mountains',
+        'shadow falls mountain': 'mountains',
+        'mountain': 'mountain',
+        'shadow canyon': 'canyon',
+        'shadow falls canyon': 'canyon',
+        'canyons': 'canyon',
+        'shadow falls lake': 'lake',
+        'shadow lake': 'lake',
+        'lakes': 'lake',
+        'shadow swamp': 'swamp',
+        'shadow fallse swamp': 'swamp',
+        'swamps': 'swamp',
+        'oasis of the lost': 'oasis',
+        'lost oasis': 'oasis',
+        'valley of the anasazi': 'valley',
+        'anasazi valley': 'valley',
+        'shadow valley': 'valley',
+        'shadow falls valley': 'valley',
+        'anasazi temple': 'temple',
+        'shadow temple': 'temple',
+        'shadow falls temple': 'temple',
+        'temples': 'temple',
+        'cave of the ancients': 'cave',
+        'shadow falls cave': 'cave',
+        'shadow cave': 'cave',
+        'hidden cave': 'cave',
+        'caves': 'cave',
+        'pyramids of the forgotten': 'pyramids',
+        'forgotten pyramids': 'pyramids',
+        'shadow pyramids': 'pyramids',
+        'shadow pyramid': 'pyramids',
+        'shadow falls pyramids': 'pyramids',
+        'shadow falls pyramid': 'pyramids',
+        'pyramid': 'pyramids'
     }
 };

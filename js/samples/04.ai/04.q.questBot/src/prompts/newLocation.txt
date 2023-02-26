@@ -15,9 +15,15 @@ Current location:
 Game state:
 {{temp.gameState}}
 
-Player inventory:
-{{conversation.inventory}}
+All players:
 
-The player just entered a new location, tell them about their journey here and describe to them this new location in lavish details. 
+{{conversation.players}}
+
+Player name: {{user.name}}
+
+Player inventory:
+{{user.inventory}}
+
+The players just entered a new location, tell them about their journey here and describe to them this new location in lavish details. 
 Warn them about any perils they might face.
 Use about 100 words: 

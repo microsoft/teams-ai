@@ -51,6 +51,16 @@ export class ConversationHistory {
         ConversationHistory.replaceLastLine(state, line + text);
     }
 
+    public static clear(state: TurnState): void {
+        if (state.conversation) {
+            state.conversation.value[ConversationHistory.StatePropertyName] = [];
+        } else {
+            throw new Error(
+                `ConversationHistory.clear() was passed a state object without a 'conversation' state member.`
+            );
+        }
+    }
+
     public static getLastLine(state: TurnState): string {
         if (state.conversation) {
             // Create history array if it doesn't exist

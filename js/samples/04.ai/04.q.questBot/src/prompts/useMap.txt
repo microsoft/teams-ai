@@ -55,6 +55,7 @@ Pyramids:
 - Details: The ancient Pyramids of the Forgotten, built by the Anuket, have stood the test of time for ages. Their walls are covered in hieroglyphs, and the air is heavy with the smell of incense. It is said that these pyramids are home to powerful magic, wielded by the Anuket, and that those brave enough to enter may find great rewards. But be warned, the tombs are guarded by ancient and powerful creatures, so it is best to proceed with caution.
 - Location: South of desert
 
+{{temp.dynamicMapLocation}}
 
 Players current location: {{conversation.locationId}}
 Best paths to every other location:
@@ -66,6 +67,12 @@ Current chat history:
 ```
 {{conversation.history}}
 ```
+
+All players:
+
+{{conversation.players}}
+
+Players name: {{user.name}}
 
 Players question:
 
