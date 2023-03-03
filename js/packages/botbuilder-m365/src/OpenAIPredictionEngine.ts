@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedCommand, PredictedDoCommand, PredictionEngine } from './PredictionEngine';
+import { PredictedCommand, PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
@@ -54,6 +54,7 @@ export interface OpenAIConversationHistoryOptions {
     maxLines?: number;
     maxCharacterLength?: number;
     lineSeparator?: string;
+    includeDoCommands?: boolean;
 }
 
 export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
@@ -73,7 +74,8 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             {
                 addTurnToHistory: true,
                 userPrefix: 'Human: ',
-                botPrefix: 'AI: '
+                botPrefix: 'AI: ',
+                includeDoCommands: true
             } as OpenAIConversationHistoryOptions,
             this._options.conversationHistory
         );
@@ -226,10 +228,19 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                         historyOptions.maxLines
                     );
                 }
-                if (response) {
+                if (historyOptions.includeDoCommands) {
+                    if (response) {
+                        ConversationHistory.addLine(
+                            state,
+                            `${historyOptions.botPrefix ?? ''}${response}`,
+                            historyOptions.maxLines
+                        );
+                    }
+                } else {
+                    const text = commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join(' ');
                     ConversationHistory.addLine(
                         state,
-                        `${historyOptions.botPrefix ?? ''}${response}`,
+                        `${historyOptions.botPrefix ?? ''}${text}`,
                         historyOptions.maxLines
                     );
                 }
@@ -286,7 +297,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                                 ? response.data.choices[0].text
                                 : '';
                         console.log(
-                            `${promptType} SUCCEEDED: status=${response.status} duration=${duration} response=${choice}`
+                            `${promptType} SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data.usage?.prompt_tokens} completion=${response.data.usage?.completion_tokens} response=${choice}`
                         );
                     } else {
                         console.error(

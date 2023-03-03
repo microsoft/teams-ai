@@ -61,6 +61,17 @@ export class ConversationHistory {
         }
     }
 
+    public static hasMoreLines(state: TurnState): boolean {
+        if (state.conversation) {
+            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            return Array.isArray(history) ? history.length > 0 : false;
+        } else {
+            throw new Error(
+                `ConversationHistory.hasMoreLines() was passed a state object without a 'conversation' state member.`
+            );
+        }
+    }
+
     public static getLastLine(state: TurnState): string {
         if (state.conversation) {
             // Create history array if it doesn't exist
@@ -76,6 +87,38 @@ export class ConversationHistory {
                 `ConversationHistory.getLastLine() was passed a state object without a 'conversation' state member.`
             );
         }
+    }
+
+    public static getLastSay(state: TurnState): string {
+        // Find start of text
+        const lastLine = this.getLastLine(state);
+        let textPos = lastLine.lastIndexOf(' SAY ');
+        if (textPos >= 0) {
+            textPos += 5;
+        } else {
+            // Find end of prefix
+            textPos = lastLine.indexOf(': ');
+            if (textPos >= 0) {
+                textPos += 2;
+            } else {
+                // Just use whole text
+                textPos = 0;
+            }
+        }
+
+        // Trim off any DO statements
+        let text = lastLine.substring(textPos);
+        let doPos = text.indexOf(' THEN DO ');
+        if (doPos >= 0) {
+            text = text.substring(0, doPos);
+        } else {
+            doPos = text.indexOf(' DO ');
+            if (doPos >= 0) {
+                text = text.substring(0, doPos);
+            }
+        }
+        
+        return text;
     }
 
     public static removeLastLine(state: TurnState): string | undefined {
@@ -126,6 +169,41 @@ export class ConversationHistory {
         }
     }
 
+    public static replaceLastSay(state: TurnState, newResponse: string, botPrefix = 'AI: '): void {
+        if (state.conversation) {
+            // Create history array if it doesn't exist
+            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            if (!Array.isArray(history)) {
+                history = [];
+            }
+
+            // Update the last line or add a new one
+            if (history.length > 0) {
+                const line = history[history.length - 1];
+                const lastSayPos = line.lastIndexOf(' SAY ');
+                if (lastSayPos >= 0 && line.indexOf(' DO ', lastSayPos) < 0) {
+                    // We found the last SAY and it wasn't followed by a DO
+                    history[history.length - 1] = `${line.substring(0, lastSayPos)} SAY ${newResponse}`;
+                } else if (line.indexOf(' DO ') >= 0) {
+                    // Append a THEN SAY after the DO's
+                    history[history.length - 1] = `${line} THEN SAY ${newResponse}`;
+                } else {
+                    // Just replace the entire line
+                    history[history.length - 1] = `${botPrefix}${newResponse}`;
+                }
+            } else {
+                history.push(`${botPrefix}${newResponse}`);
+            }
+
+            // Save history back to conversation state
+            state.conversation.value[ConversationHistory.StatePropertyName] = history;
+        } else {
+            throw new Error(
+                `ConversationHistory.replaceLastSay() was passed a state object without a 'conversation' state member.`
+            );
+        }
+    }
+
     /**
      * Returns the current conversation history as a string of text.
      *
@@ -160,41 +238,6 @@ export class ConversationHistory {
         } else {
             throw new Error(
                 `ConversationHistory.toString() was passed a state object without a 'conversation' state member.`
-            );
-        }
-    }
-
-    public static updateResponse(state: TurnState, newResponse: string, botPrefix = 'AI: '): void {
-        if (state.conversation) {
-            // Create history array if it doesn't exist
-            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
-            if (!Array.isArray(history)) {
-                history = [];
-            }
-
-            // Update the last line or add a new one
-            if (history.length > 0) {
-                const line = history[history.length - 1];
-                const lastSayPos = line.lastIndexOf(' SAY ');
-                if (lastSayPos >= 0 && line.indexOf(' DO ', lastSayPos) < 0) {
-                    // We found the last SAY and it wasn't followed by a DO
-                    history[history.length - 1] = `${line.substring(0, lastSayPos)} SAY ${newResponse}`;
-                } else if (line.indexOf(' DO ') >= 0) {
-                    // Append a THEN SAY after the DO's
-                    history[history.length - 1] = `${line} THEN SAY ${newResponse}`;
-                } else {
-                    // Just replace the entire line
-                    history[history.length - 1] = `${botPrefix}${newResponse}`;
-                }
-            } else {
-                history.push(`${botPrefix}${newResponse}`);
-            }
-
-            // Save history back to conversation state
-            state.conversation.value[ConversationHistory.StatePropertyName] = history;
-        } else {
-            throw new Error(
-                `ConversationHistory.updateResponse() was passed a state object without a 'conversation' state member.`
             );
         }
     }

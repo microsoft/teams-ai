@@ -20,6 +20,7 @@ export interface IMapLocation {
     details: string;
     prompt: string;
     mapPaths: string;
+    encounterChance: number;
     north?: string;
     west?: string;
     south?: string;

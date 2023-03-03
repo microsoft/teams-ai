@@ -59,25 +59,29 @@ Pyramids:
 
 Players current location: {{conversation.locationId}}
 Best paths to every other location:
-
 {{temp.mapPaths}}
 
-Current chat history:
+Conditions:
+{{temp.conditions}}
 
-```
-{{conversation.history}}
-```
+Story:
+{{conversation.story}}
+
+Current Player/DM Conversation:
+{{temp.conversation}}
 
 All players:
-
 {{conversation.players}}
 
-Players name: {{user.name}}
+Current Player Profile:
+{{temp.playerInfo}}
 
 Players question:
 
 ```
+
 {{activity.text}}
+
 ```
 
 Tell the player they look at their map and then answer the players question relative to the current location the way a DM would. Add some details:

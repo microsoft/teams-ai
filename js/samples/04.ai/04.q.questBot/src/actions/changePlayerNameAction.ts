@@ -1,5 +1,5 @@
 import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
+import { ApplicationTurnState, IDataEntities,  updateDMResponse } from "../bot";
 import * as responses from '../responses';
 
 export function changePlayerNameAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
@@ -21,7 +21,7 @@ export function changePlayerNameAction(app: Application<ApplicationTurnState>, p
             await context.sendActivity(`<b>${newName}</b>`);
             return true;
         } else {
-            await updateDMResponse(context, state, responses.dataError(), true);
+            await updateDMResponse(context, state, responses.dataError());
             return false;
         }
     });

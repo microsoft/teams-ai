@@ -16,7 +16,7 @@ export function listDroppedAction(app: Application<ApplicationTurnState>, predic
                 if (card) {
                     await context.sendActivity(MessageFactory.attachment(CardFactory.adaptiveCard(card)));
                 } else {
-                    await updateDMResponse(context, state, trimPromptResponse(newResponse));
+                    await updateDMResponse(context, state, trimPromptResponse(newResponse).split('\n').join('<br>'));
                 }
             } else {
                 await updateDMResponse(context, state, responses.dataError());

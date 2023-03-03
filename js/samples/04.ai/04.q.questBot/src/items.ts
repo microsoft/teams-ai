@@ -13,6 +13,8 @@ interface IMappings {
 }
 
 const mappings: IMappings = {
+    '<item>': c => mapTo('', 0),
+    'item': c => mapTo('', 0),
     'coin': c => mapTo('gold', c),
     'coins': c => mapTo('gold', c * 10),
     'gold coins': c => mapTo('gold', c),

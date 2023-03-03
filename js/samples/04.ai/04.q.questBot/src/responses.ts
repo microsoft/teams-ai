@@ -68,6 +68,16 @@ export function notInInventory(name: string): string {
     ]);
 }
 
+export function notEnoughItems(name: string): string {
+    return getRandomResponse([
+        `You don't have enough ${name}`,
+        `I'm sorry, you don't have enough ${name} for that.`,
+        `You don't have enough ${name} in your inventory.`,
+        `That won't work. You don't have enough ${name} to make it happen.`,
+        `That's not going to work. You don't have enough ${name}.`
+    ]);
+}
+
 export function notEnoughGold(gold: number): string {
     if (gold > 0) {
         return getRandomResponse([
@@ -91,11 +101,22 @@ export function notEnoughGold(gold: number): string {
 export function directionNotAvailableExample(direction: string): string {
     return `Player: go ${direction}\n` + 
         getRandomResponse([
-            `DM: You can't go ${direction}}.\n`,
+            `DM: You can't go ${direction}.\n`,
             `DM: There's nothing to the ${direction}.\n`,
             `DM: Travel to the ${direction} isn't possible.\n`
         ]);
 }
+
+export function notAllowed(): string {
+    return getRandomResponse([
+            `You can't do that.`,
+            `That's not going to work here.`,
+            `Sorry... You try but it doesn't work.`,
+            `I can't allow you to do that.`,
+            `You tried but no dice.`
+    ]);
+}
+
 
 export function dataError(): string {
     return getRandomResponse([

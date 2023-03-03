@@ -8,12 +8,16 @@
 
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
 import { Application } from './Application';
-import { PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
+import { PredictedCommand, PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
     handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>
+}
+
+export interface PredictedPlan {
+    commands: PredictedCommand[];
 }
 
 export class AI<
@@ -27,6 +31,7 @@ export class AI<
     public static readonly UnknownActionName = '___UnknownAction___';
     public static readonly OffTopicActionName = '___OffTopic___';
     public static readonly RateLimitedActionName = '___RateLimited___';
+    public static readonly PlanReadyActionName = '___PlanReady___';
     public static readonly DoCommandActionName = '___DO___';
     public static readonly SayCommandActionName = '___SAY___';
 
@@ -63,6 +68,15 @@ export class AI<
             },
             true
         );
+
+        // Register default PlanReadyActionName
+        this.action<PredictedPlan>(
+            AI.PlanReadyActionName,
+            async (_context, _state, _plan) => {
+                return Array.isArray(_plan.commands) && _plan.commands.length > 0;
+            },
+            true
+        )
 
         // Register default DoCommandActionName
         this.action<PredictedDoCommandAndHandler<TState>>(
@@ -141,9 +155,11 @@ export class AI<
         data?: Record<string, any>
     ): Promise<boolean> {
         // Call prediction engine
-        let continueChain = true;
         const commands = await this._predictionEngine.predictCommands(context, state, data, options);
-        if (commands && commands.length > 0) {
+        let continueChain = await this._actions
+            .get(AI.PlanReadyActionName)!
+            .handler(context, state, { commands }, '');
+        if (continueChain) {
             // Run predicted commands
             for (let i = 0; i < commands.length && continueChain; i++) {
                 const cmd = commands[i];
@@ -175,6 +191,15 @@ export class AI<
         }
 
         return continueChain;
+    }
+
+    public doAction<TData = Record<string,any>>(context: TurnContext, state: TState, action: string, data?: TData): Promise<boolean> {
+        if (!this._actions.has(action)) {
+            throw new Error(`Can't find an action named '${action}'.`);
+        }
+
+        const handler = this._actions.get(action)!.handler;
+        return handler(context, state, data, action);
     }
 }
 

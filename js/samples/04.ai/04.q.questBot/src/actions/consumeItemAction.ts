@@ -3,45 +3,35 @@ import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } fr
 import { normalizeItemName } from "../items";
 import * as responses from '../responses';
 
-export function dropItemAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
-    app.ai.action('dropItem', async (context, state, data: IDataEntities) => {
+export function consumeItemAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
+    app.ai.action('consumeItem', async (context, state, data: IDataEntities) => {
         const inventory = state.user.value.inventory ?? {};
-        const dropped = state.conversation.value.dropped ?? {};
         try {
             const { name } = normalizeItemName(data.name);
             const count = data.count == 'all' ? inventory[name] ?? 0 : parseNumber(data.count, 1);
             if (name) {
                 const current = inventory[name] ?? 0;
-                if (current > 0) {
+                if (current >= count) {
                     // Remove item(s) from inventory
-                    const current = inventory[name] ?? 0;
-                    const countDropped = count > current ? current : count;
-                    inventory[name] = current - countDropped;
+                    inventory[name] = current - count;
     
                     // Prune inventory
                     if (inventory[name] <= 0) {
                         delete inventory[name];
                     }
     
-                    // Add to dropped
-                    const droppedCurrent = dropped[name] ?? 0;
-                    dropped[name] = droppedCurrent + countDropped;
-    
-                    // Update droppedTurn
-                    state.conversation.value.droppedTurn = state.conversation.value.turn;
                     await context.sendActivity(`${state.user.value.name.toLowerCase()}: -${count}(${name})`);
                     return true;
                 } else {
-                    await updateDMResponse(context, state, responses.notInInventory(data.name));
+                    await updateDMResponse(context, state, responses.notEnoughItems(data.name));
                     return false;
                 }
             } else {
-                await updateDMResponse(context, state, responses.dataError());
+                await updateDMResponse(context, state, responses.notAllowed());
                 return false;
             }
         } finally {
             state.user.value.inventory = inventory;
-            state.conversation.value.dropped = dropped;
         }
     });
 }

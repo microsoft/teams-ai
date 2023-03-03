@@ -18,14 +18,14 @@ export function buyItemAction(app: Application<ApplicationTurnState>, prediction
                     // Add item(s) to inventory
                     const current = inventory[name] ?? 0;
                     inventory[name] = current + count;
-                    await context.sendActivity(`${state.user.value.name}: ${name} +${count}`);
+                    await context.sendActivity(`${state.user.value.name.toLowerCase()}: +${count}(${name}), -${cost}(gold)`);
                     return true;
                 } else {
                     await updateDMResponse(context, state, responses.notEnoughGold(gold));
                     return false;
                 }
             } else {
-                await updateDMResponse(context, state, responses.dataError(), true);
+                await updateDMResponse(context, state, responses.notAllowed());
                 return false;
             }
         } finally {

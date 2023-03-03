@@ -16,7 +16,7 @@ export function useMapAction(app: Application<ApplicationTurnState>, predictionE
         // Use the map to answer player
         let newResponse = await predictionEngine.prompt(context, state, prompts.useMap);
         if (newResponse) {
-            await updateDMResponse(context, state, trimPromptResponse(newResponse));
+            await updateDMResponse(context, state, trimPromptResponse(newResponse).split('\n').join('<br>'));
         } else {
             await updateDMResponse(context, state, responses.dataError());
         }

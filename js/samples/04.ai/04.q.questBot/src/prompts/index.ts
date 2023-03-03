@@ -10,7 +10,7 @@ export const createLocation: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6
@@ -22,7 +22,7 @@ export const listItems: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.2,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0
@@ -34,7 +34,7 @@ export const newLocation: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6
@@ -46,7 +46,7 @@ export const preQuest: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.4,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
@@ -59,7 +59,7 @@ export const prompt: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.4,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0.6,
@@ -72,11 +72,22 @@ export const startQuest: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Player:', ' DM:']
+        presence_penalty: 0.6
+    }
+};
+
+export const updateBackstory: OpenAIPromptOptions = {
+    prompt: getPromptPath('updateBackstory.txt'),
+    promptConfig: {
+        model: 'text-davinci-003',
+        temperature: 0.7,
+        max_tokens: 1000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.6
     }
 };
 
@@ -85,10 +96,9 @@ export const useMap: OpenAIPromptOptions = {
     promptConfig: {
         model: 'text-davinci-003',
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Player:', ' DM:']
+        presence_penalty: 0.6    
     }
 };

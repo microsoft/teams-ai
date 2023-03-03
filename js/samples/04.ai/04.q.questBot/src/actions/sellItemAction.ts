@@ -26,14 +26,14 @@ export function sellItemAction(app: Application<ApplicationTurnState>, predictio
                     if (inventory[name] <= 0) {
                         delete inventory[name];
                     }
-                    await context.sendActivity(`${state.user.value.name}: ${name} -${count}`);
+                    await context.sendActivity(`${state.user.value.name.toLowerCase()}: +${price}(gold), -${count}(${name})`);
                     return true;
                 } else {
                     await updateDMResponse(context, state, responses.notInInventory(name));
                     return false;
                 }
             } else {
-                await updateDMResponse(context, state, responses.dataError(), true);
+                await updateDMResponse(context, state, responses.dataError());
                 return false;
             }
         } finally {

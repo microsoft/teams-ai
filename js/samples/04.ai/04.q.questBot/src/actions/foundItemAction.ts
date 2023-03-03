@@ -12,10 +12,10 @@ export function foundItemAction(app: Application<ApplicationTurnState>, predicti
                 // Add item(s) to inventory
                 const current = inventory[name] ?? 0;
                 inventory[name] = current + count;
-                await context.sendActivity(`${state.user.value.name}: ${name} +${count}`);
+                await context.sendActivity(`${state.user.value.name.toLowerCase()}: +${count}(${name})`);
                 return true;
             } else {
-                await updateDMResponse(context, state, responses.dataError(), true);
+                await updateDMResponse(context, state, responses.notAllowed());
                 return false;
             }
         } finally {

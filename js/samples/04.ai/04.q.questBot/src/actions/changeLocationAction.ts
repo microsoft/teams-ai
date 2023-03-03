@@ -1,5 +1,5 @@
-import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
-import { ApplicationTurnState, describeSurroundings, IDataEntities, titleCase, updateDMResponse } from "../bot";
+import { Application, ConversationHistory, OpenAIPredictionEngine } from "botbuilder-m365";
+import { ApplicationTurnState, describeGameState, describeItemList, describeSurroundings, IDataEntities, titleCase, updateDMResponse } from "../bot";
 import { findMapLocation, map, quests } from "../ShadowFalls";
 import * as responses from '../responses';
 import * as prompts from '../prompts';
@@ -12,29 +12,21 @@ export function changeLocationAction(app: Application<ApplicationTurnState>, pre
         // Dynamically create the location if it doesn't exist
         let isDynamic = false;
         if (!newLocation) {
-            const name = titleCase(data.location);
-            state.temp.value.newLocation = name;
-            const description = await predictionEngine.prompt(context, state, prompts.createLocation);
-            if (description) {
-                isDynamic = true;
-                newLocation = {
-                    id: name.toLowerCase(),
-                    name: name,
-                    description: description,
-                    details: description,
-                    mapPaths: '',
-                    prompt: 'prompt.txt'
-                };
-            } else {
-                await updateDMResponse(context, state, responses.dataError());
-                return false;
-            }
-        }
-    
-        // GPT will sometimes generate a changeLocation for the current location.
-        // Ignore that and just let the story play out.
-        if (newLocation.id == state.conversation.value.locationId) {
-            return true;
+            isDynamic = true;
+            const name = data.name ? data.name : titleCase(data.location);
+            const description = data.description ?? name;
+            state.temp.value.newLocationName = name;
+            state.temp.value.newLocationDescription = description;
+            const details = await predictionEngine.prompt(context, state, prompts.createLocation);
+            newLocation = {
+                id: data.location,
+                name: name,
+                description: description,
+                details: details || description,
+                mapPaths: '',
+                prompt: 'prompt.txt',
+                encounterChance: name.toLowerCase().includes('dungeon') ? 0.4 : 0.2
+            };
         }
     
         // Does the current quest allow travel to this location?
@@ -53,19 +45,23 @@ export function changeLocationAction(app: Application<ApplicationTurnState>, pre
     
             // Describe new location to player
             state.temp.value.origin = origin;
-            state.temp.value.location = newLocation.details;
+            state.temp.value.location = `${newLocation.name} - ${newLocation.details}`;
             state.temp.value.surroundings = describeSurroundings(newLocation);
-            const newResponse = await predictionEngine.prompt(context, state, prompts.newLocation);
-            if (newResponse) {
-                await context.sendActivity(`<b>${newLocation.name}</b>`);
-                await updateDMResponse(context, state, newResponse);
+            state.temp.value.droppedItems = describeItemList(conversation.dropped);
+            state.temp.value.gameState = describeGameState(conversation);
+            await context.sendActivity(`<b>${newLocation.name}</b><br>${newLocation.details.split('\n').join('<br>')}`);
+
+            // Prepend details to conversation history
+            const lastLine = ConversationHistory.getLastLine(state);
+            if (lastLine.startsWith('DM:')) {
+                ConversationHistory.replaceLastLine(state, `DM: ${newLocation.details} ${lastLine.substring(4).trim()}`);
             } else {
-                await updateDMResponse(context, state, responses.dataError());
+                ConversationHistory.addLine(state, `DM: ${newLocation.details}`);
             }
         } else {
             await updateDMResponse(context, state, responses.moveBlocked());
         }
     
-        return false;
+        return true;
     });
 }
