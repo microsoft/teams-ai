@@ -68,6 +68,7 @@ export function passTimeAction(app: Application<ApplicationTurnState>, predictio
             if (days > 0) {
                 conversation.temperature = generateTemperature(state.temp.value.season)
                 conversation.weather = generateWeather(state.temp.value.season);
+                conversation.nextEncounterTurn = conversation.turn + Math.floor(Math.random() * 5) + 1;
                 await context.sendActivity(notification ? notification : `[${days} days later]`);
             }
 

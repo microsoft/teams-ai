@@ -13,7 +13,6 @@ import { listInventoryAction } from "./listInventoryAction";
 import { passTimeAction } from "./passTimeAction";
 import { pickupItemAction } from "./pickupItemAction";
 import { sellItemAction } from "./sellItemAction";
-import { startQuestAction } from "./startQuestAction";
 import { updatePlayerBackstoryAction } from "./updatePlayerBackstoryAction";
 import { updateStoryAction } from "./updateStoryAction";
 import { useMapAction } from "./useMapAction";
@@ -32,7 +31,6 @@ export function addActions(app: Application<ApplicationTurnState>, predictionEng
     passTimeAction(app, predictionEngine);
     pickupItemAction(app, predictionEngine);
     sellItemAction(app, predictionEngine);
-    startQuestAction(app, predictionEngine);
     updatePlayerBackstoryAction(app, predictionEngine);
     updateStoryAction(app, predictionEngine);
     useMapAction(app, predictionEngine);

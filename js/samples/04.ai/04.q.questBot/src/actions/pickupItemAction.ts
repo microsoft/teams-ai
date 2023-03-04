@@ -35,7 +35,7 @@ export function pickupItemAction(app: Application<ApplicationTurnState>, predict
                     return false;
                 }
             } else {
-                await updateDMResponse(context, state, responses.dataError());
+                await updateDMResponse(context, state, responses.notAllowed());
                 return false;
             }
         } finally {

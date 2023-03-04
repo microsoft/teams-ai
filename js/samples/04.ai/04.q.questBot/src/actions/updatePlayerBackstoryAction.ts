@@ -11,7 +11,7 @@ export function updatePlayerBackstoryAction(app: Application<ApplicationTurnStat
             const backstory = await predictionEngine.prompt(context, state, prompts.updateBackstory);
             if (backstory) {
                 // Save updated backstory
-                state.user.value.backstory = backstory;
+                state.user.value.backstory = backstory.trim();
             } else {
                 await updateDMResponse(context, state, responses.dataError());
             }

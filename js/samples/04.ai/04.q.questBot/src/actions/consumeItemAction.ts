@@ -27,8 +27,8 @@ export function consumeItemAction(app: Application<ApplicationTurnState>, predic
                     return false;
                 }
             } else {
-                await updateDMResponse(context, state, responses.notAllowed());
-                return false;
+                // Just let the story continue
+                return true;
             }
         } finally {
             state.user.value.inventory = inventory;

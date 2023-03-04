@@ -33,7 +33,7 @@ export function sellItemAction(app: Application<ApplicationTurnState>, predictio
                     return false;
                 }
             } else {
-                await updateDMResponse(context, state, responses.dataError());
+                await updateDMResponse(context, state, responses.notAllowed());
                 return false;
             }
         } finally {

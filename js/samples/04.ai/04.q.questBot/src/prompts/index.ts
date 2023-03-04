@@ -17,6 +17,30 @@ export const createLocation: OpenAIPromptOptions = {
     }
 };
 
+export const help: OpenAIPromptOptions = {
+    prompt: getPromptPath('intro.txt'),
+    promptConfig: {
+        model: 'text-davinci-003',
+        temperature: 0.6,
+        max_tokens: 1000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.6
+    }
+};
+
+export const intro: OpenAIPromptOptions = {
+    prompt: getPromptPath('intro.txt'),
+    promptConfig: {
+        model: 'text-davinci-003',
+        temperature: 0.9,
+        max_tokens: 1000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.6
+    }
+};
+
 export const listItems: OpenAIPromptOptions = {
     prompt: getPromptPath('listItems.txt'),
     promptConfig: {
@@ -45,7 +69,7 @@ export const preQuest: OpenAIPromptOptions = {
     prompt: getPromptPath('preQuest.txt'),
     promptConfig: {
         model: 'text-davinci-003',
-        temperature: 0.4,
+        temperature: 0.6,
         max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
@@ -58,7 +82,7 @@ export const prompt: OpenAIPromptOptions = {
     prompt: getPromptPath('prompt.txt'),
     promptConfig: {
         model: 'text-davinci-003',
-        temperature: 0.4,
+        temperature: 0.6,
         max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,

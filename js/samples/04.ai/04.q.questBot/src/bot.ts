@@ -30,6 +30,7 @@ const predictionEngine = new OpenAIPredictionEngine({
 
 // Strongly type the applications turn state
 export interface ConversationState {
+    greeted: boolean;
     inQuest: boolean;
     turn: number;
     questIndex: number;
@@ -54,10 +55,10 @@ export interface UserState {
 }
 
 export interface TempState {
+    prompt: string;
     quest: string;
     location: string;
     mapPaths: string;
-    surroundings: string;
     gameState: string;
     dynamicExamples: string;
     listItems: IItemList;
@@ -103,8 +104,11 @@ export const run = (context) => app.run(context);
 
 app.turn('beforeTurn', async (context, state) => {
     if (context.activity.type == ActivityTypes.Message) {
-        // Initialize player state
+        const conversation = state.conversation.value;
         const player = state.user.value;
+        const temp = state.temp.value;
+
+        // Initialize player state
         if (!player.name) {
             player.name = (context.activity.from?.name ?? '').split(' ')[0];
             if (player.name.length == 0) {
@@ -121,7 +125,6 @@ app.turn('beforeTurn', async (context, state) => {
         }
 
         // Add player to session
-        const conversation = state.conversation.value;
         if (Array.isArray(conversation.players)) {
             if (conversation.players.indexOf(player.name) < 0) {
                 conversation.players.push(player.name);
@@ -132,17 +135,38 @@ app.turn('beforeTurn', async (context, state) => {
 
         // Update message text to include players name
         // - This ensures their name is in the chat history
+        const useHelpPrompt = context.activity.text.trim().toLowerCase() == 'help';
         context.activity.text = `[${player.name}] ${context.activity.text}`;
 
-        const temp = state.temp.value;
-        temp.promptInstructions = 'Answer the players query.';
-        temp.conversation = describePlayerDMConversation(state);
-        temp.playerInfo = describePlayerInfo(player);
-        temp.droppedItems = describeItemList(conversation.dropped ?? {});
-        
+        // Are we just starting?
+        let newDay = false;
+        let location = map.locations['village'];
+        if (!conversation.greeted) {
+            newDay = true;
+            conversation.greeted = true;
+            temp.prompt = 'intro.txt';
 
-        // Are we in a quest?
-        if (conversation.inQuest === true) {
+            // Initialize location
+            conversation.turn = 1;
+            conversation.inQuest = false;
+            conversation.questIndex = -1;
+            conversation.locationId = location.id;
+            conversation.locationTurn = 1;
+            conversation.nextEncounterTurn = 5;
+            conversation.dropped = {};
+            conversation.droppedTurn = 0;
+            conversation.dynamicLocation = undefined;
+            conversation.day = Math.floor(Math.random() * 365) + 1;
+            conversation.time = Math.floor(Math.random() * 14) + 6; // Between 6am and 8pm
+
+            // Send location title as a message
+            await context.sendActivity(`<b>${location.name}</b>`);
+            app.startTypingTimer(context);
+        } else {
+            // Get current location
+            location = conversation.dynamicLocation ? conversation.dynamicLocation : map.locations[conversation.locationId];
+            temp.prompt = location.prompt;
+
             // Increment game turn
             conversation.turn++;
             conversation.locationTurn++;
@@ -154,7 +178,6 @@ app.turn('beforeTurn', async (context, state) => {
             }
 
             // Pass time
-            let newDay = false;
             conversation.time += 0.25;
             if (conversation.time >= 24) {
                 newDay = true;
@@ -164,33 +187,59 @@ app.turn('beforeTurn', async (context, state) => {
                     conversation.day = 1;
                 }
             }
+        }
 
-            // Load temp variables for prompt use
+        // User is asking for help
+        if (useHelpPrompt) {
+            temp.prompt = 'help.txt';
+        }
+
+        // Load temp variables for prompt use
+        temp.promptInstructions = 'Answer the players query.';
+        temp.conversation = describePlayerDMConversation(state);
+        temp.playerInfo = describePlayerInfo(player);
+        temp.droppedItems = describeItemList(conversation.dropped ?? {});
+        temp.location = `${location.name} - ${location.details}`;
+        temp.mapPaths = location.mapPaths;
+        temp.gameState = describeGameState(conversation);
+        temp.dynamicExamples = describeMoveExamples(location);
+        temp.timeOfDay = describeTimeOfDay(conversation.time);
+        temp.season = describeSeason(conversation.day);
+
+        if (newDay) {
+            conversation.temperature = generateTemperature(temp.season);
+            conversation.weather = generateWeather(temp.season);
+        }
+
+        temp.conditions = describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
+
+        // Are we in a quest?
+        if (conversation.inQuest === true) {
             const quest = quests[conversation.questIndex];
-            const location = conversation.dynamicLocation ? conversation.dynamicLocation : map.locations[conversation.locationId];
             temp.quest = `"${quest.title}" - ${quest.backstory}`;
-            temp.location = `${location.name} - ${location.details}`;
-            temp.mapPaths = location.mapPaths;
-            temp.surroundings = describeSurroundings(location);
-            temp.gameState = describeGameState(conversation);
-            temp.dynamicExamples = describeMoveExamples(location);
-            temp.timeOfDay = describeTimeOfDay(conversation.time);
-            temp.season = describeSeason(conversation.day);
-
-            if (newDay) {
-                conversation.temperature = generateTemperature(temp.season);
-                conversation.weather = generateWeather(temp.season);
-            }
-
-            temp.conditions = describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 
             // Generate a random encounter
             if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
                 temp.promptInstructions = 'An encounter occurred! Describe to the player the encounter.';
-                conversation.nextEncounterTurn = 5 + Math.floor(Math.random() * 15);
+                conversation.nextEncounterTurn = conversation.turn + (5 + Math.floor(Math.random() * 15));
             }
         } else {
-            conversation.inQuest = false;
+            temp.quest = `not in a quest`;
+
+            // Start quest as a random encounter
+            if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= 0.3) {
+                const quest = quests[0];
+                conversation.inQuest = true;
+                conversation.questIndex = 0;
+                temp.quest = `"${quest.title}" - ${quest.backstory}`;
+
+                temp.prompt = 'startQuest.txt';
+                conversation.nextEncounterTurn = conversation.turn + (5 + Math.floor(Math.random() * 15));
+
+                // Send quest title as a message
+                await context.sendActivity(`<b>${quest.title}</b>`);
+                app.startTypingTimer(context);
+            }
         }
     }
 
@@ -233,41 +282,8 @@ app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
 addActions(app, predictionEngine);
 
 async function selectMainPrompt(context: TurnContext, state: ApplicationTurnState): Promise<string> {
-    let prompt = 'prompt.txt';
-    if (!state.conversation.value.inQuest) {
-        prompt = 'preQuest.txt';
-    }
-
+    const prompt = state.temp.value.prompt;
     return await predictionEngine.expandPromptTemplate(context, state, prompts.getPromptPath(prompt)); 
-}
-
-export function describeSurroundings(location: IMapLocation): string {
-    let text = '';
-    ['north', 'west', 'south', 'east', 'up', 'down'].forEach(direction => {
-        if (typeof location[direction] == 'string') {
-            if (text) {
-                text += `\n`;
-            }
-
-            switch (direction) {
-                case 'up':
-                    text += `Directly above:\n`;
-                    break;
-                case 'down':
-                    text += `Directly below:\n`;
-                    break;
-                default:
-                    text += `To the ${direction}:\n`;
-                    break;
-            }
-
-            const other = map.locations[location[direction]];
-
-            text += `\tLocationId: "${other.id}"\n\tDescription: ${other.description}\n`;
-        }
-    });
-
-    return text;
 }
 
 export function describeGameState(state: ConversationState): string {
@@ -323,10 +339,14 @@ export function describePlayerDMConversation(state: ApplicationTurnState): strin
             const player = entry.substring(nameStart, nameEnd);
             const utterance = entry.substring(nameEnd + 1).trim();
             text += `${connector}${player} said \`${utterance}\``;
-            connector = 'Then ';
+            connector = '\nThen ';
         } else {
             const response = entry.substring(entry.indexOf(' ')).trim();
-            text += ` and the DM replied with \`${response}\``;
+            if (text.length > 0) {
+                text += ` and the DM replied with \`${response}\``;
+            } else {
+                text += ` The DM said \`${response}\``;
+            }
         }
     }
 

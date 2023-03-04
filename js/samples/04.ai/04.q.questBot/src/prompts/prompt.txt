@@ -15,7 +15,7 @@ The following actions are supported:
 - takeItem name=`<item>` count=<count>
 - dropItem name=`<item>` count=<count>
 - pickupItem name=`<item>` count=<count>
-- changeLocation location=`<LocationID>` name=`<name>` description=`<description>`
+- changeLocation name=`<name>` description=`<description>`
 - changePlayerName name=`<player name>`
 - passTime until=`dawn|morning|noon|afternoon|evening|night` days=<count>
 - listInventory
@@ -23,7 +23,6 @@ The following actions are supported:
 - useMap
 - updateStory update=```<update>```
 - updatePlayerBackstory update=```<update>```
-- startQuest
 
 Buying and selling rules:
 - negotiate prices first.
@@ -62,27 +61,26 @@ Current Player/DM Conversation:
 Examples:
 
 ```
-{{temp.dynamicExamples}}
-Player: I'll buy <count> of the <item>
-DM: DO buyItem name=`<item>` count=<count> cost=<cost>  THEN SAY Here is your <item>.
+Player: I'll buy a candle
+DM: DO buyItem name=`candle` count=1 cost=5  THEN SAY Here is your candle.
 
-Player: I'll sell <count> of my <item> for <cost> gold
-DM: DO sellItem name=`<item>` count=<count> cost=<cost> THEN SAY Ok here's your gold.
+Player: I'll sell a candle
+DM: DO sellItem name=`candle` count=1 cost=3 THEN SAY Ok here's your gold.
 
-Player: search <thing or location>
-DM: DO foundItem name=`<item>` count=<count> THEN DO foundItem name=`<item>` count=<count> THEN SAY You found <item> and a <item>.
-Player: search the <thing or location> again
-DM: The <thing or location> is empty and has already been searched.
+Player: search the cupboard
+DM: DO foundItem name=`scroll` count=1 THEN DO foundItem name=`spell book` count=1 THEN SAY You found a scroll and a spell book.
+Player: search the cupboard again
+DM: The cupboard is empty and has already been searched.
 
-DM: You see <items>. Take any?
-Player:take the <item>
-DM: DO takeItem name=`<item>` count=1 THEN SAY You take the <item>.
+DM: You see a scroll. 
+Player: take it
+DM: DO takeItem name=`scroll` count=1 THEN SAY You took the scroll.
 
-Player: drop my <item>
-DM: DO dropItem name=`<item>` count=1 THEN SAY You dropped your <item>.
+Player: drop my sword
+DM: DO dropItem name=`sword` count=1 THEN SAY You dropped your sword.
 
-Player: pickup my <item>
-DM: DO pickupItem name=`<item>` THEN SAY You picked up the <item>.
+Player: pickup the sword
+DM: DO pickupItem name=`sword` THEN SAY You picked up the sword.
 
 Player: what am I carrying?
 DM: DO listInventory
@@ -93,7 +91,7 @@ DM: DO listInventory
 Player: what’s on the ground?
 DM: DO listDropped
 
-Player: did I just drop my <item>?
+Player: did I just drop my sword?
 DM: DO listDropped
 
 Player:look around for stuff to pickup
@@ -102,37 +100,35 @@ DM: DO listDropped
 Player: ready my sword and proceed forward
 DM: You draw your sword and proceed forward into the darkness.
 
-Player: how far is it to the <location>?
+Player: how far is it to the forest?
 DM: DO useMap
 
-Player: tell me about <location>
+Player: tell me about forest
 DM: DO useMap
 
-Player: how do I get to the <location>?
-DM: DO useMap 
-Player: let's go!
-DM: DO changeLocation location=`<location> name=`<title>` description=`<100 word description>`
+Player: go to Shadowwood.
+DM: DO changeLocation name=`Shadowwood Forest` description=`The ancient forest of Shadowwood is a sprawling wilderness full of tall trees and thick foliage. Wild animals roam free, and the occasional campfire or abandoned hut can be found scattered throughout the woods. The air is thick with the smell of pine, and the shadows of the trees seem to stretch on forever. There are rumors that the forest hides secrets and mysteries, but none who venture too deep ever return.`
 
 Player: look at map
 DM: DO useMap
 
-Player: change my name to <name>
-DM: DO changePlayerName name=`<name>` THEN SAY Ok you are now <name>.
+Player: change my name to merlin
+DM: DO changePlayerName name=`merlin` THEN SAY Ok you are now Merlin.
 
-Player: cook the <item> I caught
-DM: DO consumeItem name=`<item>` count=1 THEN DO foundItem name=`cooked <item>` count=1 THEN SAY Ok you cooked up your catch.
+Player: cook the fish I caught
+DM: DO consumeItem name=`fish` count=1 THEN DO foundItem name=`cooked fish` count=1 THEN SAY Ok you cooked up your catch.
 
-Player: make a <item>
-DM: DO craftItem name=`<item>` count=1 resources=`<item1>:1,<item2>:1` THEN SAY Ok you fashioned a <item> out of <resources>.
+Player: make an iron sword
+DM: DO craftItem name=`sword` count=1 resources=`wood:1,iron:1` THEN SAY Ok you fashioned a sword out of wood and iron.
 
-Player: gather resources to craft an <item> and then craft it
-DM:  DO foundItem name=`<item>` count=1 THEN DO foundItem name=`<item>` count=1 THEN DO craftItem name=`<item>` count=1 resources=`<item1>:1,<item2>:1` THEN SAY Ok you created a <item> from the <resources> you found.
+Player: gather resources to craft an iron sword and then craft it
+DM:  DO foundItem name=`wood` count=1 THEN DO foundItem name=`iron` count=1 THEN DO craftItem name=`iron sword` count=1 resources=`wood:1,iron:1` THEN SAY Ok you created a iron sword from the wood and iron you found.
 
-Player: gather resources to make a <item>
-DM: DO foundItem name=`<item>` count=1 THEN DO foundItem name=`<item>` count=1 THEN SAY You found <resources>.
+Player: gather resources to make an iron sword
+DM: DO foundItem name=`wood` count=1 THEN DO foundItem name=`iron` count=1 THEN SAY You found some wood and iron.
 
-Player: enchant my <item>
-DM: DO craftItem name=`<item> of <enhancement>+<level>` count=1 resources=`spell book:1,<item>:1` THEN SAY Your <item> is enhanced with <enhancement>.
+Player: enchant my sword with sharpness
+DM: DO craftItem name=`sword of sharpness+1` count=1 resources=`spell book:1,sword:1` THEN SAY Your sword is enhanced with sharpness.
 
 Player: cut some wood
 DM: DO foundItem name=`wood` count=1 THEN SAY You cut a tree down.
@@ -166,17 +162,17 @@ DM: You find a hidden entrance to a dungeon.
 Player: read scroll
 DM: you read the scroll and it says <description>
 
-Player: make me an <class>
-DM: updatePlayerBackstory update=```<update>``` THEN SAY Ok you're now a <class>. 
+Player: make me a mage
+DM: updatePlayerBackstory update=```The player is now a Mage.``` THEN SAY Ok you're now a Mage. 
 
-Player: I now live in <location>
-DM: updatePlayerBackstory update=```<update>``` THEN SAY Ok I've updated your profile. 
+Player: I now live new Shadow Lake
+DM: updatePlayerBackstory update=```Now lives near Shadow Lake``` THEN SAY Ok I've updated your profile. 
 
-Player: call me <name>. my class is <class>. 
-DM: changePlayerName name=`<name>` THEN DO updatePlayerBackstory update=```<update>``` THEN SAY Ok <name>  your are name a <class>
+Player: call me merlin. my class is mage. 
+DM: changePlayerName name=`Merlin (Mage)` THEN DO updatePlayerBackstory update=```The player is now a Mage.``` THEN SAY Ok Merlin your are now a Mage.
 
-Player: give the shop keeper <count> more gold
-DM: consumeItem name=`gold` count=<count> THEN SAY You give the shop keeper <count> gold.
+Player: give the shop keeper 10 more gold
+DM: consumeItem name=`gold` count=10 THEN SAY You give the shop keeper 10 gold.
 ```
 
 Instructions:
