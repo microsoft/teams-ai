@@ -5,7 +5,7 @@ import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPredictio
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as responses from './responses';
 import { IItemList, IMapLocation } from './interfaces';
-import { map, quests } from './ShadowFalls';
+import { map } from './ShadowFalls';
 import * as prompts from './prompts';
 import { addActions } from './actions';
 import { LastWriterWinsStore } from './LastWriterWinsStore';
@@ -21,9 +21,8 @@ const predictionEngine = new OpenAIPredictionEngine({
     conversationHistory: {
         userPrefix: 'Player: ',
         botPrefix: 'DM: ',
-        maxLines: 2,
-        maxCharacterLength: 2000,
-        includeDoCommands: false
+        maxLines: 4,
+        maxCharacterLength: 2000
     },
     logRequests: true
 });
@@ -31,15 +30,11 @@ const predictionEngine = new OpenAIPredictionEngine({
 // Strongly type the applications turn state
 export interface ConversationState {
     greeted: boolean;
-    inQuest: boolean;
     turn: number;
-    questIndex: number;
-    locationId: string;
+    location: ILocation;
     locationTurn: number;
-    dropped: IItemList;
-    droppedTurn: number;
+    quests: { [title: string]: IQuest };
     players: string[];
-    dynamicLocation: IMapLocation;
     time: number;
     day: number;
     temperature: string;
@@ -51,49 +46,55 @@ export interface ConversationState {
 export interface UserState {
     name: string;
     backstory: string;
+    equipped: string;
     inventory: IItemList;
 }
 
 export interface TempState {
+    playerAnswered: boolean;
     prompt: string;
-    quest: string;
-    location: string;
-    mapPaths: string;
+    promptInstructions: string;
+    playerInfo: string;
     gameState: string;
-    dynamicExamples: string;
+    quests: string;
+    location: string;
+    conditions: string;
     listItems: IItemList;
     listType: string;
-    origin: string;
-    newLocationName: string;
-    newLocationDescription: string;
-    dynamicMapLocation: string;
     timeOfDay: string;
     season: string;
-    promptInstructions: string;
-    conversation: string;
-    playerInfo: string;
-    droppedItems: string;
-    conditions: string;
-    playerUtterance: string;
-    update: string;
+    backstoryChange: string;
+    equippedChange: string;
 }
 
 export interface IDataEntities {
+    action: string;
+    add: string;
+    description: string;
+    remove: string;
+    title: string;
     name: string;
-    cost: string;
-    count: string;
-    location: string;
-    resources: string;
+    backstory: string;
+    equipped: string;
     until: string;
     days: string;
-    update: string;
+}
+
+export interface IQuest {
+    title: string;
     description: string;
+}
+
+export interface ILocation {
+    title: string;
+    description: string;
+    encounterChance: number;
 }
 
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
 // Define storage and application
-const storage = new LastWriterWinsStore();
+const storage = new LastWriterWinsStore(process.env.StorageConnectionString, process.env.StorageContainer);
 const app = new Application<ApplicationTurnState>({
     storage,
     predictionEngine
@@ -101,6 +102,9 @@ const app = new Application<ApplicationTurnState>({
 
 // Export bots run() function
 export const run = (context) => app.run(context);
+
+export const DEFAULT_BACKSTORY =  `Lives in Shadow Falls.`;
+export const DEFAULT_EQUIPPED = `Wearing clothes.`;
 
 app.turn('beforeTurn', async (context, state) => {
     if (context.activity.type == ActivityTypes.Message) {
@@ -117,7 +121,11 @@ app.turn('beforeTurn', async (context, state) => {
         }
 
         if (!player.backstory) {
-            player.backstory = `Lives in Shadow Falls.`;
+            player.backstory = DEFAULT_BACKSTORY;
+        }
+
+        if (!player.equipped) {
+            player.equipped = DEFAULT_EQUIPPED;
         }
 
         if (player.inventory == undefined) {
@@ -140,42 +148,40 @@ app.turn('beforeTurn', async (context, state) => {
 
         // Are we just starting?
         let newDay = false;
-        let location = map.locations['village'];
+        let location: ILocation;
         if (!conversation.greeted) {
             newDay = true;
             conversation.greeted = true;
             temp.prompt = 'intro.txt';
 
-            // Initialize location
+            // Create starting location
+            const village = map.locations['village'];
+            location = {
+                title: village.name,
+                description: village.details,
+                encounterChance: village.encounterChance
+            };
+
+            // Initialize conversation state
             conversation.turn = 1;
-            conversation.inQuest = false;
-            conversation.questIndex = -1;
-            conversation.locationId = location.id;
+            conversation.location = location;
             conversation.locationTurn = 1;
-            conversation.nextEncounterTurn = 5;
-            conversation.dropped = {};
-            conversation.droppedTurn = 0;
-            conversation.dynamicLocation = undefined;
+            conversation.quests = {};
+            conversation.story = `The story begins.`;
             conversation.day = Math.floor(Math.random() * 365) + 1;
             conversation.time = Math.floor(Math.random() * 14) + 6; // Between 6am and 8pm
-
+            conversation.nextEncounterTurn = 5 + Math.floor(Math.random() * 15);
+        
             // Send location title as a message
-            await context.sendActivity(`<b>${location.name}</b>`);
+            await context.sendActivity(`🧙 <b>${location.title}</b>`);
             app.startTypingTimer(context);
         } else {
-            // Get current location
-            location = conversation.dynamicLocation ? conversation.dynamicLocation : map.locations[conversation.locationId];
-            temp.prompt = location.prompt;
+            location = conversation.location;
+            temp.prompt = 'prompt.txt';
 
             // Increment game turn
             conversation.turn++;
             conversation.locationTurn++;
-
-            // Age out dropped items
-            if (conversation.droppedTurn > 0 && (conversation.turn - conversation.droppedTurn) >= 5) {
-                conversation.dropped = {};
-                conversation.droppedTurn = 0;
-            }
 
             // Pass time
             conversation.time += 0.25;
@@ -195,14 +201,12 @@ app.turn('beforeTurn', async (context, state) => {
         }
 
         // Load temp variables for prompt use
+        temp.playerAnswered = false;
         temp.promptInstructions = 'Answer the players query.';
-        temp.conversation = describePlayerDMConversation(state);
         temp.playerInfo = describePlayerInfo(player);
-        temp.droppedItems = describeItemList(conversation.dropped ?? {});
-        temp.location = `${location.name} - ${location.details}`;
-        temp.mapPaths = location.mapPaths;
+        temp.location = `${location.title} - ${location.description}`;
+        temp.quests = describeQuests(conversation);
         temp.gameState = describeGameState(conversation);
-        temp.dynamicExamples = describeMoveExamples(location);
         temp.timeOfDay = describeTimeOfDay(conversation.time);
         temp.season = describeSeason(conversation.day);
 
@@ -213,42 +217,37 @@ app.turn('beforeTurn', async (context, state) => {
 
         temp.conditions = describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 
-        // Are we in a quest?
-        if (conversation.inQuest === true) {
-            const quest = quests[conversation.questIndex];
-            temp.quest = `"${quest.title}" - ${quest.backstory}`;
-
-            // Generate a random encounter
-            if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
-                temp.promptInstructions = 'An encounter occurred! Describe to the player the encounter.';
-                conversation.nextEncounterTurn = conversation.turn + (5 + Math.floor(Math.random() * 15));
-            }
-        } else {
-            temp.quest = `not in a quest`;
-
-            // Start quest as a random encounter
-            if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= 0.3) {
-                const quest = quests[0];
-                conversation.inQuest = true;
-                conversation.questIndex = 0;
-                temp.quest = `"${quest.title}" - ${quest.backstory}`;
-
-                temp.prompt = 'startQuest.txt';
-                conversation.nextEncounterTurn = conversation.turn + (5 + Math.floor(Math.random() * 15));
-
-                // Send quest title as a message
-                await context.sendActivity(`<b>${quest.title}</b>`);
-                app.startTypingTimer(context);
-            }
+        // Generate a random encounter
+        if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
+            temp.promptInstructions = 'An encounter occurred! Describe to the player the encounter.';
+            conversation.nextEncounterTurn = conversation.turn + (5 + Math.floor(Math.random() * 15));
         }
     }
 
     return true;
 });
 
-app.message('start quest', async (context, state) => {
-    await app.ai.doAction(context, state, 'startQuest');
-})
+app.turn('afterTurn', async (context, state) => {
+    const lastSay = ConversationHistory.getLastSay(state);
+    if (!lastSay && !state.temp.value.playerAnswered) {
+        // We sometime only get told to update the story so lets just read back
+        // the current story to the user.
+        const story = state.conversation.value.story;
+        await context.sendActivity(story);
+    }
+
+    return true;
+});
+
+app.message('/state', async (context, state) => {
+    await context.sendActivity(JSON.stringify(state));
+});
+
+app.message(['/reset-profile', '/reset-user'], async (context, state) => {
+    state.user.delete();
+    state.conversation.value.players = [];
+    await context.sendActivity(`I've reset your profile.`);
+});
 
 app.message('/reset', async (context, state) => {
     state.conversation.delete();
@@ -270,7 +269,10 @@ app.message('/story', async (context, state) => {
 });
 
 app.message('/profile', async (context, state) => {
-    await context.sendActivity(`<b>${state.user.value.name}</b><br>${state.user.value.backstory.split('\n').join('<br>')}`);
+    const player = state.user.value;
+    const backstory = player.backstory.split('\n').join('<br>');
+    const equipped = player.equipped.split('\n').join('<br>')
+    await context.sendActivity(`🤴 <b>${player.name}</b><br><b>Backstory:</b> ${backstory}<br><b>Equipped:</b> ${equipped}`);
 });
 
 
@@ -286,8 +288,20 @@ async function selectMainPrompt(context: TurnContext, state: ApplicationTurnStat
     return await predictionEngine.expandPromptTemplate(context, state, prompts.getPromptPath(prompt)); 
 }
 
-export function describeGameState(state: ConversationState): string {
-    return `\tTotalTurns: ${state.turn - 1}\n\tLocationTurns: ${state.locationTurn - 1}`
+export function describeGameState(conversation: ConversationState): string {
+    return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`
+}
+
+export function describeQuests(conversation: ConversationState): string {
+    let text = '';
+    let connector = '';
+    for (const key in conversation.quests) {
+        const quest = conversation.quests[key];
+        text += `${connector}"${quest.title}" - ${quest.description}`;
+        connector = '\n\n'
+    }
+
+    return text.length > 0 ? text : 'none';
 }
 
 export function describeMoveExamples(location: IMapLocation): string {
@@ -311,7 +325,7 @@ export function describeMoveExamples(location: IMapLocation): string {
 }
 
 export function describePlayerInfo(player: UserState): string {
-    let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tInventory:\n`;
+    let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
 }

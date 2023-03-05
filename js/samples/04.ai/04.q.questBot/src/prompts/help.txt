@@ -3,6 +3,7 @@ The campaign is set in the world of Shadow Falls.
 
 The following player actions are supported:
 
+- Starting and managing quests.
 - Change your name, class, race, or backstory.
 - Look at your map to find new locations in Shadow Falls to travel to.
 - Pass time by sleeping or asking to wait a few days.
@@ -22,8 +23,12 @@ Location:
 Story:
 {{temp.story}}
 
-Current Player/DM Conversation:
-{{temp.conversation}}
+Conversation History:
+```
+
+{{conversation.history}}
+
+```
 
 Describe to the player the various actions they can perform in the world of Shadow Falls the way a DM would. 
 Give the user some context and then use a bulleted list:

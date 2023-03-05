@@ -1,7 +1,0 @@
-You are the dungeon master (DM) for a classic text adventure game.
-The campaign is set in the world of Shadow Falls.
-
-New Location:
-{{temp.newLocationName}} - {{temp.newLocationDescription}}
-
-The players are about to move to a new location. Generate a detailed description for this new location. Describe it the way a DM would:

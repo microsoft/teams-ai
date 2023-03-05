@@ -22,24 +22,26 @@ export interface ParsedCommandResult {
 
 export class ResponseParser {
     public static parseAdaptiveCard(text?: string): Record<string, any> | undefined {
-        let card: Record<string, any> | undefined;
+        const obj = this.parseJSON(text);
+        return obj && obj['type'] === 'AdaptiveCard' ? obj : undefined;
+    }
+
+    public static parseJSON<T = Record<string, any>>(text?: string): T | undefined {
+        let obj: T | undefined;
         try {
             if (text) {
                 const startJson = text.indexOf('{');
                 const endJson = text.lastIndexOf('}');
                 if (startJson >= 0 && endJson > startJson) {
                     const txt = text.substring(startJson, endJson + 1);
-                    const obj: Record<string, any> = JSON.parse(txt);
-                    if (obj['type'] === 'AdaptiveCard') {
-                        card = obj;
-                    }
+                    obj = JSON.parse(txt);
                 }
             }
         } catch (err) {
             // no action
         }
 
-        return card;
+        return obj;
     }
 
     public static parseResponse(text?: string): PredictedCommand[] {

@@ -284,7 +284,7 @@ export class Application<
             const state = await turnStateManager!.loadState(storage, context);
 
             // Call beforeTurn event handlers
-            if (!this.callEventHandlers(context, state, this._beforeTurn)) {
+            if (!await this.callEventHandlers(context, state, this._beforeTurn)) {
                 return false;
             } 
 
@@ -333,7 +333,7 @@ export class Application<
                 await this._ai.chain(context, state);
 
                 // Call afterTurn event handlers
-                if (this.callEventHandlers(context, state, this._afterTurn)) {
+                if (await this.callEventHandlers(context, state, this._afterTurn)) {
                     // Save turn state
                     await turnStateManager!.saveState(storage, context, state);
                 }

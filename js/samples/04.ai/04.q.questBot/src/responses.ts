@@ -18,6 +18,21 @@ The variations should always include ${item} and ${list} variables.
 7 variations were asked for so that we can remove the 2 we like the least.
 */
 
+export function noQuests(): string {
+    return getRandomResponse([
+        `You don't have any active quests.`,
+        `Your quest log is blank.`,
+        `You are without a quest currently.`,
+        `It appears you aren't on a quest.`,
+        `You're not on a quest.`,
+    ]) + getRandomResponse([
+        ` Ask around to find quests.`,
+        ` Villagers and barkeeps are good sources of quests.`,
+        ` Try asking if anyone has heard any rumors.`,
+        ` You can always just say "create a new quest".`,
+        ``
+    ]);
+}
 export function moveBlocked(): string {
     return getRandomResponse([
         `As you begin heading towards your new destination a mysterious force transports back to your current location.`,

@@ -15,7 +15,10 @@ import {
     ConfigurationParameters,
     OpenAIApi,
     CreateCompletionRequest,
-    CreateCompletionResponse
+    CreateCompletionResponse,
+    CreateChatCompletionRequest,
+    CreateChatCompletionResponse,
+    ChatCompletionRequestMessage
 } from 'openai';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { ResponseParser } from './ResponseParser';
@@ -103,22 +106,37 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         context: TurnContext,
         state: TState,
         options: OpenAIPromptOptions,
-        data?: Record<string, any>
+        message?: string
     ): Promise<string|undefined> {
-        data = data ?? {};
+        // Check for chat completion model
+        if (options.promptConfig.model.startsWith('gpt-3.5-turbo')) {
 
-        // Request base prompt completion
-        const promptRequest = await this.createCompletionRequest(
-            context,
-            state,
-            data,
-            options.prompt,
-            options.promptConfig,
-            options.conversationHistory
-        );
+            // Request base chat completion
+            const chatRequest = await this.createChatCompletionRequest(
+                context,
+                state,
+                options.prompt,
+                options.promptConfig,
+                message,
+                options.conversationHistory
+            );
 
-        const result = await this.createCompletion(promptRequest, 'PROMPT');
-        return result?.data?.choices ? result.data.choices[0]?.text : undefined;
+            const result = await this.createChatCompletion(chatRequest);
+            return result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
+        } else {
+            // Request base prompt completion
+            const promptRequest = await this.createCompletionRequest(
+                context,
+                state,
+                {},
+                options.prompt,
+                options.promptConfig,
+                options.conversationHistory
+            );
+
+            const result = await this.createCompletion(promptRequest);
+            return result?.data?.choices ? result.data.choices[0]?.text : undefined;
+        }
     }
 
     public async predictCommands(
@@ -134,79 +152,60 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             throw new Error(`OpenAIPredictionEngine: "prompt" or "promptConfiguration" not specified.`);
         }
 
-        // Request base prompt completion
-        const promises: Promise<AxiosResponse<CreateCompletionResponse>>[] = [];
-        const promptRequest = await this.createCompletionRequest(
-            context,
-            state,
-            data,
-            options.prompt,
-            options.promptConfig,
-            options.conversationHistory
-        );
-        promises.push(this.createCompletion(promptRequest, 'PROMPT') as any);
+        // Check for chat completion model
+        let status: number;
+        let response: string;
+        if (options.promptConfig.model.startsWith('gpt-3.5-turbo')) {
+            // Request base chat completion
+            const chatRequest = await this.createChatCompletionRequest(
+                context,
+                state,
+                options.prompt,
+                options.promptConfig,
+                context.activity.text,
+                options.conversationHistory
+            );
 
-        // Add optional topic filter completion
-        if (options.topicFilter) {
-            if (!options.topicFilterConfig) {
-                throw new Error(
-                    `OpenAIPredictionEngine: a "topicFilter" prompt was specified but the "topicFilterConfig" is missing.`
-                );
-            }
-
-            const topicFilterRequest = await this.createCompletionRequest(
+            const result = await this.createChatCompletion(chatRequest);
+            status = result?.status;
+            response = result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
+        } else {
+            // Request base prompt completion
+            const promptRequest = await this.createCompletionRequest(
                 context,
                 state,
                 data,
-                options.topicFilter,
-                options.topicFilterConfig,
+                options.prompt,
+                options.promptConfig,
                 options.conversationHistory
             );
-            promises.push(this.createCompletion(topicFilterRequest, 'TOPIC FILTER') as any);
+
+            const result = await this.createCompletion(promptRequest);
+            status = result?.status;
+            response = result?.data?.choices ? result.data.choices[0]?.text : undefined;
         }
 
-        // Wait for completions to finish
-        const results = await Promise.all(promises);
 
         // Ensure we weren't rate limited
-        for (let i = 0; i < results.length; i++) {
-            if (results[i].status == 429) {
-                return [
-                    {
-                        type: 'DO',
-                        action: AI.RateLimitedActionName,
-                        data: {}
-                    } as PredictedDoCommand
-                ];
-            }
-        }
-
-        // Check topic filter
-        if (results.length > 1) {
-            if (results[1].status != 429) {
-                // Look for the word "yes" to be in the topic filters response.
-                let allowed = false;
-                if (results[1]?.data?.choices && results[1].data.choices.length > 0) {
-                    allowed = (results[1].data.choices[0].text ?? '').toLowerCase().indexOf('yes') >= 0;
-                }
-
-                // Redirect to OffTopic action if not allowed
-                if (!allowed) {
-                    return [
-                        {
-                            type: 'DO',
-                            action: AI.OffTopicActionName,
-                            data: {}
-                        } as PredictedDoCommand
-                    ];
-                }
-            }
+        if (status === 429) {
+            return [
+                {
+                    type: 'DO',
+                    action: AI.RateLimitedActionName,
+                    data: {}
+                } as PredictedDoCommand
+            ];
         }
 
         // Parse returned prompt response
-        if (Array.isArray(results[0]?.data?.choices) && results[0].data.choices.length > 0) {
+        if (response) {
+            // Patch the occasional "Then DO" which gets predicted
+            response = response.trim().replace('Then DO ', 'THEN DO ').replace('Then SAY ', 'THEN SAY ');
+            if (response.startsWith('THEN ')) {
+                response = response.substring(5);
+            }
+
             // Remove response prefix
-            let response = results[0].data.choices[0].text ?? '';
             const historyOptions = options.conversationHistory ?? {};
             if (historyOptions.botPrefix) {
                 // The model sometimes predicts additional text for the human side of things so skip that.
@@ -251,6 +250,67 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return [];
     }
 
+    private async createChatCompletionRequest(
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
+        config: CreateCompletionRequest,
+        userMessage?: string,
+        historyOptions?: OpenAIConversationHistoryOptions
+    ): Promise<CreateChatCompletionRequest> {
+        // Clone prompt config
+        const request: CreateChatCompletionRequest = Object.assign({
+            messages: []
+        } as CreateChatCompletionRequest, config);
+
+        // Expand prompt template
+        // - NOTE: While the local history options and the prompts expected history options are
+        //         different types, they're compatible via duck typing. This could impact porting.
+        const systemMsg = await PromptParser.expandPromptTemplate(context, state, {}, prompt, {
+            conversationHistory: historyOptions
+        });
+
+        // Populate system message
+        request.messages.push({
+            role: 'system',
+            content: systemMsg
+        });
+
+        // Populate conversation history
+        if (historyOptions) {
+            const userPrefix = (historyOptions.userPrefix ?? 'Human: ').toLowerCase();
+            const botPrefix = (historyOptions.botPrefix ?? 'AI: ').toLowerCase();
+            const history = ConversationHistory.toArray(state, historyOptions.maxCharacterLength);
+            for (let i = 0; i < history.length; i++) {
+                let line = history[i];
+                const lcLine = line.toLowerCase();
+                if (lcLine.startsWith(userPrefix)) {
+                    line = line.substring(userPrefix.length).trim();
+                    request.messages.push({
+                        role: 'user',
+                        content: line
+                    });
+                } else if (lcLine.startsWith(botPrefix)) {
+                    line = line.substring(botPrefix.length).trim();
+                    request.messages.push({
+                        role: 'assistant',
+                        content: line
+                    });
+                }
+            }
+        }
+
+        // Add user message
+        if (userMessage) {
+            request.messages.push({
+                role: 'user',
+                content: userMessage
+            });
+        }
+
+        return request;
+    }
+
     private async createCompletionRequest(
         context: TurnContext,
         state: TState,
@@ -272,9 +332,55 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return request;
     }
 
+    private async createChatCompletion(
+        request: CreateChatCompletionRequest
+    ): Promise<AxiosResponse<CreateChatCompletionResponse>> {
+        let response: AxiosResponse<CreateChatCompletionResponse>;
+        let error: { status?: number } = {};
+        const startTime = new Date().getTime();
+        try {
+            response = (await this._openai.createChatCompletion(request, {
+                validateStatus: (status) => status < 400 || status == 429
+            })) as any;
+        } catch (err: any) {
+            error = err;
+            throw err;
+        } finally {
+            if (this._options.logRequests) {
+                const duration = new Date().getTime() - startTime;
+                console.log(`\nCHAT REQUEST:\n\`\`\`\n${printChatMessages(request.messages)}\`\`\``);
+                if (response!) {
+                    if (response.status != 429) {
+                        const choice =
+                            Array.isArray(response?.data?.choices) && response.data.choices.length > 0
+                                ? response.data.choices[0].message.content
+                                : '';
+                        console.log(
+                            `CHAT SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data.usage?.prompt_tokens} completion=${response.data.usage?.completion_tokens} response=${choice}`
+                        );
+                    } else {
+                        console.error(
+                            `CHAT FAILED: status=${
+                                response.status
+                            } duration=${duration} headers=${JSON.stringify(response.headers)}`
+                        );
+                    }
+                } else {
+                    console.error(
+                        `CHAT FAILED: status=${
+                            error?.status
+                        } duration=${duration} message=${error?.toString()}`
+                    );
+                }
+            }
+        }
+
+        return response!;
+    }
+
+
     private async createCompletion(
-        request: CreateCompletionRequest,
-        promptType: string
+        request: CreateCompletionRequest
     ): Promise<AxiosResponse<CreateCompletionResponse>> {
         let response: AxiosResponse<CreateCompletionResponse>;
         let error: { status?: number } = {};
@@ -289,7 +395,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         } finally {
             if (this._options.logRequests) {
                 const duration = new Date().getTime() - startTime;
-                console.log(`\n${promptType} REQUEST:\n\`\`\`\n${request.prompt}\`\`\``);
+                console.log(`\nPROMPT REQUEST:\n\`\`\`\n${request.prompt}\`\`\``);
                 if (response!) {
                     if (response.status != 429) {
                         const choice =
@@ -297,18 +403,18 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                                 ? response.data.choices[0].text
                                 : '';
                         console.log(
-                            `${promptType} SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data.usage?.prompt_tokens} completion=${response.data.usage?.completion_tokens} response=${choice}`
+                            `PROMPT SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data.usage?.prompt_tokens} completion=${response.data.usage?.completion_tokens} response=${choice}`
                         );
                     } else {
                         console.error(
-                            `${promptType} FAILED: status=${
+                            `PROMPT FAILED: status=${
                                 response.status
                             } duration=${duration} headers=${JSON.stringify(response.headers)}`
                         );
                     }
                 } else {
                     console.error(
-                        `${promptType} FAILED: status=${
+                        `PROMPT FAILED: status=${
                             error?.status
                         } duration=${duration} message=${error?.toString()}`
                     );
@@ -318,4 +424,20 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
         return response!;
     }
+}
+
+function printChatMessages(messages: ChatCompletionRequestMessage[]): string {
+    let text = '';
+    messages.forEach(msg => {
+        switch (msg.role) {
+            case 'system':
+                text += msg.content + '\n';
+                break;
+            default:
+                text += `\n${msg.role}: ${msg.content}`;
+                break;
+        }
+    });
+
+    return text;
 }

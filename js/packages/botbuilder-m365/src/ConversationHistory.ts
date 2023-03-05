@@ -118,7 +118,7 @@ export class ConversationHistory {
             }
         }
         
-        return text;
+        return text.indexOf('DO ') < 0 ? text.trim() : '';
     }
 
     public static removeLastLine(state: TurnState): string | undefined {
@@ -238,6 +238,34 @@ export class ConversationHistory {
         } else {
             throw new Error(
                 `ConversationHistory.toString() was passed a state object without a 'conversation' state member.`
+            );
+        }
+    }
+
+    public static toArray(state: TurnState, maxCharacterLength = 4000): string[] {
+        if (state.conversation) {
+            // Get history array if it exists
+            const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName] ?? [];
+
+            // Populate up to max chars
+            let text = '';
+            let lines: string[] = [];
+            for (let i = history.length - 1; i >= 0; i--) {
+                // Ensure that adding line won't go over the max character length
+                const line = history[i];
+                if (text.length + line.length > maxCharacterLength) {
+                    break;
+                }
+
+                // Prepend line to output
+                text += line;
+                lines.unshift(line);
+            }
+
+            return lines;
+        } else {
+            throw new Error(
+                `ConversationHistory.toArray() was passed a state object without a 'conversation' state member.`
             );
         }
     }
