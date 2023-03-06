@@ -45,6 +45,7 @@ export class ResponseParser {
     }
 
     public static parseResponse(text?: string): PredictedCommand[] {
+        let responses = '';
         const commands: PredictedCommand[] = [];
         let tokens = this.tokenizeText(text);
         if (tokens.length > 0) {
@@ -71,7 +72,16 @@ export class ResponseParser {
                     // Add command to list if generated
                     // - In the case of `DO DO command` the first DO command wouldn't generate
                     if (result.command) {
-                        commands.push(result.command);
+                        if (result.command.type == 'SAY') {
+                            // Check for duplicate SAY
+                            const response = (result.command as PredictedSayCommand).response.trim().toLowerCase();
+                            if (responses.indexOf(response) < 0) {
+                                responses += ' ' + response;
+                                commands.push(result.command);
+                            }
+                        } else {
+                            commands.push(result.command);
+                        }
                     }
 
                     // Remove consumed tokens

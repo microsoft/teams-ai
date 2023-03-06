@@ -27,8 +27,7 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
         let removed: string[] = [];
         const remove = textToItemList(data.remove);
         for (const item in remove) {
-            const { name } = normalizeItemName(item);
-            const count = remove[name];
+            const { name, count } = normalizeItemName(item, remove[item]);
             if (items.hasOwnProperty(name)) {
                 if (count < items[name]) {
                     removed.push(`-${count}(${name})`);
@@ -49,8 +48,7 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
         let added: string[] = [];
         const add = textToItemList(data.add);
         for (const item in add) {
-            const { name } = normalizeItemName(item);
-            const count = add[name];
+            const { name, count } = normalizeItemName(item, add[item]);
             if (items.hasOwnProperty(name)) {
                 items[name] = items[name] + count;
             } else {

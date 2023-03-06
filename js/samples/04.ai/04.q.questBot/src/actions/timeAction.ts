@@ -9,6 +9,8 @@ export function timeAction(app: Application<ApplicationTurnState>, predictionEng
         switch (action) {
             case 'wait':
                 return await waitForTime(context, state, data);
+            case 'query':
+                return await queryTime(context, state);
             default:
                 await context.sendActivity(`[time.${action}]`);
                 return true;
@@ -91,10 +93,15 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
         // - We don't consider this answering the players query. We want the story to be included
         //   for added color.
         await context.sendActivity(notification ? notification : `⏳ ${days} days later`);
+        return true;
     } else {
         // If the model calls "time action='wait'"" without any options, just return the current time of day.
-        await updateDMResponse(context, state, `⏳ it's ${state.temp.value.timeOfDay}`);
-        return false;
+        return queryTime(context, state);
     }
-    return true;
+}
+
+async function queryTime(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
+    await updateDMResponse(context, state, `⏳ ${state.temp.value.conditions}`);
+    state.temp.value.playerAnswered = true;
+    return false;
 }

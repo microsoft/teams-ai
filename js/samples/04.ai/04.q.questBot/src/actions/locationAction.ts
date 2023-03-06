@@ -1,7 +1,8 @@
 import { TurnContext } from "botbuilder";
-import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, ILocation } from "../bot";
+import { Application, ConversationHistory, OpenAIPredictionEngine } from "botbuilder-m365";
+import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
 import { findMapLocation } from "../ShadowFalls";
+import * as prompts from '../prompts';
 
 export function locationAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
     app.ai.action('location', async (context, state, data: IDataEntities) => {
@@ -9,7 +10,7 @@ export function locationAction(app: Application<ApplicationTurnState>, predictio
         switch (action) {
             case 'change':
             case 'update':
-                return await updateLocation(context, state, data);
+                return await updateLocation(predictionEngine, context, state, data);
             default:
                 await context.sendActivity(`[location.${action}]`);
                 return true;
@@ -17,29 +18,26 @@ export function locationAction(app: Application<ApplicationTurnState>, predictio
     });
 }
 
-async function updateLocation(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function updateLocation(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
         const conversation = state.conversation.value;
+        const currentLocation = conversation.location;
 
-        // Create new location
+        // Create new location object
         const title =  (data.title ?? '').trim();
-        const location: ILocation = {
+        conversation.location = {
             title: title,
             description: (data.description ?? '').trim(),
             encounterChance: getEncounterChance(title)
         }
 
-        // Reset location turn
-        if (!conversation.location || location.title != conversation.location.title) {
+        // Has the location changed?
+        // - Ignore the change if the location hasn't changed.
+        if (currentLocation?.title !== conversation.location.title) {
             conversation.locationTurn = 1;
+            await context.sendActivity(`🧭 <b>${conversation.location.title}</b><br>${conversation.location.description.split('\n').join('<br>')}`);
         }
-
-        // Save updated location to conversation
-        conversation.location = location;
-
-        // Tell use the location has changed
-        await context.sendActivity(`🧭 <b>${location.title}</b><br>${location.description.split('\n').join('<br>')}`);
+    
         state.temp.value.playerAnswered = true;
-        
         return true;
 }
 

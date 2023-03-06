@@ -1,6 +1,7 @@
 import { TurnContext } from "botbuilder";
 import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, IQuest } from "../bot";
+import { ApplicationTurnState, IDataEntities, IQuest, updateDMResponse } from "../bot";
+import * as prompts from '../prompts';
 
 export function questAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
     app.ai.action('quest', async (context, state, data: IDataEntities) => {
@@ -8,9 +9,11 @@ export function questAction(app: Application<ApplicationTurnState>, predictionEn
         switch (action) {
             case 'add':
             case 'update':
-                return await updateQuest(context, state, data);
+                return await updateQuest(predictionEngine, context, state, data);
             case 'remove':
                 return await removeQuest(context, state, data);
+            case 'finish':
+                return await finishQuest(predictionEngine, context, state, data);
             case 'list':
                 return await listQuest(context, state);
             default:
@@ -20,7 +23,7 @@ export function questAction(app: Application<ApplicationTurnState>, predictionEn
     });
 }
 
-async function updateQuest(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function updateQuest(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
         const conversation = state.conversation.value;
         const quests = conversation.quests ?? {};
 
@@ -29,6 +32,13 @@ async function updateQuest(context: TurnContext, state: ApplicationTurnState, da
         const quest: IQuest = {
             title: title,
             description: (data.description ?? '').trim()
+        }
+
+        // Expand quest details
+        state.temp.value.quests = `"${quest.title}" - ${quest.description}`;
+        const details = await predictionEngine.prompt(context, state, prompts.questDetails);
+        if (details) {
+            quest.description = details.trim();
         }
 
         // Add quest to collection of active quests
@@ -58,6 +68,28 @@ async function removeQuest(context: TurnContext, state: ApplicationTurnState, da
     return true;
 }
 
+async function finishQuest(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+    const conversation = state.conversation.value;
+
+    // Find quest and delete ite
+    const quests = conversation.quests ?? {};
+    const title =  (data.title ?? '').trim().toLowerCase();
+    if (quests.hasOwnProperty(title)) {
+        const quest = quests[title];
+        delete quests[title];
+        conversation.quests = quests;
+
+        // Update campaign history
+        state.temp.value.quests = `"${quest.title}" - ${quest.description}`;
+        const update = await predictionEngine.prompt(context, state, prompts.questCompleted);
+        if (update) {
+            conversation.campaign = update.trim();
+        }
+    }
+
+    return true;
+}
+
 async function listQuest(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     const conversation = state.conversation.value;
     const quests = conversation.quests ?? {};
@@ -73,9 +105,9 @@ async function listQuest(context: TurnContext, state: ApplicationTurnState): Pro
     // Show player list of quests
     if (text.length > 0) {
         await context.sendActivity(text);
-        state.temp.value.playerAnswered = true;
-    }    
+    }
 
+    state.temp.value.playerAnswered = true;
     return true;
 }
 

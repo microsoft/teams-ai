@@ -47,6 +47,7 @@ export interface OpenAIPredictionEngineOptions {
     topicFilter?: PromptTemplate;
     topicFilterConfig?: CreateCompletionRequest;
     conversationHistory?: OpenAIConversationHistoryOptions;
+    oneSayPerTurn?: boolean;
     logRequests?: boolean;
 }
 
@@ -68,7 +69,10 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
     private readonly _openai: OpenAIApi;
 
     public constructor(options: OpenAIPredictionEngineOptions) {
-        this._options = Object.assign({} as OpenAIPredictionEngineOptions, options);
+        this._options = Object.assign({
+            oneSayPerTurn: true,
+            logRequests: false
+        } as OpenAIPredictionEngineOptions, options);
         this._configuration = new Configuration(options.configuration);
         this._openai = new OpenAIApi(this._configuration, options.basePath, options.axios as any);
 
@@ -216,7 +220,23 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             }
 
             // Parse response into commands
-            const commands = ResponseParser.parseResponse(response.trim());
+            let commands = ResponseParser.parseResponse(response.trim());
+            
+            // Filter to only a single SAY command
+            if (this._options.oneSayPerTurn) {
+                let spoken = false;
+                commands = commands.filter(cmd => {
+                    if (cmd.type == 'SAY') {
+                        if (spoken) {
+                            return false;
+                        }
+
+                        spoken = true;
+                    }
+
+                    return true;
+                });
+            }
 
             // Add turn to conversation history
             if (historyOptions.addTurnToHistory) {

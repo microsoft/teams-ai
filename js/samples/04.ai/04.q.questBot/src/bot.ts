@@ -21,8 +21,9 @@ const predictionEngine = new OpenAIPredictionEngine({
     conversationHistory: {
         userPrefix: 'Player: ',
         botPrefix: 'DM: ',
-        maxLines: 4,
-        maxCharacterLength: 2000
+        maxLines: 2,
+        maxCharacterLength: 2000,
+        includeDoCommands: false
     },
     logRequests: true
 });
@@ -34,6 +35,7 @@ export interface ConversationState {
     location: ILocation;
     locationTurn: number;
     quests: { [title: string]: IQuest };
+    campaign: string;
     players: string[];
     time: number;
     day: number;
@@ -65,6 +67,8 @@ export interface TempState {
     season: string;
     backstoryChange: string;
     equippedChange: string;
+    originalText: string;
+    newText: string;
 }
 
 export interface IDataEntities {
@@ -166,6 +170,7 @@ app.turn('beforeTurn', async (context, state) => {
             conversation.turn = 1;
             conversation.location = location;
             conversation.locationTurn = 1;
+            conversation.campaign = 'no completed quests';
             conversation.quests = {};
             conversation.story = `The story begins.`;
             conversation.day = Math.floor(Math.random() * 365) + 1;
@@ -204,7 +209,7 @@ app.turn('beforeTurn', async (context, state) => {
         temp.playerAnswered = false;
         temp.promptInstructions = 'Answer the players query.';
         temp.playerInfo = describePlayerInfo(player);
-        temp.location = `${location.title} - ${location.description}`;
+        temp.location = `"${location.title}" - ${location.description}`;
         temp.quests = describeQuests(conversation);
         temp.gameState = describeGameState(conversation);
         temp.timeOfDay = describeTimeOfDay(conversation.time);
@@ -229,11 +234,15 @@ app.turn('beforeTurn', async (context, state) => {
 
 app.turn('afterTurn', async (context, state) => {
     const lastSay = ConversationHistory.getLastSay(state);
-    if (!lastSay && !state.temp.value.playerAnswered) {
-        // We sometime only get told to update the story so lets just read back
-        // the current story to the user.
-        const story = state.conversation.value.story;
-        await context.sendActivity(story);
+    if (!lastSay) {
+        // We have a dangling `DM: ` so remove it
+        ConversationHistory.removeLastLine(state);
+
+        // Reply with the current story if we haven't answered player
+        if (!state.temp.value.playerAnswered) {
+            const story = state.conversation.value.story;
+            await context.sendActivity(story);
+        }
     }
 
     return true;
