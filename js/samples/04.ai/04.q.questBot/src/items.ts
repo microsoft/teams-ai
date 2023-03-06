@@ -50,6 +50,24 @@ export function textToItemList(text?: string): IItemList {
     return items;
 }
 
+export function searchItemList(item: string, list: IItemList): string {
+    if (list.hasOwnProperty(item)) {
+        return item;
+    }
+
+    // Search list
+    let bestMatch = '';
+    for (const key in list) {
+        if (key.indexOf(item) >= 0) {
+            if (!bestMatch || key.length < bestMatch.length) {
+                bestMatch = key;
+            } 
+        } 
+    }
+
+    return bestMatch;
+}
+
 interface IMappings {
     [key: string]: (count: number) => { name: string, count: number };
 }
@@ -64,7 +82,8 @@ const mappings: IMappings = {
     'coin': c => mapTo('gold', c),
     'coins': c => mapTo('gold', c * 10),
     'gold coins': c => mapTo('gold', c),
-    'nuggets': c => mapTo('gold', c * 10)
+    'nuggets': c => mapTo('gold', c * 10),
+    'wealth': c => mapTo('gold', c),
 }
 
 function mapTo(name: string, count: number): { name: string, count: number } {

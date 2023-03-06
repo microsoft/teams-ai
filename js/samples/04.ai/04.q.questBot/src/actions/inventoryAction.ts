@@ -1,7 +1,7 @@
 import { CardFactory, MessageFactory, TurnContext } from "botbuilder";
 import { Application, OpenAIPredictionEngine, ResponseParser } from "botbuilder-m365";
 import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
-import { normalizeItemName, textToItemList } from "../items";
+import { normalizeItemName, searchItemList, textToItemList } from "../items";
 import * as responses from "../responses";
 import * as prompts from "../prompts"
 
@@ -28,18 +28,22 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
         const remove = textToItemList(data.remove);
         for (const item in remove) {
             const { name, count } = normalizeItemName(item, remove[item]);
-            if (items.hasOwnProperty(name)) {
-                if (count < items[name]) {
-                    removed.push(`-${count}(${name})`);
-                    items[name] = items[name] - count;
+            if (name && count > 0) {
+                // Search for closest match in inventory
+                const key = searchItemList(name, items);
+                if (key) {
+                    if (count < items[key]) {
+                        removed.push(`-${count}(${key})`);
+                        items[key] = items[key] - count;
+                    } else {
+                        // Hallucinating number of items in inventory
+                        removed.push(`-${items[key]}(${key})`);
+                        delete items[key];
+                    }
                 } else {
-                    // Hallucinating number of items in inventory
-                    removed.push(`-${items[name]}(${name})`);
-                    delete items[name];
+                    // Hallucinating item as being in inventory
+                    removed.push(`-${count}(${name})`);
                 }
-            } else {
-                // Hallucinating item as being in inventory
-                removed.push(`-${count}(${name})`);
             }
         }
 
@@ -49,12 +53,14 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
         const add = textToItemList(data.add);
         for (const item in add) {
             const { name, count } = normalizeItemName(item, add[item]);
-            if (items.hasOwnProperty(name)) {
-                items[name] = items[name] + count;
-            } else {
-                items[name] = count;
+            if (name && count > 0) {
+                if (items.hasOwnProperty(name)) {
+                    items[name] = items[name] + count;
+                } else {
+                    items[name] = count;
+                }
+                added.push(`+${count}(${name})`);
             }
-            added.push(`+${count}(${name})`);
         }
 
         // Report inventory changes to user

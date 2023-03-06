@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine, ResponseParser } from 'botbuilder-m365';
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as responses from './responses';
-import { IItemList, IMapLocation } from './interfaces';
+import { IItemList } from './interfaces';
 import { map } from './ShadowFalls';
 import * as prompts from './prompts';
 import { addActions } from './actions';
@@ -30,12 +30,13 @@ const predictionEngine = new OpenAIPredictionEngine({
 
 // Strongly type the applications turn state
 export interface ConversationState {
+    version: number;
     greeted: boolean;
     turn: number;
     location: ILocation;
     locationTurn: number;
+    campaign: ICampaign;
     quests: { [title: string]: IQuest };
-    campaign: string;
     players: string[];
     time: number;
     day: number;
@@ -58,6 +59,7 @@ export interface TempState {
     promptInstructions: string;
     playerInfo: string;
     gameState: string;
+    campaign: string;
     quests: string;
     location: string;
     conditions: string;
@@ -69,6 +71,7 @@ export interface TempState {
     equippedChange: string;
     originalText: string;
     newText: string;
+    objectiveTitle: string;
 }
 
 export interface IDataEntities {
@@ -82,6 +85,18 @@ export interface IDataEntities {
     equipped: string;
     until: string;
     days: string;
+}
+
+export interface ICampaign {
+    title: string;
+    playerIntro: string;
+    objectives: ICampaignObjective[];
+}
+
+export interface ICampaignObjective {
+    title: string;
+    description: string;
+    completed: boolean;
 }
 
 export interface IQuest {
@@ -109,12 +124,20 @@ export const run = (context) => app.run(context);
 
 export const DEFAULT_BACKSTORY =  `Lives in Shadow Falls.`;
 export const DEFAULT_EQUIPPED = `Wearing clothes.`;
+export const CONVERSATION_STATE_VERSION = 1;
 
 app.turn('beforeTurn', async (context, state) => {
     if (context.activity.type == ActivityTypes.Message) {
-        const conversation = state.conversation.value;
+        let conversation = state.conversation.value;
         const player = state.user.value;
         const temp = state.temp.value;
+
+        // Clear conversation state on version change
+        if (conversation.version !== CONVERSATION_STATE_VERSION) {
+            state.conversation.delete();
+            conversation = state.conversation.value;
+            conversation.version = CONVERSATION_STATE_VERSION;
+        } 
 
         // Initialize player state
         if (!player.name) {
@@ -152,6 +175,7 @@ app.turn('beforeTurn', async (context, state) => {
 
         // Are we just starting?
         let newDay = false;
+        let campaign: ICampaign;
         let location: ILocation;
         if (!conversation.greeted) {
             newDay = true;
@@ -170,17 +194,27 @@ app.turn('beforeTurn', async (context, state) => {
             conversation.turn = 1;
             conversation.location = location;
             conversation.locationTurn = 1;
-            conversation.campaign = 'no completed quests';
             conversation.quests = {};
             conversation.story = `The story begins.`;
             conversation.day = Math.floor(Math.random() * 365) + 1;
             conversation.time = Math.floor(Math.random() * 14) + 6; // Between 6am and 8pm
             conversation.nextEncounterTurn = 5 + Math.floor(Math.random() * 15);
-        
-            // Send location title as a message
-            await context.sendActivity(`🧙 <b>${location.title}</b>`);
-            app.startTypingTimer(context);
+
+            // Create campaign
+            const response = await predictionEngine.prompt(context, state, prompts.createCampaign);
+            campaign = ResponseParser.parseJSON(response);
+            if (campaign && campaign.title && Array.isArray(campaign.objectives)) {
+                // Send campaign title as a message
+                conversation.campaign = campaign;
+                await context.sendActivity(`🧙 <b>${campaign.title}</b>`);
+                app.startTypingTimer(context);
+            } else {
+                state.conversation.delete();
+                await context.sendActivity(responses.dataError());
+                return false;
+            }
         } else {
+            campaign = conversation.campaign;
             location = conversation.location;
             temp.prompt = 'prompt.txt';
 
@@ -200,17 +234,50 @@ app.turn('beforeTurn', async (context, state) => {
             }
         }
 
-        // User is asking for help
-        if (useHelpPrompt) {
+        // Find next campaign objective
+        let campaignFinished = false;
+        let nextObjective: ICampaignObjective;
+        if (campaign) {
+            campaignFinished = true;
+            for (let i = 0; i < campaign.objectives.length; i++) {
+                const objective = campaign.objectives[i];
+                if (!objective.completed) {
+                    // Ignore if the objective is already a quest
+                    if (!conversation.quests.hasOwnProperty(objective.title.toLowerCase())) {
+                        nextObjective = objective;
+                    }
+
+                    campaignFinished = false;
+                    break;
+                }
+            }
+        }
+
+
+        // Is user asking for help
+        let objectiveAdded = false;
+        if (useHelpPrompt && !campaignFinished) {
             temp.prompt = 'help.txt';
+        } else if (nextObjective && Math.random() < 0.2) {
+            // Add campaign objective as a quest
+            conversation.quests[nextObjective.title.toLowerCase()] = {
+                title: nextObjective.title,
+                description: nextObjective.description
+            };
+
+            // Notify user of new quest
+            objectiveAdded = true;
+            await context.sendActivity(`✨ <b>${nextObjective.title}</b><br>${nextObjective.description.trim().split('\n').join('<br>')}`);
+            app.startTypingTimer(context);
         }
 
         // Load temp variables for prompt use
         temp.playerAnswered = false;
         temp.promptInstructions = 'Answer the players query.';
         temp.playerInfo = describePlayerInfo(player);
-        temp.location = `"${location.title}" - ${location.description}`;
+        temp.campaign = describeCampaign(campaign);
         temp.quests = describeQuests(conversation);
+        temp.location = `"${location.title}" - ${location.description}`;
         temp.gameState = describeGameState(conversation);
         temp.timeOfDay = describeTimeOfDay(conversation.time);
         temp.season = describeSeason(conversation.day);
@@ -222,8 +289,14 @@ app.turn('beforeTurn', async (context, state) => {
 
         temp.conditions = describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 
-        // Generate a random encounter
-        if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
+        if (campaignFinished) {
+            temp.promptInstructions = 'The players have completed the campaign. Congratulate them and tell them they can continue adventuring or use "/reset" to start over with a new campaign.';
+            conversation.campaign = undefined;
+        } else if (objectiveAdded) {
+            temp.prompt = 'newObjective.txt';
+            temp.objectiveTitle = nextObjective.title;
+        } else if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
+            // Generate a random encounter
             temp.promptInstructions = 'An encounter occurred! Describe to the player the encounter.';
             conversation.nextEncounterTurn = conversation.turn + (5 + Math.floor(Math.random() * 15));
         }
@@ -241,7 +314,9 @@ app.turn('afterTurn', async (context, state) => {
         // Reply with the current story if we haven't answered player
         if (!state.temp.value.playerAnswered) {
             const story = state.conversation.value.story;
-            await context.sendActivity(story);
+            if (story) {
+                await context.sendActivity(story);
+            }
         }
     }
 
@@ -301,6 +376,14 @@ export function describeGameState(conversation: ConversationState): string {
     return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`
 }
 
+export function describeCampaign(campaign?: ICampaign): string {
+    if (campaign) {
+        return `"${campaign.title}" - ${campaign.playerIntro}`;
+    } else {
+        return '';
+    }
+}
+
 export function describeQuests(conversation: ConversationState): string {
     let text = '';
     let connector = '';
@@ -311,26 +394,6 @@ export function describeQuests(conversation: ConversationState): string {
     }
 
     return text.length > 0 ? text : 'none';
-}
-
-export function describeMoveExamples(location: IMapLocation): string {
-    let text = ``;
-    ['north', 'west', 'south', 'east', 'up', 'down'].forEach(direction => {
-        if (location[direction]) {
-            text += `Player: go ${direction}\nDM: DO changeLocation location="${location[direction]}"\n`
-        } else {
-            switch (direction) {
-                case 'up':
-                case 'down':
-                    // No examples
-                    break;
-                default:
-                    text += responses.directionNotAvailableExample(direction);
-            }
-        }
-    });
-
-    return text;
 }
 
 export function describePlayerInfo(player: UserState): string {

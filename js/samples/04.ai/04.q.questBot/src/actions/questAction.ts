@@ -71,7 +71,7 @@ async function removeQuest(context: TurnContext, state: ApplicationTurnState, da
 async function finishQuest(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
 
-    // Find quest and delete ite
+    // Find quest and delete item
     const quests = conversation.quests ?? {};
     const title =  (data.title ?? '').trim().toLowerCase();
     if (quests.hasOwnProperty(title)) {
@@ -79,11 +79,16 @@ async function finishQuest(predictionEngine: OpenAIPredictionEngine, context: Tu
         delete quests[title];
         conversation.quests = quests;
 
-        // Update campaign history
-        state.temp.value.quests = `"${quest.title}" - ${quest.description}`;
-        const update = await predictionEngine.prompt(context, state, prompts.questCompleted);
-        if (update) {
-            conversation.campaign = update.trim();
+        // Check for the completion of a campaign objective
+        const campaign = conversation.campaign;
+        if (campaign && Array.isArray(campaign.objectives)) {
+            for (let i = 0; i < campaign.objectives.length; i++) {
+                const objective = campaign.objectives[i];
+                if (objective.title.toLowerCase() == title) {
+                    objective.completed = true;
+                    break;
+                }
+            }
         }
     }
 

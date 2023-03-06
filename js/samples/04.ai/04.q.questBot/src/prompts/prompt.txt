@@ -81,6 +81,12 @@ DM: DO quest action=`remove` title=`<title>`
 Player: complete quest
 DM: DO quest action=`finish` title=`<title>` THEN DO inventory action=`update` add=`gold:100`
 
+Player: finish quest
+DM: DO quest action=`finish` title=`<title>` THEN DO inventory action=`update` add=`gold:50,shield of protection:1`
+
+Player: fire an arrow at the monster
+DM: DO inventory action=`update` remove=`arrow:1` THEN SAY The array strikes the monster.
+
 ```
 
 Key locations in shadow falls:
@@ -108,8 +114,8 @@ Current Player Profile:
 Game State:
 {{temp.gameState}}
 
-Campaign History:
-{{conversation.campaign}}
+Campaign:
+{{temp.campaign}}
 
 Current Quests:
 {{temp.quests}}

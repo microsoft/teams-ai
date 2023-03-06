@@ -74,12 +74,21 @@ async function updatePlayer(predictionEngine: OpenAIPredictionEngine, context: T
     }
 
 
+    // Save player changes
     state.user.value.name = player.name;
     state.user.value.backstory = player.backstory;
     state.user.value.equipped = player.equipped;
-    const backstory = player.backstory.split('\n').join('<br>');
-    const equipped = player.equipped.split('\n').join('<br>')
-    await context.sendActivity(`🤴 <b>${player.name}</b><br><b>Backstory:</b> ${backstory}<br><b>Equipped:</b> ${equipped}`);
+    
+    // Build message
+    let message = `🤴 <b>${player.name}</b>`;
+    if (backstoryChange.length > 0) {
+        message += `<br><b>Backstory:</b> ${player.backstory.split('\n').join('<br>')}`;
+    }
+    if (equippedChange.length > 0) {
+        message += `<br><b>Equipped:</b> ${player.equipped.split('\n').join('<br>')}`;
+    }
+
+    await context.sendActivity(message);
     state.temp.value.playerAnswered = true;
     
     return true;

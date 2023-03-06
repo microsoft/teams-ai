@@ -5,6 +5,18 @@ export function getPromptPath(name: string): string {
     return path.join(__dirname, '../../src/prompts/', name);
 }
 
+export const createCampaign: OpenAIPromptOptions = {
+    prompt: getPromptPath('createCampaign.txt'),
+    promptConfig: {
+        model: 'gpt-3.5-turbo',
+        temperature: 0.7,
+        max_tokens: 2000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0.6
+    }
+};
+
 export const findDifferences: OpenAIPromptOptions = {
     prompt: getPromptPath('findDifferences.txt'),
     promptConfig: {
@@ -54,6 +66,18 @@ export const listItems: OpenAIPromptOptions = {
 };
 
 
+export const newObjective: OpenAIPromptOptions = {
+    prompt: getPromptPath('newObjective.txt'),
+    promptConfig: {
+        model: 'text-davinci-003',
+        temperature: 0.7,
+        max_tokens: 1000,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0
+    }
+};
+
 export const prompt: OpenAIPromptOptions = {
     prompt: getPromptPath('prompt.txt'),
     promptConfig: {
@@ -64,18 +88,6 @@ export const prompt: OpenAIPromptOptions = {
         frequency_penalty: 0,
         presence_penalty: 0.6,
         stop: [' Player:', ' DM:']
-    }
-};
-
-export const questCompleted: OpenAIPromptOptions = {
-    prompt: getPromptPath('questCompleted.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.9,
-        max_tokens: 1000,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0
     }
 };
 
