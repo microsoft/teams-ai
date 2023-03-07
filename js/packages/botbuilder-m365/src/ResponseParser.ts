@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './PredictionEngine';
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './Planner';
 
 const BREAKING_CHARACTERS = '`~!@#$%^&*()_+-={}|[]\\:";\'<>?,./ \r\n\t';
 const NAME_BREAKING_CHARACTERS = '`~!@#$%^&*()+={}|[]\\:";\'<>?,./ \r\n\t';
@@ -44,9 +44,20 @@ export class ResponseParser {
         return obj;
     }
 
-    public static parseResponse(text?: string): PredictedCommand[] {
+    public static parseResponse(text?: string): Plan {
+        // See if the response contains a plan object?
+        let plan: Plan = this.parseJSON(text);
+        if (plan && plan.type === 'PLAN') {
+            if (!Array.isArray(plan.commands)) {
+                plan.commands = [];
+            }
+
+            return plan;
+        }
+
+        // Parse response using DO/SAY syntax
         let responses = '';
-        const commands: PredictedCommand[] = [];
+        plan = { type: 'PLAN', commands: [] };
         let tokens = this.tokenizeText(text);
         if (tokens.length > 0) {
             // Insert default command if response doesn't start with a command
@@ -77,10 +88,10 @@ export class ResponseParser {
                             const response = (result.command as PredictedSayCommand).response.trim().toLowerCase();
                             if (responses.indexOf(response) < 0) {
                                 responses += ' ' + response;
-                                commands.push(result.command);
+                                plan.commands.push(result.command);
                             }
                         } else {
-                            commands.push(result.command);
+                            plan.commands.push(result.command);
                         }
                     }
 
@@ -93,7 +104,7 @@ export class ResponseParser {
             }
         }
 
-        return commands;
+        return plan;
     }
 
     public static parseDoCommand(tokens: string[]): ParsedCommandResult {

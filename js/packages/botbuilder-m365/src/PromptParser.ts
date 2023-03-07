@@ -29,7 +29,6 @@ export class PromptParser {
     public static async expandPromptTemplate(
         context: TurnContext,
         state: TurnState,
-        data: Record<string, any>,
         prompt: PromptTemplate,
         options?: PromptParserOptions
     ): Promise<string> {
@@ -72,7 +71,7 @@ export class PromptParser {
                         }
 
                         // Append variable contents to output
-                        outputPrompt += PromptParser.lookupPromptVariable(context, state, data, variableName!, options);
+                        outputPrompt += PromptParser.lookupPromptVariable(context, state, variableName!, options);
                     } else {
                         // Append character to variable name
                         variableName! += ch;
@@ -87,7 +86,6 @@ export class PromptParser {
     public static lookupPromptVariable(
         context: TurnContext,
         state: TurnState,
-        data: Record<string, any>,
         variableName: string,
         options?: PromptParserOptions
     ): string {
@@ -104,10 +102,6 @@ export class PromptParser {
             case 'activity':
                 // Return activity field
                 value = (context.activity as any)[parts[1]] ?? '';
-                break;
-            case 'data':
-                // Return referenced data entry
-                value = data[parts[1]] ?? '';
                 break;
             default:
                 // Find referenced state entry

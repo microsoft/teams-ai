@@ -13,7 +13,7 @@ export * from './ConversationHistory';
 export * from './DefaultTurnStateManager';
 export * from './MessageExtensions';
 export * from './OpenAIPredictionEngine';
-export * from './PredictionEngine';
+export * from './Planner';
 export * from './PromptParser';
 export * from './ResponseParser';
 export * from './TurnState';

@@ -19,7 +19,7 @@ import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
-import { PredictionEngine } from './PredictionEngine';
+import { Planner } from './Planner';
 import { AI } from './AI';
 
 const TYPING_TIMER_DELAY = 1000;
@@ -33,7 +33,7 @@ export interface Query<TParams extends Record<string, any>> {
 export interface ApplicationOptions<
     TState extends TurnState,
     TPredictionOptions,
-    TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>
+    TPredictionEngine extends Planner<TState, TPredictionOptions>
 > {
     adapter?: BotAdapter;
     botAppId?: string;
@@ -67,7 +67,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
 export class Application<
     TState extends TurnState = DefaultTurnState,
     TPredictionOptions = any,
-    TPredictionEngine extends PredictionEngine<TState, TPredictionOptions> = PredictionEngine<
+    TPredictionEngine extends Planner<TState, TPredictionOptions> = Planner<
         TState,
         TPredictionOptions
     >

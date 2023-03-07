@@ -8,7 +8,7 @@
 
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
 import { Application } from './Application';
-import { PredictedCommand, PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
+import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
@@ -16,14 +16,10 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
     handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>
 }
 
-export interface PredictedPlan {
-    commands: PredictedCommand[];
-}
-
 export class AI<
     TState extends TurnState,
     TPredictionOptions,
-    TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>
+    TPredictionEngine extends Planner<TState, TPredictionOptions>
 > {
     private readonly _predictionEngine: TPredictionEngine;
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
@@ -70,7 +66,7 @@ export class AI<
         );
 
         // Register default PlanReadyActionName
-        this.action<PredictedPlan>(
+        this.action<Plan>(
             AI.PlanReadyActionName,
             async (_context, _state, _plan) => {
                 return Array.isArray(_plan.commands) && _plan.commands.length > 0;
@@ -152,17 +148,17 @@ export class AI<
         context: TurnContext,
         state: TState,
         options?: TPredictionOptions,
-        data?: Record<string, any>
+        message?: string
     ): Promise<boolean> {
         // Call prediction engine
-        const commands = await this._predictionEngine.predictCommands(context, state, data, options);
+        const plan = await this._predictionEngine.generatePlan(context, state, options, message);
         let continueChain = await this._actions
             .get(AI.PlanReadyActionName)!
-            .handler(context, state, { commands }, '');
+            .handler(context, state, plan, '');
         if (continueChain) {
             // Run predicted commands
-            for (let i = 0; i < commands.length && continueChain; i++) {
-                const cmd = commands[i];
+            for (let i = 0; i < plan.commands.length && continueChain; i++) {
+                const cmd = plan[i];
                 switch (cmd.type) {
                     case 'DO':
                         const { action } = cmd as PredictedDoCommand;
@@ -176,7 +172,7 @@ export class AI<
                             // Redirect to UnknownAction handler
                             continueChain = await this._actions
                                 .get(AI.UnknownActionName)!
-                                .handler(context, state, data, action);
+                                .handler(context, state, plan, action);
                         }
                         break;
                     case 'SAY':
