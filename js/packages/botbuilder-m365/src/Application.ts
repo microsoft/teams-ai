@@ -32,13 +32,13 @@ export interface Query<TParams extends Record<string, any>> {
 
 export interface ApplicationOptions<
     TState extends TurnState,
-    TPredictionOptions,
-    TPredictionEngine extends Planner<TState, TPredictionOptions>
+    TPlanOptions,
+    TPlanner extends Planner<TState, TPlanOptions>
 > {
     adapter?: BotAdapter;
     botAppId?: string;
     storage?: Storage;
-    predictionEngine?: TPredictionEngine;
+    planner?: TPlanner;
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
     removeRecipientMention?: boolean;
@@ -66,39 +66,39 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
 export class Application<
     TState extends TurnState = DefaultTurnState,
-    TPredictionOptions = any,
-    TPredictionEngine extends Planner<TState, TPredictionOptions> = Planner<
+    TPlanOptions = any,
+    TPlanner extends Planner<TState, TPlanOptions> = Planner<
         TState,
-        TPredictionOptions
+        TPlanOptions
     >
 > {
-    private readonly _options: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
+    private readonly _options: ApplicationOptions<TState, TPlanOptions, TPlanner>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
-    private readonly _ai?: AI<TState, TPredictionOptions, TPredictionEngine>;
+    private readonly _ai?: AI<TState, TPlanOptions, TPlanner>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
     private _typingTimer: any;
 
-    public constructor(options?: ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>) {
+    public constructor(options?: ApplicationOptions<TState, TPlanOptions, TPlanner>) {
         this._options = Object.assign(
             {
                 removeRecipientMention: true,
                 startTypingTimer: true
-            } as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>,
+            } as ApplicationOptions<TState, TPlanOptions, TPlanner>,
             options
-        ) as ApplicationOptions<TState, TPredictionOptions, TPredictionEngine>;
+        ) as ApplicationOptions<TState, TPlanOptions, TPlanner>;
 
         // Create default turn state manager if needed
         if (!this._options.turnStateManager) {
             this._options.turnStateManager = new DefaultTurnStateManager() as any;
         }
 
-        // Create AI component if configured with a prediction engine
-        if (this._options.predictionEngine) {
-            this._ai = new AI(this, this._options.predictionEngine);
+        // Create AI component if configured with a planner
+        if (this._options.planner) {
+            this._ai = new AI(this._options.planner);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -109,9 +109,9 @@ export class Application<
         return this._adaptiveCards;
     }
 
-    public get ai(): AI<TState, TPredictionOptions, TPredictionEngine> {
+    public get ai(): AI<TState, TPlanOptions, TPlanner> {
         if (!this._ai) {
-            throw new Error(`The Application.ai property is unavailable because no PredictionEngine was configured.`);
+            throw new Error(`The Application.ai property is unavailable because no Planner was configured.`);
         }
 
         return this._ai;
@@ -121,7 +121,7 @@ export class Application<
         return this._messageExtensions;
     }
 
-    public get options(): ApplicationOptions<TState, TPredictionOptions, TPredictionEngine> {
+    public get options(): ApplicationOptions<TState, TPlanOptions, TPlanner> {
         return this._options;
     }
 

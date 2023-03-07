@@ -7,7 +7,6 @@
  */
 
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
-import { Application } from './Application';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
@@ -18,10 +17,10 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
 
 export class AI<
     TState extends TurnState,
-    TPredictionOptions,
-    TPredictionEngine extends Planner<TState, TPredictionOptions>
+    TPlanOptions,
+    TPlanner extends Planner<TState, TPlanOptions>
 > {
-    private readonly _predictionEngine: TPredictionEngine;
+    private readonly _planner: TPlanner;
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
 
     public static readonly UnknownActionName = '___UnknownAction___';
@@ -31,8 +30,8 @@ export class AI<
     public static readonly DoCommandActionName = '___DO___';
     public static readonly SayCommandActionName = '___SAY___';
 
-    public constructor(app: Application<TState>, predictionEngine: TPredictionEngine) {
-        this._predictionEngine = predictionEngine;
+    public constructor(planner: TPlanner) {
+        this._planner = planner;
 
         // Register default UnknownAction handler
         this.action(
@@ -107,15 +106,15 @@ export class AI<
 
     }
 
-    public get predictionEngine(): TPredictionEngine {
-        return this._predictionEngine;
+    public get planner(): TPlanner {
+        return this._planner;
     }
 
     /**
      * Registers an handler for a named action.
      *
      * @remarks
-     * Actions can be triggered by a Prediction Engine returning a DO command.
+     * Actions can be triggered by a planner returning a DO command.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
      * @param allowOverrides Optional. If true
@@ -147,11 +146,11 @@ export class AI<
     public async chain(
         context: TurnContext,
         state: TState,
-        options?: TPredictionOptions,
+        options?: TPlanOptions,
         message?: string
     ): Promise<boolean> {
-        // Call prediction engine
-        const plan = await this._predictionEngine.generatePlan(context, state, options, message);
+        // Call planner
+        const plan = await this._planner.generatePlan(context, state, options, message);
         let continueChain = await this._actions
             .get(AI.PlanReadyActionName)!
             .handler(context, state, plan, '');

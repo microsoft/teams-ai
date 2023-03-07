@@ -93,7 +93,7 @@ export class PromptParser {
         // TODO: Add support for longer dotted path variable names
         const parts = variableName.trim().split('.');
         if (parts.length != 2) {
-            throw new Error(`OpenAIPredictionEngine: invalid variable name of "${variableName}" specified`);
+            throw new Error(`PromptParser: invalid variable name of "${variableName}" specified`);
         }
 
         // Check for special cased variables first
@@ -108,7 +108,7 @@ export class PromptParser {
                 const entry = state[parts[0]];
                 if (!entry) {
                     throw new Error(
-                        `OpenAIPredictionEngine: invalid variable name of "${variableName}" specified. Couldn't find a state named "${parts[0]}".`
+                        `PromptParser: invalid variable name of "${variableName}" specified. Couldn't find a state named "${parts[0]}".`
                     );
                 }
 

@@ -12,7 +12,7 @@ export * from './Application';
 export * from './ConversationHistory';
 export * from './DefaultTurnStateManager';
 export * from './MessageExtensions';
-export * from './OpenAIPredictionEngine';
+export * from './OpenAIPlanner';
 export * from './Planner';
 export * from './PromptParser';
 export * from './ResponseParser';
