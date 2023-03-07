@@ -47,7 +47,8 @@ export class ResponseParser {
     public static parseResponse(text?: string): Plan {
         // See if the response contains a plan object?
         let plan: Plan = this.parseJSON(text);
-        if (plan && plan.type === 'PLAN') {
+        if (plan && plan.type?.toLowerCase() === 'plan') {
+            plan.type = 'plan';
             if (!Array.isArray(plan.commands)) {
                 plan.commands = [];
             }
@@ -57,7 +58,7 @@ export class ResponseParser {
 
         // Parse response using DO/SAY syntax
         let responses = '';
-        plan = { type: 'PLAN', commands: [] };
+        plan = { type: 'plan', commands: [] };
         let tokens = this.tokenizeText(text);
         if (tokens.length > 0) {
             // Insert default command if response doesn't start with a command

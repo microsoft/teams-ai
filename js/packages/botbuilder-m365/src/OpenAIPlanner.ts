@@ -183,7 +183,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         // Ensure we weren't rate limited
         if (status === 429) {
             return {
-                type: 'PLAN',
+                type: 'plan',
                 commands: [
                     {
                         type: 'DO',
@@ -261,7 +261,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
             return plan;
         }
 
-        return { type: 'PLAN', commands: [] };
+        return { type: 'plan', commands: [] };
     }
 
     private async createChatCompletionRequest(

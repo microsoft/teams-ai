@@ -19,7 +19,7 @@ export interface Planner<TState extends TurnState, TPlanOptions> {
 }
 
 export interface Plan {
-    type: 'PLAN',
+    type: 'plan',
     commands: PredictedCommand[];
 }
 
