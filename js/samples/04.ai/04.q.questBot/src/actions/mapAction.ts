@@ -1,15 +1,15 @@
 import { TurnContext } from "botbuilder";
-import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
+import { Application, OpenAIPlanner } from "botbuilder-m365";
 import { ApplicationTurnState, IDataEntities, trimPromptResponse, updateDMResponse } from "../bot";
 import * as responses from '../responses';
 import * as prompts from '../prompts';
 
-export function mapAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
+export function mapAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('map', async (context, state, data: IDataEntities) => {
         const action = (data.action ?? '').toLowerCase();
         switch (action) {
             case 'query':
-                return await queryMap(predictionEngine, context, state);
+                return await queryMap(planner, context, state);
             default:
                 await context.sendActivity(`[map.${action}]`);
                 return true;
@@ -17,9 +17,9 @@ export function mapAction(app: Application<ApplicationTurnState>, predictionEngi
     });
 }
 
-async function queryMap(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
+async function queryMap(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     // Use the map to answer player
-    let newResponse = await predictionEngine.prompt(context, state, prompts.useMap);
+    let newResponse = await planner.prompt(context, state, prompts.useMap);
     if (newResponse) {
         await updateDMResponse(context, state, trimPromptResponse(newResponse).split('\n').join('<br>'));
         state.temp.value.playerAnswered = true;

@@ -65,11 +65,11 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 import * as responses from './responses';
 
 // Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
+const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     }
@@ -150,7 +150,7 @@ server.post('/api/messages', async (req, res) => {
 
 
 async function getHint(context: TurnContext, state: ApplicationTurnState): Promise<string> {
-    const response = await predictionEngine.prompt(
+    const response = await planner.prompt(
         context,
         state,
         {
@@ -166,10 +166,9 @@ async function getHint(context: TurnContext, state: ApplicationTurnState): Promi
         }
     );
 
-    if (response.status != 429) {
-        return response.data?.choices[0].text ?? '';
-    } else {
+    if (!response) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
     }
 
+    return response;
 }

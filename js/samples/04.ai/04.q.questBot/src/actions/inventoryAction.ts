@@ -1,18 +1,18 @@
 import { CardFactory, MessageFactory, TurnContext } from "botbuilder";
-import { Application, OpenAIPredictionEngine, ResponseParser } from "botbuilder-m365";
+import { Application, OpenAIPlanner, ResponseParser } from "botbuilder-m365";
 import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
 import { normalizeItemName, searchItemList, textToItemList } from "../items";
 import * as responses from "../responses";
 import * as prompts from "../prompts"
 
-export function inventoryAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
+export function inventoryAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('inventory', async (context, state, data: IDataEntities) => {
         const action = (data.action ?? '').toLowerCase();
         switch (action) {
             case 'update':
                 return await updateList(context, state, data);
             case 'list':
-                return await printList(predictionEngine, context, state);
+                return await printList(planner, context, state);
             default:
                 await context.sendActivity(`[inventory.${action}]`);
                 return true;
@@ -90,12 +90,12 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
     return true;
 }
 
-async function printList(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
+async function printList(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     const items = state.user.value.inventory;
     if (Object.keys(items).length > 0) {
         state.temp.value.listItems = items;
         state.temp.value.listType = 'inventory';
-        const newResponse = await predictionEngine.prompt(context, state, prompts.listItems);
+        const newResponse = await planner.prompt(context, state, prompts.listItems);
         if (newResponse) {
             const card = ResponseParser.parseAdaptiveCard(newResponse);
             if (card) {

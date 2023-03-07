@@ -1,19 +1,19 @@
 import { TurnContext } from "botbuilder";
-import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
+import { Application, OpenAIPlanner } from "botbuilder-m365";
 import { ApplicationTurnState, IDataEntities, IQuest, updateDMResponse } from "../bot";
 import * as prompts from '../prompts';
 
-export function questAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
+export function questAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('quest', async (context, state, data: IDataEntities) => {
         const action = (data.action ?? '').toLowerCase();
         switch (action) {
             case 'add':
             case 'update':
-                return await updateQuest(predictionEngine, context, state, data);
+                return await updateQuest(planner, context, state, data);
             case 'remove':
                 return await removeQuest(context, state, data);
             case 'finish':
-                return await finishQuest(predictionEngine, context, state, data);
+                return await finishQuest(planner, context, state, data);
             case 'list':
                 return await listQuest(context, state);
             default:
@@ -23,7 +23,7 @@ export function questAction(app: Application<ApplicationTurnState>, predictionEn
     });
 }
 
-async function updateQuest(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function updateQuest(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
         const conversation = state.conversation.value;
         const quests = conversation.quests ?? {};
 
@@ -36,7 +36,7 @@ async function updateQuest(predictionEngine: OpenAIPredictionEngine, context: Tu
 
         // Expand quest details
         state.temp.value.quests = `"${quest.title}" - ${quest.description}`;
-        const details = await predictionEngine.prompt(context, state, prompts.questDetails);
+        const details = await planner.prompt(context, state, prompts.questDetails);
         if (details) {
             quest.description = details.trim();
         }
@@ -68,7 +68,7 @@ async function removeQuest(context: TurnContext, state: ApplicationTurnState, da
     return true;
 }
 
-async function finishQuest(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function finishQuest(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
 
     // Find quest and delete item

@@ -63,7 +63,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPredictionEngine, AI, ConversationHistory } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI, ConversationHistory } from 'botbuilder-m365';
 import * as responses from './responses';
 
 interface ConversationState {
@@ -72,7 +72,7 @@ interface ConversationState {
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
+const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
@@ -86,16 +86,6 @@ const predictionEngine = new OpenAIPredictionEngine({
         presence_penalty: 0.6,
         stop: [' Human:', ' AI:']
     },
-    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
-    topicFilterConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.0,
-        max_tokens: 128,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.0,
-        stop: [' Human:', ' AI:']
-    },
     logRequests: true
 });
 
@@ -103,7 +93,7 @@ const predictionEngine = new OpenAIPredictionEngine({
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
-    predictionEngine
+    planner
 });
 
 // Register action handlers

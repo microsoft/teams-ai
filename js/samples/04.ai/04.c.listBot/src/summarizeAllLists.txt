@@ -44,7 +44,7 @@ Here is an adaptive card template for showing 1 or more lists to a user
 
 Here's a set of lists. The key is the title of the list and the arrays contain a lists items:
 
-{{data.lists}}
+{{temp.lists}}
 
 Here's the users query:
 

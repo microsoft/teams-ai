@@ -2,10 +2,10 @@ This is a Microsoft Teams extension that assists the user with creating posts.
 The user is in the middle of editing a post which is shown below.
 
 ```
-{{data.post}}
+{{temp.post}}
 ```
 
 Using the prompt below, update the post ensuring that it's appropriate for a business environment.
 
-Prompt: {{data.prompt}}
+Prompt: {{temp.prompt}}
 Post:
