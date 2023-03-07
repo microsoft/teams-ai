@@ -157,7 +157,7 @@ export class AI<
         if (continueChain) {
             // Run predicted commands
             for (let i = 0; i < plan.commands.length && continueChain; i++) {
-                const cmd = plan[i];
+                const cmd = plan.commands[i];
                 switch (cmd.type) {
                     case 'DO':
                         const { action } = cmd as PredictedDoCommand;
