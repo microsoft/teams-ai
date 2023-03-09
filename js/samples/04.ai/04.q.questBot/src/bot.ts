@@ -22,8 +22,7 @@ const planner = new OpenAIPlanner({
         userPrefix: 'Player: ',
         botPrefix: 'DM: ',
         maxLines: 2,
-        maxCharacterLength: 2000,
-        includeDoCommands: false
+        maxCharacterLength: 2000
     },
     logRequests: true
 });
@@ -75,10 +74,9 @@ export interface TempState {
 }
 
 export interface IDataEntities {
-    action: string;
-    add: string;
+    operation: string;
     description: string;
-    remove: string;
+    items: string;
     title: string;
     name: string;
     backstory: string;
@@ -449,12 +447,16 @@ export async function updateDMResponse(context: TurnContext, state: ApplicationT
     await context.sendActivity(newResponse);
 }
 
-export function parseNumber(text: string|undefined, minValue: number): number {
+export function parseNumber(text: string|undefined, minValue?: number): number {
     try {
-        const count = parseInt(text ?? `${minValue}`);
-        return count >= minValue ? count : minValue;
+        const count = parseInt(text ?? `${minValue ?? 0}`);
+        if (typeof minValue == 'number') {
+            return count >= minValue ? count : minValue;
+        } else {
+            return count;
+        }
     } catch (err) {
-        return minValue;
+        return minValue ?? 0;
     }
 }
 

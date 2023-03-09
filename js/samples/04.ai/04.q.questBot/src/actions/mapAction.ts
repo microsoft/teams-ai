@@ -6,7 +6,7 @@ import * as prompts from '../prompts';
 
 export function mapAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('map', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
+        const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'query':
                 return await queryMap(planner, context, state);

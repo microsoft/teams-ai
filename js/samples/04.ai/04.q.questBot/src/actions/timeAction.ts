@@ -5,7 +5,7 @@ import { describeConditions, describeSeason, describeTimeOfDay, generateTemperat
 
 export function timeAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('time', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
+        const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'wait':
                 return await waitForTime(context, state, data);

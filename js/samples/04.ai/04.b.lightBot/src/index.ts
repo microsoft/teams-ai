@@ -78,13 +78,12 @@ const planner = new OpenAIPlanner({
     },
     prompt: path.join(__dirname, '../src/prompt.txt'),
     promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.0,
+        model: 'gpt-3.5-turbo',
+        temperature: 0.7,
         max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
+        presence_penalty: 0.6
     },
     logRequests: true
 });

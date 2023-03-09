@@ -26,6 +26,10 @@ import { PromptParser, PromptTemplate } from './PromptParser';
 import { ConversationHistory } from './ConversationHistory';
 import { AI } from './AI';
 
+export interface OpenAIPromptConfig extends CreateCompletionRequest {
+    useSystemMessage?: boolean;
+}
+
 export interface OpenAIPromptOptions {
     prompt: PromptTemplate;
     promptConfig: CreateCompletionRequest;
@@ -51,7 +55,7 @@ export interface OpenAIConversationHistoryOptions {
     maxLines?: number;
     maxCharacterLength?: number;
     lineSeparator?: string;
-    includeDoCommands?: boolean;
+    includePlanJson?: boolean;
 }
 
 export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
@@ -75,7 +79,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                 addTurnToHistory: true,
                 userPrefix: 'Human: ',
                 botPrefix: 'AI: ',
-                includeDoCommands: true
+                includePlanJson: true
             } as OpenAIConversationHistoryOptions,
             this._options.conversationHistory
         );
@@ -188,7 +192,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                     {
                         type: 'DO',
                         action: AI.RateLimitedActionName,
-                        data: {}
+                        entities: {}
                     } as PredictedDoCommand
                 ]
             };
@@ -240,14 +244,12 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                         historyOptions.maxLines
                     );
                 }
-                if (historyOptions.includeDoCommands) {
-                    if (response) {
-                        ConversationHistory.addLine(
-                            state,
-                            `${historyOptions.botPrefix ?? ''}${response}`,
-                            historyOptions.maxLines
-                        );
-                    }
+                if (historyOptions.includePlanJson) {
+                    ConversationHistory.addLine(
+                        state,
+                        `${historyOptions.botPrefix ?? ''}${JSON.stringify(plan)}`,
+                        historyOptions.maxLines
+                    );
                 } else {
                     const text = plan.commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join(' ');
                     ConversationHistory.addLine(
@@ -268,7 +270,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         context: TurnContext,
         state: TState,
         prompt: PromptTemplate,
-        config: CreateCompletionRequest,
+        config: OpenAIPromptConfig,
         userMessage?: string,
         historyOptions?: OpenAIConversationHistoryOptions
     ): Promise<CreateChatCompletionRequest> {
@@ -286,7 +288,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
 
         // Populate system message
         request.messages.push({
-            role: 'system',
+            role: config.useSystemMessage ? 'system' : 'user',
             content: systemMsg
         });
 

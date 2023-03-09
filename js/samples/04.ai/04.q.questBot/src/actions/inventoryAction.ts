@@ -7,14 +7,14 @@ import * as prompts from "../prompts"
 
 export function inventoryAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('inventory', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
-        switch (action) {
+        const operation = (data.operation ?? '').toLowerCase();
+        switch (operation) {
             case 'update':
                 return await updateList(context, state, data);
             case 'list':
                 return await printList(planner, context, state);
             default:
-                await context.sendActivity(`[inventory.${action}]`);
+                await context.sendActivity(`[inventory.${operation}]`);
                 return true;
         }
     });
@@ -24,61 +24,46 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
     let items = Object.assign({}, state.user.value.inventory);
     try {
         // Remove items first
-        let removed: string[] = [];
-        const remove = textToItemList(data.remove);
+        let changes: string[] = [];
+        const remove = textToItemList(data.items);
         for (const item in remove) {
+            // Normalize the items name and count
+            // - This converts 'coins:1' to 'gold:10'
             const { name, count } = normalizeItemName(item, remove[item]);
-            if (name && count > 0) {
-                // Search for closest match in inventory
-                const key = searchItemList(name, items);
-                if (key) {
-                    if (count < items[key]) {
-                        removed.push(`-${count}(${key})`);
-                        items[key] = items[key] - count;
-                    } else {
-                        // Hallucinating number of items in inventory
-                        removed.push(`-${items[key]}(${key})`);
-                        delete items[key];
-                    }
-                } else {
-                    // Hallucinating item as being in inventory
-                    removed.push(`-${count}(${name})`);
-                }
+            if (!name) {
+                continue;
             }
-        }
 
-
-        // Add items next
-        let added: string[] = [];
-        const add = textToItemList(data.add);
-        for (const item in add) {
-            const { name, count } = normalizeItemName(item, add[item]);
-            if (name && count > 0) {
+            if (count > 0) {
+                // Add the item
                 if (items.hasOwnProperty(name)) {
                     items[name] = items[name] + count;
                 } else {
                     items[name] = count;
                 }
-                added.push(`+${count}(${name})`);
+                changes.push(`+${count}(${name})`);
+            } else if (count < 0) {
+                // remove the item
+                const key = searchItemList(name, items);
+                if (key) {
+                    if (count < items[key]) {
+                        changes.push(`-${count}(${key})`);
+                        items[key] = items[key] - count;
+                    } else {
+                        // Hallucinating number of items in inventory
+                        changes.push(`-${items[key]}(${key})`);
+                        delete items[key];
+                    }
+                } else {
+                    // Hallucinating item as being in inventory
+                    changes.push(`-${count}(${name})`);
+                }
             }
         }
 
         // Report inventory changes to user
         const playerName = state.user.value.name.toLowerCase();
-        if (added.length == 1 && removed.length > 0) {
-            // Report combined add+remove
-            await context.sendActivity(`${playerName}: ${added[0]}, ${removed.join(', ')}`);
-        } else {
-            // Report added items
-            if (added.length > 0) {
-                await context.sendActivity(`${playerName}: ${added.join(', ')}`);
-            }
-
-            // Report removed items
-            if (removed.length > 0) {
-                await context.sendActivity(`${playerName}: ${removed.join(', ')}`);
-            }
-        }
+        await context.sendActivity(`${playerName}: ${changes.join(', ')}`);
 
         // Save inventory changes
         state.user.value.inventory = items;

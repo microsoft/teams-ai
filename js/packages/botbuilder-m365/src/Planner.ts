@@ -30,7 +30,7 @@ export interface PredictedCommand {
 export interface PredictedDoCommand extends PredictedCommand {
     type: 'DO';
     action: string;
-    data: Record<string, any>;
+    entities: Record<string, any>;
 }
 
 export interface PredictedSayCommand extends PredictedCommand {

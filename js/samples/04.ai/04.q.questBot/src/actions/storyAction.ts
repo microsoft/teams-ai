@@ -4,7 +4,7 @@ import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
 
 export function storyAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('story', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
+        const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'change':
             case 'update':

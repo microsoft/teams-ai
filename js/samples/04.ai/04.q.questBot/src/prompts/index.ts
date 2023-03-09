@@ -81,13 +81,12 @@ export const newObjective: OpenAIPromptOptions = {
 export const prompt: OpenAIPromptOptions = {
     prompt: getPromptPath('prompt.txt'),
     promptConfig: {
-        model: 'text-davinci-003',
+        model: 'gpt-3.5-turbo',
         temperature: 0.7,
         max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Player:', ' DM:']
+        presence_penalty: 0.6
     }
 };
 

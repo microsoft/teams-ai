@@ -6,7 +6,7 @@ import * as prompts from '../prompts';
 
 export function playerAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('player', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
+        const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'update':
                 return await updatePlayer(planner, context, state, data);

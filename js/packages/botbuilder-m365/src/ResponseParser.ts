@@ -154,7 +154,7 @@ export class ResponseParser {
                             command = {
                                 type: 'DO',
                                 action: actionName,
-                                data: {}
+                                entities: {}
                             };
                             parseState = DoCommandParseState.findEntityName;
                         } else {
@@ -201,7 +201,7 @@ export class ResponseParser {
                         // Accumulate tokens until end of string is hit
                         if (token == quoteType) {
                             // Save pair and look for additional pairs
-                            command!.data[entityName] = entityValue;
+                            command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -212,7 +212,7 @@ export class ResponseParser {
                         if (token == "`" && tokens[length + 1] == "`" && tokens[length + 2] == "`") {
                             // Save pair and look for additional pairs
                             length += 2;
-                            command!.data[entityName] = entityValue;
+                            command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -223,7 +223,7 @@ export class ResponseParser {
                         // Accumulate tokens until you hit a space
                         if (SPACE_CHARACTERS.indexOf(token) >= 0) {
                             // Save pair and look for additional pairs
-                            command!.data[entityName] = entityValue;
+                            command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -239,13 +239,13 @@ export class ResponseParser {
                 command = {
                     type: 'DO',
                     action: actionName,
-                    data: {}
+                    entities: {}
                 };
             }
 
             // Append final entity
             if (command && entityName) {
-                command.data[entityName] = entityValue;
+                command.entities[entityName] = entityValue;
             }
         }
 

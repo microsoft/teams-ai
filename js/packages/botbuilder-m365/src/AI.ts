@@ -77,7 +77,7 @@ export class AI<
         this.action<PredictedDoCommandAndHandler<TState>>(
             AI.DoCommandActionName,
             async (_context, _state, _data, _action) => {
-                const { data, handler } = _data;
+                const { entities: data, handler } = _data;
                 return await handler(_context, _state, data, _action);
             },
             true
@@ -120,9 +120,9 @@ export class AI<
      * @param allowOverrides Optional. If true
      * @returns The application instance for chaining purposes.
      */
-    public action<TData = Record<string, any>>(
+    public action<TEntities = Record<string, any>>(
         name: string|string[],
-        handler: (context: TurnContext, state: TState, data: TData, action: string) => Promise<boolean>,
+        handler: (context: TurnContext, state: TState, entities: TEntities, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
         (Array.isArray(name) ? name : [name]).forEach(n => {
