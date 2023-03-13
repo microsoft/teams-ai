@@ -204,7 +204,7 @@ app.turn('beforeTurn', async (context, state) => {
             if (campaign && campaign.title && Array.isArray(campaign.objectives)) {
                 // Send campaign title as a message
                 conversation.campaign = campaign;
-                await context.sendActivity(`🧙 <b>${campaign.title}</b>`);
+                await context.sendActivity(`🧙 <strong>${campaign.title}</b>`);
                 app.startTypingTimer(context);
             } else {
                 state.conversation.delete();
@@ -265,7 +265,7 @@ app.turn('beforeTurn', async (context, state) => {
 
             // Notify user of new quest
             objectiveAdded = true;
-            await context.sendActivity(`✨ <b>${nextObjective.title}</b><br>${nextObjective.description.trim().split('\n').join('<br>')}`);
+            await context.sendActivity(`✨ <strong>${nextObjective.title}</strong><br>${nextObjective.description.trim().split('\n').join('<br>')}`);
             app.startTypingTimer(context);
         }
 
@@ -343,23 +343,23 @@ app.message('/forget', async (context, state) => {
 
 app.message('/history', async (context, state) => {
     const history = ConversationHistory.toString(state, 4000, `\n\n`);
-    await context.sendActivity(`<b>Chat history:</b><br>${history}`);
+    await context.sendActivity(`<strong>Chat history:</strong><br>${history}`);
 });
 
 app.message('/story', async (context, state) => {
-    await context.sendActivity(`<b>The story so far:</b><br>${state.conversation.value.story ?? ''}`);
+    await context.sendActivity(`<strong>The story so far:</strong><br>${state.conversation.value.story ?? ''}`);
 });
 
 app.message('/profile', async (context, state) => {
     const player = state.user.value;
     const backstory = player.backstory.split('\n').join('<br>');
     const equipped = player.equipped.split('\n').join('<br>')
-    await context.sendActivity(`🤴 <b>${player.name}</b><br><b>Backstory:</b> ${backstory}<br><b>Equipped:</b> ${equipped}`);
+    await context.sendActivity(`🤴 <strong>${player.name}</strong><br><strong>Backstory:</strong> ${backstory}<br><strong>Equipped:</strong> ${equipped}`);
 });
 
 
 app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(`<b>${action}</b> action missing`);
+    await context.sendActivity(`<strong>${action}</strong> action missing`);
     return true;
 });
 

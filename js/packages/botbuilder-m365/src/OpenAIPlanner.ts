@@ -251,7 +251,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                         historyOptions.maxLines
                     );
                 } else {
-                    const text = plan.commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join(' ');
+                    const text = plan.commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join('\n');
                     ConversationHistory.addLine(
                         state,
                         `${historyOptions.botPrefix ?? ''}${text}`,

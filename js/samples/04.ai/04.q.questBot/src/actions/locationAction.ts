@@ -34,7 +34,7 @@ async function updateLocation(planner: OpenAIPlanner, context: TurnContext, stat
         // - Ignore the change if the location hasn't changed.
         if (currentLocation?.title !== conversation.location.title) {
             conversation.locationTurn = 1;
-            await context.sendActivity(`🧭 <b>${conversation.location.title}</b><br>${conversation.location.description.split('\n').join('<br>')}`);
+            await context.sendActivity(`🧭 <strong>${conversation.location.title}</strong><br>${conversation.location.description.split('\n').join('<br>')}`);
         }
     
         state.temp.value.playerAnswered = true;
