@@ -39,7 +39,9 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
 
     public get value(): TValue {
         if (this.isDeleted) {
-            throw new Error(`Error accessing deleted TurnStateEntry.`);
+            // Switch to a replace scenario
+            this._value = ({} as TValue);
+            this._deleted = false;
         }
 
         return this._value;

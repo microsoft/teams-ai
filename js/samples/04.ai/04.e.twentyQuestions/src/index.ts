@@ -166,10 +166,9 @@ async function getHint(context: TurnContext, state: ApplicationTurnState): Promi
         }
     );
 
-    if (response.status != 429) {
-        return response.data?.choices[0].text ?? '';
-    } else {
+    if (!response) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
     }
 
+    return response;
 }
