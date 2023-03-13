@@ -60,14 +60,14 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, ConversationHistory, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
+const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
@@ -87,7 +87,7 @@ const predictionEngine = new OpenAIPredictionEngine({
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    predictionEngine,
+    planner,
     storage
 });
 

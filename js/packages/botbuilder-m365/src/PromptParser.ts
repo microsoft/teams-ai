@@ -29,7 +29,6 @@ export class PromptParser {
     public static async expandPromptTemplate(
         context: TurnContext,
         state: TurnState,
-        data: Record<string, any>,
         prompt: PromptTemplate,
         options?: PromptParserOptions
     ): Promise<string> {
@@ -72,7 +71,7 @@ export class PromptParser {
                         }
 
                         // Append variable contents to output
-                        outputPrompt += PromptParser.lookupPromptVariable(context, state, data, variableName!, options);
+                        outputPrompt += PromptParser.lookupPromptVariable(context, state, variableName!, options);
                     } else {
                         // Append character to variable name
                         variableName! += ch;
@@ -87,7 +86,6 @@ export class PromptParser {
     public static lookupPromptVariable(
         context: TurnContext,
         state: TurnState,
-        data: Record<string, any>,
         variableName: string,
         options?: PromptParserOptions
     ): string {
@@ -95,7 +93,7 @@ export class PromptParser {
         // TODO: Add support for longer dotted path variable names
         const parts = variableName.trim().split('.');
         if (parts.length != 2) {
-            throw new Error(`OpenAIPredictionEngine: invalid variable name of "${variableName}" specified`);
+            throw new Error(`PromptParser: invalid variable name of "${variableName}" specified`);
         }
 
         // Check for special cased variables first
@@ -105,16 +103,12 @@ export class PromptParser {
                 // Return activity field
                 value = (context.activity as any)[parts[1]] ?? '';
                 break;
-            case 'data':
-                // Return referenced data entry
-                value = data[parts[1]] ?? '';
-                break;
             default:
                 // Find referenced state entry
                 const entry = state[parts[0]];
                 if (!entry) {
                     throw new Error(
-                        `OpenAIPredictionEngine: invalid variable name of "${variableName}" specified. Couldn't find a state named "${parts[0]}".`
+                        `PromptParser: invalid variable name of "${variableName}" specified. Couldn't find a state named "${parts[0]}".`
                     );
                 }
 

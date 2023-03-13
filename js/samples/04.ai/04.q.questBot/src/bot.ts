@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPredictionEngine, ResponseParser } from 'botbuilder-m365';
+import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPlanner, ResponseParser } from 'botbuilder-m365';
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as responses from './responses';
 import { IItemList } from './interfaces';
@@ -12,7 +12,7 @@ import { LastWriterWinsStore } from './LastWriterWinsStore';
 import { describeConditions, describeSeason, describeTimeOfDay, generateTemperature, generateWeather } from './conditions';
 
 // Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
+const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
@@ -22,8 +22,7 @@ const predictionEngine = new OpenAIPredictionEngine({
         userPrefix: 'Player: ',
         botPrefix: 'DM: ',
         maxLines: 2,
-        maxCharacterLength: 2000,
-        includeDoCommands: false
+        maxCharacterLength: 2000
     },
     logRequests: true
 });
@@ -75,10 +74,9 @@ export interface TempState {
 }
 
 export interface IDataEntities {
-    action: string;
-    add: string;
+    operation: string;
     description: string;
-    remove: string;
+    items: string;
     title: string;
     name: string;
     backstory: string;
@@ -116,7 +114,7 @@ export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState
 const storage = new LastWriterWinsStore(process.env.StorageConnectionString, process.env.StorageContainer);
 const app = new Application<ApplicationTurnState>({
     storage,
-    predictionEngine
+    planner
 });
 
 // Export bots run() function
@@ -201,7 +199,7 @@ app.turn('beforeTurn', async (context, state) => {
             conversation.nextEncounterTurn = 5 + Math.floor(Math.random() * 15);
 
             // Create campaign
-            const response = await predictionEngine.prompt(context, state, prompts.createCampaign);
+            const response = await planner.prompt(context, state, prompts.createCampaign);
             campaign = ResponseParser.parseJSON(response);
             if (campaign && campaign.title && Array.isArray(campaign.objectives)) {
                 // Send campaign title as a message
@@ -365,11 +363,11 @@ app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
     return true;
 });
 
-addActions(app, predictionEngine);
+addActions(app, planner);
 
 async function selectMainPrompt(context: TurnContext, state: ApplicationTurnState): Promise<string> {
     const prompt = state.temp.value.prompt;
-    return await predictionEngine.expandPromptTemplate(context, state, prompts.getPromptPath(prompt)); 
+    return await planner.expandPromptTemplate(context, state, prompts.getPromptPath(prompt)); 
 }
 
 export function describeGameState(conversation: ConversationState): string {
@@ -449,12 +447,16 @@ export async function updateDMResponse(context: TurnContext, state: ApplicationT
     await context.sendActivity(newResponse);
 }
 
-export function parseNumber(text: string|undefined, minValue: number): number {
+export function parseNumber(text: string|undefined, minValue?: number): number {
     try {
-        const count = parseInt(text ?? `${minValue}`);
-        return count >= minValue ? count : minValue;
+        const count = parseInt(text ?? `${minValue ?? 0}`);
+        if (typeof minValue == 'number') {
+            return count >= minValue ? count : minValue;
+        } else {
+            return count;
+        }
     } catch (err) {
-        return minValue;
+        return minValue ?? 0;
     }
 }
 

@@ -9,13 +9,18 @@
 import { TurnContext } from 'botbuilder';
 import { TurnState } from './TurnState';
 
-export interface PredictionEngine<TState extends TurnState, TPredictionOptions> {
-    predictCommands(
+export interface Planner<TState extends TurnState, TPlanOptions> {
+    generatePlan(
         context: TurnContext,
         state: TState,
-        data?: Record<string, any>,
-        options?: TPredictionOptions
-    ): Promise<PredictedCommand[]>;
+        options?: TPlanOptions,
+        message?: string
+    ): Promise<Plan>;
+}
+
+export interface Plan {
+    type: 'plan',
+    commands: PredictedCommand[];
 }
 
 export interface PredictedCommand {
@@ -25,7 +30,7 @@ export interface PredictedCommand {
 export interface PredictedDoCommand extends PredictedCommand {
     type: 'DO';
     action: string;
-    data: Record<string, any>;
+    entities: Record<string, any>;
 }
 
 export interface PredictedSayCommand extends PredictedCommand {

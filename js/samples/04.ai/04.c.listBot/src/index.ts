@@ -12,8 +12,7 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage,
-    TurnContext
+    MemoryStorage
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -64,11 +63,11 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPredictionEngine, AI } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI } from 'botbuilder-m365';
 import * as responses from './responses';
 
 // Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
+const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
@@ -82,16 +81,6 @@ const predictionEngine = new OpenAIPredictionEngine({
         presence_penalty: 0.6,
         stop: [' Human:', ' AI:']
     },
-    topicFilter: path.join(__dirname, '../src/topicFilter.txt'),
-    topicFilterConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.0,
-        max_tokens: 256,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.0,
-        stop: [' Human:', ' AI:']
-    },
     logRequests: true
 });
 
@@ -101,21 +90,27 @@ interface ConversationState {
     listNames: string[];
     lists: Record<string, string[]>;
 }
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+
+interface UserState {
+}
+
+interface TempState {
+    lists: Record<string, string[]>;
+}
+
+type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
-    predictionEngine
+    planner
 });
 
 // Define an interface to strongly type data parameters for actions
 interface EntityData {
     list: string; // <- populated by GPT
     item: string; // <- populated by GPT
-    items?: string[]; // <- populated by the summarizeList action
-    lists?: Record<string, string[]>;
 }
 
 // Listen for new members to join the conversation
@@ -169,9 +164,10 @@ app.ai.action('findItem', async (context, state, data: EntityData) => {
 });
 
 app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
-    data.lists = state.conversation.value.lists;
-    if (data.lists) {
+    const lists = state.conversation.value.lists;
+    if (lists) {
         // Chain into a new summarization prompt
+        state.temp.value.lists = lists;
         await app.ai.chain(
             context,
             state,
@@ -185,8 +181,7 @@ app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
                     frequency_penalty: 0,
                     presence_penalty: 0
                 }
-            },
-            data
+            }
         );
     } else {
         await context.sendActivity(responses.noListsFound());

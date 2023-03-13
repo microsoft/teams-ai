@@ -1,15 +1,15 @@
 import { TurnContext } from "botbuilder";
-import { Application, OpenAIPredictionEngine, ResponseParser } from "botbuilder-m365";
+import { Application, OpenAIPlanner, ResponseParser } from "botbuilder-m365";
 import { ApplicationTurnState, DEFAULT_BACKSTORY, DEFAULT_EQUIPPED, IDataEntities,  updateDMResponse, UserState } from "../bot";
 import * as responses from '../responses';
 import * as prompts from '../prompts';
 
-export function playerAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
+export function playerAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('player', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
+        const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'update':
-                return await updatePlayer(predictionEngine, context, state, data);
+                return await updatePlayer(planner, context, state, data);
             default:
                 await context.sendActivity(`[player.${action}]`);
                 return true;
@@ -17,7 +17,7 @@ export function playerAction(app: Application<ApplicationTurnState>, predictionE
     });
 }
 
-async function updatePlayer(predictionEngine: OpenAIPredictionEngine, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function updatePlayer(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     // Check for name change
     const player = Object.assign({}, state.user.value);
     const newName = (data.name ?? '').trim();
@@ -57,7 +57,7 @@ async function updatePlayer(predictionEngine: OpenAIPredictionEngine, context: T
         })
         state.temp.value.backstoryChange = backstoryChange ?? 'no change';
         state.temp.value.equippedChange = equippedChange ?? 'no change';
-        const update = await predictionEngine.prompt(context, state, prompts.updatePlayer);
+        const update = await planner.prompt(context, state, prompts.updatePlayer);
         const obj: UserState = ResponseParser.parseJSON(update);
         if (obj) {
             if (obj.backstory?.length > 0) {

@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedCommand, PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
+import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
@@ -26,6 +26,10 @@ import { PromptParser, PromptTemplate } from './PromptParser';
 import { ConversationHistory } from './ConversationHistory';
 import { AI } from './AI';
 
+export interface OpenAIPromptConfig extends CreateCompletionRequest {
+    useSystemMessage?: boolean;
+}
+
 export interface OpenAIPromptOptions {
     prompt: PromptTemplate;
     promptConfig: CreateCompletionRequest;
@@ -33,19 +37,12 @@ export interface OpenAIPromptOptions {
     logRequests?: boolean;
 }
 
-export interface OpenAIPredictionOptions extends OpenAIPromptOptions {
-    topicFilter?: PromptTemplate;
-    topicFilterConfig?: CreateCompletionRequest;
-}
-
-export interface OpenAIPredictionEngineOptions {
+export interface OpenAIPlannerOptions {
     configuration: ConfigurationParameters;
     basePath?: string;
     axios?: AxiosInstance;
     prompt?: PromptTemplate;
     promptConfig?: CreateCompletionRequest;
-    topicFilter?: PromptTemplate;
-    topicFilterConfig?: CreateCompletionRequest;
     conversationHistory?: OpenAIConversationHistoryOptions;
     oneSayPerTurn?: boolean;
     logRequests?: boolean;
@@ -58,21 +55,21 @@ export interface OpenAIConversationHistoryOptions {
     maxLines?: number;
     maxCharacterLength?: number;
     lineSeparator?: string;
-    includeDoCommands?: boolean;
+    includePlanJson?: boolean;
 }
 
-export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
-    implements PredictionEngine<TState, OpenAIPredictionOptions>
+export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
+    implements Planner<TState, OpenAIPromptOptions>
 {
-    private readonly _options: OpenAIPredictionEngineOptions;
+    private readonly _options: OpenAIPlannerOptions;
     private readonly _configuration: Configuration;
     private readonly _openai: OpenAIApi;
 
-    public constructor(options: OpenAIPredictionEngineOptions) {
+    public constructor(options: OpenAIPlannerOptions) {
         this._options = Object.assign({
             oneSayPerTurn: true,
             logRequests: false
-        } as OpenAIPredictionEngineOptions, options);
+        } as OpenAIPlannerOptions, options);
         this._configuration = new Configuration(options.configuration);
         this._openai = new OpenAIApi(this._configuration, options.basePath, options.axios as any);
 
@@ -82,7 +79,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                 addTurnToHistory: true,
                 userPrefix: 'Human: ',
                 botPrefix: 'AI: ',
-                includeDoCommands: true
+                includePlanJson: true
             } as OpenAIConversationHistoryOptions,
             this._options.conversationHistory
         );
@@ -96,12 +93,12 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         return this._openai;
     }
 
-    public get options(): OpenAIPredictionEngineOptions {
+    public get options(): OpenAIPlannerOptions {
         return this._options;
     }
 
     public async expandPromptTemplate(context: TurnContext, state: TState, prompt: string): Promise<string> {
-        return PromptParser.expandPromptTemplate(context, state, {}, prompt, {
+        return PromptParser.expandPromptTemplate(context, state, prompt, {
                 conversationHistory: this._options.conversationHistory
             });
     }
@@ -132,7 +129,6 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             const promptRequest = await this.createCompletionRequest(
                 context,
                 state,
-                {},
                 options.prompt,
                 options.promptConfig,
                 options.conversationHistory
@@ -143,14 +139,13 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         }
     }
 
-    public async predictCommands(
+    public async generatePlan(
         context: TurnContext,
         state: TState,
-        data?: Record<string, any>,
-        options?: OpenAIPredictionOptions
-    ): Promise<PredictedCommand[]> {
-        data = data ?? {};
-        options = options ?? (this._options as OpenAIPredictionOptions);
+        options?: OpenAIPromptOptions,
+        message?: string
+    ): Promise<Plan> {
+        options = options ?? (this._options as OpenAIPromptOptions);
 
         if (!options.prompt || !options.promptConfig) {
             throw new Error(`OpenAIPredictionEngine: "prompt" or "promptConfiguration" not specified.`);
@@ -166,7 +161,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                 state,
                 options.prompt,
                 options.promptConfig,
-                context.activity.text,
+                message ?? context.activity.text,
                 options.conversationHistory
             );
 
@@ -178,7 +173,6 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             const promptRequest = await this.createCompletionRequest(
                 context,
                 state,
-                data,
                 options.prompt,
                 options.promptConfig,
                 options.conversationHistory
@@ -192,13 +186,16 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
 
         // Ensure we weren't rate limited
         if (status === 429) {
-            return [
-                {
-                    type: 'DO',
-                    action: AI.RateLimitedActionName,
-                    data: {}
-                } as PredictedDoCommand
-            ];
+            return {
+                type: 'plan',
+                commands: [
+                    {
+                        type: 'DO',
+                        action: AI.RateLimitedActionName,
+                        entities: {}
+                    } as PredictedDoCommand
+                ]
+            };
         }
 
         // Parse returned prompt response
@@ -220,12 +217,12 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
             }
 
             // Parse response into commands
-            let commands = ResponseParser.parseResponse(response.trim());
+            const plan = ResponseParser.parseResponse(response.trim());
             
             // Filter to only a single SAY command
             if (this._options.oneSayPerTurn) {
                 let spoken = false;
-                commands = commands.filter(cmd => {
+                plan.commands = plan.commands.filter(cmd => {
                     if (cmd.type == 'SAY') {
                         if (spoken) {
                             return false;
@@ -247,16 +244,14 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                         historyOptions.maxLines
                     );
                 }
-                if (historyOptions.includeDoCommands) {
-                    if (response) {
-                        ConversationHistory.addLine(
-                            state,
-                            `${historyOptions.botPrefix ?? ''}${response}`,
-                            historyOptions.maxLines
-                        );
-                    }
+                if (historyOptions.includePlanJson) {
+                    ConversationHistory.addLine(
+                        state,
+                        `${historyOptions.botPrefix ?? ''}${JSON.stringify(plan)}`,
+                        historyOptions.maxLines
+                    );
                 } else {
-                    const text = commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join('\n');
+                    const text = plan.commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join('\n');
                     ConversationHistory.addLine(
                         state,
                         `${historyOptions.botPrefix ?? ''}${text}`,
@@ -264,17 +259,18 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                     );
                 }
             }
-            return commands;
+
+            return plan;
         }
 
-        return [];
+        return { type: 'plan', commands: [] };
     }
 
     private async createChatCompletionRequest(
         context: TurnContext,
         state: TState,
         prompt: PromptTemplate,
-        config: CreateCompletionRequest,
+        config: OpenAIPromptConfig,
         userMessage?: string,
         historyOptions?: OpenAIConversationHistoryOptions
     ): Promise<CreateChatCompletionRequest> {
@@ -286,13 +282,13 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         // Expand prompt template
         // - NOTE: While the local history options and the prompts expected history options are
         //         different types, they're compatible via duck typing. This could impact porting.
-        const systemMsg = await PromptParser.expandPromptTemplate(context, state, {}, prompt, {
+        const systemMsg = await PromptParser.expandPromptTemplate(context, state, prompt, {
             conversationHistory: historyOptions
         });
 
         // Populate system message
         request.messages.push({
-            role: 'system',
+            role: config.useSystemMessage ? 'system' : 'user',
             content: systemMsg
         });
 
@@ -334,7 +330,6 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
     private async createCompletionRequest(
         context: TurnContext,
         state: TState,
-        data: Record<string, any>,
         prompt: PromptTemplate,
         config: CreateCompletionRequest,
         historyOptions?: OpenAIConversationHistoryOptions
@@ -345,7 +340,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
         // Expand prompt template
         // - NOTE: While the local history options and the prompts expected history options are
         //         different types, they're compatible via duck typing. This could impact porting.
-        request.prompt = await PromptParser.expandPromptTemplate(context, state, data, prompt, {
+        request.prompt = await PromptParser.expandPromptTemplate(context, state, prompt, {
             conversationHistory: historyOptions
         });
 

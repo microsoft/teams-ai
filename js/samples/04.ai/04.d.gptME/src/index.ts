@@ -68,7 +68,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPredictionEngine } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
 // This Message Extension can either drop the created card into the compose window (default.) 
@@ -77,7 +77,7 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 const PREVIEW_MODE = false;
 
 // Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
+const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     }
@@ -190,11 +190,11 @@ async function callPrompt(
     context: TurnContext,
     state: DefaultTurnState,
     prompt: string,
-    data?: Record<string, any>
+    data: SubmitData
 ): Promise<string> {
     state.temp.value['post'] = data.post;
     state.temp.value['prompt'] = data.prompt;
-    const response = await predictionEngine.prompt(
+    const response = await planner.prompt(
         context,
         state,
         {

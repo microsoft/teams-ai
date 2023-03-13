@@ -1,8 +1,0 @@
-Here are the items in a list named {{data.list}}:
-
-{{data.items}}
-
-Write a friendly summary of the lists contents using the query below for context:
-
-Human: {{activity.text}}
-

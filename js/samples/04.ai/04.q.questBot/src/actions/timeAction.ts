@@ -1,11 +1,11 @@
 import { TurnContext } from "botbuilder";
-import { Application, OpenAIPredictionEngine } from "botbuilder-m365";
+import { Application, OpenAIPlanner } from "botbuilder-m365";
 import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from "../bot";
 import { describeConditions, describeSeason, describeTimeOfDay, generateTemperature, generateWeather } from "../conditions";
 
-export function timeAction(app: Application<ApplicationTurnState>, predictionEngine: OpenAIPredictionEngine): void {
+export function timeAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('time', async (context, state, data: IDataEntities) => {
-        const action = (data.action ?? '').toLowerCase();
+        const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'wait':
                 return await waitForTime(context, state, data);

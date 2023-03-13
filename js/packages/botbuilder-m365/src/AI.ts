@@ -7,8 +7,7 @@
  */
 
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
-import { Application } from './Application';
-import { PredictedCommand, PredictedDoCommand, PredictedSayCommand, PredictionEngine } from './PredictionEngine';
+import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
@@ -16,17 +15,13 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
     handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>
 }
 
-export interface PredictedPlan {
-    commands: PredictedCommand[];
-}
-
 export class AI<
     TState extends TurnState,
-    TPredictionOptions,
-    TPredictionEngine extends PredictionEngine<TState, TPredictionOptions>
+    TPlanOptions,
+    TPlanner extends Planner<TState, TPlanOptions>
 > {
-    private readonly _predictionEngine: TPredictionEngine;
-    private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
+    private readonly _planner: TPlanner;
+    private readonly actions: Map<string, ActionEntry<TState>> = new Map();
 
     public static readonly UnknownActionName = '___UnknownAction___';
     public static readonly OffTopicActionName = '___OffTopic___';
@@ -35,13 +30,13 @@ export class AI<
     public static readonly DoCommandActionName = '___DO___';
     public static readonly SayCommandActionName = '___SAY___';
 
-    public constructor(app: Application<TState>, predictionEngine: TPredictionEngine) {
-        this._predictionEngine = predictionEngine;
+    public constructor(planner: TPlanner) {
+        this._planner = planner;
 
         // Register default UnknownAction handler
         this.action(
             AI.UnknownActionName,
-            (_context, _state, _data, action) => {
+            (context, state, data, action) => {
                 console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
                 return Promise.resolve(true);
             },
@@ -51,7 +46,7 @@ export class AI<
         // Register default OffTopicAction handler
         this.action(
             AI.OffTopicActionName,
-            (_context, _state, _data, _action) => {
+            (context, state, data, action) => {
                 console.error(
                     `A Topic Filter was configured but no handler was registered for 'AI.OffTopicActionName'.`
                 );
@@ -63,17 +58,17 @@ export class AI<
         // Register default RateLimitedActionName
         this.action(
             AI.RateLimitedActionName,
-            (_context, _state, _data, _action) => {
+            (context, state, data, action) => {
                 throw new Error(`An AI request failed because it was rate limited`);
             },
             true
         );
 
         // Register default PlanReadyActionName
-        this.action<PredictedPlan>(
+        this.action<Plan>(
             AI.PlanReadyActionName,
-            async (_context, _state, _plan) => {
-                return Array.isArray(_plan.commands) && _plan.commands.length > 0;
+            async (context, state, plan) => {
+                return Array.isArray(plan.commands) && plan.commands.length > 0;
             },
             true
         )
@@ -81,9 +76,9 @@ export class AI<
         // Register default DoCommandActionName
         this.action<PredictedDoCommandAndHandler<TState>>(
             AI.DoCommandActionName,
-            async (_context, _state, _data, _action) => {
-                const { data, handler } = _data;
-                return await handler(_context, _state, data, _action);
+            async (context, state, data, action) => {
+                const { entities, handler } = data;
+                return await handler(context, state, entities, action);
             },
             true
         );
@@ -91,17 +86,17 @@ export class AI<
         // Register default SayCommandActionName
         this.action<PredictedSayCommand>(
             AI.SayCommandActionName,
-            async (_context, _state, _data, _action) => {
-                const response = _data.response;
+            async (context, state, data, action) => {
+                const response = data.response;
                 const card = ResponseParser.parseAdaptiveCard(response);
                 if (card) {
                     const attachment = CardFactory.adaptiveCard(card);
                     const activity = MessageFactory.attachment(attachment);
-                    await _context.sendActivity(activity);
-                } else if (_context.activity.channelId == Channels.Msteams) {
-                    await _context.sendActivity(response.split('\n').join('<br>'));
+                    await context.sendActivity(activity);
+                } else if (context.activity.channelId == Channels.Msteams) {
+                    await context.sendActivity(response.split('\n').join('<br>'));
                 } else {
-                    await _context.sendActivity(response);
+                    await context.sendActivity(response);
                 }
 
                 return true;
@@ -111,30 +106,30 @@ export class AI<
 
     }
 
-    public get predictionEngine(): TPredictionEngine {
-        return this._predictionEngine;
+    public get planner(): TPlanner {
+        return this._planner;
     }
 
     /**
      * Registers an handler for a named action.
      *
      * @remarks
-     * Actions can be triggered by a Prediction Engine returning a DO command.
+     * Actions can be triggered by a planner returning a DO command.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
      * @param allowOverrides Optional. If true
      * @returns The application instance for chaining purposes.
      */
-    public action<TData = Record<string, any>>(
+    public action<TEntities = Record<string, any>>(
         name: string|string[],
-        handler: (context: TurnContext, state: TState, data: TData, action: string) => Promise<boolean>,
+        handler: (context: TurnContext, state: TState, entities: TEntities, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
         (Array.isArray(name) ? name : [name]).forEach(n => {
-            if (!this._actions.has(n) || allowOverrides) {
-                this._actions.set(n, { handler, allowOverrides });
+            if (!this.actions.has(n) || allowOverrides) {
+                this.actions.set(n, { handler, allowOverrides });
             } else {
-                const entry = this._actions.get(n);
+                const entry = this.actions.get(n);
                 if (entry!.allowOverrides) {
                     entry!.handler = handler;
                 } else {
@@ -151,36 +146,36 @@ export class AI<
     public async chain(
         context: TurnContext,
         state: TState,
-        options?: TPredictionOptions,
-        data?: Record<string, any>
+        options?: TPlanOptions,
+        message?: string
     ): Promise<boolean> {
-        // Call prediction engine
-        const commands = await this._predictionEngine.predictCommands(context, state, data, options);
-        let continueChain = await this._actions
+        // Call planner
+        const plan = await this._planner.generatePlan(context, state, options, message);
+        let continueChain = await this.actions
             .get(AI.PlanReadyActionName)!
-            .handler(context, state, { commands }, '');
+            .handler(context, state, plan, '');
         if (continueChain) {
             // Run predicted commands
-            for (let i = 0; i < commands.length && continueChain; i++) {
-                const cmd = commands[i];
+            for (let i = 0; i < plan.commands.length && continueChain; i++) {
+                const cmd = plan.commands[i];
                 switch (cmd.type) {
                     case 'DO':
                         const { action } = cmd as PredictedDoCommand;
-                        if (this._actions.has(action)) {
+                        if (this.actions.has(action)) {
                             // Call action handler
-                            const handler = this._actions.get(action)!.handler;
-                            continueChain = await this._actions
+                            const handler = this.actions.get(action)!.handler;
+                            continueChain = await this.actions
                                 .get(AI.DoCommandActionName)!
                                 .handler(context, state, { handler, ...cmd as PredictedDoCommand }, action);
                         } else {
                             // Redirect to UnknownAction handler
-                            continueChain = await this._actions
+                            continueChain = await this.actions
                                 .get(AI.UnknownActionName)!
-                                .handler(context, state, data, action);
+                                .handler(context, state, plan, action);
                         }
                         break;
                     case 'SAY':
-                        continueChain = await this._actions
+                        continueChain = await this.actions
                             .get(AI.SayCommandActionName)!
                             .handler(context, state, cmd, AI.SayCommandActionName);
                         break;
@@ -194,11 +189,11 @@ export class AI<
     }
 
     public doAction<TData = Record<string,any>>(context: TurnContext, state: TState, action: string, data?: TData): Promise<boolean> {
-        if (!this._actions.has(action)) {
+        if (!this.actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }
 
-        const handler = this._actions.get(action)!.handler;
+        const handler = this.actions.get(action)!.handler;
         return handler(context, state, data, action);
     }
 }

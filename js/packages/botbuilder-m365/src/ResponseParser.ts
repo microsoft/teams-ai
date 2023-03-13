@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './PredictionEngine';
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './Planner';
 
 const BREAKING_CHARACTERS = '`~!@#$%^&*()_+-={}|[]\\:";\'<>?,./ \r\n\t';
 const NAME_BREAKING_CHARACTERS = '`~!@#$%^&*()+={}|[]\\:";\'<>?,./ \r\n\t';
@@ -44,9 +44,21 @@ export class ResponseParser {
         return obj;
     }
 
-    public static parseResponse(text?: string): PredictedCommand[] {
+    public static parseResponse(text?: string): Plan {
+        // See if the response contains a plan object?
+        let plan: Plan = this.parseJSON(text);
+        if (plan && plan.type?.toLowerCase() === 'plan') {
+            plan.type = 'plan';
+            if (!Array.isArray(plan.commands)) {
+                plan.commands = [];
+            }
+
+            return plan;
+        }
+
+        // Parse response using DO/SAY syntax
         let responses = '';
-        const commands: PredictedCommand[] = [];
+        plan = { type: 'plan', commands: [] };
         let tokens = this.tokenizeText(text);
         if (tokens.length > 0) {
             // Insert default command if response doesn't start with a command
@@ -77,10 +89,10 @@ export class ResponseParser {
                             const response = (result.command as PredictedSayCommand).response.trim().toLowerCase();
                             if (responses.indexOf(response) < 0) {
                                 responses += ' ' + response;
-                                commands.push(result.command);
+                                plan.commands.push(result.command);
                             }
                         } else {
-                            commands.push(result.command);
+                            plan.commands.push(result.command);
                         }
                     }
 
@@ -93,7 +105,7 @@ export class ResponseParser {
             }
         }
 
-        return commands;
+        return plan;
     }
 
     public static parseDoCommand(tokens: string[]): ParsedCommandResult {
@@ -142,7 +154,7 @@ export class ResponseParser {
                             command = {
                                 type: 'DO',
                                 action: actionName,
-                                data: {}
+                                entities: {}
                             };
                             parseState = DoCommandParseState.findEntityName;
                         } else {
@@ -189,7 +201,7 @@ export class ResponseParser {
                         // Accumulate tokens until end of string is hit
                         if (token == quoteType) {
                             // Save pair and look for additional pairs
-                            command!.data[entityName] = entityValue;
+                            command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -200,7 +212,7 @@ export class ResponseParser {
                         if (token == "`" && tokens[length + 1] == "`" && tokens[length + 2] == "`") {
                             // Save pair and look for additional pairs
                             length += 2;
-                            command!.data[entityName] = entityValue;
+                            command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -211,7 +223,7 @@ export class ResponseParser {
                         // Accumulate tokens until you hit a space
                         if (SPACE_CHARACTERS.indexOf(token) >= 0) {
                             // Save pair and look for additional pairs
-                            command!.data[entityName] = entityValue;
+                            command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -227,13 +239,13 @@ export class ResponseParser {
                 command = {
                     type: 'DO',
                     action: actionName,
-                    data: {}
+                    entities: {}
                 };
             }
 
             // Append final entity
             if (command && entityName) {
-                command.data[entityName] = entityValue;
+                command.entities[entityName] = entityValue;
             }
         }
 
