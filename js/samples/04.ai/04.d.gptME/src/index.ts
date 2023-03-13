@@ -192,6 +192,8 @@ async function callPrompt(
     prompt: string,
     data?: Record<string, any>
 ): Promise<string> {
+    state.temp.value['post'] = data.post;
+    state.temp.value['prompt'] = data.prompt;
     const response = await predictionEngine.prompt(
         context,
         state,
@@ -205,13 +207,12 @@ async function callPrompt(
                 frequency_penalty: 0,
                 presence_penalty: 0
             }
-        },
-        data
+        }
     );
 
-    if (response.status != 429) {
-        return response.data?.choices[0]?.text ?? '';
-    } else {
+    if (!response) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
     }
+
+    return response;
 }
