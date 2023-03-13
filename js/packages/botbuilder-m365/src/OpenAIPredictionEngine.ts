@@ -256,7 +256,7 @@ export class OpenAIPredictionEngine<TState extends TurnState = DefaultTurnState>
                         );
                     }
                 } else {
-                    const text = commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join(' ');
+                    const text = commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join('\n');
                     ConversationHistory.addLine(
                         state,
                         `${historyOptions.botPrefix ?? ''}${text}`,

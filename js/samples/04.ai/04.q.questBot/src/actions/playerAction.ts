@@ -80,12 +80,12 @@ async function updatePlayer(predictionEngine: OpenAIPredictionEngine, context: T
     state.user.value.equipped = player.equipped;
     
     // Build message
-    let message = `🤴 <b>${player.name}</b>`;
+    let message = `🤴 <strong>${player.name}</strong>`;
     if (backstoryChange.length > 0) {
-        message += `<br><b>Backstory:</b> ${player.backstory.split('\n').join('<br>')}`;
+        message += `<br><strong>Backstory:</strong> ${player.backstory.split('\n').join('<br>')}`;
     }
     if (equippedChange.length > 0) {
-        message += `<br><b>Equipped:</b> ${player.equipped.split('\n').join('<br>')}`;
+        message += `<br><strong>Equipped:</strong> ${player.equipped.split('\n').join('<br>')}`;
     }
 
     await context.sendActivity(message);

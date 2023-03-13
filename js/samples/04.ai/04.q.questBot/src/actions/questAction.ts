@@ -57,7 +57,7 @@ async function updateQuest(predictionEngine: OpenAIPredictionEngine, context: Tu
 async function removeQuest(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
 
-    // Find quest and delete ite
+    // Find quest and delete it
     const quests = conversation.quests ?? {};
     const title =  (data.title ?? '').trim().toLowerCase();
     if (quests.hasOwnProperty(title)) {
@@ -117,6 +117,6 @@ async function listQuest(context: TurnContext, state: ApplicationTurnState): Pro
 }
 
 function printQuest(quest: IQuest): string {
-    return `✨ <b>${quest.title}</b><br>${quest.description.split('\n').join('<br>')}`;
+    return `✨ <strong>${quest.title}</strong><br>${quest.description.split('\n').join('<br>')}`;
 }
 
