@@ -16,7 +16,7 @@
         "plugin:jsdoc/recommended",
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
-        // Currently samples contains no frontend
+        // Currently samples contain no frontend
         // "plugin:react/recommended",
         // "plugin:react/jsx-runtime"
     ],
@@ -45,7 +45,7 @@
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
         "prettier/prettier": "error"
-        // Currently samples contains no frontend
+        // Currently samples contain no frontend
         // "react/react-in-jsx-scope": "off",
         // "react/prop-types": "off"
     },
