@@ -4,6 +4,7 @@
 import { CardAction, CardFactory, MessagingExtensionAttachment } from 'botbuilder';
 
 export function createNpmSearchResultCard(result: any): MessagingExtensionAttachment {
+    // TODO: Use "Adaptive Card Hero Card" since Hero card is considered deprecated
     const card = CardFactory.heroCard(result.name, [], [], {
         text: result.description
     }) as MessagingExtensionAttachment;
