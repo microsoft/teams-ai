@@ -19,10 +19,11 @@ Simple scaffolding for any conversational app component, inlcuding:
 
 Relevant samples:
 
-- [Type Ahead Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/adaptiveCards/typeAheadBot)
-- [Echo Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messaging/echoBot)
-- [Search Command](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messageExtensions/searchCommand)
-- [GPT ME](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/gptME)
+- [Type Ahead Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/03.adaptiveCards/03.a.typeAheadBot)
+- [Echo Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/01.messaging/01.a.echoBot)
+- [Search Command](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/02.messageExtensions/02.a.searchCommand)
+- [GPT ME](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.d.gptME)
+
 
 ### Natural Language Modelling
 
@@ -30,7 +31,7 @@ The SDK is built to leverage OpenAI Large Language Models so you don't have to c
 
 Relevant samples:
 
-- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.a.hal9000)
 
 ### Prompt Engineering
 
@@ -38,9 +39,9 @@ With a simple text file written in human language, you can describe the function
 
 Relevant samples:
 
-- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
-- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.a.hal9000)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.b.lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.c.listBot)
 
 ### Topic Filtering
 
@@ -48,8 +49,8 @@ A simple text file can also be used to steer OpenAI in the right direction and k
 
 Relevant samples:
 
-- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.b.lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.c.listBot)
 
 ### Predictive Engine to Map Intents to Actions
 
@@ -57,8 +58,8 @@ Leveraging provided prompts and topic filters, it's simple to create a predictiv
 
 Relevant samples:
 
-- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.b.lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.c.listBot)
 
 ### Conversational Session History
 
@@ -66,7 +67,7 @@ The state of your user's session is not lost, allowing conversations to flow fre
 
 Relevant samples:
 
-- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.a.hal9000)
 
 ### Localization
 
@@ -74,7 +75,7 @@ Because OpenAI's models are trained on the open internet, they're tuned to any l
 
 Relevant samples:
 
-- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.a.hal9000)
 
 ### LLM modularity
 
@@ -82,9 +83,9 @@ While the SDK handles OpenAI's GPT models out of the box, you can choose to swap
 
 Relevant samples:
 
-- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
-- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
-- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+- [Hal9000](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.a.hal9000)
+- [Lights On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.b.lightBot)
+- [List Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/04.ai/04.c.listBot)
 
 ## Getting Started
 
