@@ -91,8 +91,7 @@ interface ConversationState {
     lists: Record<string, string[]>;
 }
 
-interface UserState {
-}
+interface UserState {}
 
 interface TempState {
     lists: Record<string, string[]>;
@@ -168,21 +167,17 @@ app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
     if (lists) {
         // Chain into a new summarization prompt
         state.temp.value.lists = lists;
-        await app.ai.chain(
-            context,
-            state,
-            {
-                prompt: path.join(__dirname, '../src/summarizeAllLists.txt'),
-                promptConfig: {
-                    model: 'text-davinci-003',
-                    temperature: 0.0,
-                    max_tokens: 2048,
-                    top_p: 1,
-                    frequency_penalty: 0,
-                    presence_penalty: 0
-                }
+        await app.ai.chain(context, state, {
+            prompt: path.join(__dirname, '../src/summarizeAllLists.txt'),
+            promptConfig: {
+                model: 'text-davinci-003',
+                temperature: 0.0,
+                max_tokens: 2048,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0
             }
-        );
+        });
     } else {
         await context.sendActivity(responses.noListsFound());
     }
@@ -212,16 +207,29 @@ server.post('/api/messages', async (req, res) => {
     });
 });
 
+/**
+ * @param state
+ * @param list
+ */
 function getItems(state: ApplicationTurnState, list: string): string[] {
     ensureListExists(state, list);
     return state.conversation.value.lists[list];
 }
 
+/**
+ * @param state
+ * @param list
+ * @param items
+ */
 function setItems(state: ApplicationTurnState, list: string, items: string[]): void {
     ensureListExists(state, list);
     state.conversation.value.lists[list] = items ?? [];
 }
 
+/**
+ * @param state
+ * @param listName
+ */
 function ensureListExists(state: ApplicationTurnState, listName: string): void {
     if (typeof state.conversation.value.lists != 'object') {
         state.conversation.value.lists = {};
