@@ -124,14 +124,13 @@ app.activity(ActivityTypes.Message, async (context, state) => {
                 await context.sendActivity(`[${guessCount}] ${response}`);
             }
         }
-     } else {
+    } else {
         // Start new game
         secretWord = responses.pickSecretWord();
         guessCount = 0;
         remainingGuesses = 20;
         await context.sendActivity(responses.startGame());
     }
-
 
     // Save game state
     state.conversation.value.secretWord = secretWord;
@@ -148,23 +147,22 @@ server.post('/api/messages', async (req, res) => {
     });
 });
 
-
+/**
+ * @param context
+ * @param state
+ */
 async function getHint(context: TurnContext, state: ApplicationTurnState): Promise<string> {
-    const response = await planner.prompt(
-        context,
-        state,
-        {
-            prompt: path.join(__dirname, '../src/prompt.txt'),
-            promptConfig: {
-                model: 'text-davinci-003',
-                temperature: 0.4,
-                max_tokens: 128,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0
-            }
+    const response = await planner.prompt(context, state, {
+        prompt: path.join(__dirname, '../src/prompt.txt'),
+        promptConfig: {
+            model: 'text-davinci-003',
+            temperature: 0.4,
+            max_tokens: 128,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0
         }
-    );
+    });
 
     if (!response) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);

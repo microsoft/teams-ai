@@ -71,7 +71,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import { Application, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
-// This Message Extension can either drop the created card into the compose window (default.) 
+// This Message Extension can either drop the created card into the compose window (default.)
 // Or use Teams botMessagePreview feature to post the activity directly to the feed onBehalf of the user.
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
@@ -166,6 +166,9 @@ server.post('/api/messages', async (req, res) => {
     });
 });
 
+/**
+ * @param card
+ */
 function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
     return {
         title: `Create Post`,
@@ -175,6 +178,12 @@ function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
     };
 }
 
+/**
+ * @param context
+ * @param state
+ * @param prompt
+ * @param data
+ */
 async function updatePost(
     context: TurnContext,
     state: DefaultTurnState,
@@ -186,6 +195,12 @@ async function updatePost(
     return createTaskInfo(card);
 }
 
+/**
+ * @param context
+ * @param state
+ * @param prompt
+ * @param data
+ */
 async function callPrompt(
     context: TurnContext,
     state: DefaultTurnState,
@@ -194,21 +209,17 @@ async function callPrompt(
 ): Promise<string> {
     state.temp.value['post'] = data.post;
     state.temp.value['prompt'] = data.prompt;
-    const response = await planner.prompt(
-        context,
-        state,
-        {
-            prompt: path.join(__dirname, prompt),
-            promptConfig: {
-                model: 'text-davinci-003',
-                temperature: 0.7,
-                max_tokens: 512,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0
-            }
+    const response = await planner.prompt(context, state, {
+        prompt: path.join(__dirname, prompt),
+        promptConfig: {
+            model: 'text-davinci-003',
+            temperature: 0.7,
+            max_tokens: 512,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0
         }
-    );
+    });
 
     if (!response) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);

@@ -1,6 +1,9 @@
-import { OpenAIPromptOptions } from "botbuilder-m365";
+import { OpenAIPromptOptions } from 'botbuilder-m365';
 import * as path from 'path';
 
+/**
+ * @param name
+ */
 export function getPromptPath(name: string): string {
     return path.join(__dirname, '../../src/prompts/', name);
 }
@@ -65,7 +68,6 @@ export const listItems: OpenAIPromptOptions = {
     }
 };
 
-
 export const newObjective: OpenAIPromptOptions = {
     prompt: getPromptPath('newObjective.txt'),
     promptConfig: {
@@ -122,6 +124,6 @@ export const useMap: OpenAIPromptOptions = {
         max_tokens: 1000,
         top_p: 1,
         frequency_penalty: 0,
-        presence_penalty: 0.6    
+        presence_penalty: 0.6
     }
 };

@@ -1,10 +1,14 @@
-import { CardFactory, MessageFactory, TurnContext } from "botbuilder";
-import { Application, OpenAIPlanner, ResponseParser } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
-import { normalizeItemName, searchItemList, textToItemList } from "../items";
-import * as responses from "../responses";
-import * as prompts from "../prompts"
+import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
+import { Application, OpenAIPlanner, ResponseParser } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
+import { normalizeItemName, searchItemList, textToItemList } from '../items';
+import * as responses from '../responses';
+import * as prompts from '../prompts';
 
+/**
+ * @param app
+ * @param planner
+ */
 export function inventoryAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('inventory', async (context, state, data: IDataEntities) => {
         const operation = (data.operation ?? '').toLowerCase();
@@ -20,11 +24,16 @@ export function inventoryAction(app: Application<ApplicationTurnState>, planner:
     });
 }
 
+/**
+ * @param context
+ * @param state
+ * @param data
+ */
 async function updateList(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
-    let items = Object.assign({}, state.user.value.inventory);
+    const items = Object.assign({}, state.user.value.inventory);
     try {
         // Remove items first
-        let changes: string[] = [];
+        const changes: string[] = [];
         const remove = textToItemList(data.items);
         for (const item in remove) {
             // Normalize the items name and count
@@ -75,6 +84,11 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
     return true;
 }
 
+/**
+ * @param planner
+ * @param context
+ * @param state
+ */
 async function printList(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     const items = state.user.value.inventory;
     if (Object.keys(items).length > 0) {
@@ -88,7 +102,7 @@ async function printList(planner: OpenAIPlanner, context: TurnContext, state: Ap
                 state.temp.value.playerAnswered = true;
                 return true;
             }
-        } 
+        }
 
         await updateDMResponse(context, state, responses.dataError());
     } else {

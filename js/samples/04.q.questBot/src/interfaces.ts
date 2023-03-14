@@ -1,6 +1,5 @@
-
 export interface IAction {
-    title: string,
+    title: string;
     examples: string[];
 }
 

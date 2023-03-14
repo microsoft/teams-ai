@@ -18,21 +18,30 @@ The variations should always include ${item} and ${list} variables.
 7 variations were asked for so that we can remove the 2 we like the least.
 */
 
+/**
+ *
+ */
 export function noQuests(): string {
-    return getRandomResponse([
-        `You don't have any active quests.`,
-        `Your quest log is blank.`,
-        `You are without a quest currently.`,
-        `It appears you aren't on a quest.`,
-        `You're not on a quest.`,
-    ]) + getRandomResponse([
-        ` Ask around to find quests.`,
-        ` Villagers and barkeeps are good sources of quests.`,
-        ` Try asking if anyone has heard any rumors.`,
-        ` You can always just say "create a new quest".`,
-        ``
-    ]);
+    return (
+        getRandomResponse([
+            `You don't have any active quests.`,
+            `Your quest log is blank.`,
+            `You are without a quest currently.`,
+            `It appears you aren't on a quest.`,
+            `You're not on a quest.`
+        ]) +
+        getRandomResponse([
+            ` Ask around to find quests.`,
+            ` Villagers and barkeeps are good sources of quests.`,
+            ` Try asking if anyone has heard any rumors.`,
+            ` You can always just say "create a new quest".`,
+            ``
+        ])
+    );
 }
+/**
+ *
+ */
 export function moveBlocked(): string {
     return getRandomResponse([
         `As you begin heading towards your new destination a mysterious force transports back to your current location.`,
@@ -43,26 +52,35 @@ export function moveBlocked(): string {
     ]);
 }
 
+/**
+ *
+ */
 export function emptyInventory(): string {
     return getRandomResponse([
         `It looks like you don't have any items on you.`,
         `It appears your inventory is devoid of any items.`,
         `Your inventory is completely empty.`,
         `You don't appear to have anything on you.`,
-        `You have nothing in your pockets or in your bag.`,
+        `You have nothing in your pockets or in your bag.`
     ]);
 }
 
+/**
+ *
+ */
 export function emptyDropped(): string {
     return getRandomResponse([
         `You see nothing on the ground.`,
         `A quick scan of the area reveals nothing at your feet.`,
         `The immediate area is empty.`,
         `There's nothing here you can take. `,
-        `You can't see anything that can be picked up.`,
+        `You can't see anything that can be picked up.`
     ]);
 }
 
+/**
+ * @param name
+ */
 export function notDropped(name: string): string {
     return getRandomResponse([
         `There isn't a ${name} nearby.`,
@@ -73,6 +91,9 @@ export function notDropped(name: string): string {
     ]);
 }
 
+/**
+ * @param name
+ */
 export function notInInventory(name: string): string {
     return getRandomResponse([
         `You aren't carrying a ${name}`,
@@ -83,6 +104,9 @@ export function notInInventory(name: string): string {
     ]);
 }
 
+/**
+ * @param name
+ */
 export function notEnoughItems(name: string): string {
     return getRandomResponse([
         `You don't have enough ${name}`,
@@ -93,6 +117,9 @@ export function notEnoughItems(name: string): string {
     ]);
 }
 
+/**
+ * @param gold
+ */
 export function notEnoughGold(gold: number): string {
     if (gold > 0) {
         return getRandomResponse([
@@ -113,36 +140,49 @@ export function notEnoughGold(gold: number): string {
     }
 }
 
+/**
+ * @param direction
+ */
 export function directionNotAvailableExample(direction: string): string {
-    return `Player: go ${direction}\n` + 
+    return (
+        `Player: go ${direction}\n` +
         getRandomResponse([
             `DM: You can't go ${direction}.\n`,
             `DM: There's nothing to the ${direction}.\n`,
             `DM: Travel to the ${direction} isn't possible.\n`
-        ]);
+        ])
+    );
 }
 
+/**
+ *
+ */
 export function notAllowed(): string {
     return getRandomResponse([
-            `You can't do that.`,
-            `That's not going to work here.`,
-            `Sorry... You try but it doesn't work.`,
-            `I can't allow you to do that.`,
-            `You tried but no dice.`
+        `You can't do that.`,
+        `That's not going to work here.`,
+        `Sorry... You try but it doesn't work.`,
+        `I can't allow you to do that.`,
+        `You tried but no dice.`
     ]);
 }
 
-
+/**
+ *
+ */
 export function dataError(): string {
     return getRandomResponse([
-            `Uh oh, it looks like we've got a bit of a hiccup here. Let's try that again.`,
-            `Oopsie! That didn't quite go as planned. Let's give it another go.`,
-            `Oops... There was a glitch in the matrix. Let's try that again.`,
-            `Pardon the interruption! Let's reload and give this another attempt.`,
-            `Wow, that was unexpected! Let's do that one over.`
+        `Uh oh, it looks like we've got a bit of a hiccup here. Let's try that again.`,
+        `Oopsie! That didn't quite go as planned. Let's give it another go.`,
+        `Oops... There was a glitch in the matrix. Let's try that again.`,
+        `Pardon the interruption! Let's reload and give this another attempt.`,
+        `Wow, that was unexpected! Let's do that one over.`
     ]);
 }
 
+/**
+ * @param action
+ */
 export function unknownAction(action: string): string {
     return getRandomResponse([
         `I'm sorry, I'm not sure how to ${action}.`,
@@ -153,6 +193,9 @@ export function unknownAction(action: string): string {
     ]);
 }
 
+/**
+ * @param responses
+ */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));
     return responses[i];

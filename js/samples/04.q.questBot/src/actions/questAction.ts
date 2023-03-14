@@ -1,8 +1,12 @@
-import { TurnContext } from "botbuilder";
-import { Application, OpenAIPlanner } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, IQuest, updateDMResponse } from "../bot";
+import { TurnContext } from 'botbuilder';
+import { Application, OpenAIPlanner } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities, IQuest, updateDMResponse } from '../bot';
 import * as prompts from '../prompts';
 
+/**
+ * @param app
+ * @param planner
+ */
 export function questAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('quest', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
@@ -23,43 +27,59 @@ export function questAction(app: Application<ApplicationTurnState>, planner: Ope
     });
 }
 
-async function updateQuest(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
-        const conversation = state.conversation.value;
-        const quests = conversation.quests ?? {};
+/**
+ * @param planner
+ * @param context
+ * @param state
+ * @param data
+ */
+async function updateQuest(
+    planner: OpenAIPlanner,
+    context: TurnContext,
+    state: ApplicationTurnState,
+    data: IDataEntities
+): Promise<boolean> {
+    const conversation = state.conversation.value;
+    const quests = conversation.quests ?? {};
 
-        // Create new quest
-        const title =  (data.title ?? '').trim();
-        const quest: IQuest = {
-            title: title,
-            description: (data.description ?? '').trim()
-        }
+    // Create new quest
+    const title = (data.title ?? '').trim();
+    const quest: IQuest = {
+        title: title,
+        description: (data.description ?? '').trim()
+    };
 
-        // Expand quest details
-        state.temp.value.quests = `"${quest.title}" - ${quest.description}`;
-        const details = await planner.prompt(context, state, prompts.questDetails);
-        if (details) {
-            quest.description = details.trim();
-        }
+    // Expand quest details
+    state.temp.value.quests = `"${quest.title}" - ${quest.description}`;
+    const details = await planner.prompt(context, state, prompts.questDetails);
+    if (details) {
+        quest.description = details.trim();
+    }
 
-        // Add quest to collection of active quests
-        quests[quest.title.toLowerCase()] = quest;
+    // Add quest to collection of active quests
+    quests[quest.title.toLowerCase()] = quest;
 
-        // Save updated location to conversation
-        conversation.quests = quests;
+    // Save updated location to conversation
+    conversation.quests = quests;
 
-        // Tell use they have a new/updated quest
-        await context.sendActivity(printQuest(quest));
-        state.temp.value.playerAnswered = true;
-        
-        return true;
+    // Tell use they have a new/updated quest
+    await context.sendActivity(printQuest(quest));
+    state.temp.value.playerAnswered = true;
+
+    return true;
 }
 
+/**
+ * @param context
+ * @param state
+ * @param data
+ */
 async function removeQuest(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
 
     // Find quest and delete it
     const quests = conversation.quests ?? {};
-    const title =  (data.title ?? '').trim().toLowerCase();
+    const title = (data.title ?? '').trim().toLowerCase();
     if (quests.hasOwnProperty(title)) {
         delete quests[title];
         conversation.quests = quests;
@@ -68,12 +88,23 @@ async function removeQuest(context: TurnContext, state: ApplicationTurnState, da
     return true;
 }
 
-async function finishQuest(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+/**
+ * @param planner
+ * @param context
+ * @param state
+ * @param data
+ */
+async function finishQuest(
+    planner: OpenAIPlanner,
+    context: TurnContext,
+    state: ApplicationTurnState,
+    data: IDataEntities
+): Promise<boolean> {
     const conversation = state.conversation.value;
 
     // Find quest and delete item
     const quests = conversation.quests ?? {};
-    const title =  (data.title ?? '').trim().toLowerCase();
+    const title = (data.title ?? '').trim().toLowerCase();
     if (quests.hasOwnProperty(title)) {
         const quest = quests[title];
         delete quests[title];
@@ -95,6 +126,10 @@ async function finishQuest(planner: OpenAIPlanner, context: TurnContext, state: 
     return true;
 }
 
+/**
+ * @param context
+ * @param state
+ */
 async function listQuest(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     const conversation = state.conversation.value;
     const quests = conversation.quests ?? {};
@@ -116,7 +151,9 @@ async function listQuest(context: TurnContext, state: ApplicationTurnState): Pro
     return true;
 }
 
+/**
+ * @param quest
+ */
 function printQuest(quest: IQuest): string {
     return `✨ <strong>${quest.title}</strong><br>${quest.description.split('\n').join('<br>')}`;
 }
-

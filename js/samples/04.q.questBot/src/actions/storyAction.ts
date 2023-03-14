@@ -1,7 +1,11 @@
-import { TurnContext } from "botbuilder";
-import { Application, ConversationHistory, OpenAIPlanner } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, updateDMResponse } from "../bot";
+import { TurnContext } from 'botbuilder';
+import { Application, ConversationHistory, OpenAIPlanner } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
 
+/**
+ * @param app
+ * @param planner
+ */
 export function storyAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('story', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
@@ -16,6 +20,11 @@ export function storyAction(app: Application<ApplicationTurnState>, planner: Ope
     });
 }
 
+/**
+ * @param context
+ * @param state
+ * @param data
+ */
 async function updateStory(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const description = (data.description ?? '').trim();
     if (description.length > 0) {

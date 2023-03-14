@@ -9,7 +9,13 @@ import { map } from './ShadowFalls';
 import * as prompts from './prompts';
 import { addActions } from './actions';
 import { LastWriterWinsStore } from './LastWriterWinsStore';
-import { describeConditions, describeSeason, describeTimeOfDay, generateTemperature, generateWeather } from './conditions';
+import {
+    describeConditions,
+    describeSeason,
+    describeTimeOfDay,
+    generateTemperature,
+    generateWeather
+} from './conditions';
 
 // Create prediction engine
 const planner = new OpenAIPlanner({
@@ -120,7 +126,7 @@ const app = new Application<ApplicationTurnState>({
 // Export bots run() function
 export const run = (context) => app.run(context);
 
-export const DEFAULT_BACKSTORY =  `Lives in Shadow Falls.`;
+export const DEFAULT_BACKSTORY = `Lives in Shadow Falls.`;
 export const DEFAULT_EQUIPPED = `Wearing clothes.`;
 export const CONVERSATION_STATE_VERSION = 1;
 
@@ -135,7 +141,7 @@ app.turn('beforeTurn', async (context, state) => {
             state.conversation.delete();
             conversation = state.conversation.value;
             conversation.version = CONVERSATION_STATE_VERSION;
-        } 
+        }
 
         // Initialize player state
         if (!player.name) {
@@ -163,7 +169,7 @@ app.turn('beforeTurn', async (context, state) => {
                 conversation.players.push(player.name);
             }
         } else {
-            conversation.players = [player.name]
+            conversation.players = [player.name];
         }
 
         // Update message text to include players name
@@ -251,7 +257,6 @@ app.turn('beforeTurn', async (context, state) => {
             }
         }
 
-
         // Is user asking for help
         let objectiveAdded = false;
         if (useHelpPrompt && !campaignFinished) {
@@ -265,7 +270,12 @@ app.turn('beforeTurn', async (context, state) => {
 
             // Notify user of new quest
             objectiveAdded = true;
-            await context.sendActivity(`✨ <strong>${nextObjective.title}</strong><br>${nextObjective.description.trim().split('\n').join('<br>')}`);
+            await context.sendActivity(
+                `✨ <strong>${nextObjective.title}</strong><br>${nextObjective.description
+                    .trim()
+                    .split('\n')
+                    .join('<br>')}`
+            );
             app.startTypingTimer(context);
         }
 
@@ -285,10 +295,16 @@ app.turn('beforeTurn', async (context, state) => {
             conversation.weather = generateWeather(temp.season);
         }
 
-        temp.conditions = describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
+        temp.conditions = describeConditions(
+            conversation.time,
+            conversation.day,
+            conversation.temperature,
+            conversation.weather
+        );
 
         if (campaignFinished) {
-            temp.promptInstructions = 'The players have completed the campaign. Congratulate them and tell them they can continue adventuring or use "/reset" to start over with a new campaign.';
+            temp.promptInstructions =
+                'The players have completed the campaign. Congratulate them and tell them they can continue adventuring or use "/reset" to start over with a new campaign.';
             conversation.campaign = undefined;
         } else if (objectiveAdded) {
             temp.prompt = 'newObjective.txt';
@@ -353,10 +369,11 @@ app.message('/story', async (context, state) => {
 app.message('/profile', async (context, state) => {
     const player = state.user.value;
     const backstory = player.backstory.split('\n').join('<br>');
-    const equipped = player.equipped.split('\n').join('<br>')
-    await context.sendActivity(`🤴 <strong>${player.name}</strong><br><strong>Backstory:</strong> ${backstory}<br><strong>Equipped:</strong> ${equipped}`);
+    const equipped = player.equipped.split('\n').join('<br>');
+    await context.sendActivity(
+        `🤴 <strong>${player.name}</strong><br><strong>Backstory:</strong> ${backstory}<br><strong>Equipped:</strong> ${equipped}`
+    );
 });
-
 
 app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
     await context.sendActivity(`<strong>${action}</strong> action missing`);
@@ -365,15 +382,25 @@ app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
 
 addActions(app, planner);
 
+/**
+ * @param context
+ * @param state
+ */
 async function selectMainPrompt(context: TurnContext, state: ApplicationTurnState): Promise<string> {
     const prompt = state.temp.value.prompt;
-    return await planner.expandPromptTemplate(context, state, prompts.getPromptPath(prompt)); 
+    return await planner.expandPromptTemplate(context, state, prompts.getPromptPath(prompt));
 }
 
+/**
+ * @param conversation
+ */
 export function describeGameState(conversation: ConversationState): string {
-    return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`
+    return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`;
 }
 
+/**
+ * @param campaign
+ */
 export function describeCampaign(campaign?: ICampaign): string {
     if (campaign) {
         return `"${campaign.title}" - ${campaign.playerIntro}`;
@@ -382,25 +409,35 @@ export function describeCampaign(campaign?: ICampaign): string {
     }
 }
 
+/**
+ * @param conversation
+ */
 export function describeQuests(conversation: ConversationState): string {
     let text = '';
     let connector = '';
     for (const key in conversation.quests) {
         const quest = conversation.quests[key];
         text += `${connector}"${quest.title}" - ${quest.description}`;
-        connector = '\n\n'
+        connector = '\n\n';
     }
 
     return text.length > 0 ? text : 'none';
 }
 
+/**
+ * @param player
+ */
 export function describePlayerInfo(player: UserState): string {
     let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
 }
 
-export function describeItemList(items: IItemList, indent: string = '\t'): string {
+/**
+ * @param items
+ * @param indent
+ */
+export function describeItemList(items: IItemList, indent = '\t'): string {
     let text = '';
     let delim = '';
     for (const key in items) {
@@ -411,6 +448,9 @@ export function describeItemList(items: IItemList, indent: string = '\t'): strin
     return text;
 }
 
+/**
+ * @param state
+ */
 export function describePlayerDMConversation(state: ApplicationTurnState): string {
     let text = '';
     let connector = '';
@@ -437,17 +477,30 @@ export function describePlayerDMConversation(state: ApplicationTurnState): strin
     return text;
 }
 
-export async function updateDMResponse(context: TurnContext, state: ApplicationTurnState, newResponse: string): Promise<void> {
+/**
+ * @param context
+ * @param state
+ * @param newResponse
+ */
+export async function updateDMResponse(
+    context: TurnContext,
+    state: ApplicationTurnState,
+    newResponse: string
+): Promise<void> {
     if (ConversationHistory.getLastLine(state).startsWith('DM:')) {
-        ConversationHistory.replaceLastLine(state,`DM: ${newResponse}`);
+        ConversationHistory.replaceLastLine(state, `DM: ${newResponse}`);
     } else {
         ConversationHistory.addLine(state, `DM: ${newResponse}`);
     }
-    
+
     await context.sendActivity(newResponse);
 }
 
-export function parseNumber(text: string|undefined, minValue?: number): number {
+/**
+ * @param text
+ * @param minValue
+ */
+export function parseNumber(text: string | undefined, minValue?: number): number {
     try {
         const count = parseInt(text ?? `${minValue ?? 0}`);
         if (typeof minValue == 'number') {
@@ -460,16 +513,23 @@ export function parseNumber(text: string|undefined, minValue?: number): number {
     }
 }
 
+/**
+ * @param response
+ */
 export function trimPromptResponse(response: string): string {
     // Remove common junk that gets returned by the model.
     return response.replace('DM: ', '').replace('```', '');
 }
 
+/**
+ * @param text
+ */
 export function titleCase(text: string): string {
-    return text.toLowerCase().split(' ').map(function(word) {
-      return (word.charAt(0).toUpperCase() + word.slice(1));
-    }).join(' ');
+    return text
+        .toLowerCase()
+        .split(' ')
+        .map(function (word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(' ');
 }
-
-
-  
