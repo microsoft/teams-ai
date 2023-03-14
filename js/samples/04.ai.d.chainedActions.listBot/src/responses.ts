@@ -18,26 +18,36 @@ The variations should always include ${item} and ${list} variables.
 7 variations were asked for so that we can remove the 2 we like the least.
 */
 
+/**
+ *
+ */
 export function greeting(): string {
     return getRandomResponse([
-        "Welcome to List Bot! Type /reset to delete all existing lists.",
+        'Welcome to List Bot! Type /reset to delete all existing lists.',
         "Hello! I'm List Bot. Use /reset to delete all your lists.",
         "Hi there! I'm here to help you manage your lists. Use /reset to delete all lists.",
         "Greetings! I'm List Bot. Type /reset to delete all your list.",
-        "Hey there! List Bot here. You can use /reset to delete all lists."
-      ]);
+        'Hey there! List Bot here. You can use /reset to delete all lists.'
+    ]);
 }
 
+/**
+ *
+ */
 export function reset(): string {
-    return getRandomResponse( [
-        "Resetting all lists. All lists have been deleted.",
-        "Starting fresh. All lists have been reset.",
-        "All lists have been cleared. Ready for new lists!",
-        "Cleaning slate. All lists have been reset.",
-        "All lists have been wiped. Ready for new lists!"
-      ]);
+    return getRandomResponse([
+        'Resetting all lists. All lists have been deleted.',
+        'Starting fresh. All lists have been reset.',
+        'All lists have been cleared. Ready for new lists!',
+        'Cleaning slate. All lists have been reset.',
+        'All lists have been wiped. Ready for new lists!'
+    ]);
 }
 
+/**
+ * @param list
+ * @param item
+ */
 export function itemNotFound(list: string, item: string): string {
     return getRandomResponse([
         `I'm sorry, I couldn't locate a ${item} on your ${list} list.`,
@@ -48,6 +58,10 @@ export function itemNotFound(list: string, item: string): string {
     ]);
 }
 
+/**
+ * @param list
+ * @param item
+ */
 export function itemFound(list: string, item: string): string {
     return getRandomResponse([
         `I found ${item} in your ${list} list.`,
@@ -58,6 +72,9 @@ export function itemFound(list: string, item: string): string {
     ]);
 }
 
+/**
+ *
+ */
 export function noListsFound(): string {
     return getRandomResponse([
         `You don't have any lists yet.`,
@@ -68,6 +85,9 @@ export function noListsFound(): string {
     ]);
 }
 
+/**
+ * @param action
+ */
 export function unknownAction(action: string): string {
     return getRandomResponse([
         `I'm sorry, I'm not sure how to ${action}.`,
@@ -78,6 +98,9 @@ export function unknownAction(action: string): string {
     ]);
 }
 
+/**
+ *
+ */
 export function offTopic(): string {
     return getRandomResponse([
         `I'm sorry, I'm not sure I can help you with that.`,
@@ -88,6 +111,9 @@ export function offTopic(): string {
     ]);
 }
 
+/**
+ * @param responses
+ */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));
     return responses[i];
