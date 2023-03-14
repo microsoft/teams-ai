@@ -3,6 +3,10 @@
 
 import { Attachment, CardFactory } from 'botbuilder';
 
+/**
+ * @param post
+ * @param previewMode
+ */
 export function createEditView(post: string, previewMode: boolean): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',

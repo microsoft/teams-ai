@@ -3,6 +3,9 @@
 
 import { Attachment, CardFactory } from 'botbuilder';
 
+/**
+ *
+ */
 export function createInitialView(): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',

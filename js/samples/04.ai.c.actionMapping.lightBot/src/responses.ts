@@ -18,6 +18,9 @@ The variations should always include ${item} and ${list} variables.
 7 variations were asked for so that we can remove the 2 we like the least.
 */
 
+/**
+ * @param status
+ */
 export function lightStatus(status: boolean): string {
     const currently = status ? 'on' : 'off';
     const opposite = status ? 'off' : 'on';
@@ -39,6 +42,9 @@ export function lightStatus(status: boolean): string {
     );
 }
 
+/**
+ * @param action
+ */
 export function unknownAction(action: string): string {
     return getRandomResponse([
         `I'm sorry, I'm not sure how to ${action}.`,
@@ -49,6 +55,9 @@ export function unknownAction(action: string): string {
     ]);
 }
 
+/**
+ *
+ */
 export function offTopic(): string {
     return getRandomResponse([
         `I'm sorry, I'm not sure I can help you with that.`,
@@ -59,6 +68,9 @@ export function offTopic(): string {
     ]);
 }
 
+/**
+ * @param responses
+ */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));
     return responses[i];

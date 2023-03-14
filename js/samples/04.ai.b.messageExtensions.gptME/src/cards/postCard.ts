@@ -3,6 +3,9 @@
 
 import { Attachment, CardFactory } from 'botbuilder';
 
+/**
+ * @param post
+ */
 export function createPostCard(post: string): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',

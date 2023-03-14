@@ -1,8 +1,18 @@
-import { TurnContext } from "botbuilder";
-import { Application, OpenAIPlanner } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from "../bot";
-import { describeConditions, describeSeason, describeTimeOfDay, generateTemperature, generateWeather } from "../conditions";
+import { TurnContext } from 'botbuilder';
+import { Application, OpenAIPlanner } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from '../bot';
+import {
+    describeConditions,
+    describeSeason,
+    describeTimeOfDay,
+    generateTemperature,
+    generateWeather
+} from '../conditions';
 
+/**
+ * @param app
+ * @param planner
+ */
 export function timeAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('time', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
@@ -18,6 +28,11 @@ export function timeAction(app: Application<ApplicationTurnState>, planner: Open
     });
 }
 
+/**
+ * @param context
+ * @param state
+ * @param data
+ */
 async function waitForTime(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const until = (data.until ?? '').toLowerCase();
     const days = parseNumber(data.days, 0);
@@ -29,7 +44,7 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
             case 'dawn':
                 conversation.time = 4;
                 if (days < 2) {
-                    notification = `⏳ crack of dawn`
+                    notification = `⏳ crack of dawn`;
                 }
                 break;
             case 'morning':
@@ -81,13 +96,18 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
 
         // Generate new weather
         if (days > 0) {
-            conversation.temperature = generateTemperature(state.temp.value.season)
+            conversation.temperature = generateTemperature(state.temp.value.season);
             conversation.weather = generateWeather(state.temp.value.season);
             conversation.nextEncounterTurn = conversation.turn + Math.floor(Math.random() * 5) + 1;
         }
 
         // Update conditions
-        state.temp.value.conditions = describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
+        state.temp.value.conditions = describeConditions(
+            conversation.time,
+            conversation.day,
+            conversation.temperature,
+            conversation.weather
+        );
 
         // Notify player
         // - We don't consider this answering the players query. We want the story to be included
@@ -100,6 +120,10 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
     }
 }
 
+/**
+ * @param context
+ * @param state
+ */
 async function queryTime(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     await updateDMResponse(context, state, `⏳ ${state.temp.value.conditions}`);
     state.temp.value.playerAnswered = true;

@@ -1,9 +1,13 @@
-import { TurnContext } from "botbuilder";
-import { Application, OpenAIPlanner } from "botbuilder-m365";
-import { ApplicationTurnState, IDataEntities, trimPromptResponse, updateDMResponse } from "../bot";
+import { TurnContext } from 'botbuilder';
+import { Application, OpenAIPlanner } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities, trimPromptResponse, updateDMResponse } from '../bot';
 import * as responses from '../responses';
 import * as prompts from '../prompts';
 
+/**
+ * @param app
+ * @param planner
+ */
 export function mapAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('map', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
@@ -17,9 +21,14 @@ export function mapAction(app: Application<ApplicationTurnState>, planner: OpenA
     });
 }
 
+/**
+ * @param planner
+ * @param context
+ * @param state
+ */
 async function queryMap(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     // Use the map to answer player
-    let newResponse = await planner.prompt(context, state, prompts.useMap);
+    const newResponse = await planner.prompt(context, state, prompts.useMap);
     if (newResponse) {
         await updateDMResponse(context, state, trimPromptResponse(newResponse).split('\n').join('<br>'));
         state.temp.value.playerAnswered = true;

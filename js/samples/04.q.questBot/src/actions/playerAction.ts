@@ -1,9 +1,20 @@
-import { TurnContext } from "botbuilder";
-import { Application, OpenAIPlanner, ResponseParser } from "botbuilder-m365";
-import { ApplicationTurnState, DEFAULT_BACKSTORY, DEFAULT_EQUIPPED, IDataEntities,  updateDMResponse, UserState } from "../bot";
+import { TurnContext } from 'botbuilder';
+import { Application, OpenAIPlanner, ResponseParser } from 'botbuilder-m365';
+import {
+    ApplicationTurnState,
+    DEFAULT_BACKSTORY,
+    DEFAULT_EQUIPPED,
+    IDataEntities,
+    updateDMResponse,
+    UserState
+} from '../bot';
 import * as responses from '../responses';
 import * as prompts from '../prompts';
 
+/**
+ * @param app
+ * @param planner
+ */
 export function playerAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
     app.ai.action('player', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
@@ -17,7 +28,18 @@ export function playerAction(app: Application<ApplicationTurnState>, planner: Op
     });
 }
 
-async function updatePlayer(planner: OpenAIPlanner, context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+/**
+ * @param planner
+ * @param context
+ * @param state
+ * @param data
+ */
+async function updatePlayer(
+    planner: OpenAIPlanner,
+    context: TurnContext,
+    state: ApplicationTurnState,
+    data: IDataEntities
+): Promise<boolean> {
     // Check for name change
     const player = Object.assign({}, state.user.value);
     const newName = (data.name ?? '').trim();
@@ -29,10 +51,10 @@ async function updatePlayer(planner: OpenAIPlanner, context: TurnContext, state:
             if (pos >= 0) {
                 conversation.players.splice(pos, 1);
             }
-            conversation.players.push(newName)
+            conversation.players.push(newName);
         }
 
-        // Update name and notify user        
+        // Update name and notify user
         player.name = newName;
     }
 
@@ -48,13 +70,13 @@ async function updatePlayer(planner: OpenAIPlanner, context: TurnContext, state:
         equippedChange = player.equipped;
     }
 
-    // Update backstory and equipped 
+    // Update backstory and equipped
     if (backstoryChange.length > 0 || equippedChange.length > 0) {
         state.temp.value.playerInfo = JSON.stringify({
             name: player.name,
             backstory: player.backstory,
             equipped: player.equipped
-        })
+        });
         state.temp.value.backstoryChange = backstoryChange ?? 'no change';
         state.temp.value.equippedChange = equippedChange ?? 'no change';
         const update = await planner.prompt(context, state, prompts.updatePlayer);
@@ -73,12 +95,11 @@ async function updatePlayer(planner: OpenAIPlanner, context: TurnContext, state:
         }
     }
 
-
     // Save player changes
     state.user.value.name = player.name;
     state.user.value.backstory = player.backstory;
     state.user.value.equipped = player.equipped;
-    
+
     // Build message
     let message = `🤴 <strong>${player.name}</strong>`;
     if (backstoryChange.length > 0) {
@@ -90,6 +111,6 @@ async function updatePlayer(planner: OpenAIPlanner, context: TurnContext, state:
 
     await context.sendActivity(message);
     state.temp.value.playerAnswered = true;
-    
+
     return true;
 }
