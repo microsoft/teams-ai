@@ -14,7 +14,7 @@
         "plugin:import/typescript",
         "plugin:import/recommended",
         "plugin:jsdoc/recommended",
-        "plugin:lodash/recommended",
+
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
         // Currently sample contains no frontend
@@ -24,7 +24,7 @@
     "plugins": [
         "@typescript-eslint",
         "jsdoc",
-        "lodash",
+
         "mocha",
         "only-warn",
         "prettier"
