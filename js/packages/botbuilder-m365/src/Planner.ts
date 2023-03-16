@@ -10,16 +10,11 @@ import { TurnContext } from 'botbuilder';
 import { TurnState } from './TurnState';
 
 export interface Planner<TState extends TurnState, TPlanOptions> {
-    generatePlan(
-        context: TurnContext,
-        state: TState,
-        options?: TPlanOptions,
-        message?: string
-    ): Promise<Plan>;
+    generatePlan(context: TurnContext, state: TState, options?: TPlanOptions, message?: string): Promise<Plan>;
 }
 
 export interface Plan {
-    type: 'plan',
+    type: 'plan';
     commands: PredictedCommand[];
 }
 

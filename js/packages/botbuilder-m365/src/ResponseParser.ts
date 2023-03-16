@@ -181,9 +181,9 @@ export class ResponseParser {
                         break;
                     case DoCommandParseState.findEntityValue:
                         // Look for either string quotes first non-space or equals token
-                        if (token == '"' || token == "'" || token == "`") {
+                        if (token == '"' || token == "'" || token == '`') {
                             // Check for content value
-                            if (token == "`" && tokens[length + 1] == "`" && tokens[length + 2] == "`") {
+                            if (token == '`' && tokens[length + 1] == '`' && tokens[length + 2] == '`') {
                                 length += 2;
                                 parseState = DoCommandParseState.inEntityContentValue;
                             } else {
@@ -209,7 +209,7 @@ export class ResponseParser {
                         }
                         break;
                     case DoCommandParseState.inEntityContentValue:
-                        if (token == "`" && tokens[length + 1] == "`" && tokens[length + 2] == "`") {
+                        if (token == '`' && tokens[length + 1] == '`' && tokens[length + 2] == '`') {
                             // Save pair and look for additional pairs
                             length += 2;
                             command!.entities[entityName] = entityValue;

@@ -19,7 +19,7 @@ import {
     MessagingExtensionQuery,
     Activity
 } from 'botbuilder';
-import { Application, RouteSelector, Query } from './Application';
+import Application, { RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
 const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
@@ -112,11 +112,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     public botMessagePreviewSend(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (
-            context: TurnContext,
-            state: TState,
-            previewActivity: Partial<Activity>
-        ) => Promise<void>
+        handler: (context: TurnContext, state: TState, previewActivity: Partial<Activity>) => Promise<void>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME, 'send');
@@ -364,7 +360,10 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-    private async returnSubmitActionResponse(context: TurnContext, result: MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined): Promise<void> {
+    private async returnSubmitActionResponse(
+        context: TurnContext,
+        result: MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined
+    ): Promise<void> {
         if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
             // Format invoke response
             let response: MessagingExtensionActionResponse;
@@ -410,8 +409,13 @@ export class MessageExtensions<TState extends TurnState> {
 /**
  * @param commandId
  * @param invokeName
+ * @param botMessagePreviewAction
  */
-function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeName: string, botMessagePreviewAction?: 'edit' | 'send'): RouteSelector {
+function createTaskSelector(
+    commandId: string | RegExp | RouteSelector,
+    invokeName: string,
+    botMessagePreviewAction?: 'edit' | 'send'
+): RouteSelector {
     if (typeof commandId == 'function') {
         // Return the passed in selector function
         return commandId;
@@ -419,7 +423,11 @@ function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeNa
         // Return a function that matches the commandId using a RegExp
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
-            if (isInvoke && typeof context?.activity?.value?.commandId == 'string' && matchesPreviewAction(context.activity, botMessagePreviewAction)) {
+            if (
+                isInvoke &&
+                typeof context?.activity?.value?.commandId == 'string' &&
+                matchesPreviewAction(context.activity, botMessagePreviewAction)
+            ) {
                 return Promise.resolve(commandId.test(context.activity.value.commandId));
             } else {
                 return Promise.resolve(false);
@@ -429,11 +437,19 @@ function createTaskSelector(commandId: string | RegExp | RouteSelector, invokeNa
         // Return a function that attempts to match commandId
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
-            return Promise.resolve(isInvoke && context?.activity?.value?.commandId === commandId && matchesPreviewAction(context.activity, botMessagePreviewAction));
+            return Promise.resolve(
+                isInvoke &&
+                    context?.activity?.value?.commandId === commandId &&
+                    matchesPreviewAction(context.activity, botMessagePreviewAction)
+            );
         };
     }
 }
 
+/**
+ * @param activity
+ * @param botMessagePreviewAction
+ */
 function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edit' | 'send'): boolean {
     if (typeof activity?.value?.botMessagePreviewAction == 'string') {
         return activity.value.botMessagePreviewAction == botMessagePreviewAction;

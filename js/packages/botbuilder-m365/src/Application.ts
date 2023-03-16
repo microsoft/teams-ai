@@ -47,7 +47,10 @@ export interface ApplicationOptions<
 
 export type RouteSelector = (context: TurnContext) => Promise<boolean>;
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
-export type ApplicationEventHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<boolean>;
+export type ApplicationEventHandler<TState extends TurnState> = (
+    context: TurnContext,
+    state: TState
+) => Promise<boolean>;
 
 export type ConversationUpdateEvents =
     | 'channelCreated'
@@ -64,13 +67,10 @@ export type ConversationUpdateEvents =
 export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
-export class Application<
+export default class Application<
     TState extends TurnState = DefaultTurnState,
     TPlanOptions = any,
-    TPlanner extends Planner<TState, TPlanOptions> = Planner<
-        TState,
-        TPlanOptions
-    >
+    TPlanner extends Planner<TState, TPlanOptions> = Planner<TState, TPlanOptions>
 > {
     private readonly _options: ApplicationOptions<TState, TPlanOptions, TPlanner>;
     private readonly _routes: AppRoute<TState>[] = [];
@@ -128,9 +128,10 @@ export class Application<
     /**
      * Adds a new route to the application.
      *
-     * @remarks
+     *
      * Routes will be matched in the order they're added to the application. The first selector to
      * return `true` when an activity is received will have its handler called.
+     *
      * @param selector Function used to determine if the route should be triggered.
      * @param handler Function to call when the route is triggered.
      * @param isInvokeRoute boolean indicating if the RouteSelector checks for "Invoke" Activities as part of its routing logic. Defaults to `false`.
@@ -284,9 +285,9 @@ export class Application<
             const state = await turnStateManager!.loadState(storage, context);
 
             // Call beforeTurn event handlers
-            if (!await this.callEventHandlers(context, state, this._beforeTurn)) {
+            if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
                 return false;
-            } 
+            }
 
             // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
             // Invoke Activities from Teams need to be responded to in less than 5 seconds.
@@ -393,9 +394,10 @@ export class Application<
     /**
      * Manually start a timer to periodically send "typing" activities.
      *
-     * @remarks
+     *
      * The timer will automatically end once an outgoing activity has been sent. If the timer is
      * already running or the current activity, is not a "message" the call is ignored.
+     *
      * @param context The context for the current turn with the user.
      */
     public startTypingTimer(context: TurnContext): void {
@@ -443,7 +445,7 @@ export class Application<
     /**
      * Manually stop the typing timer.
      *
-     * @remarks
+     *
      * If the timer isn't running nothing happens.
      */
     public stopTypingTimer(): void {
@@ -460,10 +462,7 @@ export class Application<
      * @param handler Function to call when the event is triggered.
      * @returns The application instance for chaining purposes.
      */
-    public turn(
-        event: TurnEvents | TurnEvents[],
-        handler: ApplicationEventHandler<TState>
-    ): this {
+    public turn(event: TurnEvents | TurnEvents[], handler: ApplicationEventHandler<TState>): this {
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             switch (event) {
                 case 'beforeTurn':
@@ -478,7 +477,11 @@ export class Application<
         return this;
     }
 
-    private async callEventHandlers(context: TurnContext, state: TState, handlers: ApplicationEventHandler<TState>[]): Promise<boolean> {
+    private async callEventHandlers(
+        context: TurnContext,
+        state: TState,
+        handlers: ApplicationEventHandler<TState>[]
+    ): Promise<boolean> {
         for (let i = 0; i < handlers.length; i++) {
             const continueExecution = await handlers[i](context, state);
             if (!continueExecution) {

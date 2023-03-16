@@ -12,14 +12,10 @@ import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
-    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>
+    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>;
 }
 
-export class AI<
-    TState extends TurnState,
-    TPlanOptions,
-    TPlanner extends Planner<TState, TPlanOptions>
-> {
+export class AI<TState extends TurnState, TPlanOptions, TPlanner extends Planner<TState, TPlanOptions>> {
     private readonly _planner: TPlanner;
     private readonly actions: Map<string, ActionEntry<TState>> = new Map();
 
@@ -71,7 +67,7 @@ export class AI<
                 return Array.isArray(plan.commands) && plan.commands.length > 0;
             },
             true
-        )
+        );
 
         // Register default DoCommandActionName
         this.action<PredictedDoCommandAndHandler<TState>>(
@@ -103,7 +99,6 @@ export class AI<
             },
             true
         );
-
     }
 
     public get planner(): TPlanner {
@@ -113,19 +108,20 @@ export class AI<
     /**
      * Registers an handler for a named action.
      *
-     * @remarks
+     *
      * Actions can be triggered by a planner returning a DO command.
+     *
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
      * @param allowOverrides Optional. If true
      * @returns The application instance for chaining purposes.
      */
     public action<TEntities = Record<string, any>>(
-        name: string|string[],
+        name: string | string[],
         handler: (context: TurnContext, state: TState, entities: TEntities, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
-        (Array.isArray(name) ? name : [name]).forEach(n => {
+        (Array.isArray(name) ? name : [name]).forEach((n) => {
             if (!this.actions.has(n) || allowOverrides) {
                 this.actions.set(n, { handler, allowOverrides });
             } else {
@@ -151,9 +147,7 @@ export class AI<
     ): Promise<boolean> {
         // Call planner
         const plan = await this._planner.generatePlan(context, state, options, message);
-        let continueChain = await this.actions
-            .get(AI.PlanReadyActionName)!
-            .handler(context, state, plan, '');
+        let continueChain = await this.actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, '');
         if (continueChain) {
             // Run predicted commands
             for (let i = 0; i < plan.commands.length && continueChain; i++) {
@@ -166,7 +160,7 @@ export class AI<
                             const handler = this.actions.get(action)!.handler;
                             continueChain = await this.actions
                                 .get(AI.DoCommandActionName)!
-                                .handler(context, state, { handler, ...cmd as PredictedDoCommand }, action);
+                                .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                         } else {
                             // Redirect to UnknownAction handler
                             continueChain = await this.actions
@@ -188,7 +182,12 @@ export class AI<
         return continueChain;
     }
 
-    public doAction<TData = Record<string,any>>(context: TurnContext, state: TState, action: string, data?: TData): Promise<boolean> {
+    public doAction<TData = Record<string, any>>(
+        context: TurnContext,
+        state: TState,
+        action: string,
+        data?: TData
+    ): Promise<boolean> {
         if (!this.actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }

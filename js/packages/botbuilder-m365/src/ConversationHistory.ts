@@ -63,7 +63,7 @@ export class ConversationHistory {
 
     public static hasMoreLines(state: TurnState): boolean {
         if (state.conversation) {
-            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
             return Array.isArray(history) ? history.length > 0 : false;
         } else {
             throw new Error(
@@ -117,7 +117,7 @@ export class ConversationHistory {
                 text = text.substring(0, doPos);
             }
         }
-        
+
         return text.indexOf('DO ') < 0 ? text.trim() : '';
     }
 
@@ -207,10 +207,11 @@ export class ConversationHistory {
     /**
      * Returns the current conversation history as a string of text.
      *
-     * @remarks
+     *
      * The length of the returned text is gated by `maxCharacterLength` and only whole lines of
      * history entries will be returned. That means that if the length of the most recent history
      * entry is greater then `maxCharacterLength` no text will be returned.
+     *
      * @param state Applications turn state.
      * @param maxCharacterLength Optional. Maximum length of the text returned. Defaults to 4000 characters.
      * @param lineSeparator Optional. Separate used between lines. Defaults to '\n'.
@@ -249,7 +250,7 @@ export class ConversationHistory {
 
             // Populate up to max chars
             let text = '';
-            let lines: string[] = [];
+            const lines: string[] = [];
             for (let i = history.length - 1; i >= 0; i--) {
                 // Ensure that adding line won't go over the max character length
                 const line = history[i];
