@@ -9,13 +9,44 @@
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
-export interface DefaultTurnState<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}> extends TurnState {
+export interface DefaultConversationState {
+
+}
+
+export interface DefaultUserState {
+
+}
+
+export interface DefaultTempState {
+    /**
+     * Input passed to an AI prompt
+     */
+    input: string;
+
+    /**
+     * Formatted conversation history for embedding in an AI prompt
+     */
+    history: string;
+
+    /**
+     * Output returned from an AI prompt or function
+     */
+    output: string;
+}
+
+export interface DefaultTurnState<
+    TCS extends DefaultConversationState = DefaultConversationState, 
+    TUS extends DefaultUserState = DefaultUserState, 
+    TTS extends DefaultTempState = DefaultTempState> extends TurnState {
     conversation: TurnStateEntry<TCS>;
     user: TurnStateEntry<TUS>;
     temp: TurnStateEntry<TTS>;
 }
 
-export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}>
+export class DefaultTurnStateManager<
+    TCS extends DefaultConversationState = DefaultConversationState, 
+    TUS extends DefaultUserState = DefaultUserState, 
+    TTS extends DefaultTempState = DefaultTempState>
     implements TurnStateManager<DefaultTurnState<TCS, TUS, TTS>>
 {
     public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TCS, TUS, TTS>> {

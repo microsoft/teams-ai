@@ -31,7 +31,9 @@
     "dependencies": {
         "botbuilder": "^4.19.0",
         "botbuilder-dialogs": "^4.19.0",
-        "openai": "^3.2.1"
+        "gpt-3-encoder": "^1.1.4",
+        "openai": "^3.2.1",
+        "yaml": "^2.2.1"
     },
     "resolutions": {
         "follow-redirects": "1.14.7"

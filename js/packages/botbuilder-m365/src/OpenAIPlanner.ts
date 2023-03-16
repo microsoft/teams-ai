@@ -22,29 +22,17 @@ import {
 } from 'openai';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { ResponseParser } from './ResponseParser';
-import { PromptParser, PromptTemplate } from './PromptParser';
 import { ConversationHistory } from './ConversationHistory';
-import { AI } from './AI';
-
-export interface OpenAIPromptConfig extends CreateCompletionRequest {
-    useSystemMessage?: boolean;
-}
-
-export interface OpenAIPromptOptions {
-    prompt: PromptTemplate;
-    promptConfig: CreateCompletionRequest;
-    conversationHistory?: OpenAIConversationHistoryOptions;
-    logRequests?: boolean;
-}
+import { AI, ConfiguredAIOptions } from './AI';
+import { PromptTemplate } from './Prompts';
 
 export interface OpenAIPlannerOptions {
     configuration: ConfigurationParameters;
+    defaultModel: string;
     basePath?: string;
     axios?: AxiosInstance;
-    prompt?: PromptTemplate;
-    promptConfig?: CreateCompletionRequest;
-    conversationHistory?: OpenAIConversationHistoryOptions;
     oneSayPerTurn?: boolean;
+    useSystemMessage?: boolean;
     logRequests?: boolean;
 }
 
@@ -54,12 +42,11 @@ export interface OpenAIConversationHistoryOptions {
     botPrefix?: string;
     maxLines?: number;
     maxCharacterLength?: number;
-    lineSeparator?: string;
     includePlanJson?: boolean;
 }
 
 export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
-    implements Planner<TState, OpenAIPromptOptions>
+    implements Planner<TState>
 {
     private readonly _options: OpenAIPlannerOptions;
     private readonly _configuration: Configuration;
@@ -139,7 +126,46 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         }
     }
 
-    public async generatePlan(
+
+
+    public async completePrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options?: ConfiguredAIOptions): Promise<string> {
+        // Check for chat completion model
+        const model = prompt.config.
+        if (options.promptConfig.model.startsWith('gpt-3.5-turbo')) {
+
+            // Request base chat completion
+            const chatRequest = await this.createChatCompletionRequest(
+                context,
+                state,
+                options.prompt,
+                options.promptConfig,
+                message,
+                options.conversationHistory
+            );
+
+            const result = await this.createChatCompletion(chatRequest);
+            return result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
+        } else {
+            // Request base prompt completion
+            const promptRequest = await this.createCompletionRequest(
+                context,
+                state,
+                options.prompt,
+                options.promptConfig,
+                options.conversationHistory
+            );
+
+            const result = await this.createCompletion(promptRequest);
+            return result?.data?.choices ? result.data.choices[0]?.text : undefined;
+        }
+       
+    }
+
+    public async generatePlan(context: TurnContext, state: TState, prompt: PromptTemplate, options?: ConfiguredAIOptions): Promise<Plan> {
+        
+    }
+
+    public async gentePlan(
         context: TurnContext,
         state: TState,
         options?: OpenAIPromptOptions,
