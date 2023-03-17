@@ -3241,13 +3241,6 @@ eslint-plugin-jsdoc@^30.7.7:
     semver "^7.3.4"
     spdx-expression-parse "^3.0.1"
 
-eslint-plugin-lodash@^7.1.0:
-  version "7.4.0"
-  resolved "https://registry.npmjs.org/eslint-plugin-lodash/-/eslint-plugin-lodash-7.4.0.tgz"
-  integrity sha512-Tl83UwVXqe1OVeBRKUeWcfg6/pCW1GTRObbdnbEJgYwjxp5Q92MEWQaH9+dmzbRt6kvYU1Mp893E79nJiCSM8A==
-  dependencies:
-    lodash "^4.17.21"
-
 eslint-plugin-mocha@^8.1.0:
   version "8.2.0"
   resolved "https://registry.npmjs.org/eslint-plugin-mocha/-/eslint-plugin-mocha-8.2.0.tgz"

@@ -4,19 +4,19 @@ The following samples highlight key capabilities of the M365 BotBuilder SDK.
 
 ## Basic Conversational Experiences
 
-### Conversational Bots: [Echo Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messaging/echoBot)
+### Conversational Bots: [Echo Bot](01.messaging.a.echoBot/)
 
 A conversational bot that listens for specific commands and offers a simple conversational flow: echoing the user's message back to them.
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the M365 BotBuilder SDK's ability to scaffold conversational bot components.
 
-### Adaptive Cards: [Type Ahead Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/adaptiveCards/typeAheadBot)
+### Adaptive Cards: [Type Ahead Bot](02.messageExtensions.a.searchCommand/)
 
 A conversational bot that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
 
 This sample illustrates the M365 BotBuilder SDK's ability to scaffold conversational bot and Adaptive Card components.
 
-### Message Extensions: [Search Command](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/messageExtensions/searchCommand)
+### Message Extensions: [Search Command](03.adaptiveCards.a.typeAheadBot/)
 
 A Message Extension (ME) built to search NPM for a specific package and return the result as an Adaptive Card.
 
@@ -24,7 +24,7 @@ This sample illustrates the M365 BotBuilder SDK's ability to scaffold search-bas
 
 ## AI-Powered Experiences
 
-### Conversational AI w/Natural Language: [Hal9000 Bot](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/hal9000)
+### Conversational AI w/Natural Language: [Santa Bot](04.ai.a.naturalLanguage.santaBot/)
 
 A conversational bot for Microsoft Teams, designed to mimic the AI character Hal 9000 from the movie "2001: A Space Odyssey". The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
@@ -38,7 +38,7 @@ It shows M365 BotBuilder SDK capabilities like:
 -   Localization across languages
 -   Conversational session history
 
-### AI in Message Extensions: [GPT ME](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/gptME)
+### AI in Message Extensions: [GPT ME](04.ai.b.messageExtension.gptME/)
 
 A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
@@ -50,7 +50,7 @@ It shows M365 botbuilder SDK capabilities like:
 -   Action mapping
 -   Prompt engineering
 
-### Intent to Action Mapping: [Light On/Off AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/lightBot)
+### Intent to Action Mapping: [Light On/Off AI Assistant](04.ai.c.actionMapping.lightBot/)
 
 A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off. The bot is built using Node.js and the M365 BotBuilder library.
 
@@ -67,7 +67,7 @@ It shows a broad range of M365 botbuilder SDK capabilities like:
 -   Prediction engine mapping intents to actions with third party business logic
 -   Mixing GPT-powered conversational responses with manually defined responses
 
-### Chained Actions: [List Generator AI Assistant](https://github.com/microsoft/botbuilder-m365/tree/main/js/samples/ai/listBot)
+### Chained Actions: [List Generator AI Assistant](04.ai.d.chainedActions.listGenerator/)
 
 Similar to the Light On/Off sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
 
