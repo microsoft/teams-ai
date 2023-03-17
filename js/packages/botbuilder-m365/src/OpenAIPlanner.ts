@@ -128,7 +128,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
 
 
 
-    public async completePrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options?: ConfiguredAIOptions): Promise<string> {
+    public async completePrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options?: ConfiguredAIOptions<TState>): Promise<string> {
         // Check for chat completion model
         const model = prompt.config.
         if (options.promptConfig.model.startsWith('gpt-3.5-turbo')) {
