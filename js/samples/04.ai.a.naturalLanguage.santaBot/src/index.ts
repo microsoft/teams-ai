@@ -60,39 +60,38 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
-// Create prediction engine
+// Create AI components
 const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
-    logRequests: true,
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        frequency_penalty: 0,
-        max_tokens: 2048,
-        model: 'text-davinci-003',
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:'],
-        temperature: 0.4,
-        top_p: 1
-    }
+    defaultModel: 'text-davinci-003',
+    logRequests: true
 });
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    planner,
-    storage
+    storage,
+    ai: {
+        planner,
+        promptManager,
+        prompt: 'chatGPT',
+        history: {
+            assistantHistoryType: 'text'
+        }
+    }
 });
 
 app.message('/history', async (context, state) => {
-    const history = ConversationHistory.toString(state, 10000, '\n\n');
+    const history = ConversationHistory.toString(state, 2000, '\n\n');
     await context.sendActivity(history);
 });
 

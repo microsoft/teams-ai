@@ -138,11 +138,11 @@ export class PromptTemplateEngine<TState extends TurnState> {
                 cursor++;
 
                 // Extract raw block
-                const contentWithDelimiters = this.subStr(template, startPos, cursor + 1);
+                const contentWithDelimiters = template.substring(startPos, cursor + 1);
 
                 // Remove "{{" and "}}" delimiters and trim empty chars
                 const contentWithoutDelimiters = contentWithDelimiters
-                    .substring(2, contentWithDelimiters.length - EMPTY_CODE_BLOCK_LENGTH).trim();
+                    .substring(2, contentWithDelimiters.length - 2).trim();
 
                 if (contentWithoutDelimiters.length === 0) {
                     // If what is left is empty, consider the raw block a Text Block
@@ -171,10 +171,6 @@ export class PromptTemplateEngine<TState extends TurnState> {
         }
 
         return blocks;
-    }
-
-    private subStr(text: string, startIndex: number, stopIndex: number): string {
-        return text.substring(startIndex, stopIndex);
     }
 
     private validateBlocksSyntax(blocks: Block[]): void {

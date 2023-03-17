@@ -16,14 +16,14 @@ export interface Planner<TState extends TurnState> {
         context: TurnContext,
         state: TState,
         prompt: PromptTemplate,
-        options?: ConfiguredAIOptions<TState>
+        options: ConfiguredAIOptions<TState>
     ): Promise<string|undefined>;
 
     generatePlan(
         context: TurnContext,
         state: TState,
         prompt: PromptTemplate,
-        options?: ConfiguredAIOptions<TState>
+        options: ConfiguredAIOptions<TState>
     ): Promise<Plan>;
 }
 
