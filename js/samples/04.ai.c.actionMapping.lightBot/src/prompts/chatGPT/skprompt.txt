@@ -9,6 +9,7 @@ The following actions are supported:
 - LightsOn
 - LightsOff
 - Pause time=<duration in ms>
-- LightStatus
+
+The lights are currently {{getLightStatus}}.
 
 Always respond in the form of a JSON based plan. Stick with DO/SAY.

@@ -63,7 +63,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, ConversationHistory } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultPromptManager } from 'botbuilder-m365';
 import * as responses from './responses';
 
 interface ConversationState {
@@ -71,28 +71,30 @@ interface ConversationState {
 }
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
-// Create prediction engine
+// Create AI components
 const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
     },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        model: 'gpt-3.5-turbo',
-        temperature: 0.7,
-        max_tokens: 2048,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6
-    },
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
+const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
-    planner
+    ai: {
+        planner,
+        promptManager,
+        prompt: 'chatGPT'
+    }
+});
+
+// Add a prompt function for getting the current status of the lights
+app.ai.prompts.addFunction('getLightStatus', async (context, state) => {
+    return state.conversation.value.lightsOn ? 'on' : 'off';
 });
 
 // Register action handlers
@@ -113,21 +115,6 @@ app.ai.action('Pause', async (context, state, data) => {
     await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
     await new Promise((resolve) => setTimeout(resolve, time));
     return true;
-});
-
-app.ai.action('LightStatus', async (context, state) => {
-    // Send the user a static response with the status of the lights.
-    const response = responses.lightStatus(state.conversation.value.lightsOn);
-    await context.sendActivity(response);
-
-    // Since we might be prompting the user with a followup question, we need to do
-    // some surgery on the {{conversation.history}} to append a THEN SAY command. This
-    // lets the model know we just asked the user a question and it can predict the
-    // next action based on their response.
-    ConversationHistory.appendToLastLine(state, ` THEN SAY ${response}`);
-
-    // End the current chain since we've manually just prompted the user for input.
-    return false;
 });
 
 // Register a handler to handle unknown actions that might be predicted

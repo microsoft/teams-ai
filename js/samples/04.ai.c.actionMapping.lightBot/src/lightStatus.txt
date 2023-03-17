@@ -1,3 +1,0 @@
-The lights in the room are currently {{data.lightStatus}}
-
-Generate a friendly response describing the status of the lights in the room
