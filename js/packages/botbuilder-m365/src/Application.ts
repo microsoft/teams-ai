@@ -19,8 +19,7 @@ import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
-import { Plan, Planner } from './Planner';
-import { AI, AIOptions, ConfiguredAIOptions } from './AI';
+import { AI, AIOptions } from './AI';
 
 const TYPING_TIMER_DELAY = 1000;
 
@@ -596,38 +595,3 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             };
     }
 }
-
-import { DefaultPromptManager } from './DefaultPromptManager';
-import * as path from 'path';
-import { MemoryStorage } from 'botbuilder';
-import { PromptTemplate } from './Prompts';
-
-class OpenAIPlanner implements Planner<any> {
-    constructor(options: any) {
-
-    }
-    completePrompt(context: TurnContext, state: any, prompt: PromptTemplate, options?: ConfiguredAIOptions<any>): Promise<string> {
-        throw new Error('Method not implemented.');
-    }
-    generatePlan(context: TurnContext, state: any, prompt: PromptTemplate, options?: ConfiguredAIOptions<any>): Promise<Plan> {
-        throw new Error('Method not implemented.');
-    }
-}
-
-const storage = new MemoryStorage();
-const planner = new OpenAIPlanner({ /* config settings */ });
-const promptManager = new DefaultPromptManager(path.join(__dirname, `..\src\prompts`));
-const app = new Application({
-    storage,
-    ai: {
-        planner,
-        promptManager,
-        prompt: 'chatPrompt'
-    }
-});
-
-app.ai.prompts.addFunction('getUserName', async (context, state) => {
-    return context.activity.from.name;
-});
-
-app.ai.prompts.addFunction('translateInputToEnglish', app.ai.createSemanticFunction('translationPrompt'));
