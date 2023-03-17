@@ -14,13 +14,22 @@
         "plugin:import/typescript",
         "plugin:import/recommended",
         "plugin:jsdoc/recommended",
+
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
-        // Currently samples contain no frontend
+        // Currently sample contains no frontend
         // "plugin:react/recommended",
         // "plugin:react/jsx-runtime"
     ],
-    "plugins": ["@typescript-eslint", "jsdoc", "mocha", "only-warn", "prettier"],
+    "plugins": [
+        "@typescript-eslint",
+        "jsdoc",
+
+        "mocha",
+        "only-warn",
+        "prettier"
+        // "react"
+    ],
     "parserOptions": {
         "ecmaVersion": 2015,
         // Allows for the parsing of modern ECMAScript features
@@ -40,12 +49,13 @@
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unused-vars": "off",
         "no-async-promise-executor": "off",
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
         "prettier/prettier": "error"
-        // Currently samples contain no frontend
+        // Currently sample contains no frontend
         // "react/react-in-jsx-scope": "off",
         // "react/prop-types": "off"
     },
