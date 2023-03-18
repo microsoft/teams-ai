@@ -44,12 +44,12 @@ Here is an adaptive card template for showing 1 or more lists to a user
 
 Here's a set of lists. The key is the title of the list and the arrays contain a lists items:
 
-{{temp.lists}}
+{{$lists}}
 
 Here's the users query:
 
 ```
-{{activity.text}}
+{{$input}}
 ```
 
 Use the template to create an adaptive card.
@@ -57,4 +57,3 @@ Take into account any changes asked for by the user.
 Always replace the placeholder text, List n and Item n, with real data.
 
 AdaptiveCard:
-
