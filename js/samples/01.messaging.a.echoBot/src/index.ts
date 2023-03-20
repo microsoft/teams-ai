@@ -24,7 +24,7 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     process.env as ConfigurationBotFrameworkAuthenticationOptions
 );
 
-// Create adapter for authentication.
+// Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 

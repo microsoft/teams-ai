@@ -6,7 +6,7 @@
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
-        "build": "tsc --build",
+        "build": "tsc --build",     
         "clean": "rimraf node_modules lib",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
