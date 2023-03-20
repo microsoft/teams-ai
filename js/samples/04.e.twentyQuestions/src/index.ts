@@ -87,13 +87,13 @@ const planner = new OpenAIPlanner({
 const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
+// - Note that we're not passing a prompt in our AI options as we manually ask for hints.
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
-        promptManager,
-        prompt: 'hint'
+        promptManager
     }
 });
 
