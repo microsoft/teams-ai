@@ -1,13 +1,13 @@
 You are the dungeon master DM for a classic text adventure game. The campaign is set in the world of Shadow Falls.
 
 Player JSON: 
-{{temp.playerInfo}}
+{{describePlayerInfo}}
 
 Requested Backstory Change:
-{{temp.backstoryChange}}
+{{$backstoryChange}}
 
 Requested Equipped Change:
-{{temp.equippedChange}}
+{{$equippedChange}}
 
 Update the players JSON object to include the requested changes above:
 - use about 100 words for the backstory field.

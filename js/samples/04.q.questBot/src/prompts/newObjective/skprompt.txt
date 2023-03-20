@@ -18,33 +18,33 @@ Cave of the Ancients - The Cave of the Ancients is a hidden and treacherous plac
 Pyramids of the Forgotten - The ancient Pyramids of the Forgotten, built by the Anuket, are home to powerful magic, guarded by ancient and powerful creatures.
 
 All Players:
-{{conversation.players}}
+{{$conversation.players}}
 
 Current Player Profile:
-{{temp.playerInfo}}
+{{describePlayerInfo}}
 
 Game State:
-{{temp.gameState}}
+{{describeGameState}}
 
 Campaign:
-{{temp.campaign}}
+{{describeCampaign}}
 
 Current Quests:
-{{temp.quests}}
+{{describeQuests}}
 
 Current Location:
-{{temp.location}}
+{{describeLocation}}
 
 Conditions:
-{{temp.conditions}}
+{{describeConditions}}
 
 Story:
-{{conversation.story}}
+{{$conversation.story}}
 
 Conversation History:
 ```
 
-{{conversation.history}}
+{{$history}}
 
 ```
 

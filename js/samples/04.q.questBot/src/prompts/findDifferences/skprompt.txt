@@ -1,7 +1,7 @@
 Original Description:
-{{temp.originalText}}
+{{$originalText}}
 
 New Location Description:
-{{temp.newText}}
+{{$newText}}
 
 Create a new description with just the differences:

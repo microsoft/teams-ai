@@ -18,13 +18,13 @@ Cave of the Ancients - The Cave of the Ancients is a hidden and treacherous plac
 Pyramids of the Forgotten - The ancient Pyramids of the Forgotten, built by the Anuket, are home to powerful magic, guarded by ancient and powerful creatures.
 
 Campaign:
-{{temp.campaign}}
+{{describeCampaign}}
 
 Current Location:
-{{temp.location}}
+{{describeLocation}}
 
 Conditions:
-{{temp.conditions}}
+{{describeConditions}}
 
 Greet the adventurers and introduce them to the world of Shadow Falls.
 Tell them about the campaign and the adventures that await them. 
@@ -32,5 +32,5 @@ Suggest they explore the village of Shadow Falls while they wait for their adven
 Remind them they can ask for "help" at anytime.
 - Use at least 300 words.
 
-Player: {{activity.text}}
+Player: {{$input}}
 DM:

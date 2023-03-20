@@ -18,15 +18,15 @@ The following player actions are supported:
 - List items in your inventory or that have been dropped.
 
 Location:
-{{temp.location}}
+{{describeLocation}}
 
 Story:
-{{temp.story}}
+{{$story}}
 
 Conversation History:
 ```
 
-{{conversation.history}}
+{{$history}}
 
 ```
 
