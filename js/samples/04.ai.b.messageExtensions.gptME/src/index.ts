@@ -68,7 +68,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
 // This Message Extension can either drop the created card into the compose window (default.)
@@ -76,21 +76,28 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-// Create prediction engine
+
+// Create AI components
 const planner = new OpenAIPlanner({
     configuration: {
         apiKey: process.env.OPENAI_API_KEY
-    }
+    },
+    defaultModel: 'text-davinci-003',
+    logRequests: true
 });
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
-// - Not that we're not passing the application the prediction engine since we won't be chatting with
-//   the app.
+// - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
 const app = new Application({
     storage,
     adapter,
-    botAppId: process.env.MicrosoftAppId
+    botAppId: process.env.MicrosoftAppId,
+    ai: {
+        planner,
+        promptManager
+    }
 });
 
 app.messageExtensions.fetchTask('CreatePost', async (context, state) => {
@@ -110,10 +117,10 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
         switch (data.verb) {
             case 'generate':
                 // Call GPT and return response view
-                return await updatePost(context, state, '../src/generate.txt', data);
+                return await updatePost(context, state, 'generate', data);
             case 'update':
                 // Call GPT and return an updated response view
-                return await updatePost(context, state, '../src/update.txt', data);
+                return await updatePost(context, state, 'update', data);
             case 'preview':
                 // Preview the post as an adaptive card
                 const card = createPostCard(data.post!);
@@ -190,40 +197,15 @@ async function updatePost(
     prompt: string,
     data: SubmitData
 ): Promise<TaskModuleTaskInfo> {
-    const post = await callPrompt(context, state, prompt, data);
-    const card = createEditView(post, PREVIEW_MODE);
-    return createTaskInfo(card);
-}
-
-/**
- * @param context
- * @param state
- * @param prompt
- * @param data
- */
-async function callPrompt(
-    context: TurnContext,
-    state: DefaultTurnState,
-    prompt: string,
-    data: SubmitData
-): Promise<string> {
+    // Create new or updated post
     state.temp.value['post'] = data.post;
     state.temp.value['prompt'] = data.prompt;
-    const response = await planner.prompt(context, state, {
-        prompt: path.join(__dirname, prompt),
-        promptConfig: {
-            model: 'text-davinci-003',
-            temperature: 0.7,
-            max_tokens: 512,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0
-        }
-    });
-
-    if (!response) {
+    const post = await app.ai.completePrompt(context, state, prompt);
+    if (!post) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
     }
 
-    return response;
+    // Return card
+    const card = createEditView(post, PREVIEW_MODE);
+    return createTaskInfo(card);
 }

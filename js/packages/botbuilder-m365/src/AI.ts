@@ -23,7 +23,7 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
 export interface AIOptions<TState extends TurnState> {
     planner: Planner<TState>;
     promptManager: PromptManager<TState>;
-    prompt: string|PromptTemplate|PromptSelector<TState>;
+    prompt?: string|PromptTemplate|PromptSelector<TState>;
     history?: Partial<AIHistoryOptions>;
 }
 
@@ -40,7 +40,7 @@ export interface AIHistoryOptions {
 export interface ConfiguredAIOptions<TState extends TurnState> {
     planner: Planner<TState>;
     promptManager: PromptManager<TState>;
-    prompt: string|PromptTemplate|((Context: TurnContext, state: TState) => Promise<string|PromptTemplate>);
+    prompt?: string|PromptTemplate|((Context: TurnContext, state: TState) => Promise<string|PromptTemplate>);
     history: AIHistoryOptions;
 }
 
@@ -201,7 +201,9 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
         // Select prompt
         if (!prompt) {
-            if (typeof opts.prompt == 'function') {
+            if (opts.prompt == undefined) {
+                throw new Error(`AI.chain() was called without a prompt and no default prompt was configured.`);
+            } else if (typeof opts.prompt == 'function') {
                 prompt = await opts.prompt(context, state);
             } else {
                 prompt = opts.prompt;
