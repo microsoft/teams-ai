@@ -35,21 +35,21 @@ export interface DefaultTempState {
 }
 
 export interface DefaultTurnState<
-    TCS extends DefaultConversationState = DefaultConversationState, 
-    TUS extends DefaultUserState = DefaultUserState, 
-    TTS extends DefaultTempState = DefaultTempState> extends TurnState {
-    conversation: TurnStateEntry<TCS>;
-    user: TurnStateEntry<TUS>;
-    temp: TurnStateEntry<TTS>;
+    TConversationState extends DefaultConversationState = DefaultConversationState, 
+    TUserState extends DefaultUserState = DefaultUserState, 
+    TTempState extends DefaultTempState = DefaultTempState> extends TurnState {
+    conversation: TurnStateEntry<TConversationState>;
+    user: TurnStateEntry<TUserState>;
+    temp: TurnStateEntry<TTempState>;
 }
 
 export class DefaultTurnStateManager<
-    TCS extends DefaultConversationState = DefaultConversationState, 
-    TUS extends DefaultUserState = DefaultUserState, 
-    TTS extends DefaultTempState = DefaultTempState>
-    implements TurnStateManager<DefaultTurnState<TCS, TUS, TTS>>
+    TConversationState extends DefaultConversationState = DefaultConversationState, 
+    TUserState extends DefaultUserState = DefaultUserState, 
+    TTempState extends DefaultTempState = DefaultTempState>
+    implements TurnStateManager<DefaultTurnState<TConversationState, TUserState, TTempState>>
 {
-    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TCS, TUS, TTS>> {
+    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TConversationState, TUserState, TTempState>> {
         // Compute state keys
         const activity = context.activity;
         const channelId = activity?.channelId;
@@ -80,10 +80,10 @@ export class DefaultTurnStateManager<
         const items = storage ? await storage.read([conversationKey, userKey]) : {};
 
         // Map items to state object
-        const state: DefaultTurnState<TCS, TUS, TTS> = {
+        const state: DefaultTurnState<TConversationState, TUserState, TTempState> = {
             conversation: new TurnStateEntry(items[conversationKey], conversationKey),
             user: new TurnStateEntry(items[userKey], userKey),
-            temp: new TurnStateEntry({} as TTS)
+            temp: new TurnStateEntry({} as TTempState)
         };
 
         return state;
@@ -92,7 +92,7 @@ export class DefaultTurnStateManager<
     public async saveState(
         storage: Storage,
         context: TurnContext,
-        state: DefaultTurnState<TCS, TUS, TTS>
+        state: DefaultTurnState<TConversationState, TUserState, TTempState>
     ): Promise<void> {
         // Find changes and deletions
         let changes: StoreItems | undefined;
