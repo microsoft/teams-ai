@@ -30,7 +30,10 @@ export class VarBlock extends Block {
 
     public isValid(): { valid: boolean; error?: string; } {
         let valid = true;
-        let error: string;
+        let error: string | undefined;
+        // or
+        let error: string = '';
+        // then in the return object, only return non-empty string
 
         if (this.content[0] !== VarBlock.Prefix) {
             error = `A variable must start with the symbol ${VarBlock.Prefix}`;
