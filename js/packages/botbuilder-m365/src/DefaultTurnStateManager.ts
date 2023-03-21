@@ -9,16 +9,51 @@
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
-export interface DefaultTurnState<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}> extends TurnState {
-    conversation: TurnStateEntry<TCS>;
-    user: TurnStateEntry<TUS>;
-    temp: TurnStateEntry<TTS>;
+/**
+ * `ConversationState`, `UserState`, and `TempState` can store categorizations of information in memory. All three are extensible, though `input`, `history`, and `output` are  required in `TempState`.
+ *  For example, `ConversationState`, may be appropriate storage for attachments in the conversation.  e.g.:
+ * `attachments?: Attachments[]`
+*/
+
 }
 
-export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, TTS extends {} = {}>
-    implements TurnStateManager<DefaultTurnState<TCS, TUS, TTS>>
+export interface DefaultUserState {
+
+}
+
+export interface DefaultTempState {
+    /**
+     * Input passed to an AI prompt
+     */
+    input: string;
+
+    /**
+     * Formatted conversation history for embedding in an AI prompt
+     */
+    history: string;
+
+    /**
+     * Output returned from an AI prompt or function
+     */
+    output: string;
+}
+
+export interface DefaultTurnState<
+    TConversationState extends DefaultConversationState = DefaultConversationState, 
+    TUserState extends DefaultUserState = DefaultUserState, 
+    TTempState extends DefaultTempState = DefaultTempState> extends TurnState {
+    conversation: TurnStateEntry<TConversationState>;
+    user: TurnStateEntry<TUserState>;
+    temp: TurnStateEntry<TTempState>;
+}
+
+export class DefaultTurnStateManager<
+    TConversationState extends DefaultConversationState = DefaultConversationState, 
+    TUserState extends DefaultUserState = DefaultUserState, 
+    TTempState extends DefaultTempState = DefaultTempState>
+    implements TurnStateManager<DefaultTurnState<TConversationState, TUserState, TTempState>>
 {
-    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TCS, TUS, TTS>> {
+    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TConversationState, TUserState, TTempState>> {
         // Compute state keys
         const activity = context.activity;
         const channelId = activity?.channelId;
@@ -49,10 +84,10 @@ export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, T
         const items = storage ? await storage.read([conversationKey, userKey]) : {};
 
         // Map items to state object
-        const state: DefaultTurnState<TCS, TUS, TTS> = {
+        const state: DefaultTurnState<TConversationState, TUserState, TTempState> = {
             conversation: new TurnStateEntry(items[conversationKey], conversationKey),
             user: new TurnStateEntry(items[userKey], userKey),
-            temp: new TurnStateEntry({} as TTS)
+            temp: new TurnStateEntry({} as TTempState)
         };
 
         return state;
@@ -61,7 +96,7 @@ export class DefaultTurnStateManager<TCS extends {} = {}, TUS extends {} = {}, T
     public async saveState(
         storage: Storage,
         context: TurnContext,
-        state: DefaultTurnState<TCS, TUS, TTS>
+        state: DefaultTurnState<TConversationState, TUserState, TTempState>
     ): Promise<void> {
         // Find changes and deletions
         let changes: StoreItems | undefined;

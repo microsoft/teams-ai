@@ -65,15 +65,8 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
 import * as responses from './responses';
-
-// Create prediction engine
-const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    }
-});
 
 // Strongly type the applications turn state
 interface ConversationState {
@@ -83,12 +76,25 @@ interface ConversationState {
 }
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
+// Create AI components
+const planner = new OpenAIPlanner({
+    configuration: {
+        apiKey: process.env.OPENAI_API_KEY
+    },
+    defaultModel: 'text-davinci-003',
+    logRequests: true
+});
+const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
 // Define storage and application
-// - Not that we're not passing the application the prediction engine since we won't be chatting with
-//   the app.
+// - Note that we're not passing a prompt in our AI options as we manually ask for hints.
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    storage
+    storage,
+    ai: {
+        planner,
+        promptManager
+    }
 });
 
 // List for /reset command and then delete the conversation state
@@ -152,21 +158,12 @@ server.post('/api/messages', async (req, res) => {
  * @param state
  */
 async function getHint(context: TurnContext, state: ApplicationTurnState): Promise<string> {
-    const response = await planner.prompt(context, state, {
-        prompt: path.join(__dirname, '../src/prompt.txt'),
-        promptConfig: {
-            model: 'text-davinci-003',
-            temperature: 0.4,
-            max_tokens: 128,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0
-        }
-    });
+    state.temp.value.input = context.activity.text;
+    const hint = await app.ai.completePrompt(context, state, 'hint');
 
-    if (!response) {
+    if (!hint) {
         throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
     }
 
-    return response;
+    return hint;
 }

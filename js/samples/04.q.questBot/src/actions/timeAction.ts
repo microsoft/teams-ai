@@ -11,9 +11,8 @@ import {
 
 /**
  * @param app
- * @param planner
  */
-export function timeAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
+export function timeAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('time', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
@@ -90,24 +89,13 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
                 break;
         }
 
-        // Update temp state
-        state.temp.value.timeOfDay = describeTimeOfDay(conversation.time);
-        state.temp.value.season = describeSeason(conversation.day);
-
         // Generate new weather
         if (days > 0) {
-            conversation.temperature = generateTemperature(state.temp.value.season);
-            conversation.weather = generateWeather(state.temp.value.season);
+            const season = describeSeason(conversation.day);
+            conversation.temperature = generateTemperature(season);
+            conversation.weather = generateWeather(season);
             conversation.nextEncounterTurn = conversation.turn + Math.floor(Math.random() * 5) + 1;
         }
-
-        // Update conditions
-        state.temp.value.conditions = describeConditions(
-            conversation.time,
-            conversation.day,
-            conversation.temperature,
-            conversation.weather
-        );
 
         // Notify player
         // - We don't consider this answering the players query. We want the story to be included
@@ -125,7 +113,17 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
  * @param state
  */
 async function queryTime(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
-    await updateDMResponse(context, state, `⏳ ${state.temp.value.conditions}`);
+    // Render conditions
+    const conversation = state.conversation.value;
+    const conditions = describeConditions(
+        conversation.time,
+        conversation.day,
+        conversation.temperature,
+        conversation.weather
+    );
+
+    // Say the current conditions to the player
+    await updateDMResponse(context, state, `⏳ ${conditions}`);
     state.temp.value.playerAnswered = true;
     return false;
 }

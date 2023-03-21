@@ -1,20 +1,18 @@
 import { TurnContext } from 'botbuilder';
-import { Application, ConversationHistory, OpenAIPlanner } from 'botbuilder-m365';
-import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
+import { Application } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities } from '../bot';
 import { findMapLocation } from '../ShadowFalls';
-import * as prompts from '../prompts';
 
 /**
  * @param app
- * @param planner
  */
-export function locationAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
+export function locationAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('location', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'change':
             case 'update':
-                return await updateLocation(planner, context, state, data);
+                return await updateLocation(context, state, data);
             default:
                 await context.sendActivity(`[location.${action}]`);
                 return true;
@@ -23,13 +21,11 @@ export function locationAction(app: Application<ApplicationTurnState>, planner: 
 }
 
 /**
- * @param planner
  * @param context
  * @param state
  * @param data
  */
 async function updateLocation(
-    planner: OpenAIPlanner,
     context: TurnContext,
     state: ApplicationTurnState,
     data: IDataEntities
