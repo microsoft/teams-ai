@@ -19,7 +19,7 @@ import {
     MessagingExtensionQuery,
     Activity
 } from 'botbuilder';
-import Application, { RouteSelector, Query } from './Application';
+import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
 const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;

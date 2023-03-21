@@ -313,7 +313,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         action: string,
         data?: TData
     ): Promise<boolean> {
-        if (!this.actions.has(action)) {
+        if (!this._actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }
 

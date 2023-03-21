@@ -9,11 +9,7 @@
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
-/**
- * `ConversationState`, `UserState`, and `TempState` can store categorizations of information in memory. All three are extensible, though `input`, `history`, and `output` are  required in `TempState`.
- *  For example, `ConversationState`, may be appropriate storage for attachments in the conversation.  e.g.:
- * `attachments?: Attachments[]`
-*/
+export interface DefaultConversationState {
 
 }
 
