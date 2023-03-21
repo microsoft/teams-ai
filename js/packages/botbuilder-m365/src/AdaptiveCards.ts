@@ -13,7 +13,7 @@ import {
     INVOKE_RESPONSE_KEY,
     AdaptiveCardInvokeResponse
 } from 'botbuilder';
-import { Application, RouteSelector, Query } from './Application';
+import Application, { RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
 const ACTION_INVOKE_NAME = `adaptiveCard/action`;

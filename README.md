@@ -4,7 +4,9 @@ This SDK is designed to help you build bots that can interact with Teams and Mic
 
 The SDK also facilitates the creation of bots that uses an [OpenAI](https://openai.com/api/) API key to provide an AI-driven conversational experience, or the same using Azure Foundry.
 
-This SDK is currently in preview and is subject to change. We welcome your feedback and contributions!
+This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
+
+**To get started, head over to the [00.Migration](getting-started/00.MIGRATION.md) guide.**
 
 ## Capabilities
 

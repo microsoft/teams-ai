@@ -74,7 +74,6 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         // Check for chat completion model
         const model = this.getModel(prompt);
         if (model.startsWith('gpt-3.5-turbo')) {
-
             // Request base chat completion
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
             const chatRequest = this.createChatCompletionRequest(
@@ -124,7 +123,6 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
             response = result?.data?.choices ? result.data.choices[0]?.text : undefined;
         }
 
-
         // Ensure we weren't rate limited
         if (status === 429) {
             return {
@@ -158,11 +156,11 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
 
             // Parse response into commands
             const plan = ResponseParser.parseResponse(response.trim());
-            
+
             // Filter to only a single SAY command
             if (this._options.oneSayPerTurn) {
                 let spoken = false;
-                plan.commands = plan.commands.filter(cmd => {
+                plan.commands = plan.commands.filter((cmd) => {
                     if (cmd.type == 'SAY') {
                         if (spoken) {
                             return false;
@@ -288,16 +286,14 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                         );
                     } else {
                         console.error(
-                            `CHAT FAILED: status=${
-                                response.status
-                            } duration=${duration} headers=${JSON.stringify(response.headers)}`
+                            `CHAT FAILED: status=${response.status} duration=${duration} headers=${JSON.stringify(
+                                response.headers
+                            )}`
                         );
                     }
                 } else {
                     console.error(
-                        `CHAT FAILED: status=${
-                            error?.status
-                        } duration=${duration} message=${error?.toString()}`
+                        `CHAT FAILED: status=${error?.status} duration=${duration} message=${error?.toString()}`
                     );
                 }
             }
@@ -306,10 +302,7 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         return response!;
     }
 
-
-    private async createCompletion(
-        request: CreateCompletionRequest
-    ): Promise<AxiosResponse<CreateCompletionResponse>> {
+    private async createCompletion(request: CreateCompletionRequest): Promise<AxiosResponse<CreateCompletionResponse>> {
         let response: AxiosResponse<CreateCompletionResponse>;
         let error: { status?: number } = {};
         const startTime = new Date().getTime();
@@ -335,16 +328,14 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                         );
                     } else {
                         console.error(
-                            `PROMPT FAILED: status=${
-                                response.status
-                            } duration=${duration} headers=${JSON.stringify(response.headers)}`
+                            `PROMPT FAILED: status=${response.status} duration=${duration} headers=${JSON.stringify(
+                                response.headers
+                            )}`
                         );
                     }
                 } else {
                     console.error(
-                        `PROMPT FAILED: status=${
-                            error?.status
-                        } duration=${duration} message=${error?.toString()}`
+                        `PROMPT FAILED: status=${error?.status} duration=${duration} message=${error?.toString()}`
                     );
                 }
             }
@@ -354,9 +345,12 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
     }
 }
 
+/**
+ * @param messages
+ */
 function printChatMessages(messages: ChatCompletionRequestMessage[]): string {
     let text = '';
-    messages.forEach(msg => {
+    messages.forEach((msg) => {
         switch (msg.role) {
             case 'system':
                 text += msg.content + '\n';

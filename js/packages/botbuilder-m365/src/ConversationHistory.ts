@@ -64,7 +64,7 @@ export class ConversationHistory {
 
     public static hasMoreLines(state: TurnState): boolean {
         if (state.conversation) {
-            let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
+            const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
             return Array.isArray(history) ? history.length > 0 : false;
         } else {
             throw new Error(
@@ -118,7 +118,7 @@ export class ConversationHistory {
                 text = text.substring(0, doPos);
             }
         }
-        
+
         return text.indexOf('DO ') < 0 ? text.trim() : '';
     }
 
@@ -208,10 +208,11 @@ export class ConversationHistory {
     /**
      * Returns the current conversation history as a string of text.
      *
-     * @remarks
+     *
      * The length of the returned text is gated by `maxCharacterLength` and only whole lines of
      * history entries will be returned. That means that if the length of the most recent history
      * entry is greater then `maxCharacterLength` no text will be returned.
+     *
      * @param state Applications turn state.
      * @param maxTokens Optional. Maximum length of the text returned. Defaults to 1000 tokens.
      * @param lineSeparator Optional. Separate used between lines. Defaults to '\n'.

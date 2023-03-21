@@ -17,7 +17,7 @@ import { TurnState } from './TurnState';
 export type PromptSelector<TState extends TurnState> = (Context: TurnContext, state: TState) => Promise<string|PromptTemplate>;
 
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
-    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>
+    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>;
 }
 
 export interface AIOptions<TState extends TurnState> {
@@ -109,7 +109,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
                 return Array.isArray(plan.commands) && plan.commands.length > 0;
             },
             true
-        )
+        );
 
         // Register default DoCommandActionName
         this.action<PredictedDoCommandAndHandler<TState>>(
@@ -141,7 +141,6 @@ export class AI<TState extends TurnState = DefaultTurnState> {
             },
             true
         );
-
     }
 
 
@@ -160,15 +159,16 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     /**
      * Registers a handler for a named action.
      *
-     * @remarks
+     *
      * Actions can be triggered by a planner returning a DO command.
+     *
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
      * @param allowOverrides Optional. If true
      * @returns The application instance for chaining purposes.
      */
     public action<TEntities = Record<string, any>>(
-        name: string|string[],
+        name: string | string[],
         handler: (context: TurnContext, state: TState, entities: TEntities, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
@@ -260,7 +260,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
                             const handler = this._actions.get(action)!.handler;
                             continueChain = await this._actions
                                 .get(AI.DoCommandActionName)!
-                                .handler(context, state, { handler, ...cmd as PredictedDoCommand }, action);
+                                .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                         } else {
                             // Redirect to UnknownAction handler
                             continueChain = await this._actions
@@ -307,8 +307,13 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         return (context: TurnContext, state: TState) => this.completePrompt(context, state, name, options);
     }
 
-    public doAction<TData = Record<string,any>>(context: TurnContext, state: TState, action: string, data?: TData): Promise<boolean> {
-        if (!this._actions.has(action)) {
+    public doAction<TData = Record<string, any>>(
+        context: TurnContext,
+        state: TState,
+        action: string,
+        data?: TData
+    ): Promise<boolean> {
+        if (!this.actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }
 
