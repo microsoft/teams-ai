@@ -60,7 +60,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIModerator, OpenAIPlanner, AI } from 'botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
@@ -72,6 +72,10 @@ const planner = new OpenAIPlanner({
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
+const moderator = new OpenAIModerator({
+    apiKey: process.env.OpenAIKey,
+    moderate: 'both'
+});
 const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
@@ -80,12 +84,23 @@ const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
+        moderator,
         promptManager,
         prompt: 'chat',
         history: {
             assistantHistoryType: 'text'
         }
     }
+});
+
+app.ai.action(AI.FlaggedInputActionName, async (context, state, data) => {
+    await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
+    return false;
+});
+
+app.ai.action(AI.FlaggedOutputActionName, async (context, state, data) => {
+    await context.sendActivity(`I'm not allowed to talk about such things.`);
+    return false;
 });
 
 app.message('/history', async (context, state) => {
