@@ -9,6 +9,7 @@
 export * from './AdaptiveCards';
 export * from './AI';
 export * from './Application';
+export * from './AzureOpenAIPlanner';
 export * from './ConversationHistory';
 export * from './DefaultPromptManager';
 export * from './DefaultTurnStateManager';
