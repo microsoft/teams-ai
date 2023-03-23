@@ -12,7 +12,8 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage
+    MemoryStorage,
+    TurnContext
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -31,7 +32,7 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error | string) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -183,12 +184,6 @@ app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
     await context.sendActivity(responses.unknownAction(action));
-    return false;
-});
-
-// Register a handler to deal with a user asking something off topic
-app.ai.action(AI.OffTopicActionName, async (context, state) => {
-    await context.sendActivity(responses.offTopic());
     return false;
 });
 

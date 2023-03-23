@@ -121,12 +121,6 @@ app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
     return false;
 });
 
-// Register a handler to deal with a user asking something off topic
-app.ai.action(AI.OffTopicActionName, async (context, state) => {
-    await context.sendActivity(responses.offTopic());
-    return false;
-});
-
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
