@@ -68,9 +68,7 @@ type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create AI components
 const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
+    apiKey: process.env.OpenAIKey,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
@@ -83,7 +81,7 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner,
         promptManager,
-        prompt: 'chatGPT',
+        prompt: 'chat',
         history: {
             assistantHistoryType: 'text'
         }

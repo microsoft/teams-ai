@@ -83,9 +83,7 @@ type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempS
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
+    apiKey: process.env.OpenAIKey,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });

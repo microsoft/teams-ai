@@ -73,9 +73,7 @@ type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create AI components
 const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
+    apiKey: process.env.OpenAIKey,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });

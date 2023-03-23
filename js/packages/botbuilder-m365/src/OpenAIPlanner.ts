@@ -11,57 +11,47 @@ import { TurnState } from './TurnState';
 import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
 import {
-    Configuration,
-    ConfigurationParameters,
-    OpenAIApi,
+    OpenAIClient,
+    OpenAIClientResponse,
     CreateCompletionRequest,
     CreateCompletionResponse,
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
     ChatCompletionRequestMessage
-} from 'openai';
-import { AxiosInstance, AxiosResponse } from 'axios';
+} from './OpenAIClients';
 import { ResponseParser } from './ResponseParser';
 import { ConversationHistory } from './ConversationHistory';
 import { AI, ConfiguredAIOptions } from './AI';
 import { PromptTemplate } from './Prompts';
 
 export interface OpenAIPlannerOptions {
-    configuration: ConfigurationParameters;
+    apiKey: string;
+    organization?: string;
+    endpoint?: string;
     defaultModel: string;
-    basePath?: string;
-    axios?: AxiosInstance;
     oneSayPerTurn?: boolean;
     useSystemMessage?: boolean;
     logRequests?: boolean;
 }
 
-export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
-    implements Planner<TState>
+export class OpenAIPlanner<
+    TState extends TurnState = DefaultTurnState, 
+    TOptions extends OpenAIPlannerOptions = OpenAIPlannerOptions
+> implements Planner<TState>
 {
-    private readonly _options: OpenAIPlannerOptions;
-    private readonly _configuration: Configuration;
-    private readonly _openai: OpenAIApi;
+    private readonly _options: TOptions;
+    private readonly _client: OpenAIClient;
 
-    public constructor(options: OpenAIPlannerOptions) {
+    public constructor(options: TOptions) {
         this._options = Object.assign({
             oneSayPerTurn: false,
             useSystemMessage: false,
             logRequests: false
-        } as OpenAIPlannerOptions, options);
-        this._configuration = new Configuration(options.configuration);
-        this._openai = new OpenAIApi(this._configuration, options.basePath, options.axios as any);
+        } as TOptions, options);
+        this._client =  this.createClient(this._options);
     }
 
-    public get configuration(): Configuration {
-        return this._configuration;
-    }
-
-    public get openai(): OpenAIApi {
-        return this._openai;
-    }
-
-    public get options(): OpenAIPlannerOptions {
+    public get options(): TOptions {
         return this._options;
     }
 
@@ -180,6 +170,14 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         return { type: 'plan', commands: [] };
     }
 
+    protected createClient(options: TOptions): OpenAIClient {
+        return new OpenAIClient({
+            apiKey: options.apiKey,
+            organization: options.organization, 
+            endpoint: options.endpoint
+        });
+    } 
+
     private getModel(prompt: PromptTemplate): string {
         if (Array.isArray(prompt.config.default_backends) && prompt.config.default_backends.length > 0) {
             return prompt.config.default_backends[0];
@@ -260,14 +258,12 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
 
     private async createChatCompletion(
         request: CreateChatCompletionRequest
-    ): Promise<AxiosResponse<CreateChatCompletionResponse>> {
-        let response: AxiosResponse<CreateChatCompletionResponse>;
+    ): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
+        let response: OpenAIClientResponse<CreateChatCompletionResponse>;
         let error: { status?: number } = {};
         const startTime = new Date().getTime();
         try {
-            response = (await this._openai.createChatCompletion(request, {
-                validateStatus: (status) => status < 400 || status == 429
-            })) as any;
+            response = await this._client.createChatCompletion(request);
         } catch (err: any) {
             error = err;
             throw err;
@@ -302,14 +298,12 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         return response!;
     }
 
-    private async createCompletion(request: CreateCompletionRequest): Promise<AxiosResponse<CreateCompletionResponse>> {
-        let response: AxiosResponse<CreateCompletionResponse>;
+    private async createCompletion(request: CreateCompletionRequest): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
+        let response: OpenAIClientResponse<CreateCompletionResponse>;
         let error: { status?: number } = {};
         const startTime = new Date().getTime();
         try {
-            response = (await this._openai.createCompletion(request, {
-                validateStatus: (status) => status < 400 || status == 429
-            })) as any;
+            response = await this._client.createCompletion(request);
         } catch (err: any) {
             error = err;
             throw err;

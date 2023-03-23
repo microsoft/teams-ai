@@ -79,9 +79,7 @@ const PREVIEW_MODE = false;
 
 // Create AI components
 const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
+    apiKey: process.env.OpenAIKey,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
