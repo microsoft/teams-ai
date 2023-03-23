@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module botbuilder-m365
  */
@@ -31,7 +32,7 @@ export class PromptTemplateEngine<TState extends TurnState> {
         this._promptManager = promptManager;
     }
 
-    public extractBlocks(templateText?: string, validate: boolean = true): Block[] {
+    public extractBlocks(templateText?: string, validate = true): Block[] {
         const blocks = this.tokenizeInternal(templateText);
         if (validate) {
             this.validateBlocksSyntax(blocks);

@@ -206,7 +206,11 @@ function createActionExecuteSelector(verb: string | RegExp | RouteSelector): Rou
                 a?.type == ActivityTypes.Invoke &&
                 a?.name === ACTION_INVOKE_NAME &&
                 a?.value?.action?.type === ACTION_EXECUTE_TYPE;
-            return Promise.resolve(isInvoke && a?.value?.action?.verb === verb);
+            if (isInvoke && a?.value?.action?.verb === verb) {
+                return Promise.resolve(true);
+            } else {
+                return Promise.resolve(false);
+            }
         };
     }
 }
@@ -241,7 +245,12 @@ function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filte
 }
 
 /**
- * @param dataset
+ * This code creates a RouteSelector that can be used to route search requests to
+ * a bot's search handler.
+ *
+ * @param {string} dataset
+
+ @returns {RouteSelector} Route's search requests to a bot's search handler.
  */
 function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSelector {
     if (typeof dataset == 'function') {

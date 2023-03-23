@@ -17,7 +17,7 @@ import { VarBlock } from './VarBlock';
  * @private
  */
 export class CodeBlock extends Block {
-    private _validated: boolean = false;
+    private _validated = false;
 
     constructor(content: string) {
         super();
@@ -35,6 +35,7 @@ export class CodeBlock extends Block {
         const partsToValidate = this.content.split(/[ \t\r\n]+/).filter((x) => x.trim() !== '');
 
         for (let index = 0; index < partsToValidate.length; index++) {
+            // eslint-disable-next-line security/detect-object-injection
             const part = partsToValidate[index];
 
             if (index === 0) {

@@ -22,7 +22,7 @@ export abstract class Block {
         return BlockTypes.Undefined;
     }
 
-    public content: string = '';
+    public content = '';
 
     public renderCode(
         context: TurnContext,
