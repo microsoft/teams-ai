@@ -18,11 +18,7 @@ export interface Moderator<TState extends TurnState> {
         state: TState,
         prompt: PromptTemplate,
         options: ConfiguredAIOptions<TState>
-    ): Promise<Plan|undefined>;
+    ): Promise<Plan | undefined>;
 
-    reviewPlan(
-        context: TurnContext,
-        state: TState,
-        plan: Plan
-    ): Promise<Plan>;
+    reviewPlan(context: TurnContext, state: TState, plan: Plan): Promise<Plan>;
 }

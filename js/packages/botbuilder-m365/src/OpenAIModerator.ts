@@ -10,38 +10,34 @@ import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
-import {
-    OpenAIClient,
-    OpenAIClientResponse,
-    CreateModerationRequest,
-    CreateModerationResponse,
-    CreateModerationResponseResultsInner
-} from './OpenAIClients';
+import { OpenAIClient, CreateModerationResponseResultsInner } from './OpenAIClients';
 import { PromptTemplate } from './Prompts';
 import { Moderator } from './Moderator';
 import { ConfiguredAIOptions, AI } from './AI';
 
 export interface OpenAIModeratorOptions {
     apiKey: string;
-    moderate: 'input' | 'output' | 'both',
+    moderate: 'input' | 'output' | 'both';
     organization?: string;
     endpoint?: string;
     model?: string;
 }
 
-export class OpenAIModerator<
-    TState extends TurnState = DefaultTurnState
-> implements Moderator<TState>
-{
+export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implements Moderator<TState> {
     private readonly _options: OpenAIModeratorOptions;
     private readonly _client: OpenAIClient;
 
     public constructor(options: OpenAIModeratorOptions) {
         this._options = Object.assign({}, options);
-        this._client =  this.createClient(this._options);
+        this._client = this.createClient(this._options);
     }
 
-    public async reviewPrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan> {
+    public async reviewPrompt(
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
+        options: ConfiguredAIOptions<TState>
+    ): Promise<Plan> {
         switch (this._options.moderate) {
             case 'input':
             case 'both':
@@ -50,11 +46,23 @@ export class OpenAIModerator<
                 if (result) {
                     if (result.flagged) {
                         // Input flagged
-                        return { type: 'plan', commands: [{ type: 'DO', action: AI.FlaggedInputActionName, entities: result } as PredictedDoCommand]}
+                        return {
+                            type: 'plan',
+                            commands: [
+                                {
+                                    type: 'DO',
+                                    action: AI.FlaggedInputActionName,
+                                    entities: result
+                                } as PredictedDoCommand
+                            ]
+                        };
                     }
                 } else {
                     // Rate limited
-                    return { type: 'plan', commands: [{ type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand]}
+                    return {
+                        type: 'plan',
+                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand]
+                    };
                 }
                 break;
         }
@@ -74,11 +82,25 @@ export class OpenAIModerator<
                         if (result) {
                             if (result.flagged) {
                                 // Output flagged
-                                return { type: 'plan', commands: [{ type: 'DO', action: AI.FlaggedOutputActionName, entities: result } as PredictedDoCommand]}
+                                return {
+                                    type: 'plan',
+                                    commands: [
+                                        {
+                                            type: 'DO',
+                                            action: AI.FlaggedOutputActionName,
+                                            entities: result
+                                        } as PredictedDoCommand
+                                    ]
+                                };
                             }
                         } else {
                             // Rate limited
-                            return { type: 'plan', commands: [{ type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand]}
+                            return {
+                                type: 'plan',
+                                commands: [
+                                    { type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand
+                                ]
+                            };
                         }
                     }
                 }
@@ -100,7 +122,10 @@ export class OpenAIModerator<
         });
     }
 
-    private async createModeration(input: string, model?: string): Promise<CreateModerationResponseResultsInner|undefined> {
+    private async createModeration(
+        input: string,
+        model?: string
+    ): Promise<CreateModerationResponseResultsInner | undefined> {
         const response = await this._client.createModeration({ input, model });
         if (response.data?.results && Array.isArray(response.data.results) && response.data.results.length > 0) {
             return response.data.results[0];

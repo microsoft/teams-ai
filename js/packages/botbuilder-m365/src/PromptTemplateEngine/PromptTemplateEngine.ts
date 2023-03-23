@@ -6,13 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { PromptManager } from "../Prompts";
-import { TurnState } from "../TurnState";
-import { Block, BlockTypes } from "./Block";
-import { CodeBlock } from "./CodeBlock";
-import { TextBlock } from "./TextBlock";
-import { VarBlock } from "./VarBlock";
+import { TurnContext } from 'botbuilder';
+import { PromptManager } from '../Prompts';
+import { TurnState } from '../TurnState';
+import { Block, BlockTypes } from './Block';
+import { CodeBlock } from './CodeBlock';
+import { TextBlock } from './TextBlock';
+import { VarBlock } from './VarBlock';
 
 /**
  * Given a prompt, that might contain references to variables and functions:
@@ -72,10 +72,8 @@ export class PromptTemplateEngine<TState extends TurnState> {
     }
 
     public renderVariables(context: TurnContext, state: TState, blocks: Block[]): Block[] {
-        return blocks.map(block => {
-            return block.type != BlockTypes.Variable
-                ? block
-                : new TextBlock(block.render(context, state));
+        return blocks.map((block) => {
+            return block.type != BlockTypes.Variable ? block : new TextBlock(block.render(context, state));
         });
     }
 
@@ -142,7 +140,8 @@ export class PromptTemplateEngine<TState extends TurnState> {
 
                 // Remove "{{" and "}}" delimiters and trim empty chars
                 const contentWithoutDelimiters = contentWithDelimiters
-                    .substring(2, contentWithDelimiters.length - 2).trim();
+                    .substring(2, contentWithDelimiters.length - 2)
+                    .trim();
 
                 if (contentWithoutDelimiters.length === 0) {
                     // If what is left is empty, consider the raw block a Text Block

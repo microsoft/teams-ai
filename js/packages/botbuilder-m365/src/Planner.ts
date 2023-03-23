@@ -17,7 +17,7 @@ export interface Planner<TState extends TurnState> {
         state: TState,
         prompt: PromptTemplate,
         options: ConfiguredAIOptions<TState>
-    ): Promise<string|undefined>;
+    ): Promise<string | undefined>;
 
     generatePlan(
         context: TurnContext,

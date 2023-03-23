@@ -35,7 +35,7 @@ export interface OpenAIPlannerOptions {
 }
 
 export class OpenAIPlanner<
-    TState extends TurnState = DefaultTurnState, 
+    TState extends TurnState = DefaultTurnState,
     TOptions extends OpenAIPlannerOptions = OpenAIPlannerOptions
 > implements Planner<TState>
 {
@@ -43,12 +43,15 @@ export class OpenAIPlanner<
     private readonly _client: OpenAIClient;
 
     public constructor(options: TOptions) {
-        this._options = Object.assign({
-            oneSayPerTurn: false,
-            useSystemMessage: false,
-            logRequests: false
-        } as TOptions, options);
-        this._client =  this.createClient(this._options);
+        this._options = Object.assign(
+            {
+                oneSayPerTurn: false,
+                useSystemMessage: false,
+                logRequests: false
+            } as TOptions,
+            options
+        );
+        this._client = this.createClient(this._options);
     }
 
     public get options(): TOptions {
@@ -56,9 +59,9 @@ export class OpenAIPlanner<
     }
 
     public async completePrompt(
-        context: TurnContext, 
-        state: TState, 
-        prompt: PromptTemplate, 
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
         options: ConfiguredAIOptions<TState>
     ): Promise<string> {
         // Check for chat completion model
@@ -66,12 +69,7 @@ export class OpenAIPlanner<
         if (model.startsWith('gpt-3.5-turbo')) {
             // Request base chat completion
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
-            const chatRequest = this.createChatCompletionRequest(
-                state,
-                prompt,
-                temp.input,
-                options
-            );
+            const chatRequest = this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             return result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
         } else {
@@ -80,13 +78,12 @@ export class OpenAIPlanner<
             const result = await this.createCompletion(promptRequest);
             return result?.data?.choices ? result.data.choices[0]?.text : undefined;
         }
-       
     }
 
     public async generatePlan(
-        context: TurnContext, 
-        state: TState, 
-        prompt: PromptTemplate, 
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
         options: ConfiguredAIOptions<TState>
     ): Promise<Plan> {
         // Check for chat completion model
@@ -96,12 +93,7 @@ export class OpenAIPlanner<
         if (model.startsWith('gpt-3.5-turbo')) {
             // Request base chat completion
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
-            const chatRequest = await this.createChatCompletionRequest(
-                state,
-                prompt,
-                temp.input,
-                options
-            );
+            const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             status = result?.status;
             response = result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
@@ -173,10 +165,10 @@ export class OpenAIPlanner<
     protected createClient(options: TOptions): OpenAIClient {
         return new OpenAIClient({
             apiKey: options.apiKey,
-            organization: options.organization, 
+            organization: options.organization,
             endpoint: options.endpoint
         });
-    } 
+    }
 
     private getModel(prompt: PromptTemplate): string {
         if (Array.isArray(prompt.config.default_backends) && prompt.config.default_backends.length > 0) {
@@ -193,10 +185,13 @@ export class OpenAIPlanner<
         options: ConfiguredAIOptions<TState>
     ): CreateChatCompletionRequest {
         // Clone prompt config
-        const request: CreateChatCompletionRequest = Object.assign({
-            model: this.getModel(prompt),
-            messages: []
-        }, prompt.config.completion as CreateChatCompletionRequest);
+        const request: CreateChatCompletionRequest = Object.assign(
+            {
+                model: this.getModel(prompt),
+                messages: []
+            },
+            prompt.config.completion as CreateChatCompletionRequest
+        );
         this.patchStopSequences(request);
 
         // Populate system message
@@ -298,7 +293,9 @@ export class OpenAIPlanner<
         return response!;
     }
 
-    private async createCompletion(request: CreateCompletionRequest): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
+    private async createCompletion(
+        request: CreateCompletionRequest
+    ): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
         let response: OpenAIClientResponse<CreateCompletionResponse>;
         let error: { status?: number } = {};
         const startTime = new Date().getTime();
