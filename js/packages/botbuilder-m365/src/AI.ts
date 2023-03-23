@@ -8,7 +8,9 @@
 
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
 import { ConversationHistory } from './ConversationHistory';
+import { DefaultModerator } from './DefaultModerator';
 import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
+import { Moderator } from './Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
 import { PromptManager, PromptTemplate } from './Prompts';
 import { ResponseParser } from './ResponseParser';
@@ -23,6 +25,7 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
 export interface AIOptions<TState extends TurnState> {
     planner: Planner<TState>;
     promptManager: PromptManager<TState>;
+    moderator?: Moderator<TState>;
     prompt?: string|PromptTemplate|PromptSelector<TState>;
     history?: Partial<AIHistoryOptions>;
 }
@@ -40,18 +43,18 @@ export interface AIHistoryOptions {
 export interface ConfiguredAIOptions<TState extends TurnState> {
     planner: Planner<TState>;
     promptManager: PromptManager<TState>;
+    moderator: Moderator<TState>;
     prompt?: string|PromptTemplate|((Context: TurnContext, state: TState) => Promise<string|PromptTemplate>);
     history: AIHistoryOptions;
 }
 
 export class AI<TState extends TurnState = DefaultTurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
-    private readonly _planner: Planner<TState>;
-    private readonly _promptManager: PromptManager<TState>;
     private readonly _options: ConfiguredAIOptions<TState>;
 
     public static readonly UnknownActionName = '___UnknownAction___';
-    public static readonly OffTopicActionName = '___OffTopic___';
+    public static readonly FlaggedInputActionName = '___FlaggedInput___';
+    public static readonly FlaggedOutputActionName = '___FlaggedOutput___';
     public static readonly RateLimitedActionName = '___RateLimited___';
     public static readonly PlanReadyActionName = '___PlanReady___';
     public static readonly DoCommandActionName = '___DO___';
@@ -59,6 +62,11 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     public constructor(options: AIOptions<TState>) {
         this._options = Object.assign({}, options) as ConfiguredAIOptions<TState>;
+
+        // Create moderator if needed
+        if (!this._options.moderator) {
+            this._options.moderator = new DefaultModerator<TState>();
+        }
 
         // Initialize history options
         this._options.history = Object.assign({
@@ -81,12 +89,24 @@ export class AI<TState extends TurnState = DefaultTurnState> {
             true
         );
 
-        // Register default OffTopicAction handler
+        // Register default FlaggedInputAction handler
         this.action(
-            AI.OffTopicActionName,
+            AI.FlaggedInputActionName,
             (context, state, data, action) => {
                 console.error(
-                    `A Topic Filter was configured but no handler was registered for 'AI.OffTopicActionName'.`
+                    `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
+                );
+                return Promise.resolve(true);
+            },
+            true
+        );
+
+        // Register default FlaggedOutputAction handler
+        this.action(
+            AI.FlaggedOutputActionName,
+            (context, state, data, action) => {
+                console.error(
+                    `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
                 );
                 return Promise.resolve(true);
             },
@@ -143,6 +163,9 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         );
     }
 
+    public get moderator(): Moderator<TState> {
+        return this._options.moderator;
+    }
 
     public get options(): ConfiguredAIOptions<TState> {
         return this._options;
@@ -226,7 +249,13 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         const renderedPrompt = await opts.promptManager.renderPrompt(context, state, prompt);
 
         // Generate plan
-        const plan = await opts.planner.generatePlan(context, state, renderedPrompt, opts);
+        let plan = await opts.moderator.reviewPrompt(context, state, renderedPrompt, opts);
+        if (!plan) {
+            plan = await opts.planner.generatePlan(context, state, renderedPrompt, opts);
+            plan = await opts.moderator.reviewPlan(context, state, plan);
+        }
+
+        // Process generated plan
         let continueChain = await this._actions
             .get(AI.PlanReadyActionName)!
             .handler(context, state, plan, '');
