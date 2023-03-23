@@ -103,7 +103,6 @@ export class OpenAIModerator<
     private async createModeration(input: string, model?: string): Promise<CreateModerationResponseResultsInner|undefined> {
         const response = await this._client.createModeration({ input, model });
         if (response.data?.results && Array.isArray(response.data.results) && response.data.results.length > 0) {
-            //console.log(JSON.stringify(response.data.results[0]));
             return response.data.results[0];
         } else {
             return undefined;
