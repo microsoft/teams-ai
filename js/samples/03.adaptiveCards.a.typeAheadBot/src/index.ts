@@ -13,7 +13,8 @@ import {
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
     MemoryStorage,
-    ActivityTypes
+    ActivityTypes,
+    TurnContext
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -32,7 +33,7 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -75,8 +76,8 @@ const app = new Application({
 });
 
 // Listen for new members to join the conversation
-app.conversationUpdate('membersAdded', async (context, state) => {
-    const membersAdded = context.activity.membersAdded;
+app.conversationUpdate('membersAdded', async (context, _state) => {
+    const membersAdded = context.activity.membersAdded || [];
     for (let member = 0; member < membersAdded.length; member++) {
         // Ignore the bot joining the conversation
         if (membersAdded[member].id !== context.activity.recipient.id) {
@@ -88,12 +89,12 @@ app.conversationUpdate('membersAdded', async (context, state) => {
 });
 
 // Listen for messages that trigger returning an adaptive card
-app.message(/dynamic/i, async (context, state) => {
+app.message(/dynamic/i, async (context, _state) => {
     const attachment = createDynamicSearchCard();
     await context.sendActivity({ attachments: [attachment] });
 });
 
-app.message(/static/i, async (context, state) => {
+app.message(/static/i, async (context, _state) => {
     const attachment = createStaticSearchCard();
     await context.sendActivity({ attachments: [attachment] });
 });
@@ -110,9 +111,16 @@ app.adaptiveCards.search('npmpackages', async (context, state, query) => {
         }).toString()}`
     );
 
+    interface DataObject {
+        package: {
+            name: string;
+            description: string;
+        };
+    }
+
     // Format search results
     const npmPackages: AdaptiveCardSearchResult[] = [];
-    response.data.objects.forEach((obj) => {
+    response.data.objects.forEach((obj: DataObject) => {
         const result: AdaptiveCardSearchResult = {
             title: obj.package.name,
             value: `${obj.package.name} - ${obj.package.description}`
@@ -126,20 +134,20 @@ app.adaptiveCards.search('npmpackages', async (context, state, query) => {
 });
 
 interface SubmitData {
-    choiceSelect: string;
+    choiceSelect?: string;
 }
 
 // Listen for submit buttons
-app.adaptiveCards.actionSubmit('DynamicSubmit', async (context, state, data: SubmitData) => {
+app.adaptiveCards.actionSubmit('DynamicSubmit', async (context, _state, data: SubmitData) => {
     await context.sendActivity(`Dynamically selected option is: ${data.choiceSelect}`);
 });
 
-app.adaptiveCards.actionSubmit('StaticSubmit', async (context, state, data: SubmitData) => {
+app.adaptiveCards.actionSubmit('StaticSubmit', async (context, _state, data: SubmitData) => {
     await context.sendActivity(`Statically selected option is: ${data.choiceSelect}`);
 });
 
 // Listen for ANY message to be received. MUST BE AFTER ANY OTHER HANDLERS
-app.activity(ActivityTypes.Message, async (context, state) => {
+app.activity(ActivityTypes.Message, async (context, _state) => {
     await context.sendActivity(`Try saying "static search" or "dynamic search".`);
 });
 
