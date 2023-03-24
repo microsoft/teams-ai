@@ -16,7 +16,10 @@ import { PromptManager, PromptTemplate } from './Prompts';
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
-export type PromptSelector<TState extends TurnState> = (Context: TurnContext, state: TState) => Promise<string|PromptTemplate>;
+export type PromptSelector<TState extends TurnState> = (
+    Context: TurnContext,
+    state: TState
+) => Promise<string | PromptTemplate>;
 
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
     handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>;
@@ -26,7 +29,7 @@ export interface AIOptions<TState extends TurnState> {
     planner: Planner<TState>;
     promptManager: PromptManager<TState>;
     moderator?: Moderator<TState>;
-    prompt?: string|PromptTemplate|PromptSelector<TState>;
+    prompt?: string | PromptTemplate | PromptSelector<TState>;
     history?: Partial<AIHistoryOptions>;
 }
 
@@ -44,7 +47,7 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
     planner: Planner<TState>;
     promptManager: PromptManager<TState>;
     moderator: Moderator<TState>;
-    prompt?: string|PromptTemplate|((Context: TurnContext, state: TState) => Promise<string|PromptTemplate>);
+    prompt?: string | PromptTemplate | ((Context: TurnContext, state: TState) => Promise<string | PromptTemplate>);
     history: AIHistoryOptions;
 }
 
@@ -69,15 +72,18 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         }
 
         // Initialize history options
-        this._options.history = Object.assign({
-            trackHistory: true,
-            maxTurns: 3,
-            maxTokens: 1000,
-            lineSeparator: '\n',
-            userPrefix: 'User:',
-            assistantPrefix: 'Assistant:',
-            assistantHistoryType: 'planObject'
-        } as AIHistoryOptions, this._options.history);
+        this._options.history = Object.assign(
+            {
+                trackHistory: true,
+                maxTurns: 3,
+                maxTokens: 1000,
+                lineSeparator: '\n',
+                userPrefix: 'User:',
+                assistantPrefix: 'Assistant:',
+                assistantHistoryType: 'planObject'
+            } as AIHistoryOptions,
+            this._options.history
+        );
 
         // Register default UnknownAction handler
         this.action(
@@ -195,7 +201,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         handler: (context: TurnContext, state: TState, entities: TEntities, action: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
-        (Array.isArray(name) ? name : [name]).forEach(n => {
+        (Array.isArray(name) ? name : [name]).forEach((n) => {
             if (!this._actions.has(n) || allowOverrides) {
                 this._actions.set(n, { handler, allowOverrides });
             } else {
@@ -216,7 +222,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public async chain(
         context: TurnContext,
         state: TState,
-        prompt?: string|PromptTemplate,
+        prompt?: string | PromptTemplate,
         options?: Partial<AIOptions<TState>>
     ): Promise<boolean> {
         // Configure options
@@ -234,7 +240,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         }
 
         // Populate {{$temp.input}}
-        const temp = (state as any as DefaultTurnState)?.temp?.value ?? {} as DefaultTempState;
+        const temp = (state as any as DefaultTurnState)?.temp?.value ?? ({} as DefaultTempState);
         if (typeof temp.input != 'string') {
             // Use the received activity text
             temp.input = context.activity.text;
@@ -256,24 +262,37 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         }
 
         // Process generated plan
-        let continueChain = await this._actions
-            .get(AI.PlanReadyActionName)!
-            .handler(context, state, plan, '');
+        let continueChain = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, '');
         if (continueChain) {
             // Update conversation history
             if (opts.history.trackHistory) {
-                ConversationHistory.addLine(state, `${opts.history.userPrefix.trim()} ${temp.input.trim()}`, opts.history.maxTurns * 2);
+                ConversationHistory.addLine(
+                    state,
+                    `${opts.history.userPrefix.trim()} ${temp.input.trim()}`,
+                    opts.history.maxTurns * 2
+                );
                 switch (opts.history.assistantHistoryType) {
                     case 'text':
                         // Extract only the things the assistant has said
-                        const text = plan.commands.filter(v => v.type == 'SAY').map(v => (v as PredictedSayCommand).response).join('\n');
-                        ConversationHistory.addLine(state, `${opts.history.assistantPrefix.trim()} ${text}`, opts.history.maxTurns * 2);
+                        const text = plan.commands
+                            .filter((v) => v.type == 'SAY')
+                            .map((v) => (v as PredictedSayCommand).response)
+                            .join('\n');
+                        ConversationHistory.addLine(
+                            state,
+                            `${opts.history.assistantPrefix.trim()} ${text}`,
+                            opts.history.maxTurns * 2
+                        );
                         break;
                     case 'planObject':
                     default:
                         // Embed the plan object to re-enforce the model
                         // - TODO: add support for XML as well
-                        ConversationHistory.addLine(state, `${opts.history.assistantPrefix.trim()} ${JSON.stringify(plan)}`, opts.history.maxTurns * 2);
+                        ConversationHistory.addLine(
+                            state,
+                            `${opts.history.assistantPrefix.trim()} ${JSON.stringify(plan)}`,
+                            opts.history.maxTurns * 2
+                        );
                         break;
                 }
             }
@@ -314,9 +333,9 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public async completePrompt(
         context: TurnContext,
         state: TState,
-        prompt: string|PromptTemplate,
+        prompt: string | PromptTemplate,
         options?: Partial<AIOptions<TState>>
-    ): Promise<string|undefined> {
+    ): Promise<string | undefined> {
         // Configure options
         const opts = this.configureOptions(options);
 
@@ -327,7 +346,11 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         return await opts.planner.completePrompt(context, state, renderedPrompt, opts);
     }
 
-    public createSemanticFunction(name: string, template?: PromptTemplate, options?: Partial<AIOptions<TState>>): (context: TurnContext, state: TState) => Promise<any> {
+    public createSemanticFunction(
+        name: string,
+        template?: PromptTemplate,
+        options?: Partial<AIOptions<TState>>
+    ): (context: TurnContext, state: TState) => Promise<any> {
         // Cache prompt template if being dynamically assigned
         if (template) {
             this._options.promptManager.addPromptTemplate(name, template);
@@ -353,7 +376,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     private configureOptions(options?: Partial<AIOptions<TState>>): ConfiguredAIOptions<TState> {
         let configuredOptions: ConfiguredAIOptions<TState>;
         if (options) {
-            configuredOptions = Object.assign({}, this._options,  options) as ConfiguredAIOptions<TState>;
+            configuredOptions = Object.assign({}, this._options, options) as ConfiguredAIOptions<TState>;
             if (options.history) {
                 // Just inherit any missing history settings
                 options.history = Object.assign({}, this._options.history, options.history);

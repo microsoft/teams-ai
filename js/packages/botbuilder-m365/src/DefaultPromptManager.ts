@@ -6,14 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
+import { TurnContext } from 'botbuilder';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { DefaultTurnState } from "./DefaultTurnStateManager";
-import { PromptManager, PromptTemplate } from "./Prompts";
-import { Block, PromptTemplateEngine } from "./PromptTemplateEngine";
-import { TurnState } from "./TurnState";
-
+import { DefaultTurnState } from './DefaultTurnStateManager';
+import { PromptManager, PromptTemplate } from './Prompts';
+import { Block, PromptTemplateEngine } from './PromptTemplateEngine';
+import { TurnState } from './TurnState';
 
 export interface DefaultPromptManagerOptions {
     promptsFolder: string;
@@ -25,12 +24,16 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
     private readonly _options: DefaultPromptManagerOptions;
     private readonly _templateEngine: PromptTemplateEngine<TState>;
 
-    public constructor(options: DefaultPromptManagerOptions|string) {
+    public constructor(options: DefaultPromptManagerOptions | string) {
         this._options = typeof options == 'object' ? Object.assign({}, options) : { promptsFolder: options };
         this._templateEngine = new PromptTemplateEngine(this);
     }
 
-    public addFunction(name: string, handler: (context: TurnContext, state: TState) => Promise<any>, allowOverrides = false): this {
+    public addFunction(
+        name: string,
+        handler: (context: TurnContext, state: TState) => Promise<any>,
+        allowOverrides = false
+    ): this {
         if (!this._functions.has(name) || allowOverrides) {
             this._functions.set(name, { handler, allowOverrides });
         } else {
@@ -60,7 +63,11 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         try {
             entry.blocks = this._templateEngine.extractBlocks(entry.text, true);
         } catch (err: unknown) {
-            throw new Error(`DefaultPromptManager.addPromptTemplate(): an error occurred while parsing the template for '${name}': ${(err as Error).toString()}`);
+            throw new Error(
+                `DefaultPromptManager.addPromptTemplate(): an error occurred while parsing the template for '${name}': ${(
+                    err as Error
+                ).toString()}`
+            );
         }
 
         // Cache template
@@ -93,21 +100,29 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
                 const config = await fs.readFile(configFile, 'utf-8');
                 entry.config = JSON.parse(config);
             } catch (err: unknown) {
-                throw new Error(`DefaultPromptManager.loadPromptTemplate(): an error occurred while loading '${configFile}'. The file is either invalid or missing.`);
+                throw new Error(
+                    `DefaultPromptManager.loadPromptTemplate(): an error occurred while loading '${configFile}'. The file is either invalid or missing.`
+                );
             }
 
             // Load prompt text
             try {
                 entry.text = await fs.readFile(promptFile, 'utf-8');
             } catch (err: unknown) {
-                throw new Error(`DefaultPromptManager.loadPromptTemplate(): an error occurred while loading '${promptFile}'. The file is either invalid or missing.`);
+                throw new Error(
+                    `DefaultPromptManager.loadPromptTemplate(): an error occurred while loading '${promptFile}'. The file is either invalid or missing.`
+                );
             }
 
             // Parse prompt into blocks
             try {
                 entry.blocks = this._templateEngine.extractBlocks(entry.text, true);
             } catch (err: unknown) {
-                throw new Error(`DefaultPromptManager.loadPromptTemplate(): an error occurred while parsing '${promptFile}': ${(err as Error).toString()}`);
+                throw new Error(
+                    `DefaultPromptManager.loadPromptTemplate(): an error occurred while parsing '${promptFile}': ${(
+                        err as Error
+                    ).toString()}`
+                );
             }
 
             // Cache loaded template
@@ -117,15 +132,21 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         return this._templates.get(name);
     }
 
-    public async renderPrompt(context: TurnContext, state: TState, nameOrTemplate: string | PromptTemplate): Promise<PromptTemplate> {
+    public async renderPrompt(
+        context: TurnContext,
+        state: TState,
+        nameOrTemplate: string | PromptTemplate
+    ): Promise<PromptTemplate> {
         // Load the template if needed
         let template: CachedPromptTemplate;
         if (typeof nameOrTemplate == 'string') {
-            template = await this.loadPromptTemplate(nameOrTemplate) as CachedPromptTemplate;
+            template = (await this.loadPromptTemplate(nameOrTemplate)) as CachedPromptTemplate;
         } else if (typeof nameOrTemplate == 'object' && nameOrTemplate.text && nameOrTemplate.config) {
             template = Object.assign({}, nameOrTemplate) as CachedPromptTemplate;
         } else {
-            throw new Error(`The DefaultPromptManager.renderPrompt() method was passed an invalid or missing template.`);
+            throw new Error(
+                `The DefaultPromptManager.renderPrompt() method was passed an invalid or missing template.`
+            );
         }
 
         // Render the prompt

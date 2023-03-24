@@ -6,15 +6,14 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { TurnState } from "../TurnState";
-import { Block, BlockTypes } from "./Block";
+import { TurnContext } from 'botbuilder';
+import { TurnState } from '../TurnState';
+import { Block, BlockTypes } from './Block';
 
 /**
  * @private
  */
 export class TextBlock extends Block {
-
     constructor(content: string, startIndex?: number, endIndex?: number) {
         super();
         if (typeof startIndex == 'number') {
@@ -28,7 +27,7 @@ export class TextBlock extends Block {
         return BlockTypes.Text;
     }
 
-    public isValid(): { valid: boolean; error: string; } {
+    public isValid(): { valid: boolean; error: string } {
         return {
             valid: true,
             error: ''

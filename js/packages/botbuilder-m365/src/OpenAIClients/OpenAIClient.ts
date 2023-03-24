@@ -1,4 +1,3 @@
-
 /**
  * @module botbuilder-m365
  */
@@ -7,8 +6,17 @@
  * Licensed under the MIT License.
  */
 
-import axios, { AxiosInstance, AxiosRequestHeaders } from "axios";
-import { CreateChatCompletionRequest, CreateChatCompletionResponse, CreateCompletionRequest, CreateCompletionResponse, CreateEmbeddingRequest, CreateEmbeddingResponse, CreateModerationRequest, CreateModerationResponse } from "./schema";
+import axios, { AxiosInstance, AxiosRequestHeaders } from 'axios';
+import {
+    CreateChatCompletionRequest,
+    CreateChatCompletionResponse,
+    CreateCompletionRequest,
+    CreateCompletionResponse,
+    CreateEmbeddingRequest,
+    CreateEmbeddingResponse,
+    CreateModerationRequest,
+    CreateModerationResponse
+} from './schema';
 
 export interface OpenAIClientResponse<TData> {
     status: number;
@@ -40,7 +48,9 @@ export class OpenAIClient {
             }
 
             if (!options.endpoint.toLowerCase().startsWith('https://')) {
-                throw new Error(`OpenAIClient initialized with an invalid endpoint of '${options.endpoint}'. The endpoint must be a valid HTTPS url.`);
+                throw new Error(
+                    `OpenAIClient initialized with an invalid endpoint of '${options.endpoint}'. The endpoint must be a valid HTTPS url.`
+                );
             }
         }
 
@@ -62,7 +72,9 @@ export class OpenAIClient {
         return this.post(url, request);
     }
 
-    public createChatCompletion(request: CreateChatCompletionRequest): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
+    public createChatCompletion(
+        request: CreateChatCompletionRequest
+    ): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
         const url = `${this.options.endpoint ?? this.DefaultEndpoint}/v1/chat/completions`;
         return this.post(url, request);
     }
@@ -76,8 +88,8 @@ export class OpenAIClient {
         const url = `${this.options.endpoint ?? this.DefaultEndpoint}/v1/moderations`;
         return this.post(url, request);
     }
-    
-    protected addRequestHeaders(headers: Record<string,string>, options: OpenAIClientOptions): void {
+
+    protected addRequestHeaders(headers: Record<string, string>, options: OpenAIClientOptions): void {
         headers['Authorization'] = `Bearer ${options.apiKey}`;
         if (options.organization) {
             headers['OpenAI-Organization'] = options.organization;
@@ -86,14 +98,16 @@ export class OpenAIClient {
 
     protected async post<TData>(url: string, body: object): Promise<OpenAIClientResponse<TData>> {
         // Initialize request headers
-        const requestHeaders: Record<string,string> = {
+        const requestHeaders: Record<string, string> = {
             'Content-Type': 'application/json',
             'User-Agent': this.UserAgent
         };
-        this.addRequestHeaders(requestHeaders, this.options)
+        this.addRequestHeaders(requestHeaders, this.options);
 
         // Send request
-        const { status, statusText, data, headers } = await this._httpClient.post(url, body, { headers: requestHeaders });
+        const { status, statusText, data, headers } = await this._httpClient.post(url, body, {
+            headers: requestHeaders
+        });
         return { status, statusText, data, headers: headers as any };
     }
 }

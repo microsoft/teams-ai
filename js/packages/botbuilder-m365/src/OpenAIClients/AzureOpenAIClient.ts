@@ -6,7 +6,16 @@
  * Licensed under the MIT License.
  */
 
-import { CreateChatCompletionRequest, CreateChatCompletionResponse, CreateCompletionRequest, CreateCompletionResponse, CreateEmbeddingRequest, CreateEmbeddingResponse, CreateModerationRequest, CreateModerationResponse } from './schema';
+import {
+    CreateChatCompletionRequest,
+    CreateChatCompletionResponse,
+    CreateCompletionRequest,
+    CreateCompletionResponse,
+    CreateEmbeddingRequest,
+    CreateEmbeddingResponse,
+    CreateModerationRequest,
+    CreateModerationResponse
+} from './schema';
 import { OpenAIClient, OpenAIClientOptions, OpenAIClientResponse } from './OpenAIClient';
 
 export interface AzureOpenAIClientOptions extends OpenAIClientOptions {
@@ -33,7 +42,9 @@ export class AzureOpenAIClient extends OpenAIClient {
         return this.post(url, clone);
     }
 
-    public createChatCompletion(request: CreateChatCompletionRequest): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
+    public createChatCompletion(
+        request: CreateChatCompletionRequest
+    ): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
         const clone = Object.assign({}, request);
         const deployment = this.removeModel(clone);
         const endpoint = (this.options as AzureOpenAIClientOptions).endpoint;
@@ -55,11 +66,11 @@ export class AzureOpenAIClient extends OpenAIClient {
         throw new Error(`the AzureOpenAIClient does not currently support calling the Moderation API.`);
     }
 
-    protected addRequestHeaders(headers: Record<string,string>, options: OpenAIClientOptions): void {
+    protected addRequestHeaders(headers: Record<string, string>, options: OpenAIClientOptions): void {
         headers['api-key'] = options.apiKey;
     }
 
-    private removeModel(request: { model: string; }): string {
+    private removeModel(request: { model: string }): string {
         const model = request.model;
         delete request.model;
         return model;

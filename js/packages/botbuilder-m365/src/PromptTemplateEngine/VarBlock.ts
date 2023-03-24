@@ -6,10 +6,10 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { stringify } from "yaml";
-import { TurnState } from "../TurnState";
-import { Block, BlockTypes } from "./Block";
+import { TurnContext } from 'botbuilder';
+import { stringify } from 'yaml';
+import { TurnState } from '../TurnState';
+import { Block, BlockTypes } from './Block';
 
 /**
  * @private
@@ -28,14 +28,14 @@ export class VarBlock extends Block {
         return BlockTypes.Variable;
     }
 
-    public isValid(): { valid: boolean; error?: string; } {
+    public isValid(): { valid: boolean; error?: string } {
         let valid = true;
         let error: string | undefined;
 
         if (this.content[0] !== VarBlock.Prefix) {
             error = `A variable must start with the symbol ${VarBlock.Prefix}`;
             valid = false;
-        } else  if (this.content.length < 2) {
+        } else if (this.content.length < 2) {
             error = 'The variable name is empty';
             valid = false;
         } else {
@@ -47,7 +47,6 @@ export class VarBlock extends Block {
                 error = `The variable name '${varName}' isn't currently supported. Variables must be of the form '$<property>' or '$<scope>.<property>' and sub properties aren't currently supported.`;
                 valid = false;
             }
-    
         }
 
         return { valid, error };
@@ -95,7 +94,11 @@ export class VarBlock extends Block {
     }
 
     public static formatValue(value: any): string {
-        return typeof value == 'object' || Array.isArray(value) ? stringify(value) : (value != undefined ? value.toString() : '');
+        return typeof value == 'object' || Array.isArray(value)
+            ? stringify(value)
+            : value != undefined
+            ? value.toString()
+            : '';
     }
 
     public static hasVarPrefix(text: string): boolean {

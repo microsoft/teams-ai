@@ -9,13 +9,11 @@
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
-export interface DefaultConversationState {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DefaultConversationState {}
 
-}
-
-export interface DefaultUserState {
-
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DefaultUserState {}
 
 export interface DefaultTempState {
     /**
@@ -35,21 +33,25 @@ export interface DefaultTempState {
 }
 
 export interface DefaultTurnState<
-    TConversationState extends DefaultConversationState = DefaultConversationState, 
-    TUserState extends DefaultUserState = DefaultUserState, 
-    TTempState extends DefaultTempState = DefaultTempState> extends TurnState {
+    TConversationState extends DefaultConversationState = DefaultConversationState,
+    TUserState extends DefaultUserState = DefaultUserState,
+    TTempState extends DefaultTempState = DefaultTempState
+> extends TurnState {
     conversation: TurnStateEntry<TConversationState>;
     user: TurnStateEntry<TUserState>;
     temp: TurnStateEntry<TTempState>;
 }
 
 export class DefaultTurnStateManager<
-    TConversationState extends DefaultConversationState = DefaultConversationState, 
-    TUserState extends DefaultUserState = DefaultUserState, 
-    TTempState extends DefaultTempState = DefaultTempState>
-    implements TurnStateManager<DefaultTurnState<TConversationState, TUserState, TTempState>>
+    TConversationState extends DefaultConversationState = DefaultConversationState,
+    TUserState extends DefaultUserState = DefaultUserState,
+    TTempState extends DefaultTempState = DefaultTempState
+> implements TurnStateManager<DefaultTurnState<TConversationState, TUserState, TTempState>>
 {
-    public async loadState(storage: Storage, context: TurnContext): Promise<DefaultTurnState<TConversationState, TUserState, TTempState>> {
+    public async loadState(
+        storage: Storage,
+        context: TurnContext
+    ): Promise<DefaultTurnState<TConversationState, TUserState, TTempState>> {
         // Compute state keys
         const activity = context.activity;
         const channelId = activity?.channelId;

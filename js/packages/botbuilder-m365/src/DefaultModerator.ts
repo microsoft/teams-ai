@@ -6,17 +6,21 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder-core";
-import { ConfiguredAIOptions } from "./AI";
-import { DefaultTurnState } from "./DefaultTurnStateManager";
-import { Moderator } from "./Moderator";
-import { Plan } from "./Planner";
-import { PromptTemplate } from "./Prompts";
-import { TurnState } from "./TurnState";
-
+import { TurnContext } from 'botbuilder-core';
+import { ConfiguredAIOptions } from './AI';
+import { DefaultTurnState } from './DefaultTurnStateManager';
+import { Moderator } from './Moderator';
+import { Plan } from './Planner';
+import { PromptTemplate } from './Prompts';
+import { TurnState } from './TurnState';
 
 export class DefaultModerator<TState extends TurnState = DefaultTurnState> implements Moderator<TState> {
-    reviewPrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan> {
+    reviewPrompt(
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
+        options: ConfiguredAIOptions<TState>
+    ): Promise<Plan> {
         // Just allow prompt
         return Promise.resolve(undefined);
     }
