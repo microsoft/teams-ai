@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "version": "1.0.2",
+  "manifestVersion": "1.16",
+  "id": "0b62c6ac-f1c1-49a7-9952-89fa3a6b862e",
+  "packageName": "com.package.name",
+  "name": {
+    "short": "DevOps Bot",
+    "full": "DevOps Bot"
+  },
+  "developer": {
+    "name": "microsoft",
+    "mpnId": "",
+    "websiteUrl": "https://microsoft.com",
+    "privacyUrl": "https://microsoft.com/privacy",
+    "termsOfUseUrl": "https://microsoft.com/termsofuse"
+  },
+  "description": {
+    "short": "Sample AI bot for managing list of work items",
+    "full": "Sample AI bot for managing list of work items"
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#FFFFFF",
+  "staticTabs": [
+    {
+      "entityId": "conversations",
+      "scopes": [
+        "personal"
+      ]
+    },
+    {
+      "entityId": "about",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "bots": [
+    {
+      "botId": "0b62c6ac-f1c1-49a7-9952-89fa3a6b862e",
+      "scopes": [
+        "personal",
+        "team",
+        "groupChat"
+      ],
+      "isNotificationOnly": false,
+      "supportsCalling": false,
+      "supportsVideo": false,
+      "supportsFiles": false
+    }
+  ],
+  "validDomains": []
+}
