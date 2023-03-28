@@ -14,11 +14,14 @@ namespace Microsoft.Bot.Builder.M365
     public class TypingTimer
     {
         public Timer? timer;
-        private int _delay;
+        /// <summary>
+        /// The interval in milliseconds to send "typing" activity.
+        /// </summary>
+        private int _interval;
 
         public TypingTimer(int typingTimerDelay)
         {
-            this._delay = typingTimerDelay;
+            this._interval = typingTimerDelay;
         }
 
         /// <summary>
@@ -34,10 +37,10 @@ namespace Microsoft.Bot.Builder.M365
             if (turnContext.Activity.Type != ActivityTypes.Message || this.timer != null) return;
 
             // Listen for outgoing activities
-            turnContext.OnSendActivities(TypingTimerSendActivitiesHandler);
+            turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
             
             // Start periodically send "typing" activity
-            this.timer = new Timer(SendTypingActivity, turnContext, 0, _delay);
+            this.timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
         }
 
         public void StopTypingTimer()
@@ -68,11 +71,12 @@ namespace Microsoft.Bot.Builder.M365
                 // The context object throws when we try to update "this.Responded = true". We can just
                 // eat the error but lets make sure our states cleaned up a bit.
                 this.timer = null;
+
             }
         }
 
 
-        private Task<ResourceResponse[]> TypingTimerSendActivitiesHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+        private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
             if (this.timer != null)
             {
