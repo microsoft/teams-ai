@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AI, Application, ConversationHistory, DefaultConversationState, DefaultPromptManager, DefaultTempState, DefaultTurnState, DefaultUserState, OpenAIPlanner, ResponseParser } from 'botbuilder-m365';
+import { AI, Application, ConversationHistory, DefaultConversationState, DefaultPromptManager, DefaultTempState, DefaultTurnState, DefaultUserState, OpenAIPlanner, ResponseParser } from '@microsoft/botbuilder-m365';
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as path from 'path';
 import * as responses from './responses';
