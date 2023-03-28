@@ -12,12 +12,12 @@ import { timeAction } from './timeAction';
  * @param app
  * @param planner
  */
-export function addActions(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
-    inventoryAction(app, planner);
-    locationAction(app, planner);
-    mapAction(app, planner);
-    playerAction(app, planner);
-    questAction(app, planner);
-    storyAction(app, planner);
-    timeAction(app, planner);
+export function addActions(app: Application<ApplicationTurnState>): void {
+    inventoryAction(app);
+    locationAction(app);
+    mapAction(app);
+    playerAction(app);
+    questAction(app);
+    storyAction(app);
+    timeAction(app);
 }

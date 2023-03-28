@@ -12,7 +12,8 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage
+    MemoryStorage,
+    TurnContext
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -31,7 +32,7 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error | string) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -63,47 +64,41 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from 'botbuilder-m365';
 import * as responses from './responses';
 
-// Create prediction engine
-const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.0,
-        max_tokens: 1024,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
-    logRequests: true
-});
-
 // Strongly type the applications turn state
-interface ConversationState {
+interface ConversationState extends DefaultConversationState {
     greeted: boolean;
     listNames: string[];
     lists: Record<string, string[]>;
 }
 
-interface UserState {}
+interface UserState extends DefaultUserState {}
 
-interface TempState {
+interface TempState extends DefaultTempState {
     lists: Record<string, string[]>;
 }
 
 type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
+// Create AI components
+const planner = new OpenAIPlanner<ApplicationTurnState>({
+    apiKey: process.env.OpenAIKey,
+    defaultModel: 'text-davinci-003',
+    logRequests: true
+});
+const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
-    planner
+    ai: {
+        planner,
+        promptManager,
+        prompt: 'chatGPT'
+    }
 });
 
 // Define an interface to strongly type data parameters for actions
@@ -127,6 +122,16 @@ app.message('/reset', async (context, state) => {
 });
 
 // Register action handlers
+app.ai.action('createList', async (context, state, data: EntityData) => {
+    ensureListExists(state, data.list);
+    return true;
+});
+
+app.ai.action('deleteList', async (context, state, data: EntityData) => {
+    deleteList(state, data.list);
+    return true;
+});
+
 app.ai.action('addItem', async (context, state, data: EntityData) => {
     const items = getItems(state, data.list);
     items.push(data.item);
@@ -167,17 +172,7 @@ app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
     if (lists) {
         // Chain into a new summarization prompt
         state.temp.value.lists = lists;
-        await app.ai.chain(context, state, {
-            prompt: path.join(__dirname, '../src/summarizeAllLists.txt'),
-            promptConfig: {
-                model: 'text-davinci-003',
-                temperature: 0.0,
-                max_tokens: 2048,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0
-            }
-        });
+        await app.ai.chain(context, state, 'summarize');
     } else {
         await context.sendActivity(responses.noListsFound());
     }
@@ -189,12 +184,6 @@ app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
     await context.sendActivity(responses.unknownAction(action));
-    return false;
-});
-
-// Register a handler to deal with a user asking something off topic
-app.ai.action(AI.OffTopicActionName, async (context, state) => {
-    await context.sendActivity(responses.offTopic());
     return false;
 });
 
@@ -231,13 +220,33 @@ function setItems(state: ApplicationTurnState, list: string, items: string[]): v
  * @param listName
  */
 function ensureListExists(state: ApplicationTurnState, listName: string): void {
-    if (typeof state.conversation.value.lists != 'object') {
-        state.conversation.value.lists = {};
-        state.conversation.value.listNames = [];
+    const conversation = state.conversation.value;
+    if (typeof conversation.lists != 'object') {
+        conversation.lists = {};
+        conversation.listNames = [];
     }
 
-    if (!state.conversation.value.lists.hasOwnProperty(listName)) {
-        state.conversation.value.lists[listName] = [];
-        state.conversation.value.listNames.push(listName);
+    if (!conversation.lists.hasOwnProperty(listName)) {
+        conversation.lists[listName] = [];
+        conversation.listNames.push(listName);
     }
 }
+
+/**
+ * @param state
+ * @param listName
+ */
+function deleteList(state: ApplicationTurnState, listName: string): void {
+    const conversation = state.conversation.value;
+    if (typeof conversation.lists == 'object' && conversation.lists.hasOwnProperty(listName)) {
+        delete conversation.lists[listName];
+    }
+
+    if (Array.isArray(conversation.listNames)) {
+        const pos = conversation.listNames.indexOf(listName);
+        if (pos >= 0) {
+            conversation.listNames.splice(pos, 1);
+        }
+    }
+}
+

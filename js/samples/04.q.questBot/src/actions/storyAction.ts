@@ -1,12 +1,11 @@
 import { TurnContext } from 'botbuilder';
-import { Application, ConversationHistory, OpenAIPlanner } from 'botbuilder-m365';
-import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
+import { Application } from 'botbuilder-m365';
+import { ApplicationTurnState, IDataEntities } from '../bot';
 
 /**
  * @param app
- * @param planner
  */
-export function storyAction(app: Application<ApplicationTurnState>, planner: OpenAIPlanner): void {
+export function storyAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('story', async (context, state, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {

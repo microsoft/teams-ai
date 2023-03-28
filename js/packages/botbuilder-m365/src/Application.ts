@@ -19,8 +19,7 @@ import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
-import { Planner } from './Planner';
-import { AI } from './AI';
+import { AI, AIOptions } from './AI';
 
 const TYPING_TIMER_DELAY = 1000;
 
@@ -31,14 +30,12 @@ export interface Query<TParams extends Record<string, any>> {
 }
 
 export interface ApplicationOptions<
-    TState extends TurnState,
-    TPlanOptions,
-    TPlanner extends Planner<TState, TPlanOptions>
+    TState extends TurnState
 > {
     adapter?: BotAdapter;
     botAppId?: string;
     storage?: Storage;
-    planner?: TPlanner;
+    ai?: AIOptions<TState>;
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
     removeRecipientMention?: boolean;
@@ -67,29 +64,27 @@ export type ConversationUpdateEvents =
 export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
-export default class Application<
-    TState extends TurnState = DefaultTurnState,
-    TPlanOptions = any,
-    TPlanner extends Planner<TState, TPlanOptions> = Planner<TState, TPlanOptions>
+export class Application<
+    TState extends TurnState = DefaultTurnState
 > {
-    private readonly _options: ApplicationOptions<TState, TPlanOptions, TPlanner>;
+    private readonly _options: ApplicationOptions<TState>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
-    private readonly _ai?: AI<TState, TPlanOptions, TPlanner>;
+    private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
     private _typingTimer: any;
 
-    public constructor(options?: ApplicationOptions<TState, TPlanOptions, TPlanner>) {
+    public constructor(options?: ApplicationOptions<TState>) {
         this._options = Object.assign(
             {
                 removeRecipientMention: true,
                 startTypingTimer: true
-            } as ApplicationOptions<TState, TPlanOptions, TPlanner>,
+            } as ApplicationOptions<TState>,
             options
-        ) as ApplicationOptions<TState, TPlanOptions, TPlanner>;
+        ) as ApplicationOptions<TState>;
 
         // Create default turn state manager if needed
         if (!this._options.turnStateManager) {
@@ -97,8 +92,8 @@ export default class Application<
         }
 
         // Create AI component if configured with a planner
-        if (this._options.planner) {
-            this._ai = new AI(this._options.planner);
+        if (this._options.ai) {
+            this._ai = new AI(this._options.ai);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -109,9 +104,9 @@ export default class Application<
         return this._adaptiveCards;
     }
 
-    public get ai(): AI<TState, TPlanOptions, TPlanner> {
+    public get ai(): AI<TState> {
         if (!this._ai) {
-            throw new Error(`The Application.ai property is unavailable because no Planner was configured.`);
+            throw new Error(`The Application.ai property is unavailable because no AI options were configured.`);
         }
 
         return this._ai;
@@ -121,7 +116,7 @@ export default class Application<
         return this._messageExtensions;
     }
 
-    public get options(): ApplicationOptions<TState, TPlanOptions, TPlanner> {
+    public get options(): ApplicationOptions<TState> {
         return this._options;
     }
 

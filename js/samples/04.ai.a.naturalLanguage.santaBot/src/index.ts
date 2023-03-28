@@ -60,39 +60,51 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIModerator, OpenAIPlanner, AI } from 'botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
-// Create prediction engine
+// Create AI components
 const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    logRequests: true,
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        frequency_penalty: 0,
-        max_tokens: 2048,
-        model: 'text-davinci-003',
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:'],
-        temperature: 0.4,
-        top_p: 1
-    }
+    apiKey: process.env.OpenAIKey,
+    defaultModel: 'text-davinci-003',
+    logRequests: true
 });
+const moderator = new OpenAIModerator({
+    apiKey: process.env.OpenAIKey,
+    moderate: 'both'
+});
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
-    planner,
-    storage
+    storage,
+    ai: {
+        planner,
+        moderator,
+        promptManager,
+        prompt: 'chat',
+        history: {
+            assistantHistoryType: 'text'
+        }
+    }
+});
+
+app.ai.action(AI.FlaggedInputActionName, async (context, state, data) => {
+    await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
+    return false;
+});
+
+app.ai.action(AI.FlaggedOutputActionName, async (context, state, data) => {
+    await context.sendActivity(`I'm not allowed to talk about such things.`);
+    return false;
 });
 
 app.message('/history', async (context, state) => {
-    const history = ConversationHistory.toString(state, 10000, '\n\n');
+    const history = ConversationHistory.toString(state, 2000, '\n\n');
     await context.sendActivity(history);
 });
 

@@ -6,6 +6,7 @@
  * Licensed under the MIT License.
  */
 
+import { encode } from 'gpt-3-encoder';
 import { TurnState } from './TurnState';
 
 export class ConversationHistory {
@@ -19,9 +20,9 @@ export class ConversationHistory {
      *
      * @param state Applications turn state.
      * @param line Line of text to add to history.
-     * @param maxLines Optional. Maximum number of lines to store. Defaults to 30.
+     * @param maxLines Optional. Maximum number of lines to store. Defaults to 10.
      */
-    public static addLine(state: TurnState, line: string, maxLines = 30): void {
+    public static addLine(state: TurnState, line: string, maxLines = 10): void {
         if (state.conversation) {
             // Create history array if it doesn't exist
             let history: string[] = state.conversation.value[ConversationHistory.StatePropertyName];
@@ -213,26 +214,31 @@ export class ConversationHistory {
      * entry is greater then `maxCharacterLength` no text will be returned.
      *
      * @param state Applications turn state.
-     * @param maxCharacterLength Optional. Maximum length of the text returned. Defaults to 4000 characters.
+     * @param maxTokens Optional. Maximum length of the text returned. Defaults to 1000 tokens.
      * @param lineSeparator Optional. Separate used between lines. Defaults to '\n'.
      * @returns The most recent lines of conversation history as a text string.
      */
-    public static toString(state: TurnState, maxCharacterLength = 4000, lineSeparator = '\n'): string {
+    public static toString(state: TurnState, maxTokens = 1000, lineSeparator = '\n'): string {
         if (state.conversation) {
             // Get history array if it exists
             const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName] ?? [];
 
             // Populate up to max chars
             let text = '';
+            let textTokens = 0;
+            const lineSeparatorTokens = encode(lineSeparator).length;
             for (let i = history.length - 1; i >= 0; i--) {
                 // Ensure that adding line won't go over the max character length
                 const line = history[i];
-                if (text.length + line.length + lineSeparator.length > maxCharacterLength) {
+                const lineTokens = encode(line).length;
+                const newTextTokens = textTokens + lineTokens + lineSeparatorTokens;
+                if (newTextTokens > maxTokens) {
                     break;
                 }
 
                 // Prepend line to output
                 text = `${line}${lineSeparator}${text}`;
+                textTokens = newTextTokens; 
             }
 
             return text.trim();
@@ -243,23 +249,25 @@ export class ConversationHistory {
         }
     }
 
-    public static toArray(state: TurnState, maxCharacterLength = 4000): string[] {
+    public static toArray(state: TurnState, maxTokens = 1000): string[] {
         if (state.conversation) {
             // Get history array if it exists
             const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName] ?? [];
 
             // Populate up to max chars
-            let text = '';
-            const lines: string[] = [];
+            let textTokens = 0;
+            let lines: string[] = [];
             for (let i = history.length - 1; i >= 0; i--) {
                 // Ensure that adding line won't go over the max character length
                 const line = history[i];
-                if (text.length + line.length > maxCharacterLength) {
+                const lineTokens = encode(line).length;
+                const newTextTokens = textTokens + lineTokens;
+                if (newTextTokens > maxTokens) {
                     break;
                 }
 
                 // Prepend line to output
-                text += line;
+                textTokens = newTextTokens;
                 lines.unshift(line);
             }
 

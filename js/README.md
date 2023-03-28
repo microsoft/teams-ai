@@ -13,9 +13,9 @@ To then run a sample:
 
 `cd` into the sample directory to see more instructions, or just follow the instructions below:
 
-1. Create a new bot in the [Teams Developer Portal](https://dev.teams.microsoft.com/). Follow [this guide](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/teams-developer-portal) if you're new to the portal. Make sure you create a bot for your app which can be done from "tools->Bot Management". Make note of the bot's app ID and Secret. You'll need those in the next step. The endpoint address isn't super critical as we'll reconfigure it in step 4 once we've started [ngrok](https://ngrok.com).
+1. Create a new bot in the [Teams Developer Portal](https://dev.teams.microsoft.com/). Follow [platform guide](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/teams-developer-portal) if you're new to the portal. Make sure you create a bot for your app which can be done from "tools->Bot Management". Make note of the bot's app ID and Secret. You'll need those in the next step. The endpoint address isn't super critical as we'll reconfigure it in step 4 once we've started [ngrok](https://ngrok.com).
 
-1. From a command window, navigate to the desired samples folder and create a new file called `.env` with following settings. If you're trying to run an AI sample you'll also need to create an account on [OpenAI](https://openai.com/api/) and generate an SDK key:
+1. From a command window, navigate to the desired sample folder and create a new file called `.env` with following settings. If you're trying to run an AI sample you'll also need to create an account on [OpenAI](https://openai.com/api/) and generate an SDK key:
 
 ```text
 MicrosoftAppType=MultiTenant

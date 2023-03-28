@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AI, Application, ConversationHistory, DefaultTurnState, OpenAIPlanner, ResponseParser } from 'botbuilder-m365';
+import { AI, Application, ConversationHistory, DefaultConversationState, DefaultPromptManager, DefaultTempState, DefaultTurnState, DefaultUserState, OpenAIPlanner, ResponseParser } from 'botbuilder-m365';
 import { ActivityTypes, TurnContext } from 'botbuilder';
+import * as path from 'path';
 import * as responses from './responses';
 import { IItemList } from './interfaces';
 import { map } from './ShadowFalls';
-import * as prompts from './prompts';
 import { addActions } from './actions';
 import { LastWriterWinsStore } from './LastWriterWinsStore';
 import {
@@ -17,24 +17,8 @@ import {
     generateWeather
 } from './conditions';
 
-// Create prediction engine
-const planner = new OpenAIPlanner({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    prompt: selectMainPrompt,
-    promptConfig: prompts.prompt.promptConfig,
-    conversationHistory: {
-        userPrefix: 'Player: ',
-        botPrefix: 'DM: ',
-        maxLines: 2,
-        maxCharacterLength: 2000
-    },
-    logRequests: true
-});
-
 // Strongly type the applications turn state
-export interface ConversationState {
+export interface ConversationState extends DefaultConversationState {
     version: number;
     greeted: boolean;
     turn: number;
@@ -51,27 +35,19 @@ export interface ConversationState {
     nextEncounterTurn: number;
 }
 
-export interface UserState {
+export interface UserState extends DefaultUserState {
     name: string;
     backstory: string;
     equipped: string;
     inventory: IItemList;
 }
 
-export interface TempState {
+export interface TempState extends DefaultTempState {
     playerAnswered: boolean;
     prompt: string;
     promptInstructions: string;
-    playerInfo: string;
-    gameState: string;
-    campaign: string;
-    quests: string;
-    location: string;
-    conditions: string;
     listItems: IItemList;
     listType: string;
-    timeOfDay: string;
-    season: string;
     backstoryChange: string;
     equippedChange: string;
     originalText: string;
@@ -116,11 +92,30 @@ export interface ILocation {
 
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
+// Create AI components
+const planner = new OpenAIPlanner({
+    apiKey: process.env.OpenAIKey,
+    defaultModel: 'gpt-3.5-turbo',
+    logRequests: true
+});
+const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
 // Define storage and application
+// - Note that we're not passing a prompt in our AI options as we manually ask for hints.
 const storage = new LastWriterWinsStore(process.env.StorageConnectionString, process.env.StorageContainer);
 const app = new Application<ApplicationTurnState>({
     storage,
-    planner
+    ai: {
+        planner,
+        promptManager,
+        prompt: async (context, state) => state.temp.value.prompt,
+        history: {
+            userPrefix: 'Player:',
+            assistantPrefix: 'DM:',
+            maxTurns: 3,
+            maxTokens: 600
+        }
+    }
 });
 
 // Export bots run() function
@@ -184,7 +179,7 @@ app.turn('beforeTurn', async (context, state) => {
         if (!conversation.greeted) {
             newDay = true;
             conversation.greeted = true;
-            temp.prompt = 'intro.txt';
+            temp.prompt = 'intro';
 
             // Create starting location
             const village = map.locations['village'];
@@ -205,7 +200,7 @@ app.turn('beforeTurn', async (context, state) => {
             conversation.nextEncounterTurn = 5 + Math.floor(Math.random() * 15);
 
             // Create campaign
-            const response = await planner.prompt(context, state, prompts.createCampaign);
+            const response = await app.ai.completePrompt(context, state, 'createCampaign');
             campaign = ResponseParser.parseJSON(response);
             if (campaign && campaign.title && Array.isArray(campaign.objectives)) {
                 // Send campaign title as a message
@@ -220,7 +215,7 @@ app.turn('beforeTurn', async (context, state) => {
         } else {
             campaign = conversation.campaign;
             location = conversation.location;
-            temp.prompt = 'prompt.txt';
+            temp.prompt = 'prompt';
 
             // Increment game turn
             conversation.turn++;
@@ -260,7 +255,7 @@ app.turn('beforeTurn', async (context, state) => {
         // Is user asking for help
         let objectiveAdded = false;
         if (useHelpPrompt && !campaignFinished) {
-            temp.prompt = 'help.txt';
+            temp.prompt = 'help';
         } else if (nextObjective && Math.random() < 0.2) {
             // Add campaign objective as a quest
             conversation.quests[nextObjective.title.toLowerCase()] = {
@@ -279,28 +274,16 @@ app.turn('beforeTurn', async (context, state) => {
             app.startTypingTimer(context);
         }
 
+        // Has a new day passed?
+        if (newDay) {
+            const season = describeSeason(conversation.day);
+            conversation.temperature = generateTemperature(season);
+            conversation.weather = generateWeather(season);
+        }
+
         // Load temp variables for prompt use
         temp.playerAnswered = false;
         temp.promptInstructions = 'Answer the players query.';
-        temp.playerInfo = describePlayerInfo(player);
-        temp.campaign = describeCampaign(campaign);
-        temp.quests = describeQuests(conversation);
-        temp.location = `"${location.title}" - ${location.description}`;
-        temp.gameState = describeGameState(conversation);
-        temp.timeOfDay = describeTimeOfDay(conversation.time);
-        temp.season = describeSeason(conversation.day);
-
-        if (newDay) {
-            conversation.temperature = generateTemperature(temp.season);
-            conversation.weather = generateWeather(temp.season);
-        }
-
-        temp.conditions = describeConditions(
-            conversation.time,
-            conversation.day,
-            conversation.temperature,
-            conversation.weather
-        );
 
         if (campaignFinished) {
             temp.promptInstructions =
@@ -380,39 +363,25 @@ app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
     return true;
 });
 
-addActions(app, planner);
+addActions(app);
 
-/**
- * @param context
- * @param state
- */
-async function selectMainPrompt(context: TurnContext, state: ApplicationTurnState): Promise<string> {
-    const prompt = state.temp.value.prompt;
-    return await planner.expandPromptTemplate(context, state, prompts.getPromptPath(prompt));
-}
-
-/**
- * @param conversation
- */
-export function describeGameState(conversation: ConversationState): string {
+// Register prompt functions
+app.ai.prompts.addFunction('describeGameState', async (context, state) => {
+    const conversation = state.conversation.value;
     return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`;
-}
+});
 
-/**
- * @param campaign
- */
-export function describeCampaign(campaign?: ICampaign): string {
-    if (campaign) {
-        return `"${campaign.title}" - ${campaign.playerIntro}`;
+app.ai.prompts.addFunction('describeCampaign', async (context, state) => {
+    const conversation = state.conversation.value;
+    if (conversation.campaign) {
+        return `"${conversation.campaign.title}" - ${conversation.campaign.playerIntro}`;
     } else {
         return '';
     }
-}
+});
 
-/**
- * @param conversation
- */
-export function describeQuests(conversation: ConversationState): string {
+app.ai.prompts.addFunction('describeQuests', async (context, state) => {
+    const conversation = state.conversation.value;
     let text = '';
     let connector = '';
     for (const key in conversation.quests) {
@@ -422,16 +391,33 @@ export function describeQuests(conversation: ConversationState): string {
     }
 
     return text.length > 0 ? text : 'none';
-}
+});
 
-/**
- * @param player
- */
-export function describePlayerInfo(player: UserState): string {
+app.ai.prompts.addFunction('describePlayerInfo', async (context, state) => {
+    const player = state.user.value;
     let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
-}
+});
+
+app.ai.prompts.addFunction('describeLocation', async (context, state) => {
+    const conversation = state.conversation.value;
+    if (conversation.location) {
+        return `"${conversation.location.title}" - ${conversation.location.description}`;
+    } else {
+        return '';
+    }
+});
+
+app.ai.prompts.addFunction('describeConditions', async (context, state) => {
+    const conversation = state.conversation.value;
+    return describeConditions(
+        conversation.time,
+        conversation.day,
+        conversation.temperature,
+        conversation.weather
+    );
+});
 
 /**
  * @param items
@@ -443,35 +429,6 @@ export function describeItemList(items: IItemList, indent = '\t'): string {
     for (const key in items) {
         text += `${delim}\t\t${key}: ${items[key]}`;
         delim = '\n';
-    }
-
-    return text;
-}
-
-/**
- * @param state
- */
-export function describePlayerDMConversation(state: ApplicationTurnState): string {
-    let text = '';
-    let connector = '';
-    const history: string[] = state.conversation.value[ConversationHistory.StatePropertyName] ?? [];
-    for (let i = 0; i < history.length; i++) {
-        const entry = history[i];
-        if (entry.startsWith('Player:')) {
-            const nameStart = entry.indexOf('[') + 1;
-            const nameEnd = entry.indexOf(']', nameStart);
-            const player = entry.substring(nameStart, nameEnd);
-            const utterance = entry.substring(nameEnd + 1).trim();
-            text += `${connector}${player} said \`${utterance}\``;
-            connector = '\nThen ';
-        } else {
-            const response = entry.substring(entry.indexOf(' ')).trim();
-            if (text.length > 0) {
-                text += ` and the DM replied with \`${response}\``;
-            } else {
-                text += ` The DM said \`${response}\``;
-            }
-        }
     }
 
     return text;

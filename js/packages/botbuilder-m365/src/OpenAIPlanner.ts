@@ -6,136 +6,75 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
+import { PredictedDoCommand, Planner, Plan } from './Planner';
 import { TurnState } from './TurnState';
-import { DefaultTurnState } from './DefaultTurnStateManager';
+import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
 import {
-    Configuration,
-    ConfigurationParameters,
-    OpenAIApi,
+    OpenAIClient,
+    OpenAIClientResponse,
     CreateCompletionRequest,
     CreateCompletionResponse,
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
     ChatCompletionRequestMessage
-} from 'openai';
-import { AxiosInstance, AxiosResponse } from 'axios';
+} from './OpenAIClients';
 import { ResponseParser } from './ResponseParser';
-import { PromptParser, PromptTemplate } from './PromptParser';
 import { ConversationHistory } from './ConversationHistory';
-import { AI } from './AI';
-
-export interface OpenAIPromptConfig extends CreateCompletionRequest {
-    useSystemMessage?: boolean;
-}
-
-export interface OpenAIPromptOptions {
-    prompt: PromptTemplate;
-    promptConfig: CreateCompletionRequest;
-    conversationHistory?: OpenAIConversationHistoryOptions;
-    logRequests?: boolean;
-}
+import { AI, ConfiguredAIOptions } from './AI';
+import { PromptTemplate } from './Prompts';
 
 export interface OpenAIPlannerOptions {
-    configuration: ConfigurationParameters;
-    basePath?: string;
-    axios?: AxiosInstance;
-    prompt?: PromptTemplate;
-    promptConfig?: CreateCompletionRequest;
-    conversationHistory?: OpenAIConversationHistoryOptions;
+    apiKey: string;
+    organization?: string;
+    endpoint?: string;
+    defaultModel: string;
     oneSayPerTurn?: boolean;
+    useSystemMessage?: boolean;
     logRequests?: boolean;
 }
 
-export interface OpenAIConversationHistoryOptions {
-    addTurnToHistory?: boolean;
-    userPrefix?: string;
-    botPrefix?: string;
-    maxLines?: number;
-    maxCharacterLength?: number;
-    lineSeparator?: string;
-    includePlanJson?: boolean;
-}
-
-export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
-    implements Planner<TState, OpenAIPromptOptions>
+export class OpenAIPlanner<
+    TState extends TurnState = DefaultTurnState,
+    TOptions extends OpenAIPlannerOptions = OpenAIPlannerOptions
+> implements Planner<TState>
 {
-    private readonly _options: OpenAIPlannerOptions;
-    private readonly _configuration: Configuration;
-    private readonly _openai: OpenAIApi;
+    private readonly _options: TOptions;
+    private readonly _client: OpenAIClient;
 
-    public constructor(options: OpenAIPlannerOptions) {
+    public constructor(options: TOptions) {
         this._options = Object.assign(
             {
-                oneSayPerTurn: true,
+                oneSayPerTurn: false,
+                useSystemMessage: false,
                 logRequests: false
-            } as OpenAIPlannerOptions,
+            } as TOptions,
             options
         );
-        this._configuration = new Configuration(options.configuration);
-        this._openai = new OpenAIApi(this._configuration, options.basePath, options.axios as any);
-
-        // Initialize conversation history
-        this._options.conversationHistory = Object.assign(
-            {
-                addTurnToHistory: true,
-                userPrefix: 'Human: ',
-                botPrefix: 'AI: ',
-                includePlanJson: true
-            } as OpenAIConversationHistoryOptions,
-            this._options.conversationHistory
-        );
+        this._client = this.createClient(this._options);
     }
 
-    public get configuration(): Configuration {
-        return this._configuration;
-    }
-
-    public get openai(): OpenAIApi {
-        return this._openai;
-    }
-
-    public get options(): OpenAIPlannerOptions {
+    public get options(): TOptions {
         return this._options;
     }
 
-    public async expandPromptTemplate(context: TurnContext, state: TState, prompt: string): Promise<string> {
-        return PromptParser.expandPromptTemplate(context, state, prompt, {
-            conversationHistory: this._options.conversationHistory
-        });
-    }
-
-    public async prompt(
+    public async completePrompt(
         context: TurnContext,
         state: TState,
-        options: OpenAIPromptOptions,
-        message?: string
-    ): Promise<string | undefined> {
+        prompt: PromptTemplate,
+        options: ConfiguredAIOptions<TState>
+    ): Promise<string> {
         // Check for chat completion model
-        if (options.promptConfig.model.startsWith('gpt-3.5-turbo')) {
+        const model = this.getModel(prompt);
+        if (model.startsWith('gpt-3.5-turbo')) {
             // Request base chat completion
-            const chatRequest = await this.createChatCompletionRequest(
-                context,
-                state,
-                options.prompt,
-                options.promptConfig,
-                message,
-                options.conversationHistory
-            );
-
+            const temp = (state['temp']?.value ?? {}) as DefaultTempState;
+            const chatRequest = this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             return result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
         } else {
             // Request base prompt completion
-            const promptRequest = await this.createCompletionRequest(
-                context,
-                state,
-                options.prompt,
-                options.promptConfig,
-                options.conversationHistory
-            );
-
+            const promptRequest = this.createCompletionRequest(prompt);
             const result = await this.createCompletion(promptRequest);
             return result?.data?.choices ? result.data.choices[0]?.text : undefined;
         }
@@ -144,42 +83,23 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
     public async generatePlan(
         context: TurnContext,
         state: TState,
-        options?: OpenAIPromptOptions,
-        message?: string
+        prompt: PromptTemplate,
+        options: ConfiguredAIOptions<TState>
     ): Promise<Plan> {
-        options = options ?? (this._options as OpenAIPromptOptions);
-
-        if (!options.prompt || !options.promptConfig) {
-            throw new Error(`OpenAIPredictionEngine: "prompt" or "promptConfiguration" not specified.`);
-        }
-
         // Check for chat completion model
         let status: number;
         let response: string;
-        if (options.promptConfig.model.startsWith('gpt-3.5-turbo')) {
+        const model = this.getModel(prompt);
+        if (model.startsWith('gpt-3.5-turbo')) {
             // Request base chat completion
-            const chatRequest = await this.createChatCompletionRequest(
-                context,
-                state,
-                options.prompt,
-                options.promptConfig,
-                message ?? context.activity.text,
-                options.conversationHistory
-            );
-
+            const temp = (state['temp']?.value ?? {}) as DefaultTempState;
+            const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             status = result?.status;
             response = result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
         } else {
             // Request base prompt completion
-            const promptRequest = await this.createCompletionRequest(
-                context,
-                state,
-                options.prompt,
-                options.promptConfig,
-                options.conversationHistory
-            );
-
+            const promptRequest = this.createCompletionRequest(prompt);
             const result = await this.createCompletion(promptRequest);
             status = result?.status;
             response = result?.data?.choices ? result.data.choices[0]?.text : undefined;
@@ -208,12 +128,11 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
             }
 
             // Remove response prefix
-            const historyOptions = options.conversationHistory ?? {};
-            if (historyOptions.botPrefix) {
+            if (options.history.assistantPrefix) {
                 // The model sometimes predicts additional text for the human side of things so skip that.
-                const pos = response.toLowerCase().indexOf(historyOptions.botPrefix.toLowerCase());
+                const pos = response.toLowerCase().indexOf(options.history.assistantPrefix.toLowerCase());
                 if (pos >= 0) {
-                    response = response.substring(pos + historyOptions.botPrefix.length);
+                    response = response.substring(pos + options.history.assistantPrefix.length);
                 }
             }
 
@@ -236,74 +155,56 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                 });
             }
 
-            // Add turn to conversation history
-            if (historyOptions.addTurnToHistory) {
-                if (context.activity.text) {
-                    ConversationHistory.addLine(
-                        state,
-                        `${historyOptions.userPrefix ?? ''}${context.activity.text}`,
-                        historyOptions.maxLines
-                    );
-                }
-                if (historyOptions.includePlanJson) {
-                    ConversationHistory.addLine(
-                        state,
-                        `${historyOptions.botPrefix ?? ''}${JSON.stringify(plan)}`,
-                        historyOptions.maxLines
-                    );
-                } else {
-                    const text = plan.commands
-                        .filter((v) => v.type == 'SAY')
-                        .map((v) => (v as PredictedSayCommand).response)
-                        .join('\n');
-                    ConversationHistory.addLine(
-                        state,
-                        `${historyOptions.botPrefix ?? ''}${text}`,
-                        historyOptions.maxLines
-                    );
-                }
-            }
-
             return plan;
         }
 
+        // Return an empty plan by default
         return { type: 'plan', commands: [] };
     }
 
-    private async createChatCompletionRequest(
-        context: TurnContext,
+    protected createClient(options: TOptions): OpenAIClient {
+        return new OpenAIClient({
+            apiKey: options.apiKey,
+            organization: options.organization,
+            endpoint: options.endpoint
+        });
+    }
+
+    private getModel(prompt: PromptTemplate): string {
+        if (Array.isArray(prompt.config.default_backends) && prompt.config.default_backends.length > 0) {
+            return prompt.config.default_backends[0];
+        } else {
+            return this._options.defaultModel;
+        }
+    }
+
+    private createChatCompletionRequest(
         state: TState,
         prompt: PromptTemplate,
-        config: OpenAIPromptConfig,
-        userMessage?: string,
-        historyOptions?: OpenAIConversationHistoryOptions
-    ): Promise<CreateChatCompletionRequest> {
+        userMessage: string,
+        options: ConfiguredAIOptions<TState>
+    ): CreateChatCompletionRequest {
         // Clone prompt config
         const request: CreateChatCompletionRequest = Object.assign(
             {
+                model: this.getModel(prompt),
                 messages: []
-            } as CreateChatCompletionRequest,
-            config
+            },
+            prompt.config.completion as CreateChatCompletionRequest
         );
-
-        // Expand prompt template
-        // - NOTE: While the local history options and the prompts expected history options are
-        //         different types, they're compatible via duck typing. This could impact porting.
-        const systemMsg = await PromptParser.expandPromptTemplate(context, state, prompt, {
-            conversationHistory: historyOptions
-        });
+        this.patchStopSequences(request);
 
         // Populate system message
         request.messages.push({
-            role: config.useSystemMessage ? 'system' : 'user',
-            content: systemMsg
+            role: this._options.useSystemMessage ? 'system' : 'user',
+            content: prompt.text
         });
 
         // Populate conversation history
-        if (historyOptions) {
-            const userPrefix = (historyOptions.userPrefix ?? 'Human: ').toLowerCase();
-            const botPrefix = (historyOptions.botPrefix ?? 'AI: ').toLowerCase();
-            const history = ConversationHistory.toArray(state, historyOptions.maxCharacterLength);
+        if (options.history.trackHistory) {
+            const userPrefix = options.history.userPrefix.trim().toLowerCase();
+            const assistantPrefix = options.history.assistantPrefix.trim().toLowerCase();
+            const history = ConversationHistory.toArray(state, options.history.maxTokens);
             for (let i = 0; i < history.length; i++) {
                 let line = history[i];
                 const lcLine = line.toLowerCase();
@@ -313,8 +214,8 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
                         role: 'user',
                         content: line
                     });
-                } else if (lcLine.startsWith(botPrefix)) {
-                    line = line.substring(botPrefix.length).trim();
+                } else if (lcLine.startsWith(assistantPrefix)) {
+                    line = line.substring(assistantPrefix.length).trim();
                     request.messages.push({
                         role: 'assistant',
                         content: line
@@ -334,36 +235,30 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         return request;
     }
 
-    private async createCompletionRequest(
-        context: TurnContext,
-        state: TState,
-        prompt: PromptTemplate,
-        config: CreateCompletionRequest,
-        historyOptions?: OpenAIConversationHistoryOptions
-    ): Promise<CreateCompletionRequest> {
+    private createCompletionRequest(prompt: PromptTemplate): CreateCompletionRequest {
         // Clone prompt config
-        const request = Object.assign({}, config);
-
-        // Expand prompt template
-        // - NOTE: While the local history options and the prompts expected history options are
-        //         different types, they're compatible via duck typing. This could impact porting.
-        request.prompt = await PromptParser.expandPromptTemplate(context, state, prompt, {
-            conversationHistory: historyOptions
-        });
-
+        const request: CreateCompletionRequest = Object.assign({}, prompt.config.completion as CreateCompletionRequest);
+        this.patchStopSequences(request);
+        request.model = this.getModel(prompt);
+        request.prompt = prompt.text;
         return request;
+    }
+
+    private patchStopSequences(request: any): void {
+        if (request['stop_sequences']) {
+            request.stop = request['stop_sequences'];
+            delete request['stop_sequences'];
+        }
     }
 
     private async createChatCompletion(
         request: CreateChatCompletionRequest
-    ): Promise<AxiosResponse<CreateChatCompletionResponse>> {
-        let response: AxiosResponse<CreateChatCompletionResponse>;
+    ): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
+        let response: OpenAIClientResponse<CreateChatCompletionResponse>;
         let error: { status?: number } = {};
         const startTime = new Date().getTime();
         try {
-            response = (await this._openai.createChatCompletion(request, {
-                validateStatus: (status) => status < 400 || status == 429
-            })) as any;
+            response = await this._client.createChatCompletion(request);
         } catch (err: any) {
             error = err;
             throw err;
@@ -398,14 +293,14 @@ export class OpenAIPlanner<TState extends TurnState = DefaultTurnState>
         return response!;
     }
 
-    private async createCompletion(request: CreateCompletionRequest): Promise<AxiosResponse<CreateCompletionResponse>> {
-        let response: AxiosResponse<CreateCompletionResponse>;
+    private async createCompletion(
+        request: CreateCompletionRequest
+    ): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
+        let response: OpenAIClientResponse<CreateCompletionResponse>;
         let error: { status?: number } = {};
         const startTime = new Date().getTime();
         try {
-            response = (await this._openai.createCompletion(request, {
-                validateStatus: (status) => status < 400 || status == 429
-            })) as any;
+            response = await this._client.createCompletion(request);
         } catch (err: any) {
             error = err;
             throw err;

@@ -12,21 +12,21 @@ This sample illustrates basic conversational bot behavior in Microsoft Teams and
 
 ### Adaptive Cards: [Type Ahead Bot](02.messageExtensions.a.searchCommand/)
 
-A conversational bot that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
-
-This sample illustrates the M365 BotBuilder SDK's ability to scaffold conversational bot and Adaptive Card components.
-
-### Message Extensions: [Search Command](03.adaptiveCards.a.typeAheadBot/)
-
 A Message Extension (ME) built to search NPM for a specific package and return the result as an Adaptive Card.
 
 This sample illustrates the M365 BotBuilder SDK's ability to scaffold search-based Message Extensions and return Adaptive Card components.
+
+### Message Extensions: [Search Command](03.adaptiveCards.a.typeAheadBot/)
+
+A conversational bot that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
+
+This sample illustrates the M365 BotBuilder SDK's ability to scaffold conversational bot and Adaptive Card components.
 
 ## AI-Powered Experiences
 
 ### Conversational AI w/Natural Language: [Santa Bot](04.ai.a.naturalLanguage.santaBot/)
 
-A conversational bot for Microsoft Teams, designed to mimic the AI character Hal 9000 from the movie "2001: A Space Odyssey". The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+A conversational bot for Microsoft Teams, designed to mimic being a Santa Bot for children. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
 
@@ -38,7 +38,7 @@ It shows M365 BotBuilder SDK capabilities like:
 -   Localization across languages
 -   Conversational session history
 
-### AI in Message Extensions: [GPT ME](04.ai.b.messageExtension.gptME/)
+### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.gptME/)
 
 A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
@@ -54,7 +54,7 @@ It shows M365 botbuilder SDK capabilities like:
 
 A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off. The bot is built using Node.js and the M365 BotBuilder library.
 
-This sample illustrates more complex conversational bot behavior in Microsoft Teams than the Hal9000 sample. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to third party app skills.
+This sample illustrates more complex conversational bot behavior in Microsoft Teams than the Santa sample. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to third party app skills.
 
 It shows a broad range of M365 botbuilder SDK capabilities like:
 
@@ -67,7 +67,7 @@ It shows a broad range of M365 botbuilder SDK capabilities like:
 -   Prediction engine mapping intents to actions with third party business logic
 -   Mixing GPT-powered conversational responses with manually defined responses
 
-### Chained Actions: [List Generator AI Assistant](04.ai.d.chainedActions.listGenerator/)
+### Chained Actions: [List Generator AI Assistant](04.ai.d.chainedActions.listBot/)
 
 Similar to the Light On/Off sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
 

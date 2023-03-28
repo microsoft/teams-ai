@@ -7,10 +7,24 @@
  */
 
 import { TurnContext } from 'botbuilder';
+import { ConfiguredAIOptions } from './AI';
+import { PromptTemplate } from './Prompts';
 import { TurnState } from './TurnState';
 
-export interface Planner<TState extends TurnState, TPlanOptions> {
-    generatePlan(context: TurnContext, state: TState, options?: TPlanOptions, message?: string): Promise<Plan>;
+export interface Planner<TState extends TurnState> {
+    completePrompt(
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
+        options: ConfiguredAIOptions<TState>
+    ): Promise<string | undefined>;
+
+    generatePlan(
+        context: TurnContext,
+        state: TState,
+        prompt: PromptTemplate,
+        options: ConfiguredAIOptions<TState>
+    ): Promise<Plan>;
 }
 
 export interface Plan {
