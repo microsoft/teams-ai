@@ -75,11 +75,11 @@ For example, let's say the user's name is "Dave". The bot might carry on the fol
 
 ```
 SANTA: I'm Santa! What's your name?
-DAVE: My name is DAVE.
+DAVE: My name is Dave.
 SANTA:Hi Dave, merry Christmas! I will do my utmost to make sure you receive a special gift this year!
 SANTA:What would you like for Christmas?
-DAVE:  I want my favourite car.
-SANTA:Great idea! I'm sure I can make that happen. Can I ask you which car it is so I can get the right one?
+DAVE: I want my favourite car.
+SANTA: Great idea! I'm sure I can make that happen. Can I ask you which car it is so I can get the right one?
 ```
 
 Notice that the bot remembered Dave's first message when responding to the second.
