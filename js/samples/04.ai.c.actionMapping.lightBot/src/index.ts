@@ -63,7 +63,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultPromptManager } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultPromptManager } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
 interface ConversationState {

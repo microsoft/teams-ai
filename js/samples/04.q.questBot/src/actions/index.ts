@@ -1,4 +1,4 @@
-import { Application, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, OpenAIPlanner } from '@microsoft/botbuilder-m365';
 import { ApplicationTurnState } from '../bot';
 import { inventoryAction } from './inventoryAction';
 import { locationAction } from './locationAction';
