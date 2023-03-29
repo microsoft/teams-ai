@@ -7,7 +7,7 @@
     "main": "./lib/index.js",
     "scripts": {
         "build": "tsc --build",
-        "clean": "rimraf node_modules lib",
+        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
