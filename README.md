@@ -1,5 +1,13 @@
 # BotBuilder-M365
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+This SDK is licensed under the MIT License.  This SDK includes tools to use APIs provided by third parties.  These APIs are provided under their own separate terms.
+
+-	OpenAI API.  Use of the OpenAI API requires an API key, which can be obtained from OpenAI.  By using this SDK, you agree to abide by the OpenAI API Terms of Use and Privacy Policy. You can find them at https://openai.com/policies/terms-of-use
+-	Azure OpenAI Service.  Use of the Azure OpenAI API requires an API key.  By using this SDK, you agree to abide by the Azure OpenAI API terms.  You can find them at https://www.microsoft.com/licensing/terms/productoffering/MicrosoftAzure/MCA#ServiceSpecificTerms, and associated documentation at https://learn.microsoft.com/en-us/azure/cognitive-services/openai/. 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams and M365-interacting bots.
 
 The SDK also facilitates the creation of bots that uses an [OpenAI](https://openai.com/api/) API key to provide an AI-driven conversational experience, or the same using Azure Foundry.
