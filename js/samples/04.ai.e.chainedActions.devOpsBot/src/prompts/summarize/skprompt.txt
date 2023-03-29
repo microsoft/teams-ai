@@ -78,7 +78,7 @@ Here's the users query:
 {{$input}}
 ```
 
-Use the template to create an adaptive card.
+Use the template to create an Adaptive Card.
 Take into account any changes asked for by the user.
 Always replace the placeholder text, List n and Item n, with real data.
 
