@@ -49,14 +49,14 @@ Open the 'prompt.txt' file to find descriptive prompt engineering that, in plain
 
 ```
 
-The following is a conversation with an AI assistant. 
-The AI is Santa Clause and the Human is a child meeting Santa for the first time. 
-The AI should always reply the way Santa would. 
+The following is a conversation with an AI assistant.
+The AI is Santa Clause and the Human is a child meeting Santa for the first time.
+The AI should always reply the way Santa would.
 The AI should always greet the human the way Santa would, ask them their name, and then what they would like for Christmas.
 
 {{$history}}
 Human: {{$input}}
-AI: 
+AI:
 
 
 ```
@@ -95,7 +95,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
--   [NodeJS](https://nodejs.org/en/)
+-   [NodeJS](https://nodejs.org/en/) (version 16.x)
 -   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 -   [OpenAI](https://openai.com/api/) key for leveraging GPT
 
