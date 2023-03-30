@@ -71,7 +71,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <remarks>
         /// This method calls other methods in this class based on the type of the activity to
         /// process, which allows a derived class to provide type-specific logic in a controlled way.
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is responsible for
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is responsible for
         /// routing the activity to the appropriate type-specific handler.
         /// </remarks>
         /// <seealso cref="OnMessageActivityAsync(ITurnContext{IMessageActivity}, TState, CancellationToken)"/>
@@ -117,7 +117,7 @@ namespace Microsoft.Bot.Builder.M365
                 await OnBeforeTurnAsync(turnContext, turnState, cancellationToken);
 
                 // Call activity type specific handler
-                bool eventHandlerCalled = await OnTurnEventHandlerDispatchAsync(turnContext, turnState, cancellationToken);
+                bool eventHandlerCalled = await OnTurnActivityHandlerAsync(turnContext, turnState, cancellationToken);
 
                 // End dispatch
                 if (eventHandlerCalled) return;
@@ -164,7 +164,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="OnUnrecognizedActivityTypeAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="Activity.Type"/>
         /// <seealso cref="ActivityTypes"/>
-        protected virtual async Task<bool> OnTurnEventHandlerDispatchAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
+        public virtual async Task<bool> OnTurnActivityHandlerAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
         {
             try
             {
@@ -259,10 +259,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -278,10 +278,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message update activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnMessageUpdateActivityAsync(ITurnContext<IMessageUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -297,10 +297,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message delete activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnMessageDeleteActivityAsync(ITurnContext<IMessageDeleteActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -308,7 +308,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when a conversation update activity is received from the channel when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// Conversation update activities are useful when it comes to responding to users being added to or removed from the conversation.
         /// For example, a bot could respond to a user being added by greeting the user.
         /// By default, this method will call <see cref="OnMembersAddedAsync(IList{ChannelAccount}, ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/>
@@ -321,7 +321,7 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a conversation update activity, it calls this method.
         /// If the conversation update activity indicates that members other than the bot joined the conversation, it calls
         /// <see cref="OnMembersAddedAsync(IList{ChannelAccount}, ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/>.
@@ -334,7 +334,7 @@ namespace Microsoft.Bot.Builder.M365
         /// Add logic to apply after the member added or removed logic after the call to the base class
         /// <see cref="OnConversationUpdateActivityAsync(ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/> method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="OnMembersAddedAsync(IList{ChannelAccount}, ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/>
         /// <seealso cref="OnMembersRemovedAsync(IList{ChannelAccount}, ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/>
         protected virtual Task OnConversationUpdateActivityAsync(ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
@@ -403,7 +403,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when an event activity is received from the connector when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// Message reactions correspond to the user adding a 'like' or 'sad' etc. (often an emoji) to a
         /// previously sent activity. Message reactions are only supported by a few channels.
         /// The activity that the message reaction corresponds to is indicated in the replyToId property.
@@ -416,7 +416,7 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message reaction activity, it calls this method.
         /// If the message reaction indicates that reactions were added to a message, it calls
         /// <see cref="OnReactionsAddedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, CancellationToken)"/>.
@@ -430,7 +430,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <see cref="OnMessageReactionActivityAsync(ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/> method.
         ///
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="OnReactionsAddedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>
         /// <seealso cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>
         protected virtual async Task OnMessageReactionActivityAsync(ITurnContext<IMessageReactionActivity> turnContext, TState turnState, CancellationToken cancellationToken)
@@ -502,7 +502,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when an event activity is received from the connector when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// Event activities can be used to communicate many different things.
         /// By default, this method will call <see cref="OnTokenResponseEventAsync(ITurnContext{IEventActivity}, TState, CancellationToken)"/> if the
         /// activity's name is <c>tokens/response</c> or <see cref="OnEventAsync(ITurnContext{IEventActivity}, TState, CancellationToken)"/> otherwise.
@@ -514,7 +514,7 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives an event activity, it calls this method.
         /// If the event <see cref="IEventActivity.Name"/> is `tokens/response`, it calls
         /// <see cref="OnTokenResponseEventAsync(ITurnContext{IEventActivity}, TState, CancellationToken)"/>;
@@ -531,7 +531,7 @@ namespace Microsoft.Bot.Builder.M365
         /// which is meaningful within the scope of a channel.
         /// A `tokens/response` event can be triggered by an <see cref="OAuthCard"/> or an OAuth prompt.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="OnTokenResponseEventAsync(ITurnContext{IEventActivity}, TState, CancellationToken)"/>
         /// <seealso cref="OnEventAsync(ITurnContext{IEventActivity}, TState, CancellationToken)"/>
         protected virtual Task OnEventActivityAsync(ITurnContext<IEventActivity> turnContext, TState turnState, CancellationToken cancellationToken)
@@ -595,7 +595,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when an invoke activity is received from the connector when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// Invoke activities can be used to communicate many different things.
         /// By default, this method will call <see cref="OnSignInInvokeAsync(ITurnContext{IInvokeActivity}, TState, CancellationToken)"/> if the
         /// activity's name is <c>signin/verifyState</c> or <c>signin/tokenExchange</c>.
@@ -607,7 +607,7 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives an invoke activity, it calls this method.
         /// If the event <see cref="IInvokeActivity.Name"/> is `signin/verifyState` or `signin/tokenExchange`, it calls
         /// <see cref="OnSignInInvokeAsync(ITurnContext{IInvokeActivity}, TState, CancellationToken)"/>
@@ -616,7 +616,7 @@ namespace Microsoft.Bot.Builder.M365
         /// which is meaningful within the scope of a channel.
         /// A `signin/verifyState` or `signin/tokenExchange` invoke can be triggered by an <see cref="OAuthCard"/> or an OAuth prompt.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual async Task<InvokeResponse> OnInvokeActivityAsync(ITurnContext<IInvokeActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             try
@@ -721,10 +721,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnEndOfConversationActivityAsync(ITurnContext<IEndOfConversationActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -741,10 +741,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnTypingActivityAsync(ITurnContext<ITypingActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -760,10 +760,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a installation update activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnInstallationUpdateActivityAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             switch (turnContext.Activity.Action)
@@ -789,10 +789,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a installation update activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnInstallationUpdateAddAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -808,10 +808,10 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a installation update activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnInstallationUpdateRemoveAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -819,7 +819,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when a command activity is received when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// Commands are requests to perform an action and receivers typically respond with
         /// one or more commandResult activities. Receivers are also expected to explicitly
         /// reject unsupported command activities.
@@ -830,7 +830,7 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a command activity, it calls this method.
         /// 
         /// In a derived class, override this method to add logic that applies to all comand activities.
@@ -843,7 +843,7 @@ namespace Microsoft.Bot.Builder.M365
         /// The meaning of an command activity is defined by the <see cref="ICommandActivity.Name"/> property,
         /// which is meaningful within the scope of a channel.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/>
         protected virtual Task OnCommandActivityAsync(ITurnContext<ICommandActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
@@ -852,7 +852,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when a CommandResult activity is received when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// CommandResult activities can be used to communicate the result of a command execution.
         /// </summary>
         /// <param name="turnContext">A strongly-typed context object for this turn.</param>
@@ -861,7 +861,7 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a CommandResult activity, it calls this method.
         /// 
         /// In a derived class, override this method to add logic that applies to all comand activities.
@@ -874,7 +874,7 @@ namespace Microsoft.Bot.Builder.M365
         /// The meaning of an CommandResult activity is defined by the <see cref="ICommandResultActivity.Name"/> property,
         /// which is meaningful within the scope of a channel.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/>
         protected virtual Task OnCommandResultActivityAsync(ITurnContext<ICommandResultActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
@@ -883,7 +883,7 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Invoked when an activity other than a message, conversation update, or event is received when the base behavior of
-        /// <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/> is used.
         /// If overridden, this could potentially respond to any of the other activity types like
         /// <see cref="ActivityTypes.ContactRelationUpdate"/> or <see cref="ActivityTypes.EndOfConversation"/>.
         /// By default, this method does nothing.
@@ -894,11 +894,11 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         /// <remarks>
-        /// When the <see cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// When the <see cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives an activity that is not a message, conversation update, message reaction,
         /// or event activity, it calls this method.
         /// </remarks>
-        /// <seealso cref="OnTurnEventHandlerDispatchAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnTurnActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// <seealso cref="OnMessageActivityAsync(ITurnContext{IMessageActivity}, TState, CancellationToken)"/>
         /// <seealso cref="OnConversationUpdateActivityAsync(ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/>
         /// <seealso cref="OnMessageReactionActivityAsync(ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>

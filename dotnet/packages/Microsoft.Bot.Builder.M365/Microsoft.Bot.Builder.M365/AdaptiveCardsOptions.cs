@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Microsoft.Bot.Builder.M365
 {
-    public class TurnState : Dictionary<string, TurnStateEntry>
+    public class AdaptiveCardsOptions
     {
     }
 }
