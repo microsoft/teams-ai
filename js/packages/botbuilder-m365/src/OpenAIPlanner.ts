@@ -66,7 +66,7 @@ export class OpenAIPlanner<
     ): Promise<string> {
         // Check for chat completion model
         const model = this.getModel(prompt);
-        if (model.startsWith('gpt-3.5-turbo')) {
+        if (model.startsWith('gpt-')) {
             // Request base chat completion
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
             const chatRequest = this.createChatCompletionRequest(state, prompt, temp.input, options);
@@ -90,7 +90,7 @@ export class OpenAIPlanner<
         let status: number;
         let response: string;
         const model = this.getModel(prompt);
-        if (model.startsWith('gpt-3.5-turbo')) {
+        if (model.startsWith('gpt-')) {
             // Request base chat completion
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
             const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
