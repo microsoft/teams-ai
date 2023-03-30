@@ -629,7 +629,7 @@ namespace Microsoft.Bot.Builder.M365
 
                     case "adaptiveCard/action":
                         var invokeValue = GetAdaptiveCardInvokeValue(turnContext.Activity);
-                        return CreateInvokeResponse(await OnAdaptiveCardInvokeAsync(invokeValue, turnContext, turnState, cancellationToken).ConfigureAwait(false));
+                        return CreateInvokeResponse(await OnAdaptiveCardActionExecuteAsync(invokeValue, turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                     case SignInConstants.VerifyStateOperationName:
                     case SignInConstants.TokenExchangeOperationName:
@@ -686,7 +686,7 @@ namespace Microsoft.Bot.Builder.M365
         /// it calls this method.
         /// </remarks>
         /// <seealso cref="OnInvokeActivityAsync(ITurnContext{IInvokeActivity}, TState, CancellationToken)"/>
-        protected virtual Task<AdaptiveCardInvokeResponse> OnAdaptiveCardInvokeAsync(AdaptiveCardInvokeValue invokeValue, ITurnContext<IInvokeActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual Task<AdaptiveCardInvokeResponse> OnAdaptiveCardActionExecuteAsync(AdaptiveCardInvokeValue invokeValue, ITurnContext<IInvokeActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new InvokeResponseException(HttpStatusCode.NotImplemented);
         }
