@@ -64,7 +64,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
 // Strongly type the applications turn state
@@ -84,7 +84,7 @@ type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempS
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OpenAIKey!,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
