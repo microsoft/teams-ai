@@ -71,7 +71,6 @@ namespace Microsoft.Bot.Builder.M365
                 // The context object throws when we try to update "this.Responded = true". We can just
                 // eat the error but lets make sure our states cleaned up a bit.
                 this.timer = null;
-
             }
         }
 
