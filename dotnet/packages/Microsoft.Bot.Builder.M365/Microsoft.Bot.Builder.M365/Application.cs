@@ -46,14 +46,30 @@ namespace Microsoft.Bot.Builder.M365
 
         public ApplicationOptions<TState> Options { get { return _options; } }
 
-        protected virtual Task OnBeforeTurnAsync (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <summary>
+        /// Handler that will execute before the turn's activity handler logic is processed.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>True to continue execution of the current turn. Otherwise, return False.</returns>
+        protected virtual Task<bool> OnBeforeTurnAsync (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
-        protected virtual Task OnAfterTurnAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <summary>
+        /// Handler that will execute after the turn's activity handler logic is processed.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>True to continue execution of the current turn. Otherwise, return False.</returns>
+        protected virtual Task<bool> OnAfterTurnAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
     }
@@ -113,19 +129,22 @@ namespace Microsoft.Bot.Builder.M365
                 // TODO : Fix turn state loading, this is just a placeholder
                 TState turnState = (TState)new TurnState();
 
-                // Call before turn event handler
-                await OnBeforeTurnAsync(turnContext, turnState, cancellationToken);
+                // Call before activity handler
+                if (!await OnBeforeTurnAsync(turnContext, turnState, cancellationToken)) return;
 
                 // Call activity type specific handler
                 bool eventHandlerCalled = await OnTurnActivityHandlerAsync(turnContext, turnState, cancellationToken);
 
-                // End dispatch
-                if (eventHandlerCalled) return;
+                if (!eventHandlerCalled)
+                {
+                    // TODO : call AI module
+                }
 
-                // TODO : call AI module
-
-                // Call after turn event handler
-                await OnAfterTurnAsync(turnContext, turnState, cancellationToken);
+                // Call after activity handler
+                if (await OnAfterTurnAsync(turnContext, turnState, cancellationToken))
+                {
+                    // TODO : Save turn state to persistent storage
+                };
             }
             finally
             {
