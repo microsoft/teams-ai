@@ -70,9 +70,14 @@ export class AzureOpenAIClient extends OpenAIClient {
         headers['api-key'] = options.apiKey;
     }
 
-    private removeModel(request: { model: string }): string {
+    private removeModel(request: { model?: string }): string {
         const model = request.model;
         delete request.model;
-        return model;
+
+        if (model) {
+            return model;
+        } else {
+            return '';
+        }
     }
 }

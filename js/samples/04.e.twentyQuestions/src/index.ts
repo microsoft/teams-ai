@@ -68,6 +68,10 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
+if (!process.env.OpenAIKey) {
+    throw new Error('Missing environment OpenAIKey');
+}
+
 // Strongly type the applications turn state
 interface ConversationState {
     secretWord: string;
@@ -77,7 +81,7 @@ interface ConversationState {
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create AI components
-const planner = new OpenAIPlanner({
+const planner = new OpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.OpenAIKey,
     defaultModel: 'text-davinci-003',
     logRequests: true
@@ -104,6 +108,9 @@ app.message('/quit', async (context: TurnContext, state: ApplicationTurnState) =
 
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     let { secretWord, guessCount, remainingGuesses } = state.conversation.value;
+    if (secretWord.length > 1) {
+        throw new Error('No secret word is assigned.');
+    }
     if (secretWord) {
         guessCount++;
         remainingGuesses--;
@@ -111,11 +118,11 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
         // Check for correct guess
         if (context.activity.text.toLowerCase().indexOf(secretWord.toLowerCase()) >= 0) {
             await context.sendActivity(responses.youWin(secretWord));
-            secretWord = undefined;
+            secretWord = '';
             guessCount = remainingGuesses = 0;
         } else if (remainingGuesses == 0) {
             await context.sendActivity(responses.youLose(secretWord));
-            secretWord = undefined;
+            secretWord = '';
             guessCount = remainingGuesses = 0;
         } else {
             // Ask GPT for a hint

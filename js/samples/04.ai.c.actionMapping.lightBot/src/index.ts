@@ -64,20 +64,14 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import {
-    AI,
-    Application,
-    DefaultPromptManager,
-    DefaultTurnState,
-    OpenAIPlanner,
-    TData
-} from '@microsoft/botbuilder-m365';
+import { AI, Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
 interface ConversationState {
     lightsOn: boolean;
 }
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type TData = Record<string, any>;
 
 if (!process.env.OpenAIKey) {
     throw new Error('Missing environment variables - please check that OpenAIKey is set.');
@@ -130,8 +124,8 @@ app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState,
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: TData, action: string) => {
-        await context.sendActivity(responses.unknownAction(action));
+    async (context: TurnContext, state: ApplicationTurnState, data: TData, action: string | undefined) => {
+        await context.sendActivity(responses.unknownAction(action || 'unknown'));
         return false;
     }
 );

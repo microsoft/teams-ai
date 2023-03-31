@@ -69,13 +69,13 @@ import {
     DefaultTurnState,
     OpenAIModerator,
     OpenAIPlanner,
-    TData,
     TurnState
 } from '@microsoft/botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type TData = Record<string, any>;
 
 // Create AI components
 const planner = new OpenAIPlanner({
