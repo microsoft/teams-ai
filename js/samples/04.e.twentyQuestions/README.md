@@ -35,15 +35,15 @@ interface SubmitData {
     post?: string;
 }
 
-app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, state, data) => {
+app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: TurnContext, state: ApplicationTurnState, data: SubmitData) => {
     try {
         switch (data.verb) {
             case 'generate':
                 // Call GPT and return response view
-                return await updatePost(context, state, '../src/generate.txt', data);
+                return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/generate.txt', data);
             case 'update':
                 // Call GPT and return an updated response view
-                return await updatePost(context, state, '../src/update.txt', data);
+                return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/update.txt', data);
             case 'post':
             default:
                 // Preview the post as an adaptive card

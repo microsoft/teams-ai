@@ -13,11 +13,11 @@
         "m365"
     ],
     "bugs": {
-        "url": "https://github.com/Microsoft/botbuilder-m365/issues"
+        "url": "https://github.com/microsoft/botbuilder-m365/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Microsoft/botbuilder-m365.git"
+        "url": "https://github.com/microsoft/botbuilder-m365.git"
     },
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
