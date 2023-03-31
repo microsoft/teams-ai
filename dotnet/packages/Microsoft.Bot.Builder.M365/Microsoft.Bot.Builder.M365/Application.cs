@@ -123,7 +123,7 @@ namespace Microsoft.Bot.Builder.M365
                 // Remove @mentions
                 if (_options.removeRecipientMention && turnContext.Activity.Type == ActivityTypes.Message)
                 {
-                    turnContext.Activity.Type = turnContext.Activity.RemoveRecipientMention();
+                    turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
 
                 // TODO : Fix turn state loading, this is just a placeholder
