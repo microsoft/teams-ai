@@ -53,12 +53,7 @@ namespace Microsoft.Bot.Builder.M365
 
         private async void SendTypingActivity(object state)
         {
-            ITurnContext? turnContext = state as TurnContext;
-                
-            if (turnContext == null)
-            {
-                throw new Exception("Unexpected failure of casting object TurnContext");
-            }
+            ITurnContext turnContext = state as TurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
 
             try
             {
