@@ -37,12 +37,12 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -96,13 +96,13 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // List for /reset command and then delete the conversation state
-app.message('/quit', async (context, state) => {
+app.message('/quit', async (context: TurnContext, state: ApplicationTurnState) => {
     const { secretWord } = state.conversation.value;
     state.conversation.delete();
     await context.sendActivity(responses.quitGame(secretWord));
 });
 
-app.activity(ActivityTypes.Message, async (context, state) => {
+app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     let { secretWord, guessCount, remainingGuesses } = state.conversation.value;
     if (secretWord) {
         guessCount++;

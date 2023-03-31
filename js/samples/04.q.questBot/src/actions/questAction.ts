@@ -6,7 +6,7 @@ import { ApplicationTurnState, IDataEntities, IQuest } from '../bot';
  * @param app
  */
 export function questAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('quest', async (context, state, data: IDataEntities) => {
+    app.ai.action('quest', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'add':
@@ -88,10 +88,7 @@ async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Pr
  * @param state
  * @param data
  */
-async function finishQuest(
-    state: ApplicationTurnState,
-    data: IDataEntities
-): Promise<boolean> {
+async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
 
     // Find quest and delete item
