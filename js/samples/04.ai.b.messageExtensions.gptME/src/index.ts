@@ -68,7 +68,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
 // This Message Extension can either drop the created card into the compose window (default.)

@@ -62,7 +62,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import axios from 'axios';
-import { Application } from 'botbuilder-m365';
+import { Application } from '@microsoft/botbuilder-m365';
 import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application
