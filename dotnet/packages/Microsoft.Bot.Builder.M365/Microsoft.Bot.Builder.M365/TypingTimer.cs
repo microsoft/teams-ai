@@ -63,12 +63,11 @@ namespace Microsoft.Bot.Builder.M365
             {
                 await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
             } 
-            catch (Exception)
+            catch (ObjectDisposedException)
             {
-                // Seeing a random proxy violation error from the context object. This is because
-                // we're in the middle of sending an activity on a background thread when the turn ends.
-                // The context object throws when we try to update "this.Responded = true". We can just
-                // eat the error but lets make sure our states cleaned up a bit.
+                // We're in the middle of sending an activity on a background thread when the turn ends and
+                // the turn context object is dispoed of. We can just eat the error but lets
+                // make sure our states cleaned up a bit.
                 timer = null;
 
             }
