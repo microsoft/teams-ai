@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "botbuilder": "^4.19.0",
-        "@microsoft/botbuilder-m365": "~0.1.0-alpha.1",
+        "@microsoft/botbuilder-m365": "~0.1.0-alpha.2",
         "dotenv": "^8.2.0",
         "replace": "~1.2.0",
         "restify": "~8.6.0",
