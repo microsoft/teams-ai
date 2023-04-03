@@ -23,7 +23,7 @@ namespace Microsoft.Bot.Builder.M365
         /// Constructs a new instance of the <see cref="TypingTimer"/> class.
         /// </summary>
         /// <param name="interval">The interval in milliseconds to send "typing" activity.</param>
-        public TypingTimer(int interval)
+        public TypingTimer(int interval = 1000)
         {
             this._interval = interval;
         }
@@ -47,6 +47,10 @@ namespace Microsoft.Bot.Builder.M365
             timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
         }
 
+
+        /// <summary>
+        /// Stop the timer that periodically sends "typing" activity.
+        /// </summary>
         public void StopTypingTimer()
         {
             if (timer == null) return;
