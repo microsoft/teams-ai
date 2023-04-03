@@ -17,11 +17,15 @@ namespace Microsoft.Bot.Builder.M365
         /// <summary>
         /// The interval in milliseconds to send "typing" activity.
         /// </summary>
-        private int _interval;
+        private readonly int _interval;
 
-        public TypingTimer(int typingTimerDelay)
+        /// <summary>
+        /// Constructs a new instance of the <see cref="TypingTimer"/> class.
+        /// </summary>
+        /// <param name="interval">The interval in milliseconds to send "typing" activity.</param>
+        public TypingTimer(int interval = 1000)
         {
-            this._interval = typingTimerDelay;
+            this._interval = interval;
         }
 
         /// <summary>
@@ -34,56 +38,55 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="turnContext">The context for the current turn with the user.</param>
         public void StartTypingTimer(ITurnContext turnContext)
         {
-            if (turnContext.Activity.Type != ActivityTypes.Message || this.timer != null) return;
+            if (turnContext.Activity.Type != ActivityTypes.Message || timer != null) return;
 
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
             
             // Start periodically send "typing" activity
-            this.timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
+            timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
         }
 
+
+        /// <summary>
+        /// Stop the timer that periodically sends "typing" activity.
+        /// </summary>
         public void StopTypingTimer()
         {
-            if (this.timer == null) return;
+            if (timer == null) return;
             
-            this.timer.Dispose();
-            this.timer = null;
+            timer.Dispose();
+            timer = null;
         }
 
         private async void SendTypingActivity(object state)
         {
-            ITurnContext? turnContext = state as TurnContext;
-                
-            if (turnContext == null)
-            {
-                throw new Exception("Unexpected failure of casting object TurnContext");
-            }
+            ITurnContext turnContext = state as TurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
 
             try
             {
                 await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
             } 
-            catch (Exception)
+            catch (ObjectDisposedException)
             {
-                // Seeing a random proxy violation error from the context object. This is because
-                // we're in the middle of sending an activity on a background thread when the turn ends.
-                // The context object throws when we try to update "this.Responded = true". We can just
-                // eat the error but lets make sure our states cleaned up a bit.
-                this.timer = null;
+                // We're in the middle of sending an activity on a background thread when the turn ends and
+                // the turn context object is dispoed of. We can just eat the error but lets
+                // make sure our states cleaned up a bit.
+                timer = null;
+
             }
         }
 
 
         private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
-            if (this.timer != null)
+            if (timer != null)
             {
                 foreach (var activity in activities)
                 {
                     if (activity.Type == ActivityTypes.Message)
                     {
-                        this.StopTypingTimer();
+                        StopTypingTimer();
                         break;
                     }
                 }

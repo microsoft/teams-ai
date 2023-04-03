@@ -47,6 +47,26 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
+        public void StartTypingTimer_Registers_OnSendActivites_EventHandler()
+        {
+            // Arrange
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<ITurnContext>();
+            turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
+            turnContextMock.Setup(tc => tc.OnSendActivities(It.IsAny<SendActivitiesHandler>()));
+
+            int timerDelay = 1000;
+            TypingTimer typingTimer = new TypingTimer(timerDelay);
+
+            // Act
+            typingTimer.StartTypingTimer(turnContextMock.Object);
+
+            // Assert
+            turnContextMock.Verify(tc => tc.OnSendActivities(It.IsAny<SendActivitiesHandler>()), Times.Once);
+
+        }
+
+        [Fact]
         public void StopTypingTimer_ShouldResetProperties()
         {
             // Arrange
