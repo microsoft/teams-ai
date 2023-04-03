@@ -33,7 +33,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -50,7 +50,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -67,7 +67,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -84,7 +84,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -101,7 +101,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -118,7 +118,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -143,7 +143,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -169,7 +169,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -197,7 +197,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -223,7 +223,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -249,7 +249,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -277,7 +277,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -303,7 +303,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -328,7 +328,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -360,7 +360,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(3, bot.Record.Count);
@@ -383,7 +383,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -405,7 +405,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -429,7 +429,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -451,7 +451,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -474,7 +474,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -495,7 +495,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -517,7 +517,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -539,7 +539,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -561,7 +561,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -583,7 +583,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -609,7 +609,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -632,7 +632,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -655,7 +655,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -675,7 +675,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Single(bot.Record);
@@ -702,7 +702,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestDelegatingTurnContextActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContextMock.Object, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContextMock.Object, turnState, default(CancellationToken));
 
             // Assert
             turnContextMock.VerifyGet(tc => tc.Activity, Times.AtLeastOnce);
@@ -729,7 +729,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -749,7 +749,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, bot.Record.Count);
@@ -804,7 +804,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.OnTurnActivityHandlerAsync(turnContext, turnState, default(CancellationToken));
+            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
             var sent = adapter.Activity as Activity;
