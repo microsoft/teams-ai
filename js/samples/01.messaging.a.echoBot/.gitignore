@@ -107,3 +107,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+# TeamsFx files
+env/.env.*.user
+env/.env.local
+build
+.localSettings
+.notification.localstore.json

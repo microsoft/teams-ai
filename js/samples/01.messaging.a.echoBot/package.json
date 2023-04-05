@@ -6,6 +6,8 @@
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
+        "dev:teamsfx": "env-cmd --silent -f .localSettings yarn dev",
+        "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build",
         "clean": "rimraf node_modules lib",
         "lint": "eslint **/**/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
@@ -18,6 +20,7 @@
         "url": "https://github.com"
     },
     "dependencies": {
+        "@microsoft/teamsfx": "^2.2.0",
         "botbuilder": "^4.19.0",
         "@microsoft/botbuilder-m365": "~0.1.0-alpha.2",
         "dotenv": "^8.2.0",
@@ -27,6 +30,9 @@
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.4.2",
+        "@types/node": "^14.0.0",
+        "ts-node": "^10.4.0",
+        "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
         "tslint": "~5.20.0",
         "typescript": "^4.6.4"
