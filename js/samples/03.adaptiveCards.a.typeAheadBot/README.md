@@ -8,7 +8,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
--   [NodeJS](https://nodejs.org/en/)
+-   [NodeJS](https://nodejs.org/en/) (version 16.x)
 -   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 
 ## To try this sample

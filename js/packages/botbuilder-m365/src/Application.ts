@@ -29,9 +29,7 @@ export interface Query<TParams extends Record<string, any>> {
     parameters: TParams;
 }
 
-export interface ApplicationOptions<
-    TState extends TurnState
-> {
+export interface ApplicationOptions<TState extends TurnState> {
     adapter?: BotAdapter;
     botAppId?: string;
     storage?: Storage;
@@ -42,8 +40,6 @@ export interface ApplicationOptions<
     startTypingTimer?: boolean;
 }
 
-export type RouteSelector = (context: TurnContext) => Promise<boolean>;
-export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 export type ApplicationEventHandler<TState extends TurnState> = (
     context: TurnContext,
     state: TState
@@ -61,12 +57,15 @@ export type ConversationUpdateEvents =
     | 'teamArchived'
     | 'teamUnarchived'
     | 'teamRestored';
+
+export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
+export type RouteSelector = (context: TurnContext) => Promise<boolean>;
+
 export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
+/* Actions to be performed before or after a task */
 export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
-export class Application<
-    TState extends TurnState = DefaultTurnState
-> {
+export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _options: ApplicationOptions<TState>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
@@ -123,14 +122,13 @@ export class Application<
     /**
      * Adds a new route to the application.
      *
-     *
      * Routes will be matched in the order they're added to the application. The first selector to
      * return `true` when an activity is received will have its handler called.
      *
-     * @param selector Function used to determine if the route should be triggered.
-     * @param handler Function to call when the route is triggered.
-     * @param isInvokeRoute boolean indicating if the RouteSelector checks for "Invoke" Activities as part of its routing logic. Defaults to `false`.
-     * @returns The application instance for chaining purposes.
+     * @param {RouteSelector} selector Promise to determine if the route should be triggered.
+     * @param {RouteHandler<TurnState>} handler Function to call when the route is triggered.
+     * @param {boolean} isInvokeRoute boolean indicating if the RouteSelector is an invokable Teams activity as part of its routing logic. Defaults to `false`.
+     * @returns {this} The application instance for chaining purposes.
      */
     public addRoute(selector: RouteSelector, handler: RouteHandler<TState>, isInvokeRoute = false): this {
         if (isInvokeRoute) {
@@ -144,9 +142,9 @@ export class Application<
     /**
      * Handles incoming activities of a given type.
      *
-     * @param type Name of the activity type to match or a regular expression to match against the incoming activity type. An array of type names or expression can also be passed in.
-     * @param handler Function to call when the route is triggered.
-     * @returns The application instance for chaining purposes.
+     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[] } type Name of the activity type to match or a regular expression to match against the incoming activity type. An array of type names or expression can also be passed in.
+     * @param {Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
      */
     public activity(
         type: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
@@ -162,9 +160,9 @@ export class Application<
     /**
      * Handles conversation update events.
      *
-     * @param event Name of the conversation update event to handle.
-     * @param handler Function to call when the route is triggered.
-     * @returns The application instance for chaining purposes.
+     * @param {ConversationUpdateEvents | ConversationUpdateEvents[]} event Name of the conversation update event(s) to handle.
+     * @param {Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
      */
     public conversationUpdate(
         event: ConversationUpdateEvents | ConversationUpdateEvents[],
@@ -180,8 +178,8 @@ export class Application<
     /**
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      *
-     * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
-     * @param logic The bots logic that should be run using the new proactive turn context.
+     * @param {TurnContext} context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
+     * @param {Promise<void>} logic The bot's logic that should be run using the new proactive turn context.
      */
     public continueConversationAsync(
         context: TurnContext,
@@ -227,9 +225,9 @@ export class Application<
     /**
      * Handles incoming messages with a given keyword.
      *
-     * @param keyword Substring of text or a regular expression to match against the text of an incoming message. An array of keywords or expression can also be passed in.
-     * @param handler Function to call when the route is triggered.
-     * @returns The application instance for chaining purposes.
+     * @param {string | RegExp | RouteSelector | (string | RegExp | RouteSelector[])} keyword Substring of text or a regular expression to match against the text of an incoming message. An array of keywords or expression can also be passed in.
+     * @param {Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
      */
     public message(
         keyword: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
@@ -245,9 +243,9 @@ export class Application<
     /**
      * Handles message reaction events.
      *
-     * @param event Name of the message reaction event to handle.
-     * @param handler Function to call when the route is triggered.
-     * @returns The application instance for chaining purposes.
+     * @param {MessageReactionEvents | MessageReactionEvents[]} event Name of the message reaction event to handle.
+     * @param {Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
      */
     public messageReactions(
         event: MessageReactionEvents | MessageReactionEvents[],
@@ -263,8 +261,8 @@ export class Application<
     /**
      * Dispatches an incoming activity to a handler registered with the application.
      *
-     * @param context Context for the current turn of conversation with the user.
-     * @returns True if the activity was successfully dispatched to a handler. False if no matching handlers could be found.
+     * @param {TurnContext} context Context class for the current turn of conversation with the user.
+     * @returns {boolean} True if the activity was successfully dispatched to a handler. False if no matching handlers could be found.
      */
     public async run(context: TurnContext): Promise<boolean> {
         // Start typing indicator timer
@@ -284,17 +282,19 @@ export class Application<
                 return false;
             }
 
-            // Run any RouteSelectors in this._invokeRoutes first if the incoming activity.type is "Invoke".
+            // Run any RouteSelectors in this._invokeRoutes first if the incoming Teams activity.type is "Invoke".
             // Invoke Activities from Teams need to be responded to in less than 5 seconds.
             if (context.activity.type === ActivityTypes.Invoke) {
                 for (let i = 0; i < this._invokeRoutes.length; i++) {
+                    // TODO: fix security/detect-object-injection
+                    // eslint-disable-next-line security/detect-object-injection
                     const route = this._invokeRoutes[i];
                     if (await route.selector(context)) {
                         // Execute route handler
                         await route.handler(context, state);
 
                         // Call afterTurn event handlers
-                        if (this.callEventHandlers(context, state, this._afterTurn)) {
+                        if (await this.callEventHandlers(context, state, this._afterTurn)) {
                             // Save turn state
                             await turnStateManager!.saveState(storage, context, state);
                         }
@@ -307,13 +307,15 @@ export class Application<
 
             // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
             for (let i = 0; i < this._routes.length; i++) {
+                // TODO:
+                // eslint-disable-next-line security/detect-object-injection
                 const route = this._routes[i];
                 if (await route.selector(context)) {
                     // Execute route handler
                     await route.handler(context, state);
 
                     // Call afterTurn event handlers
-                    if (this.callEventHandlers(context, state, this._afterTurn)) {
+                    if (await this.callEventHandlers(context, state, this._afterTurn)) {
                         // Save turn state
                         await turnStateManager!.saveState(storage, context, state);
                     }
@@ -393,7 +395,7 @@ export class Application<
      * The timer will automatically end once an outgoing activity has been sent. If the timer is
      * already running or the current activity, is not a "message" the call is ignored.
      *
-     * @param context The context for the current turn with the user.
+     * @param {TurnContext} context The context for the current turn with the user.
      */
     public startTypingTimer(context: TurnContext): void {
         if (context.activity.type == ActivityTypes.Message && !this._typingTimer) {
@@ -402,6 +404,8 @@ export class Application<
                 // Listen for any messages to be sent from the bot
                 if (timerRunning) {
                     for (let i = 0; i < activities.length; i++) {
+                        // TODO:
+                        // eslint-disable-next-line security/detect-object-injection
                         if (activities[i].type == ActivityTypes.Message) {
                             // Stop the timer
                             this.stopTypingTimer();
@@ -453,9 +457,9 @@ export class Application<
     /**
      * Registers a turn event handler.
      *
-     * @param event Name of the turn event to handle.
-     * @param handler Function to call when the event is triggered.
-     * @returns The application instance for chaining purposes.
+     * @param {TurnEvents | TurnEvents[]} event Name of the turn event to handle.
+     * @param {Promise<void>} handler Function to call when the event is triggered.
+     * @returns {this} The application instance for chaining purposes.
      */
     public turn(event: TurnEvents | TurnEvents[], handler: ApplicationEventHandler<TState>): this {
         (Array.isArray(event) ? event : [event]).forEach((e) => {
@@ -478,6 +482,8 @@ export class Application<
         handlers: ApplicationEventHandler<TState>[]
     ): Promise<boolean> {
         for (let i = 0; i < handlers.length; i++) {
+            // TODO:
+            // eslint-disable-next-line security/detect-object-injection
             const continueExecution = await handlers[i](context, state);
             if (!continueExecution) {
                 return false;
@@ -495,7 +501,9 @@ interface AppRoute<TState extends TurnState> {
 }
 
 /**
- * @param type
+ *
+ * @param {string | RegExp | RouteSelector} type The activity to match against.
+ * @returns {RouteSelector} A Promise that resolves to true if the event matches the selector.
  */
 function createActivitySelector(type: string | RegExp | RouteSelector): RouteSelector {
     if (typeof type == 'function') {
@@ -518,7 +526,9 @@ function createActivitySelector(type: string | RegExp | RouteSelector): RouteSel
 }
 
 /**
- * @param event
+ *
+ * @param {ConversationUpdateEvents} event The type of event to match against.
+ * @returns {RouteSelector} A promise that resolves to true if the event matches the selector.
  */
 function createConversationUpdateSelector(event: ConversationUpdateEvents): RouteSelector {
     switch (event) {
@@ -549,7 +559,9 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
 }
 
 /**
- * @param keyword
+ *
+ * @param {string | RegExp | RouteSelector} keyword The message keyword to match against.
+ * @returns {RouteSelector} A promise that resolves to true if the event matches the selector.
  */
 function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteSelector {
     if (typeof keyword == 'function') {
@@ -578,7 +590,9 @@ function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteS
 }
 
 /**
- * @param event
+ *
+ * @param {MessageReactionEvents} event The type of reaction event to handle.
+ * @returns {RouteSelector} A Promise that resolves to true if the event matches the selector.
  */
 function createMessageReactionSelector(event: MessageReactionEvents): RouteSelector {
     switch (event) {

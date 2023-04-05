@@ -103,13 +103,14 @@ export class PromptTemplateEngine<TState extends TurnState> {
         const MIN_CODE_BLOCK_LENGTH = EMPTY_CODE_BLOCK_LENGTH + 1;
 
         // Render NULL to ""
+        // Since the template is a string, all `template` instances can have non-null assertion
         if (template === null) {
             return [new TextBlock('')];
         }
 
         // If the template is "empty" return the content as a text block
-        if (template.length < MIN_CODE_BLOCK_LENGTH) {
-            return [new TextBlock(template)];
+        if (template!.length < MIN_CODE_BLOCK_LENGTH) {
+            return [new TextBlock(template!)];
         }
 
         const blocks: Block[] = [];
@@ -120,24 +121,24 @@ export class PromptTemplateEngine<TState extends TurnState> {
         let startPos = 0;
         let startFound = false;
 
-        while (cursor < template.length - 1) {
+        while (cursor < template!.length - 1) {
             // When "{{" is found
-            if (template[cursor] === this.starter && template[cursor + 1] === this.starter) {
+            if (template![cursor] === this.starter && template![cursor + 1] === this.starter) {
                 startPos = cursor;
                 startFound = true;
             }
             // When "}}" is found
-            else if (startFound && template[cursor] === this.ender && template[cursor + 1] === this.ender) {
+            else if (startFound && template![cursor] === this.ender && template![cursor + 1] === this.ender) {
                 // If there is plain text between the current var/code block and the previous one, capture that as a TextBlock
                 if (startPos > endOfLastBlock) {
-                    blocks.push(new TextBlock(template, endOfLastBlock, startPos));
+                    blocks.push(new TextBlock(template!, endOfLastBlock, startPos));
                 }
 
                 // Skip ahead to the second "}" of "}}"
                 cursor++;
 
                 // Extract raw block
-                const contentWithDelimiters = template.substring(startPos, cursor + 1);
+                const contentWithDelimiters = template!.substring(startPos, cursor + 1);
 
                 // Remove "{{" and "}}" delimiters and trim empty chars
                 const contentWithoutDelimiters = contentWithDelimiters
@@ -166,8 +167,8 @@ export class PromptTemplateEngine<TState extends TurnState> {
         }
 
         // If there is something left after the last block, capture it as a TextBlock
-        if (endOfLastBlock < template.length) {
-            blocks.push(new TextBlock(template, endOfLastBlock, template.length));
+        if (endOfLastBlock < template!.length) {
+            blocks.push(new TextBlock(template!, endOfLastBlock, template!.length));
         }
 
         return blocks;
@@ -175,9 +176,9 @@ export class PromptTemplateEngine<TState extends TurnState> {
 
     private validateBlocksSyntax(blocks: Block[]): void {
         blocks.forEach((block) => {
-            const { valid, error } = block.isValid();
-            if (!valid) {
-                throw new Error(`Prompt template syntax error: ${error}`);
+            const { valid, errorMessage: error } = block.isValid();
+            if (!valid || error) {
+                throw new Error(`Prompt template syntax error: ${error?.toString() ?? 'unknown'}`);
             }
         });
     }

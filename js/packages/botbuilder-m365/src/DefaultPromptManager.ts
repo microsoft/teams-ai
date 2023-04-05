@@ -77,8 +77,8 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
     }
 
     public invokeFunction(context: TurnContext, state: TState, name: string): Promise<any> {
-        if (this._functions.has(name)) {
-            return this._functions.get(name).handler(context, state);
+        if (this._functions && this._functions.has(name)) {
+            return Promise.resolve(this._functions.get(name)?.handler(context, state));
         } else {
             throw new Error(
                 `The DefaultPromptManager.invokeFunction() method was called for an unregistered function named "${name}".`
@@ -97,6 +97,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
             // Load prompt config
             try {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const config = await fs.readFile(configFile, 'utf-8');
                 entry.config = JSON.parse(config);
             } catch (err: unknown) {
@@ -107,6 +108,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
             // Load prompt text
             try {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 entry.text = await fs.readFile(promptFile, 'utf-8');
             } catch (err: unknown) {
                 throw new Error(
@@ -129,7 +131,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
             this._templates.set(name, entry);
         }
 
-        return this._templates.get(name);
+        return this._templates.get(name) || ({} as CachedPromptTemplate);
     }
 
     public async renderPrompt(

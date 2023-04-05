@@ -20,7 +20,7 @@ export class DefaultModerator<TState extends TurnState = DefaultTurnState> imple
         state: TState,
         prompt: PromptTemplate,
         options: ConfiguredAIOptions<TState>
-    ): Promise<Plan> {
+    ): Promise<Plan | undefined> {
         // Just allow prompt
         return Promise.resolve(undefined);
     }
