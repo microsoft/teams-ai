@@ -8,14 +8,14 @@ environmentFolderPath: ./env
 provision:
   - uses: teamsApp/create # Creates a Teams app
     with:
-      name: Santa-${{TEAMSFX_ENV}} # Teams app name
+      name: TypeAheadBot-${{TEAMSFX_ENV}} # Teams app name
     writeToEnvironmentFile:
       # Write the information of installed dependencies into environment file for the specified environment variable(s).
       teamsAppId: TEAMS_APP_ID
 
   - uses: botAadApp/create # Creates a new AAD app for Bot Registration.
     with:
-      name: Santa
+      name: TypeAheadBot
     writeToEnvironmentFile:
       botId: BOT_ID
       botPassword: SECRET_BOT_PASSWORD

@@ -2,10 +2,10 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.16",
-    "id": "1b8376a6-906c-5ef7-9b43-9214cbb3207d",
+    "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "GPT ME",
+        "short": "GPT ME-${{TEAMSFX_ENV}}",
         "full": "GPT Message Extensions"
     },
     "developer": {
@@ -26,7 +26,7 @@
     "accentColor": "#FFFFFF",
     "composeExtensions": [
         {
-            "botId": "___YOUR BOTS ID___",
+            "botId": "${{BOT_ID}}",
               "commands": [
                 {
                     "id": "CreatePost",
@@ -49,7 +49,7 @@
     ],
     "bots": [
         {
-            "botId": "___YOUR BOTS ID___",
+            "botId": "${{BOT_ID}}",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,

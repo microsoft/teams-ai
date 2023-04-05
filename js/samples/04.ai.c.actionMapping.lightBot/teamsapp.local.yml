@@ -5,13 +5,13 @@ version: 1.0.0
 provision:
   - uses: teamsApp/create # Creates a Teams app
     with:
-      name: Santa-${{TEAMSFX_ENV}} # Teams app name
+      name: LightBot-${{TEAMSFX_ENV}} # Teams app name
     writeToEnvironmentFile: # Write the information of installed dependencies into environment file for the specified environment variable(s).
       teamsAppId: TEAMS_APP_ID
 
   - uses: botAadApp/create # Creates a new AAD app for bot if BOT_ID environment variable is empty
     with:
-      name: Santa
+      name: LightBot
     writeToEnvironmentFile:
       botId: BOT_ID
       botPassword: SECRET_BOT_PASSWORD
@@ -19,7 +19,7 @@ provision:
   - uses: botFramework/create # Create or update the bot registration on dev.botframework.com
     with:
       botId: ${{BOT_ID}}
-      name: Santa
+      name: LightBot
       messagingEndpoint: ${{BOT_ENDPOINT}}/api/messages
       description: ""
       channels:

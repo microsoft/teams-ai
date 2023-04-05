@@ -2,10 +2,10 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.15",
-    "id": "<<YOUR-MICROSOFT-APP-ID>>",
+    "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "NpmSearch",
+        "short": "NpmSearch-${{TEAMSFX_ENV}}",
         "full": "NPM Search Bot"
     },
     "developer": {
@@ -36,7 +36,7 @@
     ],
     "bots": [
         {
-            "botId": "___YOUR BOTS ID___",
+            "botId": "${{BOT_ID}}",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
@@ -47,7 +47,7 @@
     "validDomains": [],
     "composeExtensions": [
         {
-            "botId": "___YOUR BOTS ID___",
+            "botId": "${{BOT_ID}}",
             "canUpdateConfiguration": true,
             "commands": [
                 {
