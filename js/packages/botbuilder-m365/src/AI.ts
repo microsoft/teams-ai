@@ -193,7 +193,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      *
      * @param {string | string[]} name Unique name of the action.
      * @param {Promise<boolean>} handler Function to call when the action is triggered.
-     * @param {boolean} allowOverrides Optional. If true
+     * @param {boolean} allowOverrides Optional. If true, default and/or existing handlers can be overridden.
      * @returns {this} The application instance for chaining purposes.
      */
     public action<TEntities extends Record<string, any> | undefined>(
@@ -396,7 +396,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     }
 }
 
-/* Type TData as Record<string, any> to allow for arbitrary data to be passed to the action handler. */
+/* TData in a handler is of type Record<string, any>, specified by the developer. However, since by default TData is not set, we use type `any` here. */
 interface ActionEntry<TState> {
     handler: (context: TurnContext, state: TState, data?: any, action?: string) => Promise<boolean>;
     allowOverrides: boolean;
