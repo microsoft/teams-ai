@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.15",
-    "id": "c44a142a-4ab1-436e-a596-df551f7be230",
+    "id": "<<MICROSOFT_APP_OR_BOT_ID>>",
     "packageName": "com.package.name",
     "name": {
         "short": "Santa",
@@ -11,9 +11,9 @@
     "developer": {
         "name": "Santa",
         "mpnId": "",
-        "websiteUrl": "https://en.wikipedia.org/wiki/HAL_9000",
-        "privacyUrl": "https://en.wikipedia.org/wiki/HAL_9000",
-        "termsOfUseUrl": "https://en.wikipedia.org/wiki/HAL_9000"
+        "websiteUrl": "https://teams.microsoft.com",
+        "privacyUrl": "https://teams.microsoft.com",
+        "termsOfUseUrl": "https://teams.microsoft.com"
     },
     "description": {
         "short": "Sample bot that thinks it's Santa Clause",
@@ -36,7 +36,7 @@
     ],
     "bots": [
         {
-            "botId": "___YOUR BOTS ID___",
+            "botId": "<<YOUR_BOT_ID>>",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
