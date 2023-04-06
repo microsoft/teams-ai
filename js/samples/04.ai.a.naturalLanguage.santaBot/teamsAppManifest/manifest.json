@@ -6,7 +6,7 @@
     "packageName": "com.package.name",
     "name": {
         "short": "Santa",
-        "full": "Santa Clause"
+        "full": "Santa Claus"
     },
     "developer": {
         "name": "Santa",
@@ -16,8 +16,8 @@
         "termsOfUseUrl": "https://teams.microsoft.com"
     },
     "description": {
-        "short": "Sample bot that thinks it's Santa Clause",
-        "full": "Sample bot that thinks it's Santa Clause"
+        "short": "Sample bot that thinks it's Santa Claus",
+        "full": "Sample bot that thinks it's Santa Claus"
     },
     "icons": {
         "outline": "outline.png",
