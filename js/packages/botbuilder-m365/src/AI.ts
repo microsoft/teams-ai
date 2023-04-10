@@ -88,7 +88,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         // Register default UnknownAction handler
         this.action(
             AI.UnknownActionName,
-            (context, state, data, action) => {
+            (context, state, data, action?) => {
                 console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
                 return Promise.resolve(true);
             },

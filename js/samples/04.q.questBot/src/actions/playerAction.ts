@@ -73,7 +73,7 @@ async function updatePlayer(
         state.temp.value.backstoryChange = backstoryChange ?? 'no change';
         state.temp.value.equippedChange = equippedChange ?? 'no change';
         const update = (await app.ai.completePrompt(context, state, 'updatePlayer')) as string;
-        const obj: UserState = ResponseParser.parseJSON(update);
+        const obj: UserState = ResponseParser.parseJSON(update) || {} as UserState;
         if (obj) {
             if (obj.backstory?.length > 0) {
                 player.backstory = obj.backstory;
