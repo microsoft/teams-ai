@@ -20,6 +20,7 @@ import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateMan
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
+import { TaskModules, TaskModulesOptions } from './TaskModules';
 
 const TYPING_TIMER_DELAY = 1000;
 
@@ -36,6 +37,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     ai?: AIOptions<TState>;
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
+    taskModules?: TaskModulesOptions;
     removeRecipientMention?: boolean;
     startTypingTimer?: boolean;
 }
@@ -71,6 +73,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
+    private readonly _taskModules: TaskModules<TState>;
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
@@ -97,6 +100,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
         this._messageExtensions = new MessageExtensions<TState>(this);
+        this._taskModules = new TaskModules<TState>(this);
     }
 
     public get adaptiveCards(): AdaptiveCards<TState> {
@@ -117,6 +121,10 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     public get options(): ApplicationOptions<TState> {
         return this._options;
+    }
+
+    public get taskModules(): TaskModules<TState> {
+        return this._taskModules;
     }
 
     /**

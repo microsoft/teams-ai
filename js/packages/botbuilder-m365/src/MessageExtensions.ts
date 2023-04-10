@@ -307,23 +307,27 @@ export class MessageExtensions<TState extends TurnState> {
             );
 
         // Add route
-        this._app.addRoute(selector, async (context, state) => {
-            // Call handler and then check to see if an invoke response has already been added
-            const result = await handler(context, state, context?.activity?.value ?? {});
-            if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                // Format invoke response
-                const response: MessagingExtensionActionResponse = {
-                    composeExtension: result
-                };
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state, context?.activity?.value ?? {});
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Format invoke response
+                    const response: MessagingExtensionActionResponse = {
+                        composeExtension: result
+                    };
 
-                // Queue up invoke response
-                await context.sendActivity({
-                    value: { body: response, status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
-            }
-        }),
-            true;
+                    // Queue up invoke response
+                    await context.sendActivity({
+                        value: { body: response, status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
         return this._app;
     }
 
