@@ -33,16 +33,16 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: any) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -65,7 +65,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { AdaptiveCardSearchResult, Application } from 'botbuilder-m365';
+import { AdaptiveCardSearchResult, Application, DefaultTurnState, TurnState } from '@microsoft/botbuilder-m365';
 import { createDynamicSearchCard, createStaticSearchCard } from './cards';
 import axios from 'axios';
 
@@ -80,6 +80,7 @@ app.conversationUpdate('membersAdded', async (context, _state) => {
     const membersAdded = context.activity.membersAdded || [];
     for (let member = 0; member < membersAdded.length; member++) {
         // Ignore the bot joining the conversation
+        // eslint-disable-next-line security/detect-object-injection
         if (membersAdded[member].id !== context.activity.recipient.id) {
             await context.sendActivity(
                 `Hello and welcome! With this sample you can see the functionality of static and dynamic search in adaptive card`
@@ -100,7 +101,7 @@ app.message(/static/i, async (context, _state) => {
 });
 
 // Listen for query from dynamic search card
-app.adaptiveCards.search('npmpackages', async (context, state, query) => {
+app.adaptiveCards.search('npmpackages', async (context: TurnContext, state: TurnState, query) => {
     // Execute query
     const searchQuery = query.parameters['queryText'] ?? '';
     const count = query.count ?? 10;

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module botbuilder-m365
  */
@@ -46,7 +47,7 @@ export class ResponseParser {
 
     public static parseResponse(text?: string): Plan {
         // See if the response contains a plan object?
-        let plan: Plan = this.parseJSON(text);
+        let plan: Plan = this.parseJSON(text) as Plan;
         if (plan && plan.type?.toLowerCase() === 'plan') {
             plan.type = 'plan';
             if (!Array.isArray(plan.commands)) {
@@ -198,8 +199,10 @@ export class ResponseParser {
                         }
                         break;
                     case DoCommandParseState.inEntityStringValue:
+                        // The following code is checking that the tokens are matching and is not exposing sensitive data
                         // Accumulate tokens until end of string is hit
-                        if (token == quoteType) {
+                        // eslint-disable-next-line security/detect-possible-timing-attacks
+                        if (token === quoteType) {
                             // Save pair and look for additional pairs
                             command!.entities[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
@@ -295,8 +298,8 @@ export class ResponseParser {
     /**
      * Simple text tokenizer. Breaking characters are added to list as separate tokens.
      *
-     * @param text Optional. Text string to tokenize.
-     * @returns Array of tokens.
+     * @param {string} text Optional. Text string to tokenize.
+     * @returns {[string]} Array of tokens.
      */
     public static tokenizeText(text?: string): string[] {
         const tokens: string[] = [];

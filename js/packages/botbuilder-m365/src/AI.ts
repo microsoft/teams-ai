@@ -191,14 +191,14 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      *
      * Actions can be triggered by a planner returning a DO command.
      *
-     * @param name Unique name of the action.
-     * @param handler Function to call when the action is triggered.
-     * @param allowOverrides Optional. If true
-     * @returns The application instance for chaining purposes.
+     * @param {string | string[]} name Unique name of the action.
+     * @param {Promise<boolean>} handler Function to call when the action is triggered.
+     * @param {boolean} allowOverrides Optional. If true, default and/or existing handlers can be overridden.
+     * @returns {this} The application instance for chaining purposes.
      */
-    public action<TEntities = Record<string, any>>(
+    public action<TEntities extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, entities: TEntities, action: string) => Promise<boolean>,
+        handler: (context: TurnContext, state: TState, entities: TEntities, action?: string) => Promise<boolean>,
         allowOverrides = false
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
@@ -272,7 +272,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
                     opts.history.maxTurns * 2
                 );
                 switch (opts.history.assistantHistoryType) {
-                    case 'text':
+                    case 'text': {
                         // Extract only the things the assistant has said
                         const text = plan.commands
                             .filter((v) => v.type == 'SAY')
@@ -284,6 +284,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
                             opts.history.maxTurns * 2
                         );
                         break;
+                    }
                     case 'planObject':
                     default:
                         // Embed the plan object to re-enforce the model
@@ -299,9 +300,11 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
             // Run predicted commands
             for (let i = 0; i < plan.commands.length && continueChain; i++) {
+                // TODO
+                // eslint-disable-next-line security/detect-object-injection
                 const cmd = plan.commands[i];
                 switch (cmd.type) {
-                    case 'DO':
+                    case 'DO': {
                         const { action } = cmd as PredictedDoCommand;
                         if (this._actions.has(action)) {
                             // Call action handler
@@ -316,6 +319,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
                                 .handler(context, state, plan, action);
                         }
                         break;
+                    }
                     case 'SAY':
                         continueChain = await this._actions
                             .get(AI.SayCommandActionName)!
@@ -392,7 +396,8 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     }
 }
 
+/* TData in a handler is of type Record<string, any>, specified by the developer. However, since by default TData is not set, we use type `any` here. */
 interface ActionEntry<TState> {
-    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, data?: any, action?: string) => Promise<boolean>;
     allowOverrides: boolean;
 }

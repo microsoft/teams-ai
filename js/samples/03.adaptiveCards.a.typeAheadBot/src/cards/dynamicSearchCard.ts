@@ -11,7 +11,7 @@ import { Attachment, CardFactory } from 'botbuilder';
 export function createDynamicSearchCard(): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-        version: '1.2',
+        version: '1.3',
         type: 'AdaptiveCard',
         body: [
             {
@@ -22,48 +22,35 @@ export function createDynamicSearchCard(): Attachment {
             {
                 columns: [
                     {
-                        width: 'auto',
-                        items: [
-                            {
-                                text: 'NPM packages search: ',
-                                wrap: true,
-                                height: 'stretch',
-                                type: 'TextBlock'
-                            }
-                        ],
-                        type: 'Column'
-                    }
-                ],
-                type: 'ColumnSet'
-            },
-            {
-                columns: [
-                    {
                         width: 'stretch',
                         items: [
                             {
                                 choices: [
                                     {
-                                        title: 'Static Option 1',
+                                        title: '@microsoft/botbuilder-m365',
                                         value: 'static_option_1'
                                     },
                                     {
-                                        title: 'Static Option 2',
+                                        title: '@microsoft/botframework-webchat',
                                         value: 'static_option_2'
                                     },
                                     {
-                                        title: 'Static Option 3',
+                                        title: '@microsoft/botframework-emulator',
                                         value: 'static_option_3'
                                     }
                                 ],
-                                isMultiSelect: false,
-                                style: 'filtered',
                                 'choices.data': {
                                     type: 'Data.Query',
                                     dataset: 'npmpackages'
                                 },
                                 id: 'choiceSelect',
-                                type: 'Input.ChoiceSet'
+                                type: 'Input.ChoiceSet',
+                                placeholder: 'Package name',
+                                label: 'NPM package search',
+                                isRequired: true,
+                                errorMessage: 'There was an error',
+                                isMultiSelect: true,
+                                style: 'expanded'
                             }
                         ],
                         type: 'Column'

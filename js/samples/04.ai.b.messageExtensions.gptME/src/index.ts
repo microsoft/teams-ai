@@ -32,20 +32,17 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
-// Create storage to use
-//const storage = new MemoryStorage();
-
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -68,7 +65,15 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from 'botbuilder-m365';
+import {
+    Application,
+    DefaultConversationState,
+    DefaultPromptManager,
+    DefaultTempState,
+    DefaultTurnState,
+    DefaultUserState,
+    OpenAIPlanner
+} from '@microsoft/botbuilder-m365';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
 // This Message Extension can either drop the created card into the compose window (default.)
@@ -76,19 +81,29 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
+if (!process.env.OpenAIKey) {
+    throw new Error('Missing environment OpenAIKey');
+}
+
+interface TempState extends DefaultTempState {
+    post: string | undefined;
+    prompt: string | undefined;
+}
+
+type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUserState, TempState>;
 
 // Create AI components
-const planner = new OpenAIPlanner({
+const planner = new OpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.OpenAIKey,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
-const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
+const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
-const app = new Application({
+const app = new Application<ApplicationTurnState>({
     storage,
     adapter,
     botAppId: process.env.MicrosoftAppId,
@@ -98,7 +113,7 @@ const app = new Application({
     }
 });
 
-app.messageExtensions.fetchTask('CreatePost', async (context, state) => {
+app.messageExtensions.fetchTask('CreatePost', async (context: TurnContext, state: ApplicationTurnState) => {
     // Return card as a TaskInfo object
     const card = createInitialView();
     return createTaskInfo(card);
@@ -110,57 +125,77 @@ interface SubmitData {
     post?: string;
 }
 
-app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, state, data) => {
-    try {
-        switch (data.verb) {
-            case 'generate':
-                // Call GPT and return response view
-                return await updatePost(context, state, 'generate', data);
-            case 'update':
-                // Call GPT and return an updated response view
-                return await updatePost(context, state, 'update', data);
-            case 'preview':
-                // Preview the post as an adaptive card
-                const card = createPostCard(data.post!);
-                const activity = MessageFactory.attachment(card);
-                return {
-                    type: 'botMessagePreview',
-                    activityPreview: activity
-                } as MessagingExtensionResult;
-            case 'post':
-                // Drop the card into compose window
-                return {
-                    type: 'result',
-                    attachmentLayout: 'list',
-                    attachments: [createPostCard(data.post)]
-                } as MessagingExtensionResult;
-                break;
+app.messageExtensions.submitAction<SubmitData>(
+    'CreatePost',
+    async (context: TurnContext, state: ApplicationTurnState, data) => {
+        try {
+            switch (data.verb) {
+                case 'generate':
+                    // Call GPT and return response view
+                    return await updatePost(context, state, 'generate', data);
+                case 'update':
+                    // Call GPT and return an updated response view
+                    return await updatePost(context, state, 'update', data);
+                case 'preview': {
+                    // Preview the post as an adaptive card
+                    const card = createPostCard(data.post!);
+                    const activity = MessageFactory.attachment(card);
+                    return {
+                        type: 'botMessagePreview',
+                        activityPreview: activity
+                    } as MessagingExtensionResult;
+                }
+                case 'post': {
+                    const attachments = [createPostCard(data.post!)] || undefined;
+                    // Drop the card into compose window
+                    return {
+                        type: 'result',
+                        attachmentLayout: 'list',
+                        attachments
+                    } as MessagingExtensionResult;
+                    break;
+                }
+            }
+        } catch (err: any) {
+            return `Something went wrong: ${err.toString()}`;
         }
-    } catch (err: any) {
-        return `Something went wrong: ${err.toString()}`;
     }
-});
+);
 
-app.messageExtensions.botMessagePreviewEdit('CreatePost', async (context, state, previewActivity) => {
-    // Get post text from previewed card
-    const post: string = previewActivity?.attachments[0]?.content?.body[0]?.text ?? '';
-    const card = createEditView(post, PREVIEW_MODE);
-    return createTaskInfo(card);
-});
+app.messageExtensions.botMessagePreviewEdit(
+    'CreatePost',
+    async (context: TurnContext, state: DefaultTurnState, previewActivity) => {
+        // Get post text from previewed card
+        const post: string = previewActivity?.attachments?.[0]?.content?.body[0]?.text ?? '';
+        const card = createEditView(post, PREVIEW_MODE);
+        return createTaskInfo(card);
+    }
+);
 
-app.messageExtensions.botMessagePreviewSend('CreatePost', async (context, state, previewActivity) => {
-    // Create a new activity using the card in the preview activity
-    const card = previewActivity?.attachments[0];
-    const activity = MessageFactory.attachment(card);
-    activity.channelData = {
-        onBehalfOf: [
-            { itemId: 0, mentionType: 'person', mri: context.activity.from.id, displayname: context.activity.from.name }
-        ]
-    };
+app.messageExtensions.botMessagePreviewSend(
+    'CreatePost',
+    async (context: TurnContext, state: DefaultTurnState, previewActivity) => {
+        // Create a new activity using the card in the preview activity
+        const card = previewActivity?.attachments?.[0];
+        const activity = card && MessageFactory.attachment(card);
+        if (!activity) {
+            throw new Error('No card found in preview activity');
+        }
+        activity.channelData = {
+            onBehalfOf: [
+                {
+                    itemId: 0,
+                    mentionType: 'person',
+                    mri: context.activity.from.id,
+                    displayname: context.activity.from.name
+                }
+            ]
+        };
 
-    // Send new activity to chat
-    await context.sendActivity(activity);
-});
+        // Send new activity to chat
+        await context.sendActivity(activity);
+    }
+);
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
@@ -191,7 +226,7 @@ function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
  */
 async function updatePost(
     context: TurnContext,
-    state: DefaultTurnState,
+    state: ApplicationTurnState,
     prompt: string,
     data: SubmitData
 ): Promise<TaskModuleTaskInfo> {

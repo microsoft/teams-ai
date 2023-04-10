@@ -1,5 +1,5 @@
 import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
-import { Application, ResponseParser } from 'botbuilder-m365';
+import { Application, ResponseParser } from '@microsoft/botbuilder-m365';
 import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
 import { normalizeItemName, searchItemList, textToItemList } from '../items';
 import * as responses from '../responses';
@@ -8,7 +8,7 @@ import * as responses from '../responses';
  * @param app
  */
 export function inventoryAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('inventory', async (context, state, data: IDataEntities) => {
+    app.ai.action('inventory', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const operation = (data.operation ?? '').toLowerCase();
         switch (operation) {
             case 'update':
@@ -87,7 +87,11 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
  * @param context
  * @param state
  */
-async function printList(app: Application<ApplicationTurnState>, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
+async function printList(
+    app: Application<ApplicationTurnState>,
+    context: TurnContext,
+    state: ApplicationTurnState
+): Promise<boolean> {
     const items = state.user.value.inventory;
     if (Object.keys(items).length > 0) {
         state.temp.value.listItems = items;

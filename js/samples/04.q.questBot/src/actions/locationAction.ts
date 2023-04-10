@@ -1,5 +1,5 @@
 import { TurnContext } from 'botbuilder';
-import { Application } from 'botbuilder-m365';
+import { Application } from '@microsoft/botbuilder-m365';
 import { ApplicationTurnState, IDataEntities } from '../bot';
 import { findMapLocation } from '../ShadowFalls';
 
@@ -7,7 +7,7 @@ import { findMapLocation } from '../ShadowFalls';
  * @param app
  */
 export function locationAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('location', async (context, state, data: IDataEntities) => {
+    app.ai.action('location', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'change':

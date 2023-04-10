@@ -32,7 +32,7 @@ export abstract class Block {
         throw new Error(`This block doesn't support code execution`);
     }
 
-    public abstract isValid(): { valid: boolean; error?: string };
+    public abstract isValid(): { valid: boolean; errorMessage?: string };
 
     public abstract render(context: TurnContext, state: TurnState): string;
 }

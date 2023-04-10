@@ -30,16 +30,16 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: any) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -61,7 +61,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState } from 'botbuilder-m365';
+import { Application, DefaultTurnState } from '@microsoft/botbuilder-m365';
 
 interface ConversationState {
     count: number;
@@ -75,13 +75,13 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Listen for user to say '/reset' and then delete conversation state
-app.message('/reset', async (context, state) => {
+app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
     state.conversation.delete();
     await context.sendActivity(`Ok I've deleted the current conversation state.`);
 });
 
 // Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
-app.activity(ActivityTypes.Message, async (context, state) => {
+app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     // Increment count state
     let count = state.conversation.value.count ?? 0;
     state.conversation.value.count = ++count;

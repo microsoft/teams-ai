@@ -5,7 +5,8 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
-
+// TODO:
+/* eslint-disable security/detect-object-injection */
 import {
     TurnContext,
     ActivityTypes,
@@ -47,6 +48,12 @@ export class AdaptiveCards<TState extends TurnState> {
         this._app = app;
     }
 
+    /**
+     *
+     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} verb The name action(s) to be handled
+     * @param {Promise<AdaptiveCard | string>} handler The promise returning the Adaptive Card or string to be executed
+     * @returns {Application} The application
+     */
     public actionExecute(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<AdaptiveCard | string>
@@ -178,7 +185,10 @@ export class AdaptiveCards<TState extends TurnState> {
 }
 
 /**
- * @param verb
+ * Selector to match an Action.Execute invoke activity.
+ *
+ * @param {string | RegExp | RouteSelector} verb action name, RegExp, or RouteSelector to match
+ * @returns {RouteSelector} The selector Promise
  */
 function createActionExecuteSelector(verb: string | RegExp | RouteSelector): RouteSelector {
     if (typeof verb == 'function') {
@@ -216,8 +226,11 @@ function createActionExecuteSelector(verb: string | RegExp | RouteSelector): Rou
 }
 
 /**
- * @param verb
- * @param filter
+ * This function is used to create a selector function that will match on a submit action for a specific verb.
+ *
+ * @param {string} verb The verb to match. Can be a string, RegExp, or RouteSelector function.
+ * @param {string} filter The property on the activity value object to match the verb against.
+ * @returns {RouteSelector} RouteSelector that matches on a submit action for a specific verb.
  */
 function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filter: string): RouteSelector {
     if (typeof verb == 'function') {
@@ -248,7 +261,7 @@ function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filte
  * This code creates a RouteSelector that can be used to route search requests to
  * a bot's search handler.
  *
- * @param {string} dataset
+ * @param {string | RegExp | RouteSelector} dataset The dataset to match. Can be a string, RegExp, or RouteSelector function.
 
  @returns {RouteSelector} Route's search requests to a bot's search handler.
  */

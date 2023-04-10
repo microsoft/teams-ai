@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module botbuilder-m365
  */
@@ -37,10 +38,10 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
         state: TState,
         prompt: PromptTemplate,
         options: ConfiguredAIOptions<TState>
-    ): Promise<Plan> {
+    ): Promise<Plan | undefined> {
         switch (this._options.moderate) {
             case 'input':
-            case 'both':
+            case 'both': {
                 const input = state?.temp?.value.input ?? context.activity.text;
                 const result = await this.createModeration(input, this._options.model);
                 if (result) {
@@ -65,8 +66,8 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
                     };
                 }
                 break;
+            }
         }
-
         return undefined;
     }
 

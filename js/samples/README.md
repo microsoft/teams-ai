@@ -38,7 +38,7 @@ It shows M365 BotBuilder SDK capabilities like:
 -   Localization across languages
 -   Conversational session history
 
-### AI in Message Extensions: [GPT ME](04.ai.b.messageExtension.gptME/)
+### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.gptME/)
 
 A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
@@ -67,7 +67,7 @@ It shows a broad range of M365 botbuilder SDK capabilities like:
 -   Prediction engine mapping intents to actions with third party business logic
 -   Mixing GPT-powered conversational responses with manually defined responses
 
-### Chained Actions: [List Generator AI Assistant](04.ai.d.chainedActions.listGenerator/)
+### Chained Actions: [List Generator AI Assistant](04.ai.d.chainedActions.listBot/)
 
 Similar to the Light On/Off sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
 
