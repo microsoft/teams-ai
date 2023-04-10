@@ -73,8 +73,7 @@ import {
     DefaultConversationState,
     DefaultUserState,
     DefaultTempState,
-    DefaultPromptManager,
-    TData
+    DefaultPromptManager
 } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
@@ -117,7 +116,7 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Define an interface to strongly type data parameters for actions
-interface EntityData extends TData {
+interface EntityData {
     list: string; // <- populated by GPT
     item: string; // <- populated by GPT
 }
@@ -199,8 +198,8 @@ app.ai.action('summarizeLists', async (context: TurnContext, state: ApplicationT
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action: string) => {
-        await context.sendActivity(responses.unknownAction(action));
+    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
+        await context.sendActivity(responses.unknownAction(action!));
         return false;
     }
 );
