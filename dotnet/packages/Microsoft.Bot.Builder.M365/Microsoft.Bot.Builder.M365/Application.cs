@@ -6,7 +6,7 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 
 namespace Microsoft.Bot.Builder.M365
 {
-    public partial class Application<TState> : IBot where TState : TurnState
+    public class Application<TState> : IBot where TState : TurnState
     {
         private readonly ApplicationOptions<TState> _options;
         private readonly AI<TState>? _ai;
@@ -14,13 +14,11 @@ namespace Microsoft.Bot.Builder.M365
         public Application(ApplicationOptions<TState> options)
         {
             _options = options;
-            _options.removeRecipientMention = true;
-            _options.startTypingTimer = true;
 
-            if (_options.turnStateManager == null)
+            if (_options.TurnStateManager == null)
             {
                 // TODO: set to default turn state manager
-                _options.turnStateManager = null;
+                _options.TurnStateManager = null;
             }
 
             if (_options.AI == null)
@@ -72,10 +70,7 @@ namespace Microsoft.Bot.Builder.M365
             return Task.FromResult(true);
         }
 
-    }
 
-    public partial class Application<TState> : IBot where TState : TurnState
-    {
         /// <summary>
         /// Called by the adapter (for example, a <see cref="CloudAdapter"/>)
         /// at runtime in order to process an inbound <see cref="Activity"/>.
@@ -91,7 +86,7 @@ namespace Microsoft.Bot.Builder.M365
         /// routing the activity to the appropriate type-specific handler.
         /// </remarks>
         /// <seealso cref="OnMessageActivityAsync(ITurnContext{IMessageActivity}, TState, CancellationToken)"/>
-        public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             if (turnContext == null)
             {
@@ -113,15 +108,14 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 // Start typing timer if configured
-                if (_options.startTypingTimer)
+                if (_options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(1000);
+                    timer = new TypingTimer(_options.TypingTimerDelay);
                     timer.StartTypingTimer(turnContext);
-
                 }
 
                 // Remove @mentions
-                if (_options.removeRecipientMention && turnContext.Activity.Type == ActivityTypes.Message)
+                if (_options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
                 {
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
@@ -358,19 +352,13 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="OnMembersRemovedAsync(IList{ChannelAccount}, ITurnContext{IConversationUpdateActivity}, TState, CancellationToken)"/>
         protected virtual Task OnConversationUpdateActivityAsync(ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            if (turnContext.Activity.MembersAdded != null)
+            if (turnContext.Activity.MembersAdded != null && turnContext.Activity.MembersAdded.Any(m => m.Id != turnContext.Activity.Recipient?.Id))
             {
-                if (turnContext.Activity.MembersAdded.Any(m => m.Id != turnContext.Activity.Recipient?.Id))
-                {
-                    return OnMembersAddedAsync(turnContext.Activity.MembersAdded, turnContext, turnState, cancellationToken);
-                }
+                return OnMembersAddedAsync(turnContext.Activity.MembersAdded, turnContext, turnState, cancellationToken);
             }
-            else if (turnContext.Activity.MembersRemoved != null)
+            else if (turnContext.Activity.MembersRemoved != null && turnContext.Activity.MembersRemoved.Any(m => m.Id != turnContext.Activity.Recipient?.Id))
             {
-                if (turnContext.Activity.MembersRemoved.Any(m => m.Id != turnContext.Activity.Recipient?.Id))
-                {
-                    return OnMembersRemovedAsync(turnContext.Activity.MembersRemoved, turnContext, turnState, cancellationToken);
-                }
+                return OnMembersRemovedAsync(turnContext.Activity.MembersRemoved, turnContext, turnState, cancellationToken);
             }
 
             throw new NotImplementedException();
@@ -555,7 +543,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="OnEventAsync(ITurnContext{IEventActivity}, TState, CancellationToken)"/>
         protected virtual Task OnEventActivityAsync(ITurnContext<IEventActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            if (turnContext.Activity.Name == SignInConstants.TokenResponseEventName)
+            if (SignInConstants.TokenResponseEventName.Equals(turnContext.Activity.Name, StringComparison.OrdinalIgnoreCase))
             {
                 return OnTokenResponseEventAsync(turnContext, turnState, cancellationToken);
             }
@@ -787,10 +775,10 @@ namespace Microsoft.Bot.Builder.M365
         {
             switch (turnContext.Activity.Action)
             {
-                case "add":
+                case InstallationUpdateActionTypes.Add:
                 case "add-upgrade":
                     return OnInstallationUpdateAddAsync(turnContext, turnState, cancellationToken);
-                case "remove":
+                case InstallationUpdateActionTypes.Remove:
                 case "remove-upgrade":
                     return OnInstallationUpdateRemoveAsync(turnContext, turnState, cancellationToken);
                 default:
@@ -951,12 +939,10 @@ namespace Microsoft.Bot.Builder.M365
                 invokeValue = obj.ToObject<SearchInvokeValue>();
                 if (invokeValue == null) throw new Exception();
             }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch
-#pragma warning restore CA1031 // Do not catch general exception types
+            catch (Exception ex)
             {
                 var errorResponse = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not valid for search");
-                throw new InvokeResponseException(HttpStatusCode.BadRequest, errorResponse);
+                throw new InvokeResponseException(HttpStatusCode.BadRequest, errorResponse, ex);
             }
 
             ValidateSearchInvokeValue(invokeValue, activity.ChannelId);
@@ -1014,12 +1000,10 @@ namespace Microsoft.Bot.Builder.M365
                 invokeValue = obj.ToObject<AdaptiveCardInvokeValue>();
                 if (invokeValue == null) throw new Exception();
             }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch
-#pragma warning restore CA1031 // Do not catch general exception types
+            catch (Exception ex)
             {
                 var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed");
-                throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
+                throw new InvokeResponseException(HttpStatusCode.BadRequest, response, ex);
             }
 
             if (invokeValue.Action == null)

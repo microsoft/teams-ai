@@ -18,7 +18,7 @@ namespace Microsoft.Bot.Builder.M365.Exceptions
         /// </summary>
         /// <param name="statusCode">The Http status code of the error.</param>
         /// <param name="body">The body of the exception. Default is null.</param>
-        public InvokeResponseException(HttpStatusCode statusCode, object? body = null)
+        public InvokeResponseException(HttpStatusCode statusCode, object? body = null, Exception? innerException = null) : base("InvokeResponseException", innerException)
         {
             _statusCode = statusCode;
             _body = body;

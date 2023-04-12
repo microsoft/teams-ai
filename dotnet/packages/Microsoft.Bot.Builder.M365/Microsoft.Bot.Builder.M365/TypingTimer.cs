@@ -72,8 +72,7 @@ namespace Microsoft.Bot.Builder.M365
                 // We're in the middle of sending an activity on a background thread when the turn ends and
                 // the turn context object is dispoed of. We can just eat the error but lets
                 // make sure our states cleaned up a bit.
-                timer = null;
-
+                this.StopTypingTimer();
             }
         }
 

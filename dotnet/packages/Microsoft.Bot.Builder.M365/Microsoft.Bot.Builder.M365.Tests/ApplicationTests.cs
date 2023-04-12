@@ -1,30 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Bot.Builder.M365;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
-using Microsoft.Rest;
 using Moq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Xunit;
+using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
 namespace Microsoft.Bot.Builder.M365.Tests
 {
     public class ApplicationTests
     {
         [Fact]
-        public async Task TestMessageActivity()
+        public async Task Test_MessageActivity()
         {
             // Arrange
             var activity = MessageFactory.Text("hello");
@@ -32,7 +21,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -41,7 +30,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMessageUpdateActivity()
+        public async Task Test_MessageUpdateActivity()
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
@@ -49,7 +38,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -58,7 +47,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMessageDeleteActivity()
+        public async Task Test_MessageDeleteActivity()
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageDelete };
@@ -66,7 +55,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -75,7 +64,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestEndOfConversationActivity()
+        public async Task Test_EndOfConversationActivity()
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.EndOfConversation, Value = "some value" };
@@ -83,7 +72,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -92,7 +81,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestTypingActivity()
+        public async Task Test_TypingActivity()
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Typing };
@@ -100,7 +89,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -109,7 +98,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInstallationUpdateActivity()
+        public async Task Test_InstallationUpdateActivity()
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.InstallationUpdate };
@@ -117,7 +106,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -126,7 +115,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMemberAdded1()
+        public async Task Test_ConversationUpdateActivity_One_MemberAdded()
         {
             // Arrange
             var activity = new Activity
@@ -142,7 +131,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -151,7 +140,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMemberAdded2()
+        public async Task Test_ConversationUpdateActivity_Two_MembersAdded()
         {
             // Arrange
             var activity = new Activity
@@ -168,7 +157,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -178,35 +167,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMemberAdded3()
-        {
-            // Arrange
-            var activity = new Activity
-            {
-                Type = ActivityTypes.ConversationUpdate,
-                MembersAdded = new List<ChannelAccount>
-                {
-                    new ChannelAccount { Id = "a" },
-                    new ChannelAccount { Id = "b" },
-                    new ChannelAccount { Id = "c" },
-                },
-                Recipient = new ChannelAccount { Id = "b" },
-            };
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
-
-            // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
-
-            // Assert
-            Assert.Equal(2, bot.Record.Count);
-            Assert.Equal("OnConversationUpdateActivityAsync", bot.Record[0]);
-            Assert.Equal("OnMembersAddedAsync", bot.Record[1]);
-        }
-
-        [Fact]
-        public async Task TestMemberRemoved1()
+        public async Task Test_ConversationUpdateActivity_One_MemberRemoved()
         {
             // Arrange
             var activity = new Activity
@@ -222,7 +183,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -231,7 +192,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMemberRemoved2()
+        public async Task Test_ConversationUpdateActivity_Two_MembersRemoved()
         {
             // Arrange
             var activity = new Activity
@@ -248,7 +209,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -258,35 +219,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMemberRemoved3()
-        {
-            // Arrange
-            var activity = new Activity
-            {
-                Type = ActivityTypes.ConversationUpdate,
-                MembersRemoved = new List<ChannelAccount>
-                {
-                    new ChannelAccount { Id = "a" },
-                    new ChannelAccount { Id = "b" },
-                    new ChannelAccount { Id = "c" },
-                },
-                Recipient = new ChannelAccount { Id = "c" },
-            };
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
-
-            // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.RunAsync(turnContext, turnState, default(CancellationToken));
-
-            // Assert
-            Assert.Equal(2, bot.Record.Count);
-            Assert.Equal("OnConversationUpdateActivityAsync", bot.Record[0]);
-            Assert.Equal("OnMembersRemovedAsync", bot.Record[1]);
-        }
-
-        [Fact]
-        public async Task TestMemberAddedJustTheBot()
+        public async Task Test_ConversationUpdateActivity_Bot_MemberAdded()
         {
             // Arrange
             var activity = new Activity
@@ -302,7 +235,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -311,7 +244,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMemberRemovedJustTheBot()
+        public async Task Test_ConversationUpdateActivity_Bot_MemberRemoved()
         {
             // Arrange
             var activity = new Activity
@@ -327,7 +260,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -336,7 +269,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestMessageReaction()
+        public async Task Test_MessageReactionActivity_ReactionAdded_And_ReactionRemoved()
         {
             // Note the code supports multiple adds and removes in the same activity though
             // a channel may decide to send separate activities for each. For example, Teams
@@ -359,7 +292,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -370,7 +303,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestTokenResponseEventAsync()
+        public async Task Test_EventActivity_TokenResponseEventAsync()
         {
             // Arrange
             var activity = new Activity
@@ -382,7 +315,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -392,7 +325,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestEventAsync()
+        public async Task Test_EventActvitiy_EventAsync()
         {
             // Arrange
             var activity = new Activity
@@ -404,7 +337,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -414,7 +347,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInvokeAsync()
+        public async Task Test_InvokeActivity()
         {
             // Arrange
             var activity = new Activity
@@ -428,7 +361,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -438,7 +371,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestSignInInvokeAsync()
+        public async Task Test_InvokeActivity_SignInInvokeAsync()
         {
             // Arrange
             var activity = new Activity
@@ -450,7 +383,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -460,7 +393,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInvokeShouldNotMatchAsync()
+        public async Task Test_InvokeActivity_InvokeShouldNotMatchAsync()
         {
             // Arrange
             var activity = new Activity
@@ -473,7 +406,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -483,7 +416,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestEventNullNameAsync()
+        public async Task Test_EventActivity_EventNullNameAsync()
         {
             // Arrange
             var activity = new Activity
@@ -494,7 +427,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -504,7 +437,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInstallationUpdateAddAsync()
+        public async Task Test_InstallationUpdateActivity_AddAsync()
         {
             // Arrange
             var activity = new Activity
@@ -516,7 +449,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -526,7 +459,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInstallationUpdateAddUpgradeAsync()
+        public async Task Test_InstallationUpdateActivity_AddUpgradeAsync()
         {
             // Arrange
             var activity = new Activity
@@ -538,7 +471,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -548,7 +481,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInstallationUpdateRemoveAsync()
+        public async Task Test_InstallationUpdateActivity_RemoveAsync()
         {
             // Arrange
             var activity = new Activity
@@ -560,7 +493,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -570,7 +503,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestInstallationUpdateRemoveUpgradeAsync()
+        public async Task Test_InstallationUpdateActivity_RemoveUpgradeAsync()
         {
             // Arrange
             var activity = new Activity
@@ -582,7 +515,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -592,7 +525,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestOnAdaptiveCardActionExecuteAsync()
+        public async Task Test_InvokeActivity_OnAdaptiveCardActionExecuteAsync()
         {
             var value = JObject.FromObject(new AdaptiveCardInvokeValue { Action = new AdaptiveCardInvokeAction { Type = "Action.Execute" } });
 
@@ -608,7 +541,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -618,7 +551,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestCommandActivityType()
+        public async Task Test_CommandActivityType()
         {
             // Arrange
             var activity = new Activity
@@ -631,7 +564,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -640,7 +573,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestCommandResultActivityType()
+        public async Task Test_CommandResultActivityType()
         {
             // Arrange
             var activity = new Activity
@@ -654,7 +587,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -663,7 +596,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestUnrecognizedActivityType()
+        public async Task Test_UnrecognizedActivityType()
         {
             // Arrange
             var activity = new Activity
@@ -674,7 +607,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -701,8 +634,8 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestDelegatingTurnContextActivityHandler(new ApplicationOptions<TurnState>());
-            await bot.RunAsync(turnContextMock.Object, turnState, default(CancellationToken));
+            var bot = new TestDelegatingTurnContext(new ApplicationOptions<TurnState>());
+            await bot.RunAsync(turnContextMock.Object, turnState, default);
 
             // Assert
             turnContextMock.VerifyGet(tc => tc.Activity, Times.AtLeastOnce);
@@ -719,7 +652,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestOnSearchInvokeAsync()
+        public async Task Test_InvokeActivity_OnSearchInvokeAsync()
         {
             // Arrange
             var value = JObject.FromObject(new SearchInvokeValue { Kind = SearchInvokeTypes.Search, QueryText = "bot" });
@@ -728,7 +661,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -738,7 +671,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public async Task TestOnSearchInvokeAsync_NoKindOnTeamsDefaults()
+        public async Task Test_InvokeActivity_OnSearchInvokeAsync_NoKindOnTeamsDefaults()
         {
             // Arrange
             var value = JObject.FromObject(new SearchInvokeValue { Kind = null, QueryText = "bot" });
@@ -748,7 +681,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -803,7 +736,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var turnState = new TurnState();
 
             // Act
-            var bot = new TestOnTurnActivityHandler(new ApplicationOptions<TurnState>());
+            var bot = new TestRunActivityHandler(new ApplicationOptions<TurnState>());
             await bot.RunAsync(turnContext, turnState, default(CancellationToken));
 
             // Assert
@@ -823,252 +756,6 @@ namespace Microsoft.Bot.Builder.M365.Tests
             var error = body.Value as Error;
             Assert.Equal("BadRequest", error.Code);
             Assert.Equal(errorMessage, error.Message);
-        }
-
-        private class NotImplementedAdapter : BotAdapter
-        {
-            public override Task DeleteActivityAsync(ITurnContext turnContext, ConversationReference reference, CancellationToken cancellationToken)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override Task<ResourceResponse[]> SendActivitiesAsync(ITurnContext turnContext, Activity[] activities, CancellationToken cancellationToken)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override Task<ResourceResponse> UpdateActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private class TestInvokeAdapter : NotImplementedAdapter
-        {
-            public IActivity Activity { get; private set; }
-
-            public override Task<ResourceResponse[]> SendActivitiesAsync(ITurnContext turnContext, Activity[] activities, CancellationToken cancellationToken)
-            {
-                Activity = activities.FirstOrDefault(activity => activity.Type == ActivityTypesEx.InvokeResponse);
-                return Task.FromResult(new ResourceResponse[0]);
-            }
-        }
-
-        private class TestOnTurnActivityHandler : Application<TurnState>
-        {
-            public TestOnTurnActivityHandler(ApplicationOptions<TurnState> options) : base(options)
-            {
-            }
-
-            public List<string> Record { get; } = new List<string>();
-
-            protected override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnMessageUpdateActivityAsync(ITurnContext<IMessageUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnMessageDeleteActivityAsync(ITurnContext<IMessageDeleteActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnConversationUpdateActivityAsync(ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return base.OnConversationUpdateActivityAsync(turnContext, turnState, cancellationToken);
-            }
-
-            protected override Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnMembersRemovedAsync(IList<ChannelAccount> membersRemoved, ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnMessageReactionActivityAsync(ITurnContext<IMessageReactionActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return base.OnMessageReactionActivityAsync(turnContext, turnState, cancellationToken);
-            }
-
-            protected override Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnReactionsRemovedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnEventActivityAsync(ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return base.OnEventActivityAsync(turnContext, turnState, cancellationToken);
-            }
-
-            protected override Task OnTokenResponseEventAsync(ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnEventAsync(ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnEndOfConversationActivityAsync(ITurnContext<IEndOfConversationActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnTypingActivityAsync(ITurnContext<ITypingActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnInstallationUpdateActivityAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return base.OnInstallationUpdateActivityAsync(turnContext, turnState, cancellationToken);
-            }
-
-            protected override Task OnCommandActivityAsync(ITurnContext<ICommandActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnCommandResultActivityAsync(ITurnContext<ICommandResultActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnUnrecognizedActivityTypeAsync(ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task<InvokeResponse> OnInvokeActivityAsync(ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                if (turnContext.Activity.Name == "some.random.invoke")
-                {
-                    return Task.FromResult(CreateInvokeResponse(null));
-                }
-
-                return base.OnInvokeActivityAsync(turnContext, turnState, cancellationToken);
-            }
-
-            protected override Task OnSignInInvokeAsync(ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnInstallationUpdateAddAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task OnInstallationUpdateRemoveAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.CompletedTask;
-            }
-
-            protected override Task<AdaptiveCardInvokeResponse> OnAdaptiveCardActionExecuteAsync(AdaptiveCardInvokeValue invokeValue, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.FromResult(new AdaptiveCardInvokeResponse());
-            }
-
-            protected override Task<SearchInvokeResponse> OnSearchInvokeAsync(SearchInvokeValue invokeValue, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                Record.Add(MethodBase.GetCurrentMethod().Name);
-                return Task.FromResult(new SearchInvokeResponse());
-            }
-        }
-
-        private class TestDelegatingTurnContextActivityHandler : Application<TurnState>
-        {
-            public TestDelegatingTurnContextActivityHandler(ApplicationOptions<TurnState> options) : base(options)
-            {
-            }
-
-            protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
-            {
-                // touch every
-                var activity = turnContext.Activity;
-                var adapter = turnContext.Adapter;
-                var turnContextState = turnContext.TurnState;
-                var responsed = turnContext.Responded;
-                turnContext.OnDeleteActivity((t, a, n) => Task.CompletedTask);
-                turnContext.OnSendActivities((t, a, n) => Task.FromResult(new ResourceResponse[] { new ResourceResponse() }));
-                turnContext.OnUpdateActivity((t, a, n) => Task.FromResult(new ResourceResponse()));
-                await turnContext.DeleteActivityAsync(activity.GetConversationReference());
-                await turnContext.SendActivityAsync(new Activity());
-                await turnContext.SendActivitiesAsync(new IActivity[] { new Activity() });
-                await turnContext.UpdateActivityAsync(new Activity());
-            }
-        }
-
-        private class MockConnectorClient : IConnectorClient
-        {
-            private Uri _baseUri = new Uri("http://tempuri.org/whatever");
-
-            public Uri BaseUri
-            {
-                get { return _baseUri; }
-                set { _baseUri = value; }
-            }
-
-            public JsonSerializerSettings SerializationSettings => throw new NotImplementedException();
-
-            public JsonSerializerSettings DeserializationSettings => throw new NotImplementedException();
-
-            public ServiceClientCredentials Credentials { get => new MockCredentials(); }
-
-            public IAttachments Attachments => throw new NotImplementedException();
-
-            public IConversations Conversations => throw new NotImplementedException();
-
-            public void Dispose()
-            {
-                throw new NotImplementedException();
-            }
-
-            private class MockCredentials : ServiceClientCredentials
-            {
-                public override Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-                {
-                    request.Headers.Authorization = new AuthenticationHeaderValue("awesome");
-                    request.Headers.UserAgent.Add(new ProductInfoHeaderValue("Windows", "3.1"));
-                    return Task.CompletedTask;
-                }
-            }
         }
     }
 }

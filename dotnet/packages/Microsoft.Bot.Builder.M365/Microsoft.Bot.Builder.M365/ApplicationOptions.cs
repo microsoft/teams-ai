@@ -5,14 +5,13 @@ namespace Microsoft.Bot.Builder.M365
 {
     public class ApplicationOptions<TState> where TState : TurnState
     {
-        public BotAdapter? adapter { get; set; }
-        public string? botAppId { get; set; }
-        public IStorage? storage { get; set; }
+        public BotAdapter? Adapter { get; set; }
+        public string? BotAppId { get; set; }
+        public IStorage? Storage { get; set; }
         public AIOptions<TState>? AI { get; set; }
-        public TurnStateManager<TState>? turnStateManager { get; set; }
-        public AdaptiveCardsOptions? adaptiveCards { get; set; }
-        public bool removeRecipientMention { get; set; } = true;
-        public bool startTypingTimer { get; set; } = true;
-        public int typingTimerDelay = 1000;
+        public TurnStateManager<TState>? TurnStateManager { get; set; }
+        public bool RemoveRecipientMention { get; set; } = true;
+        public bool StartTypingTimer { get; set; } = true;
+        public int TypingTimerDelay { get; set; } = 1000;
     }
 }
