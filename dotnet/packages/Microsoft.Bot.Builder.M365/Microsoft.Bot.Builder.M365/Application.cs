@@ -649,7 +649,11 @@ namespace Microsoft.Bot.Builder.M365
             }
             catch (InvokeResponseException e)
             {
-                return e.CreateInvokeResponse();
+                 return new InvokeResponse
+                {
+                    Status = (int)e.StatusCode,
+                    Body = e.Body
+                };
             }
         }
 

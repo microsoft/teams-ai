@@ -14,6 +14,16 @@ namespace Microsoft.Bot.Builder.M365.Exceptions
         private readonly object? _body;
 
         /// <summary>
+        /// A getter for the <see cref="InvokeResponseException"/> status code
+        /// </summary>
+        public HttpStatusCode StatusCode => _statusCode;
+
+        /// <summary>
+        /// A getter for the <see cref="InvokeResponseException"/> body
+        /// </summary>
+        public object? Body => _body;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="InvokeResponseException"/> class.
         /// </summary>
         /// <param name="statusCode">The Http status code of the error.</param>
