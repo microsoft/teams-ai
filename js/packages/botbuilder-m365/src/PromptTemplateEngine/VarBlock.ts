@@ -5,7 +5,8 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
-
+// TODO:
+/* eslint-disable security/detect-object-injection */
 import { TurnContext } from 'botbuilder';
 import { stringify } from 'yaml';
 import { TurnState } from '../TurnState';
@@ -75,7 +76,7 @@ export class VarBlock extends Block {
                 // Return activity field
                 value = this.caseInsensitiveFindValue(context.activity, parts[1]) ?? '';
                 break;
-            default:
+            default: {
                 // Find referenced state entry
                 const entry = this.caseInsensitiveFindValue(state, parts[0]);
                 if (!entry) {
@@ -87,6 +88,7 @@ export class VarBlock extends Block {
                 // Return state field
                 value = this.caseInsensitiveFindValue(entry.value, parts[1]) ?? '';
                 break;
+            }
         }
 
         // Return value
@@ -114,7 +116,7 @@ export class VarBlock extends Block {
     }
 
     private caseInsensitiveFindValue(obj: Record<string, any>, property: string): any {
-        if (obj.hasOwnProperty(property)) {
+        if (Object.prototype.hasOwnProperty.call(obj, property)) {
             return obj[property];
         } else {
             const propKey = property.toLowerCase();

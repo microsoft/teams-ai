@@ -12,7 +12,8 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage
+    MemoryStorage,
+    TurnContext
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -28,16 +29,16 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -60,23 +61,34 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIModerator, OpenAIPlanner, AI } from '@microsoft/botbuilder-m365';
+import {
+    AI,
+    Application,
+    ConversationHistory,
+    DefaultPromptManager,
+    DefaultTurnState,
+    OpenAIModerator,
+    OpenAIPlanner,
+    TurnState
+} from '@microsoft/botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type TData = Record<string, any>;
 
 // Create AI components
 const planner = new OpenAIPlanner({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OpenAIKey!,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
 const moderator = new OpenAIModerator({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OpenAIKey!,
     moderate: 'both'
 });
-const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
+// You can also modify this to out the `chatGPT` prompt.
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts/chat'));
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -86,24 +98,24 @@ const app = new Application<ApplicationTurnState>({
         planner,
         moderator,
         promptManager,
-        prompt: 'chat',
+        prompt: 'skprompt',
         history: {
             assistantHistoryType: 'text'
         }
     }
 });
 
-app.ai.action(AI.FlaggedInputActionName, async (context, state, data) => {
+app.ai.action(AI.FlaggedInputActionName, async (context: TurnContext, state: TurnState, data: TData) => {
     await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
     return false;
 });
 
-app.ai.action(AI.FlaggedOutputActionName, async (context, state, data) => {
+app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
     await context.sendActivity(`I'm not allowed to talk about such things.`);
     return false;
 });
 
-app.message('/history', async (context, state) => {
+app.message('/history', async (context: TurnContext, state: ApplicationTurnState) => {
     const history = ConversationHistory.toString(state, 2000, '\n\n');
     await context.sendActivity(history);
 });

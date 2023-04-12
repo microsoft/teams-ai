@@ -327,7 +327,7 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-    public submitAction<TData = Record<string, any>>(
+    public submitAction<TData>(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -407,9 +407,11 @@ export class MessageExtensions<TState extends TurnState> {
 }
 
 /**
- * @param commandId
- * @param invokeName
- * @param botMessagePreviewAction
+ *
+ * @param {string | RegExp | RouteSelector[]} commandId Name of the commandId
+ * @param {boolean} invokeName Whether or not the commandId a Teams invokable action
+ * @param {string} botMessagePreviewAction Message Extension preview action 'edit' or 'send'
+ * @returns {RouteSelector} Route selector function
  */
 function createTaskSelector(
     commandId: string | RegExp | RouteSelector,
@@ -447,8 +449,11 @@ function createTaskSelector(
 }
 
 /**
- * @param activity
- * @param botMessagePreviewAction
+ * Checks if the activity is a bot message preview action.
+ *
+ * @param {Activity} activity The activity / communication type that is being checked.
+ * @param {string} botMessagePreviewAction Name of the preview action
+ * @returns {boolean} True if the activity is a bot message preview action, false if it is not.
  */
 function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edit' | 'send'): boolean {
     if (typeof activity?.value?.botMessagePreviewAction == 'string') {

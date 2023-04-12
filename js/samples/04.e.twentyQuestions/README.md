@@ -2,7 +2,7 @@
 
 This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
-This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.” 
+This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
 
 It shows M365 botbuilder SDK capabilities like:
 
@@ -13,19 +13,21 @@ It shows M365 botbuilder SDK capabilities like:
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
 The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
-    
+
 #### generate.txt
+
 ```
 This is a Microsoft Teams extension that assists the user with creating posts.
 Using the prompt below, create a post that appropriate for a business environment.
 Prompt: {{data.prompt}}
 Post:
 ```
+
 </details>
 <details open>
     <summary><h3>Action mapping</h3></summary>
 Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
-    
+
 ```javascript
 interface SubmitData {
     verb: 'generate' | 'update' | 'post';
@@ -33,15 +35,15 @@ interface SubmitData {
     post?: string;
 }
 
-app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, state, data) => {
+app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: TurnContext, state: ApplicationTurnState, data: SubmitData) => {
     try {
         switch (data.verb) {
             case 'generate':
                 // Call GPT and return response view
-                return await updatePost(context, state, '../src/generate.txt', data);
+                return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/generate.txt', data);
             case 'update':
                 // Call GPT and return an updated response view
-                return await updatePost(context, state, '../src/update.txt', data);
+                return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/update.txt', data);
             case 'post':
             default:
                 // Preview the post as an adaptive card
@@ -55,16 +57,17 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context, sta
     } catch (err: any) {
         return `Something went wrong: ${err.toString()}`;
     }
-}); 
+});
 ```
+
 </details>
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). 
+This bot has been created using [Bot Framework](https://dev.botframework.com).
 
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
--   [NodeJS](https://nodejs.org/en/)
+-   [NodeJS](https://nodejs.org/en/) (version 16.x)
 -   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 -   [OpenAI](https://openai.com/api/) key for leveraging GPT
 
@@ -106,7 +109,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 
 1. **_This step is specific to Teams._**
 
-    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `___YOUR BOTS ID___`
+    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-OR-BOT-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `<<YOUR_BOT_ID>>`
     - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
     - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
 
@@ -118,17 +121,20 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 
 ## Interacting with the message extension
 
-You can interact with this message extension by finding the "GPT ME" extension beneath your compose area in chats and channels. This may be accessed in the '...' ellipses menu. 
-    
+You can interact with this message extension by finding the "GPT ME" extension beneath your compose area in chats and channels. This may be accessed in the '...' ellipses menu.
+
 The message extension provides the following functionality:
-* Create Post: Generates a post using the text-davinci-003 model, with a user-provided prompt.
-* Update Post: Updates a post using the text-davinci-003 model, with a user-provided prompt.
-* Preview Post: Previews a post as an adaptive card.
-    
+
+-   Create Post: Generates a post using the text-davinci-003 model, with a user-provided prompt.
+-   Update Post: Updates a post using the text-davinci-003 model, with a user-provided prompt.
+-   Preview Post: Previews a post as an adaptive card.
+
 ## Limitations
+
 The message extension has some limitations, including:
-* The bot is not able to perform tasks outside of generating and updating posts.
-* The bot is not able to provide inappropriate or offensive content.
+
+-   The bot is not able to perform tasks outside of generating and updating posts.
+-   The bot is not able to provide inappropriate or offensive content.
 
 ## Deploy the bot to Azure
 

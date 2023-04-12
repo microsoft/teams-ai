@@ -30,39 +30,40 @@ export class CodeBlock extends Block {
 
     public isValid(): { valid: boolean; error?: string } {
         let valid = true;
-        let error: string;
+        let errorMessage: string | undefined;
 
         const partsToValidate = this.content.split(/[ \t\r\n]+/).filter((x) => x.trim() !== '');
 
         for (let index = 0; index < partsToValidate.length; index++) {
+            // TODO:
             // eslint-disable-next-line security/detect-object-injection
             const part = partsToValidate[index];
 
             if (index === 0) {
                 // There is only a function name
                 if (VarBlock.hasVarPrefix(part)) {
-                    error = `Variables cannot be used as function names [\`${part}\`]`;
+                    errorMessage = `Variables cannot be used as function names [\`${part}\`]`;
                     valid = false;
                 }
 
                 if (!/^[a-zA-Z0-9_.]*$/.test(part)) {
-                    error = `The function name \`${part}\` contains invalid characters`;
+                    errorMessage = `The function name \`${part}\` contains invalid characters`;
                     valid = false;
                 }
             } else {
                 // The function has parameters
                 if (!VarBlock.hasVarPrefix(part)) {
-                    error = `\`${part}\` is not a valid function parameter: parameters must be variables.`;
+                    errorMessage = `\`${part}\` is not a valid function parameter: parameters must be variables.`;
                     valid = false;
                 }
 
                 if (part.length < 2) {
-                    error = `\`${part}\` is not a valid variable.`;
+                    errorMessage = `\`${part}\` is not a valid variable.`;
                     valid = false;
                 }
 
                 if (!VarBlock.isValidVarName(part.substring(1))) {
-                    error = `\`${part}\` variable name is not valid.`;
+                    errorMessage = `\`${part}\` variable name is not valid.`;
                     valid = false;
                 }
             }
@@ -70,7 +71,7 @@ export class CodeBlock extends Block {
 
         this._validated = true;
 
-        return { valid, error };
+        return { valid, error: errorMessage };
     }
 
     public render(context: TurnContext, state: TurnState): string {

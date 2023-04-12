@@ -1,7 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AI, Application, ConversationHistory, DefaultConversationState, DefaultPromptManager, DefaultTempState, DefaultTurnState, DefaultUserState, OpenAIPlanner, ResponseParser } from '@microsoft/botbuilder-m365';
+import {
+    AI,
+    Application,
+    ConversationHistory,
+    DefaultConversationState,
+    DefaultPromptManager,
+    DefaultTempState,
+    DefaultTurnState,
+    DefaultUserState,
+    OpenAIPlanner,
+    ResponseParser
+} from '@microsoft/botbuilder-m365';
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as path from 'path';
 import * as responses from './responses';
@@ -9,13 +20,7 @@ import { IItemList } from './interfaces';
 import { map } from './ShadowFalls';
 import { addActions } from './actions';
 import { LastWriterWinsStore } from './LastWriterWinsStore';
-import {
-    describeConditions,
-    describeSeason,
-    describeTimeOfDay,
-    generateTemperature,
-    generateWeather
-} from './conditions';
+import { describeConditions, describeSeason, generateTemperature, generateWeather } from './conditions';
 
 // Strongly type the applications turn state
 export interface ConversationState extends DefaultConversationState {
@@ -92,8 +97,14 @@ export interface ILocation {
 
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
+if (!process.env.OpenAIKey || !process.env.StorageConnectionString || !process.env.StorageContainer) {
+    throw new Error(
+        'Missing environment variables - please check that OpenAIKey, StorageConnectionString and StorageContainer are set.'
+    );
+}
+
 // Create AI components
-const planner = new OpenAIPlanner({
+const planner = new OpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.OpenAIKey,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
@@ -108,7 +119,7 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner,
         promptManager,
-        prompt: async (context, state) => state.temp.value.prompt,
+        prompt: async (context: TurnContext, state: ApplicationTurnState) => state.temp.value.prompt,
         history: {
             userPrefix: 'Player:',
             assistantPrefix: 'DM:',
@@ -119,13 +130,13 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Export bots run() function
-export const run = (context) => app.run(context);
+export const run = (context: TurnContext) => app.run(context);
 
 export const DEFAULT_BACKSTORY = `Lives in Shadow Falls.`;
 export const DEFAULT_EQUIPPED = `Wearing clothes.`;
 export const CONVERSATION_STATE_VERSION = 1;
 
-app.turn('beforeTurn', async (context, state) => {
+app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState) => {
     if (context.activity.type == ActivityTypes.Message) {
         let conversation = state.conversation.value;
         const player = state.user.value;
@@ -201,7 +212,10 @@ app.turn('beforeTurn', async (context, state) => {
 
             // Create campaign
             const response = await app.ai.completePrompt(context, state, 'createCampaign');
-            campaign = ResponseParser.parseJSON(response);
+            if (!response) {
+                throw new Error('Failed to create campaign');
+            }
+            campaign = ResponseParser.parseJSON(response || '') as ICampaign;
             if (campaign && campaign.title && Array.isArray(campaign.objectives)) {
                 // Send campaign title as a message
                 conversation.campaign = campaign;
@@ -235,8 +249,8 @@ app.turn('beforeTurn', async (context, state) => {
 
         // Find next campaign objective
         let campaignFinished = false;
-        let nextObjective: ICampaignObjective;
-        if (campaign) {
+        let nextObjective: ICampaignObjective = {} as ICampaignObjective;
+        if (Object.entries(campaign).length > 0) {
             campaignFinished = true;
             for (let i = 0; i < campaign.objectives.length; i++) {
                 const objective = campaign.objectives[i];
@@ -288,7 +302,7 @@ app.turn('beforeTurn', async (context, state) => {
         if (campaignFinished) {
             temp.promptInstructions =
                 'The players have completed the campaign. Congratulate them and tell them they can continue adventuring or use "/reset" to start over with a new campaign.';
-            conversation.campaign = undefined;
+            conversation.campaign = {} as ICampaign;
         } else if (objectiveAdded) {
             temp.prompt = 'newObjective.txt';
             temp.objectiveTitle = nextObjective.title;
@@ -302,7 +316,7 @@ app.turn('beforeTurn', async (context, state) => {
     return true;
 });
 
-app.turn('afterTurn', async (context, state) => {
+app.turn('afterTurn', async (context: TurnContext, state) => {
     const lastSay = ConversationHistory.getLastSay(state);
     if (!lastSay) {
         // We have a dangling `DM: ` so remove it
@@ -320,36 +334,36 @@ app.turn('afterTurn', async (context, state) => {
     return true;
 });
 
-app.message('/state', async (context, state) => {
+app.message('/state', async (context: TurnContext, state) => {
     await context.sendActivity(JSON.stringify(state));
 });
 
-app.message(['/reset-profile', '/reset-user'], async (context, state) => {
+app.message(['/reset-profile', '/reset-user'], async (context: TurnContext, state) => {
     state.user.delete();
     state.conversation.value.players = [];
     await context.sendActivity(`I've reset your profile.`);
 });
 
-app.message('/reset', async (context, state) => {
+app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
     state.conversation.delete();
     await context.sendActivity(`Ok lets start this over.`);
 });
 
-app.message('/forget', async (context, state) => {
+app.message('/forget', async (context: TurnContext, state: ApplicationTurnState) => {
     ConversationHistory.clear(state);
     await context.sendActivity(`Ok forgot all conversation history.`);
 });
 
-app.message('/history', async (context, state) => {
+app.message('/history', async (context: TurnContext, state: ApplicationTurnState) => {
     const history = ConversationHistory.toString(state, 4000, `\n\n`);
     await context.sendActivity(`<strong>Chat history:</strong><br>${history}`);
 });
 
-app.message('/story', async (context, state) => {
+app.message('/story', async (context: TurnContext, state: ApplicationTurnState) => {
     await context.sendActivity(`<strong>The story so far:</strong><br>${state.conversation.value.story ?? ''}`);
 });
 
-app.message('/profile', async (context, state) => {
+app.message('/profile', async (context: TurnContext, state: ApplicationTurnState) => {
     const player = state.user.value;
     const backstory = player.backstory.split('\n').join('<br>');
     const equipped = player.equipped.split('\n').join('<br>');
@@ -358,20 +372,23 @@ app.message('/profile', async (context, state) => {
     );
 });
 
-app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(`<strong>${action}</strong> action missing`);
-    return true;
-});
+app.ai.action(
+    AI.UnknownActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action: string = ' ') => {
+        await context.sendActivity(`<strong>${action}</strong> action missing`);
+        return true;
+    }
+);
 
 addActions(app);
 
 // Register prompt functions
-app.ai.prompts.addFunction('describeGameState', async (context, state) => {
+app.ai.prompts.addFunction('describeGameState', async (context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`;
 });
 
-app.ai.prompts.addFunction('describeCampaign', async (context, state) => {
+app.ai.prompts.addFunction('describeCampaign', async (context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     if (conversation.campaign) {
         return `"${conversation.campaign.title}" - ${conversation.campaign.playerIntro}`;
@@ -380,7 +397,7 @@ app.ai.prompts.addFunction('describeCampaign', async (context, state) => {
     }
 });
 
-app.ai.prompts.addFunction('describeQuests', async (context, state) => {
+app.ai.prompts.addFunction('describeQuests', async (context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     let text = '';
     let connector = '';
@@ -393,14 +410,14 @@ app.ai.prompts.addFunction('describeQuests', async (context, state) => {
     return text.length > 0 ? text : 'none';
 });
 
-app.ai.prompts.addFunction('describePlayerInfo', async (context, state) => {
+app.ai.prompts.addFunction('describePlayerInfo', async (context: TurnContext, state: ApplicationTurnState) => {
     const player = state.user.value;
     let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
 });
 
-app.ai.prompts.addFunction('describeLocation', async (context, state) => {
+app.ai.prompts.addFunction('describeLocation', async (context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     if (conversation.location) {
         return `"${conversation.location.title}" - ${conversation.location.description}`;
@@ -409,14 +426,9 @@ app.ai.prompts.addFunction('describeLocation', async (context, state) => {
     }
 });
 
-app.ai.prompts.addFunction('describeConditions', async (context, state) => {
+app.ai.prompts.addFunction('describeConditions', async (context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
-    return describeConditions(
-        conversation.time,
-        conversation.day,
-        conversation.temperature,
-        conversation.weather
-    );
+    return describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 });
 
 /**

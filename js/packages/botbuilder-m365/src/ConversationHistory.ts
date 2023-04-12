@@ -6,6 +6,8 @@
  * Licensed under the MIT License.
  */
 
+// TODO:
+/* eslint-disable security/detect-object-injection */
 import { encode } from 'gpt-3-encoder';
 import { TurnState } from './TurnState';
 
@@ -18,9 +20,9 @@ export class ConversationHistory {
     /**
      * Adds a new line of text to conversation history
      *
-     * @param state Applications turn state.
-     * @param line Line of text to add to history.
-     * @param maxLines Optional. Maximum number of lines to store. Defaults to 10.
+     * @param {TurnState} state Applications turn state.
+     * @param {string} line Line of text to add to history.
+     * @param {number} maxLines Optional. Maximum number of lines to store. Defaults to 10.
      */
     public static addLine(state: TurnState, line: string, maxLines = 10): void {
         if (state.conversation) {
@@ -213,10 +215,10 @@ export class ConversationHistory {
      * history entries will be returned. That means that if the length of the most recent history
      * entry is greater then `maxCharacterLength` no text will be returned.
      *
-     * @param state Applications turn state.
-     * @param maxTokens Optional. Maximum length of the text returned. Defaults to 1000 tokens.
-     * @param lineSeparator Optional. Separate used between lines. Defaults to '\n'.
-     * @returns The most recent lines of conversation history as a text string.
+     * @param {TurnState} state Applications turn state.
+     * @param {number} maxTokens Optional. Maximum length of the text returned. Defaults to 1000 tokens.
+     * @param {string} lineSeparator Optional. Separator used between lines. Defaults to '\n'.
+     * @returns {string} The most recent lines of conversation history as a text string.
      */
     public static toString(state: TurnState, maxTokens = 1000, lineSeparator = '\n'): string {
         if (state.conversation) {
@@ -238,7 +240,7 @@ export class ConversationHistory {
 
                 // Prepend line to output
                 text = `${line}${lineSeparator}${text}`;
-                textTokens = newTextTokens; 
+                textTokens = newTextTokens;
             }
 
             return text.trim();
@@ -256,7 +258,7 @@ export class ConversationHistory {
 
             // Populate up to max chars
             let textTokens = 0;
-            let lines: string[] = [];
+            const lines: string[] = [];
             for (let i = history.length - 1; i >= 0; i--) {
                 // Ensure that adding line won't go over the max character length
                 const line = history[i];

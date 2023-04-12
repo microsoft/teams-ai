@@ -7,7 +7,7 @@ import { findMapLocation } from '../ShadowFalls';
  * @param app
  */
 export function locationAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('location', async (context, state, data: IDataEntities) => {
+    app.ai.action('location', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'change':
