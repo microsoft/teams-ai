@@ -59,18 +59,5 @@ namespace Microsoft.Bot.Builder.M365.Exceptions
             : base(message, innerException)
         {
         }
-
-        /// <summary>
-        /// A factory method that creates a new <see cref="InvokeResponse"/> object with the status code and body of the current object..
-        /// </summary>
-        /// <returns>A new <see cref="InvokeResponse"/> object.</returns>
-        public InvokeResponse CreateInvokeResponse()
-        {
-            return new InvokeResponse
-            {
-                Status = (int)_statusCode,
-                Body = _body
-            };
-        }
     }
 }
