@@ -14,7 +14,7 @@ import * as responses from '../responses';
  * @param app
  */
 export function playerAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('player', async (context, state, data: IDataEntities) => {
+    app.ai.action('player', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'update':
@@ -72,8 +72,8 @@ async function updatePlayer(
     if (backstoryChange.length > 0 || equippedChange.length > 0) {
         state.temp.value.backstoryChange = backstoryChange ?? 'no change';
         state.temp.value.equippedChange = equippedChange ?? 'no change';
-        const update = await app.ai.completePrompt(context, state, 'updatePlayer');
-        const obj: UserState = ResponseParser.parseJSON(update);
+        const update = (await app.ai.completePrompt(context, state, 'updatePlayer')) as string;
+        const obj: UserState = ResponseParser.parseJSON(update) || {} as UserState;
         if (obj) {
             if (obj.backstory?.length > 0) {
                 player.backstory = obj.backstory;

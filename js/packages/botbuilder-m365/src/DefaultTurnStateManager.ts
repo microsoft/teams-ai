@@ -6,6 +6,8 @@
  * Licensed under the MIT License.
  */
 
+// TODO:
+/* eslint-disable security/detect-object-injection */
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
@@ -31,7 +33,11 @@ export interface DefaultTempState {
      */
     output: string;
 }
-
+/**
+ * Types of Turn State held in MemoryStorage
+ *
+ * @module botbuilder-m365
+ */
 export interface DefaultTurnState<
     TConversationState extends DefaultConversationState = DefaultConversationState,
     TUserState extends DefaultUserState = DefaultUserState,
@@ -100,7 +106,7 @@ export class DefaultTurnStateManager<
         let changes: StoreItems | undefined;
         let deletions: string[] | undefined;
         for (const key in state) {
-            if (state.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(state, key)) {
                 const entry = state[key];
                 if (entry.storageKey) {
                     if (entry.isDeleted) {

@@ -6,8 +6,8 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { TurnState } from "./TurnState";
+import { TurnContext } from 'botbuilder';
+import { TurnState } from './TurnState';
 
 export interface CompletionConfig {
     temperature: number;
@@ -42,9 +42,30 @@ export interface PromptTemplate {
     config: PromptTemplateConfig;
 }
 
+/**
+ * Base class for all prompt managers.
+ */
 export interface PromptManager<TState extends TurnState> {
-    addFunction(name: string, handler: (context: TurnContext, state: TState) => Promise<any>, allowOverrides?: boolean): this;
+    /**
+     * Adds a custom function <name> to the prompt manager.
+     *
+     * @param {string} name The name of the function
+     * @param {Promise<any>} handler Promise to return on function name match
+     * @param {boolean} allowOverrides Whether to allow overriding an existing function
+     * @returns {this} The prompt manager
+     */
+    addFunction(
+        name: string,
+        handler: (context: TurnContext, state: TState) => Promise<any>,
+        allowOverrides?: boolean
+    ): this;
     addPromptTemplate(name: string, template: PromptTemplate): this;
+    /**
+     *
+     * @param {TurnContext} context Current application turn context
+     * @param {TurnState} state Current turn state
+     * @param name Which function to invoke
+     */
     invokeFunction(context: TurnContext, state: TState, name: string): Promise<any>;
-    renderPrompt(context: TurnContext, state: TState, nameOrTemplate: string|PromptTemplate): Promise<PromptTemplate>;
+    renderPrompt(context: TurnContext, state: TState, nameOrTemplate: string | PromptTemplate): Promise<PromptTemplate>;
 }

@@ -13,7 +13,8 @@ import {
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
     MemoryStorage,
-    MessagingExtensionAttachment
+    MessagingExtensionAttachment,
+    TurnContext
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -33,12 +34,12 @@ const onTurnErrorHandler = async (context: any, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -62,7 +63,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import axios from 'axios';
-import { Application } from '@microsoft/botbuilder-m365';
+import { Application, DefaultTurnState } from '@microsoft/botbuilder-m365';
 import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application
@@ -72,7 +73,7 @@ const app = new Application({
 });
 
 // Listen for search actions
-app.messageExtensions.query('searchCmd', async (context, state, query) => {
+app.messageExtensions.query('searchCmd', async (context: TurnContext, state: DefaultTurnState, query) => {
     const searchQuery = query.parameters.queryText ?? '';
     const count = query.count ?? 10;
     const response = await axios.get(
@@ -95,7 +96,7 @@ app.messageExtensions.query('searchCmd', async (context, state, query) => {
 });
 
 // Listen for item tap
-app.messageExtensions.selectItem(async (context, state, item) => {
+app.messageExtensions.selectItem(async (context: TurnContext, state: DefaultTurnState, item) => {
     // Generate detailed result
     const card = createNpmPackageCard(item);
 

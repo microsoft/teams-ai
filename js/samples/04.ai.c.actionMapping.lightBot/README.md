@@ -8,7 +8,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
--   [NodeJS](https://nodejs.org/en/)
+-   [NodeJS](https://nodejs.org/en/) (version 16.x)
 -   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 
 ## To try this sample
@@ -46,7 +46,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
 1. **_This step is specific to Teams._**
 
-    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`)
+    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-OR-BOT-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`)
     - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
     - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
 

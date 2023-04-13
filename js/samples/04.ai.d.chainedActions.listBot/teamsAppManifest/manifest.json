@@ -2,55 +2,47 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.16",
-    "id": "833d05c6-8d2f-4fee-8e40-22e922e19127",
+    "id": "<<MICROSOFT_APP_OR_BOT_ID>>",
     "packageName": "com.package.name",
     "name": {
-      "short": "ListBot",
-      "full": "List Bot"
+        "short": "ListBot",
+        "full": "List Bot"
     },
     "developer": {
-      "name": "microsoft",
-      "mpnId": "",
-      "websiteUrl": "https://microsoft.com",
-      "privacyUrl": "https://microsoft.com/privacy",
-      "termsOfUseUrl": "https://microsoft.com/termsofuse"
+        "name": "microsoft",
+        "mpnId": "",
+        "websiteUrl": "https://microsoft.com",
+        "privacyUrl": "https://microsoft.com/privacy",
+        "termsOfUseUrl": "https://microsoft.com/termsofuse"
     },
     "description": {
-      "short": "Sample AI bot for managing lists of items",
-      "full": "Sample AI bot for managing lists items"
+        "short": "Sample AI bot for managing lists of items",
+        "full": "Sample AI bot for managing lists items"
     },
     "icons": {
-      "outline": "outline.png",
-      "color": "color.png"
+        "outline": "outline.png",
+        "color": "color.png"
     },
     "accentColor": "#FFFFFF",
     "staticTabs": [
-      {
-        "entityId": "conversations",
-        "scopes": [
-          "personal"
-        ]
-      },
-      {
-        "entityId": "about",
-        "scopes": [
-          "personal"
-        ]
-      }
+        {
+            "entityId": "conversations",
+            "scopes": ["personal"]
+        },
+        {
+            "entityId": "about",
+            "scopes": ["personal"]
+        }
     ],
     "bots": [
-      {
-        "botId": "de866002-27f9-43a5-8d5d-9c4ad8a012e0",
-        "scopes": [
-          "personal",
-          "team",
-          "groupChat"
-        ],
-        "isNotificationOnly": false,
-        "supportsCalling": false,
-        "supportsVideo": false,
-        "supportsFiles": false
-      }
+        {
+            "botId": "<<YOUR_BOT_ID>>",
+            "scopes": ["personal", "team", "groupChat"],
+            "isNotificationOnly": false,
+            "supportsCalling": false,
+            "supportsVideo": false,
+            "supportsFiles": false
+        }
     ],
     "validDomains": []
-  }
+}

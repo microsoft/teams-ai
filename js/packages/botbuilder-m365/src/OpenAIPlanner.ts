@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module botbuilder-m365
  */
@@ -71,12 +72,12 @@ export class OpenAIPlanner<
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
             const chatRequest = this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
-            return result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
+            return result.data?.choices[0]?.message?.content ?? '';
         } else {
             // Request base prompt completion
             const promptRequest = this.createCompletionRequest(prompt);
             const result = await this.createCompletion(promptRequest);
-            return result?.data?.choices ? result.data.choices[0]?.text : undefined;
+            return result.data?.choices[0]?.text ?? '';
         }
     }
 
@@ -96,13 +97,13 @@ export class OpenAIPlanner<
             const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             status = result?.status;
-            response = result?.data?.choices ? result.data.choices[0]?.message?.content : undefined;
+            response = result.data?.choices[0]?.message?.content ?? '';
         } else {
             // Request base prompt completion
             const promptRequest = this.createCompletionRequest(prompt);
             const result = await this.createCompletion(promptRequest);
             status = result?.status;
-            response = result?.data?.choices ? result.data.choices[0]?.text : undefined;
+            response = result.data?.choices[0]?.text ?? '';
         }
 
         // Ensure we weren't rate limited
@@ -269,17 +270,19 @@ export class OpenAIPlanner<
                 if (response!) {
                     if (response.status != 429) {
                         const choice =
-                            Array.isArray(response?.data?.choices) && response.data.choices.length > 0
-                                ? response.data.choices[0].message.content
-                                : '';
+                            Array.isArray(response?.data?.choices) &&
+                            response.data &&
+                            response.data.choices.length > 0 &&
+                            response.data.choices[0].message?.content;
+                        // TODO: if we add telemetry, we should log this
                         console.log(
-                            `CHAT SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data.usage?.prompt_tokens} completion=${response.data.usage?.completion_tokens} response=${choice}`
+                            `CHAT SUCCEEDED: status=${response.status} duration=${duration} prompt=${response?.data?.usage?.prompt_tokens} completion=${response?.data?.usage?.completion_tokens} response=${choice}`
                         );
                     } else {
                         console.error(
-                            `CHAT FAILED: status=${response.status} duration=${duration} headers=${JSON.stringify(
-                                response.headers
-                            )}`
+                            `CHAT FAILED due to rate limiting: status=${
+                                response.status
+                            } duration=${duration} headers=${JSON.stringify(response.headers)}`
                         );
                     }
                 } else {
@@ -311,11 +314,14 @@ export class OpenAIPlanner<
                 if (response!) {
                     if (response.status != 429) {
                         const choice =
-                            Array.isArray(response?.data?.choices) && response.data.choices.length > 0
+                            Array.isArray(response?.data?.choices) && response.data && response.data.choices.length > 0
                                 ? response.data.choices[0].text
                                 : '';
+                        // TODO: telemetry
                         console.log(
-                            `PROMPT SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data.usage?.prompt_tokens} completion=${response.data.usage?.completion_tokens} response=${choice}`
+                            `PROMPT SUCCEEDED: status=${response.status} duration=${duration} prompt=${
+                                response.data!.usage?.prompt_tokens
+                            } completion=${response.data!.usage?.completion_tokens} response=${choice}`
                         );
                     } else {
                         console.error(
@@ -337,7 +343,10 @@ export class OpenAIPlanner<
 }
 
 /**
- * @param messages
+ * Format text chat message.
+ *
+ * @param {ChatCompletionRequestMessage[]} messages The list of messages to be sent by the bot.
+ * @returns {string} The text string to be sent to the user.
  */
 function printChatMessages(messages: ChatCompletionRequestMessage[]): string {
     let text = '';

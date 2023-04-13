@@ -7,7 +7,7 @@
     "main": "./lib/index.js",
     "scripts": {
         "build": "tsc --build",
-        "clean": "rimraf node_modules lib",
+        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
         "lint": "eslint **/**/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "botbuilder": "^4.19.0",
-        "@microsoft/botbuilder-m365": "~0.1.0-alpha.1",
+        "@microsoft/botbuilder-m365": "~0.1.0-alpha.2",
         "dotenv": "^8.2.0",
         "replace": "~1.2.0",
         "restify": "~8.6.0"

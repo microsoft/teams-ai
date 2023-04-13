@@ -6,7 +6,7 @@ import { ApplicationTurnState, IDataEntities } from '../bot';
  * @param app
  */
 export function storyAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('story', async (context, state, data: IDataEntities) => {
+    app.ai.action('story', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'change':
