@@ -10,9 +10,9 @@ using Newtonsoft.Json.Linq;
 using Xunit;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
-namespace Microsoft.Bot.Builder.M365.Tests
+namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 {
-    public class InvokeActivityTests_NotImplemented
+    public class InvokeActivityNotImplementedTests
     {
         [Fact]
         public async Task Test_InvokeActivity()
@@ -35,7 +35,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -75,7 +75,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -115,7 +115,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -146,7 +146,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -177,7 +177,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -208,7 +208,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -239,7 +239,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -270,7 +270,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -304,7 +304,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -338,7 +338,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -369,7 +369,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -399,7 +399,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -429,7 +429,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -460,7 +460,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -491,7 +491,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -531,7 +531,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandlerFileConsent(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -571,7 +571,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandlerFileConsent(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -605,7 +605,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandlerMessagePreview(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -640,7 +640,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandlerMessagePreview(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -680,7 +680,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
@@ -714,7 +714,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             var bot = new TestActivityHandler(new ApplicationOptions<TurnState> { });
-            await bot.RunAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             Assert.NotNull(activitiesToSend);
