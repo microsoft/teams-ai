@@ -160,7 +160,8 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
-        /// <returns>True if and only if the executed handler method was implemented.</returns>
+        /// <returns>True if and only if the executed handler method was implemented. That is, the handler method does not 
+        /// throw a <see cref="NotImplementedException"/>.</returns>
         /// <remarks>
         /// This method calls other methods in this class based on the type of the activity to
         /// process, which allows a derived class to provide type-specific logic in a controlled way.
@@ -296,6 +297,10 @@ namespace Microsoft.Bot.Builder.M365
         /// <remarks>
         /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message update activity, it calls this method.
+        /// If it is a message edit event, it calls
+        /// <see cref="OnMessageEditAsync(ITurnContext{IMessageUpdateActivity}, TState, CancellationToken)"/>.
+        /// If it is a message undelete event, it calls
+        /// <see cref="OnMessageUndeleteAsync(ITurnContext{IMessageUpdateActivity}, TState, CancellationToken)"/>.
         /// </remarks>
         /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
         protected virtual Task OnMessageUpdateActivityAsync(ITurnContext<IMessageUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
@@ -321,7 +326,32 @@ namespace Microsoft.Bot.Builder.M365
             throw new NotImplementedException();
         }
 
-        // TODO : Update comment
+        /// <summary>
+        /// Invoked when a edit message event activity is received.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnMessageEditAsync(ITurnContext<IMessageUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a undo soft delete message event activity is received.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnMessageUndeleteAsync(ITurnContext<IMessageUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Override this in a derived class to provide logic specific to
         /// <see cref="ActivityTypes.MessageDelete"/> activities, such as the conversational logic.
@@ -355,7 +385,19 @@ namespace Microsoft.Bot.Builder.M365
             throw new NotImplementedException();
         }
 
-        // TODO : Update comment
+        /// <summary>
+        /// Invoked when a soft delete message event activity is received.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnMessageSoftDeleteAsync(ITurnContext<IMessageDeleteActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Invoked when a conversation update activity is received from the channel when the base behavior of
         /// <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/> is used.
@@ -457,6 +499,272 @@ namespace Microsoft.Bot.Builder.M365
 
         /// <summary>
         /// Override this in a derived class to provide logic for when members other than the bot
+        /// join the channel, such as your bot's welcome logic.
+        /// UseIt will get the associated members with the provided accounts.
+        /// </summary>
+        /// <param name="membersAdded">A list of all the accounts added to the channel, as
+        /// described by the conversation update activity.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual async Task OnMembersAddedDispatchAsync(IList<ChannelAccount> membersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            var teamsMembersAdded = new List<TeamsChannelAccount>();
+            foreach (var memberAdded in membersAdded)
+            {
+                if (memberAdded.Properties.HasValues || memberAdded.Id == turnContext.Activity?.Recipient?.Id)
+                {
+                    // when the ChannelAccount object is fully a TeamsChannelAccount, or the bot (when Teams changes the service to return the full details)
+                    teamsMembersAdded.Add(JObject.FromObject(memberAdded).ToObject<TeamsChannelAccount>());
+                }
+                else
+                {
+                    TeamsChannelAccount newMemberInfo = null;
+                    try
+                    {
+                        newMemberInfo = await TeamsInfo.GetMemberAsync(turnContext, memberAdded.Id, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (ErrorResponseException ex)
+                    {
+                        if (ex.Body?.Error?.Code != "ConversationNotFound")
+                        {
+                            throw;
+                        }
+
+                        // unable to find the member added in ConversationUpdate Activity in the response from the GetMemberAsync call
+                        newMemberInfo = new TeamsChannelAccount
+                        {
+                            Id = memberAdded.Id,
+                            Name = memberAdded.Name,
+                            AadObjectId = memberAdded.AadObjectId,
+                            Role = memberAdded.Role,
+                        };
+                    }
+
+                    teamsMembersAdded.Add(newMemberInfo);
+                }
+            }
+
+            await OnMembersAddedAsync(teamsMembersAdded, teamInfo, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Override this in a derived class to provide logic for when members other than the bot
+        /// leave the channel, such as your bot's good-bye logic.
+        /// It will get the associated members with the provided accounts.
+        /// </summary>
+        /// <param name="membersRemoved">A list of all the accounts removed from the channel, as
+        /// described by the conversation update activity.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnMembersRemovedDispatchAsync(IList<ChannelAccount> membersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            var teamsMembersRemoved = new List<TeamsChannelAccount>();
+            foreach (var memberRemoved in membersRemoved)
+            {
+                teamsMembersRemoved.Add(JObject.FromObject(memberRemoved).ToObject<TeamsChannelAccount>());
+            }
+
+            return OnMembersRemovedAsync(teamsMembersRemoved, teamInfo, turnContext, turnState, cancellationToken);
+        }
+
+        /// <summary>
+        /// Override this in a derived class to provide logic for when members other than the bot
+        /// join the channel, such as your bot's welcome logic.
+        /// </summary>
+        /// <param name="teamsMembersAdded">A list of all the members added to the channel, as
+        /// described by the conversation update activity.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnMembersAddedAsync(IList<TeamsChannelAccount> teamsMembersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            return OnMembersAddedAsync(teamsMembersAdded.Cast<ChannelAccount>().ToList(), turnContext, turnState, cancellationToken);
+        }
+
+        /// <summary>
+        /// Override this in a derived class to provide logic for when members other than the bot
+        /// leave the channel, such as your bot's good-bye logic.
+        /// </summary>
+        /// <param name="teamsMembersRemoved">A list of all the members removed from the channel, as
+        /// described by the conversation update activity.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnMembersRemovedAsync(IList<TeamsChannelAccount> teamsMembersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            return OnMembersRemovedAsync(teamsMembersRemoved.Cast<ChannelAccount>().ToList(), turnContext, turnState, cancellationToken);
+        }
+
+        /// <summary>
+        /// Invoked when a Channel Created event activity is received from the connector.
+        /// Channel Created correspond to the user creating a new channel.
+        /// </summary>
+        /// <param name="channelInfo">The channel info object which describes the channel.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnChannelCreatedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Channel Deleted event activity is received from the connector.
+        /// Channel Deleted correspond to the user deleting an existing channel.
+        /// </summary>
+        /// <param name="channelInfo">The channel info object which describes the channel.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnChannelDeletedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Channel Renamed event activity is received from the connector.
+        /// Channel Renamed correspond to the user renaming an existing channel.
+        /// </summary>
+        /// <param name="channelInfo">The channel info object which describes the channel.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnChannelRenamedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Channel Restored event activity is received from the connector.
+        /// Channel Restored correspond to the user restoring a previously deleted channel.
+        /// </summary>
+        /// <param name="channelInfo">The channel info object which describes the channel.</param>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnChannelRestoredAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Team Archived event activity is received from the connector.
+        /// Team Archived correspond to the user archiving a team.
+        /// </summary>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnTeamArchivedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Team Deleted event activity is received from the connector.
+        /// Team Deleted corresponds to the user deleting a team.
+        /// </summary>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnTeamDeletedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Team Hard Deleted event activity is received from the connector.
+        /// Team Hard Deleted corresponds to the user hard deleting a team.
+        /// </summary>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnTeamHardDeletedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Team Renamed event activity is received from the connector.
+        /// Team Renamed correspond to the user renaming an existing team.
+        /// </summary>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnTeamRenamedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Team Restored event activity is received from the connector.
+        /// Team Restored corresponds to the user restoring a team.
+        /// </summary>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnTeamRestoredAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Invoked when a Team Unarchived event activity is received from the connector.
+        /// Team Unarchived correspond to the user unarchiving a team.
+        /// </summary>
+        /// <param name="teamInfo">The team info object representing the team.</param>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        protected virtual Task OnTeamUnarchivedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Override this in a derived class to provide logic for when members other than the bot
         /// join the conversation, such as your bot's welcome logic.
         /// </summary>
         /// <param name="membersAdded">A list of all the members added to the conversation, as
@@ -533,14 +841,37 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>
         protected virtual async Task OnMessageReactionActivityAsync(ITurnContext<IMessageReactionActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
+            var reactionsAddedNotImplemented = false;
+            var reactionsRemovedNotImplemented = false;
+
             if (turnContext.Activity.ReactionsAdded != null)
             {
-                await OnReactionsAddedAsync(turnContext.Activity.ReactionsAdded, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await OnReactionsAddedAsync(turnContext.Activity.ReactionsAdded, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+                } 
+                catch (NotImplementedException)
+                {
+                    reactionsAddedNotImplemented = true;
+                }
             }
-
+            
             if (turnContext.Activity.ReactionsRemoved != null)
             {
-                await OnReactionsRemovedAsync(turnContext.Activity.ReactionsRemoved, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await OnReactionsRemovedAsync(turnContext.Activity.ReactionsRemoved, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+                }
+                catch (NotImplementedException)
+                {
+                    reactionsRemovedNotImplemented = true;
+                }
+                
+            } 
+            
+            if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -704,7 +1035,6 @@ namespace Microsoft.Bot.Builder.M365
             throw new NotImplementedException();
         }
 
-        // TODO: update comments
         /// <summary>
         /// Invoked when an invoke activity is received from the connector when the base behavior of
         /// <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/> is used.
@@ -817,7 +1147,6 @@ namespace Microsoft.Bot.Builder.M365
             }
         }
 
-        // TODO : Update comment
         /// <summary>
         /// Invoked when a <c>signin/verifyState</c> or <c>signin/tokenExchange</c> event is received when the base behavior of
         /// <see cref="OnInvokeActivityAsync(ITurnContext{IInvokeActivity}, TState, CancellationToken)"/> is used.
@@ -891,176 +1220,6 @@ namespace Microsoft.Bot.Builder.M365
         protected virtual Task<SearchInvokeResponse> OnSearchInvokeAsync(SearchInvokeValue invokeValue, ITurnContext<IInvokeActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new InvokeResponseException(HttpStatusCode.NotImplemented);
-        }
-
-        /// <summary>
-        /// Override this in a derived class to provide logic specific to
-        /// <see cref="ActivityTypes.EndOfConversation"/> activities, such as the conversational logic.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a message activity, it calls this method.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        protected virtual Task OnEndOfConversationActivityAsync(ITurnContext<IEndOfConversationActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <summary>
-        /// Override this in a derived class to provide logic specific to
-        /// <see cref="ActivityTypes.Typing"/> activities, such as the conversational logic.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a message activity, it calls this method.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        protected virtual Task OnTypingActivityAsync(ITurnContext<ITypingActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Override this in a derived class to provide logic specific to
-        /// <see cref="ActivityTypes.InstallationUpdate"/> activities.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a installation update activity, it calls this method.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        protected virtual Task OnInstallationUpdateActivityAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            switch (turnContext.Activity.Action)
-            {
-                case InstallationUpdateActionTypes.Add:
-                case "add-upgrade":
-                    return OnInstallationUpdateAddAsync(turnContext, turnState, cancellationToken);
-                case InstallationUpdateActionTypes.Remove:
-                case "remove-upgrade":
-                    return OnInstallationUpdateRemoveAsync(turnContext, turnState, cancellationToken);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Override this in a derived class to provide logic specific to
-        /// <see cref="ActivityTypes.InstallationUpdate"/> activities with 'action' set to 'add'.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a installation update activity, it calls this method.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        protected virtual Task OnInstallationUpdateAddAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Override this in a derived class to provide logic specific to
-        /// <see cref="ActivityTypes.InstallationUpdate"/> activities with 'action' set to 'remove'.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a installation update activity, it calls this method.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        protected virtual Task OnInstallationUpdateRemoveAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a command activity is received when the base behavior of
-        /// <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/> is used.
-        /// Commands are requests to perform an action and receivers typically respond with
-        /// one or more commandResult activities. Receivers are also expected to explicitly
-        /// reject unsupported command activities.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a command activity, it calls this method.
-        /// 
-        /// In a derived class, override this method to add logic that applies to all comand activities.
-        /// Add logic to apply before the specific command-handling logic before the call to the base class
-        /// <see cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/> method.
-        /// Add logic to apply after the specific command-handling logic after the call to the base class
-        /// <see cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/> method.
-        ///
-        /// Command activities communicate programmatic information from a client or channel to a bot.
-        /// The meaning of an command activity is defined by the <see cref="ICommandActivity.Name"/> property,
-        /// which is meaningful within the scope of a channel.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// <seealso cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/>
-        protected virtual Task OnCommandActivityAsync(ITurnContext<ICommandActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a CommandResult activity is received when the base behavior of
-        /// <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/> is used.
-        /// CommandResult activities can be used to communicate the result of a command execution.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// method receives a CommandResult activity, it calls this method.
-        /// 
-        /// In a derived class, override this method to add logic that applies to all comand activities.
-        /// Add logic to apply before the specific CommandResult-handling logic before the call to the base class
-        /// <see cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/> method.
-        /// Add logic to apply after the specific CommandResult-handling logic after the call to the base class
-        /// <see cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/> method.
-        ///
-        /// CommandResult activities communicate programmatic information from a client or channel to a bot.
-        /// The meaning of an CommandResult activity is defined by the <see cref="ICommandResultActivity.Name"/> property,
-        /// which is meaningful within the scope of a channel.
-        /// </remarks>
-        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
-        /// <seealso cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/>
-        protected virtual Task OnCommandResultActivityAsync(ITurnContext<ICommandResultActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -1563,267 +1722,171 @@ namespace Microsoft.Bot.Builder.M365
         }
 
         /// <summary>
-        /// Override this in a derived class to provide logic for when members other than the bot
-        /// join the channel, such as your bot's welcome logic.
-        /// UseIt will get the associated members with the provided accounts.
+        /// Override this in a derived class to provide logic specific to
+        /// <see cref="ActivityTypes.EndOfConversation"/> activities, such as the conversational logic.
         /// </summary>
-        /// <param name="membersAdded">A list of all the accounts added to the channel, as
-        /// described by the conversation update activity.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
         /// <param name="turnContext">A strongly-typed context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual async Task OnMembersAddedDispatchAsync(IList<ChannelAccount> membersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a message activity, it calls this method.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        protected virtual Task OnEndOfConversationActivityAsync(ITurnContext<IEndOfConversationActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            var teamsMembersAdded = new List<TeamsChannelAccount>();
-            foreach (var memberAdded in membersAdded)
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Override this in a derived class to provide logic specific to
+        /// <see cref="ActivityTypes.Typing"/> activities, such as the conversational logic.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a message activity, it calls this method.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        protected virtual Task OnTypingActivityAsync(ITurnContext<ITypingActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Override this in a derived class to provide logic specific to
+        /// <see cref="ActivityTypes.InstallationUpdate"/> activities.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a installation update activity, it calls this method.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        protected virtual Task OnInstallationUpdateActivityAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        {
+            switch (turnContext.Activity.Action)
             {
-                if (memberAdded.Properties.HasValues || memberAdded.Id == turnContext.Activity?.Recipient?.Id)
-                {
-                    // when the ChannelAccount object is fully a TeamsChannelAccount, or the bot (when Teams changes the service to return the full details)
-                    teamsMembersAdded.Add(JObject.FromObject(memberAdded).ToObject<TeamsChannelAccount>());
-                }
-                else
-                {
-                    TeamsChannelAccount newMemberInfo = null;
-                    try
-                    {
-                        newMemberInfo = await TeamsInfo.GetMemberAsync(turnContext, memberAdded.Id, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (ErrorResponseException ex)
-                    {
-                        if (ex.Body?.Error?.Code != "ConversationNotFound")
-                        {
-                            throw;
-                        }
-
-                        // unable to find the member added in ConversationUpdate Activity in the response from the GetMemberAsync call
-                        newMemberInfo = new TeamsChannelAccount
-                        {
-                            Id = memberAdded.Id,
-                            Name = memberAdded.Name,
-                            AadObjectId = memberAdded.AadObjectId,
-                            Role = memberAdded.Role,
-                        };
-                    }
-
-                    teamsMembersAdded.Add(newMemberInfo);
-                }
+                case InstallationUpdateActionTypes.Add:
+                case "add-upgrade":
+                    return OnInstallationUpdateAddAsync(turnContext, turnState, cancellationToken);
+                case InstallationUpdateActionTypes.Remove:
+                case "remove-upgrade":
+                    return OnInstallationUpdateRemoveAsync(turnContext, turnState, cancellationToken);
+                default:
+                    throw new NotImplementedException();
             }
-
-            await OnMembersAddedAsync(teamsMembersAdded, teamInfo, turnContext, turnState, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Override this in a derived class to provide logic for when members other than the bot
-        /// leave the channel, such as your bot's good-bye logic.
-        /// It will get the associated members with the provided accounts.
+        /// Override this in a derived class to provide logic specific to
+        /// <see cref="ActivityTypes.InstallationUpdate"/> activities with 'action' set to 'add'.
         /// </summary>
-        /// <param name="membersRemoved">A list of all the accounts removed from the channel, as
-        /// described by the conversation update activity.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
         /// <param name="turnContext">A strongly-typed context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMembersRemovedDispatchAsync(IList<ChannelAccount> membersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            var teamsMembersRemoved = new List<TeamsChannelAccount>();
-            foreach (var memberRemoved in membersRemoved)
-            {
-                teamsMembersRemoved.Add(JObject.FromObject(memberRemoved).ToObject<TeamsChannelAccount>());
-            }
-
-            return OnMembersRemovedAsync(teamsMembersRemoved, teamInfo, turnContext, turnState, cancellationToken);
-        }
-
-        /// <summary>
-        /// Override this in a derived class to provide logic for when members other than the bot
-        /// join the channel, such as your bot's welcome logic.
-        /// </summary>
-        /// <param name="teamsMembersAdded">A list of all the members added to the channel, as
-        /// described by the conversation update activity.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMembersAddedAsync(IList<TeamsChannelAccount> teamsMembersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            return OnMembersAddedAsync(teamsMembersAdded.Cast<ChannelAccount>().ToList(), turnContext, turnState, cancellationToken);
-        }
-
-        /// <summary>
-        /// Override this in a derived class to provide logic for when members other than the bot
-        /// leave the channel, such as your bot's good-bye logic.
-        /// </summary>
-        /// <param name="teamsMembersRemoved">A list of all the members removed from the channel, as
-        /// described by the conversation update activity.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMembersRemovedAsync(IList<TeamsChannelAccount> teamsMembersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            return OnMembersRemovedAsync(teamsMembersRemoved.Cast<ChannelAccount>().ToList(), turnContext, turnState, cancellationToken);
-        }
-
-        /// <summary>
-        /// Invoked when a Channel Created event activity is received from the connector.
-        /// Channel Created correspond to the user creating a new channel.
-        /// </summary>
-        /// <param name="channelInfo">The channel info object which describes the channel.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnChannelCreatedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a installation update activity, it calls this method.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        protected virtual Task OnInstallationUpdateAddAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Invoked when a Channel Deleted event activity is received from the connector.
-        /// Channel Deleted correspond to the user deleting an existing channel.
+        /// Override this in a derived class to provide logic specific to
+        /// <see cref="ActivityTypes.InstallationUpdate"/> activities with 'action' set to 'remove'.
         /// </summary>
-        /// <param name="channelInfo">The channel info object which describes the channel.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
         /// <param name="turnContext">A strongly-typed context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnChannelDeletedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a installation update activity, it calls this method.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        protected virtual Task OnInstallationUpdateRemoveAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Invoked when a Channel Renamed event activity is received from the connector.
-        /// Channel Renamed correspond to the user renaming an existing channel.
+        /// Invoked when a command activity is received when the base behavior of
+        /// <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// Commands are requests to perform an action and receivers typically respond with
+        /// one or more commandResult activities. Receivers are also expected to explicitly
+        /// reject unsupported command activities.
         /// </summary>
-        /// <param name="channelInfo">The channel info object which describes the channel.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
         /// <param name="turnContext">A strongly-typed context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnChannelRenamedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a command activity, it calls this method.
+        /// 
+        /// In a derived class, override this method to add logic that applies to all comand activities.
+        /// Add logic to apply before the specific command-handling logic before the call to the base class
+        /// <see cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/> method.
+        /// Add logic to apply after the specific command-handling logic after the call to the base class
+        /// <see cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/> method.
+        ///
+        /// Command activities communicate programmatic information from a client or channel to a bot.
+        /// The meaning of an command activity is defined by the <see cref="ICommandActivity.Name"/> property,
+        /// which is meaningful within the scope of a channel.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/>
+        protected virtual Task OnCommandActivityAsync(ITurnContext<ICommandActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Invoked when a Channel Restored event activity is received from the connector.
-        /// Channel Restored correspond to the user restoring a previously deleted channel.
+        /// Invoked when a CommandResult activity is received when the base behavior of
+        /// <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/> is used.
+        /// CommandResult activities can be used to communicate the result of a command execution.
         /// </summary>
-        /// <param name="channelInfo">The channel info object which describes the channel.</param>
-        /// <param name="teamInfo">The team info object representing the team.</param>
         /// <param name="turnContext">A strongly-typed context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnChannelRestoredAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a Team Archived event activity is received from the connector.
-        /// Team Archived correspond to the user archiving a team.
-        /// </summary>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnTeamArchivedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a Team Deleted event activity is received from the connector.
-        /// Team Deleted corresponds to the user deleting a team.
-        /// </summary>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnTeamDeletedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a Team Hard Deleted event activity is received from the connector.
-        /// Team Hard Deleted corresponds to the user hard deleting a team.
-        /// </summary>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnTeamHardDeletedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a Team Renamed event activity is received from the connector.
-        /// Team Renamed correspond to the user renaming an existing team.
-        /// </summary>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnTeamRenamedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a Team Restored event activity is received from the connector.
-        /// Team Restored corresponds to the user restoring a team.
-        /// </summary>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnTeamRestoredAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a Team Unarchived event activity is received from the connector.
-        /// Team Unarchived correspond to the user unarchiving a team.
-        /// </summary>
-        /// <param name="teamInfo">The team info object representing the team.</param>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnTeamUnarchivedAsync(TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        /// <remarks>
+        /// When the <see cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// method receives a CommandResult activity, it calls this method.
+        /// 
+        /// In a derived class, override this method to add logic that applies to all comand activities.
+        /// Add logic to apply before the specific CommandResult-handling logic before the call to the base class
+        /// <see cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/> method.
+        /// Add logic to apply after the specific CommandResult-handling logic after the call to the base class
+        /// <see cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/> method.
+        ///
+        /// CommandResult activities communicate programmatic information from a client or channel to a bot.
+        /// The meaning of an CommandResult activity is defined by the <see cref="ICommandResultActivity.Name"/> property,
+        /// which is meaningful within the scope of a channel.
+        /// </remarks>
+        /// <seealso cref="RunAsync(ITurnContext, TState, CancellationToken)"/>
+        /// <seealso cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/>
+        protected virtual Task OnCommandResultActivityAsync(ITurnContext<ICommandResultActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -1869,45 +1932,6 @@ namespace Microsoft.Bot.Builder.M365
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         protected virtual Task OnReadReceiptAsync(ReadReceiptInfo readReceiptInfo, ITurnContext<IEventActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a edit message event activity is received.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMessageEditAsync(ITurnContext<IMessageUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a undo soft delete message event activity is received.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMessageUndeleteAsync(ITurnContext<IMessageUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Invoked when a soft delete message event activity is received.
-        /// </summary>
-        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMessageSoftDeleteAsync(ITurnContext<IMessageDeleteActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

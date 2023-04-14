@@ -16,7 +16,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnMessageActivityAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnMessageUpdateActivityAsync(ITurnContext<IMessageUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -40,13 +40,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnMembersAddedAsync(membersAdded, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnMembersRemovedAsync(IList<ChannelAccount> membersRemoved, ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnMembersRemovedAsync(membersRemoved, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnMessageReactionActivityAsync(ITurnContext<IMessageReactionActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -58,13 +58,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnReactionsAddedAsync(messageReactions, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnReactionsRemovedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnReactionsRemovedAsync(messageReactions, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnEventActivityAsync(ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -76,25 +76,25 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnTokenResponseEventAsync(ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnTokenResponseEventAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnEventAsync(ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnEventAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnEndOfConversationActivityAsync(ITurnContext<IEndOfConversationActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnEndOfConversationActivityAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnTypingActivityAsync(ITurnContext<ITypingActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnTypingActivityAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnInstallationUpdateActivityAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -106,19 +106,19 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnCommandActivityAsync(ITurnContext<ICommandActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnCommandActivityAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnCommandResultActivityAsync(ITurnContext<ICommandResultActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnCommandResultActivityAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnUnrecognizedActivityTypeAsync(ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnUnrecognizedActivityTypeAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task<InvokeResponse> OnInvokeActivityAsync(ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -141,13 +141,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnInstallationUpdateAddAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnInstallationUpdateAddAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnInstallationUpdateRemoveAsync(ITurnContext<IInstallationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnInstallationUpdateRemoveAsync(turnContext, turnState, cancellationToken);
         }
 
         protected override Task<AdaptiveCardInvokeResponse> OnAdaptiveCardActionExecuteAsync(AdaptiveCardInvokeValue invokeValue, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -225,20 +225,20 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         protected override Task OnMembersAddedAsync(IList<TeamsChannelAccount> membersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnMembersAddedAsync(membersAdded, teamInfo, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnMembersRemovedAsync(IList<TeamsChannelAccount> membersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
-            return Task.CompletedTask;
+            return base.OnMembersRemovedAsync(membersRemoved, teamInfo, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnReadReceiptAsync(ReadReceiptInfo readReceiptInfo, ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
             turnContext.SendActivityAsync(readReceiptInfo.LastReadMessageId);
-            return Task.CompletedTask;
+            return base.OnReadReceiptAsync(readReceiptInfo, turnContext, turnState, cancellationToken);
         }
 
         protected override Task<InvokeResponse> OnFileConsentAsync(FileConsentCardResponse fileConsentCardResponse, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
@@ -382,14 +382,14 @@ namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
             turnContext.SendActivityAsync(meeting.StartTime.ToString());
-            return Task.CompletedTask;
+            return base.OnMeetingStartAsync(meeting, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnMeetingEndAsync(MeetingEndEventDetails meeting, ITurnContext<IEventActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod().Name);
             turnContext.SendActivityAsync(meeting.EndTime.ToString());
-            return Task.CompletedTask;
+            return base.OnMeetingEndAsync(meeting, turnContext, turnState, cancellationToken);
         }
 
         protected override Task OnMessageEditAsync(ITurnContext<IMessageUpdateActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
