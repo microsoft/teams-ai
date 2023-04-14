@@ -11,9 +11,9 @@ namespace Microsoft.Bot.Builder.M365
     /// <summary>
     /// Encapsulates the logic for sending "typing" activity to the user.
     /// </summary>
-    public class TypingTimer
+    public class TypingTimer : IDisposable
     {
-        public Timer? timer;
+        private Timer? _timer;
         /// <summary>
         /// The interval in milliseconds to send "typing" activity.
         /// </summary>
@@ -38,25 +38,35 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="turnContext">The context for the current turn with the user.</param>
         public void StartTypingTimer(ITurnContext turnContext)
         {
-            if (turnContext.Activity.Type != ActivityTypes.Message || timer != null) return;
+            if (turnContext.Activity.Type != ActivityTypes.Message || _timer != null) return;
 
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
             
             // Start periodically send "typing" activity
-            timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
+            _timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
         }
 
 
         /// <summary>
         /// Stop the timer that periodically sends "typing" activity.
         /// </summary>
-        public void StopTypingTimer()
+        public void Dispose()
         {
-            if (timer == null) return;
+            if (_timer == null) return;
             
-            timer.Dispose();
-            timer = null;
+            _timer.Dispose();
+            _timer = null;
+        }
+
+        /// <summary>
+        /// Returns whether the timer is disposed or not.
+        /// </summary>
+        /// <remarks>The timer, when first initializaed, is in a disposed state.</remarks>
+        /// <returns>True if timer is disposed.</returns>
+        public bool Disposed()
+        {
+            return _timer == null;
         }
 
         private async void SendTypingActivity(object state)
@@ -72,26 +82,31 @@ namespace Microsoft.Bot.Builder.M365
                 // We're in the middle of sending an activity on a background thread when the turn ends and
                 // the turn context object is dispoed of. We can just eat the error but lets
                 // make sure our states cleaned up a bit.
-                this.StopTypingTimer();
+                Dispose();
             }
         }
 
 
         private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
-            if (timer != null)
+            if (_timer != null)
             {
                 foreach (var activity in activities)
                 {
                     if (activity.Type == ActivityTypes.Message)
                     {
-                        StopTypingTimer();
+                        Dispose();
                         break;
                     }
                 }
             }
 
             return next();
+        }
+
+        ~ TypingTimer()
+        {
+            Dispose();
         }
 
     }

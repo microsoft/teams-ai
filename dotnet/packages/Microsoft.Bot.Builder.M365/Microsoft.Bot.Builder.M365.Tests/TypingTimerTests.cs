@@ -25,7 +25,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             typingTimer.StartTypingTimer(turnContextMock.Object);
 
             // Assert
-            Assert.NotNull(typingTimer.timer);
+            Assert.False(typingTimer.Disposed());
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             typingTimer.StartTypingTimer(turnContextMock.Object);
 
             // Assert
-            Assert.Null(typingTimer.timer);
+            Assert.True(typingTimer.Disposed());
         }
 
         [Fact]
@@ -78,10 +78,10 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             // Act
             typingTimer.StartTypingTimer(turnContextMock.Object);
-            typingTimer.StopTypingTimer();
+            typingTimer.Dispose();
 
             // Assert
-            Assert.Null(typingTimer.timer);
+            Assert.True(typingTimer.Disposed());
         }
     }
 }
