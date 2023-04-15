@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.19.3" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.19.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
