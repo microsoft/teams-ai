@@ -104,7 +104,7 @@ if (!process.env.OpenAIKey || !process.env.StorageConnectionString || !process.e
 }
 
 // Create AI components
-const planner = new OpenAIPlanner({
+const planner = new OpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.OpenAIKey,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
@@ -374,7 +374,7 @@ app.message('/profile', async (context: TurnContext, state: ApplicationTurnState
 
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action: string) => {
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action: string = ' ') => {
         await context.sendActivity(`<strong>${action}</strong> action missing`);
         return true;
     }
