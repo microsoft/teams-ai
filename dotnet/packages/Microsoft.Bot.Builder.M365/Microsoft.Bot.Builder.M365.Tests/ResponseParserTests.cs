@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using AdaptiveCards;
 using Microsoft.Bot.Builder.M365.AI;
+using Microsoft.Bot.Builder.M365.AI.Planner;
 
 namespace Microsoft.Bot.Builder.M365.Tests
 {

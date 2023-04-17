@@ -3,9 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Bot.Builder.M365.AI
+namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
-//    [JsonConverter(typeof(PredictedCommandJsonConverter))]
     public interface IPredictedCommand
     {
         string Type { get; }

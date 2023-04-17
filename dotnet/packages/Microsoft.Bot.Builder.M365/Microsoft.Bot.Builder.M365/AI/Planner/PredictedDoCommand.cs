@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Bot.Builder.M365.AI
+namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
     public class PredictedDoCommand : IPredictedCommand
     {

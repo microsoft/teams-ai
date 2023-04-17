@@ -1,10 +1,10 @@
 ﻿using AdaptiveCards;
-using Microsoft.Bot.Builder.M365.AI;
+using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Bot.Builder.M365
+namespace Microsoft.Bot.Builder.M365.AI
 {
     public class ResponseParser
     {
@@ -31,7 +31,7 @@ namespace Microsoft.Bot.Builder.M365
             int startIndex;
             int endIndex = -1;
             while (endIndex < length)
-            { 
+            {
                 // Find the first "{"
                 startIndex = text.IndexOf('{', endIndex + 1);
                 if (startIndex == -1) return result;
@@ -44,12 +44,13 @@ namespace Microsoft.Bot.Builder.M365
                     if (endIndex == -1) return result;
 
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
-                    
+
                     // Validate string to be a valid JSON
                     try
                     {
                         JToken.Parse(possibleJSON);
-                    } catch (JsonReaderException)
+                    }
+                    catch (JsonReaderException)
                     {
                         continue;
                     }
@@ -100,7 +101,7 @@ namespace Microsoft.Bot.Builder.M365
                     tokens.Insert(0, DEFAULT_COMMAND);
                 }
 
-                while (tokens.Count > 0) 
+                while (tokens.Count > 0)
                 {
                     // Parse Command
                     ParsedCommandResult result;
@@ -132,7 +133,8 @@ namespace Microsoft.Bot.Builder.M365
                                     responses += ' ' + response;
                                     newPlan.Commands.Add(result.Command);
                                 }
-                            } else
+                            }
+                            else
                             {
                                 newPlan.Commands.Add(result.Command);
                             }
@@ -140,7 +142,8 @@ namespace Microsoft.Bot.Builder.M365
 
                         // Remove consumed tokens
                         tokens = result.Length < tokens.Count ? tokens.GetRange(result.Length, tokens.Count - result.Length) : new();
-                    } else
+                    }
+                    else
                     {
                         // Ignore remaining tokens as something is malformed
                         tokens = new();
@@ -206,7 +209,8 @@ namespace Microsoft.Bot.Builder.M365
                                 // Initialize command object and enter new state
                                 command = new PredictedDoCommand(actionName);
                                 parseState = DoCommandParseState.FindEntityName;
-                            } else
+                            }
+                            else
                             {
                                 actionName += token;
                             };
@@ -227,7 +231,8 @@ namespace Microsoft.Bot.Builder.M365
                             {
                                 // We know the entity name so now we need the value
                                 parseState = DoCommandParseState.FindEntityValue;
-                            } else
+                            }
+                            else
                             {
                                 entityName += token;
                             }
@@ -241,13 +246,15 @@ namespace Microsoft.Bot.Builder.M365
                                 {
                                     length += 2;
                                     parseState = DoCommandParseState.InEntityContentValue;
-                                } else
+                                }
+                                else
                                 {
                                     // Remember quote type and enter new state
                                     quoteType = token;
                                     parseState = DoCommandParseState.InEntityStringValue;
                                 }
-                            } else if (!SPACE_CHARACTERS.Contains(token) && token != "=")
+                            }
+                            else if (!SPACE_CHARACTERS.Contains(token) && token != "=")
                             {
                                 // Assign token to value and enter new state
                                 entityValue = token;
@@ -263,7 +270,8 @@ namespace Microsoft.Bot.Builder.M365
                                 command!.Entities[entityName] = entityValue;
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = entityValue = "";
-                            } else
+                            }
+                            else
                             {
                                 entityValue += token;
                             }
@@ -275,7 +283,8 @@ namespace Microsoft.Bot.Builder.M365
                                 length += 2;
                                 command!.Entities[entityName] = entityValue;
                                 entityName = entityValue = "";
-                            } else
+                            }
+                            else
                             {
                                 entityValue += token;
                             }
@@ -287,7 +296,8 @@ namespace Microsoft.Bot.Builder.M365
                                 command!.Entities[entityName] = entityValue;
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = entityValue = "";
-                            } else
+                            }
+                            else
                             {
                                 entityValue += token;
                             }
@@ -308,7 +318,7 @@ namespace Microsoft.Bot.Builder.M365
                 }
 
             }
-            
+
             return new ParsedCommandResult(length, command!);
         }
 
@@ -318,7 +328,8 @@ namespace Microsoft.Bot.Builder.M365
             IPredictedCommand? command = null;
             if (tokens.Count > 1)
             {
-                if (!AITypes.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase)) {
+                if (!AITypes.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
+                {
                     throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
                 }
 
@@ -366,7 +377,7 @@ namespace Microsoft.Bot.Builder.M365
 
             string token = "";
             int length = text.Length;
-            for (int i=0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 string c = text[i].ToString();
                 if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
@@ -382,7 +393,8 @@ namespace Microsoft.Bot.Builder.M365
 
                     // Start a new empty token
                     token = "";
-                } else
+                }
+                else
                 {
                     // Add to existing token
                     token += c;
@@ -414,14 +426,6 @@ namespace Microsoft.Bot.Builder.M365
             return firstJSON;
         }
 
-/*        private static JObject? GetFirstJsonObject(string text)
-        {
-            string? firstJSON = GetFirstJsonString(text);
-            if (firstJSON == null) return null;
-
-            return JsonConvert.DeserializeObject<JObject>(firstJSON);
-        }*/
-
         private static Plan? GetFirstPlanObject(string text)
         {
             string? firstJSON = GetFirstJsonString(text);
@@ -432,8 +436,6 @@ namespace Microsoft.Bot.Builder.M365
                 Converters = new List<JsonConverter> { new PredictedCommandJsonConverter() }
             };
             return JsonConvert.DeserializeObject<Plan>(firstJSON, settings);
-
-            // return JsonConvert.DeserializeObject<Plan>(firstJSON);
         }
     }
 

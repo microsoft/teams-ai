@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Bot.Builder.M365.AI
+namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
     public class PredictedCommandJsonConverter : JsonConverter
     {
@@ -15,7 +15,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
         public override bool CanWrite => false;
 
-       public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject item = JObject.Load(reader);
 
