@@ -2,7 +2,7 @@
     "name": "@microsoft/botbuilder-m365",
     "author": "Microsoft Corp.",
     "description": "M365 extensions for Microsoft BotBuilder, Alpha release.",
-    "version": "0.1.0-alpha.3",
+    "version": "0.1.0-alpha.4",
     "license": "MIT",
     "keywords": [
         "botbuilder",

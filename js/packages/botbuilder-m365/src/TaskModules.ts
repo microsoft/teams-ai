@@ -197,7 +197,7 @@ function createTaskSelector(
             return Promise.resolve(
                 isInvoke &&
                 typeof context?.activity?.value?.data == 'object' &&
-                typeof context.activity.value.data[filterField] == verb
+                context.activity.value.data[filterField] == verb
             );
         };
     }
