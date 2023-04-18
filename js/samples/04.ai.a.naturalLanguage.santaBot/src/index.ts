@@ -88,7 +88,7 @@ const moderator = new OpenAIModerator({
     moderate: 'both'
 });
 // You can also modify this to out the `chatGPT` prompt.
-const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts/chat'));
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -98,7 +98,7 @@ const app = new Application<ApplicationTurnState>({
         planner,
         moderator,
         promptManager,
-        prompt: 'skprompt',
+        prompt: 'chat',
         history: {
             assistantHistoryType: 'text'
         }
