@@ -21,4 +21,5 @@ export * from './OpenAIPlanner';
 export * from './Planner';
 export * from './Prompts';
 export * from './ResponseParser';
+export * from './TaskModules';
 export * from './TurnState';

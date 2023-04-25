@@ -108,7 +108,7 @@ app.message('/quit', async (context: TurnContext, state: ApplicationTurnState) =
 
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     let { secretWord, guessCount, remainingGuesses } = state.conversation.value;
-    if (secretWord.length > 1) {
+    if (secretWord && secretWord.length < 1) {
         throw new Error('No secret word is assigned.');
     }
     if (secretWord) {

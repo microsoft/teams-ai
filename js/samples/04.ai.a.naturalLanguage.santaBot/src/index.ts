@@ -73,58 +73,75 @@ import {
 } from '@microsoft/botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ConversationState {}
+interface ConversationState { }
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 type TData = Record<string, any>;
 
-// Create AI components
+// Create Planner
 const planner = new OpenAIPlanner({
     apiKey: process.env.OpenAIKey!,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
+
+// Create Prompt Manager
+const promptsFolder = path.join(__dirname, '../src/prompts');
+const promptManager = new DefaultPromptManager(promptsFolder);
+
+// Create optional Moderator
 const moderator = new OpenAIModerator({
     apiKey: process.env.OpenAIKey!,
     moderate: 'both'
 });
-// You can also modify this to out the `chatGPT` prompt.
-const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts/chat'));
 
-// Define storage and application
+// Create state storage provider
 const storage = new MemoryStorage();
+
+// Create Application
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
         moderator,
         promptManager,
-        prompt: 'skprompt',
+        prompt: 'chat',
         history: {
-            assistantHistoryType: 'text'
+            assistantHistoryType: 'text',
+            maxTokens: 500
         }
     }
 });
 
-app.ai.action(AI.FlaggedInputActionName, async (context: TurnContext, state: TurnState, data: TData) => {
-    await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
-    return false;
+// Listen for incoming server requests.
+server.post('/api/messages', async (req, res) => {
+
+    // Route received a request to adapter for processing
+    await adapter.process(req, res as any, async (context) => {
+
+        // Dispatch to application for routing
+        await app.run(context);
+    });
 });
 
-app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
-    await context.sendActivity(`I'm not allowed to talk about such things.`);
-    return false;
-});
+// Add action for handling a flagged input
+app.ai.action(
+    AI.FlaggedInputActionName,
+    async (context: TurnContext, state: TurnState, data: TData) => {
+        await context.sendActivity(`I'm sorry your message is inappropriate`);
+        return false;
+    }
+);
+
+// Add action for handling a flagged output
+app.ai.action(
+    AI.FlaggedOutputActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
+        await context.sendActivity(`I'm not allowed to talk about such things.`);
+        return false;
+    }
+);
 
 app.message('/history', async (context: TurnContext, state: ApplicationTurnState) => {
     const history = ConversationHistory.toString(state, 2000, '\n\n');
     await context.sendActivity(history);
-});
-
-// Listen for incoming server requests.
-server.post('/api/messages', async (req, res) => {
-    // Route received a request to adapter for processing
-    await adapter.process(req, res as any, async (context) => {
-        // Dispatch to application for routing
-        await app.run(context);
-    });
 });
