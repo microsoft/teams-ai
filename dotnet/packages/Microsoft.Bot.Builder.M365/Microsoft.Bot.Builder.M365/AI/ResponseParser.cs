@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -86,10 +87,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
             if (plan != null && AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
             {
-                if (AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
-                {
-                    return plan;
-                }
+                return plan;
             }
 
             // Parse response using DO/SAY syntax
@@ -171,7 +169,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
                 string actionName = "";
                 string entityName = "";
-                string entityValue = "";
+                StringBuilder entityValue = new StringBuilder();
                 string quoteType = "";
                 DoCommandParseState parseState = DoCommandParseState.FindActionName;
 
@@ -260,7 +258,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             else if (!SPACE_CHARACTERS.Contains(token) && token != "=")
                             {
                                 // Assign token to value and enter new state
-                                entityValue = token;
+                                entityValue = new StringBuilder(token);
                                 parseState = DoCommandParseState.InEntityValue;
                             }
                             break;
@@ -270,13 +268,14 @@ namespace Microsoft.Bot.Builder.M365.AI
                             if (token == quoteType)
                             {
                                 // Save pair and look for additional pairs
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities[entityName] = entityValue.ToString();
                                 parseState = DoCommandParseState.FindEntityName;
-                                entityName = entityValue = "";
+                                entityName = "";
+                                entityValue = new StringBuilder();
                             }
                             else
                             {
-                                entityValue += token;
+                                entityValue.Append(token);
                             }
                             break;
                         case DoCommandParseState.InEntityContentValue:
@@ -284,25 +283,27 @@ namespace Microsoft.Bot.Builder.M365.AI
                             {
                                 // Save pair and look for additional pairs
                                 length += 2;
-                                command!.Entities[entityName] = entityValue;
-                                entityName = entityValue = "";
+                                command!.Entities[entityName] = entityValue.ToString();
+                                entityName = "";
+                                entityValue = new StringBuilder();
                             }
                             else
                             {
-                                entityValue += token;
+                                entityValue.Append(token);
                             }
                             break;
                         case DoCommandParseState.InEntityValue:
                             // Accumulate tokens until you hit a space
                             if (SPACE_CHARACTERS.Contains(token))
                             {
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities[entityName] = entityValue.ToString();
                                 parseState = DoCommandParseState.FindEntityName;
-                                entityName = entityValue = "";
+                                entityName = "";
+                                entityValue = new StringBuilder();
                             }
                             else
                             {
-                                entityValue += token;
+                                entityValue.Append(token);
                             }
                             break;
                     }
@@ -317,7 +318,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
                 if (command != null && entityName.Length > 0)
                 {
-                    command.Entities[entityName] = entityValue;
+                    command.Entities[entityName] = entityValue.ToString();
                 }
 
             }
