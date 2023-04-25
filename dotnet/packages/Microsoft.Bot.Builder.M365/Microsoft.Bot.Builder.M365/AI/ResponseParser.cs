@@ -45,6 +45,9 @@ namespace Microsoft.Bot.Builder.M365.AI
 
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
 
+                    // Validate JSON structure
+                    if (!IsValidJsonStructure(possibleJSON)) continue;
+
                     // Validate string to be a valid JSON
                     try
                     {
@@ -436,6 +439,42 @@ namespace Microsoft.Bot.Builder.M365.AI
                 Converters = new List<JsonConverter> { new PredictedCommandJsonConverter() }
             };
             return JsonConvert.DeserializeObject<Plan>(firstJSON, settings);
+        }
+
+        private static bool IsValidJsonStructure(string json)
+        {
+            json = json.Trim();
+            
+            if (string.IsNullOrEmpty(json) || json.Length < 2) return false;
+
+            if (json[0] != '{' || json[json.Length-1] != '}') return false;
+
+            int parenthesisStack = 0;
+
+            int i = 0;
+            while (i < json.Length)
+            {
+                int c = json.IndexOfAny(new char[] { '{', '}' }, i);
+
+                if (c == -1) 
+                {
+                    break;
+                }
+
+                if (json[c] == '{')
+                {
+                    parenthesisStack += 1;
+                } else if (json[c] == '}')
+                {
+                    parenthesisStack -= 1;
+
+                    if (parenthesisStack < 0) return false;
+                }
+
+                i = c + 1;
+            }
+
+            return parenthesisStack == 0;
         }
     }
 
