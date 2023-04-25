@@ -84,7 +84,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         {
             Plan? plan = GetFirstPlanObject(text);
 
-            if (plan != null)
+            if (plan != null && AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
             {
                 if (AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
                 {
