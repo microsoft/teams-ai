@@ -20,7 +20,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// </summary>
         /// <param name="text">text that contains valid JSON object substrings</param>
         /// <returns>An ordered list of JSON strings</returns>
-        public static List<string>? ParseJSON(string text)
+        public static List<string>? ExtractValidJsonStrings(string text)
         {
             int length = text.Length;
 
@@ -415,7 +415,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             string? firstJSON;
             try
             {
-                firstJSON = ParseJSON(text)?.First();
+                firstJSON = ExtractValidJsonStrings(text)?.First();
             }
             catch (InvalidOperationException)
             {

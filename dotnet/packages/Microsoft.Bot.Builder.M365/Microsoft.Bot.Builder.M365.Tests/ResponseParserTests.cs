@@ -14,7 +14,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             // Arange - done through parameters
 
             // Act
-            var actualObjects = ResponseParser.ParseJSON(text);
+            var actualObjects = ResponseParser.ExtractValidJsonStrings(text);
 
             // Assert
             Assert.Equal(expectedJSONs, actualObjects);
