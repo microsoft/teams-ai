@@ -325,7 +325,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         public static ParsedCommandResult ParseSayCommand(List<string> tokens)
         {
             int length = 0;
-            IPredictedCommand? command = null;
+            PredictedCommand? command = null;
             if (tokens.Count > 1)
             {
                 if (!AITypes.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))

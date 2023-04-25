@@ -8,7 +8,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     public class Plan
     {
         [JsonProperty("commands")]
-        public List<IPredictedCommand> Commands { get; }
+        public List<PredictedCommand> Commands { get; }
 
         [JsonProperty("type")]
         [JsonRequired]
@@ -16,10 +16,10 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         public Plan()
         {
-            Commands = new List<IPredictedCommand>();
+            Commands = new List<PredictedCommand>();
         }
 
-        public Plan(List<IPredictedCommand> commands)
+        public Plan(List<PredictedCommand> commands)
         {
             Commands = commands;
         }

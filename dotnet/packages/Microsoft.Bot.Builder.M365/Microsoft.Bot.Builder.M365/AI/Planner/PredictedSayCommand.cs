@@ -5,14 +5,12 @@ using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
-    public class PredictedSayCommand : IPredictedCommand
+    public class PredictedSayCommand : PredictedCommand
     {
-        public string Type { get; } = AITypes.SayCommand;
-
         [JsonProperty("response")]
         public string Response { get; set; }
 
-        public PredictedSayCommand(string response)
+        public PredictedSayCommand(string response) : base(AITypes.SayCommand)
         {
             Response = response;
         }

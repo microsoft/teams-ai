@@ -10,7 +10,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(IPredictedCommand) == objectType;
+            return typeof(PredictedCommand) == objectType;
         }
 
         public override bool CanWrite => false;

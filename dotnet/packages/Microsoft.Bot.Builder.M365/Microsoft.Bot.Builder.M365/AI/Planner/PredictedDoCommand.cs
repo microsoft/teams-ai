@@ -5,10 +5,8 @@ using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
-    public class PredictedDoCommand : IPredictedCommand
+    public class PredictedDoCommand : PredictedCommand
     {
-        public string Type { get; } = AITypes.DoCommand;
-
         [JsonProperty("action")]
         [JsonRequired]
         public string Action { get; }
@@ -17,16 +15,15 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         public Dictionary<string, object>? Entities { get; }
 
         [JsonConstructor]
-        public PredictedDoCommand(string action, Dictionary<string, object> entities)
+        public PredictedDoCommand(string action, Dictionary<string, object> entities) : base(AITypes.DoCommand)
         {
             Action = action;
             Entities = entities;
         }
 
-        public PredictedDoCommand(string action)
+        public PredictedDoCommand(string action) : this(action, new Dictionary<string, object>())
         {
-            Action = action;
-            Entities = new Dictionary<string, object>();
+
         }
     }
 }
