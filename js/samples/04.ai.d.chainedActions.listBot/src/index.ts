@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
@@ -32,16 +33,16 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: Error | string) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -64,7 +65,16 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from '@microsoft/botbuilder-m365';
+import {
+    Application,
+    DefaultTurnState,
+    OpenAIPlanner,
+    AI,
+    DefaultConversationState,
+    DefaultUserState,
+    DefaultTempState,
+    DefaultPromptManager
+} from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
 // Strongly type the applications turn state
@@ -74,13 +84,17 @@ interface ConversationState extends DefaultConversationState {
     lists: Record<string, string[]>;
 }
 
-interface UserState extends DefaultUserState {}
+type UserState = DefaultUserState;
 
 interface TempState extends DefaultTempState {
     lists: Record<string, string[]>;
 }
 
 type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
+
+if (!process.env.OpenAIKey) {
+    throw new Error('Missing OpenAIKey environment variable');
+}
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
@@ -108,7 +122,7 @@ interface EntityData {
 }
 
 // Listen for new members to join the conversation
-app.conversationUpdate('membersAdded', async (context, state) => {
+app.conversationUpdate('membersAdded', async (context: TurnContext, state: ApplicationTurnState) => {
     if (!state.conversation.value.greeted) {
         state.conversation.value.greeted = true;
         await context.sendActivity(responses.greeting());
@@ -116,30 +130,30 @@ app.conversationUpdate('membersAdded', async (context, state) => {
 });
 
 // List for /reset command and then delete the conversation state
-app.message('/reset', async (context, state) => {
+app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
     state.conversation.delete();
     await context.sendActivity(responses.reset());
 });
 
 // Register action handlers
-app.ai.action('createList', async (context, state, data: EntityData) => {
+app.ai.action('createList', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     ensureListExists(state, data.list);
     return true;
 });
 
-app.ai.action('deleteList', async (context, state, data: EntityData) => {
+app.ai.action('deleteList', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     deleteList(state, data.list);
     return true;
 });
 
-app.ai.action('addItem', async (context, state, data: EntityData) => {
+app.ai.action('addItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     const items = getItems(state, data.list);
     items.push(data.item);
     setItems(state, data.list, items);
     return true;
 });
 
-app.ai.action('removeItem', async (context, state, data: EntityData) => {
+app.ai.action('removeItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     const items = getItems(state, data.list);
     const index = items.indexOf(data.item);
     if (index >= 0) {
@@ -154,7 +168,7 @@ app.ai.action('removeItem', async (context, state, data: EntityData) => {
     }
 });
 
-app.ai.action('findItem', async (context, state, data: EntityData) => {
+app.ai.action('findItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     const items = getItems(state, data.list);
     const index = items.indexOf(data.item);
     if (index >= 0) {
@@ -167,7 +181,7 @@ app.ai.action('findItem', async (context, state, data: EntityData) => {
     return false;
 });
 
-app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
+app.ai.action('summarizeLists', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     const lists = state.conversation.value.lists;
     if (lists) {
         // Chain into a new summarization prompt
@@ -182,10 +196,13 @@ app.ai.action('summarizeLists', async (context, state, data: EntityData) => {
 });
 
 // Register a handler to handle unknown actions that might be predicted
-app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(responses.unknownAction(action));
-    return false;
-});
+app.ai.action(
+    AI.UnknownActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
+        await context.sendActivity(responses.unknownAction(action!));
+        return false;
+    }
+);
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
@@ -226,7 +243,7 @@ function ensureListExists(state: ApplicationTurnState, listName: string): void {
         conversation.listNames = [];
     }
 
-    if (!conversation.lists.hasOwnProperty(listName)) {
+    if (!Object.prototype.hasOwnProperty.call(conversation.lists, listName)) {
         conversation.lists[listName] = [];
         conversation.listNames.push(listName);
     }
@@ -238,7 +255,7 @@ function ensureListExists(state: ApplicationTurnState, listName: string): void {
  */
 function deleteList(state: ApplicationTurnState, listName: string): void {
     const conversation = state.conversation.value;
-    if (typeof conversation.lists == 'object' && conversation.lists.hasOwnProperty(listName)) {
+    if (typeof conversation.lists == 'object' && Object.prototype.hasOwnProperty.call(conversation.lists, listName)) {
         delete conversation.lists[listName];
     }
 
@@ -249,4 +266,3 @@ function deleteList(state: ApplicationTurnState, listName: string): void {
         }
     }
 }
-

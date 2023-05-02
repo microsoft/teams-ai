@@ -2,7 +2,7 @@
     "name": "@microsoft/botbuilder-m365",
     "author": "Microsoft Corp.",
     "description": "M365 extensions for Microsoft BotBuilder, Alpha release.",
-    "version": "0.1.0-alpha.2",
+    "version": "0.1.0-alpha.4",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -13,11 +13,11 @@
         "m365"
     ],
     "bugs": {
-        "url": "https://github.com/Microsoft/botbuilder-m365/issues"
+        "url": "https://github.com/microsoft/botbuilder-m365/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Microsoft/botbuilder-m365.git"
+        "url": "https://github.com/microsoft/botbuilder-m365.git"
     },
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
@@ -43,7 +43,7 @@
         "build": "tsc -b",
         "build-docs": "typedoc --theme markdown --entryPoint botbuilder-m365 --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
         "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
-        "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo",
+        "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npm-run-all build test:mocha",

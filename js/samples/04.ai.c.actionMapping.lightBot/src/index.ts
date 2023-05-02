@@ -12,7 +12,8 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage
+    MemoryStorage,
+    TurnContext
 } from 'botbuilder';
 
 // Read botFilePath and botFileSecret from .env file.
@@ -31,16 +32,16 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 //const storage = new MemoryStorage();
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -63,16 +64,21 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultPromptManager } from '@microsoft/botbuilder-m365';
+import { AI, Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
 
 interface ConversationState {
     lightsOn: boolean;
 }
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type TData = Record<string, any>;
+
+if (!process.env.OpenAIKey) {
+    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
+}
 
 // Create AI components
-const planner = new OpenAIPlanner({
+const planner = new OpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.OpenAIKey,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
@@ -91,35 +97,50 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Add a prompt function for getting the current status of the lights
-app.ai.prompts.addFunction('getLightStatus', async (context, state) => {
-    return state.conversation.value.lightsOn ? 'on' : 'off';
-});
+app.ai.prompts.addFunction(
+    'getLightStatus',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        return state.conversation.value.lightsOn ? 'on' : 'off';
+    }
+);
 
 // Register action handlers
-app.ai.action('LightsOn', async (context, state) => {
-    state.conversation.value.lightsOn = true;
-    await context.sendActivity(`[lights on]`);
-    return true;
-});
+app.ai.action(
+    'LightsOn',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = true;
+        await context.sendActivity(`[lights on]`);
+        return true;
+    }
+);
 
-app.ai.action('LightsOff', async (context, state) => {
-    state.conversation.value.lightsOn = false;
-    await context.sendActivity(`[lights off]`);
-    return true;
-});
+app.ai.action(
+    'LightsOff',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = false;
+        await context.sendActivity(`[lights off]`);
+        return true;
+    }
+);
 
-app.ai.action('Pause', async (context, state, data) => {
+app.ai.action(
+    'Pause',
+    async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
     const time = data.time ? parseInt(data.time) : 1000;
-    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
-    await new Promise((resolve) => setTimeout(resolve, time));
-    return true;
-});
+        await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+        await new Promise((resolve) => setTimeout(resolve, time));
+        return true;
+    }
+);
 
 // Register a handler to handle unknown actions that might be predicted
-app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(responses.unknownAction(action));
-    return false;
-});
+app.ai.action(
+    AI.UnknownActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: TData, action: string | undefined) => {
+        await context.sendActivity(responses.unknownAction(action || 'unknown'));
+        return false;
+    }
+);
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {

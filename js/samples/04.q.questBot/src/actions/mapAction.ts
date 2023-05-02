@@ -7,7 +7,7 @@ import * as responses from '../responses';
  * @param app
  */
 export function mapAction(app: Application<ApplicationTurnState>): void {
-    app.ai.action('map', async (context, state, data: IDataEntities) => {
+    app.ai.action('map', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
             case 'query':
@@ -24,7 +24,11 @@ export function mapAction(app: Application<ApplicationTurnState>): void {
  * @param context
  * @param state
  */
-async function queryMap(app: Application<ApplicationTurnState>, context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
+async function queryMap(
+    app: Application<ApplicationTurnState>,
+    context: TurnContext,
+    state: ApplicationTurnState
+): Promise<boolean> {
     // Use the map to answer player
     const newResponse = await app.ai.completePrompt(context, state, 'useMap');
     if (newResponse) {

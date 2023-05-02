@@ -307,27 +307,31 @@ export class MessageExtensions<TState extends TurnState> {
             );
 
         // Add route
-        this._app.addRoute(selector, async (context, state) => {
-            // Call handler and then check to see if an invoke response has already been added
-            const result = await handler(context, state, context?.activity?.value ?? {});
-            if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                // Format invoke response
-                const response: MessagingExtensionActionResponse = {
-                    composeExtension: result
-                };
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state, context?.activity?.value ?? {});
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Format invoke response
+                    const response: MessagingExtensionActionResponse = {
+                        composeExtension: result
+                    };
 
-                // Queue up invoke response
-                await context.sendActivity({
-                    value: { body: response, status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
-            }
-        }),
-            true;
+                    // Queue up invoke response
+                    await context.sendActivity({
+                        value: { body: response, status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
         return this._app;
     }
 
-    public submitAction<TData = Record<string, any>>(
+    public submitAction<TData>(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -407,9 +411,11 @@ export class MessageExtensions<TState extends TurnState> {
 }
 
 /**
- * @param commandId
- * @param invokeName
- * @param botMessagePreviewAction
+ *
+ * @param {string | RegExp | RouteSelector[]} commandId Name of the commandId
+ * @param {boolean} invokeName Whether or not the commandId a Teams invokable action
+ * @param {string} botMessagePreviewAction Message Extension preview action 'edit' or 'send'
+ * @returns {RouteSelector} Route selector function
  */
 function createTaskSelector(
     commandId: string | RegExp | RouteSelector,
@@ -447,8 +453,11 @@ function createTaskSelector(
 }
 
 /**
- * @param activity
- * @param botMessagePreviewAction
+ * Checks if the activity is a bot message preview action.
+ *
+ * @param {Activity} activity The activity / communication type that is being checked.
+ * @param {string} botMessagePreviewAction Name of the preview action
+ * @returns {boolean} True if the activity is a bot message preview action, false if it is not.
  */
 function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edit' | 'send'): boolean {
     if (typeof activity?.value?.botMessagePreviewAction == 'string') {
