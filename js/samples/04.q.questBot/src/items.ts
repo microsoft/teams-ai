@@ -1,4 +1,4 @@
-import { parseNumber } from './bot';
+import { parseNumber } from './teamsBot';
 import { IItemList } from './interfaces';
 
 /**

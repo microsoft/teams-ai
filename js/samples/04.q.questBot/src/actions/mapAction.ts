@@ -1,6 +1,6 @@
 import { TurnContext } from 'botbuilder';
 import { Application } from '@microsoft/botbuilder-m365';
-import { ApplicationTurnState, IDataEntities, trimPromptResponse, updateDMResponse } from '../bot';
+import { ApplicationTurnState, IDataEntities, trimPromptResponse, updateDMResponse } from '../teamsBot';
 import * as responses from '../responses';
 
 /**

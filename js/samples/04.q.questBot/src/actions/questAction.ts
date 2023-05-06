@@ -1,6 +1,6 @@
 import { TurnContext } from 'botbuilder';
 import { Application } from '@microsoft/botbuilder-m365';
-import { ApplicationTurnState, IDataEntities, IQuest } from '../bot';
+import { ApplicationTurnState, IDataEntities, IQuest } from '../teamsBot';
 
 /**
  * @param app

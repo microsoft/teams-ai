@@ -1,0 +1,38 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+    "version": "1.0.0",
+    "manifestVersion": "1.16",
+    "id": "5628a1f8-bdd0-4fcb-ac46-f1ddab5833fe",
+    "packageName": "com.package.name",
+    "name": {
+        "short": "DM",
+        "full": "DM"
+    },
+    "developer": {
+        "name": "microsoft",
+        "mpnId": "",
+        "websiteUrl": "https://microsoft.com",
+        "privacyUrl": "https://microsoft.com/privacy",
+        "termsOfUseUrl": "https://microsoft.com/termsofuse"
+    },
+    "description": {
+        "short": "An epic text adventure powered by AI.",
+        "full": "An epic text adventure powered by AI."
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#FFFFFF",
+    "bots": [
+        {
+            "botId": "ecfb5722-1347-475a-9b31-e7eb3ecb803f",
+            "scopes": [
+                "personal"
+            ]
+        }
+    ],
+    "validDomains": [
+        "j5tlpwv3-3978.uks1.devtunnels.ms"
+    ]
+}

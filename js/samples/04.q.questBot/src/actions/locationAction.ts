@@ -1,6 +1,6 @@
 import { TurnContext } from 'botbuilder';
 import { Application } from '@microsoft/botbuilder-m365';
-import { ApplicationTurnState, IDataEntities } from '../bot';
+import { ApplicationTurnState, IDataEntities } from '../teamsBot';
 import { findMapLocation } from '../ShadowFalls';
 
 /**

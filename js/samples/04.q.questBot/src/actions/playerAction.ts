@@ -7,7 +7,7 @@ import {
     IDataEntities,
     updateDMResponse,
     UserState
-} from '../bot';
+} from '../teamsBot';
 import * as responses from '../responses';
 
 /**

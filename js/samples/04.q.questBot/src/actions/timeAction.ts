@@ -1,6 +1,6 @@
 import { TurnContext } from 'botbuilder';
 import { Application, OpenAIPlanner } from '@microsoft/botbuilder-m365';
-import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from '../bot';
+import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from '../teamsBot';
 import { describeConditions, describeSeason, generateTemperature, generateWeather } from '../conditions';
 
 /**
