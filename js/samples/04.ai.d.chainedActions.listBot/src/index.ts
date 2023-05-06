@@ -1,60 +1,56 @@
-/* eslint-disable security/detect-object-injection */
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 // Import required packages
-import { config } from 'dotenv';
-import * as path from 'path';
-import * as restify from 'restify';
+import * as restify from "restify";
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
-    CloudAdapter,
-    ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
-    MemoryStorage,
-    TurnContext
-} from 'botbuilder';
+  CloudAdapter,
+  ConfigurationServiceClientCredentialFactory,
+  ConfigurationBotFrameworkAuthentication,
+  TurnContext,
+  MemoryStorage,
+} from "botbuilder";
 
-// Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
-config({ path: ENV_FILE });
-
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
-);
+// This bot's main dialog.
+import config from "./config";
 
 // Create adapter.
-// See https://aka.ms/about-bot-adapter to learn more about how bots work.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
+// See https://aka.ms/about-bot-adapter to learn more about adapters.
+const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
+  MicrosoftAppId: config.botId,
+  MicrosoftAppPassword: config.botPassword,
+  MicrosoftAppType: "MultiTenant",
+});
 
-// Create storage to use
-//const storage = new MemoryStorage();
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+  {},
+  credentialsFactory
+);
+
+const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
-    // This check writes out errors to console log .vs. app insights.
-    // NOTE: In production environment, you should consider logging this to Azure
-    //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+  // This check writes out errors to console log .vs. app insights.
+  // NOTE: In production environment, you should consider logging this to Azure
+  //       application insights.
+  console.error(`\n [onTurnError] unhandled error: ${error}`);
 
-    // Send a trace activity, which will be displayed in Bot Framework Emulator
-    await context.sendTraceActivity(
-        'OnTurnError Trace',
-        `${error.toString()}`,
-        'https://www.botframework.com/schemas/error',
-        'TurnError'
-    );
+  // Send a trace activity, which will be displayed in Bot Framework Emulator
+  await context.sendTraceActivity(
+    "OnTurnError Trace",
+    `${error}`,
+    "https://www.botframework.com/schemas/error",
+    "TurnError"
+  );
 
-    // Send a message to the user
-    await context.sendActivity('The bot encountered an error or bug.');
-    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
+  // Send a message to the user
+  await context.sendActivity(`The bot encountered unhandled error:\n ${error.message}`);
+  await context.sendActivity("To continue to run this bot, please fix the bot source code.");
 };
 
 // Set the onTurnError for the singleton CloudAdapter.
 adapter.onTurnError = onTurnErrorHandler;
-
 // Create HTTP server.
 const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
@@ -76,6 +72,7 @@ import {
     DefaultPromptManager
 } from '@microsoft/botbuilder-m365';
 import * as responses from './responses';
+import path from "path";
 
 // Strongly type the applications turn state
 interface ConversationState extends DefaultConversationState {
@@ -92,17 +89,17 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing OpenAIKey environment variable');
+if (!config.openAIAPIKey) {
+    throw new Error('Missing openAIAPIKey environment variable');
 }
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey!,
+    apiKey: config.openAIAPIKey!,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, './prompts'));
 
 // Define storage and application
 const storage = new MemoryStorage();

@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.16",
-    "id": "<<MICROSOFT_APP_OR_BOT_ID>>",
+    "id": "5dc684bf-fa69-4eb7-a544-66afd8030f0a",
     "packageName": "com.package.name",
     "name": {
         "short": "ListBot",
@@ -24,25 +24,21 @@
         "color": "color.png"
     },
     "accentColor": "#FFFFFF",
-    "staticTabs": [
-        {
-            "entityId": "conversations",
-            "scopes": ["personal"]
-        },
-        {
-            "entityId": "about",
-            "scopes": ["personal"]
-        }
-    ],
     "bots": [
         {
-            "botId": "<<YOUR_BOT_ID>>",
-            "scopes": ["personal", "team", "groupChat"],
+            "botId": "47de60ff-ac0a-45c4-98c8-a3b0df63315f",
+            "scopes": [
+                "personal",
+                "team",
+                "groupChat"
+            ],
             "isNotificationOnly": false,
             "supportsCalling": false,
             "supportsVideo": false,
             "supportsFiles": false
         }
     ],
-    "validDomains": []
+    "validDomains": [
+        "znw5h850-3978.uks1.devtunnels.ms"
+    ]
 }
