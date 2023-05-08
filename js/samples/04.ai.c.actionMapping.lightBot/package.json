@@ -1,34 +1,38 @@
 {
-    "name": "lightBot-demo",
+    "name": "light_bot",
     "version": "1.0.0",
-    "description": "A simple chat bot that can turn a light on and off",
+    "description": "Microsoft Teams Toolkit hello world Bot sample",
+    "engines": {
+        "node": "16 || 18"
+    },
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
-        "build": "tsc --build",
-        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
-        "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
-        "start": "tsc --build && node ./lib/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "watch": "nodemon --watch ./src -e ts --exec \"yarn start\""
+        "dev:teamsfx": "env-cmd --silent -f .localConfigs npm run dev",
+        "dev": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
+        "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
+        "start": "node ./lib/index.js",
+        "watch": "nodemon --exec \"npm run start\"",
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
         "type": "git",
         "url": "https://github.com"
     },
     "dependencies": {
-        "botbuilder": "^4.19.0",
-        "@microsoft/botbuilder-m365": "~0.1.0-alpha.2",
-        "dotenv": "^8.2.0",
-        "replace": "~1.2.0",
-        "restify": "~8.6.0"
+        "@microsoft/adaptivecards-tools": "^1.0.0",
+        "@microsoft/botbuilder-m365": "^0.1.0-alpha.6",
+        "botbuilder": "^4.17.0",
+        "restify": "^10.0.0"
     },
     "devDependencies": {
-        "@types/dotenv": "6.1.1",
-        "@types/restify": "8.4.2",
-        "nodemon": "~1.19.4",
-        "tslint": "~5.20.0",
-        "typescript": "^4.6.4"
+        "@types/node": "^14.0.0",
+        "@types/restify": "^8.5.5",
+        "env-cmd": "^10.1.0",
+        "nodemon": "^2.0.7",
+        "shx": "^0.3.3",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.4.4"
     }
 }
