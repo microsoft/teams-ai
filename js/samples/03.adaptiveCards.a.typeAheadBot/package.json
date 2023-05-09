@@ -10,7 +10,7 @@
     "dev": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
     "watch": "nodemon --exec 'npm run start'",
     "start": "node ./lib/index.js",
-    "build": "tsc --build && shx cp -r ./src/prompts ./lib/",
+    "build": "tsc --build",
     "dev:teamsfx": "env-cmd --silent -f .localConfigs npm run dev"
   },
   "repository": {
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "botbuilder": "^4.19.0",
-    "@microsoft/botbuilder-m365": "~0.1.0-alpha.2",
+    "@microsoft/botbuilder-m365": "~0.1.0-alpha.6",
     "replace": "~1.2.0",
     "restify": "~8.6.0",
     "axios": "^1.3.2"
