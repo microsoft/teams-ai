@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 // Import required packages
-import { config } from 'dotenv';
-import * as path from 'path';
 import * as restify from 'restify';
 
 // Import required bot services.
@@ -12,17 +10,20 @@ import {
     ActivityTypes,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
 
-// Read botFilePath and botFileSecret from .env file.
-const ENV_FILE = path.join(__dirname, '..', '.env');
-config({ path: ENV_FILE });
+const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
+  MicrosoftAppId: process.env.BOT_ID,
+  MicrosoftAppPassword: process.env.BOT_PASSWORD,
+  MicrosoftAppType: "MultiTenant",
+});
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    credentialsFactory
 );
 
 // Create adapter.

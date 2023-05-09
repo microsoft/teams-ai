@@ -106,3 +106,12 @@ dist
 
 # TernJS port file
 .tern-port
+env/.env.*.user
+env/.env.local
+.localConfigs
+appPackage/build
+node_modules/
+.env
+.deployment
+.DS_Store
+lib/
