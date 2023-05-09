@@ -36,12 +36,12 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.message}`);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error}`,
+        `${error.message}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -174,6 +174,7 @@ server.post('/api/messages', async (req, res) => {
 });
 
 /**
+ * This method is used to create new work item.
  * @param state
  * @param workItemInfo
  */
@@ -189,6 +190,7 @@ function createNewWorkItem(state: ApplicationTurnState, workItemInfo: EntityData
 }
 
 /**
+ * This method is used to assign a work item to a person.
  * @param state
  * @param workItemInfo
  */
@@ -204,6 +206,7 @@ function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 }
 
 /**
+ * This method is used to triage work item.
  * @param state
  * @param workItemInfo
  */
@@ -219,6 +222,7 @@ function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 }
 
 /**
+ * This method is used to make sure that work items are initialized properly.
  * @param state 
  */
 function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationState {
@@ -230,6 +234,7 @@ function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationSt
 }
 
 /**
+ * This method is used to update the existing work item.
  * @param state
  * @param workItemInfo
  */
@@ -239,11 +244,11 @@ function updateWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
     if (workItemInfo.id != null) {
         var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
         if (workItem != null) {
-            if (workItemInfo.title != null)
+            if (workItemInfo.title !== null)
                 workItem.title = workItemInfo.title;
-            if (workItemInfo.assignedTo != null)
+            if (workItemInfo.assignedTo !== null)
                 workItem.assignedTo = workItemInfo.assignedTo;
-            if (workItemInfo.status != null)
+            if (workItemInfo.status !== null)
                 workItem.status = workItemInfo.status;
         }
     }

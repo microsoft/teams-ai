@@ -4,7 +4,6 @@ Bot Framework v4 Conversation Bot sample for Teams.
 
 This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
 how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
-
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
@@ -15,7 +14,6 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
 > Note these instructions are for running the sample on your local machine, the tunnelling solution is required because
 > the Teams service needs to call into the bot.
-
 1. Clone the repository
 
     ```bash
@@ -32,7 +30,9 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
     - If you already ran `yarn install` and `yarn build` in the `js` folder, you are ready to get started with ngrok. Otherwise, you need to run `yarn install` and `yarn build` in the `js` folder.
 
-1. In a terminal, navigate to `cd` into this directory.
+Navigate to the sample directory
+
+`cd samples/04.ai.e.chainedActions.devOpsBot/README.md`
 
 1. Run ngrok tunneling service - point to port 3978
 
@@ -50,7 +50,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
 1. **_This step is specific to Teams._**
 
-    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `___YOUR BOTS ID___`
+    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. Your bot id should be pasted in where you see `<<YOUR-MICROSOFT-APP-ID>>`
     - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
     - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
 
@@ -78,7 +78,7 @@ You can interact with this bot by sending it a message, or selecting a command f
 
 3. **MessageAllMembers**
 
--   **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
+-   **Result:** The bot will send a 1:1 message to each member in the current conversation (aka on the conversation's roster).
 -   **Valid Scopes:** personal, group chat, team chat
 
 You can select an option from the command list by typing `@TeamsConversationBot` into the compose message area and `What can I do?` text above the compose area.

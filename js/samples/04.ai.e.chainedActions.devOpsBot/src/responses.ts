@@ -19,7 +19,7 @@ The variations should always include ${item} and ${list} variables.
 */
 
 /**
- *
+ * This method is used for greeting and return rendom responses.
  */
 export function greeting(): string {
     return getRandomResponse([
@@ -32,7 +32,7 @@ export function greeting(): string {
 }
 
 /**
- *
+ * This method is used to reset the work items and starting with freshly.
  */
 export function reset(): string {
     return getRandomResponse([
@@ -45,6 +45,7 @@ export function reset(): string {
 }
 
 /**
+ * This method return random response if the work item not found.
  * @param list
  * @param item
  */
@@ -59,6 +60,7 @@ export function itemNotFound(list: string, item: string): string {
 }
 
 /**
+ * This method return random responses if the work item found.
  * @param list
  * @param item
  */
@@ -73,7 +75,7 @@ export function itemFound(list: string, item: string): string {
 }
 
 /**
- *
+ * This method return random response no list found.
  */
 export function noListsFound(): string {
     return getRandomResponse([
@@ -85,6 +87,7 @@ export function noListsFound(): string {
 }
 
 /**
+ * This method return random response for any unknown action.
  * @param action
  */
 export function unknownAction(action: string): string {
@@ -98,7 +101,7 @@ export function unknownAction(action: string): string {
 }
 
 /**
- *
+ * This method return random response if the prompt is off the topic.
  */
 export function offTopic(): string {
     return getRandomResponse([
@@ -111,6 +114,7 @@ export function offTopic(): string {
 }
 
 /**
+ * This method return random response from the list of items in the array.
  * @param responses
  */
 function getRandomResponse(responses: string[]): string {
