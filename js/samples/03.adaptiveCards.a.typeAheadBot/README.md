@@ -7,14 +7,11 @@ how to incorporate basic conversational flow into a Teams application. It also i
 
 ## Prerequisites
 
--   Microsoft Teams is installed and you have an account
--   [NodeJS](https://nodejs.org/en/) (version 16.x)
--   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
+- Microsoft 365 tenant with sideload custom apps enabled
+- [NodeJS](https://nodejs.org/en/) (version 16.x)
+- [Teams Toolkit](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension) for Visual Studio Code
 
-## To try this sample
-
-> Note these instructions are for running the sample on your local machine, the tunnelling solution is required because
-> the Teams service needs to call into the bot.
+> We recommend that you use a Microsoft 365 Developer Tenant for developing apps for Microsoft Teams. [Join the Microsoft 365 Developer Program](https://learn.microsoft.com/office/developer-program/microsoft-365-developer-program) which includes a Microsoft 365 E5 developer subscription that you can use to create your own sandbox and develop solutions independent of your production environment.
 
 1. Clone the repository
 
@@ -30,62 +27,35 @@ how to incorporate basic conversational flow into a Teams application. It also i
     yarn build
     ```
 
-    - If you already ran `yarn install` and `yarn build` in the `js` folder, you are ready to get started with ngrok. Otherwise, you need to run `yarn install` and `yarn build` in the `js` folder.
-
-1. In a terminal, navigate to `cd` into this directory.
-
-1. Run ngrok tunneling service - point to port 3978
+1. In a terminal, navigate to `samples/js/samples/messaging/searchCommand`
 
     ```bash
-    ngrok http --host-header=rewrite 3978
+    cd samples/js/samples/messaging/searchCommand
     ```
 
-1. Create [Bot Framework registration resource](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration) in Azure
-
-    - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample.
-    - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
-    - **_If you don't have an Azure account_** you can use this [Bot Framework registration](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/how-to/create-a-bot-for-teams#register-your-web-service-with-the-bot-framework)
-
-1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the azure portal and you can always create a new client secret anytime.)
-
-1. **_This step is specific to Teams._**
-
-    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-OR-BOT-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `<<YOUR_BOT_ID>>`
-    - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
-    - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
-
-1. Run your bot at the command line:
+1. Open the folder in VS Code with the Teams Toolkit extension already installed
 
     ```bash
-    yarn start
+    code .
     ```
+1. Select the Teams Toolkit icon on the left. In the account section, sign-in with your Microsoft 365 account. You don't need to to sign in to Azure.
 
-1. [Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file in Teams.
+1. Select F5 or **Run > Start Debugging** in VS Code to launch the app in a Teams web client.
 
 ## Interacting with the bot
 
-You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
-
-1. **Show Welcome**
-
--   **Result:** The bot will send the welcome card for you to interact with
--   **Valid Scopes:** personal, group chat, team chat
-
-2. **MentionMe**
-
--   **Result:** The bot will respond to the message and mention the user
--   **Valid Scopes:** personal, group chat, team chat
-
-3. **MessageAllMembers**
-
--   **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
--   **Valid Scopes:** personal, group chat, team chat
-
-You can select an option from the command list by typing `@TeamsConversationBot` into the compose message area and `What can I do?` text above the compose area.
+Chat with the bot and say the term `static search` or `dynamic search` to try the bot.
 
 ## Deploy the bot to Azure
 
-To learn more about deploying a bot to Azure, see [Deploy your bot to Azure](https://aka.ms/azuredeployment) for a complete list of deployment instructions.
+- Open the Teams Toolkit from the sidebar.
+- In the `Account` section, sign in with your Azure account.
+- Locate the `Lifecycle` section.
+- Use the `Provision` feature to provision Azure resources.
+- Use the `Deploy` feature to deploy the bot source code.
+- Use the `Publish` feature to submit the app to the organisational store.
+- Follow the steps to [publish](https://learn.microsoft.com/microsoftteams/submit-approve-custom-apps#approve-the-submitted-app) the submitted app in the [Microsoft Teams Admin Center](https://admin.teams.microsoft.com).
+- Navigate to the [Microsoft Teams app store](https://teams.microsoft.com/_#/apps), locate the app in the `Built for your org` section and install the app.
 
 ## Further reading
 
