@@ -23,6 +23,9 @@ export interface AzureOpenAIClientOptions extends OpenAIClientOptions {
     apiVersion?: string;
 }
 
+/**
+ * `AzureOpenAIClient` Allows for Azure hosted OpenAI clients to be created and used. As of 4/4/2023, access keys must be specifically assigned to be used with this client.
+ */
 export class AzureOpenAIClient extends OpenAIClient {
     public constructor(options: AzureOpenAIClientOptions) {
         super(options);
@@ -62,6 +65,11 @@ export class AzureOpenAIClient extends OpenAIClient {
         return this.post(url, clone);
     }
 
+    /**
+     * Placeholder for future implementation.
+     *
+     * @param {CreateModerationRequest} request The input request and model payload.
+     */
     public createModeration(request: CreateModerationRequest): Promise<OpenAIClientResponse<CreateModerationResponse>> {
         throw new Error(`the AzureOpenAIClient does not currently support calling the Moderation API.`);
     }

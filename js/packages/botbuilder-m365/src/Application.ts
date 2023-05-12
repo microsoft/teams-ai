@@ -20,6 +20,7 @@ import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateMan
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
+import { TaskModules, TaskModulesOptions } from './TaskModules';
 
 const TYPING_TIMER_DELAY = 1000;
 
@@ -36,8 +37,10 @@ export interface ApplicationOptions<TState extends TurnState> {
     ai?: AIOptions<TState>;
     turnStateManager?: TurnStateManager<TState>;
     adaptiveCards?: AdaptiveCardsOptions;
+    taskModules?: TaskModulesOptions;
     removeRecipientMention?: boolean;
     startTypingTimer?: boolean;
+    longRunningMessages?: boolean;
 }
 
 export type ApplicationEventHandler<TState extends TurnState> = (
@@ -71,6 +74,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
+    private readonly _taskModules: TaskModules<TState>;
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
@@ -97,6 +101,12 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
         this._messageExtensions = new MessageExtensions<TState>(this);
+        this._taskModules = new TaskModules<TState>(this);
+
+        // Validate long running messages configuration
+        if (this._options.longRunningMessages && (!this._options.adapter || !this._options.botAppId)) {
+            throw new Error(`The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`);
+        }
     }
 
     public get adaptiveCards(): AdaptiveCards<TState> {
@@ -117,6 +127,10 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     public get options(): ApplicationOptions<TState> {
         return this._options;
+    }
+
+    public get taskModules(): TaskModules<TState> {
+        return this._taskModules;
     }
 
     /**
@@ -261,34 +275,56 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     /**
      * Dispatches an incoming activity to a handler registered with the application.
      *
-     * @param {TurnContext} context Context class for the current turn of conversation with the user.
+     * @param {TurnContext} turnContext Context class for the current turn of conversation with the user.
      * @returns {boolean} True if the activity was successfully dispatched to a handler. False if no matching handlers could be found.
      */
-    public async run(context: TurnContext): Promise<boolean> {
-        // Start typing indicator timer
-        this.startTypingTimer(context);
-        try {
-            // Remove @mentions
-            if (this._options.removeRecipientMention && context.activity.type == ActivityTypes.Message) {
-                context.activity.text = TurnContext.removeRecipientMention(context.activity);
-            }
+    public async run(turnContext: TurnContext): Promise<boolean> {
+        return await this.startLongRunningCall(turnContext, async (context) => {
+            // Start typing indicator timer
+            this.startTypingTimer(context);
+            try {
+                // Remove @mentions
+                if (this._options.removeRecipientMention && context.activity.type == ActivityTypes.Message) {
+                    context.activity.text = TurnContext.removeRecipientMention(context.activity);
+                }
 
-            // Load turn state
-            const { storage, turnStateManager } = this._options;
-            const state = await turnStateManager!.loadState(storage, context);
+                // Load turn state
+                const { storage, turnStateManager } = this._options;
+                const state = await turnStateManager!.loadState(storage, context);
 
-            // Call beforeTurn event handlers
-            if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
-                return false;
-            }
+                // Call beforeTurn event handlers
+                if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
+                    return false;
+                }
 
-            // Run any RouteSelectors in this._invokeRoutes first if the incoming Teams activity.type is "Invoke".
-            // Invoke Activities from Teams need to be responded to in less than 5 seconds.
-            if (context.activity.type === ActivityTypes.Invoke) {
-                for (let i = 0; i < this._invokeRoutes.length; i++) {
-                    // TODO: fix security/detect-object-injection
+                // Run any RouteSelectors in this._invokeRoutes first if the incoming Teams activity.type is "Invoke".
+                // Invoke Activities from Teams need to be responded to in less than 5 seconds.
+                if (context.activity.type === ActivityTypes.Invoke) {
+                    for (let i = 0; i < this._invokeRoutes.length; i++) {
+                        // TODO: fix security/detect-object-injection
+                        // eslint-disable-next-line security/detect-object-injection
+                        const route = this._invokeRoutes[i];
+                        if (await route.selector(context)) {
+                            // Execute route handler
+                            await route.handler(context, state);
+
+                            // Call afterTurn event handlers
+                            if (await this.callEventHandlers(context, state, this._afterTurn)) {
+                                // Save turn state
+                                await turnStateManager!.saveState(storage, context, state);
+                            }
+
+                            // End dispatch
+                            return true;
+                        }
+                    }
+                }
+
+                // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
+                for (let i = 0; i < this._routes.length; i++) {
+                    // TODO:
                     // eslint-disable-next-line security/detect-object-injection
-                    const route = this._invokeRoutes[i];
+                    const route = this._routes[i];
                     if (await route.selector(context)) {
                         // Execute route handler
                         await route.handler(context, state);
@@ -303,16 +339,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                         return true;
                     }
                 }
-            }
 
-            // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
-            for (let i = 0; i < this._routes.length; i++) {
-                // TODO:
-                // eslint-disable-next-line security/detect-object-injection
-                const route = this._routes[i];
-                if (await route.selector(context)) {
-                    // Execute route handler
-                    await route.handler(context, state);
+                // Call AI module if configured
+                if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
+                    // Begin a new chain of AI calls
+                    await this._ai.chain(context, state);
 
                     // Call afterTurn event handlers
                     if (await this.callEventHandlers(context, state, this._afterTurn)) {
@@ -323,28 +354,13 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     // End dispatch
                     return true;
                 }
+
+                // activity wasn't handled
+                return false;
+            } finally {
+                this.stopTypingTimer();
             }
-
-            // Call AI module if configured
-            if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
-                // Begin a new chain of AI calls
-                await this._ai.chain(context, state);
-
-                // Call afterTurn event handlers
-                if (await this.callEventHandlers(context, state, this._afterTurn)) {
-                    // Save turn state
-                    await turnStateManager!.saveState(storage, context, state);
-                }
-
-                // End dispatch
-                return true;
-            }
-
-            // activity wasn't handled
-            return false;
-        } finally {
-            this.stopTypingTimer();
-        }
+        });
     }
 
     /**
@@ -492,6 +508,29 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         // Continue execution
         return true;
+    }
+
+    private startLongRunningCall(context: TurnContext, handler: (context: TurnContext) => Promise<boolean>): Promise<boolean> {
+        if (context.activity.type == ActivityTypes.Message && this._options.longRunningMessages) {
+            return new Promise<boolean>((resolve, reject) => {
+                this.continueConversationAsync(context, async (ctx) => {
+                    try {
+                        // Copy original activity to new context
+                        for (const key in context.activity) {
+                            (ctx.activity as any)[key] = (context.activity as any)[key];
+                        }
+
+                        // Call handler
+                        const result = await handler(ctx);
+                        resolve(result);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            });
+        } else {
+            return handler(context);
+        }
     }
 }
 
