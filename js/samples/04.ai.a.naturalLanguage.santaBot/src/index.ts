@@ -70,7 +70,7 @@ import {
     OpenAIModerator,
     OpenAIPlanner,
     TurnState
-} from '@microsoft/botbuilder-m365';
+} from '@microsoft/teams-ai';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState { }

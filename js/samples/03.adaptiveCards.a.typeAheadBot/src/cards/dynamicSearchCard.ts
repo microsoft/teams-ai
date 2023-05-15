@@ -27,7 +27,7 @@ export function createDynamicSearchCard(): Attachment {
                             {
                                 choices: [
                                     {
-                                        title: '@microsoft/botbuilder-m365',
+                                        title: '@microsoft/teams-ai',
                                         value: 'static_option_1'
                                     },
                                     {

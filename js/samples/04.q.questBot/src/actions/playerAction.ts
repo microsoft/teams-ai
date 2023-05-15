@@ -1,5 +1,5 @@
 import { TurnContext } from 'botbuilder';
-import { Application, ResponseParser } from '@microsoft/botbuilder-m365';
+import { Application, ResponseParser } from '@microsoft/teams-ai';
 import {
     ApplicationTurnState,
     DEFAULT_BACKSTORY,

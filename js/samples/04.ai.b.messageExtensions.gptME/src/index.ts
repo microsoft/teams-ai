@@ -73,7 +73,7 @@ import {
     DefaultTurnState,
     DefaultUserState,
     OpenAIPlanner
-} from '@microsoft/botbuilder-m365';
+} from '@microsoft/teams-ai';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
 // This Message Extension can either drop the created card into the compose window (default.)

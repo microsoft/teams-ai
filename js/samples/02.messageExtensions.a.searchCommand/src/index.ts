@@ -63,7 +63,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import axios from 'axios';
-import { Application, DefaultTurnState } from '@microsoft/botbuilder-m365';
+import { Application, DefaultTurnState } from '@microsoft/teams-ai';
 import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application

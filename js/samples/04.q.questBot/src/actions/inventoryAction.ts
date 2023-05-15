@@ -1,5 +1,5 @@
 import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
-import { Application, ResponseParser } from '@microsoft/botbuilder-m365';
+import { Application, ResponseParser } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
 import { normalizeItemName, searchItemList, textToItemList } from '../items';
 import * as responses from '../responses';
