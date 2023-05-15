@@ -1,5 +1,5 @@
 import { TurnContext } from 'botbuilder';
-import { Application } from '@microsoft/botbuilder-m365';
+import { Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities } from '../bot';
 
 /**
