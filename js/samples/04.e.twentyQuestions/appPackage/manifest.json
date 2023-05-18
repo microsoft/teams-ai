@@ -2,10 +2,10 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.16",
-    "id": "<<MICROSOFT_APP_OR_BOT_ID>>",
+    "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "TwentyQuestions",
+        "short": "TwentyQuestions-${{TEAMSFX_ENV}}",
         "full": "Twenty Questions"
     },
     "developer": {
@@ -36,7 +36,7 @@
     ],
     "bots": [
         {
-            "botId": "<<YOUR_BOT_ID>>",
+            "botId": "${{BOT_ID}}",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
@@ -44,5 +44,7 @@
             "supportsFiles": false
         }
     ],
-    "validDomains": []
+    "validDomains": [
+        "${{BOT_DOMAIN}}"
+    ]
 }
