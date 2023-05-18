@@ -18,13 +18,13 @@ import { TurnState } from './TurnState';
  */
 export interface Moderator<TState extends TurnState> {
     /**
-     * Reviews an incoming utterance and generated prompt before its sent to the planner.
+     * Reviews an incoming utterance and generated prompt before it's sent to the planner.
      * @remarks
      * The moderator can review the incoming utterance for things like prompt injection attacks
      * or the leakage of sensitive information. The moderator can also review the generated prompt
      * to ensure it's appropriate for the current conversation.
      *
-     * To approve a prompt simply return undefined. Returning a new plan bypasses the planner and
+     * To approve a prompt, simply return undefined. Returning a new plan bypasses the planner and
      * redirects to a new set of actions. Typically the moderator will return a new plan with a
      * single DO command that calls `AI.FlaggedInputActionName` to flag the input for review.
      *

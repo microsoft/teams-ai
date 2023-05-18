@@ -282,7 +282,7 @@ export class MessageExtensions<TState extends TurnState> {
     }
 
     /**
-     * Registers a handler that implements a Search based messaging extension.
+     * Registers a handler that implements a Search based Message Extension.
      * @remarks
      * This handler is called when the user submits a query to a Search based messaging extension.
      * The handler should return a MessagingExtensionResult containing the results of the query.
@@ -349,7 +349,7 @@ export class MessageExtensions<TState extends TurnState> {
     }
 
     /**
-     * Registers a handler that implements a Link Unfurling based messaging extension.
+     * Registers a handler that implements a Link Unfurling based Message Extension.
      * @param commandId ID of the command(s) to register the handler for.
      * @param handler Function to call when the command is received.
      * @param handler.context Context for the current turn of conversation with the user.

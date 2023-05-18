@@ -59,9 +59,9 @@ export interface AdaptiveCard {
  */
 export interface AdaptiveCardsOptions {
     /**
-     * Data field to used to identify the Action.Submit handler to trigger.
+     * Data field used to identify the Action.Submit handler to trigger.
      * @remarks
-     * When a Action.Submit is triggered, the field name specified here will be used to determine
+     * When an Action.Submit is triggered, the field name specified here will be used to determine
      * the handler to route the request to.
      *
      * Defaults to a value of 'verb'.
@@ -185,7 +185,7 @@ export class AdaptiveCards<TState extends TurnState> {
      * The route will be added for the specified verb(s) and will be filtered using the
      * `actionSubmitFilter` option. The default filter is to use the `verb` field.
      *
-     * For outgoing AdaptiveCards you will need to include the verbs name in the cards Action.Submit.
+     * For outgoing AdaptiveCards you will need to include the verb's name in the cards Action.Submit.
      * For example:
      *
      * ```JSON

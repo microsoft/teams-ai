@@ -12,7 +12,7 @@ import { OpenAIPlanner, OpenAIPlannerOptions } from './OpenAIPlanner';
 import { TurnState } from './TurnState';
 
 /**
- * Additional options need to use the Azure OpenAI service.
+ * Additional options needed to use the Azure OpenAI service.
  */
 export interface AzureOpenAIPlannerOptions extends OpenAIPlannerOptions {
     /**
@@ -21,7 +21,7 @@ export interface AzureOpenAIPlannerOptions extends OpenAIPlannerOptions {
     endpoint: string;
 
     /**
-     * Optional. API version to use.
+     * Optional. Which Azure API version to use. Defaults to latest.
      */
     apiVersion?: string;
 }

@@ -61,7 +61,7 @@ export class ResponseParser {
     }
 
     /**
-     * Attempts to find a JSON object with in a response.
+     * Attempts to find a JSON object with-in a response.
      * @template T Optional. Type of object to return.
      * @param text Optional. Text to parse.
      * @returns The parsed object or undefined if no object could be detected.

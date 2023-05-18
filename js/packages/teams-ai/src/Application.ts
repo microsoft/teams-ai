@@ -28,7 +28,7 @@ import { TaskModules, TaskModulesOptions } from './TaskModules';
 const TYPING_TIMER_DELAY = 1000;
 
 /**
- * Query arguments for a search based message extension.
+ * Query arguments for a search-based message extension.
  * @template TParams Type of the query parameters.
  */
 export interface Query<TParams extends Record<string, any>> {
@@ -75,7 +75,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     storage?: Storage;
 
     /**
-     * Optional. AI options to use. When provided a new instance of the AI system will be created.
+     * Optional. AI options to use. When provided, a new instance of the AI system will be created.
      */
     ai?: AIOptions<TState>;
 
@@ -96,7 +96,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     taskModules?: TaskModulesOptions;
 
     /**
-     * Optional. If true, the bot will automatically remove mentions of the bots name from incoming
+     * Optional. If true, the bot will automatically remove mentions of the bot's name from incoming
      * messages. Defaults to true.
      */
     removeRecipientMention?: boolean;
@@ -114,7 +114,7 @@ export interface ApplicationOptions<TState extends TurnState> {
      * @remarks
      * This works by immediately converting the incoming request to a proactive conversation. Care should
      * be used for bots that operate in a shared hosting environment. The incoming request is immediately
-     * completed and many shared hosting environments will mark the bots process as idle and shut it down.
+     * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
      */
     longRunningMessages?: boolean;
 }
@@ -176,7 +176,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
  * a simpler fluent style of authoring bots versus the inheritance based approach used by the
  * ActivityHandler class.
  *
- * Additionally, it has built support for calling into the SDK's AI system and can be used to create
+ * Additionally, it has built-in support for calling into the SDK's AI system and can be used to create
  * bots that leverage Large Language Models (LLM) and other AI capabilities.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
@@ -247,14 +247,14 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
-     * Fluent interface for accessing Message Extension specific features.
+     * Fluent interface for accessing Message Extensions' specific features.
      */
     public get messageExtensions(): MessageExtensions<TState> {
         return this._messageExtensions;
     }
 
     /**
-     * The applications configured options.
+     * The application's configured options.
      */
     public get options(): ApplicationOptions<TState> {
         return this._options;
@@ -276,7 +276,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * Routes will be matched in the order they're added to the application. The first selector to
      * return `true` when an activity is received will have its handler called.
      *
-     * Invoke based activities receive special treatment and are matched separately as they typically
+     * Invoke-based activities receive special treatment and are matched separately as they typically
      * have shorter execution timeouts.
      * @param selector Function thats used to select a route. The function should return true to trigger the route.
      * @param handler Function to call when the route is triggered.
@@ -333,7 +333,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     /**
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      * @remarks
-     * Use of the method requires you configure the Application with the `adapter` and `botAppId`
+     * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bot's logic that should be run using the new proactive turn context.
@@ -648,7 +648,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      *
      * Returning false from `beforeTurn` does result in the bots state being saved which lets you
      * track the reason why the turn was not processed. It also means you can use `beforeTurn` as
-     * way to call into the dialog system. For example, you could use the OAuthPrompt to sign the
+     * a way to call into the dialog system. For example, you could use the OAuthPrompt to sign the
      * user in before allowing the AI system to run.
      * @param event Name of the turn event to handle.
      * @param handler Function to call when the event is triggered.

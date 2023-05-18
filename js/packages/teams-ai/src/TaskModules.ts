@@ -54,7 +54,7 @@ export class TaskModules<TState extends TurnState> {
     /**
      * Registers a handler to process the initial fetch of the task module.
      * @remarks
-     * Handlers should response with either an initial TaskInfo object or a string containing
+     * Handlers should respond with either an initial TaskInfo object or a string containing
      * a message to display to the user.
      * @template TData Optional. Type of the data object being passed to the handler.
      * @param verb Name of the verb(s) to register the handler for.
@@ -127,7 +127,7 @@ export class TaskModules<TState extends TurnState> {
     /**
      * Registers a handler to process the submission of a task module.
      * @remarks
-     * Handlers should response with another TaskInfo object, message string, or null to indicate
+     * Handlers should respond with another TaskInfo object, message string, or `null` to indicate
      * the task is completed.
      * @template TData Optional. Type of the data object being passed to the handler.
      * @param verb Name of the verb(s) to register the handler for.

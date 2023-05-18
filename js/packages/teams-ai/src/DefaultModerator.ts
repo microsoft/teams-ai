@@ -17,8 +17,8 @@ import { TurnState } from './TurnState';
 /**
  * Default moderator created by the AI system if one isn't configured.
  * @remarks
- * The default moderator is a pass through and always approves all inputs and outputs.
- * @template TState Optional. Applications turn state.
+ * The default moderator is a pass-through and always approves all inputs and outputs.
+ * @template TState Optional. The Application's turn state.
  */
 export class DefaultModerator<TState extends TurnState = DefaultTurnState> implements Moderator<TState> {
     /**
@@ -35,7 +35,7 @@ export class DefaultModerator<TState extends TurnState = DefaultTurnState> imple
     }
 
     /**
-     * Allows all plans by return the plan as is.
+     * Allows all plans by returning the plan as-is.
      */
     public reviewPlan(context: TurnContext, state: TState, plan: Plan): Promise<Plan> {
         // Just approve generated plan

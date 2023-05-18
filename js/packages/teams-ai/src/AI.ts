@@ -181,7 +181,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     private readonly _options: ConfiguredAIOptions<TState>;
 
     /**
-     * A action that will be called anytime an unknown action is predicted by the planner.
+     * An action that will be called anytime an unknown action is predicted by the planner.
      * @remarks
      * The default behavior is to simply log an error to the console. The plan is allowed to
      * continue execution by default.
@@ -189,7 +189,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public static readonly UnknownActionName = '___UnknownAction___';
 
     /**
-     * A action that will be called anytime an input is flagged by the moderator.
+     * An action that will be called anytime an input is flagged by the moderator.
      * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
@@ -197,7 +197,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public static readonly FlaggedInputActionName = '___FlaggedInput___';
 
     /**
-     * A action that will be called anytime an output is flagged by the moderator.
+     * An action that will be called anytime an output is flagged by the moderator.
      * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
@@ -205,12 +205,12 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public static readonly FlaggedOutputActionName = '___FlaggedOutput___';
 
     /**
-     * A action that will be called anytime the planner is rate limited.
+     * An action that will be called anytime the planner is rate limited.
      */
     public static readonly RateLimitedActionName = '___RateLimited___';
 
     /**
-     * A action that will be called after the plan has been predicted by the planner and it has
+     * An action that will be called after the plan has been predicted by the planner and it has
      * passed moderation.
      * @remarks
      * Overriding this action lets you customize the decision to execute a plan separately from the
@@ -221,7 +221,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public static readonly PlanReadyActionName = '___PlanReady___';
 
     /**
-     * A action that is called to DO an action.
+     * An action that is called to DO an action.
      * @remarks
      * The action system is used to do other actions. Overriding this action lets you customize the
      * execution of an individual action. You can use it to log actions being used or to prevent
@@ -233,7 +233,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public static readonly DoCommandActionName = '___DO___';
 
     /**
-     * A action that is called to SAY something.
+     * An action that is called to SAY something.
      * @remarks
      * Overriding this action lets you customize the execution of the SAY command. You can use it
      * to log the output being generated or to add support for sending certain types of output as
@@ -361,7 +361,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     /**
      * Returns the moderator being used by the AI system.
      * @remarks
-     * The default moderator simply allows all messages and plans through.
+     * The default moderator simply allows all messages and plans through without intercepting them.
      */
     public get moderator(): Moderator<TState> {
         return this._options.moderator;
@@ -392,7 +392,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * Registers a handler for a named action.
      * @remarks
      * The AI systems planner returns plans that are made up of a series of commands or actions
-     * that should be performed. Registering handler lets you provide code that should be run in
+     * that should be performed. Registering a handler lets you provide code that should be run in
      * response to one of the predicted actions.
      *
      * Plans support a DO command which specifies the name of an action to call and an optional
@@ -437,7 +437,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * @remarks
      * This method is used to chain into another prompt. It will call the prompt manager to
      * get the plan for the prompt and then execute the plan. The return value indicates whether
-     * that plan was completely executed or not and can be used to make decisions about whether the
+     * that plan was completely executed or not, and can be used to make decisions about whether the
      * outer plan should continue executing.
      * @param context Current turn context.
      * @param state Current turn state.
