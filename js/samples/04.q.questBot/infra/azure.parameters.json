@@ -16,6 +16,9 @@
     },
     "botDisplayName": {
       "value": "QuestBotInfra"
+    },
+    "openAIKey": {
+      "value": "${{SECRET_OPENAI_KEY}}"
     }
   }
 }

@@ -16,6 +16,9 @@
     },
     "botDisplayName": {
       "value": "ListBotInfra"
+    },
+    "openAIKey": {
+      "value": "${{SECRET_OPENAI_KEY}}"
     }
   }
 }

@@ -16,6 +16,9 @@
     },
     "botDisplayName": {
       "value": "GptMEInfra"
+    },
+    "openAIKey": {
+      "value": "${{SECRET_OPENAI_KEY}}"
     }
   }
 }
