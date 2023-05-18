@@ -1,6 +1,16 @@
-# Teams-AI
+# Teams AI SDK
 
----
+Welcome to the Teams AI SDK! This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams AI-interacting bots.
+
+For now, code-availability is limited to the [`js`](./js/) folder. **dotnet parity is in production and will be available soon.**
+
+The SDK also facilitates the creation of bots that uses an [OpenAI](https://openai.com/api/) API key to provide an AI-driven conversational experience, or the same using Azure Foundry.
+
+This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
+
+**To get started, head over to the [00.Migration](getting-started/00.MIGRATION.md) guide.**
+
+### License
 
 This SDK is licensed under the MIT License. This SDK includes tools to use APIs provided by third parties. These APIs are provided under their own separate terms.
 
@@ -9,23 +19,15 @@ This SDK is licensed under the MIT License. This SDK includes tools to use APIs 
 
 ---
 
-This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams AI-interacting bots.
-
-The SDK also facilitates the creation of bots that uses an [OpenAI](https://openai.com/api/) API key to provide an AI-driven conversational experience, or the same using Azure Foundry.
-
-This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
-
-**To get started, head over to the [00.Migration](getting-started/00.MIGRATION.md) guide.**
-
 ## Capabilities
 
 ### Teams-Centric Component Scaffolding
 
-> For examples of the below, browse through the [dotnet samples](./dotnet/samples) or [JS](./js/samples/) folders.
+> For examples of the below, browse through the [JS](./js/samples/) folders.
 > Simple scaffolding for any conversational app component, inlcuding:
 
 - Chat bots
-- Message extensions
+- Message Extensions
 - Link unfurling
 - Adaptive Cards
 
