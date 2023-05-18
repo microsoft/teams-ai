@@ -5,7 +5,7 @@
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "ListBot",
+        "short": "ListBot-${{TEAMSFX_ENV}}",
         "full": "List Bot"
     },
     "developer": {

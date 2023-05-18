@@ -5,7 +5,7 @@
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "GPT ME",
+        "short": "GPT ME-${{TEAMSFX_ENV}}",
         "full": "GPT Message Extensions"
     },
     "developer": {
