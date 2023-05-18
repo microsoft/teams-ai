@@ -25,16 +25,68 @@ import { ConversationHistory } from './ConversationHistory';
 import { AI, ConfiguredAIOptions } from './AI';
 import { PromptTemplate } from './Prompts';
 
+/**
+ * Options for the OpenAI based planner.
+ */
 export interface OpenAIPlannerOptions {
+    /**
+     * OpenAI API key.
+     */
     apiKey: string;
+
+    /**
+     * Optional. OpenAI organization.
+     */
     organization?: string;
+
+    /**
+     * Optional. OpenAI endpoint.
+     */
     endpoint?: string;
+
+    /**
+     * The default model to use.
+     * @remarks
+     * Prompts can override this model.
+     */
     defaultModel: string;
+
+    /**
+     * Optional. A flag indicating if the planner should only say one thing per turn.
+     * @remarks
+     * The planner will attempt to combine multiple SAY commands into a single SAY command when true.
+     * Defaults to false.
+     */
     oneSayPerTurn?: boolean;
+
+    /**
+     * Optional. A flag indicating if the planner should use the 'system' role when calling OpenAI's
+     * chatCompletion API.
+     * @remarks
+     * The planner current uses the 'user' role by default as this tends to generate more reliable
+     * instruction following. Defaults to false.
+     */
     useSystemMessage?: boolean;
+
+    /**
+     * Optional. A flag indicating if the planner should log requests to the console.
+     * @remarks
+     * Both the prompt text and the completion response will be logged to the console. For
+     * chatCompletion calls the outgoing messages array will also be logged.
+     * Defaults to false.
+     */
     logRequests?: boolean;
 }
 
+/**
+ * A planner that uses OpenAI's textCompletion and chatCompletion API's to generate plans.
+ * @remarks
+ * This planner can be configured to use different models for different prompts. The prompts model
+ * will determine which API is used to generate the plan. Any model that starts with 'gpt-' will
+ * use the chatCompletion API, otherwise the textCompletion API will be used.
+ * @template TState Optional. Type of the applications turn state.
+ * @template TOptions Optional. Type of the planner options.
+ */
 export class OpenAIPlanner<
     TState extends TurnState = DefaultTurnState,
     TOptions extends OpenAIPlannerOptions = OpenAIPlannerOptions
@@ -43,6 +95,10 @@ export class OpenAIPlanner<
     private readonly _options: TOptions;
     private readonly _client: OpenAIClient;
 
+    /**
+     * Creates a new instance of the OpenAI based planner.
+     * @param options Options for the OpenAI based planner.
+     */
     public constructor(options: TOptions) {
         this._options = Object.assign(
             {
@@ -55,10 +111,21 @@ export class OpenAIPlanner<
         this._client = this.createClient(this._options);
     }
 
+    /**
+     * Returns the configured options for the planner.
+     */
     public get options(): TOptions {
         return this._options;
     }
 
+    /**
+     * Completes a prompt without returning a plan.
+     * @param context Context for the current turn of conversation.
+     * @param state Application state for the current turn of conversation.
+     * @param prompt Prompt to complete.
+     * @param options Configuration options for the AI system.
+     * @returns The response from the prompt. Can return undefined to indicate the prompt was rate limited.
+     */
     public async completePrompt(
         context: TurnContext,
         state: TState,
@@ -81,6 +148,14 @@ export class OpenAIPlanner<
         }
     }
 
+    /**
+     * Completes a prompt and generates a plan for the AI system to execute.
+     * @param context Context for the current turn of conversation.
+     * @param state Application state for the current turn of conversation.
+     * @param prompt Prompt to complete.
+     * @param options Configuration options for the AI system.
+     * @returns The plan that was generated.
+     */
     public async generatePlan(
         context: TurnContext,
         state: TState,
@@ -163,6 +238,9 @@ export class OpenAIPlanner<
         return { type: 'plan', commands: [] };
     }
 
+    /**
+     * @private
+     */
     protected createClient(options: TOptions): OpenAIClient {
         return new OpenAIClient({
             apiKey: options.apiKey,
@@ -171,6 +249,9 @@ export class OpenAIPlanner<
         });
     }
 
+    /**
+     * @private
+     */
     private getModel(prompt: PromptTemplate): string {
         if (Array.isArray(prompt.config.default_backends) && prompt.config.default_backends.length > 0) {
             return prompt.config.default_backends[0];
@@ -179,6 +260,9 @@ export class OpenAIPlanner<
         }
     }
 
+    /**
+     * @private
+     */
     private createChatCompletionRequest(
         state: TState,
         prompt: PromptTemplate,
@@ -236,6 +320,9 @@ export class OpenAIPlanner<
         return request;
     }
 
+    /**
+     * @private
+     */
     private createCompletionRequest(prompt: PromptTemplate): CreateCompletionRequest {
         // Clone prompt config
         const request: CreateCompletionRequest = Object.assign({}, prompt.config.completion as CreateCompletionRequest);
@@ -245,6 +332,9 @@ export class OpenAIPlanner<
         return request;
     }
 
+    /**
+     * @private
+     */
     private patchStopSequences(request: any): void {
         if (request['stop_sequences']) {
             request.stop = request['stop_sequences'];
@@ -252,6 +342,9 @@ export class OpenAIPlanner<
         }
     }
 
+    /**
+     * @private
+     */
     private async createChatCompletion(
         request: CreateChatCompletionRequest
     ): Promise<OpenAIClientResponse<CreateChatCompletionResponse>> {
@@ -296,6 +389,9 @@ export class OpenAIPlanner<
         return response!;
     }
 
+    /**
+     * @private
+     */
     private async createCompletion(
         request: CreateCompletionRequest
     ): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
@@ -343,10 +439,7 @@ export class OpenAIPlanner<
 }
 
 /**
- * Format text chat message.
- *
- * @param {ChatCompletionRequestMessage[]} messages The list of messages to be sent by the bot.
- * @returns {string} The text string to be sent to the user.
+ * @private
  */
 function printChatMessages(messages: ChatCompletionRequestMessage[]): string {
     let text = '';

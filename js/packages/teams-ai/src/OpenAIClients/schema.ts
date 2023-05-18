@@ -6,6 +6,9 @@
  * Licensed under the MIT License.
  */
 
+/**
+ * @private
+ */
 export interface CreateCompletionRequest {
     model: string;
     prompt?: CreateCompletionRequestPrompt | null;
@@ -25,6 +28,9 @@ export interface CreateCompletionRequest {
     user?: string;
 }
 
+/**
+ * @private
+ */
 export interface CreateCompletionResponse {
     id: string;
     object: string;
@@ -34,6 +40,9 @@ export interface CreateCompletionResponse {
     usage?: CreateCompletionResponseUsage;
 }
 
+/**
+ * @private
+ */
 export interface CreateCompletionResponseChoicesInner {
     text?: string;
     index?: number;
@@ -41,6 +50,9 @@ export interface CreateCompletionResponseChoicesInner {
     finish_reason?: string;
 }
 
+/**
+ * @private
+ */
 export interface CreateCompletionResponseChoicesInnerLogprobs {
     tokens?: Array<string>;
     token_logprobs?: Array<number>;
@@ -48,12 +60,18 @@ export interface CreateCompletionResponseChoicesInnerLogprobs {
     text_offset?: Array<number>;
 }
 
+/**
+ * @private
+ */
 export interface CreateCompletionResponseUsage {
     prompt_tokens: number;
     completion_tokens: number;
     total_tokens: number;
 }
 
+/**
+ * @private
+ */
 export interface CreateChatCompletionRequest {
     model: string;
     messages: Array<ChatCompletionRequestMessage>;
@@ -69,12 +87,18 @@ export interface CreateChatCompletionRequest {
     user?: string;
 }
 
+/**
+ * @private
+ */
 export interface ChatCompletionRequestMessage {
     role: 'system' | 'user' | 'assistant';
     content: string;
     name?: string;
 }
 
+/**
+ * @private
+ */
 export interface CreateChatCompletionResponse {
     id: string;
     object: string;
@@ -84,34 +108,52 @@ export interface CreateChatCompletionResponse {
     usage?: CreateCompletionResponseUsage;
 }
 
+/**
+ * @private
+ */
 export interface CreateChatCompletionResponseChoicesInner {
     index?: number;
     message?: ChatCompletionResponseMessage;
     finish_reason?: string;
 }
 
+/**
+ * @private
+ */
 export interface ChatCompletionResponseMessage {
     role: 'system' | 'user' | 'assistant';
     content: string;
 }
 
+/**
+ * @private
+ */
 export interface CreateModerationRequest {
     input: CreateModerationRequestInput;
     model?: string;
 }
 
+/**
+ * @private
+ */
 export interface CreateModerationResponse {
     id: string;
     model: string;
     results: Array<CreateModerationResponseResultsInner>;
 }
 
+/**
+ * @private
+ */
 export interface CreateModerationResponseResultsInner {
     flagged: boolean;
     categories: CreateModerationResponseResultsInnerCategories;
     category_scores: CreateModerationResponseResultsInnerCategoryScores;
 }
 
+/**
+ * @private
+ */
 export interface CreateModerationResponseResultsInnerCategories {
     hate: boolean;
     'hate/threatening': boolean;
@@ -122,6 +164,9 @@ export interface CreateModerationResponseResultsInnerCategories {
     'violence/graphic': boolean;
 }
 
+/**
+ * @private
+ */
 export interface CreateModerationResponseResultsInnerCategoryScores {
     hate: number;
     'hate/threatening': number;
@@ -132,12 +177,18 @@ export interface CreateModerationResponseResultsInnerCategoryScores {
     'violence/graphic': number;
 }
 
+/**
+ * @private
+ */
 export interface CreateEmbeddingRequest {
     model: string;
     input: CreateEmbeddingRequestInput;
     user?: string;
 }
 
+/**
+ * @private
+ */
 export interface CreateEmbeddingResponse {
     object: string;
     model: string;
@@ -145,19 +196,44 @@ export interface CreateEmbeddingResponse {
     usage: CreateEmbeddingResponseUsage;
 }
 
+/**
+ * @private
+ */
 export interface CreateEmbeddingResponseDataInner {
     index: number;
     object: string;
     embedding: Array<number>;
 }
 
+/**
+ * @private
+ */
 export interface CreateEmbeddingResponseUsage {
     prompt_tokens: number;
     total_tokens: number;
 }
 
+/**
+ * @private
+ */
 export type CreateCompletionRequestPrompt = Array<any> | Array<number> | Array<string> | string;
+
+/**
+ * @private
+ */
 export type CreateCompletionRequestStop = Array<string> | string;
+
+/**
+ * @private
+ */
 export type CreateChatCompletionRequestStop = Array<string> | string;
+
+/**
+ * @private
+ */
 export type CreateModerationRequestInput = Array<string> | string;
+
+/**
+ * @private
+ */
 export type CreateEmbeddingRequestInput = Array<any> | Array<number> | Array<string> | string;

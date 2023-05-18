@@ -14,10 +14,31 @@ import { PromptManager, PromptTemplate } from './Prompts';
 import { Block, PromptTemplateEngine } from './PromptTemplateEngine';
 import { TurnState } from './TurnState';
 
+/**
+ * Options used to configure the default prompt manager.
+ */
 export interface DefaultPromptManagerOptions {
+    /**
+     * Path to the filesystem folder containing all the applications prompts.
+     */
     promptsFolder: string;
 }
 
+/**
+ * A filesystem based prompt manager.
+ * @remarks
+ * The default prompt manager uses the file system to define prompts that are compatible with
+ * Microsoft's Semantic Kernel SDK (see: https://github.com/microsoft/semantic-kernel)
+ *
+ * Each prompt is a separate folder under a root prompts folder. The folder should contain 2 files:
+ *
+ * - "config.json": contains the prompts configuration and is a serialized instance of `PromptTemplateConfig`.
+ * - "skprompt.txt": contains the text of the prompt and supports Semantic Kernels prompt template syntax.
+ *
+ * Prompts can be loaded and used by name and new dynamically defined prompt templates can be
+ * registered with the prompt manager.
+ * @template TState Optional. Type of the applications turn state.
+ */
 export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> implements PromptManager<TState> {
     private readonly _functions: Map<string, TemplateFunctionEntry<TState>> = new Map();
     private readonly _templates: Map<string, CachedPromptTemplate> = new Map();
@@ -29,6 +50,16 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         this._templateEngine = new PromptTemplateEngine(this);
     }
 
+    /**
+     * Adds a custom function <name> to the prompt manager.
+     * @remarks
+     * Functions can be used with a prompt template using a syntax of `{{name}}`. Function
+     * arguments are not currently supported.
+     * @param name The name of the function.
+     * @param handler Promise to return on function name match.
+     * @param allowOverrides Whether to allow overriding an existing function.
+     * @returns The prompt manager for chaining.
+     */
     public addFunction(
         name: string,
         handler: (context: TurnContext, state: TState) => Promise<any>,
@@ -50,6 +81,14 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         return this;
     }
 
+    /**
+     * Adds a prompt template to the prompt manager.
+     * @remarks
+     * The template will be pre-parsed and cached for use when the template is rendered by name.
+     * @param name Name of the prompt template.
+     * @param template Prompt template to add.
+     * @returns The prompt manager for chaining.
+     */
     public addPromptTemplate(name: string, template: PromptTemplate): this {
         if (this._templates.has(name)) {
             throw new Error(
@@ -76,6 +115,13 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         return this;
     }
 
+    /**
+     * Invokes a function by name.
+     * @param context Current application turn context.
+     * @param state Current turn state.
+     * @param name Name of the function to invoke.
+     * @returns The result returned by the function for insertion into a prompt.
+     */
     public invokeFunction(context: TurnContext, state: TState, name: string): Promise<any> {
         if (this._functions && this._functions.has(name)) {
             return Promise.resolve(this._functions.get(name)?.handler(context, state));
@@ -86,6 +132,13 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         }
     }
 
+    /**
+     * Loads a named prompt template from the filesystem.
+     * @remarks
+     * The template will be pre-parsed and cached for use when the template is rendered by name.
+     * @param name Name of the template to load.
+     * @returns The loaded and parsed prompt template.
+     */
     public async loadPromptTemplate(name: string): Promise<PromptTemplate> {
         if (!this._templates.has(name)) {
             const entry = {} as CachedPromptTemplate;
@@ -134,6 +187,15 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
         return this._templates.get(name) || ({} as CachedPromptTemplate);
     }
 
+    /**
+     * Renders a prompt template by name.
+     * @remarks
+     * The prompt will be automatically loaded from disk if needed and cached for future use.
+     * @param context Current application turn context.
+     * @param state Current turn state.
+     * @param nameOrTemplate Name of the prompt template to render or a prompt template to render.
+     * @returns The rendered prompt template.
+     */
     public async renderPrompt(
         context: TurnContext,
         state: TState,
@@ -158,11 +220,17 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
     }
 }
 
+/**
+ * @private
+ */
 interface TemplateFunctionEntry<TState> {
     handler: (context: TurnContext, state: TState) => Promise<any>;
     allowOverrides: boolean;
 }
 
+/**
+ * @private
+ */
 interface CachedPromptTemplate extends PromptTemplate {
     blocks: Block[];
 }
