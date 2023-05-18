@@ -22,8 +22,8 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
-1. Ensure you have downloaded and installed Visual Studio Code
-2. Install the Teams Toolkit extension
+1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
+2. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 3. Select **File > Open Folder** in VS Code and choose this samples directory from the repo
 3. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 
