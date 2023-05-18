@@ -2,10 +2,10 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.15",
-    "id": "<<Microsoft App Id>>",
+    "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "EchoBot",
+        "short": "EchoBot-${{TEAMSFX_ENV}}",
         "full": "Echo Bot"
     },
     "developer": {
@@ -36,7 +36,7 @@
     ],
     "bots": [
         {
-            "botId": "<<Bot or App Id>>",
+            "botId": "${{BOT_ID}}",
             "scopes": ["personal", "team", "groupChat"],
             "isNotificationOnly": false,
             "supportsCalling": false,
@@ -44,5 +44,7 @@
             "supportsFiles": false
         }
     ],
-    "validDomains": []
+    "validDomains": [
+        "${{BOT_DOMAIN}}"
+    ]
 }
