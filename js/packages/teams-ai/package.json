@@ -34,7 +34,7 @@
         "botbuilder": "^4.19.3",
         "botbuilder-dialogs": "^4.19.3",
         "gpt-3-encoder": "^1.1.4",
-        "yaml": "^2.2.1"
+        "yaml": "^2.2.2"
     },
     "resolutions": {
         "follow-redirects": "1.14.7"
