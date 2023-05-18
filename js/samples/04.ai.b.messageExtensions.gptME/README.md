@@ -64,16 +64,7 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: Tur
 
 This bot has been created using [Bot Framework](https://dev.botframework.com).
 
-## Prerequisites
-
--   Microsoft Teams is installed and you have an account
--   [NodeJS](https://nodejs.org/en/) (version 16.x)
--   [ngrok](https://ngrok.com/) or equivalent tunnelling solution
--   [OpenAI](https://openai.com/api/) key for leveraging GPT
-
-## To try this sample
-
-> Note these instructions are for running the sample on your local machine, the tunnelling solution is required because the Teams service needs to call into the bot.
+## To try this sample in Teams
 
 1. Clone the repository
 
@@ -81,7 +72,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-1. In the root JavaScript folder, install and build all dependencies
+2. In the root JavaScript folder, install and build all dependencies
 
     ```bash
     cd teams-ai/js
@@ -89,9 +80,71 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
     yarn build
     ```
 
-    - If you already ran `yarn install` and `yarn build` in the `js` folder, you are ready to get started with ngrok. Otherwise, you need to run `yarn install` and `yarn build` in the `js` folder.
+### Using Teams Toolkit for Visual Studio Code
 
-1. In a terminal, `cd` to this directory
+The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
+
+1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
+1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+1. Select **File > Open Folder** in VS Code and choose this samples directory from the repo
+1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
+1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
+1. In the browser that launches, select the **Add** button to install the app to Teams.
+
+> If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
+
+### Using Teams Toolkit CLI
+
+You can also use the Teams Toolkit CLI to run this sample. 
+
+1. Install the CLI
+
+    ```bash
+    npm install -g @microsoft/teamsfx-cli
+    ```
+
+1. Open a second shell instance and run ngrok tunneling service - point to port 3978
+
+    ```bash
+    ngrok http --host-header=rewrite 3978
+    ```
+
+1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
+
+    ```
+    BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
+    BOT_DOMAIN={ngrok-url}.ngrok.io
+    ```
+1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+
+1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
+
+    ```bash
+    cd teams-ai/js/samples/04.ai.b.messagingextension.gptme/
+    teamsfx provision --env local
+
+1. Next, use the CLI to validate and create an app package
+
+    ```bash
+    teamsfx deploy --env local
+    ```
+
+1. Finally, use the CLI to preview the app in Teams
+
+    ```bash
+    teamsfx preview --env local
+    ```
+
+### Manually upload the app to a Teams desktop client
+
+> If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
+
+1. In a terminal, navigate to `teams-ai/js/samples/04.ai.b.messagingextension.gptme/`
+
+    ```bash
+    cd teams-ai/js/samples/04.ai.b.messagingextension.gptme
+    ```
 
 1. Run ngrok tunneling service - point to port 3978
 
@@ -103,21 +156,21 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 
     - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample.
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
-    - **_If you don't have an Azure account_** you can use this [Bot Framework registration](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/how-to/create-a-bot-for-teams#register-your-web-service-with-the-bot-framework)
 
-1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the azure portal and you can always create a new client secret anytime.) The configuration should include your OpenAI API Key in the `OPEN_API_KEY` property.
-
+1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
+1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
 1. **_This step is specific to Teams._**
 
-    - **Edit** the `manifest.json` contained in the `teamsAppManifest` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `<<YOUR-MICROSOFT-APP-OR-BOT-ID>>` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `<<YOUR_BOT_ID>>`
-    - **Zip** up the contents of the `teamsAppManifest` folder to create a `manifest.zip`
-    - **[Sideload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) (manifest zip) file** the `manifest.zip` to Teams (in the Apps view click "Upload a custom app")
+    - **Edit** the `manifest.json` contained in the `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `${{TEAMS_APP_ID}}` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `${{BOT_ID}}`. Replace everywhere you see `${{BOT_DOMAIN}}` with the domain part of the URL created by your tunneling solution.
+    - **Zip** up the contents of the `appPackage` folder to create a `manifest.zip`
 
-1. Run your bot at the command line:
+1. Run your app from the command line:
 
     ```bash
     yarn start
     ```
+
+1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
 
 ## Interacting with the message extension
 
@@ -138,8 +191,18 @@ The message extension has some limitations, including:
 
 ## Deploy the bot to Azure
 
-To learn more about deploying a bot to Azure, see [Deploy your bot to Azure](https://aka.ms/azuredeployment) for a complete list of deployment instructions.
+You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. 
+
+To configure the Azure resources to have an environment variable for the OpenAI Key:
+
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/). 
+
+The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
+
+Use the **Provision** and **Deploy** menus of the Teams Toolkit extension or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
+
+Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
-
+-   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
