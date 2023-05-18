@@ -17,46 +17,116 @@ import {
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
+/**
+ * @private
+ */
 const ACTION_INVOKE_NAME = `adaptiveCard/action`;
+
+/**
+ * @private
+ */
 const ACTION_EXECUTE_TYPE = `Action.Execute`;
+
+/**
+ * @private
+ */
 const DEFAULT_ACTION_SUBMIT_FILTER = 'verb';
+
+/**
+ * @private
+ */
 const SEARCH_INvOKE_NAME = `application/search`;
 
+/**
+ * Strongly typed Adaptive Card.
+ * @remarks
+ * see https://adaptivecards.io/explorer/ for schema details.
+ */
 export interface AdaptiveCard {
+    /**
+     * Required type field.
+     */
     type: 'AdaptiveCard';
+
+    /**
+     * Additional card fields.
+     */
     [key: string]: any;
 }
 
+/**
+ * Options for AdaptiveCards class.
+ */
 export interface AdaptiveCardsOptions {
+    /**
+     * Data field to use for action submit filter.
+     * @remarks
+     * When a Action.Submit is triggered, the field name specified here will be used to determine
+     * the handler to route the request to.
+     *
+     * Defaults to a value of 'verb'.
+     */
     actionSubmitFilter?: string;
 }
 
+/**
+ * Parameters passed to AdaptiveCards.search() handler.
+ */
 export interface AdaptiveCardsSearchParams {
+    /**
+     * The query text.
+     */
     queryText: string;
+
+    /**
+     * The dataset to search.
+     */
     dataset: string;
 }
 
+/**
+ * Individual result returned from AdaptiveCards.search() handler.
+ */
 export interface AdaptiveCardSearchResult {
+    /**
+     * The title of the result.
+     */
     title: string;
+
+    /**
+     * The subtitle of the result.
+     */
     value: string;
 }
 
+/**
+ * AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.
+ * @template TState Type of the turn state object being persisted.
+ */
 export class AdaptiveCards<TState extends TurnState> {
     private readonly _app: Application<TState>;
 
+    /**
+     * Creates a new instance of the AdaptiveCards class.
+     * @param app Top level application class to register handlers with.
+     */
     public constructor(app: Application<TState>) {
         this._app = app;
     }
 
     /**
-     *
-     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} verb The name action(s) to be handled
-     * @param {Promise<AdaptiveCard | string>} handler The promise returning the Adaptive Card or string to be executed
-     * @returns {Application} The application
+     * Adds a route to the application for handling Adaptive Card Action.Execute events.
+     * @template TData Optional. Type of the data associated with the action.
+     * @param verb The named action(s) to be handled.
+     * @param handler The code to execute when the action is triggered.
+     * @param handler.context The current turn context.
+     * @param handler.state The current turn state.
+     * @param handler.data The data associated with the action.
+     * @returns The application for chaining purposes.
      */
-    public actionExecute(
+    public actionExecute<TData = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<AdaptiveCard | string>
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<AdaptiveCard | string>
     ): Application<TState> {
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
             const selector = createActionExecuteSelector(v);
@@ -109,9 +179,35 @@ export class AdaptiveCards<TState extends TurnState> {
         return this._app;
     }
 
-    public actionSubmit(
+    /**
+     * Adds a route to the application for handling Adaptive Card Action.Submit events.
+     * @remarks
+     * The route will be added for the specified verb(s) and will be filtered using the
+     * `actionSubmitFilter` option. The default filter is to use the `verb` field.
+     *
+     * For outgoing AdaptiveCards you will need to include the verbs name in the cards Action.Submit.
+     * For example:
+     *
+     * ```JSON
+     * {
+     *   "type": "Action.Submit",
+     *   "title": "OK",
+     *   "data": {
+     *      "verb": "ok"
+     *   }
+     * }
+     * ```
+     * @template TData Optional. Type of the data associated with the action.
+     * @param verb The named action(s) to be handled.
+     * @param handler The code to execute when the action is triggered.
+     * @param handler.context The current turn context.
+     * @param handler.state The current turn state.
+     * @param handler.data The data associated with the action.
+     * @returns The application for chaining purposes.
+     */
+    public actionSubmit<TData = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState, data: Record<string, any>) => Promise<void>
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<void>
     ): Application<TState> {
         const filter = this._app.options.adaptiveCards?.actionSubmitFilter ?? DEFAULT_ACTION_SUBMIT_FILTER;
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
@@ -185,10 +281,7 @@ export class AdaptiveCards<TState extends TurnState> {
 }
 
 /**
- * Selector to match an Action.Execute invoke activity.
- *
- * @param {string | RegExp | RouteSelector} verb action name, RegExp, or RouteSelector to match
- * @returns {RouteSelector} The selector Promise
+ * @private
  */
 function createActionExecuteSelector(verb: string | RegExp | RouteSelector): RouteSelector {
     if (typeof verb == 'function') {
@@ -226,11 +319,7 @@ function createActionExecuteSelector(verb: string | RegExp | RouteSelector): Rou
 }
 
 /**
- * This function is used to create a selector function that will match on a submit action for a specific verb.
- *
- * @param {string} verb The verb to match. Can be a string, RegExp, or RouteSelector function.
- * @param {string} filter The property on the activity value object to match the verb against.
- * @returns {RouteSelector} RouteSelector that matches on a submit action for a specific verb.
+ * @private
  */
 function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filter: string): RouteSelector {
     if (typeof verb == 'function') {
@@ -258,12 +347,7 @@ function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filte
 }
 
 /**
- * This code creates a RouteSelector that can be used to route search requests to
- * a bot's search handler.
- *
- * @param {string | RegExp | RouteSelector} dataset The dataset to match. Can be a string, RegExp, or RouteSelector function.
-
- @returns {RouteSelector} Route's search requests to a bot's search handler.
+ * @private
  */
 function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSelector {
     if (typeof dataset == 'function') {

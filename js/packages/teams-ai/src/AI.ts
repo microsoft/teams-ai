@@ -16,53 +16,242 @@ import { PromptManager, PromptTemplate } from './Prompts';
 import { ResponseParser } from './ResponseParser';
 import { TurnState } from './TurnState';
 
+/**
+ * A function that can be used to select a prompt to use for the current turn.
+ * @template TState Type of the turn state.
+ * @param context The current turn context.
+ * @param state The current turn state.
+ * @returns A string or prompt template to use for the current turn.
+ */
 export type PromptSelector<TState extends TurnState> = (
-    Context: TurnContext,
+    context: TurnContext,
     state: TState
 ) => Promise<string | PromptTemplate>;
 
+/**
+ * Entities argument passed to the action handler for AI.DoCommandActionName.
+ * @template TState Type of the turn state.
+ */
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
-    handler: (context: TurnContext, state: TState, data?: Record<string, any>, action?: string) => Promise<boolean>;
+    /**
+     * The handler that should be called to execute the command.
+     * @param context Current turn context.
+     * @param state Current turn state.
+     * @param entities Entities predicted by the model.
+     * @param action Name of the command being executed.
+     * @returns Whether the AI system should continue executing the plan.
+     */
+    handler: (context: TurnContext, state: TState, entities?: Record<string, any>, action?: string) => Promise<boolean>;
 }
 
+/**
+ * Options for configuring the AI system.
+ * @template TState Type of the turn state.
+ */
 export interface AIOptions<TState extends TurnState> {
+    /**
+     * The planner to use for generating plans.
+     */
     planner: Planner<TState>;
+
+    /**
+     * The prompt manager to use for generating prompts.
+     */
     promptManager: PromptManager<TState>;
+
+    /**
+     * Optional. The moderator to use for moderating input passed to the model and the output
+     * returned by the model.
+     */
     moderator?: Moderator<TState>;
+
+    /**
+     * Optional. The prompt to use for the current turn.
+     * @remarks
+     * This allows for the use of the AI system in a free standing mode. An exception will be
+     * thrown if the AI system is routed to by the Application object and a prompt has not been
+     * configured.
+     */
     prompt?: string | PromptTemplate | PromptSelector<TState>;
+
+    /**
+     * Optional. The history options to use for the AI system.
+     * @remarks
+     * Defaults to tracking history with a maximum of 3 turns and 1000 tokens per turn.
+     */
     history?: Partial<AIHistoryOptions>;
 }
 
+/**
+ * Options for configuring the AI systems history options.
+ */
 export interface AIHistoryOptions {
+    /**
+     * Whether the AI system should track conversation history.
+     * @remarks
+     * Defaults to true.
+     */
     trackHistory: boolean;
+
+    /**
+     * The maximum number of turns to remember.
+     * @remarks
+     * Defaults to 3.
+     */
     maxTurns: number;
+
+    /**
+     * The maximum number of tokens worth of history to add to the prompt.
+     * @remarks
+     * Defaults to 1000.
+     */
     maxTokens: number;
+
+    /**
+     * The line separator to use when concatenating history.
+     * @remarks
+     * Defaults to '\n'.
+     */
     lineSeparator: string;
+
+    /**
+     * The prefix to use for user history.
+     * @remarks
+     * Defaults to 'User:'.
+     */
     userPrefix: string;
+
+    /**
+     * The prefix to use for assistant history.
+     * @remarks
+     * Defaults to 'Assistant:'.
+     */
     assistantPrefix: string;
+
+    /**
+     * Whether the conversation history should include the plan object returned by the model or
+     * just the text of any SAY commands.
+     * @remarks
+     * Defaults to 'planObject'.
+     */
     assistantHistoryType: 'text' | 'planObject';
 }
 
+/**
+ * The configured options for the AI system after all defaults have been applied.
+ * @template TState Type of the turn state.
+ */
 export interface ConfiguredAIOptions<TState extends TurnState> {
+    /**
+     * The planner being used for generating plans.
+     */
     planner: Planner<TState>;
+
+    /**
+     * The prompt manager being used for generating prompts.
+     */
     promptManager: PromptManager<TState>;
+
+    /**
+     * The moderator being used for moderating input passed to the model and the output
+     */
     moderator: Moderator<TState>;
+
+    /**
+     * Optional prompt to use by default.
+     */
     prompt?: string | PromptTemplate | ((Context: TurnContext, state: TState) => Promise<string | PromptTemplate>);
+
+    /**
+     * The history options being used by the AI system.
+     */
     history: AIHistoryOptions;
 }
 
+/**
+ * AI System.
+ * @remarks
+ * The AI system is responsible for generating plans, moderating input and output, and
+ * generating prompts. It can be used free standing or routed to by the Application object.
+ *
+ * @template TState Optional. Type of the turn state.
+ */
 export class AI<TState extends TurnState = DefaultTurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
 
+    /**
+     * A action that will be called anytime an unknown action is predicted by the planner.
+     * @remarks
+     * The default behavior is to simply log an error to the console. The plan is allowed to
+     * continue execution by default.
+     */
     public static readonly UnknownActionName = '___UnknownAction___';
+
+    /**
+     * A action that will be called anytime an input is flagged by the moderator.
+     * @remarks
+     * The default behavior is to simply log an error to the console. Override to send a custom
+     * message to the user.
+     */
     public static readonly FlaggedInputActionName = '___FlaggedInput___';
+
+    /**
+     * A action that will be called anytime an output is flagged by the moderator.
+     * @remarks
+     * The default behavior is to simply log an error to the console. Override to send a custom
+     * message to the user.
+     */
     public static readonly FlaggedOutputActionName = '___FlaggedOutput___';
+
+    /**
+     * A action that will be called anytime the planner is rate limited.
+     */
     public static readonly RateLimitedActionName = '___RateLimited___';
+
+    /**
+     * A action that will be called after the plan has been predicted by the planner and it has
+     * passed moderation.
+     * @remarks
+     * Overriding this action lets you customize the decision to execute a plan separately from the
+     * moderator. The default behavior is to proceed with the plans execution only with a plan
+     * contains one or more commands. Returning false from this action can be used to prevent the plan
+     * from being executed.
+     */
     public static readonly PlanReadyActionName = '___PlanReady___';
+
+    /**
+     * A action that is called to DO an action.
+     * @remarks
+     * The action system is used to do other actions. Overriding this action lets you customize the
+     * execution of an individual action. You can use it to log actions being used or to prevent
+     * certain actions from being executed based on policy.
+     *
+     * The default behavior is to simply execute the action handler passed in so you will need to
+     * perform that logic yourself should you override this action.
+     */
     public static readonly DoCommandActionName = '___DO___';
+
+    /**
+     * A action that is called to SAY something.
+     * @remarks
+     * Overriding this action lets you customize the execution of the SAY command. You can use it
+     * to log the output being generated or to add support for sending certain types of output as
+     * message attachments.
+     *
+     * The default behavior attempts to look for an Adaptive Card in the output and if found sends
+     * it as an attachment. If no Adaptive Card is found then the output is sent as a plain text
+     * message.
+     *
+     * If you override this action and want to automatically send Adaptive Cards as attachments you
+     * will need to handle that yourself.
+     */
     public static readonly SayCommandActionName = '___SAY___';
 
+    /**
+     * Creates a new AI system.
+     * @param options The options used to configure the AI system.
+     */
     public constructor(options: AIOptions<TState>) {
         this._options = Object.assign({}, options) as ConfiguredAIOptions<TState>;
 
@@ -169,32 +358,56 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         );
     }
 
+    /**
+     * Returns the moderator being used by the AI system.
+     * @remarks
+     * The default moderator simply allows all messages and plans through.
+     */
     public get moderator(): Moderator<TState> {
         return this._options.moderator;
     }
 
+    /**
+     * Returns the configured options for the AI system.
+     */
     public get options(): ConfiguredAIOptions<TState> {
         return this._options;
     }
 
+    /**
+     * Returns the planner being used by the AI system.
+     */
     public get planner(): Planner<TState> {
         return this._options.planner;
     }
 
+    /**
+     * Returns the prompt manager being used by the AI system.
+     */
     public get prompts(): PromptManager<TState> {
         return this._options.promptManager;
     }
 
     /**
      * Registers a handler for a named action.
+     * @remarks
+     * The AI systems planner returns plans that are made up of a series of commands or actions
+     * that should be performed. Registering handler lets you provide code that should be run in
+     * response to one of the predicted actions.
      *
+     * Plans support a DO command which specifies the name of an action to call and an optional
+     * set of entities that should be passed to the action. The internal plan executor will call
+     * the registered handler for the action passing in the current context, state, and entities.
      *
-     * Actions can be triggered by a planner returning a DO command.
-     *
-     * @param {string | string[]} name Unique name of the action.
-     * @param {Promise<boolean>} handler Function to call when the action is triggered.
-     * @param {boolean} allowOverrides Optional. If true, default and/or existing handlers can be overridden.
-     * @returns {this} The application instance for chaining purposes.
+     * Additionally, the AI system itself uses actions to handle things like unknown actions,
+     * flagged input, and flagged output. You can override these actions by registering your own
+     * handler for them. The names of the built-in actions are available as static properties on
+     * the AI class.
+     * @template TEntities (Optional) The type of entities that the action handler expects.
+     * @param name Unique name of the action.
+     * @param handler Function to call when the action is triggered.
+     * @param allowOverrides Optional. If true, this handler is allowed to be overridden. Defaults to false.
+     * @returns The AI system instance for chaining purposes.
      */
     public action<TEntities extends Record<string, any> | undefined>(
         name: string | string[],
@@ -219,6 +432,19 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         return this;
     }
 
+    /**
+     * Chains into another prompt and executes the plan that is returned.
+     * @remarks
+     * This method is used to chain into another prompt. It will call the prompt manager to
+     * get the plan for the prompt and then execute the plan. The return value indicates whether
+     * that plan was completely executed or not and can be used to make decisions about whether the
+     * outer plan should continue executing.
+     * @param context Current turn context.
+     * @param state Current turn state.
+     * @param prompt Optional. Prompt name or prompt template to use. If omitted, the AI systems default prompt will be used.
+     * @param options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
+     * @returns True if the plan was completely executed, otherwise false.
+     */
     public async chain(
         context: TurnContext,
         state: TState,
@@ -334,6 +560,14 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         return continueChain;
     }
 
+    /**
+     * A helper method to complete a prompt using the configured prompt manager.
+     * @param context Current turn context.
+     * @param state Current turn state.
+     * @param prompt Prompt name or prompt template to use.
+     * @param options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
+     * @returns The result of the prompt. If the prompt was not completed (typically due to rate limiting), the return value will be undefined.
+     */
     public async completePrompt(
         context: TurnContext,
         state: TState,
@@ -350,6 +584,20 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         return await opts.planner.completePrompt(context, state, renderedPrompt, opts);
     }
 
+    /**
+     * Creates a semantic function that can be registered with the apps prompt manager.
+     * @remarks
+     * Semantic functions are functions that make model calls and return their results as template
+     * parameters to other prompts. For example, you could define a semantic function called
+     * 'translator' that first translates the user's input to English before calling your main prompt:
+     *
+     * ```JavaScript
+     * app.ai.prompts.addFunction('translator', app.ai.createSemanticFunction('translator-prompt'));
+     * ```
+     *
+     * You would then create a prompt called "translator-prompt" that does the translation and then in
+     * your main prompt you can call it using the template expression `{{translator}}`.
+     */
     public createSemanticFunction(
         name: string,
         template?: PromptTemplate,
@@ -363,20 +611,32 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         return (context: TurnContext, state: TState) => this.completePrompt(context, state, name, options);
     }
 
-    public doAction<TData = Record<string, any>>(
+    /**
+     * Manually executes a named action.
+     * @template TEntities Optional. Type of entities expected to be passed to the action.
+     * @param context Current turn context.
+     * @param state Current turn state.
+     * @param action Name of the action to execute.
+     * @param entities Optional. Entities to pass to the action.
+     * @returns True if the action thinks other actions should be executed.
+     */
+    public doAction<TEntities = Record<string, any>>(
         context: TurnContext,
         state: TState,
         action: string,
-        data?: TData
+        entities?: TEntities
     ): Promise<boolean> {
         if (!this._actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }
 
         const handler = this._actions.get(action)!.handler;
-        return handler(context, state, data, action);
+        return handler(context, state, entities, action);
     }
 
+    /**
+     * @private
+     */
     private configureOptions(options?: Partial<AIOptions<TState>>): ConfiguredAIOptions<TState> {
         let configuredOptions: ConfiguredAIOptions<TState>;
         if (options) {
@@ -396,8 +656,10 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     }
 }
 
-/* TData in a handler is of type Record<string, any>, specified by the developer. However, since by default TData is not set, we use type `any` here. */
+/**
+ * @private
+ */
 interface ActionEntry<TState> {
-    handler: (context: TurnContext, state: TState, data?: any, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<boolean>;
     allowOverrides: boolean;
 }

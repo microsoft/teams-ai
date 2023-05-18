@@ -11,12 +11,31 @@
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
+
+/**
+ * Default conversation state
+ * @remarks
+ * Inherit a new interface from this base interface to strongly type the applications conversation
+ * state.
+ */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DefaultConversationState {}
 
+/**
+ * Default user state
+ * @remarks
+ * Inherit a new interface from this base interface to strongly type the applications user
+ * state.
+ */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DefaultUserState {}
 
+/**
+ * Default temp state
+ * @remarks
+ * Inherit a new interface from this base interface to strongly type the applications temp
+ * state.
+ */
 export interface DefaultTempState {
     /**
      * Input passed to an AI prompt
@@ -34,9 +53,10 @@ export interface DefaultTempState {
     output: string;
 }
 /**
- * Types of Turn State held in MemoryStorage
- *
- * @module teams-ai
+ * Defines the default state scopes persisted by the `DefaultTurnStateManager`.
+ * @template TConversationState Optional. Type of the conversation state object being persisted.
+ * @template TUserState Optional. Type of the user state object being persisted.
+ * @template TTempState Optional. Type of the temp state object being persisted.
  */
 export interface DefaultTurnState<
     TConversationState extends DefaultConversationState = DefaultConversationState,
@@ -48,12 +68,24 @@ export interface DefaultTurnState<
     temp: TurnStateEntry<TTempState>;
 }
 
+/**
+ * Default turn state manager implementation.
+ * @template TConversationState Optional. Type of the conversation state object being persisted.
+ * @template TUserState Optional. Type of the user state object being persisted.
+ * @template TTempState Optional. Type of the temp state object being persisted.
+ */
 export class DefaultTurnStateManager<
     TConversationState extends DefaultConversationState = DefaultConversationState,
     TUserState extends DefaultUserState = DefaultUserState,
     TTempState extends DefaultTempState = DefaultTempState
 > implements TurnStateManager<DefaultTurnState<TConversationState, TUserState, TTempState>>
 {
+    /**
+     * Loads all of the state scopes for the current turn.
+     * @param storage Storage provider to load state scopes from.
+     * @param context Context for the current turn of conversation with the user.
+     * @returns The loaded state scopes.
+     */
     public async loadState(
         storage: Storage,
         context: TurnContext
@@ -97,6 +129,12 @@ export class DefaultTurnStateManager<
         return state;
     }
 
+    /**
+     * Saves all of the state scopes for the current turn.
+     * @param storage Storage provider to save state scopes to.
+     * @param context Context for the current turn of conversation with the user.
+     * @param state State scopes to save.
+     */
     public async saveState(
         storage: Storage,
         context: TurnContext,

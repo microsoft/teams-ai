@@ -18,6 +18,9 @@ import {
     CreateModerationResponse
 } from './schema';
 
+/**
+ * @private
+ */
 export interface OpenAIClientResponse<TData> {
     status: number;
     statusText: string;
@@ -25,12 +28,18 @@ export interface OpenAIClientResponse<TData> {
     data?: TData;
 }
 
+/**
+ * @private
+ */
 export interface OpenAIClientOptions {
     apiKey: string;
     organization?: string;
     endpoint?: string;
 }
 
+/**
+ * @private
+ */
 export class OpenAIClient {
     private _httpClient: AxiosInstance;
 

@@ -22,23 +22,63 @@ import {
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
+/**
+ * @private
+ */
 const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
+
+/**
+ * @private
+ */
 const FETCH_TASK_INVOKE_NAME = `composeExtension/fetchTask`;
+
+/**
+ * @private
+ */
 const QUERY_INVOKE_NAME = `composeExtension/query`;
+
+/**
+ * @private
+ */
 const QUERY_LINK_INVOKE_NAME = `composeExtension/queryLink`;
+
+/**
+ * @private
+ */
 const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
+
+/**
+ * @private
+ */
 const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
 
+/**
+ * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
+ * @template TState Type of the turn state object being persisted.
+ */
 export class MessageExtensions<TState extends TurnState> {
     private readonly _app: Application<TState>;
 
+    /**
+     * Creates a new instance of the MessageExtensions class.
+     * @param app Top level application class to register handlers with.
+     */
     public constructor(app: Application<TState>) {
         this._app = app;
     }
 
+    /**
+     * Registers a handler for a command that performs anonymous link unfurling.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.url URL to unfurl.
+     * @returns The application for chaining purposes.
+     */
     public anonymousQueryLink(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult>
+        handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, ANONYMOUS_QUERY_LINK_INVOKE_NAME);
@@ -56,7 +96,7 @@ export class MessageExtensions<TState extends TurnState> {
                     }
 
                     // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state);
+                    const result = await handler(context, state, context.activity.value?.url ?? '');
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                         // Format invoke response
                         const response: MessagingExtensionActionResponse = {
@@ -76,6 +116,20 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Registers a handler to process the 'edit' action of a message that's being previewed by the
+     * user prior to sending.
+     * @remarks
+     * This handler is called when the user clicks the 'Edit' button on a message that's being
+     * previewed prior to insertion into the current chat. The handler should return a new
+     * view that allows the user to edit the message.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.previewActivity The activity that's being previewed by the user.
+     * @returns The application for chaining purposes.
+     */
     public botMessagePreviewEdit(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
@@ -110,6 +164,20 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Registers a handler to process the 'send' action of a message that's being previewed by the
+     * user prior to sending.
+     * @remarks
+     * This handler is called when the user clicks the 'Send' button on a message that's being
+     * previewed prior to insertion into the current chat. The handler should complete the flow
+     * by sending the message to the current chat.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.previewActivity The activity that's being previewed by the user.
+     * @returns The application for chaining purposes.
+     */
     public botMessagePreviewSend(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, previewActivity: Partial<Activity>) => Promise<void>
@@ -147,6 +215,17 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Registers a handler to process the initial fetch task for an Action based message extension.
+     * @remarks
+     * Handlers should response with either an initial TaskInfo object or a string containing
+     * a message to display to the user.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @returns The application for chaining purposes.
+     */
     public fetchTask(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>
@@ -202,6 +281,18 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Registers a handler that implements a Search based messaging extension.
+     * @remarks
+     * This handler is called when the user submits a query to a Search based messaging extension.
+     * The handler should return a MessagingExtensionResult containing the results of the query.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.query The query parameters that were sent by the client.
+     * @returns The application for chaining purposes.
+     */
     public query<TParams extends Record<string, any> = Record<string, any>>(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, query: Query<TParams>) => Promise<MessagingExtensionResult>
@@ -257,9 +348,18 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Registers a handler that implements a Link Unfurling based messaging extension.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.url The URL that should be unfurled.
+     * @returns The application for chaining purposes.
+     */
     public queryLink(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult>
+        handler: (context: TurnContext, state: TState , url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, QUERY_LINK_INVOKE_NAME);
@@ -277,7 +377,7 @@ export class MessageExtensions<TState extends TurnState> {
                     }
 
                     // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state);
+                    const result = await handler(context, state, context.activity.value?.url);
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                         // Format invoke response
                         const response: MessagingExtensionActionResponse = {
@@ -297,8 +397,23 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-    public selectItem(
-        handler: (context: TurnContext, state: TState, item: Record<string, any>) => Promise<MessagingExtensionResult>
+    /**
+     * Registers a handler that implements the logic to handle the tap actions for items returned
+     * by a Search based message extension.
+     * @remarks
+     * The `composeExtension/selectItem` INVOKE activity does not contain any sort of command ID,
+     * so only a single select item handler can be registered. Developers will need to include a
+     * type name of some sort in the preview item they return if they need to support multiple
+     * select item handlers.
+     * @template TItem Optional. Type of the item being selected.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.item The item that was selected.
+     * @returns The application for chaining purposes.
+     */
+    public selectItem<TItem extends Record<string, any> = Record<string, any>>(
+        handler: (context: TurnContext, state: TState, item: TItem) => Promise<MessagingExtensionResult>
     ): Application<TState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
@@ -331,7 +446,17 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-    public submitAction<TData>(
+    /**
+     * Registers a handler that implements the submit action for an Action based messaging extension.
+     * @template TData Optional. Type of data being submitted.
+     * @param commandId ID of the command(s) to register the handler for.
+     * @param handler Function to call when the command is received.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.data The data that was submitted.
+     * @returns The application for chaining purposes.
+     */
+    public submitAction<TData extends Record<string,any>>(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -364,6 +489,9 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * @private
+     */
     private async returnSubmitActionResponse(
         context: TurnContext,
         result: MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined
@@ -411,11 +539,7 @@ export class MessageExtensions<TState extends TurnState> {
 }
 
 /**
- *
- * @param {string | RegExp | RouteSelector[]} commandId Name of the commandId
- * @param {boolean} invokeName Whether or not the commandId a Teams invokable action
- * @param {string} botMessagePreviewAction Message Extension preview action 'edit' or 'send'
- * @returns {RouteSelector} Route selector function
+ * @private
  */
 function createTaskSelector(
     commandId: string | RegExp | RouteSelector,
@@ -453,11 +577,7 @@ function createTaskSelector(
 }
 
 /**
- * Checks if the activity is a bot message preview action.
- *
- * @param {Activity} activity The activity / communication type that is being checked.
- * @param {string} botMessagePreviewAction Name of the preview action
- * @returns {boolean} True if the activity is a bot message preview action, false if it is not.
+ * @private
  */
 function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edit' | 'send'): boolean {
     if (typeof activity?.value?.botMessagePreviewAction == 'string') {
