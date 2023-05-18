@@ -58,7 +58,7 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
 
     /**
      * Creates a new instance of the OpenAI based moderator.
-     * @param options Configuration options for teh moderator.
+     * @param options Configuration options for the moderator.
      */
     public constructor(options: OpenAIModeratorOptions) {
         this._options = Object.assign({}, options);

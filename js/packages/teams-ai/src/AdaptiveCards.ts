@@ -59,7 +59,7 @@ export interface AdaptiveCard {
  */
 export interface AdaptiveCardsOptions {
     /**
-     * Data field to use for action submit filter.
+     * Data field to used to identify the Action.Submit handler to trigger.
      * @remarks
      * When a Action.Submit is triggered, the field name specified here will be used to determine
      * the handler to route the request to.

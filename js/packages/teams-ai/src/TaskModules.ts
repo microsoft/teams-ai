@@ -12,10 +12,7 @@ import {
     ActivityTypes,
     InvokeResponse,
     INVOKE_RESPONSE_KEY,
-    TaskModuleResponse,
-    MessagingExtensionResult,
-    MessagingExtensionActionResponse,
-    Activity
+    TaskModuleResponse
 } from 'botbuilder';
 import { Application, RouteSelector } from './Application';
 import { TurnState } from './TurnState';
@@ -24,19 +21,50 @@ const FETCH_INVOKE_NAME = `task/fetch`;
 const SUBMIT_INVOKE_NAME = `task/submit`;
 const DEFAULT_TASK_DATA_FILTER = 'verb';
 
-
+/**
+ * Options for TaskModules class.
+ */
 export interface TaskModulesOptions {
+    /**
+     * Data field to use to identify the verb of the handler to trigger.
+     * @remarks
+     * When a task module is triggered, the field name specified here will be used to determine
+     * the name of the verb for the handler to route the request to.
+     *
+     * Defaults to a value of 'verb'.
+     */
     taskDataFilter?: string;
 }
 
+/**
+ * TaskModules class to enable fluent style registration of handlers related to Task Modules.
+ * @template TState Type of the turn state object being persisted.
+ */
 export class TaskModules<TState extends TurnState> {
     private readonly _app: Application<TState>;
 
+    /**
+     * Creates a new instance of the TaskModules class.
+     * @param app Top level application class to register handlers with.
+     */
     public constructor(app: Application<TState>) {
         this._app = app;
     }
 
-    public fetch<TData>(
+    /**
+     * Registers a handler to process the initial fetch of the task module.
+     * @remarks
+     * Handlers should response with either an initial TaskInfo object or a string containing
+     * a message to display to the user.
+     * @template TData Optional. Type of the data object being passed to the handler.
+     * @param verb Name of the verb(s) to register the handler for.
+     * @param handler Function to call when the handler is triggered.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.data Data object passed to the handler.
+     * @returns The application for chaining purposes.
+     */
+    public fetch<TData extends Record<string,any> = Record<string,any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -96,7 +124,20 @@ export class TaskModules<TState extends TurnState> {
         return this._app;
     }
 
-    public submit<TData>(
+    /**
+     * Registers a handler to process the submission of a task module.
+     * @remarks
+     * Handlers should response with another TaskInfo object, message string, or null to indicate
+     * the task is completed.
+     * @template TData Optional. Type of the data object being passed to the handler.
+     * @param verb Name of the verb(s) to register the handler for.
+     * @param handler Function to call when the handler is triggered.
+     * @param handler.context Context for the current turn of conversation with the user.
+     * @param handler.state Current state of the turn.
+     * @param handler.data Data object passed to the handler.
+     * @returns The application for chaining purposes.
+     */
+    public submit<TData extends Record<string,any> = Record<string,any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -162,11 +203,7 @@ export class TaskModules<TState extends TurnState> {
 }
 
 /**
- *
- * @param {string | RegExp | RouteSelector[]} verb Name of the verb
- * @param {string} filterField Name of the data field used to filter verbs
- * @param {boolean} invokeName Name of the expected invoke activity
- * @returns {RouteSelector} Route selector function
+ * @private
  */
 function createTaskSelector(
     verb: string | RegExp | RouteSelector,
