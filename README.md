@@ -12,10 +12,10 @@ This SDK is under public preview and is subject to change. We welcome your feedb
 
 To get started, check out the getting started table of contents.
 
-- [00.Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
-- **\*** [01.AI-SETUP](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
-- [02.API-REFERENCE](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
-- [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
+0. Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
+1. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
+2. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
+3. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
 
 ## Join us for the Global Teams Hackathon event!
 
@@ -50,9 +50,9 @@ The SDK is built to leverage OpenAI Large Language Models so you don't have to c
 
 With a simple text file written in human language, you can describe the functionality of your app to cue OpenAI to focus on the right user intentions and provide relevant responses.
 
-### Topic Filtering
+### Moderation
 
-A simple text file can also be used to steer OpenAI in the right direction and keep the conversation on track.
+A configurable API call to filter inappropriate content for input content, output content, or both. (See [OpenAIModerator.ts](./js/src/openai/OpenAIModerator.ts))
 
 ### Predictive Engine to Map Intents to Actions
 
