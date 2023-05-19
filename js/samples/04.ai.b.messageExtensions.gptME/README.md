@@ -4,7 +4,7 @@ This sample is a message extension (ME) for Microsoft Teams that leverages the t
 
 This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
 
-It shows M365 botbuilder SDK capabilities like:
+It shows Teams AI SDK capabilities like:
 
 <details open>
     <summary><h3>Message extension scaffolding</h3></summary>
@@ -78,13 +78,13 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/Microsoft/botbuilder-m365.git
+    git clone https://github.com/Microsoft/teams-ai.git
     ```
 
 1. In the root JavaScript folder, install and build all dependencies
 
     ```bash
-    cd botbuilder-m365/js
+    cd teams-ai/js
     yarn install
     yarn build
     ```

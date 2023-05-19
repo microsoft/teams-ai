@@ -12,7 +12,7 @@ import {
     DefaultUserState,
     OpenAIPlanner,
     ResponseParser
-} from '@microsoft/botbuilder-m365';
+} from '@microsoft/teams-ai';
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as path from 'path';
 import * as responses from './responses';

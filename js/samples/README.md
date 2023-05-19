@@ -1,6 +1,6 @@
 # Sample Library
 
-The following samples highlight key capabilities of the M365 BotBuilder SDK.
+The following samples highlight key capabilities of the Teams AI SDK.
 
 ## Basic Conversational Experiences
 
@@ -8,19 +8,19 @@ The following samples highlight key capabilities of the M365 BotBuilder SDK.
 
 A conversational bot that listens for specific commands and offers a simple conversational flow: echoing the user's message back to them.
 
-This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the M365 BotBuilder SDK's ability to scaffold conversational bot components.
+This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the Teams AI SDK's ability to scaffold conversational bot components.
 
 ### Adaptive Cards: [Type Ahead Bot](02.messageExtensions.a.searchCommand/)
 
 A Message Extension (ME) built to search NPM for a specific package and return the result as an Adaptive Card.
 
-This sample illustrates the M365 BotBuilder SDK's ability to scaffold search-based Message Extensions and return Adaptive Card components.
+This sample illustrates the Teams AI SDK's ability to scaffold search-based Message Extensions and return Adaptive Card components.
 
 ### Message Extensions: [Search Command](03.adaptiveCards.a.typeAheadBot/)
 
 A conversational bot that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
 
-This sample illustrates the M365 BotBuilder SDK's ability to scaffold conversational bot and Adaptive Card components.
+This sample illustrates the Teams AI SDK's ability to scaffold conversational bot and Adaptive Card components.
 
 ## AI-Powered Experiences
 
@@ -30,7 +30,7 @@ A conversational bot for Microsoft Teams, designed to mimic being a Santa Bot fo
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
 
-It shows M365 BotBuilder SDK capabilities like:
+It shows Teams AI SDK capabilities like:
 
 -   Conversational bot scaffolding
 -   Natural language modelling
@@ -44,7 +44,7 @@ A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003
 
 This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
 
-It shows M365 botbuilder SDK capabilities like:
+It shows Teams AI SDK capabilities like:
 
 -   Message extension scaffolding
 -   Action mapping
@@ -56,7 +56,7 @@ A conversational bot for Microsoft Teams, designed as an AI assistant. The bot c
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams than the Santa sample. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to third party app skills.
 
-It shows a broad range of M365 botbuilder SDK capabilities like:
+It shows a broad range of Teams AI SDK capabilities like:
 
 -   Conversational bot scaffolding
 -   Natural language modelling
@@ -73,7 +73,7 @@ Similar to the Light On/Off sample, this is a conversational bot for Microsoft T
 
 This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
 
-It shows a broad range of M365 botbuilder SDK capabilities like:
+It shows a broad range of Teams AI SDK capabilities like:
 
 -   Conversational bot scaffolding
 -   Adaptive Cards

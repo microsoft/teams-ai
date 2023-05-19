@@ -74,7 +74,7 @@ import {
     DefaultUserState,
     DefaultTempState,
     DefaultPromptManager
-} from '@microsoft/botbuilder-m365';
+} from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 // Strongly type the applications turn state

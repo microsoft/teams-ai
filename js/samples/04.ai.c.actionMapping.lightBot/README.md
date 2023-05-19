@@ -19,7 +19,7 @@ how to incorporate basic conversational flow into a Teams application. It also i
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/Microsoft/botbuilder-m365.git
+    git clone https://github.com/Microsoft/teams-ai.git
     ```
 
 1. In a terminal, `cd` into this directory
