@@ -8,9 +8,14 @@ The SDK also facilitates the creation of bots that uses an [OpenAI](https://open
 
 This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
 
-**To get started, head over to the [00.Migration](getting-started/00.MIGRATION.md) guide.**
+\*\*To get started, check out the getting started table of contents.
 
-### License
+- [00.Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
+- [01.AI-SETUP](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
+- [02.API-REFERENCE](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
+- [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
+
+## License
 
 This SDK is licensed under the MIT License. This SDK includes tools to use APIs provided by third parties. These APIs are provided under their own separate terms.
 
