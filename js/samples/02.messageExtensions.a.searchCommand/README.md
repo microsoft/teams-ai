@@ -1,6 +1,6 @@
 # Teams Search Command Message Extension
 
-Messaging Extensions are a special kind of Microsoft Teams application that is support by the Bot Framework v4.
+Messaging Extensions are a special kind of Microsoft Teams application that is supported by the Bot Framework v4. SDK
 
 There are two basic types of Messaging Extension in Teams: Search-based and Action-based. This sample illustrates how to build a Search-based Messaging Extension with ease using the Teams AI libraries. 
 
