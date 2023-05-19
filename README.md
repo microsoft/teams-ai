@@ -1,4 +1,4 @@
-# Teams AI SDK
+# <image src="https://github.com/microsoft/teams-ai/assets/14900841/31453242-4da6-424b-97a3-8a66207f8d20)" height="10%" width="10%" /> Teams AI SDK
 
 Welcome to the Teams AI SDK! This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams AI-interacting bots.
 
@@ -8,12 +8,18 @@ The SDK also facilitates the creation of bots that uses an [OpenAI](https://open
 
 This SDK is under public preview and is subject to change. We welcome your feedback and contributions!
 
-\*\*To get started, check out the getting started table of contents.
+## Getting Started
+
+To get started, check out the getting started table of contents.
 
 - [00.Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
-- [01.AI-SETUP](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
+- **\*** [01.AI-SETUP](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
 - [02.API-REFERENCE](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
 - [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
+
+## Join us for the Global Teams Hackathon event!
+
+To sign up, visit [https://aka.ms/teams-hackathon](https://aka.ms/teams-hackathon).
 
 ## License
 
