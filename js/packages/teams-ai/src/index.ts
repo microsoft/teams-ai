@@ -9,6 +9,7 @@
 export * from './AdaptiveCards';
 export * from './AI';
 export * from './Application';
+export * from './Authentication';
 export * from './AzureOpenAIPlanner';
 export * from './ConversationHistory';
 export * from './DefaultModerator';
@@ -23,3 +24,4 @@ export * from './Prompts';
 export * from './ResponseParser';
 export * from './TaskModules';
 export * from './TurnState';
+export * from './TurnStateProperty';

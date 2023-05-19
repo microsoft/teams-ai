@@ -15,12 +15,14 @@ import {
     Activity,
     ResourceResponse
 } from 'botbuilder';
+import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
+import { Authentication } from './Authentication';
 
 /**
  * @private
@@ -60,6 +62,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * this property is required.
      */
     adapter?: BotAdapter;
+
+    /**
+     * Optional. OAuth prompt settings to use for authentication.
+     */
+    authentication?: OAuthPromptSettings;
 
     /**
      * Optional. Application ID of the bot.
@@ -190,7 +197,8 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
-    private _typingTimer: any;
+    private readonly _authentication?: Authentication<TState>;
+        private _typingTimer: any;
 
     /**
      * Creates a new Application instance.
@@ -213,6 +221,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
         // Create AI component if configured with a planner
         if (this._options.ai) {
             this._ai = new AI(this._options.ai);
+        }
+
+        // Create OAuthPrompt if configured
+        if (this._options.authentication) {
+            this._authentication = new Authentication<TState>(this, this._options.authentication);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -244,6 +257,20 @@ export class Application<TState extends TurnState = DefaultTurnState> {
         }
 
         return this._ai;
+    }
+
+    /**
+     * Fluent interface for accessing Authentication specific features.
+     * @remarks
+     * This property is only available if the Application was configured with `authentication` options. An
+     * exception will be thrown if you attempt to access it otherwise.
+     */
+    public get authentication(): Authentication<TState> {
+        if (!this._authentication) {
+            throw new Error(`The Application.authentication property is unavailable because no authentication options were configured.`);
+        }
+
+        return this._authentication;
     }
 
     /**
@@ -453,6 +480,20 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 // Load turn state
                 const { storage, turnStateManager } = this._options;
                 const state = await turnStateManager!.loadState(storage, context);
+
+                // Sign the user in
+                if (this._authentication && context.activity.type === ActivityTypes.Message) {
+                    // Get the auth token
+                    const token = await this._authentication.signInUser(context, state);
+                    if (token) {
+                        state['temp'].value.token = token;
+                    } else {
+                        // Save turn state and end
+                        // - This saves the current dialog stack.
+                        await turnStateManager!.saveState(storage, context, state);
+                        return false;
+                    }
+                }
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {

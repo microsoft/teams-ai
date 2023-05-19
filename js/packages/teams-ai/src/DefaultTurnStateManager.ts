@@ -38,6 +38,11 @@ export interface DefaultUserState {}
  */
 export interface DefaultTempState {
     /**
+     * Token returned if the Application was configured with authentication support.
+     */
+    authToken?: string;
+
+    /**
      * Input passed to an AI prompt
      */
     input: string;
@@ -52,6 +57,7 @@ export interface DefaultTempState {
      */
     output: string;
 }
+
 /**
  * Defines the default state scopes persisted by the `DefaultTurnStateManager`.
  * @template TConversationState Optional. Type of the conversation state object being persisted.
