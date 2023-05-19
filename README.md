@@ -17,9 +17,11 @@ To get started, check out the getting started table of contents.
 2. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
 3. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
 
-## Join us for the Global Teams Hackathon event!
+# Join us for the Global Teams Hackathon event
 
-To sign up, visit [https://aka.ms/teams-hackathon](https://aka.ms/teams-hackathon).
+To sign up, visit [https://aka.ms/hack-together-teams](https://aka.ms/hack-together-teams).
+
+> HackTogether is your playground for coding and experimenting with Microsoft Teams. With mentorship from Microsoft experts and access to the latest tech, you will learn how to build Teams apps based on the top Microsoft Teams app scenarios. The possibilities are endless for what you can create... plus you can submit your hack for a chance to win exciting prizes! 🥳
 
 ## License
 
