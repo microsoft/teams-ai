@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "forceConsistentCasingInFileNames": true,
+        "incremental": true,
+        "module": "commonjs",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "sourceMap": true,
+        "strict": false,
+        "target": "es2016",
+        "tsBuildInfoFile": "./lib/.tsbuildinfo"
+    }
+}
