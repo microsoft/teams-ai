@@ -24,9 +24,10 @@ This sample illustrates the Teams AI SDK's ability to scaffold conversational bo
 
 ## AI-Powered Experiences
 
-### Conversational AI w/Natural Language: [Santa Bot](04.ai.a.naturalLanguage.santaBot/)
+/*
+### Conversational AI w/Natural Language: [Chef bot](04.ai.a.teamsChefBot/)
 
-A conversational bot for Microsoft Teams, designed to mimic being a Santa Bot for children. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+A conversational bot for Microsoft Teams, designed as a helper bot for building Teams app. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
 
@@ -37,6 +38,8 @@ It shows Teams AI SDK capabilities like:
 -   Prompt engineering
 -   Localization across languages
 -   Conversational session history
+
+*/
 
 ### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.gptME/)
 
