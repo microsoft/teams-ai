@@ -1,6 +1,6 @@
 # Teams TypeAhead Bot
 
-Typeahead bot  ives an enhanced search experience with Adaptive Cards to search and select data.
+Type-Ahead bot  ives an enhanced search experience with Adaptive Cards to search and select data.
 
 ## To try this sample in Teams
 
