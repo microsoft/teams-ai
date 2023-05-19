@@ -9,24 +9,63 @@
 
 import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './Planner';
 
+/**
+ * @private
+ */
 const BREAKING_CHARACTERS = '`~!@#$%^&*()_+-={}|[]\\:";\'<>?,./ \r\n\t';
+
+/**
+ * @private
+ */
 const NAME_BREAKING_CHARACTERS = '`~!@#$%^&*()+={}|[]\\:";\'<>?,./ \r\n\t';
+
+/**
+ * @private
+ */
 const SPACE_CHARACTERS = ' \r\n\t';
+
+/**
+ * @private
+ */
 const COMMANDS = ['DO', 'SAY'];
+
+/**
+ * @private
+ */
 const DEFAULT_COMMAND = 'SAY';
+
+/**
+ * @private
+ */
 const IGNORED_TOKENS = ['THEN'];
 
+/**
+ * @private
+ */
 export interface ParsedCommandResult {
     length: number;
     command?: PredictedCommand;
 }
-
+/**
+ * Utility class to parse responses returned from LLM's.
+ */
 export class ResponseParser {
+    /**
+     * Attempts to find an Adaptive Card in a response.
+     * @param text Optional. Text to parse.
+     * @returns The found Adaptive Card or undefined if no card could be detected.
+     */
     public static parseAdaptiveCard(text?: string): Record<string, any> | undefined {
         const obj = this.parseJSON(text);
         return obj && obj['type'] === 'AdaptiveCard' ? obj : undefined;
     }
 
+    /**
+     * Attempts to find a JSON object with-in a response.
+     * @template T Optional. Type of object to return.
+     * @param text Optional. Text to parse.
+     * @returns The parsed object or undefined if no object could be detected.
+     */
     public static parseJSON<T = Record<string, any>>(text?: string): T | undefined {
         let obj: T | undefined;
         try {
@@ -45,6 +84,14 @@ export class ResponseParser {
         return obj;
     }
 
+    /**
+     * Parses a response and returns a plan.
+     * @remarks
+     * If a plan object can be detected in the response it will be returned. Otherwise a plan with
+     * a single SAY command containing the response will be returned.
+     * @param text Optional. Text to parse.
+     * @returns The parsed plan.
+     */
     public static parseResponse(text?: string): Plan {
         // See if the response contains a plan object?
         let plan: Plan = this.parseJSON(text) as Plan;
@@ -109,6 +156,9 @@ export class ResponseParser {
         return plan;
     }
 
+    /**
+     * @private
+     */
     public static parseDoCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
         let command: PredictedDoCommand | undefined;
@@ -255,6 +305,9 @@ export class ResponseParser {
         return { length, command };
     }
 
+    /**
+     * @private
+     */
     public static parseSayCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
         let command: PredictedSayCommand | undefined;
@@ -296,10 +349,7 @@ export class ResponseParser {
     }
 
     /**
-     * Simple text tokenizer. Breaking characters are added to list as separate tokens.
-     *
-     * @param {string} text Optional. Text string to tokenize.
-     * @returns {[string]} Array of tokens.
+     * @private
      */
     public static tokenizeText(text?: string): string[] {
         const tokens: string[] = [];
@@ -335,6 +385,9 @@ export class ResponseParser {
     }
 }
 
+/**
+ * @private
+ */
 enum DoCommandParseState {
     findActionName,
     inActionName,

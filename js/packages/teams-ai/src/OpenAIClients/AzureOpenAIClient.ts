@@ -18,12 +18,17 @@ import {
 } from './schema';
 import { OpenAIClient, OpenAIClientOptions, OpenAIClientResponse } from './OpenAIClient';
 
+/**
+ * @private
+ */
+
 export interface AzureOpenAIClientOptions extends OpenAIClientOptions {
     endpoint: string;
     apiVersion?: string;
 }
 
 /**
+ * @private
  * `AzureOpenAIClient` Allows for Azure hosted OpenAI clients to be created and used. As of 4/4/2023, access keys must be specifically assigned to be used with this client.
  */
 export class AzureOpenAIClient extends OpenAIClient {

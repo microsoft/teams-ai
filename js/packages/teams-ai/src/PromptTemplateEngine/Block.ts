@@ -10,6 +10,9 @@ import { TurnContext } from 'botbuilder';
 import { PromptManager } from '../Prompts';
 import { TurnState } from '../TurnState';
 
+/**
+ * @private
+ */
 export enum BlockTypes {
     Undefined = 0,
     Text = 1,
@@ -17,6 +20,9 @@ export enum BlockTypes {
     Variable = 3
 }
 
+/**
+ * @private
+ */
 export abstract class Block {
     public get type(): BlockTypes {
         return BlockTypes.Undefined;

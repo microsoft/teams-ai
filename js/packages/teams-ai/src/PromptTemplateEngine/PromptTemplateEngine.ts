@@ -16,14 +16,7 @@ import { TextBlock } from './TextBlock';
 import { VarBlock } from './VarBlock';
 
 /**
- * Given a prompt, that might contain references to variables and functions:
- * - Get the list of references
- * - Resolve each reference
- *   - Variable references are resolved using the context variables
- *   - Function references are resolved invoking those functions
- *     - Functions can be invoked passing in variables
- *     - Functions do not receive the context variables, unless specified using a special variable
- *     - Functions can be invoked in order and in parallel so the context variables must be immutable when invoked within the template
+ * @private
  */
 export class PromptTemplateEngine<TState extends TurnState> {
     private readonly _promptManager: PromptManager<TState>;
