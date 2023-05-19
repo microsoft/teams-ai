@@ -1,9 +1,87 @@
 # AI in Microsoft Teams: Light Bot
 
-Bot Framework v4 Conversation Bot sample for Teams.
+LightBot: Your Enlightened Assistant. This example  showcases how the LightBot understands user intent, accurately interpreting commands to effortlessly control light bot. 
+Explore how the LightBot understands, allowing precise control over turning lights on and off, while demonstrating the power and potential of the Language Model in understanding and executing user intent accurately mapped with app actions.
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
-how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+
+It shows Teams AI SDK capabilities like:
+
+<details open>
+    <summary><h3>Bot scaffolding</h3></summary>
+    Throughout the 'index.ts' file you'll see the scaffolding created to run a Bot, like storage, authentication, task modules, and action submits.
+</details>
+<details open>
+    <summary><h3>Prompt engineering</h3></summary>
+The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+
+#### generate.txt
+
+```
+This is a Microsoft Teams extension that assists the user with creating posts.
+Using the prompt below, create a post that appropriate for a business environment.
+Prompt: {{data.prompt}}
+Post:
+```
+
+</details>
+<details open>
+    <summary><h3>Action mapping</h3></summary>
+Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
+
+```javascript
+// Add a prompt function for getting the current status of the lights
+app.ai.prompts.addFunction(
+    'getLightStatus',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        return state.conversation.value.lightsOn ? 'on' : 'off';
+    }
+);
+
+// Register action handlers
+app.ai.action(
+    'LightsOn',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = true;
+        await context.sendActivity(`[lights on]`);
+        return true;
+    }
+);
+
+app.ai.action(
+    'LightsOff',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = false;
+        await context.sendActivity(`[lights off]`);
+        return true;
+    }
+);
+
+app.ai.action(
+    'Pause',
+    async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
+    const time = data.time ? parseInt(data.time) : 1000;
+        await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+        await new Promise((resolve) => setTimeout(resolve, time));
+        return true;
+    }
+);
+
+// Register a handler to handle unknown actions that might be predicted
+app.ai.action(
+    AI.UnknownActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: TData, action: string | undefined) => {
+        await context.sendActivity(responses.unknownAction(action || 'unknown'));
+        return false;
+    }
+);
+```
+
+</details>
+
+This bot has been created using [Bot Framework](https://dev.botframework.com). 
+This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+
+
 
 ## To try this sample in Teams
 
