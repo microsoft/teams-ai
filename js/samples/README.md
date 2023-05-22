@@ -84,3 +84,22 @@ It shows a broad range of Teams AI SDK capabilities like:
 -   Topic filtering
 -   Prediction engine mapping intents to actions with third party business logic
 -   Mixing GPT-powered conversational responses with manually defined responses
+
+
+### Chained Actions: [DevOps AI Assistant](04.ai.e.chainedActions.devOpsBot)
+
+Similar to the List Generator AI Assistant sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
+
+This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
+
+It shows a broad range of Teams AI SDK capabilities like:
+
+-   Conversational bot scaffolding
+-   Adaptive Cards
+-   Natural language modelling
+-   Prompt engineering
+-   Localization across languages
+-   Conversational session history
+-   Topic filtering
+-   Prediction engine mapping intents to actions with third party business logic
+-   Mixing GPT-powered conversational responses with manually defined responses
