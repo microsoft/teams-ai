@@ -1,19 +1,34 @@
-# Teams AI SDK
+# <image src="https://github.com/microsoft/teams-ai/assets/14900841/31453242-4da6-424b-97a3-8a66207f8d20)" height="10%" width="10%" /> Teams AI SDK
 
 Welcome to the Teams AI SDK! This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams AI-interacting bots.
 
 For now, code-availability is limited to the [`js`](./js/) folder. **dotnet parity is in production and will be available soon.**
 
-The SDK also facilitates the creation of bots that uses an [OpenAI](https://openai.com/api/) API key to provide an AI-driven conversational experience, or the same using Azure Foundry.
+<figure>
+<img src="https://github.com/microsoft/teams-ai/assets/14900841/2612b0fb-dae1-400c-8321-c01b9e44fe62" />
+<figcaption>This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.</figcaption>
+</figure>
 
-This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
+## Getting Started
 
-\*\*To get started, check out the getting started table of contents.
+### 🖇️ Jump right in❗️ ⤵️ 📎
 
-- [00.Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
-- [01.AI-SETUP](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
-- [02.API-REFERENCE](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
-- [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
+> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.chefbot) sample. This sample is a simple bot that uses the OpenAI API to build Teams apps.
+
+### Start with migration and other getting started guides
+
+To get started, check out the getting started table of contents.
+
+0. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
+1. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
+2. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
+3. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
+
+# Join us for the Global Teams Hackathon event
+
+To sign up, visit [https://aka.ms/hack-together-teams](https://aka.ms/hack-together-teams).
+
+> HackTogether is your playground for coding and experimenting with Microsoft Teams. With mentorship from Microsoft experts and access to the latest tech, you will learn how to build Teams apps based on the top Microsoft Teams app scenarios. The possibilities are endless for what you can create... plus you can submit your hack for a chance to win exciting prizes! 🥳
 
 ## License
 
@@ -26,7 +41,7 @@ This SDK is licensed under the MIT License. This SDK includes tools to use APIs 
 
 ## Capabilities
 
-### Teams-Centric Component Scaffolding
+### Teams-centric component scaffolding
 
 > For examples of the below, browse through the [JS](./js/samples/) folders.
 > Simple scaffolding for any conversational app component, inlcuding:
@@ -44,9 +59,9 @@ The SDK is built to leverage OpenAI Large Language Models so you don't have to c
 
 With a simple text file written in human language, you can describe the functionality of your app to cue OpenAI to focus on the right user intentions and provide relevant responses.
 
-### Topic Filtering
+### Moderation
 
-A simple text file can also be used to steer OpenAI in the right direction and keep the conversation on track.
+A configurable API call to filter inappropriate content for input content, output content, or both. (See [OpenAIModerator.ts](./js/src/openai/OpenAIModerator.ts))
 
 ### Predictive Engine to Map Intents to Actions
 

@@ -1,7 +1,22 @@
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+-   [AI in Microsoft Teams: Twenty Qestions](#ai-in-microsoft-teams-twenty-qestions)
+    -   [Setting up the sample](#setting-up-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Limitations](#limitations)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
 # AI in Microsoft Teams: Twenty Qestions
 
 Welcome to the 20 Questions Bot: The Ultimate Guessing Game! This developer sample application showcases the incredible capabilities of language models and the concept of user intent. Challenge your skills as the human player and try to guess a secret within 20 questions, while the AI-powered bot answers your queries about the secret. Experience firsthand how language models interpret user input and provide informative responses, creating an engaging and interactive gaming experience. Get ready to dive into the world of language models and explore the fascinating realm of user interaction and intent.
-It shows following SDK capabilities: 
+It shows following SDK capabilities:
 
 <details open>
     <summary><h3>Bot scaffolding</h3></summary>
@@ -23,7 +38,6 @@ Post:
 </details>
 <details open>
     <summary><h3>QnA bot with LLM</h3></summary>
-
 
 ```javascript
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
@@ -68,14 +82,11 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
     state.conversation.value.guessCount = guessCount;
     state.conversation.value.remainingGuesses = remainingGuesses;
 });
-
 ```
 
 </details>
 
-This bot has been created using [Bot Framework](https://dev.botframework.com).
-
-## To try this sample in Teams
+## Setting up the sample
 
 1. Clone the repository
 
@@ -89,7 +100,14 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
     cd teams-ai/js
     yarn install
     yarn build
+    cd samples/04.e.twentyquestions
     ```
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
+
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -107,7 +125,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -127,6 +145,7 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
+
 1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
@@ -134,6 +153,8 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```bash
     cd teams-ai/js/samples/04.e.twentyquestions/
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -190,13 +211,35 @@ The message extension has some limitations, including:
 -   The bot is not able to perform tasks outside of generating and updating posts.
 -   The bot is not able to provide inappropriate or offensive content.
 
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
+
+### Directions
+
+1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
+2. Launch Bot Framework Emulator
+3. Run the app you are in the directory for.
+
+```bash
+yarn start
+```
+
+4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
+
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
+
 ## Deploy the bot to Azure
 
-You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. 
+You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/). 
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
@@ -205,6 +248,6 @@ Use the **Provision**, **Deploy**, and **Publish** buttons of the Teams Toolkit 
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
-

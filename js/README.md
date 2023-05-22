@@ -1,4 +1,4 @@
-## Preparing your app (applies to all samples)
+# Preparing your app (applies to all samples)
 
 To build the packages and samples do the following from the root directory:
 

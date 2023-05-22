@@ -1,11 +1,29 @@
 # Teams Search Command Message Extension
 
-Messaging Extensions are a special kind of Microsoft Teams application that is supported by the Bot Framework v4. SDK
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
-There are two basic types of Message Extensions in Teams: Search-based and Action-based. This sample illustrates how to build a Search-based Messaging Extension with ease using the Teams AI libraries. 
+<!-- code_chunk_output -->
 
+-   [Teams Search Command Message Extension](#teams-search-command-message-extension)
+    -   [Summary](#summary)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+    -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+        -   [Directions](#directions)
+    -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
 
-## To try this sample in Teams
+<!-- /code_chunk_output -->
+
+## Summary
+
+This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search npmjs for packages.
+
+## Setting up the sample
 
 1. Clone the repository
 
@@ -21,7 +39,23 @@ There are two basic types of Message Extensions in Teams: Search-based and Actio
     yarn build
     ```
 
-### Using Teams Toolkit for Visual Studio Code
+3. In a terminal, navigate to the sample root.
+
+    ```bash
+    cd teams-ai/js/samples/01.messageExtensions.a.searchCommand/
+    ```
+
+## Interacting with the bot
+
+You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NPM for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
+
+Otherwise, if you only want to run the bot locally, setup, deploy and publish your app manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
+
+## Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
@@ -36,7 +70,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -52,7 +86,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
 
-    ```
+    ```bash
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
@@ -60,8 +94,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/02.messageExtensions.a.searchCommand/
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -75,14 +111,38 @@ You can also use the Teams Toolkit CLI to run this sample.
     teamsfx preview --env local
     ```
 
-### Manually upload the app to a Teams desktop client
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
+
+### Directions
+
+1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
+2. Launch Bot Framework Emulator
+3. Run the app sample you are in the directory for.
+
+```bash
+yarn start
+```
+
+4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
+
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+
+From this point, you may interact with the bot in the Web Chat tab that appears.
+
+In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above.
+
+Please also note that Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+
+## Manually upload the app to a Teams desktop client
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.echobot/`
+1. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/02.messageExtensions.a.searchCommand/
     ```
 
 1. Run ngrok tunneling service - point to port 3978
@@ -111,10 +171,6 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
 
-## Interacting with the bot
-
-You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NPM for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
-
 ## Deploy the bot to Azure
 
 You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. Use the **Provision** and **Deploy** menus of the Teams Toolkit extension or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
@@ -122,5 +178,6 @@ You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sampl
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)

@@ -284,7 +284,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler that implements a Search based Message Extension.
      * @remarks
-     * This handler is called when the user submits a query to a Search based messaging extension.
+     * This handler is called when the user submits a query to a Search based Message Extension.
      * The handler should return a MessagingExtensionResult containing the results of the query.
      * @param commandId ID of the command(s) to register the handler for.
      * @param handler Function to call when the command is received.
@@ -447,7 +447,7 @@ export class MessageExtensions<TState extends TurnState> {
     }
 
     /**
-     * Registers a handler that implements the submit action for an Action based messaging extension.
+     * Registers a handler that implements the submit action for an Action based Message Extension.
      * @template TData Optional. Type of data being submitted.
      * @param commandId ID of the command(s) to register the handler for.
      * @param handler Function to call when the command is received.
