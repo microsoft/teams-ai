@@ -1,9 +1,107 @@
-# Teams Conversation Bot
+# AI in Microsoft Teams: List Bot
 
-Bot Framework v4 Conversation Bot sample for Teams.
+ListBot: Your Ultimate List Management Companion. Powered by advanced AI capabilities, this innovative bot is designed to streamline task list. With the ability to create, update, and search lists and tasks, the ListBot offers a seamless and efficient solution to help you stay on top of your to-do's and maximize productivity. Experience the ease of list management like never before, as the ListBot harnesses the power of AI to simplify your workflow and bring order to your daily tasks and showcases the action chaining capabilities.
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
-how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+
+It shows Teams AI SDK capabilities like:
+
+<details open>
+    <summary><h3>Bot scaffolding</h3></summary>
+    Throughout the 'index.ts' file you'll see the scaffolding created to run a Bot, like storage, authentication, task modules, and action submits.
+</details>
+<details open>
+    <summary><h3>Prompt engineering</h3></summary>
+The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+
+#### generate.txt
+
+```
+This is a Microsoft Teams extension that assists the user with creating posts.
+Using the prompt below, create a post that appropriate for a business environment.
+Prompt: {{data.prompt}}
+Post:
+```
+
+</details>
+<details open>
+    <summary><h3>Action chanining</h3></summary>
+
+```javascript
+// Register action handlers
+app.ai.action('createList', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    ensureListExists(state, data.list);
+    return true;
+});
+
+app.ai.action('deleteList', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    deleteList(state, data.list);
+    return true;
+});
+
+app.ai.action('addItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    const items = getItems(state, data.list);
+    items.push(data.item);
+    setItems(state, data.list, items);
+    return true;
+});
+
+app.ai.action('removeItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    const items = getItems(state, data.list);
+    const index = items.indexOf(data.item);
+    if (index >= 0) {
+        items.splice(index, 1);
+        setItems(state, data.list, items);
+        return true;
+    } else {
+        await context.sendActivity(responses.itemNotFound(data.list, data.item));
+
+        // End the current chain
+        return false;
+    }
+});
+
+app.ai.action('findItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    const items = getItems(state, data.list);
+    const index = items.indexOf(data.item);
+    if (index >= 0) {
+        await context.sendActivity(responses.itemFound(data.list, data.item));
+    } else {
+        await context.sendActivity(responses.itemNotFound(data.list, data.item));
+    }
+
+    // End the current chain
+    return false;
+});
+
+app.ai.action('summarizeLists', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    const lists = state.conversation.value.lists;
+    if (lists) {
+        // Chain into a new summarization prompt
+        state.temp.value.lists = lists;
+        await app.ai.chain(context, state, 'summarize');
+    } else {
+        await context.sendActivity(responses.noListsFound());
+    }
+
+    // End the current chain
+    return false;
+});
+
+// Register a handler to handle unknown actions that might be predicted
+app.ai.action(
+    AI.UnknownActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
+        await context.sendActivity(responses.unknownAction(action!));
+        return false;
+    }
+);
+```
+
+</details>
+
+This bot has been created using [Bot Framework](https://dev.botframework.com). 
+This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+
 
 ## To try this sample in Teams
 
