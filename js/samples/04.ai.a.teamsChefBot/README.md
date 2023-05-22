@@ -1,4 +1,25 @@
-# Microsoft Teams Conversational Bot with GPT: Teams Chef
+# Microsoft Teams Conversational Bot with AI: Teams Chef
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+-   [Microsoft Teams Conversational Bot with AI: Teams Chef](#microsoft-teams-conversational-bot-with-ai-teams-chef)
+    -   [Summary](#summary)
+    -   [Prerequisites](#prerequisites)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
+## Summary
 
 This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook Teams apps. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
@@ -10,7 +31,10 @@ It shows M365 botbuilder SDK capabilities like:
     <summary><h3>Conversational bot scaffolding</h3></summary>
     Throughout the 'index.ts' file you'll see the scaffolding created to run a simple conversational bot, like storage, authentication, and conversation state.
 </details>
-<details open>
+
+Open the panel below to learn fine-tuned details on how this sample works.
+
+<details>
     <summary><h3>Natural language modelling</h3></summary>
     Notice that outside of one '\history' command, the 'index.ts' file relies on GPT for all its natural language modelling - no code is specifically written to handle language processing. Rather, a 'predictionEngine' is defined to handle this for you:
 
@@ -34,7 +58,7 @@ const predictionEngine = new OpenAIPredictionEngine({
 });
 ```
 
-</details open>
+</details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
     Inside the 'predictionEngine', a prompt file is defined:
@@ -45,17 +69,17 @@ prompt: path.join(__dirname, '../src/prompt.txt'),
 
 Open the 'prompt.txt' file to find descriptive prompt engineering that, in plain language and with minor training, instructs GPT how the bot should conduct itself and facilitate conversation:
 
-#### prompt.txt
+#### prompts/chat/skprompt.txt
 
-```
-The following is a conversation with an AI assistant, its name is Teams Chef. 
-Teams Chef is an expert in Microsoft Teams apps development and the Human is junior developer learning Microsoft Teams development for the first time. 
-Teams Chef should always reply by explaining new concepts in simple terms using cooking as parallel concepts. 
+```text
+The following is a conversation with an AI assistant, its name is Teams Chef.
+Teams Chef is an expert in Microsoft Teams apps development and the Human is junior developer learning Microsoft Teams development for the first time.
+Teams Chef should always reply by explaining new concepts in simple terms using cooking as parallel concepts.
 Teams Chef should always greet the human, ask them their name, and then guide the junior developer in his journey to build new apps for Microsoft Teams.
 
 {{$history}}
 Human: {{$input}}
-AI: 
+AI:
 ```
 
 </details>
@@ -88,8 +112,6 @@ Notice that the bot remembered Dave's first message when responding to the secon
     Because this sample leverages GPT for all its natural language modelling, the user can talk to an AI bot in any language of their choosing. The bot will understand and respond appropriately with no additional code required.
 </details>
 
-This bot has been created using [Bot Framework](https://dev.botframework.com).
-
 ## Prerequisites
 
 -   Global Administrator access to a [Microsoft 365 tenant](https://developer.microsoft.com/microsoft-365/dev-program?ocid=MSlearn&WT.mc_id=m365-16105-cxa) with [uploading Teams custom apps enabled](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant#enable-custom-teams-apps-and-turn-on-custom-app-uploading?WT.mc_id=m365-84637-cxa).
@@ -97,27 +119,136 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 -   [NodeJS](https://nodejs.org/en/)
 -   [OpenAI](https://openai.com/api/) key for leveraging GPT
 
-## To try this sample
-
-> Note these instructions are for running the sample on your local machine, the tunnelling solution is required because
-> the Teams service needs to call into the bot.
+## Setting up the sample
 
 1. Clone the repository
 
-1. Update the `.env.local.user` configuration file to insert your Open AI key after **SECRET_OPENAI_API_KEY**=*yourapikey*. 
+    ```bash
+    git clone https://github.com/Microsoft/teams-ai.git
+    ```
 
-1. Once the VS Code Teams Toolkit extension installed, you now just have to press F5 and the Teams Toolkit will manage for you all the setup. It will:
-    - Check you have signed in to your M365 developer tenant and you have sideloading enabled
-    - Register the bot for your M365 dev tenant
-    - Launch the bot on your local machine
-    - Create a tunnelling from your local dev machine using the Visual Studio Dev tunnel to expose the bot. You can switch back to other technology if wanted (like ngrok) by following our [documentation](https://github.com/OfficeDev/TeamsFx/wiki/%7BDebug%7D-Teams-Toolkit-VS-Code-Tasks)
-    - Launch the Teams web app asking you to add the app to your tenant
+2. In the root JavaScript folder, install and build all dependencies
 
-If everything worked well, you should have the following flow at the end after pressing F5:
+    ```bash
+    cd teams-ai/js
+    yarn install
+    yarn build
+    ```
 
-![The app is ready to be installed in Microsoft Teams](/assets/TeamsChef001.jpg "The app is ready to be installed in Microsoft Teams")
+3. In a terminal, navigate to the sample root.
 
-![The AI Chat bot is working properly and answers questions as expected](/assets/TeamsChef002.jpg "The AI Chat bot is working properly and answers questions as expected")
+    ```bash
+    cd teams-ai/js/samples/04.ai.a.teamsChefBot/
+    ```
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below.
+
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
+
+### Using Teams Toolkit for Visual Studio Code
+
+The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
+
+1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
+1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+1. Select **File > Open Folder** in VS Code and choose this samples directory from the repo
+1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
+1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
+1. In the browser that launches, select the **Add** button to install the app to Teams.
+
+> If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
+
+### Using Teams Toolkit CLI
+
+You can also use the Teams Toolkit CLI to run this sample.
+
+1. Install the CLI
+
+    ```bash
+    npm install -g @microsoft/teamsfx-cli
+    ```
+
+1. Open a second shell instance and run ngrok tunneling service - point to port 3978
+
+    ```bash
+    ngrok http --host-header=rewrite 3978
+    ```
+
+1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
+
+    ```bash
+    BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
+    BOT_DOMAIN={ngrok-url}.ngrok.io
+    ```
+
+1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
+
+    ```bash
+    cd teams-ai/js/samples/01.messaging.a.echobot/
+    teamsfx provision --env local
+
+    ```
+
+1. Next, use the CLI to validate and create an app package
+
+    ```bash
+    teamsfx deploy --env local
+    ```
+
+1. Finally, use the CLI to preview the app in Teams
+
+    ```bash
+    teamsfx preview --env local
+    ```
+
+### Manually upload the app to a Teams desktop client
+
+> If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
+
+1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.echobot/`
+
+    ```bash
+    cd teams-ai/js/samples/01.messaging.a.echobot/
+    ```
+
+1. Run ngrok tunneling service - point to port 3978
+
+    ```bash
+    ngrok http --host-header=rewrite 3978
+    ```
+
+1. Create [Bot Framework registration resource](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration) in Azure
+
+    - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample.
+    - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
+
+1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
+
+1. **_This step is specific to Teams._**
+
+    - **Edit** the `manifest.json` contained in the `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `${{TEAMS_APP_ID}}` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `${{BOT_ID}}`. Replace everywhere you see `${{BOT_DOMAIN}}` with the domain part of the URL created by your tunneling solution.
+    - **Zip** up the contents of the `appPackage` folder to create a `manifest.zip`
+
+1. Run your app from the command line:
+
+    ```bash
+    yarn start
+    ```
+
+1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
+
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. To use, simply download the app and enter your local endpoint.
+
+In order to test remote apps, you will need to use a tunneling service like ngrok.
+
+Please note:
+
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file. If you are using Teams Toolkit, the `.env` folder will be automatically generated for you.
 
 ## Interacting with the bot
 
