@@ -11,7 +11,7 @@ For now, code-availability is limited to the [`js`](./js/) folder. **dotnet pari
 
 ## Getting Started
 
-### 🖇️ Jump right in❗️ ⤵️ 📎
+### 🖇️ Jump right in❗️ 📎
 
 > If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.chefbot) sample. This sample is a simple bot that uses the OpenAI API to build Teams apps.
 
