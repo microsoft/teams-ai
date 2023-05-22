@@ -75,7 +75,7 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
 
 This bot has been created using [Bot Framework](https://dev.botframework.com).
 
-## To try this sample in Teams
+## Setting up the sample
 
 1. Clone the repository
 
@@ -107,7 +107,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -127,6 +127,7 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
+
 1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
@@ -134,6 +135,8 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```bash
     cd teams-ai/js/samples/04.e.twentyquestions/
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -192,11 +195,11 @@ The message extension has some limitations, including:
 
 ## Deploy the bot to Azure
 
-You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. 
+You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/). 
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
@@ -205,6 +208,6 @@ Use the **Provision**, **Deploy**, and **Publish** buttons of the Teams Toolkit 
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
-

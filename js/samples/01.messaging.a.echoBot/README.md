@@ -2,7 +2,24 @@
 
 This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
-## To try this sample in Teams
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+-   [Teams Echo Bot](#teams-echo-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
+## Setting up the sample
 
 1. Clone the repository
 
@@ -17,6 +34,18 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
     yarn install
     yarn build
     ```
+
+3. In a terminal, navigate to the sample root.
+
+    ```bash
+    cd teams-ai/js/samples/01.messaging.a.echobot/
+    ```
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below.
+
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -33,7 +62,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -49,7 +78,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
 
-    ```
+    ```bash
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
@@ -59,6 +88,8 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```bash
     cd teams-ai/js/samples/01.messaging.a.echobot/
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -108,6 +139,17 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
 
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. To use, simply download the app and enter your local endpoint.
+
+In order to test remote apps, you will need to use a tunneling service like ngrok.
+
+Please note:
+
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file. If you are using Teams Toolkit, the `.env` folder will be automatically generated for you.
+
 ## Interacting with the bot
 
 You can interact with this bot by sending it a message, which will echo back to you.
@@ -119,5 +161,6 @@ You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sampl
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)

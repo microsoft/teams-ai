@@ -1,8 +1,7 @@
 # AI in Microsoft Teams: Light Bot
 
-LightBot: Your Enlightened Assistant. This example  showcases how the LightBot understands user intent, accurately interpreting commands to effortlessly control light bot. 
+LightBot: Your Enlightened Assistant. This example showcases how the LightBot understands user intent, accurately interpreting commands to effortlessly control light bot.
 Explore how the LightBot understands, allowing precise control over turning lights on and off, while demonstrating the power and potential of the Language Model in understanding and executing user intent accurately mapped with app actions.
-
 
 It shows Teams AI SDK capabilities like:
 
@@ -30,41 +29,29 @@ Since a message extension is a UI-based component, user actions are explicitly d
 
 ```javascript
 // Add a prompt function for getting the current status of the lights
-app.ai.prompts.addFunction(
-    'getLightStatus',
-    async (context: TurnContext, state: ApplicationTurnState) => {
-        return state.conversation.value.lightsOn ? 'on' : 'off';
-    }
-);
+app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
+    return state.conversation.value.lightsOn ? 'on' : 'off';
+});
 
 // Register action handlers
-app.ai.action(
-    'LightsOn',
-    async (context: TurnContext, state: ApplicationTurnState) => {
-        state.conversation.value.lightsOn = true;
-        await context.sendActivity(`[lights on]`);
-        return true;
-    }
-);
+app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.value.lightsOn = true;
+    await context.sendActivity(`[lights on]`);
+    return true;
+});
 
-app.ai.action(
-    'LightsOff',
-    async (context: TurnContext, state: ApplicationTurnState) => {
-        state.conversation.value.lightsOn = false;
-        await context.sendActivity(`[lights off]`);
-        return true;
-    }
-);
+app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.value.lightsOn = false;
+    await context.sendActivity(`[lights off]`);
+    return true;
+});
 
-app.ai.action(
-    'Pause',
-    async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
+app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
     const time = data.time ? parseInt(data.time) : 1000;
-        await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
-        await new Promise((resolve) => setTimeout(resolve, time));
-        return true;
-    }
-);
+    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+    await new Promise((resolve) => setTimeout(resolve, time));
+    return true;
+});
 
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(
@@ -78,12 +65,10 @@ app.ai.action(
 
 </details>
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). 
+This bot has been created using [Bot Framework](https://dev.botframework.com).
 This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
 
-
-
-## To try this sample in Teams
+## Setting up the sample
 
 1. Clone the repository
 
@@ -97,6 +82,12 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
     cd teams-ai/js
     yarn install
     yarn build
+    ```
+
+3. In a terminal, navigate to the sample root.
+
+    ```bash
+    cd teams-ai/js/samples/04.ai.c.actionMapping.lightBot/
     ```
 
 ### Using Teams Toolkit for Visual Studio Code
@@ -115,7 +106,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -131,10 +122,11 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
 
-    ```
+    ```bash
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
+
 1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
@@ -142,6 +134,8 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```bash
     cd teams-ai/js/samples/04.ai.c.actionmapping.lightbot
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -193,32 +187,26 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 ## Interacting with the bot
 
-You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
+You can tell the bot to do actions like turning lights on, off, or dimming them. You can also ask about the status of the lights.
 
-1. **Show Welcome**
+## Testing in BotFramework Emulator
 
--   **Result:** The bot will send the welcome card for you to interact with
--   **Valid Scopes:** personal, group chat, team chat
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. To use, simply download the app and enter your local endpoint.
 
-2. **MentionMe**
+In order to test remote apps, you will need to use a tunneling service like ngrok.
 
--   **Result:** The bot will respond to the message and mention the user
--   **Valid Scopes:** personal, group chat, team chat
+Please note:
 
-3. **MessageAllMembers**
-
--   **Result:** The bot will send a 1-on-1 message to each member in the current conversation (aka on the conversation's roster).
--   **Valid Scopes:** personal, group chat, team chat
-
-You can select an option from the command list by typing `@TeamsConversationBot` into the compose message area and `What can I do?` text above the compose area.
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file. If you are using Teams Toolkit, the `.env` folder will be automatically generated for you.
 
 ## Deploy the bot to Azure
 
-You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. 
+You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/). 
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
@@ -227,5 +215,6 @@ Use the **Provision**, **Deploy**, and **Publish** buttons of the Teams Toolkit 
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)

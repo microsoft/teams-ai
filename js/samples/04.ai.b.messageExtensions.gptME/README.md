@@ -1,5 +1,26 @@
 # AI in Microsoft Teams Message Extensions: GPT-ME
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+-   [AI in Microsoft Teams Message Extensions: GPT-ME](#ai-in-microsoft-teams-message-extensions-gpt-me)
+    -   [Summary](#summary)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Interacting with the message extension](#interacting-with-the-message-extension)
+    -   [Limitations](#limitations)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
+## Summary
+
 This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
 This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
@@ -12,16 +33,14 @@ It shows Teams AI SDK capabilities like:
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
-The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+The `generate` and `update` directories have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in `generate`:
 
-#### generate.txt
+### Generate prompt
 
-```
 This is a Microsoft Teams extension that assists the user with creating posts.
 Using the prompt below, create a post that appropriate for a business environment.
 Prompt: {{data.prompt}}
 Post:
-```
 
 </details>
 <details open>
@@ -64,7 +83,7 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: Tur
 
 This bot has been created using [Bot Framework](https://dev.botframework.com).
 
-## To try this sample in Teams
+## Setting up the sample
 
 1. Clone the repository
 
@@ -79,6 +98,18 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
     yarn install
     yarn build
     ```
+
+3. In a terminal, navigate to the sample root.
+
+    ```bash
+    cd teams-ai/js/samples/04.ai.b.messageExtensions.gptME/
+    ```
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below.
+
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -96,7 +127,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -112,10 +143,11 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
 
-    ```
+    ```bash
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
+
 1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
@@ -123,6 +155,8 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```bash
     cd teams-ai/js/samples/04.ai.b.messagingextension.gptme/
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -191,11 +225,11 @@ The message extension has some limitations, including:
 
 ## Deploy the bot to Azure
 
-You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. 
+You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/). 
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
@@ -203,6 +237,18 @@ Use the **Provision**, **Deploy**, and **Publish** buttons of the Teams Toolkit 
 
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. To use, simply download the app and enter your local endpoint.
+
+In order to test remote apps, you will need to use a tunneling service like ngrok.
+
+Please note:
+
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file. If you are using Teams Toolkit, the `.env` folder will be automatically generated for you.
+
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)

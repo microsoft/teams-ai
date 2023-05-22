@@ -1,8 +1,28 @@
-# Teams TypeAhead Bot
+# Teams Type-Ahead Bot
 
-Type-Ahead bot  ives an enhanced search experience with Adaptive Cards to search and select data.
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
-## To try this sample in Teams
+<!-- code_chunk_output -->
+
+-   [Teams Type-Ahead Bot](#teams-type-ahead-bot)
+    -   [Summary](#summary)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
+## Summary
+
+This sample shows how to incorporate Adaptive Cards into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Type-Ahead bot gives an enhanced search experience with Adaptive Cards to search and select data.
+
+## Setting up the sample
 
 1. Clone the repository
 
@@ -17,6 +37,18 @@ Type-Ahead bot  ives an enhanced search experience with Adaptive Cards to search
     yarn install
     yarn build
     ```
+
+3. In a terminal, navigate to the sample root.
+
+    ```bash
+    cd teams-ai/js/samples/03.AdaptiveCards.a.TypeAhead/
+    ```
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below.
+
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -33,7 +65,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 ### Using Teams Toolkit CLI
 
-You can also use the Teams Toolkit CLI to run this sample. 
+You can also use the Teams Toolkit CLI to run this sample.
 
 1. Install the CLI
 
@@ -49,7 +81,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
 
-    ```
+    ```bash
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
@@ -59,6 +91,8 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```bash
     cd teams-ai/js/samples/03.adaptivecards.a.typeaheadbot/
     teamsfx provision --env local
+
+    ```
 
 1. Next, use the CLI to validate and create an app package
 
@@ -112,6 +146,17 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 You can interact with this bot by sending it a message. Send it a message of `dynamic` or `static` and it will respond with different Adaptive Cards.
 
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. To use, simply download the app and enter your local endpoint.
+
+In order to test remote apps, you will need to use a tunneling service like ngrok.
+
+Please note:
+
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file. If you are using Teams Toolkit, the `.env` folder will be automatically generated for you.
+
 ## Deploy the bot to Azure
 
 You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure. Use the **Provision** and **Deploy** menus of the Teams Toolkit extension or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
@@ -119,5 +164,6 @@ You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sampl
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
 
 ## Further reading
+
 -   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
