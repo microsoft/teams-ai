@@ -24,7 +24,7 @@ This sample illustrates the Teams AI SDK's ability to scaffold conversational bo
 
 ## AI-Powered Experiences
 
-/*
+
 ### Conversational AI w/Natural Language: [Chef bot](04.ai.a.teamsChefBot/)
 
 A conversational bot for Microsoft Teams, designed as a helper bot for building Teams app. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
@@ -39,7 +39,7 @@ It shows Teams AI SDK capabilities like:
 -   Localization across languages
 -   Conversational session history
 
-*/
+
 
 ### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.gptME/)
 
