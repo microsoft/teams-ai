@@ -64,7 +64,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from 'botbuilder-m365';
+import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from "@microsoft/teams-ai";
 import * as responses from './responses';
 
 // Strongly type the applications turn state
@@ -159,10 +159,14 @@ app.ai.action('summarize', async (context, state, data: EntityData) => {
 });
 
 // Register a handler to handle unknown actions that might be predicted
-app.ai.action(AI.UnknownActionName, async (context, state, data, action) => {
-    await context.sendActivity(responses.unknownAction(action));
-    return false;
-});
+// Register a handler to handle unknown actions that might be predicted
+app.ai.action(
+    AI.UnknownActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
+        await context.sendActivity(responses.unknownAction(action!));
+        return false;
+    }
+);
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {

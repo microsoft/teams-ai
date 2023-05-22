@@ -1,9 +1,9 @@
-# Teams Conversation Bot
+# Microsoft Teams Conversational Bot with GPT: DevOps Bot
 
-Bot Framework v4 Conversation Bot sample for Teams.
+This is a conversational bot for Microsoft Teams that demonstrates how you could build a DevOps bot. The bot uses the gpt-3.5-turbo model to chat with Teams users and perform DevOps action such as create, upadte, triage and summarize work items.
 
-This bot has been created using [Bot Framework](https://dev.botframework.com). This sample shows
-how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
+This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
+
 ## Prerequisites
 
 -   Microsoft Teams is installed and you have an account
@@ -17,22 +17,22 @@ how to incorporate basic conversational flow into a Teams application. It also i
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/Microsoft/botbuilder-m365.git
+    git clone https://github.com/microsoft/teams-ai.git
     ```
 
 1. In the root JavaScript folder, install and build all dependencies
 
     ```bash
-    cd botbuilder-m365/js
+    cd teams-ai/js
     yarn install
     yarn build
     ```
 
     - If you already ran `yarn install` and `yarn build` in the `js` folder, you are ready to get started with ngrok. Otherwise, you need to run `yarn install` and `yarn build` in the `js` folder.
 
-Navigate to the sample directory
+    Navigate to the sample directory
 
-`cd samples/04.ai.e.chainedActions.devOpsBot/README.md`
+    `cd samples/04.ai.e.chainedActions.devOpsBot`
 
 1. Run ngrok tunneling service - point to port 3978
 
@@ -64,21 +64,26 @@ Navigate to the sample directory
 
 ## Interacting with the bot
 
-You can interact with this bot by sending it a message, or selecting a command from the command list. The bot will respond to the following strings.
+You can interact with this bot by sending it a message. The bot will respond to the following strings.
 
-1. **Show Welcome**
+1. **create work item to track new functionality in Adaptive card and assign it to John**
 
--   **Result:** The bot will send the welcome card for you to interact with
+-   **Result:** The bot will create a tracking item in Azure DevOps and assign it to John
 -   **Valid Scopes:** personal, group chat, team chat
 
-2. **MentionMe**
+2. **update title of work item 1 to create a new bot in azure**
 
--   **Result:** The bot will respond to the message and mention the user
+-   **Result:** The bot will update the title of work item 1 to create a new bot in azure.
 -   **Valid Scopes:** personal, group chat, team chat
 
-3. **MessageAllMembers**
+3. **triage work item 1 as "in progress"**
 
--   **Result:** The bot will send a 1:1 message to each member in the current conversation (aka on the conversation's roster).
+-   **Result:** The bot will update the state of work item 1 to "in progress".
+-   **Valid Scopes:** personal, group chat, team chat
+
+4. **summarize work items"**
+
+-   **Result:** The bot will summarize the work items and respond back with an adaptive card.
 -   **Valid Scopes:** personal, group chat, team chat
 
 You can select an option from the command list by typing `@TeamsConversationBot` into the compose message area and `What can I do?` text above the compose area.
