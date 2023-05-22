@@ -7,11 +7,11 @@
 -   [Teams Type-Ahead Bot](#teams-type-ahead-bot)
     -   [Summary](#summary)
     -   [Setting up the sample](#setting-up-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Multiple ways to test](#multiple-ways-to-test)
         -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
         -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
         -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
-    -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
         -   [Directions](#directions)
     -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
@@ -44,6 +44,10 @@ This sample shows how to incorporate Adaptive Cards into a Microsoft Teams appli
     ```bash
     cd samples/03.AdaptiveCards.a.TypeAhead/
     ```
+
+## Interacting with the bot
+
+You can interact with this bot by sending it a message. Send it a message of `dynamic` or `static` and it will respond with different Adaptive Cards.
 
 ## Multiple ways to test
 
@@ -142,10 +146,6 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
-
-## Interacting with the bot
-
-You can interact with this bot by sending it a message. Send it a message of `dynamic` or `static` and it will respond with different Adaptive Cards.
 
 ## Testing in BotFramework Emulator
 

@@ -1,5 +1,24 @@
 # AI in Microsoft Teams: Light Bot
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+-   [AI in Microsoft Teams: Light Bot](#ai-in-microsoft-teams-light-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+        -   [Directions](#directions)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator-1)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
 LightBot: Your Enlightened Assistant. This example showcases how the LightBot understands user intent, accurately interpreting commands to effortlessly control light bot.
 Explore how the LightBot understands, allowing precise control over turning lights on and off, while demonstrating the power and potential of the Language Model in understanding and executing user intent accurately mapped with app actions.
 
@@ -11,11 +30,11 @@ It shows Teams AI SDK capabilities like:
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
-The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+The prompt files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example:
 
-#### generate.txt
+#### skprompt.txt
 
-```
+```text
 This is a Microsoft Teams extension that assists the user with creating posts.
 Using the prompt below, create a post that appropriate for a business environment.
 Prompt: {{data.prompt}}
@@ -27,7 +46,7 @@ Post:
     <summary><h3>Action mapping</h3></summary>
 Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
 
-```javascript
+````javascript
 // Add a prompt function for getting the current status of the lights
 app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
     return state.conversation.value.lightsOn ? 'on' : 'off';
@@ -53,19 +72,8 @@ app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState,
     return true;
 });
 
-// Register a handler to handle unknown actions that might be predicted
-app.ai.action(
-    AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: TData, action: string | undefined) => {
-        await context.sendActivity(responses.unknownAction(action || 'unknown'));
-        return false;
-    }
-);
-```
-
 </details>
 
-This bot has been created using [Bot Framework](https://dev.botframework.com).
 This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
 
 ## Setting up the sample
@@ -89,6 +97,16 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
     ```bash
     cd teams-ai/js/samples/04.ai.c.actionMapping.lightBot/
     ```
+
+## Interacting with the bot
+
+You can tell the bot to do actions like turning lights on, off, or dimming them. You can also ask about the status of the lights.
+
+## Multiple ways to test
+
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
+
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -132,7 +150,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/04.ai.c.actionmapping.lightbot
+    cd teams-ai/js/samples/04.ai.c.actionMapping.lightbot
     teamsfx provision --env local
 
     ```
@@ -185,9 +203,27 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
 
-## Interacting with the bot
+## Testing in BotFramework Emulator
 
-You can tell the bot to do actions like turning lights on, off, or dimming them. You can also ask about the status of the lights.
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
+
+### Directions
+
+1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
+2. Launch Bot Framework Emulator
+3. Run the app you are in the directory for.
+
+```bash
+yarn start
+````
+
+4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
+
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 
 ## Testing in BotFramework Emulator
 

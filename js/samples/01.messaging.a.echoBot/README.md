@@ -8,12 +8,14 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 
 -   [Teams Echo Bot](#teams-echo-bot)
     -   [Setting up the sample](#setting-up-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Multiple ways to test](#multiple-ways-to-test)
         -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
         -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
         -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
     -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
-    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator-1)
+        -   [Directions](#directions)
     -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
     -   [Further reading](#further-reading)
 
@@ -39,7 +41,12 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 
     ```bash
     cd teams-ai/js/samples/01.messaging.a.echobot/
+    yarn start
     ```
+
+## Interacting with the bot
+
+You can interact with this bot by sending it a message, which will echo back to you.
 
 ## Multiple ways to test
 
@@ -141,18 +148,25 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 ## Testing in BotFramework Emulator
 
-[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. To use, simply download the app and enter your local endpoint.
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
 
-In order to test remote apps, you will need to use a tunneling service like ngrok.
+### Directions
 
-Please note:
+1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
+2. Launch Bot Framework Emulator
+3. Run the app you are in the directory for.
 
+```bash
+yarn start
+```
+
+4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
+
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
 -   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
--   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file. If you are using Teams Toolkit, the `.env` folder will be automatically generated for you.
-
-## Interacting with the bot
-
-You can interact with this bot by sending it a message, which will echo back to you.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 
 ## Deploy the bot to Azure
 

@@ -6,14 +6,14 @@
 
 -   [Teams Search Command Message Extension](#teams-search-command-message-extension)
     -   [Summary](#summary)
-    -   [Setting up the sample](#to-try-this-sample-in-teams)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Multiple ways to test](#multiple-ways-to-test)
     -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
         -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
     -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
         -   [Directions](#directions)
     -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
-    -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
     -   [Further reading](#further-reading)
 
@@ -44,6 +44,10 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
     ```bash
     cd teams-ai/js/samples/01.messageExtensions.a.searchCommand/
     ```
+
+## Interacting with the bot
+
+You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NPM for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
 
 ## Multiple ways to test
 
@@ -166,10 +170,6 @@ Please also note that Channel-specific features (For example, Teams Message Exte
     ```
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
-
-## Interacting with the bot
-
-You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NPM for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
 
 ## Deploy the bot to Azure
 

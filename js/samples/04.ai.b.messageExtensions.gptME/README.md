@@ -6,15 +6,20 @@
 
 -   [AI in Microsoft Teams Message Extensions: GPT-ME](#ai-in-microsoft-teams-message-extensions-gpt-me)
     -   [Summary](#summary)
+        -   [Message extension scaffolding](#message-extension-scaffolding)
+        -   [Prompt engineering](#prompt-engineering)
+        -   [Generate prompt](#generate-prompt)
     -   [Setting up the sample](#setting-up-the-sample)
     -   [Multiple ways to test](#multiple-ways-to-test)
         -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
         -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
         -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+        -   [Directions](#directions)
     -   [Interacting with the message extension](#interacting-with-the-message-extension)
     -   [Limitations](#limitations)
     -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
-    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator-1)
     -   [Further reading](#further-reading)
 
 <!-- /code_chunk_output -->
@@ -27,23 +32,26 @@ This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to
 
 It shows Teams AI SDK capabilities like:
 
-<details open>
-    <summary><h3>Message extension scaffolding</h3></summary>
+### Message extension scaffolding
+
     Throughout the 'index.ts' file you'll see the scaffolding created to run a simple message extension, like storage, authentication, task modules, and action submits.
-</details>
-<details open>
-    <summary><h3>Prompt engineering</h3></summary>
+
+### Prompt engineering
+
 The `generate` and `update` directories have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in `generate`:
 
 ### Generate prompt
 
+```text
 This is a Microsoft Teams extension that assists the user with creating posts.
+
 Using the prompt below, create a post that appropriate for a business environment.
+
 Prompt: {{data.prompt}}
 Post:
+```
 
-</details>
-<details open>
+<details>
     <summary><h3>Action mapping</h3></summary>
 Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
 
@@ -80,8 +88,6 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: Tur
 ```
 
 </details>
-
-This bot has been created using [Bot Framework](https://dev.botframework.com).
 
 ## Setting up the sample
 
@@ -205,6 +211,28 @@ You can also use the Teams Toolkit CLI to run this sample.
     ```
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
+
+## Testing in BotFramework Emulator
+
+[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
+
+### Directions
+
+1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
+2. Launch Bot Framework Emulator
+3. Run the app you are in the directory for.
+
+```bash
+yarn start
+```
+
+4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
+
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 
 ## Interacting with the message extension
 
