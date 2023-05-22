@@ -1,6 +1,9 @@
 # Teams Search Command Message Extension
 
-This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+Messaging Extensions are a special kind of Microsoft Teams application that is supported by the Bot Framework v4. SDK
+
+There are two basic types of Message Extensions in Teams: Search-based and Action-based. This sample illustrates how to build a Search-based Messaging Extension with ease using the Teams AI libraries. 
+
 
 ## To try this sample in Teams
 
