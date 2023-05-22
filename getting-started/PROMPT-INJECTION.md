@@ -1,6 +1,6 @@
-> Overview & writeup originated from Autumn Wyborny
-
 # Prompt injection?
+
+> Overview & writeup originated from Autumn Wyborny
 
 Prompt injection is a technique in which you alter the content or meaning of a GPT prompt to produce different outcomes than was intended.
 

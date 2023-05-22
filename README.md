@@ -10,6 +10,12 @@ This SDK is under public preview and is subject to change. We welcome your feedb
 
 ## Getting Started
 
+### Jump right in!
+
+> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.chefbot) sample. This sample is a simple bot that uses the OpenAI API to build Teams apps.
+
+### Start with migration and other getting started guides
+
 To get started, check out the getting started table of contents.
 
 0. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
@@ -34,7 +40,7 @@ This SDK is licensed under the MIT License. This SDK includes tools to use APIs 
 
 ## Capabilities
 
-### Teams-Centric Component Scaffolding
+### Teams-centric component scaffolding
 
 > For examples of the below, browse through the [JS](./js/samples/) folders.
 > Simple scaffolding for any conversational app component, inlcuding:
@@ -43,6 +49,10 @@ This SDK is licensed under the MIT License. This SDK includes tools to use APIs 
 - Message Extensions
 - Link unfurling
 - Adaptive Cards
+
+> Below is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.
+
+![Teams-AI user-to-bot flow](https://github.com/microsoft/teams-ai/assets/14900841/2612b0fb-dae1-400c-8321-c01b9e44fe62)
 
 ### Natural Language Modelling
 
