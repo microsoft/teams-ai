@@ -1,4 +1,4 @@
-# <image src="https://github.com/microsoft/teams-ai/assets/14900841/31453242-4da6-424b-97a3-8a66207f8d20)" height="10%" width="10%" /> Teams AI SDK
+# <image src="https://github.com/microsoft/teams-ai/assets/14900841/31453242-4da6-424b-97a3-8a66207f8d20" height="10%" width="10%" /> Teams AI SDK
 
 Welcome to the Teams AI SDK! This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams AI-interacting bots.
 
