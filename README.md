@@ -12,7 +12,7 @@ This SDK is under public preview and is subject to change. We welcome your feedb
 
 To get started, check out the getting started table of contents.
 
-0. Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
+0. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
 1. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
 2. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
 3. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
