@@ -35,7 +35,7 @@ To sign up, visit [https://aka.ms/hack-together-teams](https://aka.ms/hack-toget
 ### Teams-centric component scaffolding
 
 > For examples of the below, browse through the [JS](./js/samples/) folders.
-> Simple scaffolding for any conversational app component, inlcuding:
+> Simple scaffolding for any conversational app component, including:
 
 - Chat bots
 - Message Extensions
