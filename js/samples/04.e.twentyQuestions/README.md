@@ -1,14 +1,11 @@
 # AI in Microsoft Teams: Twenty Qestions
 
-This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
-
-This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
-
-It shows Teams AI SDK capabilities like:
+Welcome to the 20 Questions Bot: The Ultimate Guessing Game! This developer sample application showcases the incredible capabilities of language models and the concept of user intent. Challenge your skills as the human player and try to guess a secret within 20 questions, while the AI-powered bot answers your queries about the secret. Experience firsthand how language models interpret user input and provide informative responses, creating an engaging and interactive gaming experience. Get ready to dive into the world of language models and explore the fascinating realm of user interaction and intent.
+It shows following SDK capabilities: 
 
 <details open>
-    <summary><h3>Message extension scaffolding</h3></summary>
-    Throughout the 'index.ts' file you'll see the scaffolding created to run a simple message extension, like storage, authentication, task modules, and action submits.
+    <summary><h3>Bot scaffolding</h3></summary>
+    Throughout the 'index.ts' file you'll see the scaffolding created to run a simple Bot, like storage, authentication, task modules, and action submits.
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
@@ -25,39 +22,53 @@ Post:
 
 </details>
 <details open>
-    <summary><h3>Action mapping</h3></summary>
-Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
+    <summary><h3>QnA bot with LLM</h3></summary>
+
 
 ```javascript
-interface SubmitData {
-    verb: 'generate' | 'update' | 'post';
-    prompt?: string;
-    post?: string;
-}
-
-app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: TurnContext, state: ApplicationTurnState, data: SubmitData) => {
-    try {
-        switch (data.verb) {
-            case 'generate':
-                // Call GPT and return response view
-                return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/generate.txt', data);
-            case 'update':
-                // Call GPT and return an updated response view
-                return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/update.txt', data);
-            case 'post':
-            default:
-                // Preview the post as an adaptive card
-                const card = createPostCard(data.post!);
-                return {
-                    type: 'result',
-                    attachmentLayout: 'list',
-                    attachments: [card]
-                } as MessagingExtensionResult;
-        }
-    } catch (err: any) {
-        return `Something went wrong: ${err.toString()}`;
+app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
+    let { secretWord, guessCount, remainingGuesses } = state.conversation.value;
+    if (secretWord && secretWord.length < 1) {
+        throw new Error('No secret word is assigned.');
     }
+    if (secretWord) {
+        guessCount++;
+        remainingGuesses--;
+
+        // Check for correct guess
+        if (context.activity.text.toLowerCase().indexOf(secretWord.toLowerCase()) >= 0) {
+            await context.sendActivity(responses.youWin(secretWord));
+            secretWord = '';
+            guessCount = remainingGuesses = 0;
+        } else if (remainingGuesses == 0) {
+            await context.sendActivity(responses.youLose(secretWord));
+            secretWord = '';
+            guessCount = remainingGuesses = 0;
+        } else {
+            // Ask GPT for a hint
+            const response = await getHint(context, state);
+            if (response.toLowerCase().indexOf(secretWord.toLowerCase()) >= 0) {
+                await context.sendActivity(`[${guessCount}] ${responses.blockSecretWord()}`);
+            } else if (remainingGuesses == 1) {
+                await context.sendActivity(`[${guessCount}] ${responses.lastGuess(response)}`);
+            } else {
+                await context.sendActivity(`[${guessCount}] ${response}`);
+            }
+        }
+    } else {
+        // Start new game
+        secretWord = responses.pickSecretWord();
+        guessCount = 0;
+        remainingGuesses = 20;
+        await context.sendActivity(responses.startGame());
+    }
+
+    // Save game state
+    state.conversation.value.secretWord = secretWord;
+    state.conversation.value.guessCount = guessCount;
+    state.conversation.value.remainingGuesses = remainingGuesses;
 });
+
 ```
 
 </details>

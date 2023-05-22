@@ -1,6 +1,6 @@
 # Teams TypeAhead Bot
 
-This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+Type-Ahead bot  ives an enhanced search experience with Adaptive Cards to search and select data.
 
 ## To try this sample in Teams
 

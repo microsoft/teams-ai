@@ -24,7 +24,7 @@ This sample illustrates the Teams AI SDK's ability to scaffold conversational bo
 
 ## AI-Powered Experiences
 
-/*
+
 ### Conversational AI w/Natural Language: [Chef bot](04.ai.a.teamsChefBot/)
 
 A conversational bot for Microsoft Teams, designed as a helper bot for building Teams app. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
@@ -39,7 +39,7 @@ It shows Teams AI SDK capabilities like:
 -   Localization across languages
 -   Conversational session history
 
-*/
+
 
 ### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.gptME/)
 
@@ -73,6 +73,25 @@ It shows a broad range of Teams AI SDK capabilities like:
 ### Chained Actions: [List Generator AI Assistant](04.ai.d.chainedActions.listBot/)
 
 Similar to the Light On/Off sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
+
+This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
+
+It shows a broad range of Teams AI SDK capabilities like:
+
+-   Conversational bot scaffolding
+-   Adaptive Cards
+-   Natural language modelling
+-   Prompt engineering
+-   Localization across languages
+-   Conversational session history
+-   Topic filtering
+-   Prediction engine mapping intents to actions with third party business logic
+-   Mixing GPT-powered conversational responses with manually defined responses
+
+
+### Chained Actions: [DevOps AI Assistant](04.ai.e.chainedActions.devOpsBot)
+
+Similar to the List Generator AI Assistant sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
 
 This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
 
