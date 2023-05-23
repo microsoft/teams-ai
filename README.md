@@ -7,7 +7,7 @@ Welcome to the Teams AI Library! This SDK is specifically designed to assist you
 <figcaption>This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.</figcaption>
 </figure>
 </p>
-The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js/) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). We are actively developing parity for .NET, which will be available soon.
+The SDK is currently available for JavaScript/TypeScript applications in the <a href="./js" ><code>js</code></a> folder and via the <a href="https://www.npmjs.com/package/@microsoft/teams-ai">teams-ai package on NPM</a>. We are actively developing parity for .NET, which will be available soon.
 
 ## Getting Started
 
