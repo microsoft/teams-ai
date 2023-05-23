@@ -486,7 +486,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     // Get the auth token
                     const token = await this._authentication.signInUser(context, state);
                     if (token) {
-                        state['temp'].value.token = token;
+                        state['temp'].value.authToken = token;
                     } else {
                         // Save turn state and end
                         // - This saves the current dialog stack.
@@ -881,3 +881,5 @@ type ApplicationEventHandler<TState extends TurnState> = (
     context: TurnContext,
     state: TState
 ) => Promise<boolean>;
+
+

@@ -45,7 +45,11 @@ export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
     public get(context: TurnContext): Promise<T | undefined>;
     public get(context: TurnContext, defaultValue: T): Promise<T>;
     public get(context: unknown, defaultValue?: unknown): Promise<T | undefined> | Promise<T> {
-        return Promise.resolve(this._state.value[this._propertyName] ?? defaultValue);
+        if (this._state.value[this._propertyName] == undefined)  {
+            this._state.value[this._propertyName] = defaultValue;
+        }
+
+        return Promise.resolve(this._state.value[this._propertyName]);
     }
 
     /**
