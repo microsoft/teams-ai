@@ -1,28 +1,26 @@
-# <image src="https://github.com/microsoft/teams-ai/assets/14900841/31453242-4da6-424b-97a3-8a66207f8d20" height="10%" width="10%" /> Teams AI SDK
-
-Welcome to the Teams AI SDK! This SDK is designed to help you build bots that can interact with Teams and Microsoft 365 apps. It is built on top of the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) to make it easier to build Teams AI-interacting bots.
-
-For now, code-availability is limited to the [`js`](./js/) folder. **dotnet parity is in production and will be available soon.**
+# <image src="https://github.com/microsoft/teams-ai/assets/14900841/31453242-4da6-424b-97a3-8a66207f8d20" height="10%" width="10%" /> Teams AI Library
+Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 
 <figure>
 <img src="https://github.com/microsoft/teams-ai/assets/14900841/2612b0fb-dae1-400c-8321-c01b9e44fe62" />
 <figcaption>This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.</figcaption>
 </figure>
 
+The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js/) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). We are actively developing parity for .NET, which will be available soon.
+
 ## Getting Started
 
-### 🖇️ Jump right in❗️ 📎
 
-> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.chefbot) sample. This sample is a simple bot that uses the OpenAI API to build Teams apps.
+> ### 🖇️ Jump right in❗️ 📎 
+> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.teamsChefBot) sample. This sample is a simple bot that uses the OpenAI GPT model to build a Teams app. Just load it up in Visual Code and hit F5! 🎉
 
-### Start with migration and other getting started guides
+### Start with our getting started guides
 
-To get started, check out the getting started table of contents.
-
-0. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
-1. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
-2. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
-3. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
+0. [Teams AI Library documentation](https://review.learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview) - Take a look our documentation!
+1. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
+2. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
+3. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
+4. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
 
 # Join us for the Global Teams Hackathon event
 
