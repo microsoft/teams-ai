@@ -1,5 +1,7 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
 
+> Please note: this sample is still being tweaked and therefore not setup with Teams Toolkit yet. We'll get it updated ASAP!
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
