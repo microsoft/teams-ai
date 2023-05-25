@@ -17,7 +17,7 @@ The SDK is currently available for JavaScript/TypeScript applications in the <a 
 
 ### Start with our getting started guides
 
-0. [Teams AI Library documentation](https://review.learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview) - Take a look our documentation!
+0. [Teams AI Library documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview) - Take a look our documentation!
 1. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
 2. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
 3. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
