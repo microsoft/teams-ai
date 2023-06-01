@@ -182,10 +182,6 @@ export class TaskModules<TState extends TurnState> {
                                     value: result as TaskModuleTaskInfo
                                 }
                             };
-                        } else {
-                            response = {
-                                task: undefined
-                            }
                         }
 
                         // Queue up invoke response
