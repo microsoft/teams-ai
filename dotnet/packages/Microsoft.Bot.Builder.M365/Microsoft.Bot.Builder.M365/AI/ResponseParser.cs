@@ -21,7 +21,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// </summary>
         /// <param name="text">text that contains valid JSON object substrings</param>
         /// <returns>An ordered list of JSON strings</returns>
-        public static List<string>? ExtractValidJsonStrings(string text)
+        public static List<string>? ParseJson(string text)
         {
             int length = text.Length;
 
@@ -71,7 +71,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Extracts the first Adaptive Card JSON from the given string.
         /// </summary>
         /// <param name="text">text that contains valid JSON object substrings</param>
-        /// <returns>Returns the first adaptive card in the string if it exists. Otherwise returns null</returns>
+        /// <returns>The first adaptive card in the string if it exists. Otherwise returns null</returns>
         public static AdaptiveCardParseResult? ParseAdaptiveCard(string text)
         {
             string? firstJsonString = GetFirstJsonString(text);
@@ -81,6 +81,14 @@ namespace Microsoft.Bot.Builder.M365.AI
             return AdaptiveCard.FromJson(firstJsonString);
         }
 
+        /// <summary>
+        /// Parses a response and returns a plan.
+        /// 
+        /// If a plan object can be detected in the response it will be returned. Otherwise a plan with a single SAY command
+        /// containing the response will be returned.
+        /// </summary>
+        /// <param name="text">Text to parse</param>
+        /// <returns>The parsed plan</returns>
         public static Plan ParseResponse(string text)
         {
             Plan? plan = GetFirstPlanObject(text);
@@ -155,7 +163,53 @@ namespace Microsoft.Bot.Builder.M365.AI
             return newPlan;
         }
 
-        public static ParsedCommandResult ParseDoCommand(List<string> tokens)
+        /// <summary>
+        /// Simple text tokensizer. Breaking characters are added to list as separate tokens.
+        /// </summary>
+        /// <param name="text">Any input string</param>
+        /// <returns>A list of tokens</returns>
+        public static List<string> TokenizeText(string text)
+        {
+            List<string> tokens = new();
+
+            if (text.Length < 1) return tokens;
+
+            string token = "";
+            int length = text.Length;
+            for (int i = 0; i < length; i++)
+            {
+                string c = text[i].ToString();
+                if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
+                {
+                    // Push token onto list
+                    if (token.Length > 0)
+                    {
+                        tokens.Add(token);
+                    }
+
+                    // Push breaking character onto list as a separate token
+                    tokens.Add(c);
+
+                    // Start a new empty token
+                    token = "";
+                }
+                else
+                {
+                    // Add to existing token
+                    token += c;
+                }
+            }
+
+            // Add last token onto list
+            if (token.Length > 0)
+            {
+                tokens.Add(token);
+            }
+
+            return tokens;
+        }
+
+        private static ParsedCommandResult ParseDoCommand(List<string> tokens)
         {
             int length = 0;
             PredictedDoCommand? command = null;
@@ -169,7 +223,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
                 string actionName = "";
                 string entityName = "";
-                StringBuilder entityValue = new StringBuilder();
+                StringBuilder entityValue = new();
                 string quoteType = "";
                 DoCommandParseState parseState = DoCommandParseState.FindActionName;
 
@@ -268,7 +322,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             if (token == quoteType)
                             {
                                 // Save pair and look for additional pairs
-                                command!.Entities[entityName] = entityValue.ToString();
+                                command!.Entities![entityName] = entityValue.ToString();
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = "";
                                 entityValue = new StringBuilder();
@@ -283,7 +337,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             {
                                 // Save pair and look for additional pairs
                                 length += 2;
-                                command!.Entities[entityName] = entityValue.ToString();
+                                command!.Entities![entityName] = entityValue.ToString();
                                 entityName = "";
                                 entityValue = new StringBuilder();
                             }
@@ -296,7 +350,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             // Accumulate tokens until you hit a space
                             if (SPACE_CHARACTERS.Contains(token))
                             {
-                                command!.Entities[entityName] = entityValue.ToString();
+                                command!.Entities![entityName] = entityValue.ToString();
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = "";
                                 entityValue = new StringBuilder();
@@ -318,7 +372,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
                 if (command != null && entityName.Length > 0)
                 {
-                    command.Entities[entityName] = entityValue.ToString();
+                    command!.Entities![entityName] = entityValue.ToString();
                 }
 
             }
@@ -326,7 +380,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             return new ParsedCommandResult(length, command!);
         }
 
-        public static ParsedCommandResult ParseSayCommand(List<string> tokens)
+        private static ParsedCommandResult ParseSayCommand(List<string> tokens)
         {
             int length = 0;
             PredictedCommand? command = null;
@@ -368,58 +422,12 @@ namespace Microsoft.Bot.Builder.M365.AI
             return new ParsedCommandResult(length, command!);
         }
 
-        /// <summary>
-        /// Simple text tokensizer. Breaking characters are added to list as separate tokens.
-        /// </summary>
-        /// <param name="text">Any input string</param>
-        /// <returns>A list of tokens</returns>
-        public static List<string> TokenizeText(string text)
-        {
-            List<string> tokens = new();
-
-            if (text.Length < 1) return tokens;
-
-            string token = "";
-            int length = text.Length;
-            for (int i = 0; i < length; i++)
-            {
-                string c = text[i].ToString();
-                if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
-                {
-                    // Push token onto list
-                    if (token.Length > 0)
-                    {
-                        tokens.Add(token);
-                    }
-
-                    // Push breaking character onto list as a separate token
-                    tokens.Add(c);
-
-                    // Start a new empty token
-                    token = "";
-                }
-                else
-                {
-                    // Add to existing token
-                    token += c;
-                }
-            }
-
-            // Add last token onto list
-            if (token.Length > 0)
-            {
-                tokens.Add(token);
-            }
-
-            return tokens;
-        }
-
         private static string? GetFirstJsonString(string text)
         {
             string? firstJSON;
             try
             {
-                firstJSON = ExtractValidJsonStrings(text)?.First();
+                firstJSON = ParseJson(text)?.First();
             }
             catch (InvalidOperationException)
             {
@@ -435,7 +443,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             string? firstJSON = GetFirstJsonString(text);
             if (firstJSON == null) return null;
 
-            JsonSerializerSettings settings = new JsonSerializerSettings
+            JsonSerializerSettings settings = new()
             {
                 Converters = new List<JsonConverter> { new PredictedCommandJsonConverter() }
             };

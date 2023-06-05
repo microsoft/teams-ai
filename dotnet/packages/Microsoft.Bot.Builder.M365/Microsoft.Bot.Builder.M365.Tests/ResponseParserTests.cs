@@ -14,7 +14,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             // Arange - done through parameters
 
             // Act
-            var actualObjects = ResponseParser.ExtractValidJsonStrings(text);
+            var actualObjects = ResponseParser.ParseJson(text);
 
             // Assert
             Assert.Equal(expectedJSONs, actualObjects);
@@ -71,7 +71,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             Assert.Single(responsePlan.Commands);
             
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
-            Assert.Empty(predictedDoCommand.Entities);
+            Assert.Empty(predictedDoCommand!.Entities!);
             Assert.Equal("actionValue", predictedDoCommand.Action);
         }
 
@@ -109,8 +109,8 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Single(predictedDoCommand.Entities);
-            Assert.Equal("entityValue", predictedDoCommand.Entities["entityName"]);
+            Assert.Single(predictedDoCommand.Entities!);
+            Assert.Equal("entityValue", predictedDoCommand.Entities!["entityName"]);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Equal(2, predictedDoCommand.Entities.Count);
+            Assert.Equal(2, predictedDoCommand.Entities!.Count);
             Assert.Equal("entityValueA", predictedDoCommand.Entities["entityNameA"]);
             Assert.Equal("entityValueB", predictedDoCommand.Entities["entityNameB"]);
         }
@@ -333,7 +333,6 @@ namespace Microsoft.Bot.Builder.M365.Tests
             // Assert
             Assert.Equal(expectedTokens, actualTokens);
         }
-
 
         [Fact]
         public void Test_TokenizeText_Simple_SayCommand()
