@@ -17,10 +17,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         private static readonly string[] IGNORED_TOKENS = { "THEN" };
 
         /// <summary>
-        /// Extract all the valid JSON strings within the input text and returns a list of objects.
+        /// Extract all the valid json strings within the input text and returns a list of objects.
         /// </summary>
-        /// <param name="text">text that contains valid JSON object substrings</param>
-        /// <returns>An ordered list of JSON strings</returns>
+        /// <param name="text">text that contains valid json object substrings</param>
+        /// <returns>An ordered list of json strings</returns>
         public static List<string>? ParseJson(string text)
         {
             int length = text.Length;
@@ -37,29 +37,29 @@ namespace Microsoft.Bot.Builder.M365.AI
                 startIndex = text.IndexOf('{', endIndex + 1);
                 if (startIndex == -1) return result;
 
-                // Find the first "}" such that all the contents sandwiched between S & E is a valid JSON.
+                // Find the first "}" such that all the contents sandwiched between S & E is a valid json.
                 endIndex = startIndex;
                 while (endIndex < length)
                 {
                     endIndex = text.IndexOf('}', endIndex + 1);
                     if (endIndex == -1) return result;
 
-                    string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
+                    string possibleJson = text.Substring(startIndex, endIndex - startIndex + 1);
 
-                    // Validate JSON structure
-                    if (!IsValidJsonStructure(possibleJSON)) continue;
+                    // Validate json structure
+                    if (!IsValidJsonStructure(possibleJson)) continue;
 
-                    // Validate string to be a valid JSON
+                    // Validate string to be a valid json
                     try
                     {
-                        JToken.Parse(possibleJSON);
+                        JToken.Parse(possibleJson);
                     }
                     catch (JsonReaderException)
                     {
                         continue;
                     }
 
-                    result.Add(possibleJSON);
+                    result.Add(possibleJson);
                     break;
                 }
             }
@@ -68,17 +68,17 @@ namespace Microsoft.Bot.Builder.M365.AI
         }
 
         /// <summary>
-        /// Extracts the first Adaptive Card JSON from the given string.
+        /// Extracts the first Adaptive Card json from the given string.
         /// </summary>
-        /// <param name="text">text that contains valid JSON object substrings</param>
+        /// <param name="text">text that contains valid json object substrings</param>
         /// <returns>The first adaptive card in the string if it exists. Otherwise returns null</returns>
         public static AdaptiveCardParseResult? ParseAdaptiveCard(string text)
         {
-            string? firstJsonString = GetFirstJsonString(text);
+            string? firstJson = GetFirstJsonString(text);
 
-            if (firstJsonString == null) return null;
+            if (firstJson == null) return null;
 
-            return AdaptiveCard.FromJson(firstJsonString);
+            return AdaptiveCard.FromJson(firstJson);
         }
 
         /// <summary>
@@ -424,30 +424,34 @@ namespace Microsoft.Bot.Builder.M365.AI
 
         private static string? GetFirstJsonString(string text)
         {
-            string? firstJSON;
             try
             {
-                firstJSON = ParseJson(text)?.First();
+                return ParseJson(text)?.First();
             }
             catch (InvalidOperationException)
             {
                 // Empty sequence
                 return null;
             }
-
-            return firstJSON;
         }
 
         private static Plan? GetFirstPlanObject(string text)
         {
-            string? firstJSON = GetFirstJsonString(text);
-            if (firstJSON == null) return null;
+            string? firstJson = GetFirstJsonString(text);
+            if (firstJson == null) return null;
 
             JsonSerializerSettings settings = new()
             {
                 Converters = new List<JsonConverter> { new PredictedCommandJsonConverter() }
             };
-            return JsonConvert.DeserializeObject<Plan>(firstJSON, settings);
+
+            try
+            {
+                return JsonConvert.DeserializeObject<Plan>(firstJson, settings);
+            } catch (Exception ex)
+            {
+                throw new ResponseParserException("Unable to deserialize plan json string", ex);
+            }
         }
 
         private static bool IsValidJsonStructure(string json)

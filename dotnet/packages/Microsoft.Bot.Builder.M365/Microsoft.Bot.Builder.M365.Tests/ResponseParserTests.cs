@@ -2,6 +2,7 @@
 using AdaptiveCards;
 using Microsoft.Bot.Builder.M365.AI;
 using Microsoft.Bot.Builder.M365.AI.Planner;
+using Microsoft.Bot.Builder.M365.Exceptions;
 
 namespace Microsoft.Bot.Builder.M365.Tests
 {
@@ -232,8 +233,36 @@ namespace Microsoft.Bot.Builder.M365.Tests
             Action action = () => ResponseParser.ParseResponse(planJSON);
 
             // Act & Assert
-            JsonSerializationException ex = Assert.Throws<JsonSerializationException>(action);
-            Assert.Equal("Unknown command type `newCommand`", ex.Message);
+            ResponseParserException ex = Assert.Throws<ResponseParserException>(action);
+            Assert.Equal("Unable to deserialize plan json string", ex.Message);
+        }
+
+        [Fact]
+        public void Test_ParsePlan_Invalid_DO_Command_Format_Missing_Action()
+        {
+            // Arrange 
+            var planJSON = @"{ 'type':'plan','commands':[{ type: 'DO' }] }";
+
+            // Act
+            Action action = () => ResponseParser.ParseResponse(planJSON);
+
+            // Act & Assert
+            ResponseParserException ex = Assert.Throws<ResponseParserException>(action);
+            Assert.Equal("Unable to deserialize plan json string", ex.Message);
+        }
+
+        [Fact]
+        public void Test_ParsePlan_Invalid_SAY_Command_Format_Missing_Response()
+        {
+            // Arrange 
+            var planJSON = @"{ 'type':'plan','commands':[{ type: 'SAY' }] }";
+
+            // Act
+            Action action = () => ResponseParser.ParseResponse(planJSON);
+
+            // Act & Assert
+            ResponseParserException ex = Assert.Throws<ResponseParserException>(action);
+            Assert.Equal("Unable to deserialize plan json string", ex.Message);
         }
 
         [Fact]

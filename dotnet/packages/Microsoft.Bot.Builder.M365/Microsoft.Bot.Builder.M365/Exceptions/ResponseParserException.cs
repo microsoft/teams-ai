@@ -9,5 +9,9 @@ namespace Microsoft.Bot.Builder.M365.Exceptions
         public ResponseParserException(string message) : base(message)
         {
         }
+
+        public ResponseParserException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }
