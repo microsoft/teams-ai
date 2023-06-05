@@ -304,7 +304,7 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
                 'The players have completed the campaign. Congratulate them and tell them they can continue adventuring or use "/reset" to start over with a new campaign.';
             conversation.campaign = {} as ICampaign;
         } else if (objectiveAdded) {
-            temp.prompt = 'newObjective.txt';
+            temp.prompt = 'newObjective';
             temp.objectiveTitle = nextObjective.title;
         } else if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
             // Generate a random encounter
