@@ -12,7 +12,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
     {
 
         [Fact]
-        public void StartTypingTimer_MessageActivityType()
+        public void Start_MessageActivityType()
         {
             // Arrange
             var botAdapterStub = Mock.Of<BotAdapter>();
@@ -22,14 +22,31 @@ namespace Microsoft.Bot.Builder.M365.Tests
             TypingTimer typingTimer = new TypingTimer(timerDelay);
 
             // Act
-            typingTimer.StartTypingTimer(turnContextMock.Object);
+            typingTimer.Start(turnContextMock.Object);
 
             // Assert
-            Assert.False(typingTimer.Disposed());
+            Assert.True(typingTimer.IsRunning());
         }
 
         [Fact]
-        public void StartTypingTimer_NotMessageActivityType()
+        public void Start_DoubleStart_ShouldFail()
+        {
+            // Arrange
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Type = ActivityTypes.Message });
+
+            int timerDelay = 1000;
+            TypingTimer typingTimer = new TypingTimer(timerDelay);
+
+            // Act
+            typingTimer.Start(turnContextMock.Object);
+
+            // Assert
+            Assert.False(typingTimer.Start(turnContextMock.Object));
+        }
+
+        [Fact]
+        public void Start_NotMessageActivityType()
         {
             // Arrange
             var botAdapterStub = Mock.Of<BotAdapter>();
@@ -40,14 +57,14 @@ namespace Microsoft.Bot.Builder.M365.Tests
             TypingTimer typingTimer = new TypingTimer(timerDelay);
 
             // Act
-            typingTimer.StartTypingTimer(turnContextMock.Object);
+            typingTimer.Start(turnContextMock.Object);
 
             // Assert
-            Assert.True(typingTimer.Disposed());
+            Assert.False(typingTimer.IsRunning());
         }
 
         [Fact]
-        public void StartTypingTimer_Registers_OnSendActivites_EventHandler()
+        public void Start_Registers_OnSendActivites_EventHandler()
         {
             // Arrange
             var botAdapterStub = Mock.Of<BotAdapter>();
@@ -59,7 +76,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             TypingTimer typingTimer = new TypingTimer(timerDelay);
 
             // Act
-            typingTimer.StartTypingTimer(turnContextMock.Object);
+            typingTimer.Start(turnContextMock.Object);
 
             // Assert
             turnContextMock.Verify(tc => tc.OnSendActivities(It.IsAny<SendActivitiesHandler>()), Times.Once);
@@ -67,7 +84,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
         [Fact]
-        public void StopTypingTimer_ShouldResetProperties()
+        public void Dispose_ShouldResetProperties()
         {
             // Arrange
             var botAdapterStub = Mock.Of<BotAdapter>();
@@ -77,11 +94,11 @@ namespace Microsoft.Bot.Builder.M365.Tests
             TypingTimer typingTimer = new TypingTimer(timerDelay);
 
             // Act
-            typingTimer.StartTypingTimer(turnContextMock.Object);
+            typingTimer.Start(turnContextMock.Object);
             typingTimer.Dispose();
 
             // Assert
-            Assert.True(typingTimer.Disposed());
+            Assert.False(typingTimer.IsRunning());
         }
     }
 }

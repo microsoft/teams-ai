@@ -111,7 +111,7 @@ namespace Microsoft.Bot.Builder.M365
                 if (_options.StartTypingTimer)
                 {
                     timer = new TypingTimer(_options.TypingTimerDelay);
-                    timer.StartTypingTimer(turnContext);
+                    timer.Start(turnContext);
                 }
 
                 // Remove @mentions

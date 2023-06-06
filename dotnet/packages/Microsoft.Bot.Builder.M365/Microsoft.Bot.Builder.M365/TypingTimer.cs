@@ -1,10 +1,4 @@
 ﻿using Microsoft.Bot.Schema;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -20,12 +14,17 @@ namespace Microsoft.Bot.Builder.M365
         private readonly int _interval;
 
         /// <summary>
+        /// To detect redundant calls
+        /// </summary>
+        private bool _disposedValue = false;
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="TypingTimer"/> class.
         /// </summary>
         /// <param name="interval">The interval in milliseconds to send "typing" activity.</param>
         public TypingTimer(int interval = 1000)
         {
-            this._interval = interval;
+            _interval = interval;
         }
 
         /// <summary>
@@ -36,37 +35,53 @@ namespace Microsoft.Bot.Builder.M365
         /// the current activity is not a "message" the call is ignored.
         /// </remarks>
         /// <param name="turnContext">The context for the current turn with the user.</param>
-        public void StartTypingTimer(ITurnContext turnContext)
+        /// <returns>True if the timer was started, otherwise False.</returns>
+        public bool Start(ITurnContext turnContext)
         {
-            if (turnContext.Activity.Type != ActivityTypes.Message || _timer != null) return;
+            if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
             
             // Start periodically send "typing" activity
             _timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
-        }
 
+            return true;
+        }
 
         /// <summary>
         /// Stop the timer that periodically sends "typing" activity.
         /// </summary>
         public void Dispose()
         {
-            if (_timer == null) return;
-            
-            _timer.Dispose();
-            _timer = null;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    if (_timer != null)
+                    {
+                        _timer.Dispose();
+                        _timer = null;
+                    }
+                }
+
+                _disposedValue = true;
+            }
         }
 
         /// <summary>
-        /// Returns whether the timer is disposed or not.
+        /// Whether there is a timer currently running.
         /// </summary>
-        /// <remarks>The timer, when first initializaed, is in a disposed state.</remarks>
-        /// <returns>True if timer is disposed.</returns>
-        public bool Disposed()
+        /// <returns>True if there's a timer currently running, otherwise False.</returns>
+        public bool IsRunning()
         {
-            return _timer == null;
+            return _timer != null;
         }
 
         private async void SendTypingActivity(object state)
@@ -86,7 +101,6 @@ namespace Microsoft.Bot.Builder.M365
             }
         }
 
-
         private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
             if (_timer != null)
@@ -103,11 +117,5 @@ namespace Microsoft.Bot.Builder.M365
 
             return next();
         }
-
-        ~ TypingTimer()
-        {
-            Dispose();
-        }
-
     }
 }
