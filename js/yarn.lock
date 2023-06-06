@@ -412,6 +412,13 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@cspotcode/source-map-support@^0.8.0":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"
+  integrity sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==
+  dependencies:
+    "@jridgewell/trace-mapping" "0.3.9"
+
 "@eslint/eslintrc@^0.4.3":
   version "0.4.3"
   resolved "https://registry.npmjs.org/@eslint/eslintrc/-/eslintrc-0.4.3.tgz"
@@ -507,6 +514,11 @@
   resolved "https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.1.0.tgz"
   integrity sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w==
 
+"@jridgewell/resolve-uri@^3.0.3":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.1.tgz#c08679063f279615a3326583ba3a90d1d82cc721"
+  integrity sha512-dSYZh7HhCDtCKm4QakX0xFpsRDqjjtZf/kjI/v3T3Nwt5r8/qz/M19F9ySyOqU94SXBmeG9ttTul+YnR4LOxFA==
+
 "@jridgewell/set-array@^1.0.0", "@jridgewell/set-array@^1.0.1":
   version "1.1.2"
   resolved "https://registry.npmjs.org/@jridgewell/set-array/-/set-array-1.1.2.tgz"
@@ -516,6 +528,14 @@
   version "1.4.14"
   resolved "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.14.tgz"
   integrity sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==
+
+"@jridgewell/trace-mapping@0.3.9":
+  version "0.3.9"
+  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.9.tgz#6534fd5933a53ba7cbf3a17615e273a0d1273ff9"
+  integrity sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==
+  dependencies:
+    "@jridgewell/resolve-uri" "^3.0.3"
+    "@jridgewell/sourcemap-codec" "^1.4.10"
 
 "@jridgewell/trace-mapping@^0.3.9":
   version "0.3.17"
@@ -745,6 +765,26 @@
   version "2.0.0"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
+
+"@tsconfig/node10@^1.0.7":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
+  integrity sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==
+
+"@tsconfig/node12@^1.0.7":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node12/-/node12-1.0.11.tgz#ee3def1f27d9ed66dac6e46a295cffb0152e058d"
+  integrity sha512-cqefuRsh12pWyGsIoBKJA9luFu3mRxCA+ORZvA4ktLSzIuCUtWVxGIuXigEwO5/ywWFMZ2QEGKWvkZG1zDMTag==
+
+"@tsconfig/node14@^1.0.0":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node14/-/node14-1.0.3.tgz#e4386316284f00b98435bf40f72f75a09dabf6c1"
+  integrity sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==
+
+"@tsconfig/node16@^1.0.2":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
+  integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
 "@types/argparse@1.0.38":
   version "1.0.38"
@@ -1088,6 +1128,11 @@ acorn-walk@^7.0.0:
   resolved "https://registry.npmjs.org/acorn-walk/-/acorn-walk-7.2.0.tgz"
   integrity sha512-OPdCF6GsMIP+Az+aWfAAOEt2/+iVDKE7oy6lJ098aoe59oAmK76qV6Gw60SbZ8jHuG2wH058GF4pLFbYamYrVA==
 
+acorn-walk@^8.1.1:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.2.0.tgz#741210f2e2426454508853a2f44d0ab83b7f69c1"
+  integrity sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==
+
 acorn@^5.1.0:
   version "5.7.4"
   resolved "https://registry.npmjs.org/acorn/-/acorn-5.7.4.tgz"
@@ -1097,6 +1142,11 @@ acorn@^7.0.0, acorn@^7.1.1, acorn@^7.4.0:
   version "7.4.1"
   resolved "https://registry.npmjs.org/acorn/-/acorn-7.4.1.tgz"
   integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
+
+acorn@^8.4.1:
+  version "8.8.2"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.8.2.tgz#1b2f25db02af965399b9776b0c2c391276d37c4a"
+  integrity sha512-xjIYgE8HBrkpd/sJqOGNspf8uHG+NOHGOw6a/Urj8taM2EXfdNAH2oFcPeIFfsv3+kz/mJrS5VuMqbNLjCa2vw==
 
 adal-node@0.2.3:
   version "0.2.3"
@@ -1565,94 +1615,70 @@ bn.js@^5.0.0, bn.js@^5.1.1:
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.2.1.tgz"
   integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
 
-botbuilder-azure-blobs@^4.19.0:
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/botbuilder-azure-blobs/-/botbuilder-azure-blobs-4.19.2.tgz#e6af55a95cbc45283005b0722bd33558a49a571c"
-  integrity sha512-vsfOt4f0CRAbXB5WGO+AlNiDkHNVHgn2atbOs/34wtIS07ctrBWfZMK++GKWbfvjBUTGjH8A08JrDKBgZq7a/Q==
+botbuilder-azure-blobs@^4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botbuilder-azure-blobs/-/botbuilder-azure-blobs-4.19.3.tgz#8e63a568f0e210ff323ccf44f9785de2b439f92b"
+  integrity sha512-p2iH0qB6pPQ43/UHNp5wV5I3n66a+Vxwy7iCZBU3KPTzBBUivqnzB3oxRItcCfYiElbPJ6VdXFPlQXPkQLZ2lw==
   dependencies:
     "@azure/storage-blob" "^12.2.1"
-    botbuilder-core "4.19.2"
-    botbuilder-stdlib "4.19.2-internal"
+    botbuilder-core "4.19.3"
+    botbuilder-stdlib "4.19.3-internal"
     get-stream "^6.0.0"
     p-map "^4.0.0"
     zod "~1.11.17"
 
-botbuilder-core@4.19.0:
-  version "4.19.0"
-  resolved "https://registry.npmjs.org/botbuilder-core/-/botbuilder-core-4.19.0.tgz"
-  integrity sha512-sllAWVHvcB3hPyWJ52ojboAH3Esu4pl46eYwiL4GCzlQdoS5f4ch4VVHhJGy5CPtwhpsJx8Hdmc/7lBqXMw/Vw==
+botbuilder-core@4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botbuilder-core/-/botbuilder-core-4.19.3.tgz#6e7069c23eb0e72f64931c79cd9c8cea50b167d5"
+  integrity sha512-TpCopZ5a+TsL0hq7vZqWaFGSqxboO+OA9nvCCR9cphGsbx7GfKIwMBfiq6V4fFUhc+Y9q/wiJ06pF0VTkG3CjQ==
   dependencies:
-    botbuilder-dialogs-adaptive-runtime-core "4.19.0-preview"
-    botbuilder-stdlib "4.19.0-internal"
-    botframework-connector "4.19.0"
-    botframework-schema "4.19.0"
+    botbuilder-dialogs-adaptive-runtime-core "4.19.3-preview"
+    botbuilder-stdlib "4.19.3-internal"
+    botframework-connector "4.19.3"
+    botframework-schema "4.19.3"
     uuid "^8.3.2"
     zod "~1.11.17"
 
-botbuilder-core@4.19.2:
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/botbuilder-core/-/botbuilder-core-4.19.2.tgz#ec84406f9f16d09477f83746657113e2050ae3a3"
-  integrity sha512-s7ykmr33eNFG1eAx+nV0qhEpblQat2RsD43LcJ3sz4MwcUDucZtRXxle1nO2vfmnkPPChGZ3LzDKVvx9QAQCow==
-  dependencies:
-    botbuilder-dialogs-adaptive-runtime-core "4.19.2-preview"
-    botbuilder-stdlib "4.19.2-internal"
-    botframework-connector "4.19.2"
-    botframework-schema "4.19.2"
-    uuid "^8.3.2"
-    zod "~1.11.17"
-
-botbuilder-dialogs-adaptive-runtime-core@4.19.0-preview:
-  version "4.19.0-preview"
-  resolved "https://registry.npmjs.org/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.19.0-preview.tgz"
-  integrity sha512-qx0/RqFsd0Ibd5mkM1ZpdTvzKE7ZdnYIqqeTd+/HmNQ9ZMsufCFK0MoTceRGHHVdzYdl2ZFKhTA6npnUhpBNnw==
+botbuilder-dialogs-adaptive-runtime-core@4.19.3-preview:
+  version "4.19.3-preview"
+  resolved "https://registry.yarnpkg.com/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.19.3-preview.tgz#f9fa6d77c8303c44336fd3a08119be0c4c1df7fc"
+  integrity sha512-VVAgt4BEC6BaDH1fURRs4t8T/a/CySbTLBE3GY3Xk3TdF0HzHKzA+bDlM7qR+20D9Yy52hFK97wYlimD8QRMpg==
   dependencies:
     dependency-graph "^0.10.0"
 
-botbuilder-dialogs-adaptive-runtime-core@4.19.2-preview:
-  version "4.19.2-preview"
-  resolved "https://registry.yarnpkg.com/botbuilder-dialogs-adaptive-runtime-core/-/botbuilder-dialogs-adaptive-runtime-core-4.19.2-preview.tgz#13227f99fd42968addc2b51874e7a63c7d32fa14"
-  integrity sha512-K37NS0Xm6TolOV88tWWW0tXVC/zLGcPXqHyM6EnWqIVzElZJ+vPuhQzGVFsc1GaQcBEDDa79erCtdKSgwvSlmw==
-  dependencies:
-    dependency-graph "^0.10.0"
-
-botbuilder-dialogs@^4.19.0:
-  version "4.19.0"
-  resolved "https://registry.npmjs.org/botbuilder-dialogs/-/botbuilder-dialogs-4.19.0.tgz"
-  integrity sha512-Aha/KszD6DR5XouZAslNZhv8BlxtqG6FYi4aNva5SS/TwcPzhHzDwfX/N+8/9GnJP073PKjbETBrzaKAWzyNSg==
+botbuilder-dialogs@^4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botbuilder-dialogs/-/botbuilder-dialogs-4.19.3.tgz#8e22b2d9cf8e8587ed17480d4c938bfdee7a81a3"
+  integrity sha512-TBHnAe6U+/bcdtKILIpkBvGw0nzRs6A5ArFIAg11ja+riEyU9VVptx9rkka1++C/9tWWGF+3grJ2dA3UFkUkrA==
   dependencies:
     "@microsoft/recognizers-text-choice" "1.1.4"
     "@microsoft/recognizers-text-date-time" "1.1.4"
     "@microsoft/recognizers-text-number" "1.1.4"
     "@microsoft/recognizers-text-suite" "1.1.4"
-    botbuilder-core "4.19.0"
-    botbuilder-dialogs-adaptive-runtime-core "4.19.0-preview"
-    botframework-connector "4.19.0"
+    botbuilder-core "4.19.3"
+    botbuilder-dialogs-adaptive-runtime-core "4.19.3-preview"
+    botframework-connector "4.19.3"
     globalize "^1.4.2"
     lodash "^4.17.21"
     uuid "^8.3.2"
     zod "~1.11.17"
 
-botbuilder-stdlib@4.19.0-internal:
-  version "4.19.0-internal"
-  resolved "https://registry.npmjs.org/botbuilder-stdlib/-/botbuilder-stdlib-4.19.0-internal.tgz"
-  integrity sha512-uqIFgtiKptvmXGeqtiD62MWXs+F5ne1MyKiltJN5Nm1DfKDx2AmNoH483nhavenEPaDr1MfR7JdXjpRbEjoqvw==
+botbuilder-stdlib@4.19.3-internal:
+  version "4.19.3-internal"
+  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.19.3-internal.tgz#781a7671f4e07ae0efdf84035ca93c7973a2876d"
+  integrity sha512-iaJr+EwOhQDO2gYYijVXiH4ztJSXMtmJcezhoCS0f+i4yy49flSVdJlBw3bYknJFsZcRub8842ESPHwDiu6cZw==
 
-botbuilder-stdlib@4.19.2-internal:
-  version "4.19.2-internal"
-  resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.19.2-internal.tgz#38e91b50dc289ff93c16a3a8c454412c5d1d91ba"
-  integrity sha512-sMIlXGWeI/cGNzN9p9N+OSmdVDJHs56lhcBS6oT2pYUDxhyLgKubBShZ/lbBvc3E77GOg56FnFXXcHe0TUhD3g==
-
-botbuilder@^4.19.0:
-  version "4.19.0"
-  resolved "https://registry.npmjs.org/botbuilder/-/botbuilder-4.19.0.tgz"
-  integrity sha512-K5VvDUb3g5BOn5Y8KnMC+Hd3H1pO89au75K6xjnBZ7SnMjZJkUZ18DhCS9vAdmM1PWkXcId+pfCq1tPtV797dg==
+botbuilder@^4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.19.3.tgz#208b2bd095cbf1e06f94d90997b5ab05b232d139"
+  integrity sha512-oR6tm4wASM/6FcTZP+5lsWfFnjlw3C+I7OJl0s2En5N0jaafH8fvAZ9FOFXBo8Esr9L8n7BlHPXK8Q+/zStHOA==
   dependencies:
     "@azure/ms-rest-js" "^2.6.1"
     axios "^0.25.0"
-    botbuilder-core "4.19.0"
-    botbuilder-stdlib "4.19.0-internal"
-    botframework-connector "4.19.0"
-    botframework-streaming "4.19.0"
+    botbuilder-core "4.19.3"
+    botbuilder-stdlib "4.19.3-internal"
+    botframework-connector "4.19.3"
+    botframework-streaming "4.19.3"
     dayjs "^1.10.3"
     filenamify "^4.1.0"
     fs-extra "^7.0.1"
@@ -1660,60 +1686,35 @@ botbuilder@^4.19.0:
     uuid "^8.3.2"
     zod "~1.11.17"
 
-botframework-connector@4.19.0:
-  version "4.19.0"
-  resolved "https://registry.npmjs.org/botframework-connector/-/botframework-connector-4.19.0.tgz"
-  integrity sha512-ngwWX9pzr0FiNNVfMkk9cOu9yX3DPmdGLxWVyAfxW4qgKDZx80AumRhTkVIvRR2VCkoFSIuWV+q0wa7Mnz/Qpg==
+botframework-connector@4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.19.3.tgz#b652ea4a6c762f3b56bac604b2abe606781d586f"
+  integrity sha512-WjzNHioJpOigfuEJ20PqQjNMc7KeBRgFjWMIqW5A+xmiMHqxVUIU57tUdE2Xe7yI7glDsLDHTjY0tFQxAKXHdQ==
   dependencies:
     "@azure/identity" "^2.0.4"
     "@azure/ms-rest-js" "^2.6.1"
     adal-node "0.2.3"
     axios "^0.25.0"
     base64url "^3.0.0"
-    botbuilder-stdlib "4.19.0-internal"
-    botframework-schema "4.19.0"
+    botbuilder-stdlib "4.19.3-internal"
+    botframework-schema "4.19.3"
     cross-fetch "^3.0.5"
     jsonwebtoken "^9.0.0"
     rsa-pem-from-mod-exp "^0.8.4"
     zod "~1.11.17"
 
-botframework-connector@4.19.2:
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/botframework-connector/-/botframework-connector-4.19.2.tgz#e0c22a076ea437a760b904c5ba1b224e3d7c3519"
-  integrity sha512-6T3sKkyA7skisc9QyijlU6pzxrV9sUZhlqvabpgIFJ9F4s28MgHpx5dFzjgcxaRfJ48Xot83T95QAUJahxLl9g==
-  dependencies:
-    "@azure/identity" "^2.0.4"
-    "@azure/ms-rest-js" "^2.6.1"
-    adal-node "0.2.3"
-    axios "^0.25.0"
-    base64url "^3.0.0"
-    botbuilder-stdlib "4.19.2-internal"
-    botframework-schema "4.19.2"
-    cross-fetch "^3.0.5"
-    jsonwebtoken "^9.0.0"
-    rsa-pem-from-mod-exp "^0.8.4"
-    zod "~1.11.17"
-
-botframework-schema@4.19.0:
-  version "4.19.0"
-  resolved "https://registry.npmjs.org/botframework-schema/-/botframework-schema-4.19.0.tgz"
-  integrity sha512-vFizvdNuNzZKGNJQVblyb9xzxWiE8gJtlPy8+pENXZf54PLY0IO0RqVAsakMH+MMePJ4UeE98++8Z3mstfwkiQ==
+botframework-schema@4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.19.3.tgz#4f3992f09d468299f8bd6263a01a1bbaf3cd8d01"
+  integrity sha512-MjAJe4Y2nYsyDIiVeA4YLKbzzZTGesdyV7paI4ojbVS9vWR3i8eXQWKaCYcXUN3FC4+BCv8K/P5pTg99w0Y6Ag==
   dependencies:
     uuid "^8.3.2"
     zod "~1.11.17"
 
-botframework-schema@4.19.2:
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/botframework-schema/-/botframework-schema-4.19.2.tgz#4faf78f1b4385588318f881742d91419819ea508"
-  integrity sha512-CugYz39ALIfUP1Vamk5A79PnWr/bwNEWn6iAEnKzCdM066rMz+ZDkkw1UL/D3tNTqAstMrfLovT5d7n/j/s23w==
-  dependencies:
-    uuid "^8.3.2"
-    zod "~1.11.17"
-
-botframework-streaming@4.19.0:
-  version "4.19.0"
-  resolved "https://registry.npmjs.org/botframework-streaming/-/botframework-streaming-4.19.0.tgz"
-  integrity sha512-E49k7C8E1z7TRselnz6CkpA+hqybJZH1RWqb/G1dsbGLQPQmOCiSgUQmFEZ6SNlyv2/5y8sBVtt338Pj+/RgZA==
+botframework-streaming@4.19.3:
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/botframework-streaming/-/botframework-streaming-4.19.3.tgz#46e98b4630b777d6c75e4c070a413aebbdf103bb"
+  integrity sha512-X7QlzN9aMN0F1ADlYCrtDy71wWaBzDDIAiOsdwLlzl5xKnZc0gbbFLL+WyYYieX/3K2B1UHBZEimGvRL0yWrbQ==
   dependencies:
     "@types/node" "^10.17.27"
     "@types/ws" "^6.0.3"
@@ -7749,6 +7750,25 @@ trim-repeated@^1.0.0:
   dependencies:
     escape-string-regexp "^1.0.2"
 
+ts-node@^10.4.0:
+  version "10.9.1"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.1.tgz#e73de9102958af9e1f0b168a6ff320e25adcff4b"
+  integrity sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==
+  dependencies:
+    "@cspotcode/source-map-support" "^0.8.0"
+    "@tsconfig/node10" "^1.0.7"
+    "@tsconfig/node12" "^1.0.7"
+    "@tsconfig/node14" "^1.0.0"
+    "@tsconfig/node16" "^1.0.2"
+    acorn "^8.4.1"
+    acorn-walk "^8.1.1"
+    arg "^4.1.0"
+    create-require "^1.1.0"
+    diff "^4.0.1"
+    make-error "^1.1.1"
+    v8-compile-cache-lib "^3.0.1"
+    yn "3.1.1"
+
 ts-node@^9.0.0:
   version "9.1.1"
   resolved "https://registry.npmjs.org/ts-node/-/ts-node-9.1.1.tgz"
@@ -8158,6 +8178,11 @@ uuid@^8.3.0, uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+
+v8-compile-cache-lib@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/v8-compile-cache-lib/-/v8-compile-cache-lib-3.0.1.tgz#6336e8d71965cb3d35a1bbb7868445a7c05264bf"
+  integrity sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==
 
 v8-compile-cache@^2.0.3:
   version "2.3.0"

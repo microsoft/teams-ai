@@ -48,6 +48,6 @@ Conversation History:
 
 ```
 
-A campaign objective called "{{temp.objectiveTitle}}" has been added as a quest. 
+A campaign objective called "{{$objectiveTitle}}" has been added as a quest. 
 Interrupt the player and have an NPC introduce the new quest.
 - use about 200 words

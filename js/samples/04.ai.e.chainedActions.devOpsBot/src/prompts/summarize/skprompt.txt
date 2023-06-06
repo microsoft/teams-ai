@@ -1,0 +1,85 @@
+Here is an adaptive card template for showing 1 or more lists to a user
+
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.4",
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Your Work Items",
+            "weight": "Bolder",
+            "size": "Large"
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {
+                            "title": "Id",
+                            "value": "id1"
+                        },
+                        {
+                            "title": "Title",
+                            "value": "title1"
+                        },
+                        {
+                            "title": "Assigned To",
+                            "value": "assignedTo1"
+                        },
+                        {
+                            "title": "Status",
+                            "value": "status1"
+                        }
+                    ],
+                    "separator": true
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {
+                            "title": "Id",
+                            "value": "id2"
+                        },
+                        {
+                            "title": "Title",
+                            "value": "title2"
+                        },
+                        {
+                            "title": "Assigned To",
+                            "value": "assignedTo2"
+                        },
+                        {
+                            "title": "Status",
+                            "value": "status2"
+                        }
+                    ],
+                    "separator": true
+                }
+            ]
+        }
+    ]
+}
+
+Here's a set of lists. The key is the id of the work item and title:
+
+{{$workItems}}
+
+Here's the user's query:
+
+```
+{{$input}}
+```
+
+Use the template to create an Adaptive Card.
+Take into account any changes asked for by the user.
+Always replace the placeholder text, List n and Item n, with real data.
+
+AdaptiveCard:

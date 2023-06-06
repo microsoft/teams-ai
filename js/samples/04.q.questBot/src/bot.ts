@@ -19,7 +19,7 @@ import * as responses from './responses';
 import { IItemList } from './interfaces';
 import { map } from './ShadowFalls';
 import { addActions } from './actions';
-import { LastWriterWinsStore } from './LastWriterWinsStore';
+import { LastWriterWinsMemoryStore } from './LastWriterWinsStore';
 import { describeConditions, describeSeason, generateTemperature, generateWeather } from './conditions';
 
 // Strongly type the applications turn state
@@ -97,9 +97,9 @@ export interface ILocation {
 
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OpenAIKey || !process.env.StorageConnectionString || !process.env.StorageContainer) {
+if (!process.env.OpenAIKey) {
     throw new Error(
-        'Missing environment variables - please check that OpenAIKey, StorageConnectionString and StorageContainer are set.'
+        'Missing environment variables - please check that OpenAIKey is set.'
     );
 }
 
@@ -113,7 +113,7 @@ const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(_
 
 // Define storage and application
 // - Note that we're not passing a prompt in our AI options as we manually ask for hints.
-const storage = new LastWriterWinsStore(process.env.StorageConnectionString, process.env.StorageContainer);
+const storage = new LastWriterWinsMemoryStore();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
@@ -304,7 +304,7 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
                 'The players have completed the campaign. Congratulate them and tell them they can continue adventuring or use "/reset" to start over with a new campaign.';
             conversation.campaign = {} as ICampaign;
         } else if (objectiveAdded) {
-            temp.prompt = 'newObjective.txt';
+            temp.prompt = 'newObjective';
             temp.objectiveTitle = nextObjective.title;
         } else if (conversation.turn >= conversation.nextEncounterTurn && Math.random() <= location.encounterChance) {
             // Generate a random encounter
