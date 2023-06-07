@@ -221,8 +221,8 @@ namespace Microsoft.Bot.Builder.M365.AI
                     throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
                 }
 
-                string actionName = "";
-                string entityName = "";
+                StringBuilder actionName = new();
+                StringBuilder entityName = new();
                 StringBuilder entityValue = new();
                 string quoteType = "";
                 DoCommandParseState parseState = DoCommandParseState.FindActionName;
@@ -252,7 +252,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             if (!BREAKING_CHARACTERS.Contains(token))
                             {
                                 // Assign token to action name and enter new state
-                                actionName = token;
+                                actionName = new StringBuilder(token);
                                 parseState = DoCommandParseState.InActionName;
                             }
                             break;
@@ -262,12 +262,12 @@ namespace Microsoft.Bot.Builder.M365.AI
                             if (NAME_BREAKING_CHARACTERS.Contains(token))
                             {
                                 // Initialize command object and enter new state
-                                command = new PredictedDoCommand(actionName);
+                                command = new PredictedDoCommand(actionName.ToString());
                                 parseState = DoCommandParseState.FindEntityName;
                             }
                             else
                             {
-                                actionName += token;
+                                actionName.Append(token);
                             };
                             break;
                         case DoCommandParseState.FindEntityName:
@@ -275,7 +275,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             if (!BREAKING_CHARACTERS.Contains(token))
                             {
                                 // Assign token to entity name and enter new state
-                                entityName = token;
+                                entityName = new StringBuilder(token);
                                 parseState = DoCommandParseState.InEntityName;
                             }
                             break;
@@ -289,7 +289,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                             }
                             else
                             {
-                                entityName += token;
+                                entityName.Append(token);
                             }
                             break;
                         case DoCommandParseState.FindEntityValue:
@@ -322,9 +322,9 @@ namespace Microsoft.Bot.Builder.M365.AI
                             if (token == quoteType)
                             {
                                 // Save pair and look for additional pairs
-                                command!.Entities![entityName] = entityValue.ToString();
+                                command!.Entities![entityName.ToString()] = entityValue.ToString();
                                 parseState = DoCommandParseState.FindEntityName;
-                                entityName = "";
+                                entityName = new();
                                 entityValue = new StringBuilder();
                             }
                             else
@@ -337,8 +337,8 @@ namespace Microsoft.Bot.Builder.M365.AI
                             {
                                 // Save pair and look for additional pairs
                                 length += 2;
-                                command!.Entities![entityName] = entityValue.ToString();
-                                entityName = "";
+                                command!.Entities![entityName.ToString()] = entityValue.ToString();
+                                entityName = new();
                                 entityValue = new StringBuilder();
                             }
                             else
@@ -350,9 +350,9 @@ namespace Microsoft.Bot.Builder.M365.AI
                             // Accumulate tokens until you hit a space
                             if (SPACE_CHARACTERS.Contains(token))
                             {
-                                command!.Entities![entityName] = entityValue.ToString();
+                                command!.Entities![entityName.ToString()] = entityValue.ToString();
                                 parseState = DoCommandParseState.FindEntityName;
-                                entityName = "";
+                                entityName = new();
                                 entityValue = new StringBuilder();
                             }
                             else
@@ -367,12 +367,12 @@ namespace Microsoft.Bot.Builder.M365.AI
                 // This happens when a DO command without any entities is at the end of the response.
                 if (command == null && actionName.Length > 0)
                 {
-                    command = new PredictedDoCommand(actionName);
+                    command = new PredictedDoCommand(actionName.ToString());
                 };
 
                 if (command != null && entityName.Length > 0)
                 {
-                    command!.Entities![entityName] = entityValue.ToString();
+                    command!.Entities![entityName.ToString()] = entityValue.ToString();
                 }
 
             }
