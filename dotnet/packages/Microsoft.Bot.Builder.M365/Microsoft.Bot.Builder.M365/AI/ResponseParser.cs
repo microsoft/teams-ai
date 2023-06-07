@@ -38,30 +38,23 @@ namespace Microsoft.Bot.Builder.M365.AI
                 if (startIndex == -1) return result;
 
                 // Find the first "}" such that all the contents sandwiched between S & E is a valid json.
-                endIndex = startIndex;
-                while (endIndex < length)
+                endIndex = FindValidJsonStructure(text, startIndex);
+
+                if (endIndex == -1) return result;
+
+                string possibleJson = text.Substring(startIndex, endIndex - startIndex + 1);
+
+                // Validate string to be a valid json
+                try
                 {
-                    endIndex = text.IndexOf('}', endIndex + 1);
-                    if (endIndex == -1) return result;
-
-                    string possibleJson = text.Substring(startIndex, endIndex - startIndex + 1);
-
-                    // Validate json structure
-                    if (!IsValidJsonStructure(possibleJson)) continue;
-
-                    // Validate string to be a valid json
-                    try
-                    {
-                        JToken.Parse(possibleJson);
-                    }
-                    catch (JsonReaderException)
-                    {
-                        continue;
-                    }
-
-                    result.Add(possibleJson);
-                    break;
+                    JToken.Parse(possibleJson);
                 }
+                catch (JsonReaderException)
+                {
+                    continue;
+                }
+
+                result.Add(possibleJson);
             }
 
             return result;
@@ -454,40 +447,47 @@ namespace Microsoft.Bot.Builder.M365.AI
             }
         }
 
-        private static bool IsValidJsonStructure(string json)
+        private static int FindValidJsonStructure(string text, int startIndex)
         {
-            json = json.Trim();
-            
-            if (string.IsNullOrEmpty(json) || json.Length < 2) return false;
+                   
+            if (string.IsNullOrEmpty(text) || text.Length < 2) return -1;
 
-            if (json[0] != '{' || json[json.Length-1] != '}') return false;
+            if (text[startIndex] != '{') 
+            {
+                return -1;
+            }
 
             int parenthesisStack = 0;
 
-            int i = 0;
-            while (i < json.Length)
+            int i = startIndex;
+            while (i < text.Length)
             {
-                int c = json.IndexOfAny(new char[] { '{', '}' }, i);
+                int c = text.IndexOfAny(new char[] { '{', '}' }, i);
 
-                if (c == -1) 
-                {
-                    break;
-                }
+                if (c == -1) break;
 
-                if (json[c] == '{')
+                if (text[c] == '{')
                 {
                     parenthesisStack += 1;
-                } else if (json[c] == '}')
+                } else if (text[c] == '}')
                 {
                     parenthesisStack -= 1;
 
-                    if (parenthesisStack < 0) return false;
+                    if (parenthesisStack < 0)
+                    {
+                        return -1;
+                    }
+                    else if (parenthesisStack == 0)
+                    {
+                        // Found a valid json structure, return the index of '}'
+                        return c;
+                    }
                 }
 
                 i = c + 1;
             }
 
-            return parenthesisStack == 0;
+            return -1;
         }
     }
 
