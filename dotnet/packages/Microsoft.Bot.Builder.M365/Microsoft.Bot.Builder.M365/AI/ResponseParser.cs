@@ -392,7 +392,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                 }
 
                 // Parse command (skips initial SAY token)
-                string response = "";
+                StringBuilder response = new StringBuilder();
                 while (++length < tokens.Count)
                 {
                     // Check for ignored tokens
@@ -409,13 +409,13 @@ namespace Microsoft.Bot.Builder.M365.AI
                     }
 
                     // Append token to output response
-                    response += token;
+                    response.Append(token);
                 }
 
                 // Create command
                 if (response.Length > 0)
                 {
-                    command = new PredictedSayCommand(response);
+                    command = new PredictedSayCommand(response.ToString());
                 }
             }
 
