@@ -19,6 +19,11 @@ namespace Microsoft.Bot.Builder.M365
         private bool _disposedValue = false;
 
         /// <summary>
+        /// Data passed to the timer callback
+        /// </summary>
+        private TimerState? _timerState;
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="TypingTimer"/> class.
         /// </summary>
         /// <param name="interval">The interval in milliseconds to send "typing" activity.</param>
@@ -40,11 +45,13 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
+            _timerState = new TimerState(turnContext, false);
+
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
-            
+
             // Start periodically send "typing" activity
-            _timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
+            _timer = new Timer(SendTypingActivity, _timerState, 0, _interval);
 
             return true;
         }
@@ -68,6 +75,7 @@ namespace Microsoft.Bot.Builder.M365
                     {
                         _timer.Dispose();
                         _timer = null;
+                        _timerState = null;
                     }
                 }
 
@@ -86,11 +94,25 @@ namespace Microsoft.Bot.Builder.M365
 
         private async void SendTypingActivity(object state)
         {
-            ITurnContext turnContext = state as TurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
+            TimerState timerState = state as TimerState ?? throw new Exception("Unexpected failure of casting object TimerState");
+
+            ITurnContext turnContext = timerState.TurnContext;
 
             try
             {
-                await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
+                if (timerState.SendInProgress == false)
+                {
+                    timerState.SendInProgress = true;
+                    await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
+                    timerState.SendInProgress = false;
+                }
+                else
+                {
+                    // If the previous task is still running, we don't need to start a new one.
+                    // This is to avoid sending multiple "typing" activities at the same time.
+                    // (e.g. when the bot is slow to respond to user input)
+                    return;
+                }
             } 
             catch (ObjectDisposedException)
             {
@@ -116,6 +138,19 @@ namespace Microsoft.Bot.Builder.M365
             }
 
             return next();
+        }
+
+        private class TimerState
+        {
+            public readonly ITurnContext TurnContext;
+            public bool SendInProgress;
+
+            public TimerState(ITurnContext turnContext, bool typingActivitySendInProgress) 
+            {
+                TurnContext = turnContext;
+                SendInProgress = typingActivitySendInProgress;
+            }
+
         }
     }
 }
