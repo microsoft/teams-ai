@@ -19,7 +19,7 @@ namespace Microsoft.Bot.Builder.M365
         private bool _disposedValue = false;
 
         /// <summary>
-        /// Data passed to the timer callback
+        /// Data passed to the timer callback.
         /// </summary>
         private TimerState? _timerState;
 
