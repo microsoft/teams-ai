@@ -154,7 +154,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             return newPlan;
         }
 
-        public static ParsedCommandResult ParseDoCommand(List<string> tokens)
+        internal static ParsedCommandResult ParseDoCommand(List<string> tokens)
         {
             int length = 0;
             PredictedDoCommand? command = null;
@@ -322,7 +322,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             return new ParsedCommandResult(length, command!);
         }
 
-        public static ParsedCommandResult ParseSayCommand(List<string> tokens)
+        internal static ParsedCommandResult ParseSayCommand(List<string> tokens)
         {
             int length = 0;
             IPredictedCommand? command = null;
