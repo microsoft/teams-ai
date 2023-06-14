@@ -26,7 +26,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         {
             if (!_functions.ContainsKey(name) || allowOverrides)
             {
-                _functions.Add(name, new TemplateFunctionEntry<TState>(promptFunction, allowOverrides));
+                _functions[name] = new TemplateFunctionEntry<TState>(promptFunction, allowOverrides);
             } else
             {
                 if (_functions.TryGetValue(name, out var entry))
@@ -58,13 +58,13 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
             // string updatedPrompt = "";
 
-            _templates.Add(name, new PromptTemplate(promptTemplate.Name, promptTemplate.Text, promptTemplate.Configuration));
+            _templates.Add(name, promptTemplate);
 
             return this;
         }
 
         /// <inheritdoc />
-        public Task<string> InvokeFunction(TurnContext turnContext, TState turnState, string name)
+        public Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name)
         {
             if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> value))
             {
@@ -86,7 +86,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
 
             if (_promptsFolder == null)
             {
-                throw new Exception($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
+                throw new PromptManagerException($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
             }
             
             return _LoadPromptTemplateFromFile(name);
@@ -119,7 +119,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
 
             // Continue only if prompt template exists
             var promptPath = Path.Combine(promptFolder, PROMPT_FILE);
-            if (!File.Exists(promptPath)) { throw new Exception($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
+            if (!File.Exists(promptPath)) { throw new PromptManagerException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
 
             // Load prompt template
             var text = File.ReadAllText(promptPath);
@@ -127,7 +127,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             // Load prompt configuration. Note: the configuration is optional.
             PromptTemplateConfiguration? config;
             var configPath = Path.Combine(promptFolder, CONFIG_FILE);
-            if (!File.Exists(configPath)) { throw new Exception($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
+            if (!File.Exists(configPath)) { throw new PromptManagerException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
 
             try
             {
@@ -135,7 +135,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error while loading prompt. {ex.Message}");
+                throw new PromptManagerException($"Error while loading prompt. {ex.Message}");
             }
 
             return new PromptTemplate(name, text, config);
