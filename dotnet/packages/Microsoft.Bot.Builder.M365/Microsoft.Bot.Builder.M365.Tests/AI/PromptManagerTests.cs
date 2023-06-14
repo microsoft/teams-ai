@@ -71,7 +71,6 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var promptManager = new PromptManager<TurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
-                name,
                 "template string",
                 new PromptTemplateConfiguration
                 {
@@ -98,7 +97,6 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var promptManager = new PromptManager<TurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
-                name,
                 "template string",
                 new PromptTemplateConfiguration
                 {
@@ -126,7 +124,6 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var promptManager = new PromptManager<TurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
-                name,
                 "template string",
                 new PromptTemplateConfiguration
                 {
@@ -162,7 +159,6 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var promptManager = new PromptManager<TurnState>(directoryPath);
             var name = "promptTemplateFolder";
             var expectedPromptTemplate = new PromptTemplate(
-                name,
                 "This is a prompt template string.",
                 new PromptTemplateConfiguration
                 {
@@ -189,7 +185,6 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
 
             // Assert
             // Comparison for every property in this object
-            Assert.Equal(loadedPromptTemplate.Name, expectedPromptTemplate.Name);
             Assert.Equal(loadedPromptTemplate.Text, expectedPromptTemplate.Text);
             Assert.Equal(loadedPromptTemplate.Configuration.Description, expectedPromptTemplate.Configuration.Description);
             Assert.Equal(loadedPromptTemplate.Configuration.Schema, expectedPromptTemplate.Configuration.Schema);
