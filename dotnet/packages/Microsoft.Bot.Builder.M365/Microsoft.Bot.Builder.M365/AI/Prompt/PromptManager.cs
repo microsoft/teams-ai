@@ -144,8 +144,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         private void _VerifyDirectoryExists(string directoryPath)
         {
             if (Directory.Exists(directoryPath)) { return; }
-
-            throw new Exception($"Directory doesn't exist `{directoryPath}`");
+            
+            throw new PromptManagerException($"Directory doesn't exist `{directoryPath}`");
         }
     }
 }
