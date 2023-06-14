@@ -1,5 +1,7 @@
 ﻿using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.TemplateEngine;
 
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
@@ -52,12 +54,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
                 throw new PromptManagerException($"Text template `{name}` already exists.");
             }
 
-            // TODO: Review prompt template standards and make sure they align with SK's
-            // convert all the `.` in variable refernces to `_` to conform to SK template rules
-            // Ex. {{ $state.conversation.value }} to {{ $state_conversation_value }}
-            // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
-            // string updatedPrompt = "";
-
             _templates.Add(name, promptTemplate);
 
             return this;
@@ -92,6 +88,50 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             return _LoadPromptTemplateFromFile(name);
         }
 
+        /// TODO: Update access modifier to be internal
+        /// <summary>
+        /// Renders a prompt template by name.
+        /// </summary>
+        /// <param name="kernel">The semantic kernel</param>
+        /// <param name="turnContext">Current application turn context.</param>
+        /// <param name="turnState">Current turn state.</param>
+        /// <param name="promptTemplate">Prompt template to render.</param>
+        /// <returns>The rendered prompt template</returns>
+        internal async Task<PromptTemplate> RenderPrompt(IKernel kernel, TurnContext turnContext, TState turnState, string name)
+        {
+            PromptTemplate promptTemplate = LoadPromptTemplate(name);
+
+            return await RenderPrompt(kernel, turnContext, turnState, promptTemplate);
+        }
+
+        /// TODO: Update access modifier to be internal
+        /// TODO: Ensure turnContext and turnState descriptions are same throughout the SDK
+        /// <summary>
+        /// Renders a prompt template.
+        /// </summary>
+        /// <param name="kernel">The semantic kernel</param>
+        /// <param name="turnContext">Current application turn context.</param>
+        /// <param name="turnState">Current turn state.</param>
+        /// <param name="promptTemplate">Prompt template to render.</param>
+        /// <returns>The rendered prompt template</returns>
+        public async Task<PromptTemplate> RenderPrompt(IKernel kernel, TurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        {
+            // TODO: Review prompt template standards and make sure they align with SK's.
+            // Convert all the `.` in variable refernces to `_` to conform to SK template rules
+            // Ex. {{ $state.conversation.value }} to {{ $state_conversation_value }}
+            // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
+            // string updatedPrompt = "";
+
+            RegisterFunctionsIntoKernel(kernel, turnContext, turnState);
+            SKContext context = kernel.CreateNewContext();
+            LoadStateIntoContext(context, turnContext, turnState);
+
+            PromptTemplateEngine promptRenderer = new();
+            string renderedPrompt = await promptRenderer.RenderAsync(promptTemplate.Text, context);
+
+            return new PromptTemplate(renderedPrompt, promptTemplate.Configuration);
+        }
+
         /// <summary>
         /// Registers all the functions into the <seealso cref="SemanticKernel.IKernel"/> default skill collection.
         /// </summary>
@@ -107,6 +147,19 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
                 SKFunctionWrapper<TState> sKFunction = new (turnContext, turnState, templateEntry.Key, this);
                 kernel.RegisterCustomFunction(sKFunction);
             }
+        }
+
+        /// TODO: Update this once turn state infrastructure is implemented
+        /// <summary>
+        /// Loads value from turn context and turn state into context variables.
+        /// </summary>
+        /// <param name="turnContext">The context object for this turn.</param>
+        /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+        /// <returns>Variables that could be injected into the prompt template</returns>
+        internal void LoadStateIntoContext(SKContext context, TurnContext turnContext, TState turnState)
+        {
+            context["input"] = turnContext.Activity.Text;
+            // TODO: Load turn state 'temp' values into the context
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)
@@ -138,7 +191,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
                 throw new PromptManagerException($"Error while loading prompt. {ex.Message}");
             }
 
-            return new PromptTemplate(name, text, config);
+            return new PromptTemplate(text, config);
         }
 
         private void _VerifyDirectoryExists(string directoryPath)
