@@ -49,7 +49,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         {
             if (_templates.ContainsKey(name))
             {
-                throw new ArgumentException($"Text template `{name}` already exists.");
+                throw new PromptManagerException($"Text template `{name}` already exists.");
             }
 
             // TODO: Review prompt template standards and make sure they align with SK's
