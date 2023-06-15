@@ -13,6 +13,10 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         /// The action handler function.
         /// </summary>
         public ActionHandler<TState> Handler { get; set; }
+
+        /// <summary>
+        /// Whether to allow overrides of this action's properties.
+        /// </summary>
         public bool AllowOverrides { get; set; }
 
         public ActionEntry(string name, ActionHandler<TState> handler, bool allowOverrides = true)
