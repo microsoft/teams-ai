@@ -56,9 +56,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <inheritdoc/>
         public async Task<string> CompletePromptAsync(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
-            // TODO: This step is just for testing purposes, REMOVE THIS LINE!
-            // promptTemplate = await _promptManager.RenderPrompt(_kernel, turnContext, turnState, promptTemplate);
-
             string model = _GetModel(promptTemplate);
             try
             {
@@ -174,10 +171,10 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
             var chatCompletion = _kernel.GetService<IChatCompletion>();
 
-            // TODO: when turn state is implemented inject history
+            // TODO: When turn state is implemented inject history
             var chatHistory = chatCompletion.CreateNewChat();
 
-            // TODO: when turn state is implemented inject history
+            // TODO: When turn state is implemented inject history
             // Users message
             chatHistory.AddUserMessage(promptTemplate.Text);
 
