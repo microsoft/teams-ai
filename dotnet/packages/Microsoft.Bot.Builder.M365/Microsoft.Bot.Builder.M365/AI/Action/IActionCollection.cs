@@ -1,7 +1,7 @@
 ﻿
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
-    public delegate Task<bool> ActionHandler<TState>(TurnContext turnContext, TState turnState, object? data = null, string? action = null) where TState : TurnState;
+    public delegate Task<bool> ActionHandler<TState>(TurnContext turnContext, TState turnState, object? entities = null, string? action = null) where TState : TurnState;
 
     public interface IActionCollection<TState> where TState : TurnState
     {
@@ -21,7 +21,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         /// <returns>The action entry in this collection.</returns>
         /// <exception cref="ArgumentException"></exception>
         ActionEntry<TState> GetAction(string actionName);
-
+        
         /// <summary>
         /// Checks if the action is in the collection.
         /// </summary>
