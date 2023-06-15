@@ -3,12 +3,12 @@ using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.AI;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextCompletion;
 using Microsoft.SemanticKernel.SemanticFunctions;
+using AIException = Microsoft.SemanticKernel.AI.AIException;
 using PromptTemplate = Microsoft.Bot.Builder.M365.AI.Prompt.PromptTemplate;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
@@ -57,7 +57,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         public async Task<string> CompletePromptAsync(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
             // TODO: This step is just for testing purposes, REMOVE THIS LINE!
-            promptTemplate = await _promptManager.RenderPrompt(_kernel, turnContext, turnState, promptTemplate);
+            // promptTemplate = await _promptManager.RenderPrompt(_kernel, turnContext, turnState, promptTemplate);
 
             string model = _GetModel(promptTemplate);
             try
