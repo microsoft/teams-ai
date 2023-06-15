@@ -31,7 +31,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="name">Name of the function to invoke.</param>
         /// <returns>The result returned by the function for insertion into a prompt.</returns>
-        Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name);
+        Task<string> InvokeFunction(TurnContext turnContext, TState turnState, string name);
 
         /// <summary>
         /// Loads a named prompt template from the filesystem.

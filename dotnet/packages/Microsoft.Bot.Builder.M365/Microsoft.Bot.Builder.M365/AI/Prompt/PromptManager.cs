@@ -60,7 +60,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         }
 
         /// <inheritdoc />
-        public Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name)
+        public Task<string> InvokeFunction(TurnContext turnContext, TState turnState, string name)
         {
             if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> value))
             {
@@ -97,11 +97,11 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
         /// <returns>The rendered prompt template</returns>
-        internal async Task<PromptTemplate> RenderPrompt(IKernel kernel, TurnContext turnContext, TState turnState, string name)
+        internal async Task<PromptTemplate> RenderPrompt(TurnContext turnContext, TState turnState, string name)
         {
             PromptTemplate promptTemplate = LoadPromptTemplate(name);
 
-            return await RenderPrompt(kernel, turnContext, turnState, promptTemplate);
+            return await RenderPrompt(turnContext, turnState, promptTemplate);
         }
 
         /// TODO: Update access modifier to be internal
@@ -114,7 +114,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
         /// <returns>The rendered prompt template</returns>
-        public async Task<PromptTemplate> RenderPrompt(IKernel kernel, TurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        public async Task<PromptTemplate> RenderPrompt(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
         {
             // TODO: Review prompt template standards and make sure they align with SK's.
             // Convert all the `.` in variable refernces to `_` to conform to SK template rules
@@ -122,6 +122,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
             // string updatedPrompt = "";
 
+            IKernel kernel = Kernel.Builder.Build();
             RegisterFunctionsIntoKernel(kernel, turnContext, turnState);
             SKContext context = kernel.CreateNewContext();
             LoadStateIntoContext(context, turnContext, turnState);
