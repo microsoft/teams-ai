@@ -39,7 +39,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Register default UnknownAction handler
         /// </summary>
         [Action(DefaultActions.UnknownActionName)]
-        protected Task<bool> UnkownAction(TurnContext turnContext, TState turnState, object data, string action)
+        protected Task<bool> UnkownAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
             // TODO: Log error
             return Task.FromResult(true);
@@ -49,7 +49,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Register default FlaggedInputAction handler
         /// </summary>
         [Action(DefaultActions.FlaggedInputActionName)]
-        protected Task<bool> FlaggedInputAction(TurnContext turnContext, TState turnState, object data, string action)
+        protected Task<bool> FlaggedInputAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
             // TODO: Log error
             return Task.FromResult(true);
@@ -60,7 +60,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
         /// </summary>
         [Action(DefaultActions.FlaggedOutputActionName)]
-        protected Task<bool> FlaggedOutputAction(TurnContext turnContext, TState turnState, object data, string action)
+        protected Task<bool> FlaggedOutputAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
             // TODO: Log error
             return Task.FromResult(true);
@@ -70,20 +70,18 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Register default RateLimitedActionName
         /// </summary>
         [Action(DefaultActions.RateLimitedActionName)]
-        protected Task<bool> RateLimitedAction(TurnContext turnContext, TState turnState, object data, string action)
+        protected Task<bool> RateLimitedAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            // TODO: Create specific exception
-            throw new Exception("An AI request failed because it was rate limited");
+            throw new AIException("An AI request failed because it was rate limited");
         }
 
         /// <summary>
         /// Register default PlanReadyActionName
         /// </summary>
         [Action(DefaultActions.PlanReadyActionName)]
-        protected Task<bool> PlanReadyAction(TurnContext turnContext, TState turnState, object data, string action)
+        protected Task<bool> PlanReadyAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            // TODO: Create specific exception
-            Plan plan = data as Plan ?? throw new Exception("Unexpected `data` object: It should be a Plan object");
+            Plan plan = data as Plan ?? throw new AIException("Unexpected `data` object: It should be a Plan object");
             
             return Task.FromResult(plan.Commands.Count > 0);
         }
@@ -92,7 +90,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Register default DoCommandActionName
         /// </summary>
         [Action(DefaultActions.DoCommandActionName)]
-        protected Task<bool> DoCommand(TurnContext turnContext, TState turnState, object data, string action)
+        protected Task<bool> DoCommand(ITurnContext turnContext, TState turnState, object data, string action)
         {
             PredictedDoCommand command = data as PredictedDoCommand ?? throw new Exception ("Unexpected `data` object: It should be a PredictedDoCommand object");
 
@@ -105,7 +103,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Register default SayCommandActionName
         /// </summary>
         [Action(DefaultActions.SayCommandActionName)]
-        protected async Task<bool> SayCommand(TurnContext turnContext, TState turnState, object data, string action)
+        protected async Task<bool> SayCommand(ITurnContext turnContext, TState turnState, object data, string action)
         {
             PredictedSayCommand command = data as PredictedSayCommand ?? throw new Exception("Unexpected `data` object: It should be a PredictedDoCommand object");
             string response = command.Response;
@@ -245,7 +243,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
-        public async Task<bool> Chain(TurnContext turnContext, TState turnState, string? prompt, AIOptions<TState>? options, CancellationToken cancellationToken = default)
+        public async Task<bool> Chain(ITurnContext turnContext, TState turnState, string? prompt, AIOptions<TState>? options, CancellationToken cancellationToken = default)
         {
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
@@ -321,7 +319,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
-        public async Task<string> CompletePrompt(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
+        public async Task<string> CompletePrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
@@ -342,7 +340,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
-        public async Task<string> CompletePrompt(TurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
+        public async Task<string> CompletePrompt(ITurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
@@ -380,7 +378,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                 _options.PromptManager.AddPromptTemplate(name, template);
             }
 
-            return (TurnContext turnContext, TState turnState) => CompletePrompt(turnContext, turnState, name, options, default);
+            return (ITurnContext turnContext, TState turnState) => CompletePrompt(turnContext, turnState, name, options, default);
         }
 
         private AIOptions<TState> _ConfigureOptions(AIOptions<TState>? options)

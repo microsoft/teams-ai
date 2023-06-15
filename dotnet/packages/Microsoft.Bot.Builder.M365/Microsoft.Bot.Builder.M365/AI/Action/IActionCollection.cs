@@ -1,7 +1,7 @@
 ﻿
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
-    public delegate Task<bool> ActionHandler<TState>(TurnContext turnContext, TState turnState, object? entities = null, string? action = null) where TState : TurnState;
+    public delegate Task<bool> ActionHandler<TState>(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null) where TState : TurnState;
 
     public interface IActionCollection<TState> where TState : TurnState
     {

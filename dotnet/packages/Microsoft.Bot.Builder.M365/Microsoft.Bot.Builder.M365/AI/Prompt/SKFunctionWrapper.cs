@@ -15,7 +15,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         private string _name;
         private PromptManager<TState> _promptManager;
         private TState _turnState;
-        private TurnContext _turnContext;
+        private ITurnContext _turnContext;
         private IReadOnlySkillCollection? _skillCollection;
 
         public string Name => _name;
@@ -32,7 +32,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
 
         public CompleteRequestSettings RequestSettings => throw new NotImplementedException();
 
-        public SKFunctionWrapper(TurnContext turnContext, TState turnState, string name, PromptManager<TState> promptManager)
+        public SKFunctionWrapper(ITurnContext turnContext, TState turnState, string name, PromptManager<TState> promptManager)
         {
             _name = name;
             _promptManager = promptManager;

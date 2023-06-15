@@ -60,7 +60,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         }
 
         /// <inheritdoc />
-        public Task<string> InvokeFunction(TurnContext turnContext, TState turnState, string name)
+        public Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name)
         {
             if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> value))
             {
@@ -96,7 +96,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
         /// <returns>The rendered prompt template</returns>
-        internal async Task<PromptTemplate> RenderPrompt(TurnContext turnContext, TState turnState, string name)
+        internal async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name)
         {
             PromptTemplate promptTemplate = LoadPromptTemplate(name);
 
@@ -112,7 +112,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
         /// <returns>The rendered prompt template</returns>
-        internal async Task<PromptTemplate> RenderPrompt(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        internal async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
         {
             // TODO: Review prompt template standards and make sure they align with SK's.
             // Convert all the `.` in variable refernces to `_` to conform to SK template rules
@@ -137,7 +137,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="kernel">The semantic kernel</param>
         /// <param name="turnContext">The context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-        internal void RegisterFunctionsIntoKernel(IKernel kernel, TurnContext turnContext, TState turnState)
+        internal void RegisterFunctionsIntoKernel(IKernel kernel, ITurnContext turnContext, TState turnState)
         {
             // TODO: Optimize
             foreach (var templateEntry in _functions)
@@ -155,7 +155,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnContext">The context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <returns>Variables that could be injected into the prompt template</returns>
-        internal void LoadStateIntoContext(SKContext context, TurnContext turnContext, TState turnState)
+        internal void LoadStateIntoContext(SKContext context, ITurnContext turnContext, TState turnState)
         {
             context["input"] = turnContext.Activity.Text;
             // TODO: Load turn state 'temp' values into the context

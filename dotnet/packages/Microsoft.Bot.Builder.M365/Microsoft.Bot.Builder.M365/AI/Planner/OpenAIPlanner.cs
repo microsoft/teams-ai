@@ -54,7 +54,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
         /// <inheritdoc/>
-        public async Task<string> CompletePromptAsync(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
+        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
             string model = _GetModel(promptTemplate);
             try
@@ -81,7 +81,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
         /// <inheritdoc/>
-        public async Task<Plan> GeneratePlanAsync(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
+        public async Task<Plan> GeneratePlanAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
             string result;
             try
