@@ -88,7 +88,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             return _LoadPromptTemplateFromFile(name);
         }
 
-        /// TODO: Update access modifier to be internal
         /// <summary>
         /// Renders a prompt template by name.
         /// </summary>
@@ -104,7 +103,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             return await RenderPrompt(turnContext, turnState, promptTemplate);
         }
 
-        /// TODO: Update access modifier to be internal
         /// TODO: Ensure turnContext and turnState descriptions are same throughout the SDK
         /// <summary>
         /// Renders a prompt template.
@@ -114,7 +112,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
         /// <returns>The rendered prompt template</returns>
-        public async Task<PromptTemplate> RenderPrompt(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        internal async Task<PromptTemplate> RenderPrompt(TurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
         {
             // TODO: Review prompt template standards and make sure they align with SK's.
             // Convert all the `.` in variable refernces to `_` to conform to SK template rules
