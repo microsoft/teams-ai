@@ -48,7 +48,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="moderator"> The moderator to use for moderating input passed to the model and the output</param>
         /// <param name="prompt">Optional. The prompt to use for the current turn.</param>
         /// <param name="history">Optional. The history options to use for the AI system.</param>
-        public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, Moderator<TState> moderator, string? prompt, AIHistoryOptions? history)
+        public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, Moderator<TState> moderator, string? prompt = null, AIHistoryOptions? history = null)
         {
             Planner = planner;
             PromptManager = promptManager;

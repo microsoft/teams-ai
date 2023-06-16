@@ -97,7 +97,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                         {
                             Commands =
                             {
-                                new PredictedDoCommand(DefaultActions.RateLimitedActionName)
+                                new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName)
                             }
                         };
                     }

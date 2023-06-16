@@ -1,8 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Action;
 using Microsoft.Bot.Builder.M365.AI.Planner;
-using AdaptiveCards;
-using Microsoft.Bot.Schema;
-using Microsoft.Bot.Connector;
 using System.Reflection;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
@@ -33,97 +30,9 @@ namespace Microsoft.Bot.Builder.M365.AI
             }
 
             _options.History ??= new AIHistoryOptions();
-        }
 
-        /// <summary>
-        /// Register default UnknownAction handler
-        /// </summary>
-        [Action(DefaultActions.UnknownActionName)]
-        protected Task<bool> UnkownAction(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            // TODO: Log error
-            return Task.FromResult(true);
-        }
-
-        /// <summary>
-        /// Register default FlaggedInputAction handler
-        /// </summary>
-        [Action(DefaultActions.FlaggedInputActionName)]
-        protected Task<bool> FlaggedInputAction(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            // TODO: Log error
-            return Task.FromResult(true);
-        }
-
-        /// <summary>
-        /// Register default FlaggedOutputAction handler
-
-        /// </summary>
-        [Action(DefaultActions.FlaggedOutputActionName)]
-        protected Task<bool> FlaggedOutputAction(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            // TODO: Log error
-            return Task.FromResult(true);
-        }
-
-        /// <summary>
-        /// Register default RateLimitedActionName
-        /// </summary>
-        [Action(DefaultActions.RateLimitedActionName)]
-        protected Task<bool> RateLimitedAction(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            throw new AIException("An AI request failed because it was rate limited");
-        }
-
-        /// <summary>
-        /// Register default PlanReadyActionName
-        /// </summary>
-        [Action(DefaultActions.PlanReadyActionName)]
-        protected Task<bool> PlanReadyAction(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            Plan plan = data as Plan ?? throw new AIException("Unexpected `data` object: It should be a Plan object");
-            
-            return Task.FromResult(plan.Commands.Count > 0);
-        }
-
-        /// <summary>
-        /// Register default DoCommandActionName
-        /// </summary>
-        [Action(DefaultActions.DoCommandActionName)]
-        protected Task<bool> DoCommand(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            PredictedDoCommand command = data as PredictedDoCommand ?? throw new Exception ("Unexpected `data` object: It should be a PredictedDoCommand object");
-
-            ActionHandler<TState> handler = _actions.GetAction(command.Action).Handler;
-
-            return handler.Invoke(turnContext, turnState, data, action);
-        }
-
-        /// <summary>
-        /// Register default SayCommandActionName
-        /// </summary>
-        [Action(DefaultActions.SayCommandActionName)]
-        protected async Task<bool> SayCommand(ITurnContext turnContext, TState turnState, object data, string action)
-        {
-            PredictedSayCommand command = data as PredictedSayCommand ?? throw new Exception("Unexpected `data` object: It should be a PredictedDoCommand object");
-            string response = command.Response;
-            AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
-            
-            if (card != null)
-            {
-                // TODO: Log card warnings
-                Attachment attachment = new() { Content = card, ContentType = AdaptiveCard.ContentType };
-                IMessageActivity activity = MessageFactory.Attachment(attachment);
-                await turnContext.SendActivityAsync(activity);
-            } else if (turnContext.Activity.ChannelId == Channels.Msteams)
-            {
-                await turnContext.SendActivityAsync(response.Replace("\n", "<br>"));
-            } else
-            {
-                await turnContext.SendActivityAsync(response);
-            };
-
-            return true;
+            // Import default actions
+            ImportActions(new DefaultActions<TState>());
         }
 
         /// <summary>
@@ -243,7 +152,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
-        public async Task<bool> Chain(ITurnContext turnContext, TState turnState, string? prompt, AIOptions<TState>? options, CancellationToken cancellationToken = default)
+        public async Task<bool> Chain(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
@@ -272,7 +181,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             Plan plan = await aIOptions.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
 
             // Process generated plan
-            bool continueChain = await _actions.GetAction(DefaultActions.PlanReadyActionName)!.Handler(turnContext, turnState, plan);
+            bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler(turnContext, turnState, plan);
             if (continueChain)
             {
                 // TODO: Update conversation history
@@ -288,19 +197,19 @@ namespace Microsoft.Bot.Builder.M365.AI
                     {
                         // Call action handler
                         continueChain = await _actions
-                            .GetAction(DefaultActions.DoCommandActionName)!
+                            .GetAction(DefaultActionTypes.DoCommandActionName)!
                             .Handler(turnContext, turnState, doCommand, doCommand.Action);
                     } else {
                         // Redirect to UnknownAction handler
                         continueChain = await _actions
-                            .GetAction(DefaultActions.UnknownActionName)
+                            .GetAction(DefaultActionTypes.UnknownActionName)
                             .Handler(turnContext, turnState, plan, doCommand.Action);
                     }
                 } else if (command is PredictedSayCommand sayCommand)
                 {
                     continueChain = await _actions
-                        .GetAction(DefaultActions.SayCommandActionName)
-                        .Handler(turnContext, turnState, sayCommand, DefaultActions.SayCommandActionName);
+                        .GetAction(DefaultActionTypes.SayCommandActionName)
+                        .Handler(turnContext, turnState, sayCommand, DefaultActionTypes.SayCommandActionName);
                 } else
                 {
                     throw new AIException($"Unknown command of {command.Type} predicted");
