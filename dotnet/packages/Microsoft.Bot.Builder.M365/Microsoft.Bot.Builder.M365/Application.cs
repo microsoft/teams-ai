@@ -3,14 +3,33 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Builder.M365.AI;
 
 namespace Microsoft.Bot.Builder.M365
 {
+    // TODO: Implement long running calls feature
+    /// <summary>
+    /// Application class for routing and processing incoming requests.
+    /// </summary>
+    /// <remarks>
+    /// The Application object replaces the traditional ActivityHandler that a bot would use. It supports
+    /// a simpler fluent style of authoring bots versus the inheritance based approach used by the
+    /// ActivityHandler class.
+    ///
+    /// Additionally, it has built-in support for calling into the SDK's AI system and can be used to create
+    /// bots that leverage Large Language Models (LLM) and other AI capabilities.
+    /// </remarks>
+    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     public class Application<TState> : IBot where TState : TurnState
     {
         private readonly ApplicationOptions<TState> _options;
         private readonly AI<TState>? _ai;
+        private readonly int _typingTimerDelay = 1000;
 
+        /// <summary>
+        /// Creates a new Application instance.
+        /// </summary>
+        /// <param name="options">Optional. Options used to configure the application.</param>
         public Application(ApplicationOptions<TState> options)
         {
             _options = options;
@@ -21,14 +40,20 @@ namespace Microsoft.Bot.Builder.M365
                 _options.TurnStateManager = null;
             }
 
-            if (_options.AI == null)
+            if (_options.AI != null)
             {
-                // TODO: set to default AI object
-                _ai = null;
+                _ai = new AI<TState>(_options.AI);
             }
 
         }
 
+        /// <summary>
+        /// Fluent interface for accessing AI specific features.
+        /// </summary>
+        /// <remarks>
+        /// This property is only available if the Application was configured with 'ai' options. An
+        /// exception will be thrown if you attempt to access it otherwise.
+        /// </remarks>
         public AI<TState> AI
         {
             get
@@ -42,6 +67,9 @@ namespace Microsoft.Bot.Builder.M365
             }
         }
 
+        /// <summary>
+        /// The application's configured options.
+        /// </summary>
         public ApplicationOptions<TState> Options { get { return _options; } }
 
         /// <summary>
@@ -110,7 +138,7 @@ namespace Microsoft.Bot.Builder.M365
                 // Start typing timer if configured
                 if (_options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(_options.TypingTimerDelay);
+                    timer = new TypingTimer(_typingTimerDelay);
                     timer.StartTypingTimer(turnContext);
                 }
 
@@ -129,12 +157,13 @@ namespace Microsoft.Bot.Builder.M365
                 // Call activity type specific handler
                 bool eventHandlerCalled = await RunAsync(turnContext, turnState, cancellationToken);
 
-                if (!eventHandlerCalled)
+                if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
-                    // TODO : call AI module
+                    // Begin a new chain of AI calls
+                    await _ai.Chain(turnContext, turnState); 
                 }
 
-                // Call after activity handler
+                // Call after turn activity handler
                 if (await OnAfterTurnAsync(turnContext, turnState, cancellationToken))
                 {
                     // TODO : Save turn state to persistent storage
