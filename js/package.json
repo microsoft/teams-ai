@@ -1,7 +1,7 @@
 {
     "private": true,
-    "name": "botbuilder-m365",
-    "version": "0.0.1",
+    "name": "teams-ai",
+    "version": "0.1.0",
     "workspaces": [
         "./packages/*",
         "./samples/*"

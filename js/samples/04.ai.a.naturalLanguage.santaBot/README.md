@@ -107,7 +107,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com).
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/Microsoft/botbuilder-m365.git
+    git clone https://github.com/Microsoft/teams-ai.git
     ```
 
 1. In a terminal, navigate to `samples/04.ai.naturalLanguage.santaBot`

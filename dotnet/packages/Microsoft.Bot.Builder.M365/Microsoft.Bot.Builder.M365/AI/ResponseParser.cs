@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -41,23 +42,23 @@ namespace Microsoft.Bot.Builder.M365.AI
                 while (endIndex < length)
                 {
                     endIndex = text.IndexOf('}', endIndex + 1);
-                    if (endIndex == -1) return result;
+                if (endIndex == -1) return result;
 
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
 
                     // Validate string to be a valid JSON
-                    try
-                    {
+                try
+                {
                         JToken.Parse(possibleJSON);
-                    }
-                    catch (JsonReaderException)
-                    {
-                        continue;
-                    }
+                }
+                catch (JsonReaderException)
+                {
+                    continue;
+                }
 
                     result.Add(possibleJSON);
                     break;
-                }
+            }
             }
 
             return result;
@@ -77,6 +78,14 @@ namespace Microsoft.Bot.Builder.M365.AI
             return AdaptiveCard.FromJson(firstJsonString);
         }
 
+        /// <summary>
+        /// Parses a response and returns a plan.
+        /// 
+        /// If a plan object can be detected in the response it will be returned. Otherwise a plan with a single SAY command
+        /// containing the response will be returned.
+        /// </summary>
+        /// <param name="text">Text to parse</param>
+        /// <returns>The parsed plan</returns>
         public static Plan ParseResponse(string text)
         {
             Plan? plan = GetFirstPlanObject(text);
@@ -85,8 +94,8 @@ namespace Microsoft.Bot.Builder.M365.AI
             {
                 if (AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
                 {
-                    return plan;
-                }
+                return plan;
+            }
             }
 
             // Parse response using DO/SAY syntax
@@ -155,6 +164,47 @@ namespace Microsoft.Bot.Builder.M365.AI
         }
 
         internal static ParsedCommandResult ParseDoCommand(List<string> tokens)
+        {
+            List<string> tokens = new();
+
+            if (text.Length < 1) return tokens;
+
+            string token = "";
+            int length = text.Length;
+            for (int i = 0; i < length; i++)
+            {
+                string c = text[i].ToString();
+                if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
+                {
+                    // Push token onto list
+                    if (token.Length > 0)
+                    {
+                        tokens.Add(token);
+                    }
+
+                    // Push breaking character onto list as a separate token
+                    tokens.Add(c);
+
+                    // Start a new empty token
+                    token = "";
+                }
+                else
+                {
+                    // Add to existing token
+                    token += c;
+                }
+            }
+
+            // Add last token onto list
+            if (token.Length > 0)
+            {
+                tokens.Add(token);
+            }
+
+            return tokens;
+        }
+
+        private static ParsedCommandResult ParseDoCommand(List<string> tokens)
         {
             int length = 0;
             PredictedDoCommand? command = null;
@@ -370,7 +420,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="text">Any input string</param>
         /// <returns>A list of tokens</returns>
         public static List<string> TokenizeText(string text)
-        {
+            {
             List<string> tokens = new();
 
             if (text.Length < 1) return tokens;
@@ -381,12 +431,12 @@ namespace Microsoft.Bot.Builder.M365.AI
             {
                 string c = text[i].ToString();
                 if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
-                {
+            {
                     // Push token onto list
                     if (token.Length > 0)
-                    {
+            {
                         tokens.Add(token);
-                    }
+        }
 
                     // Push breaking character onto list as a separate token
                     tokens.Add(c);
@@ -395,7 +445,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                     token = "";
                 }
                 else
-                {
+            {
                     // Add to existing token
                     token += c;
                 }
@@ -411,20 +461,20 @@ namespace Microsoft.Bot.Builder.M365.AI
         }
 
         private static string? GetFirstJsonString(string text)
-        {
+                {
             string? firstJSON;
             try
-            {
+                    {
                 firstJSON = ParseJSON(text)?.First();
-            }
+                    }
             catch (InvalidOperationException)
-            {
+                    {
                 // Empty sequence
                 return null;
-            }
+                }
 
             return firstJSON;
-        }
+            }
 
         private static Plan? GetFirstPlanObject(string text)
         {

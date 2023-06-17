@@ -19,6 +19,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// The response that the AI system should say.
         /// </summary>
         [JsonProperty("response")]
+        [JsonRequired]
         public string Response { get; set; }
 
         public PredictedSayCommand(string response)

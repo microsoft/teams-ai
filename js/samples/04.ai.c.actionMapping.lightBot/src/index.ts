@@ -64,7 +64,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { AI, Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/botbuilder-m365';
+import { AI, Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 interface ConversationState {
@@ -97,29 +97,41 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Add a prompt function for getting the current status of the lights
-app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
-    return state.conversation.value.lightsOn ? 'on' : 'off';
-});
+app.ai.prompts.addFunction(
+    'getLightStatus',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        return state.conversation.value.lightsOn ? 'on' : 'off';
+    }
+);
 
 // Register action handlers
-app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.value.lightsOn = true;
-    await context.sendActivity(`[lights on]`);
-    return true;
-});
+app.ai.action(
+    'LightsOn',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = true;
+        await context.sendActivity(`[lights on]`);
+        return true;
+    }
+);
 
-app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.value.lightsOn = false;
-    await context.sendActivity(`[lights off]`);
-    return true;
-});
+app.ai.action(
+    'LightsOff',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = false;
+        await context.sendActivity(`[lights off]`);
+        return true;
+    }
+);
 
-app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
+app.ai.action(
+    'Pause',
+    async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
     const time = data.time ? parseInt(data.time) : 1000;
-    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
-    await new Promise((resolve) => setTimeout(resolve, time));
-    return true;
-});
+        await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+        await new Promise((resolve) => setTimeout(resolve, time));
+        return true;
+    }
+);
 
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(

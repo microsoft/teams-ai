@@ -65,7 +65,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { AdaptiveCardSearchResult, Application, DefaultTurnState, TurnState } from '@microsoft/botbuilder-m365';
+import { AdaptiveCardSearchResult, Application, DefaultTurnState, TurnState } from '@microsoft/teams-ai';
 import { createDynamicSearchCard, createStaticSearchCard } from './cards';
 import axios from 'axios';
 
