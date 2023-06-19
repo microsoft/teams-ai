@@ -19,11 +19,6 @@ namespace Microsoft.Bot.Builder.M365
         private bool _disposedValue = false;
 
         /// <summary>
-        /// Data passed to the timer callback.
-        /// </summary>
-        private TimerState? _timerState;
-
-        /// <summary>
         /// Constructs a new instance of the <see cref="TypingTimer"/> class.
         /// </summary>
         /// <param name="interval">The interval in milliseconds to send "typing" activity.</param>
@@ -45,15 +40,11 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
-            _timerState = new TimerState(turnContext, _interval);
-
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
 
             // Start periodically send "typing" activity
-            _timer = new Timer(SendTypingActivity, _timerState, Timeout.Infinite, Timeout.Infinite);
-
-            _timerState.Timer = _timer;
+            _timer = new Timer(SendTypingActivity, turnContext, Timeout.Infinite, Timeout.Infinite);
 
             // Fire first time
             _timer.Change(0, Timeout.Infinite);
@@ -80,7 +71,6 @@ namespace Microsoft.Bot.Builder.M365
                     {
                         _timer.Dispose();
                         _timer = null;
-                        _timerState = null;
                     }
                 }
 
@@ -99,16 +89,12 @@ namespace Microsoft.Bot.Builder.M365
 
         private async void SendTypingActivity(object state)
         {
-            TimerState timerState = state as TimerState ?? throw new Exception("Unexpected failure of casting object TimerState");
-
-            ITurnContext turnContext = timerState.TurnContext;
-            Timer timer = timerState.Timer ?? throw new Exception("Unexpected failure of casting object Timer"); ;
-            int interval = timerState.Interval;
+            ITurnContext turnContext = state as ITurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
 
             try
             {
                 await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
-                timer.Change(interval, Timeout.Infinite);
+                _timer!.Change(_interval, Timeout.Infinite);
             } 
             catch (ObjectDisposedException)
             {
@@ -134,21 +120,6 @@ namespace Microsoft.Bot.Builder.M365
             }
 
             return next();
-        }
-
-        private class TimerState
-        {
-            public readonly ITurnContext TurnContext;
-            public Timer? Timer { set; get; }
-            public readonly int Interval;
-
-            public TimerState(ITurnContext turnContext,int interval, Timer? timer = null) 
-            {
-                TurnContext = turnContext;
-                Interval = interval;
-                Timer = timer;
-            }
-
         }
     }
 }
