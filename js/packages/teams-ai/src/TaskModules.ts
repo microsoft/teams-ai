@@ -166,7 +166,7 @@ export class TaskModules<TState extends TurnState> {
                     const result = await handler(context, state, context.activity.value?.data ?? {});
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                         // Format invoke response
-                        let response: TaskModuleResponse = {};
+                        let response: TaskModuleResponse | undefined = undefined;
                         if (typeof result == 'string') {
                             // Return message
                             response = {
