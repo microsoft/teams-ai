@@ -54,6 +54,7 @@ const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
 
 /**
  * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
+ *
  * @template TState Type of the turn state object being persisted.
  */
 export class MessageExtensions<TState extends TurnState> {
@@ -61,6 +62,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Creates a new instance of the MessageExtensions class.
+     *
      * @param app Top level application class to register handlers with.
      */
     public constructor(app: Application<TState>) {
@@ -69,6 +71,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler for a command that performs anonymous link unfurling.
+     *
      * @param commandId ID of the command(s) to register the handler for.
      * @param handler Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
      * @param handler.context Context for the current turn of conversation with the user.
@@ -119,6 +122,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the 'edit' action of a message that's being previewed by the
      * user prior to sending.
+     *
      * @remarks
      * This handler is called when the user clicks the 'Edit' button on a message that's being
      * previewed prior to insertion into the current chat. The handler should return a new
@@ -167,6 +171,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the 'send' action of a message that's being previewed by the
      * user prior to sending.
+     *
      * @remarks
      * This handler is called when the user clicks the 'Send' button on a message that's being
      * previewed prior to insertion into the current chat. The handler should complete the flow
@@ -217,6 +222,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch task for an Action based message extension.
+     *
      * @remarks
      * Handlers should response with either an initial TaskInfo object or a string containing
      * a message to display to the user.
@@ -283,6 +289,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Search based Message Extension.
+     *
      * @remarks
      * This handler is called when the user submits a query to a Search based Message Extension.
      * The handler should return a MessagingExtensionResult containing the results of the query.
@@ -350,6 +357,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Link Unfurling based Message Extension.
+     *
      * @param commandId ID of the command(s) to register the handler for.
      * @param handler Function to call when the command is received.
      * @param handler.context Context for the current turn of conversation with the user.
@@ -359,7 +367,7 @@ export class MessageExtensions<TState extends TurnState> {
      */
     public queryLink(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState , url: string) => Promise<MessagingExtensionResult>
+        handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, QUERY_LINK_INVOKE_NAME);
@@ -400,6 +408,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler that implements the logic to handle the tap actions for items returned
      * by a Search based message extension.
+     *
      * @remarks
      * The `composeExtension/selectItem` INVOKE activity does not contain any sort of command ID,
      * so only a single select item handler can be registered. Developers will need to include a
@@ -448,6 +457,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements the submit action for an Action based Message Extension.
+     *
      * @template TData Optional. Type of data being submitted.
      * @param commandId ID of the command(s) to register the handler for.
      * @param handler Function to call when the command is received.
@@ -456,7 +466,7 @@ export class MessageExtensions<TState extends TurnState> {
      * @param handler.data The data that was submitted.
      * @returns The application for chaining purposes.
      */
-    public submitAction<TData extends Record<string,any>>(
+    public submitAction<TData extends Record<string, any>>(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -490,6 +500,8 @@ export class MessageExtensions<TState extends TurnState> {
     }
 
     /**
+     * @param context
+     * @param result
      * @private
      */
     private async returnSubmitActionResponse(
@@ -539,6 +551,9 @@ export class MessageExtensions<TState extends TurnState> {
 }
 
 /**
+ * @param commandId
+ * @param invokeName
+ * @param botMessagePreviewAction
  * @private
  */
 function createTaskSelector(
@@ -577,6 +592,8 @@ function createTaskSelector(
 }
 
 /**
+ * @param activity
+ * @param botMessagePreviewAction
  * @private
  */
 function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edit' | 'send'): boolean {

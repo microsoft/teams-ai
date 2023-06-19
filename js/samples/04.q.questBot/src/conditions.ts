@@ -55,7 +55,7 @@ Winter: Sunny - 20%, Cloudy - 40%, Rainy - 10%, Windy - 10%, Snowy - 10%, Foggy 
  * @param season
  */
 export function generateWeather(season: string): string {
-    let weather: string = '';
+    let weather = '';
     let modifier: string;
     const randomNumber = Math.random();
 
@@ -125,7 +125,7 @@ export function generateWeather(season: string): string {
  * @param season
  */
 export function generateTemperature(season: string): string {
-    let temperature: string = '';
+    let temperature = '';
     const randomNumber = Math.random();
 
     if (season === 'spring') {

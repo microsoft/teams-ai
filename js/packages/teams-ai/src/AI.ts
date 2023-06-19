@@ -18,6 +18,7 @@ import { TurnState } from './TurnState';
 
 /**
  * A function that can be used to select a prompt to use for the current turn.
+ *
  * @template TState Type of the turn state.
  * @param context The current turn context.
  * @param state The current turn state.
@@ -30,11 +31,13 @@ export type PromptSelector<TState extends TurnState> = (
 
 /**
  * Entities argument passed to the action handler for AI.DoCommandActionName.
+ *
  * @template TState Type of the turn state.
  */
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
     /**
      * The handler that should be called to execute the command.
+     *
      * @param context Current turn context.
      * @param state Current turn state.
      * @param entities Entities predicted by the model.
@@ -46,6 +49,7 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
 
 /**
  * Options for configuring the AI system.
+ *
  * @template TState Type of the turn state.
  */
 export interface AIOptions<TState extends TurnState> {
@@ -67,6 +71,7 @@ export interface AIOptions<TState extends TurnState> {
 
     /**
      * Optional. The prompt to use for the current turn.
+     *
      * @remarks
      * This allows for the use of the AI system in a free standing mode. An exception will be
      * thrown if the AI system is routed to by the Application object and a prompt has not been
@@ -76,6 +81,7 @@ export interface AIOptions<TState extends TurnState> {
 
     /**
      * Optional. The history options to use for the AI system.
+     *
      * @remarks
      * Defaults to tracking history with a maximum of 3 turns and 1000 tokens per turn.
      */
@@ -88,6 +94,7 @@ export interface AIOptions<TState extends TurnState> {
 export interface AIHistoryOptions {
     /**
      * Whether the AI system should track conversation history.
+     *
      * @remarks
      * Defaults to true.
      */
@@ -95,6 +102,7 @@ export interface AIHistoryOptions {
 
     /**
      * The maximum number of turns to remember.
+     *
      * @remarks
      * Defaults to 3.
      */
@@ -102,6 +110,7 @@ export interface AIHistoryOptions {
 
     /**
      * The maximum number of tokens worth of history to add to the prompt.
+     *
      * @remarks
      * Defaults to 1000.
      */
@@ -109,6 +118,7 @@ export interface AIHistoryOptions {
 
     /**
      * The line separator to use when concatenating history.
+     *
      * @remarks
      * Defaults to '\n'.
      */
@@ -116,6 +126,7 @@ export interface AIHistoryOptions {
 
     /**
      * The prefix to use for user history.
+     *
      * @remarks
      * Defaults to 'User:'.
      */
@@ -123,6 +134,7 @@ export interface AIHistoryOptions {
 
     /**
      * The prefix to use for assistant history.
+     *
      * @remarks
      * Defaults to 'Assistant:'.
      */
@@ -131,6 +143,7 @@ export interface AIHistoryOptions {
     /**
      * Whether the conversation history should include the plan object returned by the model or
      * just the text of any SAY commands.
+     *
      * @remarks
      * Defaults to 'planObject'.
      */
@@ -139,6 +152,7 @@ export interface AIHistoryOptions {
 
 /**
  * The configured options for the AI system after all defaults have been applied.
+ *
  * @template TState Type of the turn state.
  */
 export interface ConfiguredAIOptions<TState extends TurnState> {
@@ -170,6 +184,7 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
 
 /**
  * AI System.
+ *
  * @remarks
  * The AI system is responsible for generating plans, moderating input and output, and
  * generating prompts. It can be used free standing or routed to by the Application object.
@@ -182,6 +197,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * An action that will be called anytime an unknown action is predicted by the planner.
+     *
      * @remarks
      * The default behavior is to simply log an error to the console. The plan is allowed to
      * continue execution by default.
@@ -190,6 +206,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * An action that will be called anytime an input is flagged by the moderator.
+     *
      * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
@@ -198,6 +215,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * An action that will be called anytime an output is flagged by the moderator.
+     *
      * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
@@ -212,6 +230,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     /**
      * An action that will be called after the plan has been predicted by the planner and it has
      * passed moderation.
+     *
      * @remarks
      * Overriding this action lets you customize the decision to execute a plan separately from the
      * moderator. The default behavior is to proceed with the plans execution only with a plan
@@ -222,6 +241,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * An action that is called to DO an action.
+     *
      * @remarks
      * The action system is used to do other actions. Overriding this action lets you customize the
      * execution of an individual action. You can use it to log actions being used or to prevent
@@ -234,6 +254,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * An action that is called to SAY something.
+     *
      * @remarks
      * Overriding this action lets you customize the execution of the SAY command. You can use it
      * to log the output being generated or to add support for sending certain types of output as
@@ -250,6 +271,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Creates a new AI system.
+     *
      * @param options The options used to configure the AI system.
      */
     public constructor(options: AIOptions<TState>) {
@@ -360,6 +382,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Returns the moderator being used by the AI system.
+     *
      * @remarks
      * The default moderator simply allows all messages and plans through without intercepting them.
      */
@@ -390,6 +413,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Registers a handler for a named action.
+     *
      * @remarks
      * The AI systems planner returns plans that are made up of a series of commands or actions
      * that should be performed. Registering a handler lets you provide code that should be run in
@@ -434,6 +458,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Chains into another prompt and executes the plan that is returned.
+     *
      * @remarks
      * This method is used to chain into another prompt. It will call the prompt manager to
      * get the plan for the prompt and then execute the plan. The return value indicates whether
@@ -562,6 +587,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * A helper method to complete a prompt using the configured prompt manager.
+     *
      * @param context Current turn context.
      * @param state Current turn state.
      * @param prompt Prompt name or prompt template to use.
@@ -586,15 +612,19 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Creates a semantic function that can be registered with the apps prompt manager.
-     * @remarks
-     * Semantic functions are functions that make model calls and return their results as template
+     *
+     * @param name
+     * @param template
+     * @param options
+     * @remarks 
+Semantic functions are functions that make model calls and return their results as template
      * parameters to other prompts. For example, you could define a semantic function called
      * 'translator' that first translates the user's input to English before calling your main prompt:
-     *
+     * 
      * ```JavaScript
      * app.ai.prompts.addFunction('translator', app.ai.createSemanticFunction('translator-prompt'));
      * ```
-     *
+     * 
      * You would then create a prompt called "translator-prompt" that does the translation and then in
      * your main prompt you can call it using the template expression `{{translator}}`.
      */
@@ -613,6 +643,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Manually executes a named action.
+     *
      * @template TEntities Optional. Type of entities expected to be passed to the action.
      * @param context Current turn context.
      * @param state Current turn state.
@@ -635,6 +666,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @param options
      * @private
      */
     private configureOptions(options?: Partial<AIOptions<TState>>): ConfiguredAIOptions<TState> {

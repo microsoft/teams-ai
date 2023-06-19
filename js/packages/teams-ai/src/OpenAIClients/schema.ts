@@ -216,6 +216,27 @@ export interface CreateEmbeddingResponseUsage {
 /**
  * @private
  */
+export interface CreateContentSafetyRequest {
+    text: string;
+    categories: AzureOpenAIModeratorCategory[];
+}
+
+export interface CreateContentSafetyResponseBlocklistsMatchResultsInner {
+    category: string;
+    severity: number;
+}
+
+export interface CreateContentSafetyResponse {
+    blocklistsMatchResults: Array<string>;
+    hateResult: CreateContentSafetyResponseBlocklistsMatchResultsInner;
+    selfHarmResult: CreateContentSafetyResponseBlocklistsMatchResultsInner;
+    sexualResult: CreateContentSafetyResponseBlocklistsMatchResultsInner;
+    violenceResult: CreateContentSafetyResponseBlocklistsMatchResultsInner;
+}
+
+/**
+ * @private
+ */
 export type CreateCompletionRequestPrompt = Array<any> | Array<number> | Array<string> | string;
 
 /**
@@ -237,3 +258,11 @@ export type CreateModerationRequestInput = Array<string> | string;
  * @private
  */
 export type CreateEmbeddingRequestInput = Array<any> | Array<number> | Array<string> | string;
+
+/**
+ * @private
+ */
+export type AzureOpenAIModeratorCategory = 'Hate' | 'Sexual' | 'SelfHarm' | 'Violence';
+
+export type ModerationInput = CreateModerationRequest | CreateContentSafetyRequest;
+export type ModerationResponse = CreateModerationResponse | CreateContentSafetyResponse;

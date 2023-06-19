@@ -98,9 +98,7 @@ export interface ILocation {
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
 if (!process.env.OpenAIKey) {
-    throw new Error(
-        'Missing environment variables - please check that OpenAIKey is set.'
-    );
+    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
 }
 
 // Create AI components
@@ -374,7 +372,7 @@ app.message('/profile', async (context: TurnContext, state: ApplicationTurnState
 
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action: string = ' ') => {
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action = ' ') => {
         await context.sendActivity(`<strong>${action}</strong> action missing`);
         return true;
     }

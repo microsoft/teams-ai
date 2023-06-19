@@ -46,6 +46,7 @@ export interface OpenAIPlannerOptions {
 
     /**
      * The default model to use.
+     *
      * @remarks
      * Prompts can override this model.
      */
@@ -53,6 +54,7 @@ export interface OpenAIPlannerOptions {
 
     /**
      * Optional. A flag indicating if the planner should only say one thing per turn.
+     *
      * @remarks
      * The planner will attempt to combine multiple SAY commands into a single SAY command when true.
      * Defaults to false.
@@ -62,6 +64,7 @@ export interface OpenAIPlannerOptions {
     /**
      * Optional. A flag indicating if the planner should use the 'system' role when calling OpenAI's
      * chatCompletion API.
+     *
      * @remarks
      * The planner current uses the 'user' role by default as this tends to generate more reliable
      * instruction following. Defaults to false.
@@ -70,6 +73,7 @@ export interface OpenAIPlannerOptions {
 
     /**
      * Optional. A flag indicating if the planner should log requests to the console.
+     *
      * @remarks
      * Both the prompt text and the completion response will be logged to the console. For
      * chatCompletion calls the outgoing messages array will also be logged.
@@ -80,6 +84,7 @@ export interface OpenAIPlannerOptions {
 
 /**
  * A planner that uses OpenAI's textCompletion and chatCompletion API's to generate plans.
+ *
  * @remarks
  * This planner can be configured to use different models for different prompts. The prompts model
  * will determine which API is used to generate the plan. Any model that starts with 'gpt-' will
@@ -97,6 +102,7 @@ export class OpenAIPlanner<
 
     /**
      * Creates a new instance of the OpenAI based planner.
+     *
      * @param options Options for the OpenAI based planner.
      */
     public constructor(options: TOptions) {
@@ -120,6 +126,7 @@ export class OpenAIPlanner<
 
     /**
      * Completes a prompt without returning a plan.
+     *
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      * @param prompt Prompt to complete.
@@ -150,6 +157,7 @@ export class OpenAIPlanner<
 
     /**
      * Completes a prompt and generates a plan for the AI system to execute.
+     *
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      * @param prompt Prompt to complete.
@@ -172,13 +180,13 @@ export class OpenAIPlanner<
             const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             status = result?.status;
-            response = result.data?.choices[0]?.message?.content ?? '';
+            response = status === 200 ? result.data?.choices[0]?.message?.content ?? '' : '';
         } else {
             // Request base prompt completion
             const promptRequest = this.createCompletionRequest(prompt);
             const result = await this.createCompletion(promptRequest);
             status = result?.status;
-            response = result.data?.choices[0]?.text ?? '';
+            response = status === 200 ? result.data?.choices[0]?.text ?? '' : '';
         }
 
         // Ensure we weren't rate limited
@@ -239,6 +247,7 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param options
      * @private
      */
     protected createClient(options: TOptions): OpenAIClient {
@@ -250,6 +259,7 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param prompt
      * @private
      */
     private getModel(prompt: PromptTemplate): string {
@@ -261,6 +271,10 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param state
+     * @param prompt
+     * @param userMessage
+     * @param options
      * @private
      */
     private createChatCompletionRequest(
@@ -321,6 +335,7 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param prompt
      * @private
      */
     private createCompletionRequest(prompt: PromptTemplate): CreateCompletionRequest {
@@ -333,6 +348,7 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param request
      * @private
      */
     private patchStopSequences(request: any): void {
@@ -343,6 +359,7 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param request
      * @private
      */
     private async createChatCompletion(
@@ -390,6 +407,7 @@ export class OpenAIPlanner<
     }
 
     /**
+     * @param request
      * @private
      */
     private async createCompletion(
@@ -439,6 +457,7 @@ export class OpenAIPlanner<
 }
 
 /**
+ * @param messages
  * @private
  */
 function printChatMessages(messages: ChatCompletionRequestMessage[]): string {

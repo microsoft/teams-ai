@@ -26,6 +26,7 @@ export interface DefaultPromptManagerOptions {
 
 /**
  * A filesystem based prompt manager.
+ *
  * @remarks
  * The default prompt manager uses the file system to define prompts that are compatible with
  * Microsoft's Semantic Kernel SDK (see: https://github.com/microsoft/semantic-kernel)
@@ -52,6 +53,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Adds a custom function <name> to the prompt manager.
+     *
      * @remarks
      * Functions can be used with a prompt template using a syntax of `{{name}}`. Function
      * arguments are not currently supported.
@@ -83,6 +85,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Adds a prompt template to the prompt manager.
+     *
      * @remarks
      * The template will be pre-parsed and cached for use when the template is rendered by name.
      * @param name Name of the prompt template.
@@ -117,6 +120,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Invokes a function by name.
+     *
      * @param context Current application turn context.
      * @param state Current turn state.
      * @param name Name of the function to invoke.
@@ -134,6 +138,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Loads a named prompt template from the filesystem.
+     *
      * @remarks
      * The template will be pre-parsed and cached for use when the template is rendered by name.
      * @param name Name of the template to load.
@@ -189,6 +194,7 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Renders a prompt template by name.
+     *
      * @remarks
      * The prompt will be automatically loaded from disk if needed and cached for future use.
      * @param context Current application turn context.

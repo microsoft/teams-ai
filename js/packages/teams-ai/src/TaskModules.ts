@@ -27,6 +27,7 @@ const DEFAULT_TASK_DATA_FILTER = 'verb';
 export interface TaskModulesOptions {
     /**
      * Data field to use to identify the verb of the handler to trigger.
+     *
      * @remarks
      * When a task module is triggered, the field name specified here will be used to determine
      * the name of the verb for the handler to route the request to.
@@ -38,6 +39,7 @@ export interface TaskModulesOptions {
 
 /**
  * TaskModules class to enable fluent style registration of handlers related to Task Modules.
+ *
  * @template TState Type of the turn state object being persisted.
  */
 export class TaskModules<TState extends TurnState> {
@@ -45,6 +47,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Creates a new instance of the TaskModules class.
+     *
      * @param app Top level application class to register handlers with.
      */
     public constructor(app: Application<TState>) {
@@ -53,6 +56,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch of the task module.
+     *
      * @remarks
      * Handlers should respond with either an initial TaskInfo object or a string containing
      * a message to display to the user.
@@ -64,13 +68,9 @@ export class TaskModules<TState extends TurnState> {
      * @param handler.data Data object passed to the handler.
      * @returns The application for chaining purposes.
      */
-    public fetch<TData extends Record<string,any> = Record<string,any>>(
+    public fetch<TData extends Record<string, any> = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (
-            context: TurnContext,
-            state: TState,
-            data: TData
-            ) => Promise<TaskModuleTaskInfo | string>
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string>
     ): Application<TState> {
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
             const filterField = this._app.options.taskModules?.taskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
@@ -126,6 +126,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the submission of a task module.
+     *
      * @remarks
      * Handlers should respond with another TaskInfo object, message string, or `null` to indicate
      * the task is completed.
@@ -137,7 +138,7 @@ export class TaskModules<TState extends TurnState> {
      * @param handler.data Data object passed to the handler.
      * @returns The application for chaining purposes.
      */
-    public submit<TData extends Record<string,any> = Record<string,any>>(
+    public submit<TData extends Record<string, any> = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -165,7 +166,7 @@ export class TaskModules<TState extends TurnState> {
                     const result = await handler(context, state, context.activity.value?.data ?? {});
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                         // Format invoke response
-                        let response: TaskModuleResponse;
+                        let response: TaskModuleResponse = {};
                         if (typeof result == 'string') {
                             // Return message
                             response = {
@@ -199,6 +200,9 @@ export class TaskModules<TState extends TurnState> {
 }
 
 /**
+ * @param verb
+ * @param filterField
+ * @param invokeName
  * @private
  */
 function createTaskSelector(
@@ -229,8 +233,8 @@ function createTaskSelector(
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             return Promise.resolve(
                 isInvoke &&
-                typeof context?.activity?.value?.data == 'object' &&
-                context.activity.value.data[filterField] == verb
+                    typeof context?.activity?.value?.data == 'object' &&
+                    context.activity.value.data[filterField] == verb
             );
         };
     }

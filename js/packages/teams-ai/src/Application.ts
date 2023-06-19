@@ -29,6 +29,7 @@ const TYPING_TIMER_DELAY = 1000;
 
 /**
  * Query arguments for a search-based message extension.
+ *
  * @template TParams Type of the query parameters.
  */
 export interface Query<TParams extends Record<string, any>> {
@@ -50,11 +51,13 @@ export interface Query<TParams extends Record<string, any>> {
 
 /**
  * Options for the Application class.
+ *
  * @template TState Type of the turn state.
  */
 export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. Bot adapter being used.
+     *
      * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
@@ -63,6 +66,7 @@ export interface ApplicationOptions<TState extends TurnState> {
 
     /**
      * Optional. Application ID of the bot.
+     *
      * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
@@ -111,6 +115,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. If true, the bot supports long running messages that can take longer then the 10 - 15
      * second timeout imposed by most channels. Defaults to false.
+     *
      * @remarks
      * This works by immediately converting the incoming request to a proactive conversation. Care should
      * be used for bots that operate in a shared hosting environment. The incoming request is immediately
@@ -137,6 +142,7 @@ export type ConversationUpdateEvents =
 
 /**
  * Function for handling an incoming request.
+ *
  * @template TState Type of the turn state.
  * @param context Context for the current turn of conversation with the user.
  * @param state Current turn state.
@@ -146,6 +152,7 @@ export type RouteHandler<TState extends TurnState> = (context: TurnContext, stat
 
 /**
  * Function for selecting whether a route handler should be triggered.
+ *
  * @param context Context for the current turn of conversation with the user.
  * @returns A promise that resolves with a boolean indicating whether the route handler should be triggered.
  */
@@ -158,6 +165,7 @@ export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 
 /**
  * Turn event types.
+ *
  * @remarks
  * The `beforeTurn` event is triggered before the turn is processed. This allows for the turn state to be
  * modified before the turn is processed. Returning false from the event handler will prevent the turn from
@@ -171,6 +179,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
 /**
  * Application class for routing and processing incoming requests.
+ *
  * @remarks
  * The Application object replaces the traditional ActivityHandler that a bot would use. It supports
  * a simpler fluent style of authoring bots versus the inheritance based approach used by the
@@ -194,6 +203,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Creates a new Application instance.
+     *
      * @param options Optional. Options used to configure the application.
      */
     public constructor(options?: ApplicationOptions<TState>) {
@@ -221,7 +231,9 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         // Validate long running messages configuration
         if (this._options.longRunningMessages && (!this._options.adapter || !this._options.botAppId)) {
-            throw new Error(`The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`);
+            throw new Error(
+                `The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`
+            );
         }
     }
 
@@ -234,6 +246,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Fluent interface for accessing AI specific features.
+     *
      * @remarks
      * This property is only available if the Application was configured with `ai` options. An
      * exception will be thrown if you attempt to access it otherwise.
@@ -269,6 +282,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Adds a new route to the application.
+     *
      * @remarks
      * Developers won't typically need to call this method directly as it's used internally by all
      * of the fluent interfaces to register routes for their specific activity types.
@@ -294,6 +308,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Handles incoming activities of a given type.
+     *
      * @param type Name of the activity type to match or a regular expression to match against the incoming activity type. An array of type names or expression can also be passed in.
      * @param handler Function to call when the route is triggered.
      * @param handler.context The context object for the turn.
@@ -313,6 +328,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Handles conversation update events.
+     *
      * @param event Name of the conversation update event(s) to handle.
      * @param handler Function to call when the route is triggered.
      * @param handler.context The context object for the turn.
@@ -332,6 +348,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Starts a new "proactive" session with a conversation the bot is already a member of.
+     *
      * @remarks
      * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
      * options. An exception will be thrown if either is missing.
@@ -381,6 +398,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Handles incoming messages with a given keyword.
+     *
      * @remarks
      * This method provides a simple way to have a bot respond anytime a user sends your bot a
      * message with a specific word or phrase.
@@ -410,6 +428,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Handles message reaction events.
+     *
      * @param event Name of the message reaction event to handle.
      * @param handler Function to call when the route is triggered.
      * @returns The application instance for chaining purposes.
@@ -427,6 +446,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Dispatches an incoming activity to a handler registered with the application.
+     *
      * @remarks
      * This method should be called from your bot's "turn handler" (its primary message handler)
      *
@@ -531,6 +551,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Sends a proactive activity to an existing conversation the bot is a member of.
+     *
      * @remarks
      * This method provides a simple way to send a proactive message to a conversation the bot is a member of.
      *
@@ -576,6 +597,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Manually start a timer to periodically send "typing" activities.
+     *
      * @remarks
      * The timer waits 1000ms to send its initial "typing" activity and then send an additional
      * "typing" activity every 1000ms. The timer will automatically end once an outgoing activity
@@ -629,6 +651,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Manually stop the typing timer.
+     *
      * @remarks
      * If the timer isn't running nothing happens.
      */
@@ -641,6 +664,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Registers a turn event handler.
+     *
      * @remarks
      * Turn events let you do something before or after a turn is run. Returning false from
      * `beforeTurn` lets you prevent the turn from running and returning false from `afterTurn`
@@ -654,7 +678,10 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * @param handler Function to call when the event is triggered.
      * @returns The application instance for chaining purposes.
      */
-    public turn(event: TurnEvents | TurnEvents[], handler: (context: TurnContext, state: TState) => Promise<boolean>): this {
+    public turn(
+        event: TurnEvents | TurnEvents[],
+        handler: (context: TurnContext, state: TState) => Promise<boolean>
+    ): this {
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             switch (event) {
                 case 'beforeTurn':
@@ -670,6 +697,9 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @param context
+     * @param state
+     * @param handlers
      * @private
      */
     private async callEventHandlers(
@@ -691,9 +721,14 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @param context
+     * @param handler
      * @private
      */
-    private startLongRunningCall(context: TurnContext, handler: (context: TurnContext) => Promise<boolean>): Promise<boolean> {
+    private startLongRunningCall(
+        context: TurnContext,
+        handler: (context: TurnContext) => Promise<boolean>
+    ): Promise<boolean> {
         if (context.activity.type == ActivityTypes.Message && this._options.longRunningMessages) {
             return new Promise<boolean>((resolve, reject) => {
                 this.continueConversationAsync(context, async (ctx) => {
@@ -726,6 +761,7 @@ interface AppRoute<TState extends TurnState> {
 }
 
 /**
+ * @param type
  * @private
  */
 function createActivitySelector(type: string | RegExp | RouteSelector): RouteSelector {
@@ -749,6 +785,7 @@ function createActivitySelector(type: string | RegExp | RouteSelector): RouteSel
 }
 
 /**
+ * @param event
  * @private
  */
 function createConversationUpdateSelector(event: ConversationUpdateEvents): RouteSelector {
@@ -780,6 +817,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
 }
 
 /**
+ * @param keyword
  * @private
  */
 function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteSelector {
@@ -809,6 +847,7 @@ function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteS
 }
 
 /**
+ * @param event
  * @private
  */
 function createMessageReactionSelector(event: MessageReactionEvents): RouteSelector {
@@ -836,7 +875,4 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
 /**
  * @private
  */
-type ApplicationEventHandler<TState extends TurnState> = (
-    context: TurnContext,
-    state: TState
-) => Promise<boolean>;
+type ApplicationEventHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<boolean>;

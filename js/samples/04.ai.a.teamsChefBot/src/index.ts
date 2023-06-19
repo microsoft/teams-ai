@@ -61,7 +61,15 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIModerator, OpenAIPlanner, AI } from '@microsoft/botbuilder-m365';
+import {
+    Application,
+    ConversationHistory,
+    DefaultPromptManager,
+    DefaultTurnState,
+    OpenAIModerator,
+    OpenAIPlanner,
+    AI
+} from '@microsoft/botbuilder-m365';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}

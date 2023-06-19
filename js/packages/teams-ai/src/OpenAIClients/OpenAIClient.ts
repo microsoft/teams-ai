@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import axios, { AxiosInstance, AxiosRequestHeaders } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import {
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
@@ -15,7 +15,7 @@ import {
     CreateEmbeddingRequest,
     CreateEmbeddingResponse,
     CreateModerationRequest,
-    CreateModerationResponse
+    ModerationResponse
 } from './schema';
 
 /**
@@ -35,6 +35,7 @@ export interface OpenAIClientOptions {
     apiKey: string;
     organization?: string;
     endpoint?: string;
+    headerKey?: string;
 }
 
 /**
@@ -93,7 +94,7 @@ export class OpenAIClient {
         return this.post(url, request);
     }
 
-    public createModeration(request: CreateModerationRequest): Promise<OpenAIClientResponse<CreateModerationResponse>> {
+    public createModeration(request: CreateModerationRequest): Promise<OpenAIClientResponse<ModerationResponse>> {
         const url = `${this.options.endpoint ?? this.DefaultEndpoint}/v1/moderations`;
         return this.post(url, request);
     }

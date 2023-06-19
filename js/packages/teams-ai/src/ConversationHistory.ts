@@ -22,6 +22,7 @@ export class ConversationHistory {
 
     /**
      * Adds a new line of text to conversation history
+     *
      * @param state Applications turn state.
      * @param line Line of text to add to history.
      * @param maxLines Optional. Maximum number of lines to store. Defaults to 10.
@@ -53,6 +54,7 @@ export class ConversationHistory {
 
     /**
      * Appends additional text to the last line of conversation history.
+     *
      * @param state Applications turn state.
      * @param text Text to add to the last line.
      */
@@ -63,6 +65,7 @@ export class ConversationHistory {
 
     /**
      * Clears all conversation history for the current conversation.
+     *
      * @param state Applications turn state.
      */
     public static clear(state: TurnState): void {
@@ -77,6 +80,7 @@ export class ConversationHistory {
 
     /**
      * Checks to see if one or more lines of history has persisted.
+     *
      * @param state Applications turn state.
      * @returns True if there are 1 or more lines of history.
      */
@@ -93,6 +97,7 @@ export class ConversationHistory {
 
     /**
      * Returns the last line of history.
+     *
      * @param state Applications turn state.
      * @returns The last line of history or an empty string.
      */
@@ -115,6 +120,7 @@ export class ConversationHistory {
 
     /**
      * Searches the history to find the last SAY response from the assistant.
+     *
      * @param state Applications turn state.
      * @returns Last thing said by the assistant. Defaults to an empty string.
      */
@@ -152,6 +158,7 @@ export class ConversationHistory {
 
     /**
      * Removes the last line from the conversation history.
+     *
      * @param state Applications turn state.
      * @returns The removed line or undefined.
      */
@@ -181,6 +188,7 @@ export class ConversationHistory {
 
     /**
      * Replaces the last line of history with a new line.
+     *
      * @param state Applications turn state.
      * @param line New line of history.
      */
@@ -210,6 +218,7 @@ export class ConversationHistory {
 
     /**
      * Replaces the last SAY with a new response.
+     *
      * @param state Applications turn state.
      * @param newResponse New response from the assistant.
      * @param assistantPrefix Prefix for when a new line needs to be inserted. Defaults to 'Assistant:'.
@@ -251,6 +260,7 @@ export class ConversationHistory {
 
     /**
      * Returns the current conversation history as a string of text.
+     *
      * @remarks
      * The length of the returned text is gated by `maxCharacterLength` and only whole lines of
      * history entries will be returned. That means that if the length of the most recent history
@@ -293,6 +303,7 @@ export class ConversationHistory {
 
     /**
      * Returns the current conversation history as an array of lines.
+     *
      * @param state The Application's turn state.
      * @param maxTokens Optional. Maximum length of the text to include. Defaults to 1000 tokens.
      * @returns The most recent lines of conversation history as an array.

@@ -64,7 +64,16 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from "@microsoft/teams-ai";
+import {
+    Application,
+    DefaultTurnState,
+    OpenAIPlanner,
+    AI,
+    DefaultConversationState,
+    DefaultUserState,
+    DefaultTempState,
+    DefaultPromptManager
+} from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 // Strongly type the applications turn state
@@ -73,7 +82,7 @@ interface ConversationState extends DefaultConversationState {
     workItems: EntityData[];
 }
 
-interface UserState extends DefaultUserState { }
+type UserState = DefaultUserState;
 
 interface TempState extends DefaultTempState {
     workItems: EntityData[];
@@ -124,7 +133,7 @@ app.message('/reset', async (context, state) => {
 
 // Register action handlers
 app.ai.action('createWI', async (context, state, data: EntityData) => {
-    var id = createNewWorkItem(state, data);
+    const id = createNewWorkItem(state, data);
     await context.sendActivity(`New work item created with ID: ${id} and assigned to: ${data.assignedTo}`);
     return false;
 });
@@ -145,7 +154,7 @@ app.ai.action('triageWI', async (context, state, data: EntityData) => {
 });
 
 app.ai.action('summarize', async (context, state, data: EntityData) => {
-    const workItems = ensureWorkItemsInitialized(state).workItems
+    const workItems = ensureWorkItemsInitialized(state).workItems;
     if (workItems.length != 0) {
         // Chain into a new summarization prompt
         state.temp.value.workItems = workItems;
@@ -179,6 +188,7 @@ server.post('/api/messages', async (req, res) => {
 
 /**
  * This method is used to create new work item.
+ *
  * @param state
  * @param workItemInfo
  */
@@ -195,6 +205,7 @@ function createNewWorkItem(state: ApplicationTurnState, workItemInfo: EntityData
 
 /**
  * This method is used to assign a work item to a person.
+ *
  * @param state
  * @param workItemInfo
  */
@@ -202,7 +213,7 @@ function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
     const conversation = ensureWorkItemsInitialized(state);
 
     if (workItemInfo.id != null) {
-        var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
+        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
         if (workItem != null) {
             workItem.assignedTo = workItemInfo.assignedTo;
         }
@@ -211,6 +222,7 @@ function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to triage work item.
+ *
  * @param state
  * @param workItemInfo
  */
@@ -218,7 +230,7 @@ function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
     const conversation = ensureWorkItemsInitialized(state);
 
     if (workItemInfo.id != null) {
-        var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
+        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
         if (workItem != null) {
             workItem.status = workItemInfo.status;
         }
@@ -227,7 +239,8 @@ function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to make sure that work items are initialized properly.
- * @param state 
+ *
+ * @param state
  */
 function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationState {
     const conversation = state.conversation.value;
@@ -239,6 +252,7 @@ function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationSt
 
 /**
  * This method is used to update the existing work item.
+ *
  * @param state
  * @param workItemInfo
  */
@@ -246,14 +260,11 @@ function updateWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
     const conversation = ensureWorkItemsInitialized(state);
 
     if (workItemInfo.id != null) {
-        var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
+        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
         if (workItem != null) {
-            if (workItemInfo.title !== null)
-                workItem.title = workItemInfo.title;
-            if (workItemInfo.assignedTo !== null)
-                workItem.assignedTo = workItemInfo.assignedTo;
-            if (workItemInfo.status !== null)
-                workItem.status = workItemInfo.status;
+            if (workItemInfo.title !== null) workItem.title = workItemInfo.title;
+            if (workItemInfo.assignedTo !== null) workItem.assignedTo = workItemInfo.assignedTo;
+            if (workItemInfo.status !== null) workItem.status = workItemInfo.status;
         }
     }
 }
