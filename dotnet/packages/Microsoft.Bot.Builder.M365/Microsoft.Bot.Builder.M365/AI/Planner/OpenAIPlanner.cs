@@ -26,31 +26,38 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         where TOptions : OpenAIPlannerOptions
     {
         private TOptions _options { get; }
-        private readonly IKernel _kernel;
-        private PromptManager<TState> _promptManager;
+        protected readonly IKernel _kernel;
+        private readonly ILogger _logger;
         
-        public OpenAIPlanner(TOptions options, PromptManager<TState> promptManager, ILogger logger)
+        public OpenAIPlanner(TOptions options, ILogger logger)
         {
             // TODO: Configure Retry Handler
             _options = options;
-            _promptManager = promptManager;
+            _logger = logger;
             _kernel = Kernel.Builder
-                .WithDefaultAIService<ITextCompletion>(
-                    new OpenAITextCompletion(
-                        options.DefaultModel,
-                        options.ApiKey,
-                        options.Organization
-                    )
-                )
-                .WithDefaultAIService<IChatCompletion>(
-                    new OpenAIChatCompletion(
-                        options.DefaultModel,
-                        options.ApiKey,
-                        options.Organization
-                    )
-                )
+                .WithDefaultAIService(_CreateTextCompletionService(options))
+                .WithDefaultAIService(_CreateChatCompletionService(options))
                 .WithLogger(logger)
-                .Build();   
+                .Build();
+        }
+
+        private protected virtual ITextCompletion _CreateTextCompletionService(TOptions options)
+        {
+            return new OpenAITextCompletion(
+                options.DefaultModel,
+                options.ApiKey,
+                options.Organization
+            );
+
+        }
+
+        private protected virtual IChatCompletion _CreateChatCompletionService(TOptions options)
+        {
+            return new OpenAIChatCompletion(
+                options.DefaultModel,
+                options.ApiKey,
+                options.Organization
+            );
         }
 
         /// <inheritdoc/>
