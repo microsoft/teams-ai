@@ -45,13 +45,18 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
-            _timerState = new TimerState(turnContext, false);
+            _timerState = new TimerState(turnContext, _interval);
 
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
 
             // Start periodically send "typing" activity
-            _timer = new Timer(SendTypingActivity, _timerState, 0, _interval);
+            _timer = new Timer(SendTypingActivity, _timerState, Timeout.Infinite, Timeout.Infinite);
+
+            _timerState.Timer = _timer;
+
+            // Fire first time
+            _timer.Change(0, Timeout.Infinite);
 
             return true;
         }
@@ -97,22 +102,13 @@ namespace Microsoft.Bot.Builder.M365
             TimerState timerState = state as TimerState ?? throw new Exception("Unexpected failure of casting object TimerState");
 
             ITurnContext turnContext = timerState.TurnContext;
+            Timer timer = timerState.Timer ?? throw new Exception("Unexpected failure of casting object Timer"); ;
+            int interval = timerState.Interval;
 
             try
             {
-                if (timerState.SendInProgress == false)
-                {
-                    timerState.SendInProgress = true;
-                    await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
-                    timerState.SendInProgress = false;
-                }
-                else
-                {
-                    // If the previous task is still running, we don't need to start a new one.
-                    // This is to avoid sending multiple "typing" activities at the same time.
-                    // (e.g. when the bot is slow to respond to user input)
-                    return;
-                }
+                await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
+                timer.Change(interval, Timeout.Infinite);
             } 
             catch (ObjectDisposedException)
             {
@@ -143,12 +139,14 @@ namespace Microsoft.Bot.Builder.M365
         private class TimerState
         {
             public readonly ITurnContext TurnContext;
-            public bool SendInProgress;
+            public Timer? Timer { set; get; }
+            public readonly int Interval;
 
-            public TimerState(ITurnContext turnContext, bool typingActivitySendInProgress) 
+            public TimerState(ITurnContext turnContext,int interval, Timer? timer = null) 
             {
                 TurnContext = turnContext;
-                SendInProgress = typingActivitySendInProgress;
+                Interval = interval;
+                Timer = timer;
             }
 
         }
