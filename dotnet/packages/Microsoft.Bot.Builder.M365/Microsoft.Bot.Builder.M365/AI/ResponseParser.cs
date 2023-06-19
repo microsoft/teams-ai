@@ -163,47 +163,6 @@ namespace Microsoft.Bot.Builder.M365.AI
             return newPlan;
         }
 
-        internal static ParsedCommandResult ParseDoCommand(List<string> tokens)
-        {
-            List<string> tokens = new();
-
-            if (text.Length < 1) return tokens;
-
-            string token = "";
-            int length = text.Length;
-            for (int i = 0; i < length; i++)
-            {
-                string c = text[i].ToString();
-                if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
-                {
-                    // Push token onto list
-                    if (token.Length > 0)
-                    {
-                        tokens.Add(token);
-                    }
-
-                    // Push breaking character onto list as a separate token
-                    tokens.Add(c);
-
-                    // Start a new empty token
-                    token = "";
-                }
-                else
-                {
-                    // Add to existing token
-                    token += c;
-                }
-            }
-
-            // Add last token onto list
-            if (token.Length > 0)
-            {
-                tokens.Add(token);
-            }
-
-            return tokens;
-        }
-
         private static ParsedCommandResult ParseDoCommand(List<string> tokens)
         {
             int length = 0;

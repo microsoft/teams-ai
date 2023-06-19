@@ -4,6 +4,9 @@ using System.Net;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Builder.M365.AI;
+using Microsoft.Bot.Schema.Teams;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Builder.Teams;
 
 namespace Microsoft.Bot.Builder.M365
 {
