@@ -1,23 +1,22 @@
 ﻿using Microsoft.Bot.Schema;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Microsoft.Bot.Builder.M365
 {
     /// <summary>
     /// Encapsulates the logic for sending "typing" activity to the user.
     /// </summary>
-    public class TypingTimer
+    public class TypingTimer : IDisposable
     {
-        public Timer? timer;
+        private Timer? _timer;
         /// <summary>
         /// The interval in milliseconds to send "typing" activity.
         /// </summary>
         private readonly int _interval;
+
+        /// <summary>
+        /// To detect redundant calls
+        /// </summary>
+        private bool _disposedValue = false;
 
         /// <summary>
         /// Constructs a new instance of the <see cref="TypingTimer"/> class.
@@ -25,7 +24,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="interval">The interval in milliseconds to send "typing" activity.</param>
         public TypingTimer(int interval = 1000)
         {
-            this._interval = interval;
+            _interval = interval;
         }
 
         /// <summary>
@@ -36,56 +35,85 @@ namespace Microsoft.Bot.Builder.M365
         /// the current activity is not a "message" the call is ignored.
         /// </remarks>
         /// <param name="turnContext">The context for the current turn with the user.</param>
-        public void StartTypingTimer(ITurnContext turnContext)
+        /// <returns>True if the timer was started, otherwise False.</returns>
+        public bool Start(ITurnContext turnContext)
         {
-            if (turnContext.Activity.Type != ActivityTypes.Message || timer != null) return;
+            if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
-            
-            // Start periodically send "typing" activity
-            timer = new Timer(SendTypingActivity, turnContext, 0, _interval);
-        }
 
+            // Start periodically send "typing" activity
+            _timer = new Timer(SendTypingActivity, turnContext, Timeout.Infinite, Timeout.Infinite);
+
+            // Fire first time
+            _timer.Change(0, Timeout.Infinite);
+
+            return true;
+        }
 
         /// <summary>
         /// Stop the timer that periodically sends "typing" activity.
         /// </summary>
-        public void StopTypingTimer()
+        public void Dispose()
         {
-            if (timer == null) return;
-            
-            timer.Dispose();
-            timer = null;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    if (_timer != null)
+                    {
+                        _timer.Dispose();
+                        _timer = null;
+                    }
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// Whether there is a timer currently running.
+        /// </summary>
+        /// <returns>True if there's a timer currently running, otherwise False.</returns>
+        public bool IsRunning()
+        {
+            return _timer != null;
         }
 
         private async void SendTypingActivity(object state)
         {
-            ITurnContext turnContext = state as TurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
+            ITurnContext turnContext = state as ITurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
 
             try
             {
                 await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
+                _timer!.Change(_interval, Timeout.Infinite);
             } 
             catch (ObjectDisposedException)
             {
                 // We're in the middle of sending an activity on a background thread when the turn ends and
                 // the turn context object is dispoed of. We can just eat the error but lets
                 // make sure our states cleaned up a bit.
-                this.StopTypingTimer();
+                Dispose();
             }
         }
 
-
         private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
-            if (timer != null)
+            if (_timer != null)
             {
                 foreach (var activity in activities)
                 {
                     if (activity.Type == ActivityTypes.Message)
                     {
-                        StopTypingTimer();
+                        Dispose();
                         break;
                     }
                 }
@@ -93,6 +121,5 @@ namespace Microsoft.Bot.Builder.M365
 
             return next();
         }
-
     }
 }
