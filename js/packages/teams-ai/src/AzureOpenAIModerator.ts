@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-returns */
 /* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
@@ -35,7 +36,7 @@ export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
 }
 
 /**
- * A moderator tha users OpenAI's moderation API to review prompts and plans for safety.
+ * An Azure OpenAI moderator that uses OpenAI's moderation API to review prompts and plans for safety.
  *
  * @remarks
  * This moderation can be configure to review the input from the user, output from the model, or both.
@@ -66,8 +67,10 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
     }
 
     /**
-     * @param options
+     * Creates a new instance of the Azure OpenAI client.
+     *
      * @protected
+     * @param options The options for the moderator.
      */
     protected override createClient(options: OpenAIModeratorOptions): AzureOpenAIClient {
         return new AzureOpenAIClient({
