@@ -49,6 +49,7 @@
         /// </summary>
         /// <remarks>
         /// Both the prompt text and the completion response will be logged.
+        /// If this is set to true, a logger must be provided to the planner.
         /// Defaults to false.
         /// </remarks>
         public bool LogRequests { get; set; } = false;

@@ -11,7 +11,7 @@
     <PackageReference Include="AdaptiveCards" Version="3.0.0" />
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.19.3" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.19.3" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="0.15.230609.2-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="0.16.230615.1-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 

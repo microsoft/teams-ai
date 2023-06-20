@@ -3,29 +3,37 @@ using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
     public class DefaultActions<TState> where TState : TurnState
     {
+        private readonly ILogger? _logger;
+
+        public DefaultActions(ILogger? logger)
+        {
+            _logger = logger;
+        }
+
         [Action(DefaultActionTypes.UnknownActionName)]
         public Task<bool> UnkownAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            // TODO: Log error
+            _logger?.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
             return Task.FromResult(true);
         }
 
         [Action(DefaultActionTypes.FlaggedInputActionName)]
         public Task<bool> FlaggedInputAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            // TODO: Log error
+            _logger?.LogError($"The users input has been moderated but no handler was registered for ${DefaultActionTypes.FlaggedInputActionName}");
             return Task.FromResult(true);
         }
 
         [Action(DefaultActionTypes.FlaggedOutputActionName)]
         public Task<bool> FlaggedOutputAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            // TODO: Log error
+            _logger?.LogError($"The bots output has been moderated but no handler was registered for ${DefaultActionTypes.FlaggedOutputActionName}");
             return Task.FromResult(true);
         }
 
@@ -38,7 +46,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         [Action(DefaultActionTypes.PlanReadyActionName)]
         public Task<bool> PlanReadyAction(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            Plan plan = data as Plan ?? throw new Exception("Unexpected `data` object: It should be a Plan object");
+            Plan plan = data as Plan ?? throw new ArgumentException("Unexpected `data` object: It should be a Plan object");
 
             return Task.FromResult(plan.Commands.Count > 0);
         }
@@ -46,7 +54,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         [Action(DefaultActionTypes.DoCommandActionName)]
         public Task<bool> DoCommand(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            DoCommandActionData<TState> doCommandActionData = data as DoCommandActionData<TState> ?? throw new Exception("Unexpected `data` object: It should be a PredictedDoCommand object");
+            DoCommandActionData<TState> doCommandActionData = data as DoCommandActionData<TState> ?? throw new ArgumentException("Unexpected `data` object: It should be a PredictedDoCommand object");
 
             if (doCommandActionData.Handler == null)
             {
@@ -66,13 +74,18 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         [Action(DefaultActionTypes.SayCommandActionName)]
         public async Task<bool> SayCommand(ITurnContext turnContext, TState turnState, object data, string action)
         {
-            PredictedSayCommand command = data as PredictedSayCommand ?? throw new Exception("Unexpected `data` object: It should be a PredictedDoCommand object");
+            PredictedSayCommand command = data as PredictedSayCommand ?? throw new ArgumentException("Unexpected `data` object: It should be a PredictedDoCommand object");
             string response = command.Response;
             AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
 
             if (card != null)
             {
-                // TODO: Log card warnings
+                if (card.Warnings.Count > 0)
+                {
+                    string warnings = string.Join("\n", card.Warnings.Select(w => w.Message));
+                    _logger?.LogWarning($"{card.Warnings.Count} warnings found in the model generated adaptive card:\n {warnings}");
+                }
+
                 Attachment attachment = new() { Content = card, ContentType = AdaptiveCard.ContentType };
                 IMessageActivity activity = MessageFactory.Attachment(attachment);
                 await turnContext.SendActivityAsync(activity);

@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder.M365.AI.Action;
-using Microsoft.Bot.Builder.M365.AI.Prompt;
+﻿using Azure.AI.OpenAI;
+using Microsoft.Bot.Builder.M365.AI.Action;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -26,19 +26,29 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         where TOptions : OpenAIPlannerOptions
     {
         private TOptions _options { get; }
-        protected readonly IKernel _kernel;
-        private readonly ILogger _logger;
+        private protected readonly IKernel _kernel;
+        private readonly ILogger? _logger;
         
-        public OpenAIPlanner(TOptions options, ILogger logger)
+        public OpenAIPlanner(TOptions options, ILogger? logger)
         {
             // TODO: Configure Retry Handler
             _options = options;
-            _logger = logger;
-            _kernel = Kernel.Builder
+            KernelBuilder builder = Kernel.Builder
                 .WithDefaultAIService(_CreateTextCompletionService(options))
-                .WithDefaultAIService(_CreateChatCompletionService(options))
-                .WithLogger(logger)
-                .Build();
+                .WithDefaultAIService(_CreateChatCompletionService(options));
+                
+            if (options.LogRequests && logger == null)
+            {
+                throw new ArgumentException("Logger parameter cannot be null if `LogRequests` option is set to true");
+            }
+            
+            if (logger != null)
+            {
+                builder.WithLogger(logger);
+                _logger = logger;
+            }
+
+            _kernel = builder.Build();
         }
 
         private protected virtual ITextCompletion _CreateTextCompletionService(TOptions options)
@@ -64,27 +74,51 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
             string model = _GetModel(promptTemplate);
+            string result;
+            int completionTokens;
+            int promptTokens;
+            bool isChatCompletion = model.StartsWith("gpt-", StringComparison.OrdinalIgnoreCase);
+
             try
             {
-                if (model.StartsWith("gpt-", StringComparison.OrdinalIgnoreCase))
+                DateTime startTime = DateTime.Now;
+                string prefix = isChatCompletion ? "CHAT" : "PROMPT";
+
+                _logger?.LogInformation($"\n{prefix} REQUEST: \n\'\'\'\n{promptTemplate.Text}\n\'\'\'");
+
+                if (isChatCompletion)
                 {
                     // Request base chat completion
                     IChatResult response = await _CreateChatCompletion(turnState, options, promptTemplate, cancellationToken);
                     ChatMessageBase message = await response.GetChatMessageAsync(cancellationToken).ConfigureAwait(false);
-
-                    return message.Content.ToString();
+                    CompletionsUsage usage = ((ITextResult)response).ModelResult.GetOpenAIChatResult().Usage;
+                    
+                    completionTokens = usage.CompletionTokens;
+                    promptTokens = usage.PromptTokens;
+                    result = message.Content.ToString();
                 }
                 else
                 {
                     // Request base text completion
-                    ITextCompletionResult response = await _CreateTextCompletion(promptTemplate, cancellationToken);
-                    return await response.GetCompletionAsync(cancellationToken).ConfigureAwait(false);
+                    ITextResult response = await _CreateTextCompletion(promptTemplate, cancellationToken);
+                    CompletionsUsage usage = response.ModelResult.GetOpenAITextResult().Usage;
+                    
+                    completionTokens = usage.CompletionTokens;
+                    promptTokens = usage.PromptTokens; 
+                    result = await response.GetCompletionAsync(cancellationToken).ConfigureAwait(false);
                 }
-            } 
+
+                // Response succeeded with a completion
+                TimeSpan duration = DateTime.Now - startTime;
+
+                _logger?.LogInformation($"\n{prefix} SUCCEEDED: duration={duration.TotalSeconds} prompt={promptTokens} completion={completionTokens} response={result}");
+
+                return result;
+            }
             catch (Exception ex)
             {
                 throw new PlannerException($"Failed to perform AI prompt completion: {ex.Message}", ex);
-            };
+            }
         }
 
         /// <inheritdoc/>
@@ -153,7 +187,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             return new Plan();
         }
 
-        private async Task<ITextCompletionResult> _CreateTextCompletion(PromptTemplate promptTemplate, CancellationToken cancellationToken)
+        private async Task<ITextResult> _CreateTextCompletion(PromptTemplate promptTemplate, CancellationToken cancellationToken)
         {
                 var skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
 

@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder.M365.AI.Planner;
 using System.Reflection;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -19,7 +20,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         private readonly IActionCollection<TState> _actions;
         private readonly AIOptions<TState> _options;
 
-        public AI(AIOptions<TState> options)
+        public AI(AIOptions<TState> options, ILogger? logger)
         { 
             _options = options;
             _actions = new ActionCollection<TState>();
@@ -31,8 +32,9 @@ namespace Microsoft.Bot.Builder.M365.AI
 
             _options.History ??= new AIHistoryOptions();
 
+
             // Import default actions
-            ImportActions(new DefaultActions<TState>());
+            ImportActions(new DefaultActions<TState>(logger));
         }
 
         /// <summary>
@@ -152,7 +154,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
-        public async Task<bool> Chain(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
+        public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
@@ -161,12 +163,43 @@ namespace Microsoft.Bot.Builder.M365.AI
             {
                 if (aIOptions.Prompt == null)
                 {
-                    throw new AIException("AI.Chain() was called without a prompt and no default prompt was configured.");
+                    throw new AIException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
                 } else
                 {
                     prompt = aIOptions.Prompt;
                 }
             }
+
+            // TODO: Populate {{$temp.input}}
+
+            // TODO: Populate {{$temp.history}}
+
+            // Render the prompt
+            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
+
+            return await ChainAsync(turnContext, turnState, renderedPrompt, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Chains into another prompt and executes the plan that is returned.
+        /// </summary>
+        /// <remarks>
+        /// This method is used to chain into another prompt. It will call the prompt manager to
+        /// get the plan for the prompt and then execute the plan. The return value indicates whether
+        /// that plan was completely executed or not, and can be used to make decisions about whether the
+        /// outer plan should continue executing.
+        /// </remarks>
+        /// <param name="turnContext">Current turn context.</param>
+        /// <param name="turnState">Current turn state.</param>
+        /// <param name="prompt">Optional. Prompt template to use.</param>
+        /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>True if the plan was completely executed, otherwise false.</returns>
+        /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
+        public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, PromptTemplate prompt, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
+        {
+            AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
             // TODO: Populate {{$temp.input}}
 
@@ -190,7 +223,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             for (int i = 0; i < plan.Commands.Count && continueChain; i++)
             {
                 IPredictedCommand command = plan.Commands[i];
-                
+
                 if (command is PredictedDoCommand doCommand)
                 {
                     if (_actions.HasAction(doCommand.Action))
@@ -199,18 +232,22 @@ namespace Microsoft.Bot.Builder.M365.AI
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.DoCommandActionName)!
                             .Handler(turnContext, turnState, doCommand, doCommand.Action);
-                    } else {
+                    }
+                    else
+                    {
                         // Redirect to UnknownAction handler
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.UnknownActionName)
                             .Handler(turnContext, turnState, plan, doCommand.Action);
                     }
-                } else if (command is PredictedSayCommand sayCommand)
+                }
+                else if (command is PredictedSayCommand sayCommand)
                 {
                     continueChain = await _actions
                         .GetAction(DefaultActionTypes.SayCommandActionName)
                         .Handler(turnContext, turnState, sayCommand, DefaultActionTypes.SayCommandActionName);
-                } else
+                }
+                else
                 {
                     throw new AIException($"Unknown command of {command.Type} predicted");
                 }
@@ -228,7 +265,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
-        public async Task<string> CompletePrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
+        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
@@ -249,7 +286,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
-        public async Task<string> CompletePrompt(ITurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
+        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
@@ -287,7 +324,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                 _options.PromptManager.AddPromptTemplate(name, template);
             }
 
-            return (ITurnContext turnContext, TState turnState) => CompletePrompt(turnContext, turnState, name, options, default);
+            return (ITurnContext turnContext, TState turnState) => CompletePromptAsync(turnContext, turnState, name, options, default);
         }
 
         private AIOptions<TState> _ConfigureOptions(AIOptions<TState>? options)

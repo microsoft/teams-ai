@@ -163,7 +163,7 @@ namespace Microsoft.Bot.Builder.M365
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.Chain(turnContext, turnState); 
+                    await _ai.ChainAsync(turnContext, turnState); 
                 }
 
                 // Call after turn activity handler

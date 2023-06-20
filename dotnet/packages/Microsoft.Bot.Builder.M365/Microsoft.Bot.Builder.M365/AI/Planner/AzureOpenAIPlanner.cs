@@ -1,5 +1,4 @@
-﻿using Microsoft.Bot.Builder.M365.AI.Prompt;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.ChatCompletion;
@@ -14,7 +13,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     public class AzureOpenAIPlanner<TState> : OpenAIPlanner<TState, AzureOpenAIPlannerOptions>
         where TState : TurnState
     {
-        public AzureOpenAIPlanner(AzureOpenAIPlannerOptions options, PromptManager<TState> promptManager, ILogger logger) : base(options, promptManager, logger)
+        public AzureOpenAIPlanner(AzureOpenAIPlannerOptions options, ILogger logger) : base(options, logger)
         {
         }
 
