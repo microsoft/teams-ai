@@ -19,15 +19,9 @@ The SDK is currently available for JavaScript/TypeScript applications in the <a 
 
 0. [Teams AI Library documentation](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview) - Take a look our documentation!
 1. [Migration](getting-started/00.MIGRATION.md) - if you have an existing bot, this guide will help you migrate to this SDK.
-2. **\*** [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
+2. [AI Setup](getting-started/01.AI-SETUP.md) - if you're starting from scratch, this guide will help you <large>**get started with AI**</large>.
 3. [API-Reference](getting-started/02.API-REFERENCE.md) - this guide will help you understand the API reference.
 4. [Prompt injection](getting-started/03.PROMPT-INJECTION.md) - this guide will help you learn the basics of avoiding prompt injection in your bot.
-
-# Join us for the Global Teams Hackathon event
-
-To sign up, visit [https://aka.ms/hack-together-teams](https://aka.ms/hack-together-teams).
-
-> HackTogether is your playground for coding and experimenting with Microsoft Teams. With mentorship from Microsoft experts and access to the latest tech, you will learn how to build Teams apps based on the top Microsoft Teams app scenarios. The possibilities are endless for what you can create... plus you can submit your hack for a chance to win exciting prizes! 🥳
 
 ## Capabilities
 
