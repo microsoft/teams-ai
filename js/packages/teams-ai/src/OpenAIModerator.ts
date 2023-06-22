@@ -70,20 +70,21 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      * @param prompt Generated prompt to be reviewed.
-     * @param options Current options for the AI system.
      * @returns An undefined value to approve the prompt or a new plan to redirect to if not approved.
      */
-    public async reviewPrompt(
-        context: TurnContext,
-        state: TState,
-        prompt: PromptTemplate,
-        options: ConfiguredAIOptions<TState>
-    ): Promise<Plan | undefined> {
+    public async reviewPrompt(context: TurnContext, state: TState, prompt: PromptTemplate): Promise<Plan | undefined> {
         switch (this._options.moderate) {
             case 'input':
             case 'both': {
                 const input = state?.temp?.value.input ?? context.activity.text;
-                const result = await this.createModeration(input, this._options.model);
+                // moderate incomming utterance
+                let result = await this.createModeration(input, this._options.model);
+
+                // moderate prompt
+                if (result && !result.flagged) {
+                    result = await this.createModeration(prompt.text, this._options.model);
+                }
+
                 if (result) {
                     if (result.flagged) {
                         // Input flagged
