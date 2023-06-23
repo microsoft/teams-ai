@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.M365.AI.Planner;
+﻿using Microsoft.Bot.Builder.M365.AI.Moderator;
+using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 
 namespace Microsoft.Bot.Builder.M365.AI
@@ -19,7 +20,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Optional. The moderator to use for moderating input passed to the model and the output
         /// returned by the model.
         /// </summary>
-        public Moderator<TState> Moderator { get; set; }
+        public IModerator<TState> Moderator { get; set; }
 
         // TODO: Support PromptTemplate and PromptSelector handler as options
         /// <summary>
@@ -48,7 +49,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="moderator"> The moderator to use for moderating input passed to the model and the output</param>
         /// <param name="prompt">Optional. The prompt to use for the current turn.</param>
         /// <param name="history">Optional. The history options to use for the AI system.</param>
-        public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, Moderator<TState> moderator, string? prompt = null, AIHistoryOptions? history = null)
+        public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, IModerator<TState> moderator, string? prompt = null, AIHistoryOptions? history = null)
         {
             Planner = planner;
             PromptManager = promptManager;

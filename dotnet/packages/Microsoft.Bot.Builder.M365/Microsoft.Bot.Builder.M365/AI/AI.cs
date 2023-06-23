@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Builder.M365.AI.Moderator;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -20,7 +21,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         private readonly IActionCollection<TState> _actions;
         private readonly AIOptions<TState> _options;
 
-        public AI(AIOptions<TState> options, ILogger? logger)
+        public AI(AIOptions<TState> options, ILogger? logger = null)
         { 
             _options = options;
             _actions = new ActionCollection<TState>();
@@ -43,7 +44,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <remarks>
         /// The default moderator simply allows all messages and plans through without intercepting them.
         /// </remarks>
-        public Moderator<TState> Moderator => _options.Moderator;
+        public IModerator<TState> Moderator => _options.Moderator;
 
         /// <summary>
         /// Returns the options for the AI system.
