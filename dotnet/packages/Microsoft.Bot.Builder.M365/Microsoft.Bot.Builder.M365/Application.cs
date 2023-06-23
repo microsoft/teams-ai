@@ -145,8 +145,8 @@ namespace Microsoft.Bot.Builder.M365
                 // Start typing timer if configured
                 if (_options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(_typingTimerDelay);
-                    timer.StartTypingTimer(turnContext);
+                    timer = new TypingTimer(_options.TypingTimerDelay);
+                    timer.Start(turnContext);
                 }
 
                 // Remove @mentions
@@ -178,8 +178,8 @@ namespace Microsoft.Bot.Builder.M365
             }
             finally
             {
-                // End typing timer if configured
-                timer?.StopTypingTimer();
+                // Dipose the timer if configured
+                timer?.Dispose();
             }
 
 
