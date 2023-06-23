@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.Bot.Builder.M365.Utilities;
+
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
     public class PromptTemplate
@@ -8,6 +10,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
 
         public PromptTemplate(string text, PromptTemplateConfiguration configuration)
         {
+            Verify.NotNull(text, nameof(text));
+            Verify.NotNull(configuration, nameof(configuration));
+
             Text = text;
             Configuration = configuration;
         }

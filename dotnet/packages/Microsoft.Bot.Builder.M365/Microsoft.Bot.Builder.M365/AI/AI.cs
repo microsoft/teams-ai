@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -20,8 +21,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         private readonly IActionCollection<TState> _actions;
         private readonly AIOptions<TState> _options;
 
-        public AI(AIOptions<TState> options, ILogger? logger)
-        { 
+        public AI(AIOptions<TState> options, ILogger? logger = null)
+        {
+            Verify.NotNull(options, nameof(options));
+
             _options = options;
             _actions = new ActionCollection<TState>();
 
@@ -81,6 +84,9 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <exception cref="Exception"></exception>
         public AI<TState> RegisterAction(string name, ActionHandler<TState> handler, bool allowOverrides = false)
         {
+            Verify.NotNull(name, nameof(name));
+            Verify.NotNull(handler, nameof(handler));
+
             if (!_actions.HasAction(name) || allowOverrides)
             {
                 _actions.SetAction(name, handler, allowOverrides);
@@ -106,6 +112,8 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <returns>The current instance object.</returns>
         public AI<TState> RegisterAction(ActionEntry<TState> action)
         {
+            Verify.NotNull(action, nameof(action));
+
             return RegisterAction(action.Name, action.Handler, action.AllowOverrides);
         }
 
@@ -117,6 +125,8 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <returns>The current instance object.</returns>
         public AI<TState> ImportActions(object instance)
         {
+            Verify.NotNull(instance, nameof(instance));
+
             MethodInfo[] methods = instance.GetType()
                 .GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod);
 
@@ -156,6 +166,9 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
             // Select prompt
@@ -199,6 +212,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, PromptTemplate prompt, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(prompt, nameof(prompt));
+
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
             // TODO: Populate {{$temp.input}}
@@ -267,6 +284,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// or threads to receive notice of cancellation.</param>
         public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(promptTemplate, nameof(promptTemplate));
+
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
 
@@ -288,6 +309,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// or threads to receive notice of cancellation.</param>
         public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(name, nameof(name));
+
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
 
@@ -319,6 +344,8 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <returns>A prompt function.</returns>
         public PromptFunction<TState> CreateSemanticFunction(string name, PromptTemplate? template, AIOptions<TState>? options)
         {
+            Verify.NotNull(name, nameof(name));
+
             if (template != null)
             {
                 _options.PromptManager.AddPromptTemplate(name, template);

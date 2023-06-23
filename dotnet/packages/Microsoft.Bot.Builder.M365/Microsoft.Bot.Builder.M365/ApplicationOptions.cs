@@ -53,6 +53,7 @@ namespace Microsoft.Bot.Builder.M365
         /// </summary>
         public bool StartTypingTimer { get; set; } = true;
 
+        // TODO: Implement long running messages infrastructure
         /// <summary>
         /// Optional. If true, the bot supports long running messages that can take longer then the 10 - 15
         /// second timeout imposed by most channels. Defaults to false.

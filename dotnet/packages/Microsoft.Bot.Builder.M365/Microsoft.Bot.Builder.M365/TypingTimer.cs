@@ -1,10 +1,5 @@
-﻿using Microsoft.Bot.Schema;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using Microsoft.Bot.Builder.M365.Utilities;
+using Microsoft.Bot.Schema;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -38,6 +33,8 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="turnContext">The context for the current turn with the user.</param>
         public void StartTypingTimer(ITurnContext turnContext)
         {
+            Verify.NotNull(turnContext);
+
             if (turnContext.Activity.Type != ActivityTypes.Message || timer != null) return;
 
             // Listen for outgoing activities

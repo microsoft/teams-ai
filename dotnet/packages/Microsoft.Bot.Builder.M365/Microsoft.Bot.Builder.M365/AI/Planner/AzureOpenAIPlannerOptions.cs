@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Bot.Builder.M365.AI.Planner
+﻿using Microsoft.Bot.Builder.M365.Utilities;
+
+namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
     /// <summary>
     /// Additional options needed to use the Azure OpenAI service.
@@ -20,6 +22,8 @@
         /// <param name="defaultModel">The default model to use.</param>
         public AzureOpenAIPlannerOptions(string apiKey, string defaultModel, string endpoint) : base(apiKey, defaultModel)
         {
+            Verify.NotNull(endpoint, nameof(endpoint));
+
             Endpoint = endpoint;
         }
     }
