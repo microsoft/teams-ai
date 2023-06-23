@@ -2,7 +2,6 @@
 using AdaptiveCards;
 using Microsoft.Bot.Builder.M365.AI;
 using Microsoft.Bot.Builder.M365.AI.Planner;
-using Microsoft.Bot.Builder.M365.Exceptions;
 
 namespace Microsoft.Bot.Builder.M365.Tests
 {
@@ -15,7 +14,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             // Arange - done through parameters
 
             // Act
-            var actualObjects = ResponseParser.ParseJson(text);
+            var actualObjects = ResponseParser.ParseJSON(text);
 
             // Assert
             Assert.Equal(expectedJSONs, actualObjects);
@@ -72,7 +71,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             Assert.Single(responsePlan.Commands);
             
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
-            Assert.Empty(predictedDoCommand!.Entities!);
+            Assert.Empty(predictedDoCommand.Entities);
             Assert.Equal("actionValue", predictedDoCommand.Action);
         }
 
@@ -110,8 +109,8 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Single(predictedDoCommand.Entities!);
-            Assert.Equal("entityValue", predictedDoCommand.Entities!["entityName"]);
+            Assert.Single(predictedDoCommand.Entities);
+            Assert.Equal("entityValue", predictedDoCommand.Entities["entityName"]);
         }
 
         [Fact]
@@ -129,7 +128,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Equal(2, predictedDoCommand.Entities!.Count);
+            Assert.Equal(2, predictedDoCommand.Entities.Count);
             Assert.Equal("entityValueA", predictedDoCommand.Entities["entityNameA"]);
             Assert.Equal("entityValueB", predictedDoCommand.Entities["entityNameB"]);
         }
@@ -233,36 +232,8 @@ namespace Microsoft.Bot.Builder.M365.Tests
             Action action = () => ResponseParser.ParseResponse(planJSON);
 
             // Act & Assert
-            ResponseParserException ex = Assert.Throws<ResponseParserException>(action);
-            Assert.Equal("Unable to deserialize plan json string", ex.Message);
-        }
-
-        [Fact]
-        public void Test_ParsePlan_Invalid_DO_Command_Format_Missing_Action()
-        {
-            // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{ type: 'DO' }] }";
-
-            // Act
-            Action action = () => ResponseParser.ParseResponse(planJSON);
-
-            // Act & Assert
-            ResponseParserException ex = Assert.Throws<ResponseParserException>(action);
-            Assert.Equal("Unable to deserialize plan json string", ex.Message);
-        }
-
-        [Fact]
-        public void Test_ParsePlan_Invalid_SAY_Command_Format_Missing_Response()
-        {
-            // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{ type: 'SAY' }] }";
-
-            // Act
-            Action action = () => ResponseParser.ParseResponse(planJSON);
-
-            // Act & Assert
-            ResponseParserException ex = Assert.Throws<ResponseParserException>(action);
-            Assert.Equal("Unable to deserialize plan json string", ex.Message);
+            JsonSerializationException ex = Assert.Throws<JsonSerializationException>(action);
+            Assert.Equal("Unknown command type `newCommand`", ex.Message);
         }
 
         [Fact]
@@ -362,6 +333,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
             // Assert
             Assert.Equal(expectedTokens, actualTokens);
         }
+
 
         [Fact]
         public void Test_TokenizeText_Simple_SayCommand()

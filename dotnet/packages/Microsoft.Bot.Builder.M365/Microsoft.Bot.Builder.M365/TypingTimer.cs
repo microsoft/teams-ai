@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Schema;
+﻿using Microsoft.Bot.Builder.M365.Utilities;
+using Microsoft.Bot.Schema;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -38,6 +39,8 @@ namespace Microsoft.Bot.Builder.M365
         /// <returns>True if the timer was started, otherwise False.</returns>
         public bool Start(ITurnContext turnContext)
         {
+            Verify.NotNull(turnContext);
+
             if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
             // Listen for outgoing activities

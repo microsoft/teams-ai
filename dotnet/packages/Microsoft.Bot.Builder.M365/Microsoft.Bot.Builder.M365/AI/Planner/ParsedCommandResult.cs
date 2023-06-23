@@ -4,12 +4,13 @@ using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
-    public class ParsedCommandResult
+    internal class ParsedCommandResult
     {
-        public readonly int Length;
-        public readonly PredictedCommand Command;
+        public int Length { get; set; }
 
-        public ParsedCommandResult(int length, PredictedCommand command)
+        public IPredictedCommand Command { get; set; }
+
+        public ParsedCommandResult(int length, IPredictedCommand command)
         {
             Length = length;
             Command = command;

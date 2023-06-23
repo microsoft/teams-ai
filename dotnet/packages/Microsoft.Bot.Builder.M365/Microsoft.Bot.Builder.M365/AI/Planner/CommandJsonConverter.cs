@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
@@ -10,7 +7,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(PredictedCommand) == objectType;
+            return typeof(IPredictedCommand) == objectType;
         }
 
         public override bool CanWrite => false;

@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.Exceptions
 {
-    public class ResponseParserException : Exception
+    public class PromptManagerException : Exception
     {
-        public ResponseParserException(string message) : base(message)
+        public PromptManagerException(string message) : base(message)
         {
         }
     }
