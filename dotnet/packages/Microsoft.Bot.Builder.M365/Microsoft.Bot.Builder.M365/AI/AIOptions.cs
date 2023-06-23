@@ -14,7 +14,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <summary>
         /// The prompt manager to use for generating prompts.
         /// </summary>
-        public PromptManager<TState> PromptManager { get; set; }
+        public IPromptManager<TState> PromptManager { get; set; }
 
         /// <summary>
         /// Optional. The moderator to use for moderating input passed to the model and the output
