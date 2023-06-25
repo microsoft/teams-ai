@@ -29,7 +29,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
         
-        public OpenAIPlanner(TOptions options, ILogger? logger)
+        public OpenAIPlanner(TOptions options, ILogger? logger = null)
         {
             // TODO: Configure Retry Handler
             _options = options;
@@ -134,13 +134,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
                 {
                     {
-                        return new Plan
-                        {
-                            Commands =
-                            {
-                                new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName)
-                            }
-                        };
+                        Plan plan = new();
+                        plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
+                        return plan;
                     }
                 }
 

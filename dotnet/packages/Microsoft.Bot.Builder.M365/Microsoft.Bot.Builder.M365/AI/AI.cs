@@ -20,7 +20,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         private readonly IActionCollection<TState> _actions;
         private readonly AIOptions<TState> _options;
 
-        public AI(AIOptions<TState> options, ILogger? logger)
+        public AI(AIOptions<TState> options, ILogger? logger = null)
         { 
             _options = options;
             _actions = new ActionCollection<TState>();
