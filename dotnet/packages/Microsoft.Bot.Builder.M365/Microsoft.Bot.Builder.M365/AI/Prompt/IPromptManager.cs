@@ -39,5 +39,25 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <param name="name">Name of the template to load.</param>
         /// <returns>The loaded prompt template.</returns>
         PromptTemplate LoadPromptTemplate(string name);
+
+        /// <summary>
+        /// Renders a prompt template by name.
+        /// </summary>
+        /// <param name="kernel">The semantic kernel</param>
+        /// <param name="turnContext">Current application turn context.</param>
+        /// <param name="turnState">Current turn state.</param>
+        /// <param name="promptTemplate">Prompt template to render.</param>
+        /// <returns>The rendered prompt template</returns>
+        Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name);
+
+        /// <summary>
+        /// Renders a prompt template.
+        /// </summary>
+        /// <param name="kernel">The semantic kernel</param>
+        /// <param name="turnContext">Current application turn context.</param>
+        /// <param name="turnState">Current turn state.</param>
+        /// <param name="promptTemplate">Prompt template to render.</param>
+        /// <returns>The rendered prompt template</returns>
+        Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate);
     }
 }

@@ -58,7 +58,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// </summary>
         public IPlanner<TState> Planner => _options.Planner;
 
-        public PromptManager<TState> Prompts => _options.PromptManager;
+        public IPromptManager<TState> Prompts => _options.PromptManager;
 
         /// <summary>
         /// Registers a handler for a named action.

@@ -210,7 +210,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 throw new InvalidOperationException("Unable to determine current assembly directory.");
             }
 
-            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AI/prompts"));
+            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
             var promptManager = new PromptManager<TurnState>(directoryPath);
             var name = "invalidPromptTemplateFolder";
 
