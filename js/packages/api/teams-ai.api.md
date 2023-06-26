@@ -131,6 +131,25 @@ export interface ApplicationOptions<TState extends TurnState> {
 }
 
 // @public
+export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> extends OpenAIModerator<TState> {
+    constructor(options: AzureOpenAIModeratorOptions);
+    // Warning: (ae-forgotten-export) The symbol "AzureOpenAIClient" needs to be exported by the entry point index.d.ts
+    protected createClient(options: OpenAIModeratorOptions): AzureOpenAIClient;
+    // Warning: (ae-forgotten-export) The symbol "CreateModerationResponseResultsInner" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    protected createModeration(input: string): Promise<CreateModerationResponseResultsInner | undefined>;
+    reviewPlan(context: TurnContext, state: TState, plan: Plan): Promise<Plan>;
+    reviewPrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan | undefined>;
+}
+
+// @public
+export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
+    // Warning: (ae-forgotten-export) The symbol "AzureOpenAIModeratorCategory" needs to be exported by the entry point index.d.ts
+    categories?: AzureOpenAIModeratorCategory[];
+}
+
+// @public
 export class AzureOpenAIPlanner<TState extends TurnState = DefaultTurnState> extends OpenAIPlanner<TState, AzureOpenAIPlannerOptions> {
     // Warning: (ae-forgotten-export) The symbol "OpenAIClient" needs to be exported by the entry point index.d.ts
     //
@@ -261,8 +280,6 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
     constructor(options: OpenAIModeratorOptions);
     // (undocumented)
     protected createClient(options: OpenAIModeratorOptions): OpenAIClient;
-    // Warning: (ae-forgotten-export) The symbol "CreateModerationResponseResultsInner" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     protected createModeration(input: string, model?: string): Promise<CreateModerationResponseResultsInner | undefined>;
     // (undocumented)
@@ -274,6 +291,7 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
 // @public
 export interface OpenAIModeratorOptions {
     apiKey: string;
+    apiVersion?: string;
     endpoint?: string;
     model?: string;
     moderate: 'input' | 'output' | 'both';

@@ -264,7 +264,7 @@
         {
           "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!AdaptiveCards:class",
-          "docComment": "/**\n * AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.  @template TState Type of the turn state object being persisted.\n */\n",
+          "docComment": "/**\n * AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.\n *\n * @template TState Type of the turn state object being persisted.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -339,7 +339,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!AdaptiveCards#actionExecute:member(1)",
-              "docComment": "/**\n * Adds a route to the application for handling Adaptive Card Action.Execute events.  @template TData Optional. Type of the data associated with the action.\n *\n * @param verb - The named action(s) to be handled.\n *\n * @param handler - The code to execute when the action is triggered.\n *\n * @param  - handler.context The current turn context.\n *\n * @param  - handler.state The current turn state.\n *\n * @param  - handler.data The data associated with the action.\n *\n * @returns The application for chaining purposes.\n */\n",
+              "docComment": "/**\n * Adds a route to the application for handling Adaptive Card Action.Execute events.\n *\n * @template TData Optional. Type of the data associated with the action.\n *\n * @param verb - The named action(s) to be handled.\n *\n * @param handler - The code to execute when the action is triggered.\n *\n * @param  - handler.context The current turn context.\n *\n * @param  - handler.state The current turn state.\n *\n * @param  - handler.data The data associated with the action.\n *\n * @returns The application for chaining purposes.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -1438,7 +1438,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!AI#createSemanticFunction:member(1)",
-              "docComment": "/**\n * Creates a semantic function that can be registered with the apps prompt manager.\n *\n * @remarks\n *\n * Semantic functions are functions that make model calls and return their results as template parameters to other prompts. For example, you could define a semantic function called 'translator' that first translates the user's input to English before calling your main prompt:\n * ```JavaScript\n * app.ai.prompts.addFunction('translator', app.ai.createSemanticFunction('translator-prompt'));\n * ```\n *\n * You would then create a prompt called \"translator-prompt\" that does the translation and then in your main prompt you can call it using the template expression `{{translator}}`.\n */\n",
+              "docComment": "/**\n * Creates a semantic function that can be registered with the apps prompt manager.\n *\n * @remarks\n *\n * Semantic functions are functions that make model calls and return their results as template parameters to other prompts. For example, you could define a semantic function called 'translator' that first translates the user's input to English before calling your main prompt:\n * ```JavaScript\n * app.ai.prompts.addFunction('translator', app.ai.createSemanticFunction('translator-prompt'));\n * ```\n *\n * You would then create a prompt called \"translator-prompt\" that does the translation and then in your main prompt you can call it using the template expression `{{translator}}`.\n *\n * @param name - \n *\n * @param template - \n *\n * @param options - \n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -1551,7 +1551,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!AI#doAction:member(1)",
-              "docComment": "/**\n * Manually executes a named action.  @template TEntities Optional. Type of entities expected to be passed to the action.\n *\n * @param context - Current turn context.\n *\n * @param state - Current turn state.\n *\n * @param action - Name of the action to execute.\n *\n * @param entities - Optional. Entities to pass to the action.\n *\n * @returns True if the action thinks other actions should be executed.\n */\n",
+              "docComment": "/**\n * Manually executes a named action.\n *\n * @template TEntities Optional. Type of entities expected to be passed to the action.\n *\n * @param context - Current turn context.\n *\n * @param state - Current turn state.\n *\n * @param action - Name of the action to execute.\n *\n * @param entities - Optional. Entities to pass to the action.\n *\n * @returns True if the action thinks other actions should be executed.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -2267,7 +2267,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!AIOptions:interface",
-          "docComment": "/**\n * Options for configuring the AI system.  @template TState Type of the turn state.\n */\n",
+          "docComment": "/**\n * Options for configuring the AI system.\n *\n * @template TState Type of the turn state.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -4198,7 +4198,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!ApplicationOptions:interface",
-          "docComment": "/**\n * Options for the Application class.  @template TState Type of the turn state.\n */\n",
+          "docComment": "/**\n * Options for the Application class.\n *\n * @template TState Type of the turn state.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -4521,8 +4521,497 @@
         },
         {
           "kind": "Class",
+          "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModerator:class",
+          "docComment": "/**\n * An Azure OpenAI moderator that uses OpenAI's moderation API to review prompts and plans for safety.\n *\n * @remarks\n *\n * This moderation can be configured to review the input from the user, output from the model, or both.  @template TState Optional. Type of the applications turn state.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class AzureOpenAIModerator<TState extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "TurnState",
+              "canonicalReference": "@microsoft/teams-ai!TurnState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " = "
+            },
+            {
+              "kind": "Reference",
+              "text": "DefaultTurnState",
+              "canonicalReference": "@microsoft/teams-ai!DefaultTurnState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "OpenAIModerator",
+              "canonicalReference": "@microsoft/teams-ai!OpenAIModerator:class"
+            },
+            {
+              "kind": "Content",
+              "text": "<TState>"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/AzureOpenAIModerator.ts",
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "TState",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              }
+            }
+          ],
+          "isAbstract": false,
+          "name": "AzureOpenAIModerator",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModerator:constructor(1)",
+              "docComment": "/**\n * Creates a new instance of the OpenAI based moderator.\n *\n * @param options - Configuration options for the moderator.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AzureOpenAIModeratorOptions",
+                  "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModeratorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModerator#createClient:member(1)",
+              "docComment": "/**\n * Creates a new instance of the Azure OpenAI client.\n *\n * @protected\n *\n * @param options - The options for the moderator.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "protected createClient(options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OpenAIModeratorOptions",
+                  "canonicalReference": "@microsoft/teams-ai!OpenAIModeratorOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AzureOpenAIClient",
+                  "canonicalReference": "@microsoft/teams-ai!~AzureOpenAIClient:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": true,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "createClient"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModerator#createModeration:member(1)",
+              "docComment": "/**\n * @protected\n *\n * @remarks\n *\n * This method is called by the moderator to moderate the input.  @template TState Optional. Type of the applications turn state.\n *\n * @param input - The input to moderate.\n *\n * @returns The moderation results.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "protected createModeration(input: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CreateModerationResponseResultsInner",
+                  "canonicalReference": "@microsoft/teams-ai!~CreateModerationResponseResultsInner:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 7
+              },
+              "releaseTag": "Public",
+              "isProtected": true,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "input",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "createModeration"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModerator#reviewPlan:member(1)",
+              "docComment": "/**\n * Reviews the SAY commands generated by the planner for safety violations.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param plan - Plan generated by the planner.\n *\n * @returns The plan to execute. Either the current plan passed in for review or a new plan.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "reviewPlan(context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TurnContext",
+                  "canonicalReference": "botbuilder-core!TurnContext:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", state: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "TState"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", plan: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Plan",
+                  "canonicalReference": "@microsoft/teams-ai!Plan:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Plan",
+                  "canonicalReference": "@microsoft/teams-ai!Plan:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 11
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "context",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "state",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "plan",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "reviewPlan"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModerator#reviewPrompt:member(1)",
+              "docComment": "/**\n * Reviews an incoming utterance for safety violations.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param prompt - Generated prompt to be reviewed.\n *\n * @param options - Current options for the AI system.\n *\n * @returns An undefined value to approve the prompt or a new plan to redirect to if not approved.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "reviewPrompt(context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TurnContext",
+                  "canonicalReference": "botbuilder-core!TurnContext:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", state: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "TState"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", prompt: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "PromptTemplate",
+                  "canonicalReference": "@microsoft/teams-ai!PromptTemplate:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConfiguredAIOptions",
+                  "canonicalReference": "@microsoft/teams-ai!ConfiguredAIOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<TState>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Plan",
+                  "canonicalReference": "@microsoft/teams-ai!Plan:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 10,
+                "endIndex": 14
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "context",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "state",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "prompt",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 9
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "reviewPrompt"
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModeratorOptions:interface",
+          "docComment": "/**\n * Options for the OpenAI based moderator.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface AzureOpenAIModeratorOptions extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "OpenAIModeratorOptions",
+              "canonicalReference": "@microsoft/teams-ai!OpenAIModeratorOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/AzureOpenAIModerator.ts",
+          "releaseTag": "Public",
+          "name": "AzureOpenAIModeratorOptions",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@microsoft/teams-ai!AzureOpenAIModeratorOptions#categories:member",
+              "docComment": "/**\n * Optional: Azure OpenAI Content Safety Categories Allowed values: \"Hate\", \"Sexual\", \"SelfHarm\", \"Violence\"\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "categories?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AzureOpenAIModeratorCategory",
+                  "canonicalReference": "@microsoft/teams-ai!~AzureOpenAIModeratorCategory:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "categories",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 2
+            }
+          ]
+        },
+        {
+          "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!AzureOpenAIPlanner:class",
-          "docComment": "/**\n * Planner that uses the Azure OpenAI service.  @template TState Optional. Type of the applications turn state.\n */\n",
+          "docComment": "/**\n * Planner that uses the Azure OpenAI service.\n *\n * @template TState Optional. Type of the applications turn state.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -4591,7 +5080,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!AzureOpenAIPlanner#createClient:member(1)",
-              "docComment": "/**\n * @private\n */\n",
+              "docComment": "/**\n * @param options -  @private\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -4914,7 +5403,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!ConfiguredAIOptions:interface",
-          "docComment": "/**\n * The configured options for the AI system after all defaults have been applied.  @template TState Type of the turn state.\n */\n",
+          "docComment": "/**\n * The configured options for the AI system after all defaults have been applied.\n *\n * @template TState Type of the turn state.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -5980,7 +6469,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!DefaultModerator#reviewPlan:member(1)",
-              "docComment": "/**\n * Allows all plans by returning the plan as-is.\n */\n",
+              "docComment": "/**\n * Allows all plans by returning the plan as-is.\n *\n * @param context - \n *\n * @param state - \n *\n * @param plan - \n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -6076,7 +6565,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!DefaultModerator#reviewPrompt:member(1)",
-              "docComment": "/**\n * Allows all prompts by returning undefined.\n */\n",
+              "docComment": "/**\n * Allows all prompts by returning undefined.\n *\n * @param context - \n *\n * @param state - \n *\n * @param prompt - \n *\n * @param options - \n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -6861,7 +7350,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!DefaultTurnState:interface",
-          "docComment": "/**\n * Defines the default state scopes persisted by the `DefaultTurnStateManager`.  @template TConversationState Optional. Type of the conversation state object being persisted.  @template TUserState Optional. Type of the user state object being persisted.  @template TTempState Optional. Type of the temp state object being persisted.\n */\n",
+          "docComment": "/**\n * Defines the default state scopes persisted by the `DefaultTurnStateManager`.\n *\n * @template TConversationState Optional. Type of the conversation state object being persisted.  @template TUserState Optional. Type of the user state object being persisted.  @template TTempState Optional. Type of the temp state object being persisted.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -7078,7 +7567,7 @@
         {
           "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!DefaultTurnStateManager:class",
-          "docComment": "/**\n * Default turn state manager implementation.  @template TConversationState Optional. Type of the conversation state object being persisted.  @template TUserState Optional. Type of the user state object being persisted.  @template TTempState Optional. Type of the temp state object being persisted.\n */\n",
+          "docComment": "/**\n * Default turn state manager implementation.\n *\n * @template TConversationState Optional. Type of the conversation state object being persisted.  @template TUserState Optional. Type of the user state object being persisted.  @template TTempState Optional. Type of the temp state object being persisted.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -7402,7 +7891,7 @@
         {
           "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!MessageExtensions:class",
-          "docComment": "/**\n * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.  @template TState Type of the turn state object being persisted.\n */\n",
+          "docComment": "/**\n * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.\n *\n * @template TState Type of the turn state object being persisted.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -8472,7 +8961,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!MessageExtensions#submitAction:member(1)",
-              "docComment": "/**\n * Registers a handler that implements the submit action for an Action based Message Extension.  @template TData Optional. Type of data being submitted.\n *\n * @param commandId - ID of the command(s) to register the handler for.\n *\n * @param handler - Function to call when the command is received.\n *\n * @param  - handler.context Context for the current turn of conversation with the user.\n *\n * @param  - handler.state Current state of the turn.\n *\n * @param  - handler.data The data that was submitted.\n *\n * @returns The application for chaining purposes.\n */\n",
+              "docComment": "/**\n * Registers a handler that implements the submit action for an Action based Message Extension.\n *\n * @template TData Optional. Type of data being submitted.\n *\n * @param commandId - ID of the command(s) to register the handler for.\n *\n * @param handler - Function to call when the command is received.\n *\n * @param  - handler.context Context for the current turn of conversation with the user.\n *\n * @param  - handler.state Current state of the turn.\n *\n * @param  - handler.data The data that was submitted.\n *\n * @returns The application for chaining purposes.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8668,7 +9157,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!Moderator:interface",
-          "docComment": "/**\n * A moderator is responsible for reviewing and approving AI prompts and plans.  @template TState Type of the applications turn state.\n */\n",
+          "docComment": "/**\n * A moderator is responsible for reviewing and approving AI prompts and plans.\n *\n * @template TState Type of the applications turn state.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -9429,6 +9918,33 @@
             },
             {
               "kind": "PropertySignature",
+              "canonicalReference": "@microsoft/teams-ai!OpenAIModeratorOptions#apiVersion:member",
+              "docComment": "/**\n * Optional. Azure Content Safety API version.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "apiVersion?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "apiVersion",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!OpenAIModeratorOptions#endpoint:member",
               "docComment": "/**\n * Optional. OpenAI endpoint.\n */\n",
               "excerptTokens": [
@@ -9770,7 +10286,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!OpenAIPlanner#createClient:member(1)",
-              "docComment": "/**\n * @private\n */\n",
+              "docComment": "/**\n * @param options -  @private\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10753,7 +11269,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!PredictedDoCommandAndHandler:interface",
-          "docComment": "/**\n * Entities argument passed to the action handler for AI.DoCommandActionName.  @template TState Type of the turn state.\n */\n",
+          "docComment": "/**\n * Entities argument passed to the action handler for AI.DoCommandActionName.\n *\n * @template TState Type of the turn state.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -11315,7 +11831,7 @@
         {
           "kind": "TypeAlias",
           "canonicalReference": "@microsoft/teams-ai!PromptSelector:type",
-          "docComment": "/**\n * A function that can be used to select a prompt to use for the current turn.  @template TState Type of the turn state.\n *\n * @param context - The current turn context.\n *\n * @param state - The current turn state.\n *\n * @returns A string or prompt template to use for the current turn.\n */\n",
+          "docComment": "/**\n * A function that can be used to select a prompt to use for the current turn.\n *\n * @template TState Type of the turn state.\n *\n * @param context - The current turn context.\n *\n * @param state - The current turn state.\n *\n * @returns A string or prompt template to use for the current turn.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -11617,7 +12133,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!Query:interface",
-          "docComment": "/**\n * Query arguments for a search-based message extension.  @template TParams Type of the query parameters.\n */\n",
+          "docComment": "/**\n * Query arguments for a search-based message extension.\n *\n * @template TParams Type of the query parameters.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -11811,7 +12327,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!ResponseParser.parseDoCommand:member(1)",
-              "docComment": "/**\n * @private\n */\n",
+              "docComment": "/**\n * @param tokens -  @private\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11860,7 +12376,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!ResponseParser.parseJSON:member(1)",
-              "docComment": "/**\n * Attempts to find a JSON object with-in a response.  @template T Optional. Type of object to return.\n *\n * @param text - Optional. Text to parse.\n *\n * @returns The parsed object or undefined if no object could be detected.\n */\n",
+              "docComment": "/**\n * Attempts to find a JSON object with-in a response.\n *\n * @template T Optional. Type of object to return.\n *\n * @param text - Optional. Text to parse.\n *\n * @returns The parsed object or undefined if no object could be detected.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11983,7 +12499,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!ResponseParser.parseSayCommand:member(1)",
-              "docComment": "/**\n * @private\n */\n",
+              "docComment": "/**\n * @param tokens -  @private\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -12032,7 +12548,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!ResponseParser.tokenizeText:member(1)",
-              "docComment": "/**\n * @private\n */\n",
+              "docComment": "/**\n * @param text -  @private\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -12083,7 +12599,7 @@
         {
           "kind": "TypeAlias",
           "canonicalReference": "@microsoft/teams-ai!RouteHandler:type",
-          "docComment": "/**\n * Function for handling an incoming request.  @template TState Type of the turn state.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param state - Current turn state.\n *\n * @returns A promise that resolves when the handler completes its processing.\n */\n",
+          "docComment": "/**\n * Function for handling an incoming request.\n *\n * @template TState Type of the turn state.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param state - Current turn state.\n *\n * @returns A promise that resolves when the handler completes its processing.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -12747,7 +13263,7 @@
         {
           "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!TurnStateEntry:class",
-          "docComment": "/**\n * Accessor class for managing an individual state scope.  @template TValue Optional. Strongly typed value of the state scope.\n */\n",
+          "docComment": "/**\n * Accessor class for managing an individual state scope.\n *\n * @template TValue Optional. Strongly typed value of the state scope.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -13052,7 +13568,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@microsoft/teams-ai!TurnStateManager:interface",
-          "docComment": "/**\n * Interface implemented by classes responsible for loading and saving an applications turn state.  @template TState Type of the state object being persisted.\n */\n",
+          "docComment": "/**\n * Interface implemented by classes responsible for loading and saving an applications turn state.\n *\n * @template TState Type of the state object being persisted.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

@@ -109,3 +109,6 @@ dist
 .tern-port
 
 .DS_Store
+
+# api-extract temp files
+**/packages/api/temp/
