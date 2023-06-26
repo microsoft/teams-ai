@@ -10,8 +10,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
 
         public PromptTemplate(string text, PromptTemplateConfiguration configuration)
         {
-            Verify.NotNull(text, nameof(text));
-            Verify.NotNull(configuration, nameof(configuration));
+            Verify.ParamNotNull(text, nameof(text));
+            Verify.ParamNotNull(configuration, nameof(configuration));
 
             Text = text;
             Configuration = configuration;

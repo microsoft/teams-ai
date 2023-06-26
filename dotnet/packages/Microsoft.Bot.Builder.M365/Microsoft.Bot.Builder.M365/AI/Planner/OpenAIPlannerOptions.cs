@@ -63,8 +63,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <param name="defaultModel">The default model to use.</param>
         public OpenAIPlannerOptions(string apiKey, string defaultModel)
         {
-            Verify.NotNull(apiKey, nameof(apiKey));
-            Verify.NotNull(defaultModel, nameof(defaultModel));
+            Verify.ParamNotNull(apiKey, nameof(apiKey));
+            Verify.ParamNotNull(defaultModel, nameof(defaultModel));
 
             ApiKey = apiKey;
             DefaultModel = defaultModel;

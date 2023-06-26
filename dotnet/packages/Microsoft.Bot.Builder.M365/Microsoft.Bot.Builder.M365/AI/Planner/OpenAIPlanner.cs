@@ -54,7 +54,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private protected virtual ITextCompletion _CreateTextCompletionService(TOptions options)
         {
-            Verify.NotNull(options, nameof(options));
+            Verify.ParamNotNull(options, nameof(options));
 
             return new OpenAITextCompletion(
                 options.DefaultModel,
@@ -66,7 +66,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private protected virtual IChatCompletion _CreateChatCompletionService(TOptions options)
         {
-            Verify.NotNull(options, nameof(options));
+            Verify.ParamNotNull(options, nameof(options));
 
             return new OpenAIChatCompletion(
                 options.DefaultModel,
@@ -78,9 +78,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <inheritdoc/>
         public virtual async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
-            Verify.NotNull(turnContext, nameof(turnContext));
-            Verify.NotNull(turnState, nameof(turnState));
-            Verify.NotNull(options, nameof(options));
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(options, nameof(options));
 
             string model = _GetModel(promptTemplate);
             string result;
@@ -133,9 +133,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <inheritdoc/>
         public async Task<Plan> GeneratePlanAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
-            Verify.NotNull(turnContext, nameof(turnContext));
-            Verify.NotNull(turnState, nameof(turnState));
-            Verify.NotNull(options, nameof(options));
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(options, nameof(options));
 
             string result;
             try
@@ -171,7 +171,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 try
                 {
                     plan = ResponseParser.ParseResponse(result.Trim());
-                    Verify.NotNull(plan, nameof(plan));
+                    Verify.ParamNotNull(plan, nameof(plan));
                 } catch (Exception ex)
                 {
                     throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
@@ -205,7 +205,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private async Task<ITextResult> _CreateTextCompletion(PromptTemplate promptTemplate, CancellationToken cancellationToken)
         {
-            Verify.NotNull(promptTemplate, nameof(promptTemplate));
+            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
 
             var skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
 
@@ -217,9 +217,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private async Task<IChatResult> _CreateChatCompletion(TState turnState, AIOptions<TState> options, PromptTemplate promptTemplate, CancellationToken cancellationToken)
         {
-            Verify.NotNull(turnState, nameof(turnState));
-            Verify.NotNull(options, nameof(options));
-            Verify.NotNull(promptTemplate, nameof(promptTemplate));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(options, nameof(options));
+            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
 
             PromptTemplateConfig templateConfig = promptTemplate.Configuration.GetPromptTemplateConfig();
             ChatRequestSettings chatRequestSettings = new()

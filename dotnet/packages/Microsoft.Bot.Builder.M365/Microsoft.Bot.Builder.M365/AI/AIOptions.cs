@@ -52,9 +52,9 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="history">Optional. The history options to use for the AI system.</param>
         public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, IModerator<TState> moderator, string? prompt = null, AIHistoryOptions? history = null)
         {
-            Verify.NotNull(planner, nameof(planner));
-            Verify.NotNull(promptManager, nameof(promptManager));
-            Verify.NotNull(moderator, nameof(moderator));
+            Verify.ParamNotNull(planner, nameof(planner));
+            Verify.ParamNotNull(promptManager, nameof(promptManager));
+            Verify.ParamNotNull(moderator, nameof(moderator));
 
             Planner = planner;
             PromptManager = promptManager;
