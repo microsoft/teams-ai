@@ -6,15 +6,20 @@ The file content should be the following:
 ```json
 {
   "OpenAI": {
-    "modelId": "<Model Id>", // ex. "text-davinci-003"
-    "chatModelId": "<Chat Model Id>", // ex. "gpt-3.5-turbo" or any model that can be used with chat completion api
+    "modelId": "<Model Id>",
+    "chatModelId": "<Chat Model Id>",
     "apiKey": "<OpenAI API key>"
   },
   "AzureOpenAI": {
-   "modelId": "<Model Id>", // ex. "text-davinci-003", The name of the model in the Azure OpenAI resource
-    "chatModelId": "<Chat Model Id>", // ex. "gpt-35-turbo" or any model that can be used with chat completion api
-    "apiKey": "<Azure OpenAI API key>"
-    "endpoint": "<Azure OpenAI API Endpoint>" // ex. https://<randomDomain>.openai.azure.com/"
+   "modelId": "<Model Id>",
+   "chatModelId": "<Chat Model Id>",
+    "apiKey": "<Azure OpenAI API key>",
+    "endpoint": "<Azure OpenAI API Endpoint>"
   }
 }
 ```
+
+`modelId`: ex. "text-davinci-003". If using Azure Open AI then this will be the model deployment name.
+`chatModelId`: ex. "gpt-3.5-turbo" or any model that can be used with chat completion api.
+`apiKey`: the API key.
+`endpoint`: the endpoint for Azure OpenAI. ex. https://<randomDomain>.openai.azure.com/
