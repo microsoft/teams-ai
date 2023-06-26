@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365.AI
@@ -46,7 +47,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <remarks>
         /// The default moderator simply allows all messages and plans through without intercepting them.
         /// </remarks>
-        public Moderator<TState> Moderator => _options.Moderator;
+        public IModerator<TState> Moderator => _options.Moderator;
 
         /// <summary>
         /// Returns the options for the AI system.
@@ -58,7 +59,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// </summary>
         public IPlanner<TState> Planner => _options.Planner;
 
-        public PromptManager<TState> Prompts => _options.PromptManager;
+        public IPromptManager<TState> Prompts => _options.PromptManager;
 
         /// <summary>
         /// Registers a handler for a named action.

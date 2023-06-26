@@ -1,10 +1,13 @@
 ﻿using System.Reflection;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Schema;
+using Microsoft.SemanticKernel.TemplateEngine;
 using Moq;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AI
 {
+    // TODO: Complete tests once turn state infrastructure is implemented
     public class PromptManagerTests
     {
         [Fact]
@@ -155,7 +158,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 throw new InvalidOperationException("Unable to determine current assembly directory.");
             }
 
-            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AI/prompts"));
+            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
             var promptManager = new PromptManager<TurnState>(directoryPath);
             var name = "promptTemplateFolder";
             var expectedPromptTemplate = new PromptTemplate(
@@ -207,7 +210,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 throw new InvalidOperationException("Unable to determine current assembly directory.");
             }
 
-            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AI/prompts"));
+            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
             var promptManager = new PromptManager<TurnState>(directoryPath);
             var name = "invalidPromptTemplateFolder";
 
@@ -216,6 +219,147 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
 
             // Assert 
             Assert.Equal(exception.Message, $"Directory doesn't exist `{directoryPath}\\{name}`");
+        }
+
+        [Fact]
+        public async void RenderPrompt_PlainText()
+        {
+            // Arrange
+            var promptManager = new PromptManager<TurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
+
+            var turnStateMock = new Mock<TurnState>();
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                        {
+                            MaxTokens = 2000,
+                            Temperature = 0.2,
+                            TopP = 0.5,
+                        }
+            };
+
+            var name = "promptTemplateName";
+            var promptString = "plain template string";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
+
+            // Act
+            promptManager.AddPromptTemplate(name, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+
+            // Assert
+            Assert.Equal(renderedPrompt.Text, promptString);
+        }
+
+        [Fact]
+        public async void RenderPrompt_ResolveFunction_FunctionExists()
+        {
+            // Arrange
+            var promptManager = new PromptManager<TurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
+
+            var turnStateMock = new Mock<TurnState>();
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                        {
+                            MaxTokens = 2000,
+                            Temperature = 0.2,
+                            TopP = 0.5,
+                        }
+            };
+            /// Configure function
+            var promptFunctionName = "promptFunctionName";
+            var output = "output";
+            PromptFunction<TurnState> promptFunction = (TurnContext, TurnState) => Task.FromResult(output);
+
+            /// Configure prompt
+            var promptString = "The output of the function is {{ " + promptFunctionName + " }}";
+            var expectedRenderedPrompt = $"The output of the function is {output}";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
+            
+            // Act
+            promptManager.AddFunction(promptFunctionName, promptFunction);
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+
+            // Assert
+            Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
+        }
+
+        [Fact]
+        public async Task RenderPrompt_ResolveFunction_FunctionNotExists()
+        {
+            // Arrange
+            var promptManager = new PromptManager<TurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
+
+            var turnStateMock = new Mock<TurnState>();
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                        {
+                            MaxTokens = 2000,
+                            Temperature = 0.2,
+                            TopP = 0.5,
+                        }
+            };
+            
+            /// Prompt function not configured
+
+            /// Configure prompt
+            var name = "promptTemplateName";
+            var promptString = "The output of the function is {{ promptFunction }}";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
+
+            // Act
+            promptManager.AddPromptTemplate(name, promptTemplate);
+            var ex = await Assert.ThrowsAsync<PromptManagerException>(async () => await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate));
+
+            // Assert
+            Assert.Equal("Failed to render prompt: $Function not found: Function `promptFunction` not found", ex.Message);
+            Assert.Equal(typeof(TemplateException), ex.InnerException?.GetType());
+        }
+
+        [Fact]
+        public async void RenderPrompt_ResolveVariable_Exist()
+        {
+
+        }
+
+        [Fact]
+        public async void RenderPrompt_ResolveVariable_NotExist()
+        {
+
+        }
+
+        [Fact]
+        public async void RenderPrompt_ResolveVariable_NestedObject()
+        {
+
+        }
+
+        [Fact]
+        public async void RenderPrompt_ResolveVariable_NestedObject_GreaterThanLevel2Depth_ShouldFail()
+        {
+            // {{ $state.conversation.level2.level3 }} is not allowed
+        }
+
+        [Fact]
+        public async void RenderPrompt_WithFunctionAndVariableReference()
+        {
+
         }
     }
 }

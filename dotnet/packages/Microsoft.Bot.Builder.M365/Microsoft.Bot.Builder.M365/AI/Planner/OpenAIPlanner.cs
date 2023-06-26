@@ -30,7 +30,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
         
-        public OpenAIPlanner(TOptions options, ILogger? logger)
+        public OpenAIPlanner(TOptions options, ILogger? logger = null)
         {
             // TODO: Configure Retry Handler
             _options = options;
@@ -61,6 +61,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 options.ApiKey,
                 options.Organization
             );
+
         }
 
         private protected virtual IChatCompletion _CreateChatCompletionService(TOptions options)
@@ -75,7 +76,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
         /// <inheritdoc/>
-        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
+        public virtual async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
             Verify.NotNull(turnContext, nameof(turnContext));
             Verify.NotNull(turnState, nameof(turnState));
@@ -145,15 +146,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 // Ensure we weren't rate limited
                 if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
                 {
-                    {
-                        return new Plan
-                        {
-                            Commands =
-                            {
-                                new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName)
-                            }
-                        };
-                    }
+                    Plan plan = new();
+                    plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
+                    return plan;
                 }
 
                 throw;
@@ -172,7 +167,16 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 // TODO: Remove response prefix - once Conversation History & TurnState is ported
 
                 // Parse response into commands
-                Plan plan = ResponseParser.ParseResponse(result.Trim());
+                Plan? plan;
+                try
+                {
+                    plan = ResponseParser.ParseResponse(result.Trim());
+                    Verify.NotNull(plan, nameof(plan));
+                } catch (Exception ex)
+                {
+                    throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
+                }
+
 
                 // Filter to only a single SAY command
                 if (_options.OneSayPerTurn)
