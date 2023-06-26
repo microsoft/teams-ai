@@ -3,7 +3,6 @@ using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -94,8 +93,8 @@ namespace Microsoft.Bot.Builder.M365.AI
             {
                 if (AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
                 {
-                return plan;
-            }
+                    return plan;
+                }
             }
 
             // Parse response using DO/SAY syntax

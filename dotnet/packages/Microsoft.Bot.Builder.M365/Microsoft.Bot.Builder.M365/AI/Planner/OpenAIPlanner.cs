@@ -1,6 +1,7 @@
 ﻿using Azure.AI.OpenAI;
 using Microsoft.Bot.Builder.M365.AI.Action;
 using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
@@ -29,7 +30,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
         
-        public OpenAIPlanner(TOptions options, ILogger? logger)
+        public OpenAIPlanner(TOptions options, ILogger? logger = null)
         {
             // TODO: Configure Retry Handler
             _options = options;
@@ -53,6 +54,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private protected virtual ITextCompletion _CreateTextCompletionService(TOptions options)
         {
+            Verify.NotNull(options, nameof(options));
+
             return new OpenAITextCompletion(
                 options.DefaultModel,
                 options.ApiKey,
@@ -63,6 +66,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private protected virtual IChatCompletion _CreateChatCompletionService(TOptions options)
         {
+            Verify.NotNull(options, nameof(options));
+
             return new OpenAIChatCompletion(
                 options.DefaultModel,
                 options.ApiKey,
@@ -71,8 +76,12 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
         /// <inheritdoc/>
-        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
+        public virtual async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(options, nameof(options));
+
             string model = _GetModel(promptTemplate);
             string result;
             int completionTokens;
@@ -124,6 +133,10 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <inheritdoc/>
         public async Task<Plan> GeneratePlanAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(options, nameof(options));
+
             string result;
             try
             {
@@ -133,15 +146,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 // Ensure we weren't rate limited
                 if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
                 {
-                    {
-                        return new Plan
-                        {
-                            Commands =
-                            {
-                                new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName)
-                            }
-                        };
-                    }
+                    Plan plan = new();
+                    plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
+                    return plan;
                 }
 
                 throw;
@@ -160,7 +167,16 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 // TODO: Remove response prefix - once Conversation History & TurnState is ported
 
                 // Parse response into commands
-                Plan plan = ResponseParser.ParseResponse(result.Trim());
+                Plan? plan;
+                try
+                {
+                    plan = ResponseParser.ParseResponse(result.Trim());
+                    Verify.NotNull(plan, nameof(plan));
+                } catch (Exception ex)
+                {
+                    throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
+                }
+
 
                 // Filter to only a single SAY command
                 if (_options.OneSayPerTurn)
@@ -189,16 +205,22 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
         private async Task<ITextResult> _CreateTextCompletion(PromptTemplate promptTemplate, CancellationToken cancellationToken)
         {
-                var skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
+            Verify.NotNull(promptTemplate, nameof(promptTemplate));
 
-                ITextCompletion textCompletion = _kernel.GetService<ITextCompletion>();
+            var skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
 
-                var completions = await textCompletion.GetCompletionsAsync(promptTemplate.Text, CompleteRequestSettings.FromCompletionConfig(skPromptTemplate.Completion), cancellationToken);
-                return completions[0];
+            ITextCompletion textCompletion = _kernel.GetService<ITextCompletion>();
+
+            var completions = await textCompletion.GetCompletionsAsync(promptTemplate.Text, CompleteRequestSettings.FromCompletionConfig(skPromptTemplate.Completion), cancellationToken);
+            return completions[0];
         }
 
         private async Task<IChatResult> _CreateChatCompletion(TState turnState, AIOptions<TState> options, PromptTemplate promptTemplate, CancellationToken cancellationToken)
         {
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(options, nameof(options));
+            Verify.NotNull(promptTemplate, nameof(promptTemplate));
+
             PromptTemplateConfig templateConfig = promptTemplate.Configuration.GetPromptTemplateConfig();
             ChatRequestSettings chatRequestSettings = new()
             {

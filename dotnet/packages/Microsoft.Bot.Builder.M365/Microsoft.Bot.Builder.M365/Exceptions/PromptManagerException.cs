@@ -9,5 +9,9 @@ namespace Microsoft.Bot.Builder.M365.Exceptions
         public PromptManagerException(string message) : base(message)
         {
         }
+
+        public PromptManagerException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

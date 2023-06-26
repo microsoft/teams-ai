@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
+using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -14,7 +15,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <summary>
         /// The prompt manager to use for generating prompts.
         /// </summary>
-        public PromptManager<TState> PromptManager { get; set; }
+        public IPromptManager<TState> PromptManager { get; set; }
 
         /// <summary>
         /// Optional. The moderator to use for moderating input passed to the model and the output
@@ -51,6 +52,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="history">Optional. The history options to use for the AI system.</param>
         public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, IModerator<TState> moderator, string? prompt = null, AIHistoryOptions? history = null)
         {
+            Verify.NotNull(planner, nameof(planner));
+            Verify.NotNull(promptManager, nameof(promptManager));
+            Verify.NotNull(moderator, nameof(moderator));
+
             Planner = planner;
             PromptManager = promptManager;
             Moderator = moderator;

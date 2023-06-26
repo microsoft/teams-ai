@@ -7,6 +7,8 @@ using Microsoft.Bot.Builder.M365.AI;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Teams;
+using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -33,8 +35,10 @@ namespace Microsoft.Bot.Builder.M365
         /// Creates a new Application instance.
         /// </summary>
         /// <param name="options">Optional. Options used to configure the application.</param>
-        public Application(ApplicationOptions<TState> options)
+        public Application(ApplicationOptions<TState> options, ILogger? logger = null)
         {
+            Verify.NotNull(options);
+
             _options = options;
 
             if (_options.TurnStateManager == null)
@@ -45,7 +49,7 @@ namespace Microsoft.Bot.Builder.M365
 
             if (_options.AI != null)
             {
-                _ai = new AI<TState>(_options.AI);
+                _ai = new AI<TState>(_options.AI, logger);
             }
 
         }
@@ -142,8 +146,8 @@ namespace Microsoft.Bot.Builder.M365
                 if (_options.StartTypingTimer)
                 {
                     timer = new TypingTimer(_typingTimerDelay);
-                    timer.StartTypingTimer(turnContext);
-                }
+                    timer.Start(turnContext);
+                };
 
                 // Remove @mentions
                 if (_options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
@@ -174,8 +178,8 @@ namespace Microsoft.Bot.Builder.M365
             }
             finally
             {
-                // End typing timer if configured
-                timer?.StopTypingTimer();
+                // Dipose the timer if configured
+                timer?.Dispose();
             }
 
 

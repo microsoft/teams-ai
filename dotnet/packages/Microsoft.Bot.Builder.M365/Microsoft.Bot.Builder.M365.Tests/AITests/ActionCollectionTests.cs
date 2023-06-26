@@ -76,5 +76,21 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             // Assert
             Assert.False(hasAction);
         }
+
+        [Fact]
+        public void Test_HasAction_True()
+        {
+            // Arrange
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
+            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            var name = "actionName";
+
+            // Act
+            actionCollection.SetAction(name, handler, true);
+            bool hasAction = actionCollection.HasAction(name);
+
+            // Assert
+            Assert.True(hasAction);
+        }
     }
 }
