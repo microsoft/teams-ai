@@ -146,13 +146,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 // Ensure we weren't rate limited
                 if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
                 {
-                    {
-                        Plan plan = new();
-                        plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
-                        return plan;
-                            }
-                        };
-                    }
+                    Plan plan = new();
+                    plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
+                    return plan;
                 }
 
                 throw;

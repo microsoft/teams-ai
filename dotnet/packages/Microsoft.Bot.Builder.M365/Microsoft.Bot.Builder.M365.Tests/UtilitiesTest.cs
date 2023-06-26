@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Bot.Builder.M365.Utilities;
+﻿using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365.Tests
 {
