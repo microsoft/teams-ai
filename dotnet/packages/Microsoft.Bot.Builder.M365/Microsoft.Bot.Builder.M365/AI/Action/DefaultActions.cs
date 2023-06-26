@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
+    // TODO: Resolve this issue before private preview. Need more research and thinking. How are developers going to use this?
+    // 1. Unused parameters, 2. Making the data parameter type more explicit and not just "object".
     public class DefaultActions<TState> where TState : TurnState
     {
         private readonly ILogger? _logger;
@@ -64,7 +66,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
             if (doCommandActionData.PredictedDoCommand == null)
             {
                 throw new Exception("Unexpected `data` object: PredictedDoCommand does not exist");
-            }   
+            }
 
             ActionHandler<TState> handler = doCommandActionData.Handler;
 

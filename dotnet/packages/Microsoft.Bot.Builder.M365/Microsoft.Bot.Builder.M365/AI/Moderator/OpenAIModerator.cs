@@ -34,7 +34,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewPrompt(TurnContext turnContext, TState turnState, PromptTemplate prompt)
+        public async Task<Plan?> ReviewPrompt(ITurnContext turnContext, TState turnState, PromptTemplate prompt)
         {
             switch (_options.Moderate)
             {
@@ -55,7 +55,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewPlan(TurnContext turnContext, TState turnState, Plan plan)
+        public async Task<Plan> ReviewPlan(ITurnContext turnContext, TState turnState, Plan plan)
         {
             switch (_options.Moderate)
             {

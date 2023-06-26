@@ -31,7 +31,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
             if (_options.Moderator == null)
             {
-                // TODO: Set default moderator
+                _options.Moderator = new DefaultModerator<TState>();
             }
 
             _options.History ??= new AIHistoryOptions();
@@ -226,10 +226,15 @@ namespace Microsoft.Bot.Builder.M365.AI
             // Render the prompt
             PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
 
-            // TODO: Implement moderator
+            // Review prompt
+            Plan? plan = await aIOptions.Moderator.ReviewPrompt(turnContext, turnState, renderedPrompt);
 
-            // Generate plan
-            Plan plan = await aIOptions.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
+            if (plan == null)
+            {
+                // Generate plan
+                plan = await aIOptions.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
+                plan = await aIOptions.Moderator.ReviewPlan(turnContext, turnState, plan);
+            }
 
             // Process generated plan
             bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler(turnContext, turnState, plan);
