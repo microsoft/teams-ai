@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.AI;
+using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
@@ -46,8 +47,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
 
             var options = new OpenAIPlannerOptions(config.ApiKey, config.ModelId);
             var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
+            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TurnState>();
 
@@ -86,8 +88,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
 
             var options = new OpenAIPlannerOptions(config.ApiKey, config.ChatModelId);
             var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
+            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TurnState>();
 
@@ -123,8 +126,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
 
             var options = new OpenAIPlannerOptions(invalidApiKey, config.ChatModelId);
             var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
+            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TurnState>();
 
@@ -157,8 +161,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
 
             var options = new OpenAIPlannerOptions(config.ApiKey, "invalidModel");
             var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
+            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TurnState>();
 
