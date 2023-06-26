@@ -76,7 +76,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
         /// <inheritdoc/>
-        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
+        public virtual async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
             Verify.NotNull(turnContext, nameof(turnContext));
             Verify.NotNull(turnState, nameof(turnState));
@@ -167,7 +167,16 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 // TODO: Remove response prefix - once Conversation History & TurnState is ported
 
                 // Parse response into commands
-                Plan plan = ResponseParser.ParseResponse(result.Trim());
+                Plan? plan;
+                try
+                {
+                    plan = ResponseParser.ParseResponse(result.Trim());
+                    Verify.NotNull(plan, nameof(plan));
+                } catch (Exception ex)
+                {
+                    throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
+                }
+
 
                 // Filter to only a single SAY command
                 if (_options.OneSayPerTurn)
