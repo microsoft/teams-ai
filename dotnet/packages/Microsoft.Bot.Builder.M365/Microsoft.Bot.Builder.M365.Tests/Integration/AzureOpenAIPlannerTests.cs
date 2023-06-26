@@ -9,12 +9,12 @@ using Xunit.Abstractions;
 
 namespace Microsoft.Bot.Builder.M365.Tests.Integration
 {
-    public sealed class OpenAICompletionTests
+    public sealed class AzureOpenAICompletionTests
     {
         private readonly IConfigurationRoot _configuration;
         private readonly RedirectOutput _output;
 
-        public OpenAICompletionTests(ITestOutputHelper output)
+        public AzureOpenAICompletionTests(ITestOutputHelper output)
         {
             _output = new RedirectOutput(output);
 
@@ -31,21 +31,18 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile(path: settingsPath, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
-                .AddUserSecrets<OpenAICompletionTests>()
+                .AddUserSecrets<AzureOpenAICompletionTests>()
                 .Build();
         }
 
-        [Theory(Skip = "OpenAI will throttle requests. This test should only be run manually.")]
+        [Theory(Skip = "AzureOpenAI will throttle requests. This test should only be run manually.")]
         [InlineData("What is the capital city of Thailand?", "Bangkok")]
-        public async Task OpenAIPlanner_CompletePromptAsync_TextCompletion(string prompt, string expectedAnswerContains)
+        public async Task AzureOpenAIPlanner_CompletePromptAsync_TextCompletion(string prompt, string expectedAnswerContains)
         {
             // Arrange
-            var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
-            Assert.NotNull(config.ApiKey);
-            Assert.NotNull(config.ChatModelId);
-
-            var options = new OpenAIPlannerOptions(config.ApiKey, config.ModelId);
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var config = _configuration.GetSection("AzureOpenAI").Get<AzureOpenAIConfiguration>();
+            var options = new AzureOpenAIPlannerOptions(config.ApiKey, config.ModelId, config.Endpoint);
+            var planner = new AzureOpenAIPlanner<TurnState>(options, _output);
 
             var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
             var turnContextMock = new Mock<ITurnContext>();
@@ -75,17 +72,17 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             Assert.Contains("PROMPT", _output.GetLogs());
         }
 
-        [Theory(Skip = "OpenAI will throttle requests. This test should only be run manually.")]
+        [Theory(Skip = "AzureOpenAI will throttle requests. This test should only be run manually.")]
         [InlineData("What city is the capital of British Columbia, Canada?", "Victoria")]
-        public async Task OpenAIPlanner_CompletePromptAsync_ChatCompletion(string prompt, string expectedAnswerContains)
+        public async Task AzureOpenAIPlanner_CompletePromptAsync_ChatCompletion(string prompt, string expectedAnswerContains)
         {
             // Arrange
-            var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
+            var config = _configuration.GetSection("AzureOpenAI").Get<AzureOpenAIConfiguration>();
             Assert.NotNull(config.ApiKey);
             Assert.NotNull(config.ChatModelId);
 
-            var options = new OpenAIPlannerOptions(config.ApiKey, config.ChatModelId);
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var options = new AzureOpenAIPlannerOptions(config.ApiKey, config.ChatModelId, config.Endpoint);
+            var planner = new AzureOpenAIPlanner<TurnState>(options, _output);
 
             var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
             var turnContextMock = new Mock<ITurnContext>();
@@ -113,16 +110,16 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             Assert.Contains("CHAT", _output.GetLogs());
         }
 
-        [Fact(Skip = "OpenAI will throttle requests. This test should only be run manually.")]
-        public async Task OpenAIPlanner_CompletePromptAsync_Unauthorized()
+        [Fact(Skip = "AzureOpenAI will throttle requests. This test should only be run manually.")]
+        public async Task AzureOpenAIPlanner_CompletePromptAsync_Unauthorized()
         {
             // Arrange
-            var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
+            var config = _configuration.GetSection("AzureOpenAI").Get<AzureOpenAIConfiguration>();
             Assert.NotNull(config.ChatModelId);
             var invalidApiKey = "invalidApiKey";
 
-            var options = new OpenAIPlannerOptions(invalidApiKey, config.ChatModelId);
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var options = new AzureOpenAIPlannerOptions(invalidApiKey, config.ChatModelId, config.Endpoint);
+            var planner = new AzureOpenAIPlanner<TurnState>(options, _output);
 
             var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
             var turnContextMock = new Mock<ITurnContext>();
@@ -148,15 +145,15 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             Assert.Equal("Failed to perform AI prompt completion: Access denied: The request is not authorized, HTTP status: 401", exception.Message);
         }
 
-        [Fact(Skip = "OpenAI will throttle requests. This test should only be run manually.")]
-        public async Task OpenAIPlanner_CompletePromptAsync_InvalidModel_InvalidRequest()
+        [Fact(Skip = "AzureOpenAI will throttle requests. This test should only be run manually.")]
+        public async Task AzureOpenAIPlanner_CompletePromptAsync_InvalidModel_InvalidRequest()
         {
             // Arrange
-            var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
+            var config = _configuration.GetSection("AzureOpenAI").Get<AzureOpenAIConfiguration>();
             Assert.NotNull(config.ApiKey);
 
-            var options = new OpenAIPlannerOptions(config.ApiKey, "invalidModel");
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
+            var options = new AzureOpenAIPlannerOptions(config.ApiKey, "invalidModel", config.Endpoint);
+            var planner = new AzureOpenAIPlanner<TurnState>(options, _output);
 
             var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), new Moderator<TurnState>());
             var turnContextMock = new Mock<ITurnContext>();
