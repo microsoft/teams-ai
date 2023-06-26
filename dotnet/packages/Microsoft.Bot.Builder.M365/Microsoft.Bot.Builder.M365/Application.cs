@@ -50,7 +50,6 @@ namespace Microsoft.Bot.Builder.M365
             if (_options.AI != null)
             {
                 _ai = new AI<TState>(_options.AI, logger);
-                _ai = null;
             }
 
         }
@@ -145,10 +144,10 @@ namespace Microsoft.Bot.Builder.M365
             {
                 // Start typing timer if configured
                 if (_options.StartTypingTimer)
-                    timer = new TypingTimer(_options.TypingTimerDelay);
+                {
+                    timer = new TypingTimer(_typingTimerDelay);
                     timer.Start(turnContext);
-                    timer.StartTypingTimer(turnContext);
-                }
+                };
 
                 // Remove @mentions
                 if (_options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
