@@ -1,3 +1,4 @@
+// TODO: Remove these lines once the linting issues are resolved:
 /* eslint-disable jsdoc/require-returns */
 /* eslint-disable security/detect-object-injection */
 /**
@@ -39,7 +40,7 @@ export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
  * An Azure OpenAI moderator that uses OpenAI's moderation API to review prompts and plans for safety.
  *
  * @remarks
- * This moderation can be configure to review the input from the user, output from the model, or both.
+ * This moderation can be configured to review the input from the user, output from the model, or both.
  * @template TState Optional. Type of the applications turn state.
  */
 export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> extends OpenAIModerator<TState> {
@@ -56,7 +57,7 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
         const moderatorOptions: AzureOpenAIModeratorOptions = {
             apiKey: options.apiKey,
             moderate: options.moderate ?? 'both',
-            categories: options.categories,
+            categories: options.categories ?? ['Hate', 'Sexual', 'SelfHarm', 'Violence'],
             endpoint: options.endpoint,
             apiVersion: options.apiVersion
         };
@@ -149,7 +150,7 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                 if (result) {
                     if (result.flagged) {
                         // Input flagged
-                        console.log(`ReviewPrompt: Azure Content Safety Result: ${JSON.stringify(result)}`);
+                        console.info(`ReviewPrompt: Azure Content Safety Result: ${JSON.stringify(result)}`);
                         return {
                             type: 'plan',
                             commands: [
@@ -189,12 +190,13 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                 for (let i = 0; i < plan.commands.length; i++) {
                     const cmd = plan.commands[i];
                     if (cmd.type == 'SAY') {
-                        const output = (cmd as PredictedSayCommand).response;
+                        const predictedSayCommand = cmd as PredictedSayCommand;
+                        const output = predictedSayCommand.response;
                         const result = await this.createModeration(output);
                         if (result) {
                             if (result.flagged) {
                                 // Output flagged
-                                console.log(`ReviewPlan: Azure Content Safety Result: ${JSON.stringify(result)}`);
+                                console.info(`ReviewPlan: Azure Content Safety Result: ${JSON.stringify(result)}`);
                                 return {
                                     type: 'plan',
                                     commands: [

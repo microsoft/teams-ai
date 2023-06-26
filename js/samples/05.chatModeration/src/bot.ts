@@ -15,7 +15,6 @@ export type ApplicationTurnState = DefaultTurnState<DefaultConversationState>;
 type TData = Record<string, any>;
 
 // Create AI components
-//
 // Create a planner
 const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.AZURE_OPENAI_KEY!,

@@ -9,5 +9,5 @@ You must return the following JSON structure:
 Always respond in the form of a JSON based plan. Stick with DO/SAY.
 
 {{$history}}
-Human: {{$input}}
+User: {{$input}}
 AI assistant: 

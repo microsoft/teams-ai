@@ -1,23 +1,22 @@
-# Teams Echo Bot
+# Chat Bot with Moderation Control
 
-This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+This sample shows how to incorporate Azure Open AI Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
--   [Teams Echo Bot](#teams-echo-bot)
-    -   [Setting up the sample](#setting-up-the-sample)
-    -   [Interacting with the bot](#interacting-with-the-bot)
-    -   [Multiple ways to test](#multiple-ways-to-test)
-        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
-        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
-    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
-    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator-1)
-        -   [Directions](#directions)
-    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
-    -   [Further reading](#further-reading)
+- [Chat Moderation Bot](#chat-bot-with-moderation-control)
+  - [Setting up the sample](#setting-up-the-sample)
+  - [Interacting with the bot](#interacting-with-the-bot)
+  - [Multiple ways to test](#multiple-ways-to-test)
+    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+    - [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+    - [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+  - [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+    - [Directions](#directions)
+  - [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+  - [Further reading](#further-reading)
 
 <!-- /code_chunk_output -->
 
@@ -40,7 +39,7 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/05.chatModeration/
     yarn start
     ```
 
@@ -52,7 +51,7 @@ You can interact with this bot by sending it a message, which will echo back to 
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below.
 
-Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-botframework-emulator) section.
 
 ### Using Teams Toolkit for Visual Studio Code
 
@@ -93,7 +92,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/05.chatModeration/
     teamsfx provision --env local
 
     ```
@@ -114,10 +113,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.echobot/`
+1. In a terminal, navigate to `teams-ai/js/samples/05.chatModeration/`
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/05.chatModeration/
     ```
 
 1. Run ngrok tunneling service - point to port 3978
@@ -164,9 +163,9 @@ yarn start
 
 ![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
 
--   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
--   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
--   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
+- In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+- Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+- If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 
 ## Deploy the bot to Azure
 
@@ -176,5 +175,5 @@ Alternatively, you can learn more about deploying a bot to Azure manually in the
 
 ## Further reading
 
--   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
--   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
+- [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
+- [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
