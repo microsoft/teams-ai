@@ -25,7 +25,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
                 throw new InvalidOperationException("Unable to determine current assembly directory.");
             }
 
-            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../Integration/"));
+            var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../IntegrationTests/"));
             var settingsPath = Path.Combine(directoryPath, "testsettings.json");
 
             _configuration = new ConfigurationBuilder()
