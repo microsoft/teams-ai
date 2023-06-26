@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.TemplateEngine;
@@ -26,6 +27,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <inheritdoc />
         public IPromptManager<TState> AddFunction(string name, PromptFunction<TState> promptFunction, bool allowOverrides = false)
         {
+            Verify.NotNull(name, nameof(name));
+            Verify.NotNull(promptFunction, nameof(promptFunction));
+
             if (!_functions.ContainsKey(name) || allowOverrides)
             {
                 _functions[name] = new TemplateFunctionEntry<TState>(promptFunction, allowOverrides);
@@ -49,6 +53,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <inheritdoc />
         public IPromptManager<TState> AddPromptTemplate(string name, PromptTemplate promptTemplate)
         {
+            Verify.NotNull(name, nameof(name));
+            Verify.NotNull(promptTemplate, nameof(promptTemplate));
+
             if (_templates.ContainsKey(name))
             {
                 throw new PromptManagerException($"Text template `{name}` already exists.");
@@ -62,6 +69,10 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <inheritdoc />
         public Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name)
         {
+            Verify.NotNull(turnContext, nameof(turnContext));
+            Verify.NotNull(turnState, nameof(turnState));
+            Verify.NotNull(name, nameof(name));
+
             if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> value))
             {
                 PromptFunction<TState> handler = value.Handler;
@@ -74,7 +85,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
 
         /// <inheritdoc />
         public PromptTemplate LoadPromptTemplate(string name)
-        {   
+        {
+            Verify.NotNull(name, nameof(name));
+
             if (_templates.TryGetValue(name, out PromptTemplate template))
             {
                 return template;
@@ -91,6 +104,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <summary>
         /// Renders a prompt template by name.
         /// </summary>
+        /// <param name="kernel">The semantic kernel</param>
         /// <param name="turnContext">Current application turn context.</param>
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
@@ -107,6 +121,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <summary>
         /// Renders a prompt template.
         /// </summary>
+        /// <param name="kernel">The semantic kernel</param>
         /// <param name="turnContext">Current application turn context.</param>
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
