@@ -20,11 +20,13 @@ export interface TurnState {
 
 /**
  * Interface implemented by classes responsible for loading and saving an applications turn state.
+ *
  * @template TState Type of the state object being persisted.
  */
 export interface TurnStateManager<TState extends TurnState> {
     /**
      * Loads all of the state scopes for the current turn.
+     *
      * @param storage Storage provider to load state scopes from.
      * @param context Context for the current turn of conversation with the user.
      * @returns The loaded state scopes.
@@ -33,6 +35,7 @@ export interface TurnStateManager<TState extends TurnState> {
 
     /**
      * Saves all of the state scopes for the current turn.
+     *
      * @param storage Storage provider to save state scopes to.
      * @param context Context for the current turn of conversation with the user.
      * @param state State scopes to save.
@@ -42,6 +45,7 @@ export interface TurnStateManager<TState extends TurnState> {
 
 /**
  * Accessor class for managing an individual state scope.
+ *
  * @template TValue Optional. Strongly typed value of the state scope.
  */
 export class TurnStateEntry<TValue extends Record<string, any> = Record<string, any>> {
@@ -52,8 +56,9 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
 
     /**
      * Creates a new instance of the `TurnStateEntry` class.
-     * @param value Optional. Value to initialize the state scope with. The default is an {} object.
-     * @param storageKey Optional. Storage key to use when persisting the state scope.
+     *
+     * @param {TValue} value Optional. Value to initialize the state scope with. The default is an {} object.
+     * @param {string} storageKey Optional. Storage key to use when persisting the state scope.
      */
     public constructor(value?: TValue, storageKey?: string) {
         this._value = value || ({} as TValue);
@@ -62,7 +67,10 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
     }
 
     /**
+    /**
      * Gets a value indicating whether the state scope has changed since it was last loaded.
+     *
+     * @returns {boolean} A value indicating whether the state scope has changed.
      */
     public get hasChanged(): boolean {
         return JSON.stringify(this._value) != this._hash;
@@ -70,6 +78,8 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
 
     /**
      * Gets a value indicating whether the state scope has been deleted.
+     *
+     * @returns {boolean} A value indicating whether the state scope has been deleted.
      */
     public get isDeleted(): boolean {
         return this._deleted;
@@ -77,6 +87,8 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
 
     /**
      * Gets the value of the state scope.
+     *
+     * @returns {TValue} The value of the state scope.
      */
     public get value(): TValue {
         if (this.isDeleted) {
@@ -90,6 +102,8 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
 
     /**
      * Gets the storage key used to persist the state scope.
+     *
+     * @returns {string | undefined} The storage key used to persist the state scope.
      */
     public get storageKey(): string | undefined {
         return this._storageKey;
@@ -104,7 +118,8 @@ export class TurnStateEntry<TValue extends Record<string, any> = Record<string, 
 
     /**
      * Replaces the state scope with a new value.
-     * @param value New value to replace the state scope with.
+     *
+     * @param {TValue} value New value to replace the state scope with.
      */
     public replace(value?: TValue): void {
         this._value = value || ({} as TValue);

@@ -27,7 +27,8 @@ const DEFAULT_TASK_DATA_FILTER = 'verb';
 export interface TaskModulesOptions {
     /**
      * Data field to use to identify the verb of the handler to trigger.
-     * @remarks
+     *
+     * @summary
      * When a task module is triggered, the field name specified here will be used to determine
      * the name of the verb for the handler to route the request to.
      *
@@ -38,6 +39,7 @@ export interface TaskModulesOptions {
 
 /**
  * TaskModules class to enable fluent style registration of handlers related to Task Modules.
+ *
  * @template TState Type of the turn state object being persisted.
  */
 export class TaskModules<TState extends TurnState> {
@@ -45,7 +47,8 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Creates a new instance of the TaskModules class.
-     * @param app Top level application class to register handlers with.
+     *
+     * @param {Application} app Top level application class to register handlers with.
      */
     public constructor(app: Application<TState>) {
         this._app = app;
@@ -53,24 +56,24 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch of the task module.
-     * @remarks
+     *
+     * @summary
      * Handlers should respond with either an initial TaskInfo object or a string containing
      * a message to display to the user.
+     *
      * @template TData Optional. Type of the data object being passed to the handler.
-     * @param verb Name of the verb(s) to register the handler for.
-     * @param handler Function to call when the handler is triggered.
-     * @param handler.context Context for the current turn of conversation with the user.
-     * @param handler.state Current state of the turn.
-     * @param handler.data Data object passed to the handler.
-     * @returns The application for chaining purposes.
+     *
+     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} verb - Name of the verb(s) to register the handler for.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string>} handler - Function to call when the handler is triggered.
+     * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
+     * @param {TState} handler.state - Current state of the turn.
+     * @param {TData} handler.data - Data object passed to the handler.
+     *
+     * @returns {Application<TState>} The application for chaining purposes.
      */
-    public fetch<TData extends Record<string,any> = Record<string,any>>(
+    public fetch<TData extends Record<string, any> = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (
-            context: TurnContext,
-            state: TState,
-            data: TData
-            ) => Promise<TaskModuleTaskInfo | string>
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string>
     ): Application<TState> {
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
             const filterField = this._app.options.taskModules?.taskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
@@ -126,18 +129,22 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the submission of a task module.
-     * @remarks
+     *
+     * @summary
      * Handlers should respond with another TaskInfo object, message string, or `null` to indicate
      * the task is completed.
+     *
      * @template TData Optional. Type of the data object being passed to the handler.
-     * @param verb Name of the verb(s) to register the handler for.
-     * @param handler Function to call when the handler is triggered.
-     * @param handler.context Context for the current turn of conversation with the user.
-     * @param handler.state Current state of the turn.
-     * @param handler.data Data object passed to the handler.
-     * @returns The application for chaining purposes.
+     *
+     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} verb - Name of the verb(s) to register the handler for.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string | null | undefined>} handler - Function to call when the handler is triggered.
+     * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
+     * @param {TState} handler.state - Current state of the turn.
+     * @param {TData} handler.data - Data object passed to the handler.
+     *
+     * @returns {Application<TState>} The application for chaining purposes.
      */
-    public submit<TData extends Record<string,any> = Record<string,any>>(
+    public submit<TData extends Record<string, any> = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
             context: TurnContext,
@@ -199,7 +206,17 @@ export class TaskModules<TState extends TurnState> {
 }
 
 /**
+ * Creates a route selector function for a given verb, filter field, and invoke name.
+ *
+ * @param {string | RegExp | RouteSelector} verb - The verb to match.
+ * @param {string} filterField - The field to use for filtering.
+ * @param {string} invokeName - The name of the invoke action.
+ *
+ * @returns {RouteSelector} The route selector function.
  * @private
+ * @summary
+ * This function is used to create a route selector function for a given verb, filter field, and invoke name.
+ * The route selector function is used to match incoming requests to the appropriate handler function.
  */
 function createTaskSelector(
     verb: string | RegExp | RouteSelector,
@@ -213,12 +230,14 @@ function createTaskSelector(
         // Return a function that matches the verb using a RegExp
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
+            const data = context?.activity?.value?.data;
             if (
                 isInvoke &&
-                typeof context?.activity?.value?.data == 'object' &&
-                typeof context.activity.value.data[filterField] == 'string'
+                typeof data == 'object' &&
+                typeof data[filterField] == 'string' &&
+                Object.keys(data).length === 1 // Ensure that data only contains the filterField property
             ) {
-                return Promise.resolve(verb.test(context.activity.value.data[filterField]));
+                return Promise.resolve(verb.test(data[filterField]));
             } else {
                 return Promise.resolve(false);
             }
@@ -227,10 +246,9 @@ function createTaskSelector(
         // Return a function that attempts to match verb
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
+            const data = context?.activity?.value?.data;
             return Promise.resolve(
-                isInvoke &&
-                typeof context?.activity?.value?.data == 'object' &&
-                context.activity.value.data[filterField] == verb
+                isInvoke && typeof data == 'object' && data[filterField] == verb && Object.keys(data).length === 1 // Ensure that data only contains the filterField property
             );
         };
     }

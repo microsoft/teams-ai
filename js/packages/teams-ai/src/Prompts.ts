@@ -70,7 +70,8 @@ export interface PromptTemplateConfig {
 
     /**
      * Optional. Array of backends (models) to use for the prompt.
-     * @remarks
+     *
+     * @summary
      * Passing the name of a model to use here will override the default model used by a planner.
      */
     default_backends?: string[];
@@ -97,7 +98,8 @@ export interface PromptTemplate {
 export interface PromptManager<TState extends TurnState> {
     /**
      * Adds a custom function <name> to the prompt manager.
-     * @remarks
+     *
+     * @summary
      * Functions added to the prompt manager can be invoked by name from within a prompt template.
      * @param name The name of the function.
      * @param handler Promise to return on function name match.
@@ -112,6 +114,7 @@ export interface PromptManager<TState extends TurnState> {
 
     /**
      * Adds a prompt template to the prompt manager.
+     *
      * @param name Name of the prompt template.
      * @param template Prompt template to add.
      * @returns The prompt manager for chaining.
@@ -120,6 +123,7 @@ export interface PromptManager<TState extends TurnState> {
 
     /**
      * Invokes a function by name.
+     *
      * @param context Current application turn context.
      * @param state Current turn state.
      * @param name Name of the function to invoke.
@@ -129,6 +133,7 @@ export interface PromptManager<TState extends TurnState> {
 
     /**
      * Renders a prompt template by name.
+     *
      * @param context Current application turn context.
      * @param state Current turn state.
      * @param nameOrTemplate Name of the prompt template to render or a prompt template to render.
