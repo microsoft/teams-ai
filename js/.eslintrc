@@ -45,7 +45,8 @@
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "prettier/prettier": "error"
+        "prettier/prettier": "error",
+        "jsdoc/empty-tags": "off"
         // Currently samples contain no frontend
         // "react/react-in-jsx-scope": "off",
         // "react/prop-types": "off"
