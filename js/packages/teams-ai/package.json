@@ -37,7 +37,13 @@
         "@types/node": "^20.3.1",
         "eslint": "^8.42.0",
         "jsonwebtoken": "^9.0.0",
-        "typescript": "^5.1.6"
+        "typescript": "^5.1.6",
+        "@types/mocha": "^10.0.1",
+        "@types/assert": "^1.5.6",
+        "mocha": "10.2.0",
+        "nyc": "^15.1.0",
+        "shx": "^0.3.4",
+        "ts-mocha": "10.0.0",
     },
     "scripts": {
         "build": "tsc -b",
@@ -46,8 +52,9 @@
         "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
-        "test": "npm-run-all build test:mocha",
-        "test:mocha": "nyc mocha tests",
+        "test": "ts-mocha src/**/*.spec.ts --timeout 10000",
+        "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
+        "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
         "test:compat": "api-extractor run --verbose"
     },
     "files": [
