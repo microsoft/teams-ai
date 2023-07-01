@@ -8,6 +8,7 @@ import {
     AzureOpenAIModerator,
     DefaultConversationState
 } from '@microsoft/teams-ai';
+import { ModerationSeverity } from '@microsoft/teams-ai/lib/OpenAIClients';
 import { MemoryStorage, TurnContext } from 'botbuilder';
 import * as path from 'path';
 
@@ -24,12 +25,31 @@ const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
 });
 
 // Create a moderator
-const moderator = new AzureOpenAIModerator<ApplicationTurnState>({
+const moderator =  new AzureOpenAIModerator<ApplicationTurnState>({
     apiKey: process.env.AZURE_MODERATOR_API_KEY!,
     endpoint: process.env.AZURE_MODERATOR_ENDPOINT!,
     apiVersion: '2023-04-30-preview',
     moderate: 'both',
-    categories: ['Hate', 'Sexual', 'SelfHarm', 'Violence']
+    categories: [
+        {
+            category: 'Hate',
+            severity: ModerationSeverity.Safe
+        },
+        {
+            category: 'SelfHarm',
+            severity: ModerationSeverity.High
+        },
+        {
+            category: 'Sexual',
+            severity: ModerationSeverity.High
+        },
+        {
+            category: 'Violence',
+            severity: ModerationSeverity.High
+        }
+    ],
+    // breakByBlocklists: true,
+    // blocklistNames: [] // Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. You could attach multiple lists name here.
 });
 
 // Create a prompt manager

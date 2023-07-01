@@ -19,7 +19,10 @@ import {
     AzureOpenAIModeratorCategory,
     CreateContentSafetyResponse,
     OpenAIClientResponse,
-    ModerationResponse
+    ModerationResponse,
+    CreateContentSafetyRequest,
+    ContentSafetyHarmCategory,
+    ContentSafetyOptions
 } from './OpenAIClients';
 import { PromptTemplate } from './Prompts';
 import { ConfiguredAIOptions, AI } from './AI';
@@ -30,11 +33,26 @@ import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
  */
 export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
     /**
-     * Optional: Azure OpenAI Content Safety Categories
-     * Allowed values: "Hate", "Sexual", "SelfHarm", "Violence"
+     * Azure OpenAI Content Safety Categories.
+     * Each category is provided with a severity level threshold from 0 to 6.
+     * If the severity level of a category is greater than or equal to the threshold, the category is flagged.
      */
-    categories?: AzureOpenAIModeratorCategory[];
+    categories?: ContentSafetyHarmCategory[];
+
+    /**
+     * Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. You could attach multiple lists name here.
+     */
+    blocklistNames?: string[];
+
+    /**
+     * When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
+     * When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+     * Default value is false.
+     */
+    breakByBlocklists?: boolean;
 }
+
+const defaultHarmCategories: AzureOpenAIModeratorCategory[] = ['Hate', 'Sexual', 'SelfHarm', 'Violence'];
 
 /**
  * An Azure OpenAI moderator that uses OpenAI's moderation API to review prompts and plans for safety.
@@ -44,8 +62,9 @@ export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
  * @template TState Optional. Type of the applications turn state.
  */
 export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> extends OpenAIModerator<TState> {
-    private _harmCategories: AzureOpenAIModeratorCategory[];
+    private readonly _contentSafetyOptions: ContentSafetyOptions;
     private readonly _azureContentSafetyClient: AzureOpenAIClient;
+    private readonly _azureContentSafetyCategories: Record<string, ContentSafetyHarmCategory> = {};
 
     /**
      * Creates a new instance of the OpenAI based moderator.
@@ -54,17 +73,49 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
      */
     public constructor(options: AzureOpenAIModeratorOptions) {
         // Create the moderator options
-        const moderatorOptions: AzureOpenAIModeratorOptions = {
+        const moderatorOptions: OpenAIModeratorOptions = {
             apiKey: options.apiKey,
             moderate: options.moderate ?? 'both',
-            categories: options.categories ?? ['Hate', 'Sexual', 'SelfHarm', 'Violence'],
             endpoint: options.endpoint,
             apiVersion: options.apiVersion
         };
         super(moderatorOptions);
 
+        // Create the Azure OpenAI Content Safety client
         this._azureContentSafetyClient = this.createClient(moderatorOptions);
-        this._harmCategories = options.categories ?? [];
+
+        // Construct the content safety categories
+        let categories: AzureOpenAIModeratorCategory[] = [];
+        if (options.categories) {
+            options.categories.forEach((category) => {
+                categories.push(category.category);
+                this._azureContentSafetyCategories[category.category] = category;
+            });
+        } else {
+            categories = Object.assign([], defaultHarmCategories);
+            this._azureContentSafetyCategories.Hate = {
+                category: 'Hate',
+                severity: 6
+            };
+            this._azureContentSafetyCategories.Sexual = {
+                category: 'Sexual',
+                severity: 6
+            };
+            this._azureContentSafetyCategories.SelfHarm = {
+                category: 'SelfHarm',
+                severity: 6
+            };
+            this._azureContentSafetyCategories.Violence = {
+                category: 'Violence',
+                severity: 6
+            };
+        }
+        // Create the content safety request
+        this._contentSafetyOptions = {
+            categories: categories ?? defaultHarmCategories,
+            blocklistNames: options.blocklistNames ?? [],
+            breakByBlocklists: options.breakByBlocklists ?? false
+        };
     }
 
     /**
@@ -72,6 +123,7 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
      *
      * @protected
      * @param options The options for the moderator.
+     * @returns The Azure OpenAI client.
      */
     protected override createClient(options: OpenAIModeratorOptions): AzureOpenAIClient {
         return new AzureOpenAIClient({
@@ -86,33 +138,43 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
      * @protected
      * @param input The input to moderate.
      * @returns The moderation results.
-     * @remarks
      * This method is called by the moderator to moderate the input.
      * @template TState Optional. Type of the applications turn state.
      */
     protected async createModeration(input: string): Promise<CreateModerationResponseResultsInner | undefined> {
         const response = (await this._azureContentSafetyClient.createModeration({
             text: input,
-            categories: this._harmCategories
-        })) as OpenAIClientResponse<ModerationResponse>;
+            ...this._contentSafetyOptions
+        } as CreateContentSafetyRequest)) as OpenAIClientResponse<ModerationResponse>;
         const data = response.data as CreateContentSafetyResponse;
         if (!data) {
             return undefined;
         }
+        // Check if the input is safe for each category
+        const hateResult: boolean =
+            data.hateResult?.severity > 0 &&
+            data.hateResult.severity <= this._azureContentSafetyCategories.Hate.severity;
+        const selfHarmResult: boolean =
+            data.selfHarmResult?.severity > 0 &&
+            data.selfHarmResult.severity <= this._azureContentSafetyCategories.SelfHarm.severity;
+        const sexualResult: boolean =
+            data.sexualResult?.severity > 0 &&
+            data.sexualResult.severity <= this._azureContentSafetyCategories.Sexual.severity;
+        const violenceResult: boolean =
+            data.violenceResult?.severity > 0 &&
+            data.violenceResult.severity <= this._azureContentSafetyCategories.Violence.severity;
+
+        // Create the moderation results
         const result: CreateModerationResponseResultsInner = {
-            flagged:
-                data.hateResult?.severity > 0 ||
-                data.selfHarmResult?.severity > 0 ||
-                data.sexualResult?.severity > 0 ||
-                data.violenceResult?.severity > 0,
+            flagged: hateResult || selfHarmResult || sexualResult || violenceResult,
             categories: {
-                hate: data.hateResult?.severity > 0,
-                'hate/threatening': data.hateResult?.severity > 0,
-                'self-harm': data.selfHarmResult?.severity > 0,
-                sexual: data.sexualResult?.severity > 0,
-                'sexual/minors': data.sexualResult?.severity > 0,
-                violence: data.violenceResult?.severity > 0,
-                'violence/graphic': data.violenceResult?.severity > 0
+                hate: hateResult,
+                'hate/threatening': hateResult,
+                'self-harm': selfHarmResult,
+                sexual: sexualResult,
+                'sexual/minors': sexualResult,
+                violence: violenceResult,
+                'violence/graphic': violenceResult
             },
             category_scores: {
                 hate: data.hateResult?.severity ?? 0,
@@ -172,7 +234,7 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                 break;
             }
         }
-        return Promise.resolve(undefined);
+        return undefined;
     }
 
     /**
