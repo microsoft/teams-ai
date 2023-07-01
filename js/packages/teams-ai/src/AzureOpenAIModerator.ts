@@ -22,7 +22,8 @@ import {
     ModerationResponse,
     CreateContentSafetyRequest,
     ContentSafetyHarmCategory,
-    ContentSafetyOptions
+    ContentSafetyOptions,
+    ModerationSeverity
 } from './OpenAIClients';
 import { PromptTemplate } from './Prompts';
 import { ConfiguredAIOptions, AI } from './AI';
@@ -177,13 +178,14 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                 'violence/graphic': violenceResult
             },
             category_scores: {
-                hate: data.hateResult?.severity ?? 0,
-                'hate/threatening': data.hateResult?.severity ?? 0,
-                'self-harm': data.selfHarmResult?.severity ?? 0,
-                sexual: data.sexualResult?.severity ?? 0,
-                'sexual/minors': data.sexualResult?.severity ?? 0,
-                violence: data.violenceResult?.severity ?? 0,
-                'violence/graphic': data.violenceResult?.severity ?? 0
+                // Normalize the scores to be between 0 and 1
+                hate: (data.hateResult?.severity ?? 0) / ModerationSeverity.High,
+                'hate/threatening': (data.hateResult?.severity ?? 0) / ModerationSeverity.High,
+                'self-harm': (data.selfHarmResult?.severity ?? 0) / ModerationSeverity.High,
+                sexual: (data.sexualResult?.severity ?? 0) / ModerationSeverity.High,
+                'sexual/minors': (data.sexualResult?.severity ?? 0) / ModerationSeverity.High,
+                violence: (data.violenceResult?.severity ?? 0) / ModerationSeverity.High,
+                'violence/graphic': (data.violenceResult?.severity ?? 0) / ModerationSeverity.High
             }
         };
         return result;
@@ -212,7 +214,7 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                 if (result) {
                     if (result.flagged) {
                         // Input flagged
-                        console.info(`ReviewPrompt: Azure Content Safety Result: ${JSON.stringify(result)}`);
+                        // console.info(`ReviewPrompt: Azure Content Safety Result: ${JSON.stringify(result)}`);
                         return {
                             type: 'plan',
                             commands: [
@@ -258,7 +260,7 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                         if (result) {
                             if (result.flagged) {
                                 // Output flagged
-                                console.info(`ReviewPlan: Azure Content Safety Result: ${JSON.stringify(result)}`);
+                                // console.info(`ReviewPlan: Azure Content Safety Result: ${JSON.stringify(result)}`);
                                 return {
                                     type: 'plan',
                                     commands: [

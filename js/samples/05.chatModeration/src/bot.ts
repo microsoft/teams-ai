@@ -33,7 +33,7 @@ const moderator =  new AzureOpenAIModerator<ApplicationTurnState>({
     categories: [
         {
             category: 'Hate',
-            severity: ModerationSeverity.Safe
+            severity: ModerationSeverity.High
         },
         {
             category: 'SelfHarm',
