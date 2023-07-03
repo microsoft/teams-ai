@@ -40,6 +40,8 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
         [Theory]
         [InlineData("I hate you", true)]
         [InlineData("Turn on the light", false)]
+        [InlineData("我恨你", true)]
+        [InlineData("電気をつける", false)]
         public async Task AzureContentSafetyModerator_ReviewPrompt(string input, bool flagged)
         {
             // Arrange
@@ -48,6 +50,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             var moderator = new AzureContentSafetyModerator<TurnState>(options, _output);
 
             var botAdapterMock = new Mock<BotAdapter>();
+            // TODO: when TurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = input,
