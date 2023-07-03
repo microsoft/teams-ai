@@ -33,7 +33,7 @@ namespace Microsoft.Bot.Builder.M365.AI.AzureContentSafety
         /// <param name="request">The <see cref="AzureContentSafetyTextAnalysisRequest">.</param>
         /// <returns>The <see cref="AzureContentSafetyTextAnalysisResponse"></returns>
         /// <exception cref="AzureContentSafetyClientException" />
-        public async Task<AzureContentSafetyTextAnalysisResponse> ExecuteTextModeration(AzureContentSafetyTextAnalysisRequest request)
+        public virtual async Task<AzureContentSafetyTextAnalysisResponse> ExecuteTextModeration(AzureContentSafetyTextAnalysisRequest request)
         {
             try
             {
