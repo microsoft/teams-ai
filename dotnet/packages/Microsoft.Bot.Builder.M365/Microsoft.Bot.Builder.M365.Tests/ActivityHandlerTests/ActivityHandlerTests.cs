@@ -11,6 +11,7 @@ using Microsoft.Bot.Schema.Teams;
 using Microsoft.Rest.Serialization;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 {

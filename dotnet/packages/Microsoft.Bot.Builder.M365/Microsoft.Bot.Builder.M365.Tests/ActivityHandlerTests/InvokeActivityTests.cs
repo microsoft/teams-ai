@@ -2,12 +2,8 @@
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 {

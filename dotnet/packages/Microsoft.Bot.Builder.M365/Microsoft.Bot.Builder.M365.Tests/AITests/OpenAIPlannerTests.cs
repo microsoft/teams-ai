@@ -8,6 +8,7 @@ using AIException = Microsoft.SemanticKernel.AI.AIException;
 using Microsoft.Bot.Builder.M365.AI.Action;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder.M365.AI.Moderator;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AITests
 {

@@ -9,6 +9,7 @@ using Microsoft.Bot.Schema.Teams;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 {

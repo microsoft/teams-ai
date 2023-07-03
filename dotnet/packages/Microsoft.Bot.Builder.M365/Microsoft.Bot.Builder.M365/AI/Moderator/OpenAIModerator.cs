@@ -4,6 +4,7 @@ using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Builder.M365.OpenAI;
 using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
 {

@@ -1,9 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AI
 {

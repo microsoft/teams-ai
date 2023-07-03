@@ -2,6 +2,7 @@
 using Microsoft.Bot.Schema.Teams;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
 {

@@ -11,6 +11,7 @@ using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextCompletion;
 using Microsoft.SemanticKernel.SemanticFunctions;
 using AIException = Microsoft.SemanticKernel.AI.AIException;
 using PromptTemplate = Microsoft.Bot.Builder.M365.AI.Prompt.PromptTemplate;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {

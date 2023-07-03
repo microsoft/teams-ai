@@ -1,4 +1,5 @@
-﻿
+﻿using Microsoft.Bot.Builder.M365.State;
+
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
     public interface IPromptManager<TState> where TState : TurnState

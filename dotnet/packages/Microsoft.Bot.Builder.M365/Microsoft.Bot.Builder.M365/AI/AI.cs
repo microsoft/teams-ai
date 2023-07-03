@@ -6,6 +6,7 @@ using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.Utilities;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {

@@ -9,6 +9,7 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Teams;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder.M365.Utilities;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -37,7 +38,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="options">Optional. Options used to configure the application.</param>
         public Application(ApplicationOptions<TState> options, ILogger? logger = null)
         {
-            Verify.NotNull(options);
+            Verify.ParamNotNull(options);
 
             _options = options;
 

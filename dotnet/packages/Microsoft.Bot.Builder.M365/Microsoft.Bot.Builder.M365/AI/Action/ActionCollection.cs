@@ -1,4 +1,5 @@
-﻿
+﻿using Microsoft.Bot.Builder.M365.State;
+
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
     public class ActionCollection<TState> : IActionCollection<TState> where TState : TurnState

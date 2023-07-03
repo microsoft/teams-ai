@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Bot.Builder.M365.AI.Prompt
+﻿using Microsoft.Bot.Builder.M365.State;
+
+namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
     public delegate Task<string> PromptFunction<TState>(ITurnContext turnContext, TState turnState) where TState : TurnState;
 

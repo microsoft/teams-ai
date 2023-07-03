@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.AI;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -38,7 +39,7 @@ namespace Microsoft.Bot.Builder.M365
         /// Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
         /// be created.
         /// </summary>
-        public TurnStateManager<TState>? TurnStateManager { get; set; }
+        public ITurnStateManager<TState>? TurnStateManager { get; set; }
 
         /// <summary>
         /// Optional. If true, the bot will automatically remove mentions of the bot's name from incoming
