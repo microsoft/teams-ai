@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Action;
-using Microsoft.Bot.Builder.M365.AI.OpenAI;
+using Microsoft.Bot.Builder.M365.AI.AzureContentSafety;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Extensions.Logging;

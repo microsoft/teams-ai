@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Microsoft.Bot.Builder.M365.AI.OpenAI
+namespace Microsoft.Bot.Builder.M365.AI.AzureContentSafety
 {
     /// <summary>
     /// The client to make calls to Azure Content Safety API.
@@ -45,14 +45,14 @@ namespace Microsoft.Bot.Builder.M365.AI.OpenAI
                     Encoding.UTF8,
                     "application/json"
                 );
-                
+
                 string apiVersion = _options.ApiVersion ?? "2023-04-30-preview";
                 string url = $"{_options.Endpoint}/contentsafety/text:analyze?api-version={apiVersion}";
                 HttpResponseMessage httpResponse = await _ExecutePostRequest(url, content);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 AzureContentSafetyTextAnalysisResponse result = JsonSerializer.Deserialize<AzureContentSafetyTextAnalysisResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
-                
+
                 Verify.NotNull(result.HateResult);
                 return result;
             }

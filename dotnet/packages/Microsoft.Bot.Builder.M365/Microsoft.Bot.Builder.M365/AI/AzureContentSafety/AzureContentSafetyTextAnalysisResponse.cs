@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Microsoft.Bot.Builder.M365.AI.OpenAI
+namespace Microsoft.Bot.Builder.M365.AI.AzureContentSafety
 {
     public class AzureContentSafetyTextAnalysisResponse
     {

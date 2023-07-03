@@ -1,4 +1,4 @@
-﻿using Microsoft.Bot.Builder.M365.AI.OpenAI;
+﻿using Microsoft.Bot.Builder.M365.AI.AzureContentSafety;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
 {

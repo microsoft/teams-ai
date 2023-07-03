@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Runtime.Serialization;
 
-namespace Microsoft.Bot.Builder.M365.AI.OpenAI
+namespace Microsoft.Bot.Builder.M365.AI.AzureContentSafety
 {
     public enum AzureContentSafetyHarmCategory
     {
