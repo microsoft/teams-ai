@@ -37,7 +37,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
                 .Build();
         }
 
-        [Theory]
+        [Theory(Skip = "This test should only be run manually.")]
         [InlineData("I hate you", true)]
         [InlineData("Turn on the light", false)]
         [InlineData("我恨你", true)]
@@ -75,7 +75,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             }
         }
 
-        [Theory]
+        [Theory(Skip = "This test should only be run manually.")]
         [InlineData("I hate you", true)]
         [InlineData("The light is turned on", false)]
         public async Task AzureContentSafetyModerator_ReviewPlan(string response, bool flagged)
