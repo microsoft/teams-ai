@@ -46,7 +46,7 @@ Post:
     <summary><h3>Action mapping</h3></summary>
 Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
 
-````javascript
+```javascript
 // Add a prompt function for getting the current status of the lights
 app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
     return state.conversation.value.lightsOn ? 'on' : 'off';
@@ -71,6 +71,7 @@ app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState,
     await new Promise((resolve) => setTimeout(resolve, time));
     return true;
 });
+```
 
 </details>
 
