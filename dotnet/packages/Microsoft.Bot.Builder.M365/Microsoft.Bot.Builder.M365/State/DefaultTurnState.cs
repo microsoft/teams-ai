@@ -17,7 +17,8 @@ namespace Microsoft.Bot.Builder.M365.State
         public const string UserStateKey = "userState";
         public const string TempStateKey = "tempState";
 
-        public TurnStateEntry<TConversationState>? ConversationState {
+        public TurnStateEntry<TConversationState>? ConversationState
+        {
             get
             {
                 return Get<TConversationState>(ConversationStateKey);
@@ -63,4 +64,7 @@ namespace Microsoft.Bot.Builder.M365.State
             this[key] = castedValue;
         }
     }
+
+    public class DefaultTurnState : DefaultTurnState<Dictionary<string, object>, Dictionary<string, object>, TempState> { }
+
 }

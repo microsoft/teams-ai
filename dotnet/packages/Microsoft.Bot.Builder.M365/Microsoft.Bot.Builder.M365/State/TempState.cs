@@ -10,17 +10,24 @@ namespace Microsoft.Bot.Builder.M365.State
     /// </remarks>
     public class TempState : Dictionary<string, object>
     {
-        private string _inputKey = "input";
-        private string _outputKey = "output";
-        private string _historyKey = "history";
+        public const string InputKey = "input";
+        public const string OutputKey = "output";
+        public const string HistoryKey = "history";
+
+        public TempState() : base()
+        {
+            this[InputKey] = string.Empty;
+            this[OutputKey] = string.Empty;
+            this[HistoryKey] = string.Empty;
+        }
 
         /// <summary>
         /// Input pass to an AI prompt
         /// </summary>
         public string Input
         {
-            get => Get<string>(_inputKey);
-            set => Set(_inputKey, value);
+            get => Get<string>(InputKey)!;
+            set => Set(InputKey, value);
         }
 
         /// <summary>
@@ -28,8 +35,8 @@ namespace Microsoft.Bot.Builder.M365.State
         /// </summary>
         public string Output
         {
-            get => Get<string>(_inputKey);
-            set => Set(_outputKey, value);
+            get => Get<string>(OutputKey)!;
+            set => Set(OutputKey, value);
         }
 
         /// <summary>
@@ -37,13 +44,22 @@ namespace Microsoft.Bot.Builder.M365.State
         /// </summary>
         public string History
         {
-            get => Get<string>(_inputKey);
-            set => Set(_historyKey, value);
+            get => Get<string>(InputKey)!;
+            set => Set(HistoryKey, value);
         }
 
-        public T Get<T>(string key)
+        public T? Get<T>(string key) where T : class
         {
-            return (T)this[key];
+            if (TryGetValue(key, out object value))
+            {
+                if (value is T t)
+                {
+                    return t;
+                };
+            }
+
+            // Return null if either the key or type don't match
+            return null;
         }
 
         public void Set<T>(string key, T value)

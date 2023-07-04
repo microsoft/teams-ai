@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.Utilities;
+using System.Text.Json;
 
 namespace Microsoft.Bot.Builder.M365.State
 {
@@ -7,7 +8,7 @@ namespace Microsoft.Bot.Builder.M365.State
         private TValue _value;
         private string? _storageKey;
         private bool _deleted = false;
-        private int _hash;
+        private string _hash;
 
         public TurnStateEntry(TValue value, string? storageKey = null)
         {
@@ -15,10 +16,10 @@ namespace Microsoft.Bot.Builder.M365.State
 
             _value = value;
             _storageKey = storageKey;
-            _hash = value.GetHashCode();
+            _hash = ComputeHash(value);
         }
 
-        private TurnStateEntry(TValue value, string? storageKey, bool deleted, int hash)
+        private TurnStateEntry(TValue value, string? storageKey, bool deleted, string hash)
         {
             _value = value;
             _storageKey = storageKey;
@@ -28,7 +29,7 @@ namespace Microsoft.Bot.Builder.M365.State
 
         public bool HasChanged
         {
-            get { return _value.GetHashCode() == _hash; }
+            get { return ComputeHash(_value) != _hash; }
         }
 
         public bool IsDeleted
@@ -40,11 +41,9 @@ namespace Microsoft.Bot.Builder.M365.State
         {
             get 
             {
-                if (_deleted)
+                if (IsDeleted)
                 {
-                    // Switch to a replace scenario?
-                    // TODO: Once TValue is sorted, figure this out.
-                    throw new Exception("This entry has been deleted");
+                    _deleted = false;
                 }
 
                 return _value;
@@ -73,6 +72,13 @@ namespace Microsoft.Bot.Builder.M365.State
             if (_value is not T castedValue) return null;
 
             return new TurnStateEntry<T>(castedValue, _storageKey, _deleted, _hash);
+        }
+
+        internal static string ComputeHash(object obj)
+        {
+            Verify.ParamNotNull(obj);
+
+            return JsonSerializer.Serialize(obj, new JsonSerializerOptions() { MaxDepth = 64 });
         }
     }
 }

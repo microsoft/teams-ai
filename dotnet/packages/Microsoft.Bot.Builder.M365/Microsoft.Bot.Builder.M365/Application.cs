@@ -44,8 +44,8 @@ namespace Microsoft.Bot.Builder.M365
 
             if (_options.TurnStateManager == null)
             {
-                // TODO: set to default turn state manager
-                _options.TurnStateManager = null;
+                // TODO: Clean up the turn state class structure to avoid such casting
+                _options.TurnStateManager = (ITurnStateManager<TState>)new DefaultTurnStateManager();
             }
 
             if (_options.AI != null)
@@ -156,11 +156,21 @@ namespace Microsoft.Bot.Builder.M365
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
 
-                // TODO : Fix turn state loading, this is just a placeholder
-                TState turnState = (TState)new TurnState();
+                ITurnStateManager<TState>? turnStateManager = Options.TurnStateManager;
+                IStorage? storage = Options.Storage;
+
+                TState turnState = await turnStateManager!.LoadStateAsync(storage, turnContext);
 
                 // Call before activity handler
-                if (!await OnBeforeTurnAsync(turnContext, turnState, cancellationToken)) return;
+                if (!await OnBeforeTurnAsync(turnContext, turnState, cancellationToken))
+                {
+                    // Save turn state
+                    // - This lets the bot keep track of why it ended the previous turn. It also
+                    //   allows the dialog system to be used before the AI system is called.
+                    await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
+
+                    return;
+                };
 
                 // Call activity type specific handler
                 bool eventHandlerCalled = await RunActivityHandlerAsync(turnContext, turnState, cancellationToken);
@@ -168,13 +178,13 @@ namespace Microsoft.Bot.Builder.M365
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.ChainAsync(turnContext, turnState); 
+                    await _ai.ChainAsync(turnContext, turnState);
                 }
 
                 // Call after turn activity handler
                 if (await OnAfterTurnAsync(turnContext, turnState, cancellationToken))
                 {
-                    // TODO : Save turn state to persistent storage
+                    await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
                 };
             }
             finally

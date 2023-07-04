@@ -101,7 +101,7 @@ namespace Microsoft.Bot.Builder.M365.OpenAI
                 HttpStatusCode statusCode = response.StatusCode;
                 string failureReason = response.ReasonPhrase;
 
-                throw new OpenAIClientException($"HTTP response failure status code: ${statusCode} ({failureReason})", statusCode);
+                throw new OpenAIClientException($"HTTP response failure status code: {(int)statusCode} ({failureReason})", statusCode);
 
             }
             catch (Exception e)

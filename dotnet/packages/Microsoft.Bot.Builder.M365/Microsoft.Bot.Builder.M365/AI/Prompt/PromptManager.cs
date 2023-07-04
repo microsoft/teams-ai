@@ -158,7 +158,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             }
         }
 
-        /// TODO: Update this once turn state infrastructure is implemented
         /// <summary>
         /// Loads value from turn context and turn state into context variables.
         /// </summary>
@@ -167,8 +166,15 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <returns>Variables that could be injected into the prompt template</returns>
         internal void LoadStateIntoContext(SKContext context, ITurnContext turnContext, TState turnState)
         {
-            context["input"] = turnContext.Activity.Text;
-            // TODO: Load turn state 'temp' values into the context
+            if (turnState as object is DefaultTurnState defaultTurnState)
+            {
+                context[TempState.OutputKey] = defaultTurnState.TempState?.Value.Output ?? string.Empty;
+                context[TempState.InputKey] = defaultTurnState.TempState?.Value.Input ?? turnContext.Activity.Text;
+                context[TempState.HistoryKey] = defaultTurnState.TempState?.Value.History ?? string.Empty;
+            }
+
+            // TODO: Load arbitrary values from turn state into context
+            return;
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)

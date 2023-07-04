@@ -38,7 +38,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_LoadState_StorageProvided_ShouldPopulateTurnState()
+        public async void Test_LoadState_MockStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
             var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
@@ -73,6 +73,101 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
             Assert.Equal(state.ConversationState?.Value, conversationState);
             Assert.Equal(state.UserState?.Value, userState);
             Assert.NotNull(state.TempState);
+        }
+
+        [Fact]
+        public async void Test_LoadState_MemoryStorageProvided_ShouldPopulateTurnState()
+        {
+            // Arrange
+            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnContext = _createConfiguredTurnContext();
+            Activity activity = turnContext.Activity;
+            string channelId = activity.ChannelId;
+            string botId = activity.Recipient.Id;
+            string conversationId = activity.Conversation.Id;
+            string userId = activity.From.Id;
+
+            string conversationKey = $"{channelId}/${botId}/conversations/${conversationId}";
+            string userKey = $"{channelId}/${botId}/users/${userId}";
+
+            var conversationState = new ConversationState();
+            var userState = new UserState();
+
+            IStorage storage = new MemoryStorage();
+            IDictionary<string, object> items = new Dictionary<string, object>
+            {
+                [conversationKey] = conversationState,
+                [userKey] = userState
+            };
+            await storage.WriteAsync(items);
+
+            // Act
+            ApplicationTurnState state = await turnStateManager.LoadStateAsync(storage, turnContext);
+
+            // Assert
+            Assert.NotNull(state);
+            Assert.Equal(state.ConversationState?.Value, conversationState);
+            Assert.Equal(state.UserState?.Value, userState);
+            Assert.NotNull(state.TempState);
+        }
+
+        [Fact]
+        public async void Test_SaveState_SavesChanges()
+        {
+            // Arrange
+            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnContext = _createConfiguredTurnContext();
+
+            var storageKey = "storageKey";
+            var stateValue = new ConversationState();
+            ApplicationTurnState state = new()
+            {
+                ConversationState = new TurnStateEntry<ConversationState>(stateValue, storageKey)
+            };
+
+            var storage = new MemoryStorage();
+            var stateValueKey = "stateValueKey";
+
+            // Act
+            /// Mutate the conversation state to so that the changes are saved.
+            stateValue[stateValueKey] = "arbitaryString";
+            /// Save the state
+            await turnStateManager.SaveStateAsync(storage, turnContext, state);
+            /// Load from storage
+            IDictionary<string, object> storedItems = await storage.ReadAsync(new string[] { storageKey }, default);
+
+            // Assert
+            Assert.NotNull(storedItems);
+            Assert.Equal(state.ConversationState.Value, storedItems[storageKey]);
+        }
+
+        [Fact]
+        public async void Test_SaveState_DeletesChanges()
+        {
+            // Arrange
+            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnContext = _createConfiguredTurnContext();
+
+            var storageKey = "storageKey";
+            var stateValue = new ConversationState();
+            ApplicationTurnState state = new()
+            {
+                ConversationState = new TurnStateEntry<ConversationState>(stateValue, storageKey)
+            };
+
+            var storage = new MemoryStorage();
+
+            // Act
+            /// Delete conversation state
+            state.ConversationState.Delete();
+            /// Save the state
+            await turnStateManager.SaveStateAsync(storage, turnContext, state);
+            /// Load from storage
+            IDictionary<string, object> storedItems = await storage.ReadAsync(new string[] { storageKey }, default);
+
+            // Assert
+            Assert.NotNull(storedItems);
+            Assert.Empty(storedItems.Keys);
         }
 
         private TurnContext _createConfiguredTurnContext()

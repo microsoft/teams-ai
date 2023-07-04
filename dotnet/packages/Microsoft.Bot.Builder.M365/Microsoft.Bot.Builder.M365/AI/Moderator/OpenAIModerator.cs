@@ -42,9 +42,17 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                 case ModerationType.Input:
                 case ModerationType.Both:
                     {
-                        // get input from turnstate
-                        // TODO: when TurnState is implemented, get the user input
                         string input = turnContext.Activity.Text;
+
+                        // TODO: Refactor turn state to fix complex logic
+                        // Get input from turn state
+                        if (turnState as object is DefaultTurnState defaultTurnState)
+                        {
+                            if (defaultTurnState.TempState?.Value.Input != null)
+                            {
+                                input = defaultTurnState.TempState?.Value.Input!;
+                            }
+                        }
 
                         return await _HandleTextModeration(input, true);
                     }

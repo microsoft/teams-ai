@@ -185,9 +185,22 @@ namespace Microsoft.Bot.Builder.M365.AI
                 }
             }
 
-            // TODO: Populate {{$temp.input}}
+            // TODO: Clean up turn state infra to prevent uncesseraily complex logic
+            if (turnState as object is DefaultTurnState defaultTurnState)
+            {
+                TempState? tempState = defaultTurnState.TempState?.Value;
 
-            // TODO: Populate {{$temp.history}}
+                if (tempState != null)
+                {
+                    tempState.Input ??= turnContext.Activity.Text;
+
+                    if (tempState.History == null && options?.History != null && options.History.TrackHistory)
+                    {
+                        // TODO: Set the conversation history from semantic kernel
+                        tempState.History = "";
+                    }
+                }
+            }
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
@@ -220,9 +233,21 @@ namespace Microsoft.Bot.Builder.M365.AI
 
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
-            // TODO: Populate {{$temp.input}}
+            if (turnState as object is DefaultTurnState defaultTurnState)
+            {
+                TempState? tempState = defaultTurnState.TempState?.Value;
 
-            // TODO: Populate {{$temp.history}}
+                if (tempState != null)
+                {
+                    tempState.Input ??= turnContext.Activity.Text;
+
+                    if (tempState.History == null && options?.History != null && options.History.TrackHistory)
+                    {
+                        // TODO: Set the conversation history from semantic kernel history object
+                        tempState.History = "";
+                    }
+                }
+            }
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
