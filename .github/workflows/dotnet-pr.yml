@@ -1,0 +1,20 @@
+#
+# Place holder to enable dotnet-pr workflow
+#
+
+name: dotnet-pr
+
+on:
+  pull_request:
+    branches:
+      - DOTNET
+    paths:
+      - 'dotnet/**'
+
+jobs:
+  echo:
+    runs-on: "windows-latest"
+    steps:
+      - name: echo
+        shell: bash
+        run: echo dotnet
