@@ -65,6 +65,9 @@ namespace Microsoft.Bot.Builder.M365.State
         }
     }
 
+    /// <summary>
+    /// Defines the default state scopes persisted by the `DefaultTurnStateManager`.
+    /// </summary>
     public class DefaultTurnState : DefaultTurnState<Dictionary<string, object>, Dictionary<string, object>, TempState> { }
 
 }

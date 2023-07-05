@@ -12,8 +12,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         private string? _promptsFolder;
         private readonly Dictionary<string, PromptTemplate> _templates;
         private readonly Dictionary<string, TemplateFunctionEntry<TState>> _functions;
+        private readonly Dictionary<string, string> _promptVariables;
 
-        public PromptManager(string? promptsFolder = null)
+        public PromptManager(string? promptsFolder = null, Dictionary<string, string>? promptVariables = null)
         {
             if (promptsFolder != null)
             {
@@ -21,9 +22,19 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
                 _promptsFolder = promptsFolder;
             }
 
+            _promptVariables = promptVariables ?? new Dictionary<string, string>();
+
             _templates = new Dictionary<string, PromptTemplate>();
             _functions = new Dictionary<string, TemplateFunctionEntry<TState>>();
         }
+
+        /// <summary>
+        /// Register prompt variables.
+        /// </summary>
+        /// <remarks>
+        /// You will be able to reference these variables in the prompt template string by using this format: `{{ $key }}`.
+        /// </remarks>
+        public IDictionary<string, string> Variables => _promptVariables;
 
         /// <inheritdoc />
         public IPromptManager<TState> AddFunction(string name, PromptFunction<TState> promptFunction, bool allowOverrides = false)
@@ -166,15 +177,18 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <returns>Variables that could be injected into the prompt template</returns>
         internal void LoadStateIntoContext(SKContext context, ITurnContext turnContext, TState turnState)
         {
+            foreach (KeyValuePair<string, string> pair in _promptVariables)
+            {
+                context.Variables.Set(pair.Key, pair.Value);
+            }
+            
+            // Temp state values override the user configured variables
             if (turnState as object is DefaultTurnState defaultTurnState)
             {
                 context[TempState.OutputKey] = defaultTurnState.TempState?.Value.Output ?? string.Empty;
                 context[TempState.InputKey] = defaultTurnState.TempState?.Value.Input ?? turnContext.Activity.Text;
                 context[TempState.HistoryKey] = defaultTurnState.TempState?.Value.History ?? string.Empty;
             }
-
-            // TODO: Load arbitrary values from turn state into context
-            return;
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)

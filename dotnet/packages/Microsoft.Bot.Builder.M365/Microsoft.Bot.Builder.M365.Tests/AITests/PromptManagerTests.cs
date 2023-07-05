@@ -334,33 +334,120 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         }
 
         [Fact]
-        public async void RenderPrompt_ResolveVariable_Exist()
+        public async void RenderPrompt_ResolveVariable()
         {
+            // Arrange
+            var promptManager = new PromptManager<TurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
+            var turnStateMock = new Mock<TurnState>();
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                        {
+                            MaxTokens = 2000,
+                            Temperature = 0.2,
+                            TopP = 0.5,
+                        }
+            };
+            /// Configure variable
+            var variableKey = "variableName";
+            var variableValue = "value";
+
+            /// Configure prompt
+            var promptString = "The output of the function is {{ $" + variableKey + " }}";
+            var expectedRenderedPrompt = $"The output of the function is {variableValue}";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
+
+            // Act
+            promptManager.Variables[variableKey] = variableValue;
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+
+            // Assert
+            Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
         }
 
         [Fact]
-        public async void RenderPrompt_ResolveVariable_NotExist()
+        public async void RenderPrompt_ResolveVariable_DefaultTurnState()
         {
+            // Arrange
+            var promptManager = new PromptManager<TurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
+            var defaultTurnState = new DefaultTurnState();
+            var inputValue = "input";
+            var outputValue = "output";
+            var historyValue = "history";
+            var tempState = new TempState()
+            {
+                Input = inputValue,
+                Output = outputValue,
+                History = historyValue
+            };
+            defaultTurnState.TempState = new TurnStateEntry<TempState>(tempState);
+
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                        {
+                            MaxTokens = 2000,
+                            Temperature = 0.2,
+                            TopP = 0.5,
+                        }
+            };
+
+            /// Configure prompt
+            var promptString = "{{ $input }}, {{ $output }}, {{ $history }}";
+            var expectedRenderedPrompt = $"{inputValue}, {outputValue}, {historyValue}";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
+
+            // Act
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, defaultTurnState, promptTemplate);
+
+            // Assert
+            Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
         }
 
         [Fact]
-        public async void RenderPrompt_ResolveVariable_NestedObject()
+        public async void RenderPrompt_ResolveVariable_NotExist_ShouldResolveToEmptyString()
         {
+            // Arrange
+            var promptManager = new PromptManager<TurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-        }
+            var turnStateMock = new Mock<TurnState>();
 
-        [Fact]
-        public async void RenderPrompt_ResolveVariable_NestedObject_GreaterThanLevel2Depth_ShouldFail()
-        {
-            // {{ $state.conversation.level2.level3 }} is not allowed
-        }
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                        {
+                            MaxTokens = 2000,
+                            Temperature = 0.2,
+                            TopP = 0.5,
+                        }
+            };
 
-        [Fact]
-        public async void RenderPrompt_WithFunctionAndVariableReference()
-        {
+            /// Configure prompt
+            var promptString = "{{ $variable }}";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
 
+            // Act
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+
+            // Assert
+            Assert.Equal("", renderedPrompt.Text);
         }
     }
 }

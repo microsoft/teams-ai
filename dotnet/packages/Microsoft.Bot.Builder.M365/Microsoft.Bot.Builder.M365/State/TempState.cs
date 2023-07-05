@@ -44,7 +44,7 @@ namespace Microsoft.Bot.Builder.M365.State
         /// </summary>
         public string History
         {
-            get => Get<string>(InputKey)!;
+            get => Get<string>(HistoryKey)!;
             set => Set(HistoryKey, value);
         }
 
