@@ -12,7 +12,6 @@ using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365
 {
-    // TODO: Implement long running calls feature
     /// <summary>
     /// Application class for routing and processing incoming requests.
     /// </summary>
@@ -50,6 +49,12 @@ namespace Microsoft.Bot.Builder.M365
             if (_options.AI != null)
             {
                 _ai = new AI<TState>(_options.AI, logger);
+            }
+
+            // Validate long running messages configuration
+            if (this._options.LongRunningMessages == true && (this._options.Adapter == null || this._options.BotAppId == null))
+            {
+                throw new Exception("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
             }
 
         }
@@ -138,19 +143,27 @@ namespace Microsoft.Bot.Builder.M365
                 throw new ArgumentException($"{nameof(turnContext)}.Activity must have non-null Type.");
             }
 
+            await this._StartLongRunningCall(turnContext, this._OnTurnAsync, cancellationToken);
+        }
+
+        /// <summary>
+        /// Internal method to wrap the logic of handling a bot turn.
+        /// </summary>
+        private async Task _OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
+        {
             TypingTimer? timer = null;
 
             try
             {
                 // Start typing timer if configured
-                if (_options.StartTypingTimer)
+                if (this._options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(_typingTimerDelay);
-                    timer.Start(turnContext);
+                    timer = new TypingTimer(this._typingTimerDelay);
+                    _ = timer.Start(turnContext);
                 };
 
                 // Remove @mentions
-                if (_options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
+                if (this._options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
                 {
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
@@ -159,19 +172,22 @@ namespace Microsoft.Bot.Builder.M365
                 TState turnState = (TState)new TurnState();
 
                 // Call before activity handler
-                if (!await OnBeforeTurnAsync(turnContext, turnState, cancellationToken)) return;
+                if (!await this.OnBeforeTurnAsync(turnContext, turnState, cancellationToken))
+                {
+                    return;
+                }
 
                 // Call activity type specific handler
-                bool eventHandlerCalled = await RunActivityHandlerAsync(turnContext, turnState, cancellationToken);
+                bool eventHandlerCalled = await this.RunActivityHandlerAsync(turnContext, turnState, cancellationToken);
 
-                if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
+                if (!eventHandlerCalled && this._ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.ChainAsync(turnContext, turnState); 
+                    _ = await this._ai.ChainAsync(turnContext, turnState);
                 }
 
                 // Call after turn activity handler
-                if (await OnAfterTurnAsync(turnContext, turnState, cancellationToken))
+                if (await this.OnAfterTurnAsync(turnContext, turnState, cancellationToken))
                 {
                     // TODO : Save turn state to persistent storage
                 };
@@ -181,8 +197,6 @@ namespace Microsoft.Bot.Builder.M365
                 // Dipose the timer if configured
                 timer?.Dispose();
             }
-
-
         }
 
         /// <summary>
@@ -1967,6 +1981,27 @@ namespace Microsoft.Bot.Builder.M365
         protected virtual Task OnReadReceiptAsync(ReadReceiptInfo readReceiptInfo, ITurnContext<IEventActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Convert original handler to proactive conversation.
+        /// </summary>
+        /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+        /// <param name="handler">The method to call to handle the bot turn.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
+        /// <returns>A task that represents the work queued to execute.</returns>
+        private Task _StartLongRunningCall(ITurnContext turnContext, Func<ITurnContext, CancellationToken, Task> handler, CancellationToken cancellationToken = default)
+        {
+            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && this._options.LongRunningMessages == true)
+            {
+                /// <see cref="BotAdapter.ContinueConversationAsync"/> supports <see cref="Activity"/> as input
+                return this._options.Adapter!.ContinueConversationAsync(this._options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
+            }
+            else
+            {
+                return handler(turnContext, cancellationToken);
+            }
         }
 
         /// <summary>

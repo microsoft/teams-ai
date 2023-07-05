@@ -710,5 +710,96 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             turnContextMock.Verify(tc => tc.DeleteActivityAsync(It.IsAny<ConversationReference>(), It.IsAny<CancellationToken>()), Times.Once);
             turnContextMock.Verify(tc => tc.UpdateActivityAsync(It.IsAny<IActivity>(), It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public async Task Test_OnTurnAsync_Disable_LongRunningMessages()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+
+            // Act
+            var bot = new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                LongRunningMessages = false,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            Assert.Single(bot.Record);
+            Assert.Equal("OnMessageActivityAsync", bot.Record[0]);
+        }
+
+        [Fact]
+        public void Test_OnTurnAsync_Enable_LongRunningMessages_Without_Adapter_ShouldThrow()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+
+            // Act
+            var exception = Assert.Throws<Exception>(() => new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                LongRunningMessages = true,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false
+            }));
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.", exception.Message);
+        }
+
+        [Fact]
+        public async Task Test_OnTurnAsync_Enable_LongRunningMessages_Message_Activity()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var adapterMock = new Mock<BotAdapter>();
+            adapterMock.Setup(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+            // Act
+            var bot = new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                Adapter = adapterMock.Object,
+                BotAppId = "test-bot-app-id",
+                LongRunningMessages = true,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false,
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            adapterMock.Verify(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_OnTurnAsync_Enable_LongRunningMessages_NonMessage_Activity()
+        {
+            // Arrange
+            var activity = new Activity { Type = ActivityTypes.MessageUpdate };
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var adapterMock = new Mock<BotAdapter>();
+            adapterMock.Setup(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+            // Act
+            var bot = new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                Adapter = adapterMock.Object,
+                BotAppId = "test-bot-app-id",
+                LongRunningMessages = true,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false,
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            adapterMock.Verify(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+            Assert.Single(bot.Record);
+            Assert.Equal("OnMessageUpdateActivityAsync", bot.Record[0]);
+        }
     }
 }
