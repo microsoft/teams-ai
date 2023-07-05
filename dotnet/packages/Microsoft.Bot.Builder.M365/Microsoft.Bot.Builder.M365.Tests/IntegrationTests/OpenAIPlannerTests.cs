@@ -58,11 +58,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
@@ -99,11 +99,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
@@ -137,11 +137,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
@@ -172,11 +172,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
