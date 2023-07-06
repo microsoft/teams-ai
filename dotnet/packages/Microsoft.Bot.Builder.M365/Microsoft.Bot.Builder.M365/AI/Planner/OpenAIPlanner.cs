@@ -98,8 +98,11 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
                 if (isChatCompletion)
                 {
+                    DefaultTurnState? defaultTurnState = _CastToDefaultTurnState(turnState);
+                    string? userMessage = defaultTurnState?.TempState?.Value.Input;
+
                     // Request base chat completion
-                    IChatResult response = await _CreateChatCompletion(turnState, options, promptTemplate, cancellationToken);
+                    IChatResult response = await _CreateChatCompletion(turnState, options, promptTemplate, userMessage, cancellationToken);
                     ChatMessageBase message = await response.GetChatMessageAsync(cancellationToken).ConfigureAwait(false);
                     CompletionsUsage usage = ((ITextResult)response).ModelResult.GetOpenAIChatResult().Usage;
                     
@@ -165,7 +168,18 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                     result = result.Substring(5);
                 }
 
-                // TODO: Remove response prefix - once Conversation History & TurnState is ported
+                string? assistantPrefix = options.History?.AssistantPrefix;
+
+                if (assistantPrefix != null)
+                {
+                    // The model sometimes predicts additional text for the human side of things so skip that.
+                    int position = result.ToLower().IndexOf(assistantPrefix.ToLower());
+                    if (position >= 0)
+                    {
+                        result = result.Substring(position + assistantPrefix.Length);
+                    }
+
+                }
 
                 // Parse response into commands
                 Plan? plan;
@@ -216,10 +230,10 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             return completions[0];
         }
 
-        private async Task<IChatResult> _CreateChatCompletion(TState turnState, AIOptions<TState> options, PromptTemplate promptTemplate, CancellationToken cancellationToken)
+        private async Task<IChatResult> _CreateChatCompletion(TState turnState, AIOptions<TState> aiOptions, PromptTemplate promptTemplate, string? userMessage, CancellationToken cancellationToken)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
-            Verify.ParamNotNull(options, nameof(options));
+            Verify.ParamNotNull(aiOptions, nameof(aiOptions));
             Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
 
             PromptTemplateConfig templateConfig = promptTemplate.Configuration.GetPromptTemplateConfig();
@@ -235,12 +249,50 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
             var chatCompletion = _kernel.GetService<IChatCompletion>();
 
-            // TODO: When turn state is implemented inject history
             var chatHistory = chatCompletion.CreateNewChat();
 
-            // TODO: When turn state is implemented inject history
-            // Users message
-            chatHistory.AddUserMessage(promptTemplate.Text);
+
+            if (_options.UseSystemMessage)
+            {
+                chatHistory.AddSystemMessage(promptTemplate.Text);
+            } else
+            {
+                chatHistory.AddUserMessage(promptTemplate.Text);
+            }
+
+            DefaultTurnState? defaultTurnState = _CastToDefaultTurnState(turnState);
+
+            // Populate Conversation History
+            if (defaultTurnState != null && aiOptions.History != null && aiOptions.History.TrackHistory)
+            {
+                string userPrefix = aiOptions.History.UserPrefix;
+                string assistantPrefix = aiOptions.History.AssistantPrefix;
+                string[] history = ConversationHistory.ToArray(defaultTurnState, aiOptions.History.MaxTokens);
+
+                for (int i = 0; i < history.Length; i++)
+                {
+                    string line = history[i];
+                    string lowercaseLine = line.ToLower();
+                    if (lowercaseLine.StartsWith(userPrefix))
+                    {
+                        line = line.Substring(userPrefix.Length).Trim();
+
+                        chatHistory.AddUserMessage(line);
+                    }
+                    else if (lowercaseLine.StartsWith(assistantPrefix))
+                    {
+                        line = line.Substring(assistantPrefix.Length).Trim();
+                        
+                        chatHistory.AddAssistantMessage(line);
+                    }
+                }
+            }
+
+            // Add user message
+            if (userMessage != null)
+            {
+                chatHistory.AddUserMessage(userMessage);
+            }
 
             var completions = await chatCompletion.GetChatCompletionsAsync(chatHistory, chatRequestSettings, cancellationToken);
 
@@ -256,6 +308,11 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             {
                 return _options.DefaultModel;
             }
+        }
+
+        private DefaultTurnState? _CastToDefaultTurnState(TState turnState)
+        {
+            return turnState as object as DefaultTurnState;
         }
 
     }

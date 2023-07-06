@@ -24,7 +24,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// </summary>
         public IModerator<TState> Moderator { get; set; }
 
-        // TODO: Support PromptTemplate and PromptSelector handler as options
+        // TODO: potentially support PromptTemplate and PromptSelector handler as options
         /// <summary>
         /// Optional. The prompt to use for the current turn.
         /// </summary>

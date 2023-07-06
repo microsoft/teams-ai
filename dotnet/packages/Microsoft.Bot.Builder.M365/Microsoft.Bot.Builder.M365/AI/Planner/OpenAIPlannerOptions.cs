@@ -44,7 +44,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// The planner currently uses the 'user' role by default as this tends to generate more reliable instruction following.
         /// Defaults to false.
         /// </remarks>
-        public bool? UseSystemMessage { get; set; }
+        public bool UseSystemMessage { get; set; } = false;
 
         /// <summary>
         /// A flag indicating if the planner should log requests with the provided logger.

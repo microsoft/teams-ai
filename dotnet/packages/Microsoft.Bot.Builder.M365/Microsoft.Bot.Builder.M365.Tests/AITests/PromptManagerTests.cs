@@ -8,7 +8,6 @@ using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AI
 {
-    // TODO: Complete tests once turn state infrastructure is implemented
     public class PromptManagerTests
     {
         [Fact]

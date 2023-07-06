@@ -44,7 +44,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                     {
                         string input = turnContext.Activity.Text;
 
-                        // TODO: Refactor turn state to fix complex logic
+                        // TODO: Refactor turn state to fix convoluted logic
+
                         // Get input from turn state
                         if (turnState as object is DefaultTurnState defaultTurnState)
                         {
