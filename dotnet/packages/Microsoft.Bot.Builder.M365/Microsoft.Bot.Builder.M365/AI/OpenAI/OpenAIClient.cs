@@ -5,6 +5,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Bot.Builder.M365.OpenAI
 {
@@ -32,17 +33,21 @@ namespace Microsoft.Bot.Builder.M365.OpenAI
         /// Make a call to the OpenAI text moderation endpoint.
         /// </summary>
         /// <param name="text">The input text to moderate.</param>
+        /// <param name="model">The moderation model to use.</param>
         /// <returns>The moderation result from the API call.</returns>
         /// <exception cref="OpenAIClientException" />
-        public async Task<ModerationResponse> ExecuteTextModeration(string text)
+        public virtual async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
         {
             try
             {
                 using HttpContent content = new StringContent(
                     JsonSerializer.Serialize(new
                     {
-                        model = _options.DefaultModel,
+                        model = model,
                         input = text 
+                    }, new JsonSerializerOptions()
+                    {
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     }),
                     Encoding.UTF8,
                     "application/json"

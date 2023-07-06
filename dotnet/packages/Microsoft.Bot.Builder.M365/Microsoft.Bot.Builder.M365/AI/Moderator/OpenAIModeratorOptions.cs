@@ -9,7 +9,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
         public string ApiKey { get; set; }
 
         /// <summary>
-        /// Which parts of the conversation to moderate
+        /// Which parts of the conversation to moderate.
         /// </summary>
         public ModerationType Moderate { get; set; }
 
@@ -24,23 +24,19 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
         public string? Endpoint { get; set; }
 
         /// <summary>
-        /// The default model to use.
+        /// The moderation model to use.
         /// </summary>
-        /// <remarks>
-        /// Prompts can override this model.
-        /// </remarks>
-        public string DefaultModel { get; set; }
+        public string? Model { get; set; }
 
         /// <summary>
         /// Create an instance of the OpenAIModeratorOptions class.
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="defaultModel">The default model to use.</param>
-        public OpenAIModeratorOptions(string apiKey, ModerationType moderate, string defaultModel)
+        /// <param name="moderate">Which parts of the conversation to moderate.</param>
+        public OpenAIModeratorOptions(string apiKey, ModerationType moderate)
         {
             ApiKey = apiKey;
             Moderate = moderate;
-            DefaultModel = defaultModel;
         }
     }
 

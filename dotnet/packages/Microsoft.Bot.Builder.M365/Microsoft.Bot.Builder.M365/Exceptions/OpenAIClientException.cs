@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Bot.Builder.M365.Exceptions
 {
-    internal class OpenAIClientException : Exception
+    public class OpenAIClientException : Exception
     {
         public readonly HttpStatusCode? statusCode;
 
