@@ -52,7 +52,7 @@ namespace Microsoft.Bot.Builder.M365
             }
 
             // Validate long running messages configuration
-            if (this._options.LongRunningMessages == true && (this._options.Adapter == null || this._options.BotAppId == null))
+            if (_options.LongRunningMessages == true && (_options.Adapter == null || _options.BotAppId == null))
             {
                 throw new Exception("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
             }
@@ -143,7 +143,7 @@ namespace Microsoft.Bot.Builder.M365
                 throw new ArgumentException($"{nameof(turnContext)}.Activity must have non-null Type.");
             }
 
-            await this._StartLongRunningCall(turnContext, this._OnTurnAsync, cancellationToken);
+            await _StartLongRunningCall(turnContext, _OnTurnAsync, cancellationToken);
         }
 
         /// <summary>
@@ -156,14 +156,14 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 // Start typing timer if configured
-                if (this._options.StartTypingTimer)
+                if (_options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(this._typingTimerDelay);
-                    _ = timer.Start(turnContext);
+                    timer = new TypingTimer(_typingTimerDelay);
+                    timer.Start(turnContext);
                 };
 
                 // Remove @mentions
-                if (this._options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
+                if (_options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
                 {
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
@@ -172,22 +172,22 @@ namespace Microsoft.Bot.Builder.M365
                 TState turnState = (TState)new TurnState();
 
                 // Call before activity handler
-                if (!await this.OnBeforeTurnAsync(turnContext, turnState, cancellationToken))
+                if (!await OnBeforeTurnAsync(turnContext, turnState, cancellationToken))
                 {
                     return;
                 }
 
                 // Call activity type specific handler
-                bool eventHandlerCalled = await this.RunActivityHandlerAsync(turnContext, turnState, cancellationToken);
+                bool eventHandlerCalled = await RunActivityHandlerAsync(turnContext, turnState, cancellationToken);
 
-                if (!eventHandlerCalled && this._ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
+                if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    _ = await this._ai.ChainAsync(turnContext, turnState);
+                    await _ai.ChainAsync(turnContext, turnState);
                 }
 
                 // Call after turn activity handler
-                if (await this.OnAfterTurnAsync(turnContext, turnState, cancellationToken))
+                if (await OnAfterTurnAsync(turnContext, turnState, cancellationToken))
                 {
                     // TODO : Save turn state to persistent storage
                 };
@@ -1993,10 +1993,10 @@ namespace Microsoft.Bot.Builder.M365
         /// <returns>A task that represents the work queued to execute.</returns>
         private Task _StartLongRunningCall(ITurnContext turnContext, Func<ITurnContext, CancellationToken, Task> handler, CancellationToken cancellationToken = default)
         {
-            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && this._options.LongRunningMessages == true)
+            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && _options.LongRunningMessages == true)
             {
                 /// <see cref="BotAdapter.ContinueConversationAsync"/> supports <see cref="Activity"/> as input
-                return this._options.Adapter!.ContinueConversationAsync(this._options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
+                return _options.Adapter!.ContinueConversationAsync(_options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
             }
             else
             {
