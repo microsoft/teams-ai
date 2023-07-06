@@ -11,8 +11,8 @@ namespace Microsoft.Bot.Builder.M365.State
     /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
     public class DefaultTurnStateManager<TDefaultTurnState, TConversationState, TUserState, TTempState> : ITurnStateManager<TDefaultTurnState>
         where TDefaultTurnState : DefaultTurnState<TConversationState, TUserState, TTempState>, new()
-        where TConversationState : Dictionary<string, object>, new()
-        where TUserState : Dictionary<string, object>, new()
+        where TConversationState : StateBase, new()
+        where TUserState : StateBase, new()
         where TTempState : TempState, new()
     {
 
@@ -141,7 +141,7 @@ namespace Microsoft.Bot.Builder.M365.State
         }
     }
 
-    public class DefaultTurnStateManager : DefaultTurnStateManager<DefaultTurnState, Dictionary<string, object>, Dictionary<string, object>, TempState>
+    public class DefaultTurnStateManager : DefaultTurnStateManager<DefaultTurnState, StateBase, StateBase, TempState>
     {
     }
 }

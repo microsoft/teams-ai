@@ -180,8 +180,8 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
             ));
         }
 
-        private class ConversationState : Dictionary<string, object> { }
-        private class UserState : Dictionary<string, object> { }
+        private class ConversationState : StateBase { }
+        private class UserState : StateBase { }
 
         private class ApplicationTurnState : DefaultTurnState<ConversationState, UserState, TempState> { }
     }

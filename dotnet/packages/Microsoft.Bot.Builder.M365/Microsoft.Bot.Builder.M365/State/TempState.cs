@@ -8,7 +8,7 @@ namespace Microsoft.Bot.Builder.M365.State
     /// <remarks>
     /// Inherit a new class from this base abstract class to strongly type the applications temp state.
     /// </remarks>
-    public class TempState : Dictionary<string, object>
+    public class TempState : StateBase
     {
         public const string InputKey = "input";
         public const string OutputKey = "output";
@@ -60,14 +60,6 @@ namespace Microsoft.Bot.Builder.M365.State
 
             // Return null if either the key or type don't match
             return null;
-        }
-
-        public void Set<T>(string key, T value)
-        {
-            Verify.ParamNotNull(key, nameof(key));
-            Verify.ParamNotNull(value, nameof(value));
-
-            this[key] = value!;
         }
     }
 }

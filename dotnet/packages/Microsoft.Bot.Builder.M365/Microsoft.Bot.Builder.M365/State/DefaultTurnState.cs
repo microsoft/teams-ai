@@ -9,8 +9,8 @@ namespace Microsoft.Bot.Builder.M365.State
     /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
     /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
     public class DefaultTurnState<TConversationState, TUserState, TTempState> : TurnState
-        where TConversationState : Dictionary<string, object>
-        where TUserState : Dictionary<string, object>
+        where TConversationState : StateBase
+        where TUserState : StateBase
         where TTempState : TempState
     {
         public const string ConversationStateKey = "conversationState";
@@ -68,6 +68,6 @@ namespace Microsoft.Bot.Builder.M365.State
     /// <summary>
     /// Defines the default state scopes persisted by the `DefaultTurnStateManager`.
     /// </summary>
-    public class DefaultTurnState : DefaultTurnState<Dictionary<string, object>, Dictionary<string, object>, TempState> { }
+    public class DefaultTurnState : DefaultTurnState<StateBase, StateBase, TempState> { }
 
 }
