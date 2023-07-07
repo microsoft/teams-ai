@@ -47,7 +47,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                         // TODO: Refactor turn state to fix convoluted logic
 
                         // Get input from turn state
-                        if (turnState as object is DefaultTurnState defaultTurnState)
+                        if (turnState as object is TurnState defaultTurnState)
                         {
                             if (defaultTurnState.TempState?.Value.Input != null)
                             {

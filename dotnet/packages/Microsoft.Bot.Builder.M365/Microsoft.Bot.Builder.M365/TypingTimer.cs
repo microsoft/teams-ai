@@ -97,7 +97,10 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
-                _timer!.Change(_interval, Timeout.Infinite);
+                if (IsRunning())
+                {
+                    _timer?.Change(_interval, Timeout.Infinite);
+                }
             } 
             catch (ObjectDisposedException)
             {

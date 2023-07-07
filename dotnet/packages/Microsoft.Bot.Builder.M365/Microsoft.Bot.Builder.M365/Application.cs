@@ -26,9 +26,11 @@ namespace Microsoft.Bot.Builder.M365
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    public class Application<TState> : IBot where TState : TurnState
+    public class Application<TState, TTurnStateManager> : IBot
+        where TState : TurnState
+        where TTurnStateManager : ITurnStateManager<TState>, new()
     {
-        private readonly ApplicationOptions<TState> _options;
+        private readonly ApplicationOptions<TState, TTurnStateManager> _options;
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
 
@@ -36,17 +38,13 @@ namespace Microsoft.Bot.Builder.M365
         /// Creates a new Application instance.
         /// </summary>
         /// <param name="options">Optional. Options used to configure the application.</param>
-        public Application(ApplicationOptions<TState> options, ILogger? logger = null)
+        public Application(ApplicationOptions<TState, TTurnStateManager> options, ILogger? logger = null)
         {
             Verify.ParamNotNull(options);
 
             _options = options;
 
-            if (_options.TurnStateManager == null)
-            {
-                // TODO: Clean up the turn state class structure to avoid such casting
-                _options.TurnStateManager = (ITurnStateManager<TState>)new DefaultTurnStateManager();
-            }
+            _options.TurnStateManager ??= new TTurnStateManager();
 
             if (_options.AI != null)
             {
@@ -78,7 +76,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <summary>
         /// The application's configured options.
         /// </summary>
-        public ApplicationOptions<TState> Options { get { return _options; } }
+        public ApplicationOptions<TState, TTurnStateManager> Options { get { return _options; } }
 
         /// <summary>
         /// Handler that will execute before the turn's activity handler logic is processed.
@@ -88,7 +86,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True to continue execution of the current turn. Otherwise, return False.</returns>
-        protected virtual Task<bool> OnBeforeTurnAsync (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual Task<bool> OnBeforeTurnAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
         }
@@ -291,8 +289,8 @@ namespace Microsoft.Bot.Builder.M365
                         break;
                 }
 
-            } 
-            catch (NotImplementedException) 
+            }
+            catch (NotImplementedException)
             {
                 return false;
             }
@@ -893,13 +891,13 @@ namespace Microsoft.Bot.Builder.M365
                 try
                 {
                     await OnReactionsAddedAsync(turnContext.Activity.ReactionsAdded, turnContext, turnState, cancellationToken).ConfigureAwait(false);
-                } 
+                }
                 catch (NotImplementedException)
                 {
                     reactionsAddedNotImplemented = true;
                 }
             }
-            
+
             if (turnContext.Activity.ReactionsRemoved != null)
             {
                 try
@@ -910,9 +908,9 @@ namespace Microsoft.Bot.Builder.M365
                 {
                     reactionsRemovedNotImplemented = true;
                 }
-                
-            } 
-            
+
+            }
+
             if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
             {
                 throw new NotImplementedException();
@@ -941,7 +939,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="Activity.Id"/>
         /// <seealso cref="ITurnContext.SendActivityAsync(IActivity, CancellationToken)"/>
         /// <seealso cref="ResourceResponse.Id"/>
-        protected virtual Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TState turnState,  CancellationToken cancellationToken)
+        protected virtual Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -1183,7 +1181,7 @@ namespace Microsoft.Bot.Builder.M365
             }
             catch (InvokeResponseException e)
             {
-                 return new InvokeResponse
+                return new InvokeResponse
                 {
                     Status = (int)e.StatusCode,
                     Body = e.Body
@@ -1215,7 +1213,7 @@ namespace Microsoft.Bot.Builder.M365
         {
             switch (turnContext.Activity.Name)
             {
-                case SignInConstants.VerifyStateOperationName: 
+                case SignInConstants.VerifyStateOperationName:
                     return OnSignInVerifyStateAsync(turnContext, turnState, cancellationToken);
                 case SignInConstants.TokenExchangeOperationName:
                     return OnSignInTokenExchangeAsync(turnContext, turnState, cancellationToken);

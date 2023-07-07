@@ -1,16 +1,11 @@
 ﻿using Microsoft.Bot.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
 {
-    internal class TestDelegatingTurnContext : Application<TurnState>
+    internal class TestDelegatingTurnContext : Application<TurnState, TurnStateManager>
     {
-        public TestDelegatingTurnContext(ApplicationOptions<TurnState> options) : base(options)
+        public TestDelegatingTurnContext(ApplicationOptions<TurnState, TurnStateManager> options) : base(options)
         {
         }
 

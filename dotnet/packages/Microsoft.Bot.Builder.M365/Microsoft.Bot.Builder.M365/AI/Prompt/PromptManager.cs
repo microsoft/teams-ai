@@ -183,7 +183,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             }
             
             // Temp state values override the user configured variables
-            if (turnState as object is DefaultTurnState defaultTurnState)
+            if (turnState as object is TurnState defaultTurnState)
             {
                 context[TempState.OutputKey] = defaultTurnState.TempState?.Value.Output ?? string.Empty;
                 context[TempState.InputKey] = defaultTurnState.TempState?.Value.Input ?? turnContext.Activity.Text;

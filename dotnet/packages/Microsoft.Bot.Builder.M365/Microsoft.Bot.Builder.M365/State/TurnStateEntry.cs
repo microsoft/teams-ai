@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Microsoft.Bot.Builder.M365.State
 {
-    public class TurnStateEntry<TValue> where TValue : class
+    public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue> where TValue : class
     {
         private TValue _value;
         private string? _storageKey;

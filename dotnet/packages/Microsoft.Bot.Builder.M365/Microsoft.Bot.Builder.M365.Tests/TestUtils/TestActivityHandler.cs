@@ -6,9 +6,9 @@ using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
 {
-    internal class TestActivityHandler : Application<TurnState>
+    internal class TestActivityHandler : Application<TurnState, TurnStateManager>
     {
-        public TestActivityHandler(ApplicationOptions<TurnState> options) : base(options)
+        public TestActivityHandler(ApplicationOptions<TurnState, TurnStateManager> options) : base(options)
         {
         }
 

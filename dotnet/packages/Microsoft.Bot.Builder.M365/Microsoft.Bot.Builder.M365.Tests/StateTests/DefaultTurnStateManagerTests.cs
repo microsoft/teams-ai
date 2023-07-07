@@ -1,11 +1,8 @@
 ﻿
 using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
-using Microsoft.Bot.Builder.M365.Utilities;
-using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Moq;
-using Xunit.Abstractions;
 
 namespace Microsoft.Bot.Builder.M365.Tests.StateTests
 {
@@ -21,7 +18,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         public async void Test_LoadState_NoStorageProvided_ShouldInitializeEmptyConstructor()
         {
             // Arrange
-            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
             IStorage storage = null;
             
@@ -41,7 +38,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         public async void Test_LoadState_MockStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
-            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
@@ -79,7 +76,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         public async void Test_LoadState_MemoryStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
-            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
@@ -115,7 +112,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         public async void Test_SaveState_SavesChanges()
         {
             // Arrange
-            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
 
             var storageKey = "storageKey";
@@ -145,7 +142,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         public async void Test_SaveState_DeletesChanges()
         {
             // Arrange
-            var turnStateManager = new DefaultTurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
+            var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
 
             var storageKey = "storageKey";
@@ -183,6 +180,6 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
         private class ConversationState : StateBase { }
         private class UserState : StateBase { }
 
-        private class ApplicationTurnState : DefaultTurnState<ConversationState, UserState, TempState> { }
+        private class ApplicationTurnState : TurnState<ConversationState, UserState, TempState> { }
     }
 }

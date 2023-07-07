@@ -4,10 +4,12 @@ using Microsoft.Bot.Builder.M365.State;
 namespace Microsoft.Bot.Builder.M365
 {
     /// <summary>
-    /// Options for the <see cref="Application{TState}"/> class
+    /// Options for the <see cref="Application{TState, TTurnStateManager}"/> class
     /// </summary>
     /// <typeparam name="TState">Type of the turn state</typeparam>
-    public class ApplicationOptions<TState> where TState : TurnState
+    public class ApplicationOptions<TState, TTurnStateManager> 
+        where TState : TurnState
+        where TTurnStateManager : ITurnStateManager<TState>
     {
         /// <summary>
         /// Optional. Bot adapter being used.
@@ -39,7 +41,7 @@ namespace Microsoft.Bot.Builder.M365
         /// Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
         /// be created.
         /// </summary>
-        public ITurnStateManager<TState>? TurnStateManager { get; set; }
+        public TTurnStateManager? TurnStateManager { get; set; }
 
         /// <summary>
         /// Optional. If true, the bot will automatically remove mentions of the bot's name from incoming

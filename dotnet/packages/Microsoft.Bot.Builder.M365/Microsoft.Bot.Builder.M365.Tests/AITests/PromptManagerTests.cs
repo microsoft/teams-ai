@@ -378,7 +378,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var defaultTurnState = new DefaultTurnState();
+            var defaultTurnState = new TurnState();
             var inputValue = "input";
             var outputValue = "output";
             var historyValue = "history";

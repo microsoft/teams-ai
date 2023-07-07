@@ -2,63 +2,65 @@
 
 namespace Microsoft.Bot.Builder.M365.State
 {
-    public class TurnState : Dictionary<string, TurnStateEntry<object>>
+    /// <summary>
+    /// Defines the default state scopes persisted by the `DefaultTurnStateManager`.
+    /// </summary>
+    /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
+    /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
+    /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
+    public class TurnState<TConversationState, TUserState, TTempState> : StateBase
+        where TConversationState : StateBase
+        where TUserState : StateBase
+        where TTempState : TempState
     {
-        public bool TryGetValue<T>(string key, out TurnStateEntry<T> value) where T : class
+        public const string ConversationStateKey = "conversationState";
+        public const string UserStateKey = "userState";
+        public const string TempStateKey = "tempState";
+
+        public TurnStateEntry<TConversationState>? ConversationState
         {
-            Verify.ParamNotNull(key, nameof(key));
-
-            if (base.TryGetValue(key, out TurnStateEntry<object> entry))
+            get
             {
-                TurnStateEntry<T>? castedEntry = entry.CastValue<T>();
-                if (castedEntry != null)
-                {
-                    value = castedEntry;
-                    return true;
-                };
-
-                throw new Exception($"Failed to cast generic object to type '{typeof(T)}'");
+                return Get<TurnStateEntry<TConversationState>>(ConversationStateKey);
             }
-
-            value = null!;
-
-            return false;
-        }
-
-        public TurnStateEntry<T>? Get<T>(string key) where T : class
-        {
-            Verify.ParamNotNull(key, nameof(key));
-
-            if (TryGetValue(key, out TurnStateEntry<T> value))
+            set
             {
-                return value;
+                Verify.ParamNotNull(value, nameof(value));
+
+                Set(ConversationStateKey, value!);
             }
-            else
-            {
-                return null!;
-            };
         }
-
-        public void Set<T>(string key, T value) where T : class
+        public TurnStateEntry<TUserState>? UserState
         {
-            Verify.ParamNotNull(key, nameof(key));
-            Verify.ParamNotNull(value, nameof(value));
-
-            this[key] = new TurnStateEntry<object>(value, key);
-        }
-
-        public void SetValue<T>(string key, T value) where T : class
-        {
-            Verify.ParamNotNull(key, nameof(key));
-            Verify.ParamNotNull(value, nameof(value));
-
-            if (TryGetValue(key, out TurnStateEntry<T> entry))
+            get
             {
-                entry.Replace(value);
-                return;
-            };
+                return Get<TurnStateEntry<TUserState>>(UserStateKey);
+            }
+            set
+            {
+                Verify.ParamNotNull(value, nameof(value));
 
-            this[key] = new TurnStateEntry<object>(value, key);
+                Set(UserStateKey, value!);
+            }
+        }
+        public TurnStateEntry<TTempState>? TempState
+        {
+            get
+            {
+                return Get<TurnStateEntry<TTempState>>(TempStateKey);
+            }
+            set
+            {
+                Verify.ParamNotNull(value, nameof(value));
+
+                Set(TempStateKey, value!);
+            }
         }
     }
+
+    /// <summary>
+    /// Defines the default state scopes persisted by the <see cref="TurnStateManager"/>.
+    /// </summary>
+    public class TurnState : TurnState<StateBase, StateBase, TempState> { }
+
 }

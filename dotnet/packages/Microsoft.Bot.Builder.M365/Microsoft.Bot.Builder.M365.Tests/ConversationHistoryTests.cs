@@ -67,7 +67,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         public void Clear_ThrowsArgumentNullException_WhenTurnStateIsNull()
         {
             // Arrange
-            DefaultTurnState turnState = null;
+            TurnState turnState = null;
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.Clear(turnState));
@@ -77,7 +77,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         public void Clear_ThrowsInvalidOperationException_WhenTurnStateHasNoConversationState()
         {
             // Arrange
-            var turnState = new DefaultTurnState();
+            var turnState = new TurnState();
 
             // Act and Assert
             Assert.Throws<ArgumentException>(() => ConversationHistory.Clear(turnState));
@@ -133,7 +133,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         public void HasMoreLines_ThrowsArgumentNullExceptionIfTurnStateIsNull()
         {
             // Arrange
-            DefaultTurnState turnState = null;
+            TurnState turnState = null;
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.HasMoreLines(turnState));
@@ -173,7 +173,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         public void GetLastLine_ThrowsArgumentNullExceptionIfTurnStateIsNull()
         {
             // Arrange
-            DefaultTurnState turnState = null;
+            TurnState turnState = null;
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.GetLastLine(turnState));
@@ -244,9 +244,9 @@ namespace Microsoft.Bot.Builder.M365.Tests
         }
 
 
-        private DefaultTurnState _GetDefaultTurnStateWithConversationState()
+        private TurnState _GetDefaultTurnStateWithConversationState()
         {
-            DefaultTurnState state = new()
+            TurnState state = new()
             {
                 ConversationState = new TurnStateEntry<StateBase>(new StateBase(), "")
             };
@@ -294,7 +294,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         public void RemoveLastLine_ThrowsArgumentNullExceptionIfTurnStateIsNull()
         {
             // Arrange
-            DefaultTurnState? turnState = null;
+            TurnState? turnState = null;
 
             // Act and Assert
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.RemoveLastLine(turnState));

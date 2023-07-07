@@ -98,8 +98,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
                 if (isChatCompletion)
                 {
-                    DefaultTurnState? defaultTurnState = _CastToDefaultTurnState(turnState);
-                    string? userMessage = defaultTurnState?.TempState?.Value.Input;
+                    string? userMessage = turnState?.TempState?.Value.Input;
 
                     // Request base chat completion
                     IChatResult response = await _CreateChatCompletion(turnState, options, promptTemplate, userMessage, cancellationToken);
@@ -260,14 +259,12 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 chatHistory.AddUserMessage(promptTemplate.Text);
             }
 
-            DefaultTurnState? defaultTurnState = _CastToDefaultTurnState(turnState);
-
             // Populate Conversation History
-            if (defaultTurnState != null && aiOptions.History != null && aiOptions.History.TrackHistory)
+            if (aiOptions.History != null && aiOptions.History.TrackHistory)
             {
                 string userPrefix = aiOptions.History.UserPrefix;
                 string assistantPrefix = aiOptions.History.AssistantPrefix;
-                string[] history = ConversationHistory.ToArray(defaultTurnState, aiOptions.History.MaxTokens);
+                string[] history = ConversationHistory.ToArray(turnState, aiOptions.History.MaxTokens);
 
                 for (int i = 0; i < history.Length; i++)
                 {
@@ -308,11 +305,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             {
                 return _options.DefaultModel;
             }
-        }
-
-        private DefaultTurnState? _CastToDefaultTurnState(TState turnState)
-        {
-            return turnState as object as DefaultTurnState;
         }
 
     }

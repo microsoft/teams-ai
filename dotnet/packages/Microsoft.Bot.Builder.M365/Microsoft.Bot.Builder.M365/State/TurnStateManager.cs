@@ -9,16 +9,16 @@ namespace Microsoft.Bot.Builder.M365.State
     /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
     /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
     /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
-    public class DefaultTurnStateManager<TDefaultTurnState, TConversationState, TUserState, TTempState> : ITurnStateManager<TDefaultTurnState>
-        where TDefaultTurnState : DefaultTurnState<TConversationState, TUserState, TTempState>, new()
+    public class TurnStateManager<TState, TConversationState, TUserState, TTempState> : ITurnStateManager<TState>
+        where TState : TurnState<TConversationState, TUserState, TTempState>, new()
         where TConversationState : StateBase, new()
         where TUserState : StateBase, new()
         where TTempState : TempState, new()
     {
 
-        public DefaultTurnStateManager() { }
+        public TurnStateManager() { }
 
-        public async Task<TDefaultTurnState> LoadStateAsync(IStorage? storage, ITurnContext turnContext)
+        public async Task<TState> LoadStateAsync(IStorage? storage, ITurnContext turnContext)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Microsoft.Bot.Builder.M365.State
                     items = new Dictionary<string, object>();
                 }
 
-                TDefaultTurnState state = new();
+                TState state = new();
                 TUserState? userState = null;
                 TConversationState? conversationState = null;
                 TTempState? tempState = null;
@@ -82,7 +82,7 @@ namespace Microsoft.Bot.Builder.M365.State
             }
         }
 
-        public async Task SaveStateAsync(IStorage? storage, ITurnContext turnContext, TDefaultTurnState turnState)
+        public async Task SaveStateAsync(IStorage? storage, ITurnContext turnContext, TState turnState)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Microsoft.Bot.Builder.M365.State
 
                 foreach (string key in turnState.Keys)
                 {
-                    if (turnState.TryGetValue(key, out TurnStateEntry<object> entry))
+                    if (turnState.TryGetValue(key, out IReadOnlyEntry<object> entry))
                     {
                         if (entry.StorageKey != null)
                         {
@@ -141,7 +141,7 @@ namespace Microsoft.Bot.Builder.M365.State
         }
     }
 
-    public class DefaultTurnStateManager : DefaultTurnStateManager<DefaultTurnState, StateBase, StateBase, TempState>
+    public class TurnStateManager : TurnStateManager<TurnState, StateBase, StateBase, TempState>
     {
     }
 }

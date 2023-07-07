@@ -237,16 +237,14 @@ namespace Microsoft.Bot.Builder.M365.AI
             bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler(turnContext, turnState, plan);
             if (continueChain)
             {
-                DefaultTurnState? defaultTurnState = _CastToDefaultTurnState(turnState);
-
                 // Update conversation history
-                if (defaultTurnState != null && options?.History != null && options.History.TrackHistory)
+                if (turnState != null && options?.History != null && options.History.TrackHistory)
                 {
                     string userPrefix = Options.History!.UserPrefix.Trim();
-                    string userInput = defaultTurnState.TempState!.Value.Input.Trim();
+                    string userInput = turnState.TempState!.Value.Input.Trim();
                     int doubleMaxTurns = Options.History.MaxTurns * 2;
 
-                    ConversationHistory.AddLine(defaultTurnState, $"{userPrefix} ${userInput}", doubleMaxTurns);
+                    ConversationHistory.AddLine(turnState, $"{userPrefix} ${userInput}", doubleMaxTurns);
                     string assisstantPrefix = Options.History!.AssistantPrefix.Trim();
 
                     switch (options?.History.AssistantHistoryType)
@@ -257,7 +255,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                                 .OfType<PredictedSayCommand>()
                                 .Select(c => c.Response));
 
-                            ConversationHistory.AddLine(defaultTurnState, $"{assisstantPrefix}, ${text}");
+                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix}, ${text}");
 
                             break;
 
@@ -265,7 +263,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                         default:
                             // Embed the plan object to re-enforce the model
                             // TODO: Add support for XML as well
-                            ConversationHistory.AddLine(defaultTurnState, $"{assisstantPrefix} {plan.ToJsonString()}");
+                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix} {plan.ToJsonString()}");
                             break;
                     }
 
@@ -280,10 +278,16 @@ namespace Microsoft.Bot.Builder.M365.AI
                 {
                     if (_actions.HasAction(doCommand.Action))
                     {
+                        DoCommandActionData<TState> data = new()
+                        {
+                            PredictedDoCommand = doCommand,
+                            Handler = _actions.GetAction(doCommand.Action).Handler
+                        };
+
                         // Call action handler
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.DoCommandActionName)!
-                            .Handler(turnContext, turnState, doCommand, doCommand.Action);
+                            .Handler(turnContext, turnState, data, doCommand.Action);
                     }
                     else
                     {
@@ -409,28 +413,20 @@ namespace Microsoft.Bot.Builder.M365.AI
 
         private void _SetTempStateValues(TState turnState, ITurnContext turnContext, AIOptions<TState>? options)
         {
-            // TODO: Clean up turn state infra to prevent uncesseraily complex logic
-            DefaultTurnState? defaultTurnState = _CastToDefaultTurnState(turnState);
+            TempState? tempState =  turnState.TempState?.Value;
 
-            if (defaultTurnState != null)
+            if (tempState != null)
             {
-                TempState? tempState = defaultTurnState.TempState?.Value;
-
-                if (tempState != null)
+                if (tempState.Input == null || tempState.Input == string.Empty)
                 {
-                    tempState.Input ??= turnContext.Activity.Text;
+                    tempState.Input = turnContext.Activity.Text;
+                }
 
-                    if (tempState.History == null && options?.History != null && options.History.TrackHistory)
-                    {
-                        tempState.History = ConversationHistory.ToString(defaultTurnState, options.History.MaxTokens, options.History.LineSeparator);
-                    }
+                if (tempState.History == null && options?.History != null && options.History.TrackHistory)
+                {
+                    tempState.History = ConversationHistory.ToString(turnState, options.History.MaxTokens, options.History.LineSeparator);
                 }
             }
-        }
-
-        private DefaultTurnState? _CastToDefaultTurnState(TState turnState)
-        {
-            return turnState as object as DefaultTurnState;
         }
     }   
 }

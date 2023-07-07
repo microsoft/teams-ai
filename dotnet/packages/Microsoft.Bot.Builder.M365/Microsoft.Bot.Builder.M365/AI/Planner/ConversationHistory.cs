@@ -14,7 +14,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <param name="turnState">Applications turn state.</param>
         /// <param name="line">Line of text to add to history.</param>
         /// <param name="maxLines">Optional. Maximum number of lines to store. Defaults to 10.</param>
-        public static void AddLine(DefaultTurnState turnState, string line, int maxLines = 10)
+        public static void AddLine(TurnState turnState, string line, int maxLines = 10)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
             Verify.ParamNotNull(line, nameof(line));
@@ -37,7 +37,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             _SetHistory(turnState, history);
         }
 
-        public static void AppendToLastLine(DefaultTurnState turnState, string text)
+        public static void AppendToLastLine(TurnState turnState, string text)
         {
             string line = GetLastLine(turnState);
             ReplaceLastLine(turnState, line + text);
@@ -47,7 +47,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// Clears all conversation history for the current conversation.
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
-        public static void Clear(DefaultTurnState turnState)
+        public static void Clear(TurnState turnState)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
             _VerifyConversationState(turnState);
@@ -60,7 +60,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>True if there are 1 or more lines of history.</returns>
-        public static bool HasMoreLines(DefaultTurnState turnState)
+        public static bool HasMoreLines(TurnState turnState)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
             _VerifyConversationState(turnState);
@@ -74,7 +74,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>The last line of history or an empty string.</returns>
-        public static string GetLastLine(DefaultTurnState turnState)
+        public static string GetLastLine(TurnState turnState)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
             _VerifyConversationState(turnState);
@@ -88,7 +88,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>Last thing said by the assistant. Defaults to an empty string.</returns>
-        public static string GetLastSay(DefaultTurnState turnState)
+        public static string GetLastSay(TurnState turnState)
         {
             // Find start of text
             string lastLine = GetLastLine(turnState);
@@ -136,7 +136,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>The removed line or null.</returns>
-        public static string? RemoveLastLine(DefaultTurnState turnState)
+        public static string? RemoveLastLine(TurnState turnState)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
 
@@ -164,7 +164,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <param name="line">New line of history.</param>
-        public static void ReplaceLastLine(DefaultTurnState turnState, string line)
+        public static void ReplaceLastLine(TurnState turnState, string line)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
             Verify.ParamNotNull(line, nameof(line));
@@ -193,7 +193,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <param name="turnState">Applications turn state.</param>
         /// <param name="newResponse">New response from the assistant.</param>
         /// <param name="assistantPrefix">Prefix for when a new line needs to be inserted. Defaults to 'Assistant:'.</param>
-        public static void ReplaceLastSay(DefaultTurnState turnState, string newResponse, string assistantPrefix = "Assistant:")
+        public static void ReplaceLastSay(TurnState turnState, string newResponse, string assistantPrefix = "Assistant:")
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
             Verify.ParamNotNull(newResponse, nameof(newResponse));
@@ -243,7 +243,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <param name="maxTokens">Optional. Maximum length of the text returned. Defaults to 1000 tokens.</param>
         /// <param name="lineSeparator">Optional. Separator used between lines. Defaults to '\n'.</param>
         /// <returns>The most recent lines of conversation history as a text string.</returns>
-        public static string ToString(DefaultTurnState turnState, int maxTokens = 1000, string lineSeparator = "\n")
+        public static string ToString(TurnState turnState, int maxTokens = 1000, string lineSeparator = "\n")
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
 
@@ -279,7 +279,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <param name="turnState">The Application's turn state.</param>
         /// <param name="maxTokens">Optional. Maximum length of the text to include. Defaults to 1000 tokens.</param>
         /// <returns>The most recent lines of conversation history as an array.</returns>
-        public static string[] ToArray(DefaultTurnState turnState, int maxTokens = 1000)
+        public static string[] ToArray(TurnState turnState, int maxTokens = 1000)
         {
             Verify.ParamNotNull(turnState, nameof(turnState));
 
@@ -313,7 +313,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// </summary>
         /// <param name="turnState">The application turn state</param>
         /// <returns>The coversation history</returns>
-        public static List<string> GetHistory(DefaultTurnState turnState)
+        public static List<string> GetHistory(TurnState turnState)
         {
             if (turnState.ConversationState != null && turnState.ConversationState.Value.TryGetValue(StatePropertyName, out object history))
             {
@@ -327,7 +327,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
 
-        private static void _VerifyConversationState(DefaultTurnState turnState)
+        private static void _VerifyConversationState(TurnState turnState)
         {
             if (turnState.ConversationState == null)
             {
@@ -335,7 +335,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             }
         }
 
-        private static void _SetHistory(DefaultTurnState turnState, List<string> newHistory)
+        private static void _SetHistory(TurnState turnState, List<string> newHistory)
         {
             turnState.ConversationState?.Value.Set(StatePropertyName, newHistory);
         }
