@@ -22,11 +22,12 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
         /// </summary>
         /// <param name="options">Options to configure the moderator</param>
         /// <param name="logger">A logger instance</param>
+        /// <param name="httpClient">HTTP client.</param>
         public OpenAIModerator(OpenAIModeratorOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
             _options = options;
 
-            OpenAIClientOptions clientOptions = new(_options.ApiKey, _options.DefaultModel)
+            OpenAIClientOptions clientOptions = new(_options.ApiKey)
             {
                 Organization = _options.Organization,
             };
@@ -98,9 +99,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
         {
             try
             {
-                ModerationResponse response = await _client.ExecuteTextModeration(text);
+                ModerationResponse response = await _client.ExecuteTextModeration(text, _options.Model);
                 ModerationResult? result = response.Results.Count > 0 ? response.Results[0] : null;
-                            
+                
                 if (result != null)
                 {
                     if (result.Flagged)

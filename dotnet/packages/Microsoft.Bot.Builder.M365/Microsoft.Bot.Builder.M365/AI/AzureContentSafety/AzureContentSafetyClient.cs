@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Builder.M365.AI.Moderator;
-using Microsoft.Bot.Builder.M365.Exceptions;
+﻿using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Runtime.Serialization;
@@ -7,45 +7,38 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Microsoft.Bot.Builder.M365.OpenAI
+namespace Microsoft.Bot.Builder.M365.AI.AzureContentSafety
 {
     /// <summary>
-    /// The client to make calls to OpenAI's API
+    /// The client to make calls to Azure Content Safety API.
     /// </summary>
-    public class OpenAIClient
+    public class AzureContentSafetyClient
     {
         private const string HttpUserAgent = "Microsoft Teams AI";
-        private const string OpenAIModerationEndpoint = "https://api.openai.com/v1/moderations";
 
-        private HttpClient _httpClient;
-        private ILogger? _logger;
-        private OpenAIClientOptions _options;
+        private readonly HttpClient _httpClient;
+        private readonly ILogger? _logger;
+        private readonly AzureContentSafetyClientOptions _options;
 
-        public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
+        public AzureContentSafetyClient(AzureContentSafetyClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
             _httpClient = httpClient ?? new HttpClient();
             _logger = logger;
             _options = options;
-
         }
 
         /// <summary>
-        /// Make a call to the OpenAI text moderation endpoint.
+        /// Make a call to the Azure Content Safety text analysis API.
         /// </summary>
-        /// <param name="text">The input text to moderate.</param>
-        /// <param name="model">The moderation model to use.</param>
-        /// <returns>The moderation result from the API call.</returns>
-        /// <exception cref="OpenAIClientException" />
-        public virtual async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
+        /// <param name="request">The <see cref="AzureContentSafetyTextAnalysisRequest">.</param>
+        /// <returns>The <see cref="AzureContentSafetyTextAnalysisResponse"></returns>
+        /// <exception cref="AzureContentSafetyClientException" />
+        public virtual async Task<AzureContentSafetyTextAnalysisResponse> ExecuteTextModeration(AzureContentSafetyTextAnalysisRequest request)
         {
             try
             {
                 using HttpContent content = new StringContent(
-                    JsonSerializer.Serialize(new
-                    {
-                        model = model,
-                        input = text 
-                    }, new JsonSerializerOptions()
+                    JsonSerializer.Serialize(request, new JsonSerializerOptions()
                     {
                         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     }),
@@ -53,20 +46,23 @@ namespace Microsoft.Bot.Builder.M365.OpenAI
                     "application/json"
                 );
 
-                HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIModerationEndpoint, content);
+                string apiVersion = _options.ApiVersion ?? "2023-04-30-preview";
+                string url = $"{_options.Endpoint}/contentsafety/text:analyze?api-version={apiVersion}";
+                HttpResponseMessage httpResponse = await _ExecutePostRequest(url, content);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
-                ModerationResponse result = JsonSerializer.Deserialize<ModerationResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
-                
+                AzureContentSafetyTextAnalysisResponse result = JsonSerializer.Deserialize<AzureContentSafetyTextAnalysisResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
+
+                Verify.NotNull(result.HateResult);
                 return result;
             }
-            catch (OpenAIClientException)
+            catch (AzureContentSafetyClientException)
             {
                 throw;
             }
             catch (Exception e)
             {
-                throw new OpenAIClientException($"Something went wrong: {e.Message}");
+                throw new AzureContentSafetyClientException($"Something went wrong: {e.Message}");
             }
         }
 
@@ -79,13 +75,8 @@ namespace Microsoft.Bot.Builder.M365.OpenAI
                 using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url))
                 {
                     request.Headers.Add("Accept", "application/json");
-                    request.Headers.Add("User-Agent", HttpUserAgent);      
-                    request.Headers.Add("Authorization", $"Bearer {_options.ApiKey}");
-
-                    if (_options.Organization != null)
-                    {
-                        request.Headers.Add("OpenAI-Organization", _options.Organization);
-                    }
+                    request.Headers.Add("User-Agent", HttpUserAgent);
+                    request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey);
 
                     if (content != null)
                     {
@@ -106,12 +97,12 @@ namespace Microsoft.Bot.Builder.M365.OpenAI
                 HttpStatusCode statusCode = response.StatusCode;
                 string failureReason = response.ReasonPhrase;
 
-                throw new OpenAIClientException($"HTTP response failure status code: {(int)statusCode} ({failureReason})", statusCode);
+                throw new AzureContentSafetyClientException($"HTTP response failure status code: ${statusCode} ({failureReason})", statusCode);
 
             }
             catch (Exception e)
             {
-                throw new OpenAIClientException($"Something went wrong {e.Message}");
+                throw new AzureContentSafetyClientException($"Something went wrong {e.Message}");
             }
 
         }

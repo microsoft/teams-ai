@@ -78,11 +78,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
@@ -104,11 +104,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
@@ -131,11 +131,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 new PromptTemplateConfiguration
                 {
                     Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
                 }
             );
 
@@ -233,11 +233,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                {
+                    MaxTokens = 2000,
+                    Temperature = 0.2,
+                    TopP = 0.5,
+                }
             };
 
             var name = "promptTemplateName";
@@ -267,11 +267,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                {
+                    MaxTokens = 2000,
+                    Temperature = 0.2,
+                    TopP = 0.5,
+                }
             };
             /// Configure function
             var promptFunctionName = "promptFunctionName";
@@ -306,11 +306,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                {
+                    MaxTokens = 2000,
+                    Temperature = 0.2,
+                    TopP = 0.5,
+                }
             };
             
             /// Prompt function not configured
