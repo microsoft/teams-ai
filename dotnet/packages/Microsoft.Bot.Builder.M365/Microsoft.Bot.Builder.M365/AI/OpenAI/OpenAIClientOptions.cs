@@ -13,22 +13,12 @@
         public string? Organization { get; set; }
 
         /// <summary>
-        /// The default model to use.
-        /// </summary>
-        /// <remarks>
-        /// Prompts can override this model.
-        /// </remarks>
-        public string DefaultModel { get; set; }
-
-        /// <summary>
         /// Create an instance of the OpenAIModeratorOptions class.
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="defaultModel">The default model to use.</param>
-        public OpenAIClientOptions(string apiKey, string defaultModel)
+        public OpenAIClientOptions(string apiKey)
         {
             ApiKey = apiKey;
-            DefaultModel = defaultModel;
         }
     }
 }
