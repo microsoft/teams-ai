@@ -26,7 +26,6 @@ namespace Microsoft.Bot.Builder.M365
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     public class Application<TState> : IBot where TState : TurnState
     {
-        private readonly ApplicationOptions<TState> _options;
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
 
@@ -38,21 +37,21 @@ namespace Microsoft.Bot.Builder.M365
         {
             Verify.NotNull(options);
 
-            _options = options;
+            Options = options;
 
-            if (_options.TurnStateManager == null)
+            if (Options.TurnStateManager == null)
             {
                 // TODO: set to default turn state manager
-                _options.TurnStateManager = null;
+                Options.TurnStateManager = null;
             }
 
-            if (_options.AI != null)
+            if (Options.AI != null)
             {
-                _ai = new AI<TState>(_options.AI, logger);
+                _ai = new AI<TState>(Options.AI, logger);
             }
 
             // Validate long running messages configuration
-            if (_options.LongRunningMessages == true && (_options.Adapter == null || _options.BotAppId == null))
+            if (Options.LongRunningMessages == true && (Options.Adapter == null || Options.BotAppId == null))
             {
                 throw new Exception("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
             }
@@ -82,7 +81,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <summary>
         /// The application's configured options.
         /// </summary>
-        public ApplicationOptions<TState> Options { get { return _options; } }
+        public ApplicationOptions<TState> Options { get; }
 
         /// <summary>
         /// Handler that will execute before the turn's activity handler logic is processed.
@@ -92,7 +91,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True to continue execution of the current turn. Otherwise, return False.</returns>
-        protected virtual Task<bool> OnBeforeTurnAsync (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual Task<bool> OnBeforeTurnAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
         }
@@ -156,14 +155,14 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 // Start typing timer if configured
-                if (_options.StartTypingTimer)
+                if (Options.StartTypingTimer)
                 {
                     timer = new TypingTimer(_typingTimerDelay);
-                    timer.Start(turnContext);
+                    _ = timer.Start(turnContext);
                 };
 
                 // Remove @mentions
-                if (_options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
+                if (Options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
                 {
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
@@ -183,7 +182,7 @@ namespace Microsoft.Bot.Builder.M365
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.ChainAsync(turnContext, turnState);
+                    _ = await _ai.ChainAsync(turnContext, turnState);
                 }
 
                 // Call after turn activity handler
@@ -259,12 +258,12 @@ namespace Microsoft.Bot.Builder.M365
                         break;
 
                     case ActivityTypes.Invoke:
-                        var invokeResponse = await OnInvokeActivityAsync(new DelegatingTurnContext<IInvokeActivity>(turnContext), turnState, cancellationToken).ConfigureAwait(false);
+                        InvokeResponse invokeResponse = await OnInvokeActivityAsync(new DelegatingTurnContext<IInvokeActivity>(turnContext), turnState, cancellationToken).ConfigureAwait(false);
 
                         // If OnInvokeActivityAsync has already sent an InvokeResponse, do not send another one.
                         if (invokeResponse != null && turnContext.TurnState.Get<Activity>(BotAdapter.InvokeResponseKey) == null)
                         {
-                            await turnContext.SendActivityAsync(new Activity { Value = invokeResponse, Type = ActivityTypesEx.InvokeResponse }, cancellationToken).ConfigureAwait(false);
+                            _ = await turnContext.SendActivityAsync(new Activity { Value = invokeResponse, Type = ActivityTypesEx.InvokeResponse }, cancellationToken).ConfigureAwait(false);
                         }
 
                         break;
@@ -294,8 +293,8 @@ namespace Microsoft.Bot.Builder.M365
                         break;
                 }
 
-            } 
-            catch (NotImplementedException) 
+            }
+            catch (NotImplementedException)
             {
                 return false;
             }
@@ -354,7 +353,7 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                var channelData = turnContext.Activity.GetChannelData<TeamsChannelData>();
+                TeamsChannelData? channelData = turnContext.Activity.GetChannelData<TeamsChannelData>();
 
                 if (channelData != null)
                 {
@@ -417,7 +416,7 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                var channelData = turnContext.Activity.GetChannelData<TeamsChannelData>();
+                TeamsChannelData? channelData = turnContext.Activity.GetChannelData<TeamsChannelData>();
 
                 if (channelData != null)
                 {
@@ -480,7 +479,7 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                var channelData = turnContext.Activity.GetChannelData<TeamsChannelData>();
+                TeamsChannelData? channelData = turnContext.Activity.GetChannelData<TeamsChannelData>();
 
                 if (turnContext.Activity.MembersAdded != null)
                 {
@@ -557,19 +556,19 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual async Task OnMembersAddedDispatchAsync(IList<ChannelAccount> membersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual async Task OnMembersAddedDispatchAsync(IList<ChannelAccount> membersAdded, TeamInfo? teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            var teamsMembersAdded = new List<TeamsChannelAccount>();
-            foreach (var memberAdded in membersAdded)
+            List<TeamsChannelAccount> teamsMembersAdded = new();
+            foreach (ChannelAccount memberAdded in membersAdded)
             {
                 if (memberAdded.Properties.HasValues || memberAdded.Id == turnContext.Activity?.Recipient?.Id)
                 {
                     // when the ChannelAccount object is fully a TeamsChannelAccount, or the bot (when Teams changes the service to return the full details)
-                    teamsMembersAdded.Add(JObject.FromObject(memberAdded).ToObject<TeamsChannelAccount>());
+                    teamsMembersAdded.Add(JObject.FromObject(memberAdded).ToObject<TeamsChannelAccount>()!);
                 }
                 else
                 {
-                    TeamsChannelAccount newMemberInfo = null;
+                    TeamsChannelAccount? newMemberInfo = null;
                     try
                     {
                         newMemberInfo = await TeamsInfo.GetMemberAsync(turnContext, memberAdded.Id, cancellationToken).ConfigureAwait(false);
@@ -611,12 +610,12 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMembersRemovedDispatchAsync(IList<ChannelAccount> membersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual Task OnMembersRemovedDispatchAsync(IList<ChannelAccount> membersRemoved, TeamInfo? teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            var teamsMembersRemoved = new List<TeamsChannelAccount>();
-            foreach (var memberRemoved in membersRemoved)
+            List<TeamsChannelAccount> teamsMembersRemoved = new();
+            foreach (ChannelAccount memberRemoved in membersRemoved)
             {
-                teamsMembersRemoved.Add(JObject.FromObject(memberRemoved).ToObject<TeamsChannelAccount>());
+                teamsMembersRemoved.Add(JObject.FromObject(memberRemoved).ToObject<TeamsChannelAccount>()!);
             }
 
             return OnMembersRemovedAsync(teamsMembersRemoved, teamInfo, turnContext, turnState, cancellationToken);
@@ -634,7 +633,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMembersAddedAsync(IList<TeamsChannelAccount> teamsMembersAdded, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual Task OnMembersAddedAsync(IList<TeamsChannelAccount> teamsMembersAdded, TeamInfo? teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             return OnMembersAddedAsync(teamsMembersAdded.Cast<ChannelAccount>().ToList(), turnContext, turnState, cancellationToken);
         }
@@ -651,7 +650,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
-        protected virtual Task OnMembersRemovedAsync(IList<TeamsChannelAccount> teamsMembersRemoved, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
+        protected virtual Task OnMembersRemovedAsync(IList<TeamsChannelAccount> teamsMembersRemoved, TeamInfo? teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             return OnMembersRemovedAsync(teamsMembersRemoved.Cast<ChannelAccount>().ToList(), turnContext, turnState, cancellationToken);
         }
@@ -888,21 +887,21 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>
         protected virtual async Task OnMessageReactionActivityAsync(ITurnContext<IMessageReactionActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
-            var reactionsAddedNotImplemented = false;
-            var reactionsRemovedNotImplemented = false;
+            bool reactionsAddedNotImplemented = false;
+            bool reactionsRemovedNotImplemented = false;
 
             if (turnContext.Activity.ReactionsAdded != null)
             {
                 try
                 {
                     await OnReactionsAddedAsync(turnContext.Activity.ReactionsAdded, turnContext, turnState, cancellationToken).ConfigureAwait(false);
-                } 
+                }
                 catch (NotImplementedException)
                 {
                     reactionsAddedNotImplemented = true;
                 }
             }
-            
+
             if (turnContext.Activity.ReactionsRemoved != null)
             {
                 try
@@ -913,9 +912,8 @@ namespace Microsoft.Bot.Builder.M365
                 {
                     reactionsRemovedNotImplemented = true;
                 }
-                
-            } 
-            
+            }
+
             if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
             {
                 throw new NotImplementedException();
@@ -944,7 +942,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <seealso cref="Activity.Id"/>
         /// <seealso cref="ITurnContext.SendActivityAsync(IActivity, CancellationToken)"/>
         /// <seealso cref="ResourceResponse.Id"/>
-        protected virtual Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TState turnState,  CancellationToken cancellationToken)
+        protected virtual Task OnReactionsAddedAsync(IList<MessageReaction> messageReactions, ITurnContext<IMessageReactionActivity> turnContext, TState turnState, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -1017,11 +1015,11 @@ namespace Microsoft.Bot.Builder.M365
                 switch (turnContext.Activity.Name)
                 {
                     case "application/vnd.microsoft.readReceipt":
-                        return OnReadReceiptAsync(JObject.FromObject(turnContext.Activity.Value).ToObject<ReadReceiptInfo>(), turnContext, turnState, cancellationToken);
+                        return OnReadReceiptAsync(JObject.FromObject(turnContext.Activity.Value).ToObject<ReadReceiptInfo>()!, turnContext, turnState, cancellationToken);
                     case "application/vnd.microsoft.meetingStart":
-                        return OnMeetingStartAsync(JObject.FromObject(turnContext.Activity.Value).ToObject<MeetingStartEventDetails>(), turnContext, turnState, cancellationToken);
+                        return OnMeetingStartAsync(JObject.FromObject(turnContext.Activity.Value).ToObject<MeetingStartEventDetails>()!, turnContext, turnState, cancellationToken);
                     case "application/vnd.microsoft.meetingEnd":
-                        return OnMeetingEndAsync(JObject.FromObject(turnContext.Activity.Value).ToObject<MeetingEndEventDetails>(), turnContext, turnState, cancellationToken);
+                        return OnMeetingEndAsync(JObject.FromObject(turnContext.Activity.Value).ToObject<MeetingEndEventDetails>()!, turnContext, turnState, cancellationToken);
                 }
             }
 
@@ -1135,7 +1133,7 @@ namespace Microsoft.Bot.Builder.M365
                             return CreateInvokeResponse(await OnMessagingExtensionQueryAsync(SafeCast<MessagingExtensionQuery>(turnContext.Activity.Value), turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                         case "composeExtension/selectItem":
-                            return CreateInvokeResponse(await OnMessagingExtensionSelectItemAsync(turnContext.Activity.Value as JObject, turnContext, turnState, cancellationToken).ConfigureAwait(false));
+                            return CreateInvokeResponse(await OnMessagingExtensionSelectItemAsync((turnContext.Activity.Value as JObject)!, turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                         case "composeExtension/submitAction":
                             return CreateInvokeResponse(await OnMessagingExtensionSubmitActionDispatchAsync(SafeCast<MessagingExtensionAction>(turnContext.Activity.Value), turnContext, turnState, cancellationToken).ConfigureAwait(false));
@@ -1147,11 +1145,11 @@ namespace Microsoft.Bot.Builder.M365
                             return CreateInvokeResponse(await OnMessagingExtensionConfigurationQuerySettingUrlAsync(SafeCast<MessagingExtensionQuery>(turnContext.Activity.Value), turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                         case "composeExtension/setting":
-                            await OnMessagingExtensionConfigurationSettingAsync(turnContext.Activity.Value as JObject, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+                            await OnMessagingExtensionConfigurationSettingAsync((turnContext.Activity.Value as JObject)!, turnContext, turnState, cancellationToken).ConfigureAwait(false);
                             return CreateInvokeResponse(null);
 
                         case "composeExtension/onCardButtonClicked":
-                            await OnMessagingExtensionCardButtonClickedAsync(turnContext.Activity.Value as JObject, turnContext, turnState, cancellationToken).ConfigureAwait(false);
+                            await OnMessagingExtensionCardButtonClickedAsync((turnContext.Activity.Value as JObject)!, turnContext, turnState, cancellationToken).ConfigureAwait(false);
                             return CreateInvokeResponse(null);
 
                         case "task/fetch":
@@ -1167,11 +1165,11 @@ namespace Microsoft.Bot.Builder.M365
                             return CreateInvokeResponse(await OnTabSubmitAsync(SafeCast<TabSubmit>(turnContext.Activity.Value), turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                         case "application/search":
-                            var searchInvokeValue = GetSearchInvokeValue(turnContext.Activity);
+                            SearchInvokeValue searchInvokeValue = GetSearchInvokeValue(turnContext.Activity);
                             return CreateInvokeResponse(await OnSearchInvokeAsync(searchInvokeValue, turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                         case "adaptiveCard/action":
-                            var invokeValue = GetAdaptiveCardInvokeValue(turnContext.Activity);
+                            AdaptiveCardInvokeValue invokeValue = GetAdaptiveCardInvokeValue(turnContext.Activity);
                             return CreateInvokeResponse(await OnAdaptiveCardActionExecuteAsync(invokeValue, turnContext, turnState, cancellationToken).ConfigureAwait(false));
 
                         case SignInConstants.VerifyStateOperationName:
@@ -1186,7 +1184,7 @@ namespace Microsoft.Bot.Builder.M365
             }
             catch (InvokeResponseException e)
             {
-                 return new InvokeResponse
+                return new InvokeResponse
                 {
                     Status = (int)e.StatusCode,
                     Body = e.Body
@@ -1218,7 +1216,7 @@ namespace Microsoft.Bot.Builder.M365
         {
             switch (turnContext.Activity.Name)
             {
-                case SignInConstants.VerifyStateOperationName: 
+                case SignInConstants.VerifyStateOperationName:
                     return OnSignInVerifyStateAsync(turnContext, turnState, cancellationToken);
                 case SignInConstants.TokenExchangeOperationName:
                     return OnSignInTokenExchangeAsync(turnContext, turnState, cancellationToken);
@@ -1302,14 +1300,14 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (activity.Value == null)
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Missing value property for search");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Missing value property for search");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
             }
 
-            var obj = activity.Value as JObject;
+            JObject? obj = activity.Value as JObject;
             if (obj == null)
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed for search");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed for search");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
             }
 
@@ -1318,11 +1316,14 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 invokeValue = obj.ToObject<SearchInvokeValue>();
-                if (invokeValue == null) throw new Exception();
+                if (invokeValue == null)
+                {
+                    throw new Exception();
+                }
             }
             catch (Exception ex)
             {
-                var errorResponse = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not valid for search");
+                AdaptiveCardInvokeResponse errorResponse = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not valid for search");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, errorResponse, ex);
             }
 
@@ -1337,7 +1338,7 @@ namespace Microsoft.Bot.Builder.M365
             if (string.IsNullOrEmpty(searchInvokeValue.Kind))
             {
                 // Teams does not always send the 'kind' field. Default to 'search'.
-                if (Connector.Channels.Msteams.Equals(channelId, StringComparison.OrdinalIgnoreCase))
+                if (Channels.Msteams.Equals(channelId, StringComparison.OrdinalIgnoreCase))
                 {
                     searchInvokeValue.Kind = SearchInvokeTypes.Search;
                 }
@@ -1354,7 +1355,7 @@ namespace Microsoft.Bot.Builder.M365
 
             if (missingField != null)
             {
-                var errorResponse = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", $"Missing {missingField} property for search");
+                AdaptiveCardInvokeResponse errorResponse = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", $"Missing {missingField} property for search");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, errorResponse);
             }
         }
@@ -1363,14 +1364,14 @@ namespace Microsoft.Bot.Builder.M365
         {
             if (activity.Value == null)
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Missing value property");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Missing value property");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
             }
 
-            var obj = activity.Value as JObject;
+            JObject? obj = activity.Value as JObject;
             if (obj == null)
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
             }
 
@@ -1379,23 +1380,26 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 invokeValue = obj.ToObject<AdaptiveCardInvokeValue>();
-                if (invokeValue == null) throw new Exception();
+                if (invokeValue == null)
+                {
+                    throw new Exception();
+                }
             }
             catch (Exception ex)
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Value property is not properly formed");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response, ex);
             }
 
             if (invokeValue.Action == null)
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Missing action property");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "BadRequest", "Missing action property");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
             }
 
             if (invokeValue.Action.Type != "Action.Execute")
             {
-                var response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "NotSupported", $"The action '{invokeValue.Action.Type}'is not supported.");
+                AdaptiveCardInvokeResponse response = CreateAdaptiveCardInvokeErrorResponse(HttpStatusCode.BadRequest, "NotSupported", $"The action '{invokeValue.Action.Type}'is not supported.");
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, response);
             }
 
@@ -1993,10 +1997,10 @@ namespace Microsoft.Bot.Builder.M365
         /// <returns>A task that represents the work queued to execute.</returns>
         private Task _StartLongRunningCall(ITurnContext turnContext, Func<ITurnContext, CancellationToken, Task> handler, CancellationToken cancellationToken = default)
         {
-            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && _options.LongRunningMessages == true)
+            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && Options.LongRunningMessages == true)
             {
                 /// <see cref="BotAdapter.ContinueConversationAsync"/> supports <see cref="Activity"/> as input
-                return _options.Adapter!.ContinueConversationAsync(_options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
+                return Options.Adapter!.ContinueConversationAsync(Options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
             }
             else
             {
@@ -2011,13 +2015,13 @@ namespace Microsoft.Bot.Builder.M365
         /// <returns>The object casted in the new type.</returns>
         private static T SafeCast<T>(object value)
         {
-            var obj = value as JObject;
+            JObject? obj = value as JObject;
             if (obj == null)
             {
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, $"expected type '{value.GetType().Name}'");
             }
 
-            return obj.ToObject<T>();
+            return obj.ToObject<T>()!;
         }
     }
 }

@@ -1,16 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
-using Microsoft.Bot.Schema.Teams;
-using Microsoft.Rest.Serialization;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 {
@@ -493,7 +490,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""StartTime"":""2021-06-05T00:01:02.0Z""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -527,7 +524,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""EndTime"":""2021-06-05T01:02:03.0Z""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -562,7 +559,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""lastReadMessageId"":""10101010""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -681,7 +678,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
             turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
-            turnContextMock.Setup(tc => tc.Adapter).Returns(new BotFrameworkAdapter(new SimpleCredentialProvider()));
+            turnContextMock.Setup(tc => tc.Adapter).Returns(new CloudAdapter());
             turnContextMock.Setup(tc => tc.TurnState).Returns(new TurnContextStateCollection());
             turnContextMock.Setup(tc => tc.Responded).Returns(false);
             turnContextMock.Setup(tc => tc.OnDeleteActivity(It.IsAny<DeleteActivityHandler>()));

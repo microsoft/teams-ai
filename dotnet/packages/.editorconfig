@@ -179,6 +179,7 @@ dotnet_diagnostic.IDE0050.severity = warning # Convert anonymous type to tuple
 dotnet_diagnostic.IDE0051.severity = warning # Remove unused private member
 dotnet_diagnostic.IDE0052.severity = warning # Remove unread private member
 dotnet_diagnostic.IDE0055.severity = warning # Formatting rule
+dotnet_diagnostic.IDE0058.severity = warning # Remove unused expression value
 dotnet_diagnostic.IDE0059.severity = warning # Unnecessary assignment of a value
 dotnet_diagnostic.IDE0060.severity = warning # Remove unused parameter
 dotnet_diagnostic.IDE0070.severity = warning # Use 'System.HashCode.Combine'
