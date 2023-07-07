@@ -21,10 +21,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 
             var adapter = new TestInvokeAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -44,10 +44,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Name = SignInConstants.TokenExchangeOperationName,
             };
             var turnContext = new TurnContext(new TestInvokeAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -70,10 +70,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             };
             var adapter = new TestInvokeAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -110,10 +110,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -154,10 +154,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -190,10 +190,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -225,10 +225,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -260,10 +260,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -295,10 +295,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -330,10 +330,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -365,10 +365,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -404,10 +404,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -443,10 +443,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -479,10 +479,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -514,10 +514,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -549,10 +549,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -584,10 +584,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -619,10 +619,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -654,10 +654,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -689,10 +689,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -723,10 +723,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -755,10 +755,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             };
 
             var turnContext = new TurnContext(new TestInvokeAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -776,10 +776,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             var activity = GetSearchActivity(value);
             activity.ChannelId = Channels.Msteams;
             var turnContext = new TurnContext(new TestInvokeAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -796,10 +796,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             var value = JObject.FromObject(new SearchInvokeValue { Kind = SearchInvokeTypes.Search, QueryText = "bot" });
             var activity = GetSearchActivity(value);
             var turnContext = new TurnContext(new TestInvokeAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -852,10 +852,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             // Arrange
             var adapter = new TestInvokeAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager>());
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert

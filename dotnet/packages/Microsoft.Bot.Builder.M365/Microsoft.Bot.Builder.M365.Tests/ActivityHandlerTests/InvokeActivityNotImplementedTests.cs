@@ -32,10 +32,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions());
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -72,10 +72,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -112,10 +112,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -143,10 +143,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -174,10 +174,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -205,10 +205,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -236,10 +236,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -267,10 +267,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -301,10 +301,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -335,10 +335,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -366,10 +366,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -396,10 +396,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -426,10 +426,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -457,10 +457,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -488,10 +488,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -528,10 +528,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandlerFileConsent(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandlerFileConsent(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -568,10 +568,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandlerFileConsent(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandlerFileConsent(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -602,10 +602,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandlerMessagePreview(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandlerMessagePreview(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -637,10 +637,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandlerMessagePreview(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandlerMessagePreview(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -677,10 +677,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -711,10 +711,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             }
 
             var turnContext = new TurnContext(new SimpleAdapter(CaptureSend), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
-            var bot = new TestActivityHandler(new ApplicationOptions<TurnState, TurnStateManager> { });
+            var bot = new TestActivityHandler(new TestApplicationOptions { });
             await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
@@ -724,42 +724,42 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             Assert.Equal(400, ((InvokeResponse)activitiesToSend[0].Value).Status);
         }
 
-        private class TestActivityHandler : Application<TurnState, TurnStateManager>
+        private class TestActivityHandler : TestApplication
         {
-            public TestActivityHandler(ApplicationOptions<TurnState, TurnStateManager> options) : base(options)
+            public TestActivityHandler(TestApplicationOptions options) : base(options)
             {
             }
         }
 
-        private class TestActivityHandlerFileConsent : Application<TurnState, TurnStateManager>
+        private class TestActivityHandlerFileConsent : TestApplication
         {
-            public TestActivityHandlerFileConsent(ApplicationOptions<TurnState, TurnStateManager> options) : base(options)
+            public TestActivityHandlerFileConsent(TestApplicationOptions options) : base(options)
             {
             }
 
-            protected override Task OnFileConsentAcceptAsync(FileConsentCardResponse fileConsentCardResponse, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+            protected override Task OnFileConsentAcceptAsync(FileConsentCardResponse fileConsentCardResponse, ITurnContext<IInvokeActivity> turnContext, TestTurnState turnState, CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
             }
 
-            protected override Task OnFileConsentDeclineAsync(FileConsentCardResponse fileConsentCardResponse, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+            protected override Task OnFileConsentDeclineAsync(FileConsentCardResponse fileConsentCardResponse, ITurnContext<IInvokeActivity> turnContext, TestTurnState turnState, CancellationToken cancellationToken)
             {
                 return Task.CompletedTask;
             }
         }
 
-        private class TestActivityHandlerMessagePreview : Application<TurnState, TurnStateManager>
+        private class TestActivityHandlerMessagePreview : TestApplication
         {
-            public TestActivityHandlerMessagePreview(ApplicationOptions<TurnState, TurnStateManager> options) : base(options)
+            public TestActivityHandlerMessagePreview(TestApplicationOptions options) : base(options)
             {
             }
 
-            protected override Task<MessagingExtensionActionResponse> OnMessagingExtensionBotMessagePreviewEditAsync(MessagingExtensionAction action, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+            protected override Task<MessagingExtensionActionResponse> OnMessagingExtensionBotMessagePreviewEditAsync(MessagingExtensionAction action, ITurnContext<IInvokeActivity> turnContext, TestTurnState turnState, CancellationToken cancellationToken)
             {
                 return Task.FromResult(new MessagingExtensionActionResponse());
             }
 
-            protected override Task<MessagingExtensionActionResponse> OnMessagingExtensionBotMessagePreviewSendAsync(MessagingExtensionAction action, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+            protected override Task<MessagingExtensionActionResponse> OnMessagingExtensionBotMessagePreviewSendAsync(MessagingExtensionAction action, ITurnContext<IInvokeActivity> turnContext, TestTurnState turnState, CancellationToken cancellationToken)
             {
                 return Task.FromResult(new MessagingExtensionActionResponse());
             }

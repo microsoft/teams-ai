@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder.M365.AI.AzureContentSafety;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
+using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
@@ -10,7 +11,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
     /// An moderator that uses Azure Content Safety API.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public class AzureContentSafetyModerator<TState>: IModerator<TState> where TState : TurnState
+    public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : TurnState
     {
         private readonly AzureContentSafetyModeratorOptions _options;
         private readonly AzureContentSafetyClient _client;

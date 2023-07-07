@@ -1,15 +1,14 @@
 ﻿using Microsoft.Bot.Schema;
-using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.Tests.TestUtils
 {
-    internal class TestDelegatingTurnContext : Application<TurnState, TurnStateManager>
+    internal class TestDelegatingTurnContext : TestApplication
     {
-        public TestDelegatingTurnContext(ApplicationOptions<TurnState, TurnStateManager> options) : base(options)
+        public TestDelegatingTurnContext(TestApplicationOptions options) : base(options)
         {
         }
 
-        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TestTurnState turnState, CancellationToken cancellationToken)
         {
             // touch every
             var activity = turnContext.Activity;

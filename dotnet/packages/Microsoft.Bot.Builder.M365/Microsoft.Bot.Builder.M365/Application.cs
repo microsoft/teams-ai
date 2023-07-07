@@ -29,7 +29,6 @@ namespace Microsoft.Bot.Builder.M365
         where TState : TurnState
         where TTurnStateManager : ITurnStateManager<TState>, new()
     {
-        private readonly ApplicationOptions<TState, TTurnStateManager> _options;
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
 
@@ -43,7 +42,7 @@ namespace Microsoft.Bot.Builder.M365
 
             Options = options;
 
-            _options.TurnStateManager ??= new TTurnStateManager();
+            Options.TurnStateManager ??= new TTurnStateManager();
 
             if (Options.AI != null)
             {
@@ -81,7 +80,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <summary>
         /// The application's configured options.
         /// </summary>
-        public ApplicationOptions<TState, TTurnStateManager> Options { get { return _options; } }
+        public ApplicationOptions<TState, TTurnStateManager> Options { get; }
 
         /// <summary>
         /// Handler that will execute before the turn's activity handler logic is processed.
@@ -918,11 +917,12 @@ namespace Microsoft.Bot.Builder.M365
                 catch (NotImplementedException)
                 {
                     reactionsRemovedNotImplemented = true;
-            }
+                }
 
-            if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
-            {
-                throw new NotImplementedException();
+                if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 

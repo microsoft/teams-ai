@@ -6,7 +6,7 @@ using Moq;
 
 namespace Microsoft.Bot.Builder.M365.Tests.StateTests
 {
-    public class DefaultTurnStateManagerTests
+    public class TurnStateManagerTests
     {
         [Fact]
         public void Test_LoadState_MissingRequiredTurnContextProperties_ShouldFail()

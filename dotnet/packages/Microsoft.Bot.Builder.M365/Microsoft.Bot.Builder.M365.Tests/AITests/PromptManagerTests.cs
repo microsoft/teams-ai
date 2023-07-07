@@ -5,6 +5,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.SemanticKernel.TemplateEngine;
 using Moq;
 using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AI
 {
@@ -14,11 +15,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void AddFunction_Simple()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var name = "promptFunctionName";
-            PromptFunction<TurnState> promptFunction = (ITurnContext turnContext, TurnState turnState) => Task.FromResult(name);
+            PromptFunction<TestTurnState> promptFunction = (ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(name);
 
             // Act
             promptManager.AddFunction(name, promptFunction);
@@ -31,13 +32,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void AddFunction_AlreadyExists_AllowOverride()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var name = "promptFunctionName";
             var nameOverride = "promptFunctionNameOverride";
-            PromptFunction<TurnState> promptFunction = (ITurnContext turnContext, TurnState turnState) => Task.FromResult(name);
-            PromptFunction<TurnState> promptFunctionOverride = (ITurnContext turnContext, TurnState turnState) => Task.FromResult(nameOverride);
+            PromptFunction<TestTurnState> promptFunction = (ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(name);
+            PromptFunction<TestTurnState> promptFunctionOverride = (ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(nameOverride);
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
@@ -51,13 +52,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void AddFunction_AlreadyExists_NotAllowOverride()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var name = "promptFunctionName";
             var nameOverride = "promptFunctionNameOverride";
-            Task<string> promptFunction(ITurnContext turnContext, TurnState turnState) => Task.FromResult(name);
-            Task<string> promptFunctionOverride(ITurnContext turnContext, TurnState turnState) => Task.FromResult(nameOverride);
+            Task<string> promptFunction(ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(name);
+            Task<string> promptFunctionOverride(ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(nameOverride);
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
@@ -71,7 +72,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void AddPromptTemplate_Simple()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
                 "template string",
@@ -97,7 +98,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void AddPromptTemplate_AlreadyExists()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
                 "template string",
@@ -124,7 +125,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void LoadPromptTemplate_FromCollection()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
                 "template string",
@@ -159,7 +160,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             }
 
             var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
-            var promptManager = new PromptManager<TurnState>(directoryPath);
+            var promptManager = new PromptManager<TestTurnState>(directoryPath);
             var name = "promptTemplateFolder";
             var expectedPromptTemplate = new PromptTemplate(
                 "This is a prompt template string.",
@@ -211,7 +212,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             }
 
             var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
-            var promptManager = new PromptManager<TurnState>(directoryPath);
+            var promptManager = new PromptManager<TestTurnState>(directoryPath);
             var name = "invalidPromptTemplateFolder";
 
             // Act
@@ -225,11 +226,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async void RenderPrompt_PlainText()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
@@ -259,11 +260,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async void RenderPrompt_ResolveFunction_FunctionExists()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
@@ -276,7 +277,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             /// Configure function
             var promptFunctionName = "promptFunctionName";
             var output = "output";
-            PromptFunction<TurnState> promptFunction = (TurnContext, TurnState) => Task.FromResult(output);
+            PromptFunction<TestTurnState> promptFunction = (TurnContext, TestTurnState) => Task.FromResult(output);
 
             /// Configure prompt
             var promptString = "The output of the function is {{ " + promptFunctionName + " }}";
@@ -298,11 +299,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async Task RenderPrompt_ResolveFunction_FunctionNotExists()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
@@ -336,11 +337,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async void RenderPrompt_ResolveVariable()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
@@ -374,11 +375,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async void RenderPrompt_ResolveVariable_DefaultTurnState()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var defaultTurnState = new TurnState();
+            var defaultTurnState = new TestTurnState();
             var inputValue = "input";
             var outputValue = "output";
             var historyValue = "history";
@@ -419,11 +420,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async void RenderPrompt_ResolveVariable_NotExist_ShouldResolveToEmptyString()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState>();
+            var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
 
             var configuration = new PromptTemplateConfiguration
             {
