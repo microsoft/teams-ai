@@ -2016,12 +2016,13 @@ namespace Microsoft.Bot.Builder.M365
         private static T SafeCast<T>(object value)
         {
             JObject? obj = value as JObject;
-            if (obj == null)
+            T? result;
+            if (obj == null || (result = obj.ToObject<T>()) == null)
             {
                 throw new InvokeResponseException(HttpStatusCode.BadRequest, $"expected type '{value.GetType().Name}'");
             }
 
-            return obj.ToObject<T>()!;
+            return result;
         }
     }
 }
