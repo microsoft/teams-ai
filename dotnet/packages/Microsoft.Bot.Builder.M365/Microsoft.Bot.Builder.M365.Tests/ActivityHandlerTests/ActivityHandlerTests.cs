@@ -1,16 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
-using Microsoft.Bot.Schema.Teams;
-using Microsoft.Rest.Serialization;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
 {
@@ -493,7 +490,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""StartTime"":""2021-06-05T00:01:02.0Z""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -527,7 +524,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""EndTime"":""2021-06-05T01:02:03.0Z""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -562,7 +559,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""lastReadMessageId"":""10101010""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -681,7 +678,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             // Arrange
             var turnContextMock = new Mock<ITurnContext>();
             turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
-            turnContextMock.Setup(tc => tc.Adapter).Returns(new BotFrameworkAdapter(new SimpleCredentialProvider()));
+            turnContextMock.Setup(tc => tc.Adapter).Returns(new CloudAdapter());
             turnContextMock.Setup(tc => tc.TurnState).Returns(new TurnContextStateCollection());
             turnContextMock.Setup(tc => tc.Responded).Returns(false);
             turnContextMock.Setup(tc => tc.OnDeleteActivity(It.IsAny<DeleteActivityHandler>()));
@@ -709,6 +706,97 @@ namespace Microsoft.Bot.Builder.M365.Tests.ActivityHandlerTests
             turnContextMock.Verify(tc => tc.SendActivitiesAsync(It.IsAny<IActivity[]>(), It.IsAny<CancellationToken>()), Times.Once);
             turnContextMock.Verify(tc => tc.DeleteActivityAsync(It.IsAny<ConversationReference>(), It.IsAny<CancellationToken>()), Times.Once);
             turnContextMock.Verify(tc => tc.UpdateActivityAsync(It.IsAny<IActivity>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_OnTurnAsync_Disable_LongRunningMessages()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+
+            // Act
+            var bot = new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                LongRunningMessages = false,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            Assert.Single(bot.Record);
+            Assert.Equal("OnMessageActivityAsync", bot.Record[0]);
+        }
+
+        [Fact]
+        public void Test_OnTurnAsync_Enable_LongRunningMessages_Without_Adapter_ShouldThrow()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+
+            // Act
+            var exception = Assert.Throws<Exception>(() => new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                LongRunningMessages = true,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false
+            }));
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.", exception.Message);
+        }
+
+        [Fact]
+        public async Task Test_OnTurnAsync_Enable_LongRunningMessages_Message_Activity()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var adapterMock = new Mock<BotAdapter>();
+            adapterMock.Setup(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+            // Act
+            var bot = new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                Adapter = adapterMock.Object,
+                BotAppId = "test-bot-app-id",
+                LongRunningMessages = true,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false,
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            adapterMock.Verify(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_OnTurnAsync_Enable_LongRunningMessages_NonMessage_Activity()
+        {
+            // Arrange
+            var activity = new Activity { Type = ActivityTypes.MessageUpdate };
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var adapterMock = new Mock<BotAdapter>();
+            adapterMock.Setup(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+            // Act
+            var bot = new TestActivityHandler(new ApplicationOptions<TurnState>
+            {
+                Adapter = adapterMock.Object,
+                BotAppId = "test-bot-app-id",
+                LongRunningMessages = true,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false,
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            adapterMock.Verify(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+            Assert.Single(bot.Record);
+            Assert.Equal("OnMessageUpdateActivityAsync", bot.Record[0]);
         }
     }
 }

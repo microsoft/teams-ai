@@ -163,10 +163,10 @@ dotnet_diagnostic.CS1591.severity = warning # Missing XML comment for publicly v
 
 dotnet_diagnostic.IDE0001.severity = warning # Simplify name
 dotnet_diagnostic.IDE0002.severity = warning # Simplify member access
+dotnet_diagnostic.IDE0003.severity = warning # Remove this or Me qualification
 dotnet_diagnostic.IDE0004.severity = warning # Remove unnecessary cast
 dotnet_diagnostic.IDE0005.severity = warning # Remove unnecessary using directives
 dotnet_diagnostic.IDE0008.severity = warning # Use explicit type instead of var
-dotnet_diagnostic.IDE0009.severity = warning # Add this or Me qualification
 dotnet_diagnostic.IDE0011.severity = warning # Add braces
 dotnet_diagnostic.IDE0018.severity = warning # Inline variable declaration
 dotnet_diagnostic.IDE0032.severity = warning # Use auto-implemented property
