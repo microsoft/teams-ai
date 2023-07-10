@@ -42,22 +42,22 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
             {
                 case ModerationType.Input:
                 case ModerationType.Both:
+                {
+                    string input = turnState.TempState?.Value.Input ?? turnContext.Activity.Text;
+
+                    // TODO: Refactor turn state to fix convoluted logic
+
+                    // Get input from turn state
+                    if (turnState as object is TurnState defaultTurnState)
                     {
-                        string input = turnContext.Activity.Text;
-
-                        // TODO: Refactor turn state to fix convoluted logic
-
-                        // Get input from turn state
-                        if (turnState as object is TurnState defaultTurnState)
+                        if (defaultTurnState.TempState?.Value.Input != null)
                         {
-                            if (defaultTurnState.TempState?.Value.Input != null)
-                            {
-                                input = defaultTurnState.TempState?.Value.Input!;
-                            }
+                            input = defaultTurnState.TempState?.Value.Input!;
                         }
-
-                        return await _HandleTextModeration(input, true);
                     }
+
+                    return await _HandleTextModeration(input, true);
+                }
                 default:
                     break;
             }
@@ -107,7 +107,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                     if (result.Flagged)
                     {
                         string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
-                        
+
                         // Flagged
                         return new Plan()
                         {
