@@ -6,60 +6,68 @@ namespace Microsoft.Bot.Builder.M365.State
     public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue> where TValue : class
     {
         private TValue _value;
-        private string? _storageKey;
-        private bool _deleted = false;
         private string _hash;
 
+        /// <summary>
+        /// Constructs the turn state entry.
+        /// </summary>
+        /// <param name="value">The entry value</param>
+        /// <param name="storageKey">The storage key used to store object entry</param>
         public TurnStateEntry(TValue value, string? storageKey = null)
         {
             Verify.ParamNotNull(value, nameof(value));
 
             _value = value;
-            _storageKey = storageKey;
+            StorageKey = storageKey;
             _hash = ComputeHash(value);
         }
 
         private TurnStateEntry(TValue value, string? storageKey, bool deleted, string hash)
         {
             _value = value;
-            _storageKey = storageKey;
-            _deleted = deleted;
+            StorageKey = storageKey;
+            IsDeleted = deleted;
             _hash = hash;
         }
 
+        /// <inheritdoc />
         public bool HasChanged
         {
             get { return ComputeHash(_value) != _hash; }
         }
 
-        public bool IsDeleted
-        {
-            get { return _deleted; }
-        }
+        /// <inheritdoc />
+        public bool IsDeleted { get; private set; } = false;
 
+        /// <inheritdoc />
         public TValue Value
         {
-            get 
+            get
             {
                 if (IsDeleted)
                 {
-                    _deleted = false;
+                    IsDeleted = false;
                 }
 
                 return _value;
             }
         }
 
-        public string? StorageKey 
-        { 
-            get { return _storageKey; } 
-        }
+        /// <inheritdoc />
+        public string? StorageKey { get; }
 
+        /// <summary>
+        ///  Deletes the entry.
+        /// </summary>
         public void Delete()
         {
-            _deleted = true;
+            IsDeleted = true;
         }
 
+        /// <summary>
+        /// Replaces the value in the entry.
+        /// </summary>
+        /// <param name="value">The entry value.</param>
         public void Replace(TValue value)
         {
             Verify.ParamNotNull(value, nameof(value));
@@ -67,13 +75,12 @@ namespace Microsoft.Bot.Builder.M365.State
             _value = value;
         }
 
-        public TurnStateEntry<T>? CastValue<T>() where T : class
-        {
-            if (_value is not T castedValue) return null;
-
-            return new TurnStateEntry<T>(castedValue, _storageKey, _deleted, _hash);
-        }
-
+        // TODO: Optimize if possible
+        /// <summary>
+        /// Computes the hash from the object
+        /// </summary>
+        /// <param name="obj">The object to compute has from</param>
+        /// <returns>Returns a Json object representation </returns>
         internal static string ComputeHash(object obj)
         {
             Verify.ParamNotNull(obj);

@@ -1,5 +1,4 @@
-﻿
-namespace Microsoft.Bot.Builder.M365.State
+﻿namespace Microsoft.Bot.Builder.M365.Exceptions
 {
     internal class TurnStateManagerException : Exception
     {

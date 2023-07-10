@@ -2,8 +2,19 @@
 
 namespace Microsoft.Bot.Builder.M365.State
 {
+    /// <summary>
+    /// The base state class.
+    /// </summary>
     public class StateBase : Dictionary<string, object>
     {
+        /// <summary>
+        /// Tries to get the value from the dictionary.
+        /// </summary>
+        /// <typeparam name="T">Type of the value</typeparam>
+        /// <param name="key">key to look for</param>
+        /// <param name="value">value associated with key</param>
+        /// <returns>True if a value of given type is associated with key.</returns>
+        /// <exception cref="InvalidCastException"></exception>
         public bool TryGetValue<T>(string key, out T value) where T : class
         {
             Verify.ParamNotNull(key, nameof(key));
@@ -16,7 +27,7 @@ namespace Microsoft.Bot.Builder.M365.State
                     return true;
                 };
 
-                throw new Exception($"Failed to cast generic object to type '{typeof(T)}'");
+                throw new InvalidCastException($"Failed to cast generic object to type '{typeof(T)}'");
             }
 
             value = null!;
@@ -24,6 +35,12 @@ namespace Microsoft.Bot.Builder.M365.State
             return false;
         }
 
+        /// <summary>
+        /// Gets the value from the dictionary.
+        /// </summary>
+        /// <typeparam name="T">Type of the value</typeparam>
+        /// <param name="key">key to look for</param>
+        /// <returns>The value associated with the key</returns>
         public T? Get<T>(string key) where T : class
         {
             Verify.ParamNotNull(key, nameof(key));
@@ -38,6 +55,12 @@ namespace Microsoft.Bot.Builder.M365.State
             };
         }
 
+        /// <summary>
+        /// Sets value in the dictionary.
+        /// </summary>
+        /// <typeparam name="T">Type of value</typeparam>
+        /// <param name="key">key to look for</param>
+        /// <param name="value">value associated with key</param>
         public void Set<T>(string key, T value) where T : class
         {
             Verify.ParamNotNull(key, nameof(key));

@@ -18,6 +18,7 @@ namespace Microsoft.Bot.Builder.M365.State
 
         public TurnStateManager() { }
 
+        /// <inheritdoc />
         public async Task<TState> LoadStateAsync(IStorage? storage, ITurnContext turnContext)
         {
             try
@@ -29,7 +30,6 @@ namespace Microsoft.Bot.Builder.M365.State
                 string conversationId = activity.Conversation.Id;
                 string userId = activity.From.Id;
 
-                // TODO: update to a more appropriate guard method
                 Verify.ParamNotNull(activity, "TurnContext.Activity");
                 Verify.ParamNotNull(channelId, "TurnContext.Activity.ChannelId");
                 Verify.ParamNotNull(botId, "TurnContext.Activity.Recipient.Id");
@@ -82,6 +82,7 @@ namespace Microsoft.Bot.Builder.M365.State
             }
         }
 
+        /// <inheritdoc />
         public async Task SaveStateAsync(IStorage? storage, ITurnContext turnContext, TState turnState)
         {
             try

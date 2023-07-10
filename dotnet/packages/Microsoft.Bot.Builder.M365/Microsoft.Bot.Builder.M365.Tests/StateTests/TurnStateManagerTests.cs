@@ -6,14 +6,11 @@ using Moq;
 
 namespace Microsoft.Bot.Builder.M365.Tests.StateTests
 {
+    /// <summary>
+    /// TODO: Add tests that enforce required properties. Ex. If a required param/object is null, should throw exception.
+    /// </summary>
     public class TurnStateManagerTests
     {
-        [Fact]
-        public void Test_LoadState_MissingRequiredTurnContextProperties_ShouldFail()
-        {
-            // a combination for each property required
-        }
-
         [Fact]
         public async void Test_LoadState_NoStorageProvided_ShouldInitializeEmptyConstructor()
         {
@@ -21,7 +18,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
             var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
             IStorage storage = null;
-            
+
             // Act
             ApplicationTurnState state = await turnStateManager.LoadStateAsync(storage, turnContext);
 

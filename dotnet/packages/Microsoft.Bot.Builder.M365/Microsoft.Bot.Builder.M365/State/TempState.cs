@@ -47,19 +47,5 @@ namespace Microsoft.Bot.Builder.M365.State
             get => Get<string>(HistoryKey)!;
             set => Set(HistoryKey, value);
         }
-
-        public T? Get<T>(string key) where T : class
-        {
-            if (TryGetValue(key, out object value))
-            {
-                if (value is T t)
-                {
-                    return t;
-                };
-            }
-
-            // Return null if either the key or type don't match
-            return null;
-        }
     }
 }

@@ -17,6 +17,9 @@ namespace Microsoft.Bot.Builder.M365.State
         public const string UserStateKey = "userState";
         public const string TempStateKey = "tempState";
 
+        /// <summary>
+        /// Stores all the conversation-related state.
+        /// </summary>
         public TurnStateEntry<TConversationState>? ConversationState
         {
             get
@@ -30,6 +33,10 @@ namespace Microsoft.Bot.Builder.M365.State
                 Set(ConversationStateKey, value!);
             }
         }
+
+        /// <summary>
+        /// Stores all the user related state.
+        /// </summary>
         public TurnStateEntry<TUserState>? UserState
         {
             get
@@ -43,6 +50,10 @@ namespace Microsoft.Bot.Builder.M365.State
                 Set(UserStateKey, value!);
             }
         }
+
+        /// <summary>
+        /// Stores all the tmeporary state for the current turn.
+        /// </summary>
         public TurnStateEntry<TTempState>? TempState
         {
             get
