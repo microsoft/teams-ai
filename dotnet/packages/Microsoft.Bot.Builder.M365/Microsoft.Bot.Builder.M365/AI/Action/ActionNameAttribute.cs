@@ -9,6 +9,6 @@
         /// <summary>
         /// Create new <see cref="ActionNameAttribute"/>.
         /// </summary>
-        public ActionNameAttribute() : base(ActionParameterType.Name, null) { }
+        public ActionNameAttribute() : base(ActionParameterType.Name) { }
     }
 }

@@ -68,9 +68,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
                 throw new Exception("Unexpected `data` object: PredictedDoCommand does not exist");
             }
 
-            ActionHandler<TState> handler = doCommandActionData.Handler;
+            IActionHandler<TState> handler = doCommandActionData.Handler;
 
-            return handler.Invoke(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, action);
+            return handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, action);
         }
 
         [Action(DefaultActionTypes.SayCommandActionName)]

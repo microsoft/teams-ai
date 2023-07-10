@@ -12,7 +12,7 @@
         /// </summary>
         internal Type? Type { get; set; }
 
-        internal ActionParameterAttribute(ActionParameterType actionParameterType, Type? type)
+        internal ActionParameterAttribute(ActionParameterType actionParameterType, Type? type = null)
         {
             ActionParameterType = actionParameterType;
             Type = type;
@@ -35,7 +35,7 @@
         /// <summary>
         /// The action parameter is data object
         /// </summary>
-        Data,
+        Entities,
         /// <summary>
         /// The action parameter is action name
         /// </summary>

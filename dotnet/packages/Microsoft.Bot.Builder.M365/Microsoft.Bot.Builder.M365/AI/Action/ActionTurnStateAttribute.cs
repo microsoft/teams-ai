@@ -13,9 +13,13 @@
         /// <exception cref="Exception">Throws if the input type is not a <see cref="TurnState"/>.</exception>
         public ActionTurnStateAttribute(Type type) : base(ActionParameterType.TurnState, type)
         {
-            if (!typeof(TurnState).IsAssignableFrom(type))
+            if (type == null)
             {
-                throw new Exception("ActionTurnStateAttribute input type should be a TurnState");
+                throw new ArgumentNullException("type", "ActionTurnState attribute input type should not be null.");
+            }
+            else if (!typeof(TurnState).IsAssignableFrom(type))
+            {
+                throw new Exception("ActionTurnState attribute input type should be a TurnState");
             }
         }
     }

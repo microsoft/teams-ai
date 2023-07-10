@@ -12,14 +12,14 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         /// <summary>
         /// The action handler function.
         /// </summary>
-        public ActionHandler<TState> Handler { get; set; }
+        public IActionHandler<TState> Handler { get; set; }
 
         /// <summary>
         /// Whether to allow overrides of this action's properties.
         /// </summary>
         public bool AllowOverrides { get; set; }
 
-        public ActionEntry(string name, ActionHandler<TState> handler, bool allowOverrides = true)
+        public ActionEntry(string name, IActionHandler<TState> handler, bool allowOverrides = true)
         {
             Name = name;
             Handler = handler;
@@ -39,14 +39,14 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         public static ActionEntry<TState>? FromNativeMethod(MethodInfo methodSignature, object methodContainerInstance)
         {
             if (methodSignature == null)
-            { 
+            {
                 throw new Exception("Method is null");
             }
 
             if (methodContainerInstance == null)
             {
                 throw new Exception("Method container instance is null");
-            } 
+            }
 
             ActionAttribute? actionAttribute = methodSignature
                 .GetCustomAttributes(typeof(ActionAttribute), true)
@@ -59,14 +59,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
             }
 
             string name = actionAttribute.Name;
-            ActionHandler<TState>? handler = Delegate.CreateDelegate(typeof(ActionHandler<TState>), methodContainerInstance, methodSignature, false) as ActionHandler<TState>;
+            IActionHandler<TState> handler = new ActionHandlerx<TState>(methodSignature, methodContainerInstance);
             bool allowOverrides = actionAttribute.AllowOverrides;
 
-            if (handler == null)
-            {
-                throw new Exception("Action handler method has an incorrect type signature");
-            }
-            
             return new ActionEntry<TState>(name, handler, allowOverrides);
         }
     }
