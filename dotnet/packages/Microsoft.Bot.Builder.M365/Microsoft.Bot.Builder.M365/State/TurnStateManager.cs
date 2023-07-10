@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.M365.Utilities;
+﻿using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Bot.Schema;
 
 namespace Microsoft.Bot.Builder.M365.State

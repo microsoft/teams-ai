@@ -22,14 +22,6 @@ namespace Microsoft.Bot.Builder.M365.State
             _hash = ComputeHash(value);
         }
 
-        private TurnStateEntry(TValue value, string? storageKey, bool deleted, string hash)
-        {
-            _value = value;
-            StorageKey = storageKey;
-            IsDeleted = deleted;
-            _hash = hash;
-        }
-
         /// <inheritdoc />
         public bool HasChanged
         {
