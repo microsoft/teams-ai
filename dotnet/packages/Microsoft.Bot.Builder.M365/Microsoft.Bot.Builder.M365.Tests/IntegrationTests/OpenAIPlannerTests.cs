@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
+using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
 namespace Microsoft.Bot.Builder.M365.Tests.Integration
 {
@@ -46,12 +48,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             Assert.NotNull(config.ChatModelId);
 
             var options = new OpenAIPlannerOptions(config.ApiKey, config.ModelId);
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
-            var moderatorMock = new Mock<IModerator<TurnState>>();
+            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
 
             var promptTemplate = new PromptTemplate(
                 prompt,
@@ -87,12 +89,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             Assert.NotNull(config.ChatModelId);
 
             var options = new OpenAIPlannerOptions(config.ApiKey, config.ChatModelId);
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
-            var moderatorMock = new Mock<IModerator<TurnState>>();
+            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
 
             var promptTemplate = new PromptTemplate(
                 prompt,
@@ -125,12 +127,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             var invalidApiKey = "invalidApiKey";
 
             var options = new OpenAIPlannerOptions(invalidApiKey, config.ChatModelId);
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
-            var moderatorMock = new Mock<IModerator<TurnState>>();
+            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -160,12 +162,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.Integration
             Assert.NotNull(config.ApiKey);
 
             var options = new OpenAIPlannerOptions(config.ApiKey, "invalidModel");
-            var planner = new OpenAIPlanner<TurnState, OpenAIPlannerOptions>(options, _output);
-            var moderatorMock = new Mock<IModerator<TurnState>>();
+            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
-            var aiOptions = new AIOptions<TurnState>(planner, new PromptManager<TurnState>(), moderatorMock.Object);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",

@@ -1,11 +1,7 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
-namespace Microsoft.Bot.Builder.M365.Tests.AI
+namespace Microsoft.Bot.Builder.M365.Tests.AITests
 {
     public class ActionCollectionTests
     {
@@ -13,14 +9,14 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_Simple()
         {
             // Arrange
-            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             string name = "action";
-            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            ActionHandler<TestTurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
             bool allowOverrides = true;
 
             // Act
             actionCollection.SetAction(name, handler, allowOverrides);
-            ActionEntry<TurnState> entry = actionCollection.GetAction(name);
+            ActionEntry<TestTurnState> entry = actionCollection.GetAction(name);
 
             // Assert
             Assert.True(actionCollection.HasAction(name));
@@ -34,9 +30,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_Set_NonOverridable_Action_Throws_Exception()
         {
             // Arrange
-            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             string name = "action";
-            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            ActionHandler<TestTurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
             bool allowOverrides = false;
             actionCollection.SetAction(name, handler, allowOverrides);
 
@@ -52,7 +48,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_Get_NonExistent_Action()
         {
             // Arrange
-            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             var nonExistentAction = "non existent action";
 
             // Act
@@ -67,7 +63,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_HasAction_False()
         {
             // Arrange
-            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             var nonExistentAction = "non existent action";
 
             // Act
@@ -81,8 +77,8 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_HasAction_True()
         {
             // Arrange
-            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
-            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            ActionHandler<TestTurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
             var name = "actionName";
 
             // Act

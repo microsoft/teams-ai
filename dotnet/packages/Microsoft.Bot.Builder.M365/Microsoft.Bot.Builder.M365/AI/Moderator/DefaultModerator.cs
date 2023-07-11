@@ -1,9 +1,10 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
 {
-    public class DefaultModerator<TState> : IModerator<TState> where TState : TurnState
+    public class DefaultModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         public Task<Plan> ReviewPlan(ITurnContext turnContext, TState turnState, Plan plan)
         {

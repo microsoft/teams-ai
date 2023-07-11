@@ -1,11 +1,12 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
+using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Bot.Builder.M365.Utilities;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
-    public sealed class AIOptions<TState> where TState : TurnState
+    public sealed class AIOptions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// The planner to use for generating plans.
@@ -21,9 +22,9 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// Optional. The moderator to use for moderating input passed to the model and the output
         /// returned by the model.
         /// </summary>
-        public IModerator<TState> Moderator { get; set; }
+        public IModerator<TState>? Moderator { get; set; }
 
-        // TODO: Support PromptTemplate and PromptSelector handler as options
+        // TODO: potentially support PromptTemplate and PromptSelector handler as options
         /// <summary>
         /// Optional. The prompt to use for the current turn.
         /// </summary>
@@ -50,11 +51,10 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="moderator"> The moderator to use for moderating input passed to the model and the output</param>
         /// <param name="prompt">Optional. The prompt to use for the current turn.</param>
         /// <param name="history">Optional. The history options to use for the AI system.</param>
-        public AIOptions(IPlanner<TState> planner, PromptManager<TState> promptManager, IModerator<TState> moderator, string? prompt = null, AIHistoryOptions? history = null)
+        public AIOptions(IPlanner<TState> planner, IPromptManager<TState> promptManager, IModerator<TState>? moderator = null, string? prompt = null, AIHistoryOptions? history = null)
         {
-            Verify.NotNull(planner, nameof(planner));
-            Verify.NotNull(promptManager, nameof(promptManager));
-            Verify.NotNull(moderator, nameof(moderator));
+            Verify.ParamNotNull(planner, nameof(planner));
+            Verify.ParamNotNull(promptManager, nameof(promptManager));
 
             Planner = planner;
             PromptManager = promptManager;

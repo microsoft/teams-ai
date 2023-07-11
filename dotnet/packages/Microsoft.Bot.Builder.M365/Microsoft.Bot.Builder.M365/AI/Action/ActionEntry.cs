@@ -1,8 +1,9 @@
-﻿using System.Reflection;
+﻿using Microsoft.Bot.Builder.M365.State;
+using System.Reflection;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
-    public class ActionEntry<TState> where TState : TurnState
+    public class ActionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// The name of the action.

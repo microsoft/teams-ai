@@ -1,10 +1,11 @@
-﻿
+﻿using Microsoft.Bot.Builder.M365.State;
+
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
     // TODO: Support different delegate types
-    public delegate Task<bool> ActionHandler<TState>(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null) where TState : TurnState;
+    public delegate Task<bool> ActionHandler<TState>(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null) where TState : ITurnState<StateBase, StateBase, TempState>;
 
-    public interface IActionCollection<TState> where TState : TurnState
+    public interface IActionCollection<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Set an action in the collection.

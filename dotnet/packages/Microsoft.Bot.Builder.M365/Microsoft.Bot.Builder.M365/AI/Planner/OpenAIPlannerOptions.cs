@@ -44,7 +44,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// The planner currently uses the 'user' role by default as this tends to generate more reliable instruction following.
         /// Defaults to false.
         /// </remarks>
-        public bool? UseSystemMessage { get; set; }
+        public bool UseSystemMessage { get; set; } = false;
 
         /// <summary>
         /// A flag indicating if the planner should log requests with the provided logger.
@@ -63,8 +63,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         /// <param name="defaultModel">The default model to use.</param>
         public OpenAIPlannerOptions(string apiKey, string defaultModel)
         {
-            Verify.NotNull(apiKey, nameof(apiKey));
-            Verify.NotNull(defaultModel, nameof(defaultModel));
+            Verify.ParamNotNull(apiKey, nameof(apiKey));
+            Verify.ParamNotNull(defaultModel, nameof(defaultModel));
 
             ApiKey = apiKey;
             DefaultModel = defaultModel;

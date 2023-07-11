@@ -3,16 +3,18 @@ using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.TemplateEngine;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
-    public class PromptManager<TState> : IPromptManager<TState> where TState : TurnState
+    public class PromptManager<TState> : IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private string? _promptsFolder;
         private readonly Dictionary<string, PromptTemplate> _templates;
         private readonly Dictionary<string, TemplateFunctionEntry<TState>> _functions;
+        private readonly Dictionary<string, string> _promptVariables;
 
-        public PromptManager(string? promptsFolder = null)
+        public PromptManager(string? promptsFolder = null, Dictionary<string, string>? promptVariables = null)
         {
             if (promptsFolder != null)
             {
@@ -20,15 +22,25 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
                 _promptsFolder = promptsFolder;
             }
 
+            _promptVariables = promptVariables ?? new Dictionary<string, string>();
+
             _templates = new Dictionary<string, PromptTemplate>();
             _functions = new Dictionary<string, TemplateFunctionEntry<TState>>();
         }
 
+        /// <summary>
+        /// Register prompt variables.
+        /// </summary>
+        /// <remarks>
+        /// You will be able to reference these variables in the prompt template string by using this format: `{{ $key }}`.
+        /// </remarks>
+        public IDictionary<string, string> Variables => _promptVariables;
+
         /// <inheritdoc />
         public IPromptManager<TState> AddFunction(string name, PromptFunction<TState> promptFunction, bool allowOverrides = false)
         {
-            Verify.NotNull(name, nameof(name));
-            Verify.NotNull(promptFunction, nameof(promptFunction));
+            Verify.ParamNotNull(name, nameof(name));
+            Verify.ParamNotNull(promptFunction, nameof(promptFunction));
 
             if (!_functions.ContainsKey(name) || allowOverrides)
             {
@@ -53,8 +65,8 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <inheritdoc />
         public IPromptManager<TState> AddPromptTemplate(string name, PromptTemplate promptTemplate)
         {
-            Verify.NotNull(name, nameof(name));
-            Verify.NotNull(promptTemplate, nameof(promptTemplate));
+            Verify.ParamNotNull(name, nameof(name));
+            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
 
             if (_templates.ContainsKey(name))
             {
@@ -69,9 +81,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <inheritdoc />
         public Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name)
         {
-            Verify.NotNull(turnContext, nameof(turnContext));
-            Verify.NotNull(turnState, nameof(turnState));
-            Verify.NotNull(name, nameof(name));
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(name, nameof(name));
 
             if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> value))
             {
@@ -86,7 +98,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <inheritdoc />
         public PromptTemplate LoadPromptTemplate(string name)
         {
-            Verify.NotNull(name, nameof(name));
+            Verify.ParamNotNull(name, nameof(name));
 
             if (_templates.TryGetValue(name, out PromptTemplate template))
             {
@@ -157,7 +169,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             }
         }
 
-        /// TODO: Update this once turn state infrastructure is implemented
         /// <summary>
         /// Loads value from turn context and turn state into context variables.
         /// </summary>
@@ -166,8 +177,18 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
         /// <returns>Variables that could be injected into the prompt template</returns>
         internal void LoadStateIntoContext(SKContext context, ITurnContext turnContext, TState turnState)
         {
-            context["input"] = turnContext.Activity.Text;
-            // TODO: Load turn state 'temp' values into the context
+            foreach (KeyValuePair<string, string> pair in _promptVariables)
+            {
+                context.Variables.Set(pair.Key, pair.Value);
+            }
+            
+            // Temp state values override the user configured variables
+            if (turnState as object is TurnState defaultTurnState)
+            {
+                context[TempState.OutputKey] = defaultTurnState.Temp?.Output ?? string.Empty;
+                context[TempState.InputKey] = defaultTurnState.Temp?.Input ?? turnContext.Activity.Text;
+                context[TempState.HistoryKey] = defaultTurnState.Temp?.History ?? string.Empty;
+            }
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)
