@@ -53,7 +53,6 @@ namespace Microsoft.Bot.Builder.M365.AI.AzureContentSafety
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 AzureContentSafetyTextAnalysisResponse result = JsonSerializer.Deserialize<AzureContentSafetyTextAnalysisResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
 
-                Verify.ParamNotNull(result.HateResult);
                 return result;
             }
             catch (AzureContentSafetyClientException)
