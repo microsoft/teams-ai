@@ -59,7 +59,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
             }
 
             string name = actionAttribute.Name;
-            IActionHandler<TState> handler = new ActionHandlerx<TState>(methodSignature, methodContainerInstance);
+            IActionHandler<TState> handler = new ActionHandler<TState>(methodSignature, methodContainerInstance);
             bool allowOverrides = actionAttribute.AllowOverrides;
 
             return new ActionEntry<TState>(name, handler, allowOverrides);

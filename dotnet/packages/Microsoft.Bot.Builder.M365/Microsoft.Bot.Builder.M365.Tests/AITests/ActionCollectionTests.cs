@@ -1,9 +1,4 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Action;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AI
 {
@@ -15,7 +10,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             // Arrange
             IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             string name = "action";
-            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionHandler<TurnState> handler = new TestActionHandler();
             bool allowOverrides = true;
 
             // Act
@@ -36,7 +31,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             // Arrange
             IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             string name = "action";
-            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionHandler<TurnState> handler = new TestActionHandler();
             bool allowOverrides = false;
             actionCollection.SetAction(name, handler, allowOverrides);
 
@@ -82,7 +77,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         {
             // Arrange
             IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
-            ActionHandler<TurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionHandler<TurnState> handler = new TestActionHandler();
             var name = "actionName";
 
             // Act
@@ -91,6 +86,14 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
 
             // Assert
             Assert.True(hasAction);
+        }
+
+        private class TestActionHandler : IActionHandler<TurnState>
+        {
+            public Task<bool> PerformAction(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null)
+            {
+                return Task.FromResult(true);
+            }
         }
     }
 }

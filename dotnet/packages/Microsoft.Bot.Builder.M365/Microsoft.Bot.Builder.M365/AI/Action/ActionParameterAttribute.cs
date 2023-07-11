@@ -7,15 +7,9 @@
         /// </summary>
         internal ActionParameterType ActionParameterType { get; set; }
 
-        /// <summary>
-        /// The real data type.
-        /// </summary>
-        internal Type? Type { get; set; }
-
-        internal ActionParameterAttribute(ActionParameterType actionParameterType, Type? type = null)
+        internal ActionParameterAttribute(ActionParameterType actionParameterType)
         {
             ActionParameterType = actionParameterType;
-            Type = type;
         }
     }
 

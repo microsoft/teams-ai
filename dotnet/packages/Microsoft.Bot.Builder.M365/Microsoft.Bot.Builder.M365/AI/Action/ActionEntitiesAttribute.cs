@@ -9,13 +9,6 @@
         /// <summary>
         /// Create new <see cref="ActionEntitiesAttribute"/>.
         /// </summary>
-        /// <param name="type">The type of action data.</param>
-        public ActionEntitiesAttribute(Type type) : base(ActionParameterType.Entities, type)
-        {
-            if (type == null)
-            {
-                throw new ArgumentNullException("type", "ActionEntities attribute input type should not be null.");
-            }
-        }
+        public ActionEntitiesAttribute() : base(ActionParameterType.Entities) { }
     }
 }

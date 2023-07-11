@@ -2,40 +2,46 @@
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
-    internal sealed class ActionHandlerx<TState> : IActionHandler<TState> where TState : TurnState
+    // TODO: add analyzer to show type warning at compile time.
+    /// <summary>
+    /// The action handler built from method.
+    /// </summary>
+    /// <typeparam name="TState">Type of the turn state</typeparam>
+    internal sealed class ActionHandler<TState> : IActionHandler<TState> where TState : TurnState
     {
         private readonly MethodInfo _method;
 
         private object _containerInstance;
 
-        private ActionParameterAttribute[] _parameterTypes;
+        private Tuple<ActionParameterType, Type>[] _parameterTypes;
 
         private Type _returnType;
 
-        internal ActionHandlerx(MethodInfo method, object containerInstance) {
+        internal ActionHandler(MethodInfo method, object containerInstance)
+        {
             _method = method;
             _containerInstance = containerInstance;
 
             _returnType = _method.ReturnType;
             if (_returnType != typeof(void)
-                || _returnType != typeof(bool)
-                || _returnType != typeof(Task)
-                || _returnType != typeof(Task<bool>)
-                || _returnType != typeof(ValueTask)
-                || _returnType != typeof(ValueTask<bool>))
+                && _returnType != typeof(bool)
+                && _returnType != typeof(Task)
+                && _returnType != typeof(Task<bool>)
+                && _returnType != typeof(ValueTask)
+                && _returnType != typeof(ValueTask<bool>))
             {
                 throw new Exception($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
             }
 
             ParameterInfo[] parameters = _method.GetParameters();
-            List<ActionParameterAttribute> parameterTypes = new();
+            List<Tuple<ActionParameterType, Type>> parameterTypes = new();
             foreach (ParameterInfo parameter in parameters)
             {
                 IEnumerable<ActionParameterAttribute> parameterAttributes = parameter.GetCustomAttributes(typeof(ActionParameterAttribute), true).Cast<ActionParameterAttribute>();
                 ActionParameterAttribute parameterAttribute = parameterAttributes.FirstOrDefault();
                 if (parameterAttribute == null)
                 {
-                    parameterTypes.Add(new ActionParameterAttribute(ActionParameterType.Unknown, parameter.ParameterType));
+                    parameterTypes.Add(Tuple.Create(ActionParameterType.Unknown, parameter.ParameterType));
                 }
                 else if (parameterAttributes.Count() > 1)
                 {
@@ -43,11 +49,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
                 }
                 else
                 {
-                    if (parameterAttribute.Type != null)
-                    {
-                        CheckParameterAssignment(_method, parameterAttribute.Type, parameter.ParameterType);
-                    }
-                    parameterTypes.Add(parameterAttribute);
+                    parameterTypes.Add(Tuple.Create(parameterAttribute.ActionParameterType, parameter.ParameterType));
                 }
             }
             _parameterTypes = parameterTypes.ToArray();
@@ -56,69 +58,83 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         public async Task<bool> PerformAction(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null)
         {
             List<object?> parameters = new();
-            foreach (ActionParameterAttribute parameterType in _parameterTypes)
+            foreach (Tuple<ActionParameterType, Type> parameterType in _parameterTypes)
             {
-                switch (parameterType.ActionParameterType)
+                switch (parameterType.Item1)
                 {
                     case ActionParameterType.TurnContext:
-                        CheckParameterAssignment(_method, turnContext.GetType(), parameterType.Type!);
+                        CheckParameterAssignment(_method, turnContext.GetType(), parameterType.Item2!);
                         parameters.Add(turnContext);
                         break;
                     case ActionParameterType.TurnState:
-                        CheckParameterAssignment(_method, turnState.GetType(), parameterType.Type!);
+                        CheckParameterAssignment(_method, turnState.GetType(), parameterType.Item2!);
                         parameters.Add(turnState);
                         break;
                     case ActionParameterType.Entities:
                         if (entities != null)
                         {
-                            CheckParameterAssignment(_method, entities.GetType(), parameterType.Type!);
+                            CheckParameterAssignment(_method, entities.GetType(), parameterType.Item2!);
                         }
                         parameters.Add(entities);
                         break;
                     case ActionParameterType.Name:
                         if (action != null)
                         {
-                            CheckParameterAssignment(_method, action.GetType(), parameterType.Type!);
+                            CheckParameterAssignment(_method, action.GetType(), parameterType.Item2!);
                         }
                         parameters.Add(action);
                         break;
                     case ActionParameterType.Unknown:
                     default:
-                        parameters.Add(parameterType.Type == null ? null : parameterType.Type.IsValueType ? Activator.CreateInstance(parameterType.Type) : null);
+                        parameters.Add(parameterType.Item2 == null ? null : parameterType.Item2.IsValueType ? Activator.CreateInstance(parameterType.Item2) : null);
                         break;
                 }
             }
 
-            object result = _method.Invoke(_containerInstance, parameters.ToArray());
-            if (_returnType == typeof(void))
+            try
             {
-                return true;
+                object result = _method.Invoke(_containerInstance, parameters.ToArray());
+                if (_returnType == typeof(void))
+                {
+                    return true;
+                }
+                else if (_returnType == typeof(bool))
+                {
+                    return (bool)result;
+                }
+                else if (_returnType == typeof(Task))
+                {
+                    await ((Task)result).ConfigureAwait(false);
+                    return true;
+                }
+                else if (_returnType == typeof(Task<bool>))
+                {
+                    return await ((Task<bool>)result).ConfigureAwait(false);
+                }
+                else if (_returnType == typeof(ValueTask))
+                {
+                    await ((ValueTask)result).ConfigureAwait(false);
+                    return true;
+                }
+                else if (_returnType == typeof(ValueTask<bool>))
+                {
+                    return await ((ValueTask<bool>)result).ConfigureAwait(false);
+                }
+                else
+                {
+                    throw new Exception($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
+                }
             }
-            else if (_returnType == typeof(bool))
+            catch (TargetInvocationException ex)
             {
-                return (bool)result;
-            }
-            else if (_returnType == typeof(Task))
-            {
-                await ((Task)result).ConfigureAwait(false);
-                return true;
-            }
-            else if (_returnType == typeof(Task<bool>))
-            {
-                return await ((Task<bool>)result).ConfigureAwait(false);
-            }
-            else if (_returnType == typeof(ValueTask))
-            {
-                await ((ValueTask)result).ConfigureAwait(false);
-                return true;
-            }
-            else if (_returnType == typeof(ValueTask<bool>))
-            {
-                return await ((ValueTask<bool>)result).ConfigureAwait(false);
-            }
-            else
-            {
-                throw new Exception($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
+                if (ex.InnerException != null)
+                {
+                    throw ex.InnerException;
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 
