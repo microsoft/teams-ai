@@ -41,7 +41,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             );
 
             static string rateLimitedFunc() => throw new PlannerException("", new AIException(AIException.ErrorCodes.Throttling));
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState, OpenAIPlannerOptions>(options, rateLimitedFunc);
+            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, rateLimitedFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
             // Act
@@ -83,7 +83,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             );
 
             static string throwsExceptionFunc() => throw new PlannerException("Exception Message");
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState, OpenAIPlannerOptions>(options, throwsExceptionFunc);
+            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, throwsExceptionFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
             // Act
@@ -120,7 +120,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             );
 
             static string emptyStringFunc() => String.Empty;
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState, OpenAIPlannerOptions>(options, emptyStringFunc);
+            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, emptyStringFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
             // Act
@@ -160,7 +160,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
 
             string multipleSayCommands = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValueA'}, {'type':'SAY','response':'responseValueB'}]}";
             string multipleSayCommandsFunc() => multipleSayCommands;
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState, OpenAIPlannerOptions>(options, multipleSayCommandsFunc);
+            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, multipleSayCommandsFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
 
@@ -203,7 +203,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
 
             string simplePlan = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValueA'}, {'type':'DO', 'action': 'actionName'}]}";
             string multipleSayCommandsFunc() => simplePlan;
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState, OpenAIPlannerOptions>(options, multipleSayCommandsFunc);
+            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, multipleSayCommandsFunc);
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
@@ -221,13 +221,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             Assert.Equal("actionName", doCommand.Action);
         }
 
-        private class CustomCompletePromptOpenAIPlanner<TState, TOptions> : OpenAIPlanner<TState, TOptions>
-            where TState : TestTurnState
-            where TOptions : OpenAIPlannerOptions
-        {
+        private class CustomCompletePromptOpenAIPlanner<TState> : OpenAIPlanner<TState>
+            where TState : TestTurnState {
             private Func<string> customFunction;
 
-            public CustomCompletePromptOpenAIPlanner(TOptions options, Func<string> customFunction, ILogger? logger = null) : base(options, logger)
+            public CustomCompletePromptOpenAIPlanner(OpenAIPlannerOptions options, Func<string> customFunction, ILogger? logger = null) : base(options, logger)
             {
                 this.customFunction = customFunction;
             }
