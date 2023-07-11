@@ -70,9 +70,9 @@ namespace Microsoft.Bot.Builder.M365.State
                 conversationState ??= new TConversationState();
                 tempState ??= new TTempState();
 
-                state.UserState = new TurnStateEntry<TUserState>(userState, userKey);
-                state.ConversationState = new TurnStateEntry<TConversationState>(conversationState, conversationKey);
-                state.TempState = new TurnStateEntry<TTempState>(tempState);
+                state.UserStateEntry = new TurnStateEntry<TUserState>(userState, userKey);
+                state.ConversationStateEntry = new TurnStateEntry<TConversationState>(conversationState, conversationKey);
+                state.TempStateEntry = new TurnStateEntry<TTempState>(tempState);
 
                 return state;
 
@@ -88,7 +88,6 @@ namespace Microsoft.Bot.Builder.M365.State
         {
             try
             {
-                Verify.ParamNotNull(storage, nameof(storage));
                 Verify.ParamNotNull(turnContext, nameof(turnContext));
                 Verify.ParamNotNull(turnState, nameof(turnState));
 

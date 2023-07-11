@@ -7,7 +7,7 @@ using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
-    public class PromptManager<TState> : IPromptManager<TState> where TState : TurnState
+    public class PromptManager<TState> : IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private string? _promptsFolder;
         private readonly Dictionary<string, PromptTemplate> _templates;
@@ -185,9 +185,9 @@ namespace Microsoft.Bot.Builder.M365.AI.Prompt
             // Temp state values override the user configured variables
             if (turnState as object is TurnState defaultTurnState)
             {
-                context[TempState.OutputKey] = defaultTurnState.TempState?.Value.Output ?? string.Empty;
-                context[TempState.InputKey] = defaultTurnState.TempState?.Value.Input ?? turnContext.Activity.Text;
-                context[TempState.HistoryKey] = defaultTurnState.TempState?.Value.History ?? string.Empty;
+                context[TempState.OutputKey] = defaultTurnState.Temp?.Output ?? string.Empty;
+                context[TempState.InputKey] = defaultTurnState.Temp?.Input ?? turnContext.Activity.Text;
+                context[TempState.HistoryKey] = defaultTurnState.Temp?.History ?? string.Empty;
             }
         }
 

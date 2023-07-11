@@ -24,7 +24,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     /// use the chatCompletion API, otherwise the textCompletion API will be used.
     /// </remarks>
     public class OpenAIPlanner<TState, TOptions> : IPlanner<TState>
-        where TState : TurnState
+        where TState : ITurnState<StateBase, StateBase, TempState>
         where TOptions : OpenAIPlannerOptions
     {
         private TOptions _options { get; }
@@ -98,7 +98,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
 
                 if (isChatCompletion)
                 {
-                    string? userMessage = turnState?.TempState?.Value.Input;
+                    string? userMessage = turnState?.Temp?.Input;
 
                     // Request base chat completion
                     IChatResult response = await _CreateChatCompletion(turnState, options, promptTemplate, userMessage, cancellationToken);

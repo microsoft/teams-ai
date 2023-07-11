@@ -4,7 +4,7 @@
     /// Interface implemented by classes responsible for loading and saving an applications turn state.
     /// </summary>
     /// <typeparam name="TState">Type of the state object being persisted.</typeparam>
-    public interface ITurnStateManager<TState> where TState : class
+    public interface ITurnStateManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Loads all of the state scopes for the current turn.

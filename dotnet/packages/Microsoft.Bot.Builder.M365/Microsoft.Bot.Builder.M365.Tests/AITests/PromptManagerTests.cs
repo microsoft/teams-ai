@@ -389,7 +389,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
                 Output = outputValue,
                 History = historyValue
             };
-            defaultTurnState.TempState = new TurnStateEntry<TempState>(tempState);
+            defaultTurnState.TempStateEntry = new TurnStateEntry<TempState>(tempState);
 
             var configuration = new PromptTemplateConfiguration
             {

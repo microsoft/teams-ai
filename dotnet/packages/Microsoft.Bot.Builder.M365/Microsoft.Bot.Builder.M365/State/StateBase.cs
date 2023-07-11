@@ -15,7 +15,7 @@ namespace Microsoft.Bot.Builder.M365.State
         /// <param name="value">value associated with key</param>
         /// <returns>True if a value of given type is associated with key.</returns>
         /// <exception cref="InvalidCastException"></exception>
-        public bool TryGetValue<T>(string key, out T value) where T : class
+        public bool TryGetValue<T>(string key, out T value)
         {
             Verify.ParamNotNull(key, nameof(key));
 
@@ -30,7 +30,7 @@ namespace Microsoft.Bot.Builder.M365.State
                 throw new InvalidCastException($"Failed to cast generic object to type '{typeof(T)}'");
             }
 
-            value = null!;
+            value = default;
 
             return false;
         }
@@ -41,7 +41,7 @@ namespace Microsoft.Bot.Builder.M365.State
         /// <typeparam name="T">Type of the value</typeparam>
         /// <param name="key">key to look for</param>
         /// <returns>The value associated with the key</returns>
-        public T? Get<T>(string key) where T : class
+        public T? Get<T>(string key)
         {
             Verify.ParamNotNull(key, nameof(key));
 
@@ -51,7 +51,7 @@ namespace Microsoft.Bot.Builder.M365.State
             }
             else
             {
-                return null!;
+                return default;
             };
         }
 
@@ -61,7 +61,7 @@ namespace Microsoft.Bot.Builder.M365.State
         /// <typeparam name="T">Type of value</typeparam>
         /// <param name="key">key to look for</param>
         /// <param name="value">value associated with key</param>
-        public void Set<T>(string key, T value) where T : class
+        public void Set<T>(string key, T value)
         {
             Verify.ParamNotNull(key, nameof(key));
             Verify.ParamNotNull(value, nameof(value));

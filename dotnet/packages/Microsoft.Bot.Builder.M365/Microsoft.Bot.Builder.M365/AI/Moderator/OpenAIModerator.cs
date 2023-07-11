@@ -12,7 +12,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
     /// An moderator that uses OpenAI's moderation API.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public class OpenAIModerator<TState> : IModerator<TState> where TState : TurnState
+    public class OpenAIModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly OpenAIModeratorOptions _options;
         private readonly OpenAIClient _client;
@@ -43,16 +43,16 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                 case ModerationType.Input:
                 case ModerationType.Both:
                 {
-                    string input = turnState.TempState?.Value.Input ?? turnContext.Activity.Text;
+                    string input = turnState.Temp?.Input ?? turnContext.Activity.Text;
 
                     // TODO: Refactor turn state to fix convoluted logic
 
                     // Get input from turn state
                     if (turnState as object is TurnState defaultTurnState)
                     {
-                        if (defaultTurnState.TempState?.Value.Input != null)
+                        if (defaultTurnState.Temp?.Input != null)
                         {
-                            input = defaultTurnState.TempState?.Value.Input!;
+                            input = defaultTurnState.Temp?.Input!;
                         }
                     }
 

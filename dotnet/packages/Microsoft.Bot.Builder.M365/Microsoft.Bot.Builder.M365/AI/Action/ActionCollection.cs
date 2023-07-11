@@ -2,7 +2,7 @@
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
-    public class ActionCollection<TState> : IActionCollection<TState> where TState : TurnState
+    public class ActionCollection<TState> : IActionCollection<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly Dictionary<string, ActionEntry<TState>> _actions;
 

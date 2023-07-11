@@ -11,7 +11,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
     /// An moderator that uses Azure Content Safety API.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : TurnState
+    public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly AzureContentSafetyModeratorOptions _options;
         private readonly AzureContentSafetyClient _client;
@@ -42,7 +42,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                 case ModerationType.Input:
                 case ModerationType.Both:
                 {
-                    string input = turnState.TempState?.Value.Input ?? turnContext.Activity.Text;
+                    string input = turnState.Temp?.Input ?? turnContext.Activity.Text;
 
                     return await _HandleTextModeration(input, true);
                 }

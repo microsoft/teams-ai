@@ -7,7 +7,6 @@ using Microsoft.Bot.Builder.M365.AI;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Teams;
-using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Bot.Builder.M365.State;
 
@@ -26,7 +25,7 @@ namespace Microsoft.Bot.Builder.M365
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     public class Application<TState, TTurnStateManager> : IBot
-        where TState : TurnState
+        where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>, new()
     {
         private readonly AI<TState>? _ai;
@@ -36,7 +35,7 @@ namespace Microsoft.Bot.Builder.M365
         /// Creates a new Application instance.
         /// </summary>
         /// <param name="options">Optional. Options used to configure the application.</param>
-        public Application(ApplicationOptions<TState, TTurnStateManager> options, ILogger? logger = null)
+        public Application(ApplicationOptions<TState, TTurnStateManager> options)
         {
             Verify.ParamNotNull(options);
 
@@ -46,7 +45,7 @@ namespace Microsoft.Bot.Builder.M365
 
             if (Options.AI != null)
             {
-                _ai = new AI<TState>(Options.AI, logger);
+                _ai = new AI<TState>(Options.AI, Options.Logger);
             }
 
             // Validate long running messages configuration

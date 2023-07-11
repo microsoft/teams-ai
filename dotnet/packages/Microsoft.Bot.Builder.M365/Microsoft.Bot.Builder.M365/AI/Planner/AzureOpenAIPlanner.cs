@@ -12,7 +12,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     /// </summary>
     /// <typeparam name="TState">Type of the applications turn state</typeparam>
     public class AzureOpenAIPlanner<TState> : OpenAIPlanner<TState, AzureOpenAIPlannerOptions>
-        where TState : TurnState
+        where TState : ITurnState<StateBase, StateBase, TempState>
     {
         public AzureOpenAIPlanner(AzureOpenAIPlannerOptions options, ILogger logger) : base(options, logger)
         {

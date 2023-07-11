@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder.M365.AI;
 using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -7,8 +8,8 @@ namespace Microsoft.Bot.Builder.M365
     /// Options for the <see cref="Application{TState, TTurnStateManager}"/> class
     /// </summary>
     /// <typeparam name="TState">Type of the turn state</typeparam>
-    public class ApplicationOptions<TState, TTurnStateManager> 
-        where TState : TurnState
+    public class ApplicationOptions<TState, TTurnStateManager>
+        where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>
     {
         /// <summary>
@@ -44,6 +45,14 @@ namespace Microsoft.Bot.Builder.M365
         public TTurnStateManager? TurnStateManager { get; set; }
 
         /// <summary>
+        /// Optional. Logger that will be used in this application.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}"/> and <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}.AzureOpenAIPlanner"/> prompt completion data will is logged at the <see cref="LogLevel.Info"/> level.
+        /// </remarks>
+        public ILogger? Logger { get; set; }
+
+        /// <summary>
         /// Optional. If true, the bot will automatically remove mentions of the bot's name from incoming
         /// messages. Defaults to true.
         /// </summary>
@@ -67,4 +76,6 @@ namespace Microsoft.Bot.Builder.M365
         /// </remarks>
         public bool? LongRunningMessages { get; set; } = false;
     }
+
+    public class ApplicationOptions<TurnState> { }
 }

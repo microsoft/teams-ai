@@ -248,7 +248,7 @@ namespace Microsoft.Bot.Builder.M365.Tests
         {
             TurnState state = new()
             {
-                ConversationState = new TurnStateEntry<StateBase>(new StateBase(), "")
+                ConversationStateEntry = new TurnStateEntry<StateBase>(new StateBase(), "")
             };
 
             return state;

@@ -11,7 +11,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
     // Create work item
     // TODO: Resolve this issue before private preview. Need more research and thinking. How are developers going to use this?
     // 1. Unused parameters, 2. Making the data parameter type more explicit and not just "object".
-    public class DefaultActions<TState> where TState : TurnState
+    public class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly ILogger? _logger;
 

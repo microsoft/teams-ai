@@ -8,7 +8,7 @@ namespace Microsoft.Bot.Builder.M365.State
     /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
     /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
     /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
-    public class TurnState<TConversationState, TUserState, TTempState> : StateBase
+    public class TurnState<TConversationState, TUserState, TTempState> : StateBase, ITurnState<TConversationState, TUserState, TTempState>
         where TConversationState : StateBase
         where TUserState : StateBase
         where TTempState : TempState
@@ -18,9 +18,9 @@ namespace Microsoft.Bot.Builder.M365.State
         public const string TempStateKey = "tempState";
 
         /// <summary>
-        /// Stores all the conversation-related state.
+        /// Stores all the conversation-related state entry.
         /// </summary>
-        public TurnStateEntry<TConversationState>? ConversationState
+        public TurnStateEntry<TConversationState>? ConversationStateEntry
         {
             get
             {
@@ -35,9 +35,9 @@ namespace Microsoft.Bot.Builder.M365.State
         }
 
         /// <summary>
-        /// Stores all the user related state.
+        /// Stores all the user related state entry.
         /// </summary>
-        public TurnStateEntry<TUserState>? UserState
+        public TurnStateEntry<TUserState>? UserStateEntry
         {
             get
             {
@@ -52,9 +52,9 @@ namespace Microsoft.Bot.Builder.M365.State
         }
 
         /// <summary>
-        /// Stores all the tmeporary state for the current turn.
+        /// Stores all the temporary state entry for the current turn.
         /// </summary>
-        public TurnStateEntry<TTempState>? TempState
+        public TurnStateEntry<TTempState>? TempStateEntry
         {
             get
             {
@@ -65,6 +65,39 @@ namespace Microsoft.Bot.Builder.M365.State
                 Verify.ParamNotNull(value, nameof(value));
 
                 Set(TempStateKey, value!);
+            }
+        }
+
+        /// <summary>
+        /// Stores all the conversation-related state.
+        /// </summary>
+        public TConversationState? Conversation
+        {
+            get
+            {
+                return ConversationStateEntry?.Value;
+            }
+        }
+
+        /// <summary>
+        /// Stores all the user related state.
+        /// </summary>
+        public TUserState? User
+        {
+            get
+            {
+                return UserStateEntry?.Value;
+            }
+        }
+
+        /// <summary>
+        /// Stores the current turn's state.
+        /// </summary>
+        public TTempState? Temp
+        {
+            get
+            {
+                return TempStateEntry?.Value;
             }
         }
     }

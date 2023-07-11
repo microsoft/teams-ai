@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.Bot.Builder.M365.AI
 {
@@ -18,7 +19,7 @@ namespace Microsoft.Bot.Builder.M365.AI
     /// generating prompts. It can be used free standing or routed to by the Application object.
     /// </remarks>
     /// <typeparam name="TState">Optional. Type of the turn state.</typeparam>
-    public class AI<TState> where TState : TurnState
+    public class AI<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly IActionCollection<TState> _actions;
         private readonly AIOptions<TState> _options;
@@ -241,7 +242,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                 if (turnState != null && options?.History != null && options.History.TrackHistory)
                 {
                     string userPrefix = Options.History!.UserPrefix.Trim();
-                    string userInput = turnState.TempState!.Value.Input.Trim();
+                    string userInput = turnState.Temp!.Input.Trim();
                     int doubleMaxTurns = Options.History.MaxTurns * 2;
 
                     ConversationHistory.AddLine(turnState, $"{userPrefix} ${userInput}", doubleMaxTurns);
@@ -396,7 +397,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         private AIOptions<TState> _ConfigureOptions(AIOptions<TState>? options)
         {
             AIOptions<TState> configuredOptions;
-            
+
             if (options != null)
             {
                 configuredOptions = options;
@@ -413,7 +414,7 @@ namespace Microsoft.Bot.Builder.M365.AI
 
         private void _SetTempStateValues(TState turnState, ITurnContext turnContext, AIOptions<TState>? options)
         {
-            TempState? tempState =  turnState.TempState?.Value;
+            TempState? tempState =  turnState.Temp;
 
             if (tempState != null)
             {

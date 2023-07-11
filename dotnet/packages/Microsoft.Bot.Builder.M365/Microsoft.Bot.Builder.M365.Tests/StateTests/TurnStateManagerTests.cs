@@ -24,11 +24,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
 
             // Assert
             Assert.NotNull(state);
-            Assert.NotNull(state.ConversationState);
-            Assert.NotNull(state.UserState);
-            Assert.NotNull(state.TempState);
+            Assert.NotNull(state.Conversation);
+            Assert.NotNull(state.User);
+            Assert.NotNull(state.Temp);
 
-            Assert.Equal(state.ConversationState.Value, new ConversationState());
+            Assert.Equal(state.ConversationStateEntry!.Value, new ConversationState());
         }
 
         [Fact]
@@ -64,9 +64,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
             // Assert
             storage.Verify(storage => storage.ReadAsync(new string[] { conversationKey, userKey }, It.IsAny<CancellationToken>()));
             Assert.NotNull(state);
-            Assert.Equal(state.ConversationState?.Value, conversationState);
-            Assert.Equal(state.UserState?.Value, userState);
-            Assert.NotNull(state.TempState);
+            Assert.Equal(state.Conversation, conversationState);
+            Assert.Equal(state.User, userState);
+            Assert.NotNull(state.Temp);
         }
 
         [Fact]
@@ -100,9 +100,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
 
             // Assert
             Assert.NotNull(state);
-            Assert.Equal(state.ConversationState?.Value, conversationState);
-            Assert.Equal(state.UserState?.Value, userState);
-            Assert.NotNull(state.TempState);
+            Assert.Equal(state.ConversationStateEntry?.Value, conversationState);
+            Assert.Equal(state.UserStateEntry?.Value, userState);
+            Assert.NotNull(state.TempStateEntry);
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
             var stateValue = new ConversationState();
             ApplicationTurnState state = new()
             {
-                ConversationState = new TurnStateEntry<ConversationState>(stateValue, storageKey)
+                ConversationStateEntry = new TurnStateEntry<ConversationState>(stateValue, storageKey)
             };
 
             var storage = new MemoryStorage();
@@ -132,7 +132,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
 
             // Assert
             Assert.NotNull(storedItems);
-            Assert.Equal(state.ConversationState.Value, storedItems[storageKey]);
+            Assert.Equal(state.ConversationStateEntry.Value, storedItems[storageKey]);
         }
 
         [Fact]
@@ -146,14 +146,14 @@ namespace Microsoft.Bot.Builder.M365.Tests.StateTests
             var stateValue = new ConversationState();
             ApplicationTurnState state = new()
             {
-                ConversationState = new TurnStateEntry<ConversationState>(stateValue, storageKey)
+                ConversationStateEntry = new TurnStateEntry<ConversationState>(stateValue, storageKey)
             };
 
             var storage = new MemoryStorage();
 
             // Act
             /// Delete conversation state
-            state.ConversationState.Delete();
+            state.ConversationStateEntry.Delete();
             /// Save the state
             await turnStateManager.SaveStateAsync(storage, turnContext, state);
             /// Load from storage

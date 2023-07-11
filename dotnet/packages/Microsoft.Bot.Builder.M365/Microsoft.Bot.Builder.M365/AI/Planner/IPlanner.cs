@@ -6,7 +6,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
     /// <summary>
     /// A planner is responsible for generating a plan that the AI system will execute.
     /// </summary>
-    public interface IPlanner<TState> where TState : TurnState
+    public interface IPlanner<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Completes a prompt without returning a plan.
