@@ -269,14 +269,13 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 for (int i = 0; i < history.Length; i++)
                 {
                     string line = history[i];
-                    string lowercaseLine = line.ToLower();
-                    if (lowercaseLine.StartsWith(userPrefix))
+                    if (line.StartsWith(userPrefix, StringComparison.OrdinalIgnoreCase))
                     {
                         line = line.Substring(userPrefix.Length).Trim();
 
                         chatHistory.AddUserMessage(line);
                     }
-                    else if (lowercaseLine.StartsWith(assistantPrefix))
+                    else if (line.StartsWith(assistantPrefix, StringComparison.OrdinalIgnoreCase))
                     {
                         line = line.Substring(assistantPrefix.Length).Trim();
                         

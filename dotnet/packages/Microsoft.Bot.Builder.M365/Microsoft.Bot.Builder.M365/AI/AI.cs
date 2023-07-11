@@ -217,21 +217,21 @@ namespace Microsoft.Bot.Builder.M365.AI
             Verify.ParamNotNull(turnState, nameof(turnState));
             Verify.ParamNotNull(prompt, nameof(prompt));
 
-            AIOptions<TState> aIOptions = _ConfigureOptions(options);
+            AIOptions<TState> opts = _ConfigureOptions(options);
 
             _SetTempStateValues(turnState, turnContext, options);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
+            PromptTemplate renderedPrompt = await opts.PromptManager.RenderPrompt(turnContext, turnState, prompt);
 
             // Review prompt
-            Plan? plan = await aIOptions.Moderator.ReviewPrompt(turnContext, turnState, renderedPrompt);
+            Plan? plan = await opts.Moderator.ReviewPrompt(turnContext, turnState, renderedPrompt);
 
             if (plan == null)
             {
                 // Generate plan
-                plan = await aIOptions.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
-                plan = await aIOptions.Moderator.ReviewPlan(turnContext, turnState, plan);
+                plan = await opts.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, opts, cancellationToken);
+                plan = await opts.Moderator.ReviewPlan(turnContext, turnState, plan);
             }
 
             // Process generated plan
@@ -239,16 +239,16 @@ namespace Microsoft.Bot.Builder.M365.AI
             if (continueChain)
             {
                 // Update conversation history
-                if (turnState != null && options?.History != null && options.History.TrackHistory)
+                if (turnState != null && opts?.History != null && opts.History.TrackHistory)
                 {
-                    string userPrefix = Options.History!.UserPrefix.Trim();
+                    string userPrefix = opts.History!.UserPrefix.Trim();
                     string userInput = turnState.Temp!.Input.Trim();
-                    int doubleMaxTurns = Options.History.MaxTurns * 2;
+                    int doubleMaxTurns = opts.History.MaxTurns * 2;
 
-                    ConversationHistory.AddLine(turnState, $"{userPrefix} ${userInput}", doubleMaxTurns);
+                    ConversationHistory.AddLine(turnState, $"{userPrefix} {userInput}", doubleMaxTurns);
                     string assisstantPrefix = Options.History!.AssistantPrefix.Trim();
 
-                    switch (options?.History.AssistantHistoryType)
+                    switch (opts?.History.AssistantHistoryType)
                     {
                         case AssistantHistoryType.Text:
                             // Extract only the things the assistant has said
@@ -256,7 +256,7 @@ namespace Microsoft.Bot.Builder.M365.AI
                                 .OfType<PredictedSayCommand>()
                                 .Select(c => c.Response));
 
-                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix}, ${text}");
+                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix}, {text}");
 
                             break;
 
