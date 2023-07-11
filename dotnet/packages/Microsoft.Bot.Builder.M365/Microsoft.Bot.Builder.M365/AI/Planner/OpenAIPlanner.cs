@@ -308,4 +308,12 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         }
 
     }
+
+    /// <inheritdoc/>
+    public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions> where TState : ITurnState<StateBase, StateBase, TempState>
+    {
+        public OpenAIPlanner(OpenAIPlannerOptions options, ILogger? logger = null) : base(options, logger)
+        {
+        }
+    }
 }
