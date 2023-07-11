@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.Tokenizers;
+using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
@@ -251,7 +252,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
             List<string> history = GetHistory(turnState);
 
             // Populate up to max chars
-            string text = "";
+            StringBuilder text = new();
             int textTokens = 0;
             int lineSeparatorTokens = GPT3Tokenizer.Encode(lineSeparator).Count;
             for (int i = history.Count - 1; i >= 0; i--)
@@ -266,11 +267,11 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
                 }
 
                 // Prepend line to output
-                text = $"{line}{lineSeparator}{text}";
+                text.Insert(0, $"{line}{lineSeparator}");
                 textTokens = newTextTokens;
             }
 
-            return text.Trim();
+            return text.ToString().Trim();
         }
 
         /// <summary>

@@ -45,17 +45,6 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                 {
                     string input = turnState.Temp?.Input ?? turnContext.Activity.Text;
 
-                    // TODO: Refactor turn state to fix convoluted logic
-
-                    // Get input from turn state
-                    if (turnState as object is TurnState defaultTurnState)
-                    {
-                        if (defaultTurnState.Temp?.Input != null)
-                        {
-                            input = defaultTurnState.Temp?.Input!;
-                        }
-                    }
-
                     return await _HandleTextModeration(input, true);
                 }
                 default:

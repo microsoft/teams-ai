@@ -54,7 +54,6 @@ namespace Microsoft.Bot.Builder.M365.State
                 TState state = new();
                 TUserState? userState = null;
                 TConversationState? conversationState = null;
-                TTempState? tempState = null;
 
                 if (items.TryGetValue(userKey, out object userStateValue))
                 {
@@ -68,11 +67,10 @@ namespace Microsoft.Bot.Builder.M365.State
 
                 userState ??= new TUserState();
                 conversationState ??= new TConversationState();
-                tempState ??= new TTempState();
 
                 state.UserStateEntry = new TurnStateEntry<TUserState>(userState, userKey);
                 state.ConversationStateEntry = new TurnStateEntry<TConversationState>(conversationState, conversationKey);
-                state.TempStateEntry = new TurnStateEntry<TTempState>(tempState);
+                state.TempStateEntry = new TurnStateEntry<TTempState>(new());
 
                 return state;
 
