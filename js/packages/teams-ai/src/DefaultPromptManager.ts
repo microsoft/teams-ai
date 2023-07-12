@@ -26,7 +26,8 @@ export interface DefaultPromptManagerOptions {
 
 /**
  * A filesystem based prompt manager.
- * @remarks
+ *
+ * @summary
  * The default prompt manager uses the file system to define prompts that are compatible with
  * Microsoft's Semantic Kernel SDK (see: https://github.com/microsoft/semantic-kernel)
  *
@@ -51,14 +52,16 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
     }
 
     /**
-     * Adds a custom function <name> to the prompt manager.
-     * @remarks
+     * Adds a custom function to the prompt manager.
+     *
+     * @summary
      * Functions can be used with a prompt template using a syntax of `{{name}}`. Function
      * arguments are not currently supported.
-     * @param name The name of the function.
-     * @param handler Promise to return on function name match.
-     * @param allowOverrides Whether to allow overriding an existing function.
-     * @returns The prompt manager for chaining.
+     *
+     * @param {string} name - The name of the function.
+     * @param {(context: TurnContext, state: TState) => Promise<any>} handler - Promise to return on function name match.
+     * @param {boolean} allowOverrides - Whether to allow overriding an existing function.
+     * @returns {this} The prompt manager for chaining.
      */
     public addFunction(
         name: string,
@@ -83,11 +86,12 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Adds a prompt template to the prompt manager.
-     * @remarks
+     *
+     * @summary
      * The template will be pre-parsed and cached for use when the template is rendered by name.
-     * @param name Name of the prompt template.
-     * @param template Prompt template to add.
-     * @returns The prompt manager for chaining.
+     * @param {string} name - Name of the prompt template.
+     * @param {PromptTemplate} template - Prompt template to add.
+     * @returns {this} The prompt manager for chaining.
      */
     public addPromptTemplate(name: string, template: PromptTemplate): this {
         if (this._templates.has(name)) {
@@ -117,10 +121,11 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Invokes a function by name.
-     * @param context Current application turn context.
-     * @param state Current turn state.
-     * @param name Name of the function to invoke.
-     * @returns The result returned by the function for insertion into a prompt.
+     *
+     * @param {TurnContext} context - Current application turn context.
+     * @param {TState} state - Current turn state.
+     * @param {string} name - Name of the function to invoke.
+     * @returns {Promise<any>} The result returned by the function for insertion into a prompt.
      */
     public invokeFunction(context: TurnContext, state: TState, name: string): Promise<any> {
         if (this._functions && this._functions.has(name)) {
@@ -134,10 +139,11 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Loads a named prompt template from the filesystem.
-     * @remarks
+     *
+     * @summary
      * The template will be pre-parsed and cached for use when the template is rendered by name.
-     * @param name Name of the template to load.
-     * @returns The loaded and parsed prompt template.
+     * @param {string} name - Name of the template to load.
+     * @returns {Promise<PromptTemplate>} The loaded and parsed prompt template.
      */
     public async loadPromptTemplate(name: string): Promise<PromptTemplate> {
         if (!this._templates.has(name)) {
@@ -189,12 +195,13 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Renders a prompt template by name.
-     * @remarks
+     *
+     * @summary
      * The prompt will be automatically loaded from disk if needed and cached for future use.
-     * @param context Current application turn context.
-     * @param state Current turn state.
-     * @param nameOrTemplate Name of the prompt template to render or a prompt template to render.
-     * @returns The rendered prompt template.
+     * @param {TurnContext} context - Current application turn context.
+     * @param {TState} state - Current turn state.
+     * @param {string | PromptTemplate} nameOrTemplate - Name of the prompt template to render or a prompt template to render.
+     * @returns {Promise<PromptTemplate>} The rendered prompt template.
      */
     public async renderPrompt(
         context: TurnContext,
