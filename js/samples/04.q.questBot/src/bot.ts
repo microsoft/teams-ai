@@ -117,7 +117,7 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner,
         promptManager,
-        prompt: async (context: TurnContext, state: ApplicationTurnState) => state.temp.value.prompt,
+        prompt: async (_context: TurnContext, state: ApplicationTurnState) => state.temp.value.prompt,
         history: {
             userPrefix: 'Player:',
             assistantPrefix: 'DM:',
@@ -254,7 +254,7 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
                 const objective = campaign.objectives[i];
                 if (!objective.completed) {
                     // Ignore if the objective is already a quest
-                    if (!conversation.quests.hasOwnProperty(objective.title.toLowerCase())) {
+                    if (!Object.prototype.hasOwnProperty.call(conversation.quests, objective.title.toLowerCase())) {
                         nextObjective = objective;
                     }
 
@@ -381,12 +381,12 @@ app.ai.action(
 addActions(app);
 
 // Register prompt functions
-app.ai.prompts.addFunction('describeGameState', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeGameState', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`;
 });
 
-app.ai.prompts.addFunction('describeCampaign', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeCampaign', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     if (conversation.campaign) {
         return `"${conversation.campaign.title}" - ${conversation.campaign.playerIntro}`;
@@ -395,7 +395,7 @@ app.ai.prompts.addFunction('describeCampaign', async (context: TurnContext, stat
     }
 });
 
-app.ai.prompts.addFunction('describeQuests', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeQuests', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     let text = '';
     let connector = '';
@@ -408,14 +408,14 @@ app.ai.prompts.addFunction('describeQuests', async (context: TurnContext, state:
     return text.length > 0 ? text : 'none';
 });
 
-app.ai.prompts.addFunction('describePlayerInfo', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describePlayerInfo', async (_context: TurnContext, state: ApplicationTurnState) => {
     const player = state.user.value;
     let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
 });
 
-app.ai.prompts.addFunction('describeLocation', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeLocation', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     if (conversation.location) {
         return `"${conversation.location.title}" - ${conversation.location.description}`;
@@ -424,14 +424,17 @@ app.ai.prompts.addFunction('describeLocation', async (context: TurnContext, stat
     }
 });
 
-app.ai.prompts.addFunction('describeConditions', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeConditions', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     return describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 });
 
 /**
- * @param items
- * @param indent
+ * Returns a string representation of the given item list.
+ *
+ * @param {IItemList} items - The item list to describe.
+ * @param {string} [indent='\t'] - The indentation string to use.
+ * @returns {string} The string representation of the item list.
  */
 export function describeItemList(items: IItemList, indent = '\t'): string {
     let text = '';
@@ -464,8 +467,11 @@ export async function updateDMResponse(
 }
 
 /**
- * @param text
- * @param minValue
+ * Parses a string to a number.
+ *
+ * @param {string | undefined} text - The string to parse.
+ * @param {number} [minValue=0] - The minimum value to return.
+ * @returns {number} The parsed number.
  */
 export function parseNumber(text: string | undefined, minValue?: number): number {
     try {
@@ -481,7 +487,10 @@ export function parseNumber(text: string | undefined, minValue?: number): number
 }
 
 /**
- * @param response
+ * Trims the prompt response by removing common junk that gets returned by the model.
+ *
+ * @param {string} response - The response to trim.
+ * @returns {string} The trimmed response.
  */
 export function trimPromptResponse(response: string): string {
     // Remove common junk that gets returned by the model.
@@ -489,7 +498,10 @@ export function trimPromptResponse(response: string): string {
 }
 
 /**
- * @param text
+ * Converts a string to title case.
+ *
+ * @param {string} text - The string to convert to title case.
+ * @returns {string} The title case version of the input string.
  */
 export function titleCase(text: string): string {
     return text

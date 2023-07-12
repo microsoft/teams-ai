@@ -11,7 +11,7 @@ import {
 import * as responses from '../responses';
 
 /**
- * @param app
+ * @param {Application<ApplicationTurnState>} app - The application.
  */
 export function playerAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('player', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -27,10 +27,13 @@ export function playerAction(app: Application<ApplicationTurnState>): void {
 }
 
 /**
- * @param app
- * @param context
- * @param state
- * @param data
+ * Updates the player's information.
+ *
+ * @param {Application<ApplicationTurnState>} app - The application.
+ * @param {TurnContext} context - The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state - The state object for the current turn of conversation.
+ * @param {IDataEntities} data - The data entities extracted from the user's utterance.
+ * @returns {Promise<boolean>} - A boolean indicating whether the player's information was successfully updated.
  */
 async function updatePlayer(
     app: Application<ApplicationTurnState>,

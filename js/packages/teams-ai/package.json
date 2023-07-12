@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-ai",
     "author": "Microsoft Corp.",
     "description": "SDK focused on building AI based applications for Microsoft Teams.",
-    "version": "0.1.0-preview.3",
+    "version": "0.1.0-preview.2",
     "license": "MIT",
     "keywords": [
         "botbuilder",

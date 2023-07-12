@@ -36,8 +36,9 @@ export class AzureOpenAIPlanner<TState extends TurnState = DefaultTurnState> ext
     AzureOpenAIPlannerOptions
 > {
     /**
-     * @param options
+     * @param {AzureOpenAIPlannerOptions} options Options for the AzureOpenAIPlanner
      * @private
+     * @returns {AzureOpenAIClient} A planner that uses Azure OpenAI to generate plans
      */
     protected createClient(options: AzureOpenAIPlannerOptions): OpenAIClient {
         return new AzureOpenAIClient({

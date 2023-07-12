@@ -23,9 +23,9 @@ export class ConversationHistory {
     /**
      * Adds a new line of text to conversation history
      *
-     * @param state Applications turn state.
-     * @param line Line of text to add to history.
-     * @param maxLines Optional. Maximum number of lines to store. Defaults to 10.
+     * @param {TurnState} state Applications turn state.
+     * @param {string} line Line of text to add to history.
+     * @param {number} maxLines Optional. Maximum number of lines to store. Defaults to 10.
      */
     public static addLine(state: TurnState, line: string, maxLines = 10): void {
         if (state.conversation) {
@@ -55,8 +55,8 @@ export class ConversationHistory {
     /**
      * Appends additional text to the last line of conversation history.
      *
-     * @param state Applications turn state.
-     * @param text Text to add to the last line.
+     * @param {TurnState} state Applications turn state.
+     * @param {string} text Text to add to the last line.
      */
     public static appendToLastLine(state: TurnState, text: string): void {
         const line = ConversationHistory.getLastLine(state);
@@ -66,7 +66,7 @@ export class ConversationHistory {
     /**
      * Clears all conversation history for the current conversation.
      *
-     * @param state Applications turn state.
+     * @param {TurnState} state Applications turn state.
      */
     public static clear(state: TurnState): void {
         if (state.conversation) {
@@ -81,8 +81,8 @@ export class ConversationHistory {
     /**
      * Checks to see if one or more lines of history has persisted.
      *
-     * @param state Applications turn state.
-     * @returns True if there are 1 or more lines of history.
+     * @param {TurnState} state Applications turn state.
+     * @returns {boolean} True if there are 1 or more lines of history.
      */
     public static hasMoreLines(state: TurnState): boolean {
         if (state.conversation) {
@@ -98,8 +98,8 @@ export class ConversationHistory {
     /**
      * Returns the last line of history.
      *
-     * @param state Applications turn state.
-     * @returns The last line of history or an empty string.
+     * @param {TurnState} state Applications turn state.
+     * @returns {string} The last line of history or an empty string.
      */
     public static getLastLine(state: TurnState): string {
         if (state.conversation) {
@@ -121,8 +121,8 @@ export class ConversationHistory {
     /**
      * Searches the history to find the last SAY response from the assistant.
      *
-     * @param state Applications turn state.
-     * @returns Last thing said by the assistant. Defaults to an empty string.
+     * @param {TurnState} state Applications turn state.
+     * @returns {string} Last thing said by the assistant. Defaults to an empty string.
      */
     public static getLastSay(state: TurnState): string {
         // Find start of text
@@ -159,8 +159,8 @@ export class ConversationHistory {
     /**
      * Removes the last line from the conversation history.
      *
-     * @param state Applications turn state.
-     * @returns The removed line or undefined.
+     * @param {TurnState} state Applications turn state.
+     * @returns {string | undefined} The removed line or undefined.
      */
     public static removeLastLine(state: TurnState): string | undefined {
         if (state.conversation) {
@@ -189,8 +189,8 @@ export class ConversationHistory {
     /**
      * Replaces the last line of history with a new line.
      *
-     * @param state Applications turn state.
-     * @param line New line of history.
+     * @param {TurnState} state Applications turn state.
+     * @param {string} line New line of history.
      */
     public static replaceLastLine(state: TurnState, line: string): void {
         if (state.conversation) {
@@ -219,9 +219,9 @@ export class ConversationHistory {
     /**
      * Replaces the last SAY with a new response.
      *
-     * @param state Applications turn state.
-     * @param newResponse New response from the assistant.
-     * @param assistantPrefix Prefix for when a new line needs to be inserted. Defaults to 'Assistant:'.
+     * @param {TurnState} state Applications turn state.
+     * @param {string} newResponse New response from the assistant.
+     * @param {string} assistantPrefix Prefix for when a new line needs to be inserted. Defaults to 'Assistant:'.
      */
     public static replaceLastSay(state: TurnState, newResponse: string, assistantPrefix = 'Assistant:'): void {
         if (state.conversation) {
@@ -261,14 +261,14 @@ export class ConversationHistory {
     /**
      * Returns the current conversation history as a string of text.
      *
-     * @remarks
+     * @summary
      * The length of the returned text is gated by `maxCharacterLength` and only whole lines of
      * history entries will be returned. That means that if the length of the most recent history
      * entry is greater then `maxCharacterLength`, no text will be returned.
-     * @param state Application's turn state.
-     * @param maxTokens Optional. Maximum length of the text returned. Defaults to 1000 tokens.
-     * @param lineSeparator Optional. Separator used between lines. Defaults to '\n'.
-     * @returns The most recent lines of conversation history as a text string.
+     * @param {TurnState} state Application's turn state.
+     * @param {number} maxTokens Optional. Maximum length of the text returned. Defaults to 1000 tokens.
+     * @param {string} lineSeparator Optional. Separator used between lines. Defaults to '\n'.
+     * @returns {string} The most recent lines of conversation history as a text string.
      */
     public static toString(state: TurnState, maxTokens = 1000, lineSeparator = '\n'): string {
         if (state.conversation) {
@@ -304,9 +304,9 @@ export class ConversationHistory {
     /**
      * Returns the current conversation history as an array of lines.
      *
-     * @param state The Application's turn state.
-     * @param maxTokens Optional. Maximum length of the text to include. Defaults to 1000 tokens.
-     * @returns The most recent lines of conversation history as an array.
+     * @param {TurnState} state The Application's turn state.
+     * @param {number} maxTokens Optional. Maximum length of the text to include. Defaults to 1000 tokens.
+     * @returns {string[]} The most recent lines of conversation history as an array.
      */
     public static toArray(state: TurnState, maxTokens = 1000): string[] {
         if (state.conversation) {

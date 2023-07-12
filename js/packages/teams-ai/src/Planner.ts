@@ -70,7 +70,7 @@ export interface PredictedCommand {
     /**
      * Type of command to execute.
      *
-     * @remarks
+     * @summary
      * DO commands are actions that the AI system should perform. SAY commands are responses that
      * the AI system should say.
      */

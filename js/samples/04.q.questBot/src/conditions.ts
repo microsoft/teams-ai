@@ -1,15 +1,21 @@
 /**
- * @param time
- * @param day
- * @param temperature
- * @param weather
+ * Returns a string describing the current conditions.
+ *
+ * @param {number} time - The current time.
+ * @param {number} day - The current day.
+ * @param {string} temperature - The current temperature.
+ * @param {string} weather - The current weather.
+ * @returns {string} A string describing the current conditions.
  */
 export function describeConditions(time: number, day: number, temperature: string, weather: string): string {
     return `It's a ${describeSeason(day)} ${describeTimeOfDay(time)} and the weather is ${temperature} and ${weather}.`;
 }
 
 /**
- * @param time
+ * Returns a string describing the time of day.
+ *
+ * @param {number} time - The current time.
+ * @returns {'dawn' | 'morning' | 'noon' | 'afternoon' | 'evening' | 'night'} A string describing the time of day.
  */
 export function describeTimeOfDay(time: number): 'dawn' | 'morning' | 'noon' | 'afternoon' | 'evening' | 'night' {
     if (time >= 4 && time < 6) {
@@ -28,7 +34,10 @@ export function describeTimeOfDay(time: number): 'dawn' | 'morning' | 'noon' | '
 }
 
 /**
- * @param day
+ * Returns the current season based on the day of the year.
+ *
+ * @param {number} day - The current day of the year.
+ * @returns {'spring' | 'summer' | 'fall' | 'winter'} The current season.
  */
 export function describeSeason(day: number): 'spring' | 'summer' | 'fall' | 'winter' {
     if (day >= 79 && day <= 172) {
@@ -52,7 +61,8 @@ Winter: Sunny - 20%, Cloudy - 40%, Rainy - 10%, Windy - 10%, Snowy - 10%, Foggy 
 */
 
 /**
- * @param season
+ * @param {string} season The season to generate weather for.
+ * @returns {string} A string representing the generated weather.
  */
 export function generateWeather(season: string): string {
     let weather = '';
@@ -122,7 +132,11 @@ export function generateWeather(season: string): string {
 }
 
 /**
- * @param season
+/**
+ * Generates a temperature string based on the given season.
+ *
+ * @param {string} season The season to generate temperature for.
+ * @returns {string} A string representing the generated temperature.
  */
 export function generateTemperature(season: string): string {
     let temperature = '';

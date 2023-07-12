@@ -204,12 +204,9 @@ export class AdaptiveCards<TState extends TurnState> {
      * }
      * ```
      * @template TData Optional. Type of the data associated with the action.
-     * @param verb The named action(s) to be handled.
-     * @param handler The code to execute when the action is triggered.
-     * @param handler.context The current turn context.
-     * @param handler.state The current turn state.
-     * @param handler.data The data associated with the action.
-     * @returns The application for chaining purposes.
+     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} verb The named action(s) to be handled.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<AdaptiveCard | string>} handler The code to execute when the action is triggered.
+     * @returns {Application} The application for chaining purposes.
      */
     public actionSubmit<TData = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
@@ -289,6 +286,7 @@ export class AdaptiveCards<TState extends TurnState> {
 /**
  * @param verb
  * @private
+ * @returns {RouteSelector} A function that matches the verb using a RegExp or attempts to match verb.
  */
 function createActionExecuteSelector(verb: string | RegExp | RouteSelector): RouteSelector {
     if (typeof verb == 'function') {
@@ -329,6 +327,7 @@ function createActionExecuteSelector(verb: string | RegExp | RouteSelector): Rou
  * @param verb
  * @param filter
  * @private
+ * @returns {RouteSelector} A function that matches the verb using a RegExp or attempts to match verb.
  */
 function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filter: string): RouteSelector {
     if (typeof verb == 'function') {
@@ -358,6 +357,8 @@ function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filte
 /**
  * @param dataset
  * @private
+ * @param {string | RegExp | RouteSelector} dataset - The dataset to match.
+ * @returns {RouteSelector} A function that matches the dataset using a RegExp or attempts to match dataset.
  */
 function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSelector {
     if (typeof dataset == 'function') {
