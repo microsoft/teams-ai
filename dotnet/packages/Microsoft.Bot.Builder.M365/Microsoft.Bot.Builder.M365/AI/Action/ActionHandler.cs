@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
@@ -7,7 +8,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
     /// The action handler built from method.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state</typeparam>
-    internal sealed class ActionHandler<TState> : IActionHandler<TState> where TState : TurnState
+    internal sealed class ActionHandler<TState> : IActionHandler<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly MethodInfo _method;
 

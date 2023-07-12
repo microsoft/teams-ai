@@ -5,6 +5,7 @@ using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_DefaultActions_Are_Imported()
         {
             // Act
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
 
             // Assert
             Assert.True(actions.HasAction(DefaultActionTypes.UnknownActionName));
@@ -35,10 +36,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         {
             // Arrange
             var logs = new List<string>();
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>(logs);
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>(logs);
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
             var unknownAction = actions.GetAction(DefaultActionTypes.UnknownActionName);
@@ -55,10 +56,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         {
             // Arrange
             var logs = new List<string>();
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>(logs);
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>(logs);
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
             var flaggedInputAction = actions.GetAction(DefaultActionTypes.FlaggedInputActionName);
@@ -75,10 +76,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         {
             // Arrange
             var logs = new List<string>();
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>(logs);
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>(logs);
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
             var flaggedOutputAction = actions.GetAction(DefaultActionTypes.FlaggedOutputActionName);
@@ -94,10 +95,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async Task Test_Execute_RateLimitedAction()
         {
             // Arrange
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
 
             // Act
             var rateLimitedAction = actions.GetAction(DefaultActionTypes.RateLimitedActionName);
@@ -112,10 +113,10 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async Task Test_Execute_PlanReadyAction()
         {
             // Arrange
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
             var plan0 = new Plan(new List<IPredictedCommand>());
             var plan1 = new Plan(new List<IPredictedCommand>()
             {
@@ -139,12 +140,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async Task Test_Execute_DoCommandAction()
         {
             // Arrange
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
             var handler = new TestActionHandler();
-            var data = new DoCommandActionData<TurnState>
+            var data = new DoCommandActionData<TestTurnState>
             {
                 PredictedDoCommand = new PredictedDoCommand("test-action"),
                 Handler = handler,
@@ -166,11 +167,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public async Task Test_Execute_SayCommandAction()
         {
             // Arrange
-            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
             var turnContextMock = new Mock<ITurnContext>();
             turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
             turnContextMock.Setup(tc => tc.SendActivityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResourceResponse()));
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
             var command = new PredictedSayCommand("hello");
 
             // Act
@@ -185,7 +186,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             Assert.Equal("Value cannot be null. (Parameter 'command')", exception.Message);
         }
 
-        private static IActionCollection<TState> ImportDefaultActions<TState>(IList<string>? logs = null) where TState : TurnState
+        private static IActionCollection<TState> ImportDefaultActions<TState>(IList<string>? logs = null) where TState : ITurnState<StateBase, StateBase, TempState>
         {
             ILogger? logger = null;
             if (logs != null)
@@ -218,11 +219,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             return (IActionCollection<TState>)actionsField!.GetValue(ai)!;
         }
 
-        private class TestActionHandler : IActionHandler<TurnState>
+        private class TestActionHandler : IActionHandler<TestTurnState>
         {
             public string? ActionName { get; set; }
 
-            public Task<bool> PerformAction(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null)
+            public Task<bool> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
             {
                 ActionName = action;
                 return Task.FromResult(true);

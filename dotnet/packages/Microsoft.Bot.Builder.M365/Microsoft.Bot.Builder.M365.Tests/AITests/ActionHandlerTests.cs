@@ -4,11 +4,12 @@ using Microsoft.Bot.Builder.M365.AI.Action;
 using Microsoft.Bot.Builder.M365.AI.Moderator;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
+using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 using Microsoft.Bot.Schema;
 using Moq;
 
-namespace Microsoft.Bot.Builder.M365.Tests.AI
+namespace Microsoft.Bot.Builder.M365.Tests.AITests
 {
     public class ActionHandlerTests
     {
@@ -18,11 +19,11 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             // Arrange
             var instance = new DifferentReturnTypesActions();
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
             var actionNames = new[] { "action1", "action2", "action3", "action4", "action5", "action6" };
 
             // Act
-            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
+            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
                 actions.GetAction(actionName)?.Handler.PerformAction(turnContext, turnState);
@@ -40,14 +41,14 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         public void Test_Actions_DifferentParameterAttributes()
         {
             // Arrange
-            var instance = new DifferentParameterAttributesActions<TurnState>();
+            var instance = new DifferentParameterAttributesActions<TestTurnState>();
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
             var actionNames = new[] { "action1", "action2", "action3", "action4", "action5", "action6" };
             var entities = new object();
 
             // Act
-            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
+            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
                 actions.GetAction(actionName)?.Handler.PerformAction(turnContext, turnState, entities, actionName);
@@ -76,12 +77,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         {
             // Arrange
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TurnState();
+            var turnState = new TestTurnState();
             var actionName = "action";
             var entities = new object();
 
             // Act
-            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
+            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             var exception = await Assert.ThrowsAsync<Exception>(async () => await actions.GetAction(actionName).Handler.PerformAction(turnContext, turnState, entities, actionName));
 
             // Assert
@@ -89,7 +90,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             Assert.Equal($"Cannot assign {from} to {to} of action method Action", exception.Message);
         }
 
-        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : TurnState
+        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : ITurnState<StateBase, StateBase, TempState>
         {
             AIOptions<TState> options = new(
                 new Mock<IPlanner<TState>>().Object,
@@ -106,25 +107,25 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
         {
             yield return new object[]
             {
-                new TestActions<string, TurnState, object, string>(),
+                new TestActions<string, TestTurnState, object, string>(),
                 typeof(TurnContext),
                 typeof(string),
             };
             yield return new object[]
             {
                 new TestActions<TurnContext, string, object, string>(),
-                typeof(TurnState),
+                typeof(TestTurnState),
                 typeof(string),
             };
             yield return new object[]
             {
-                new TestActions<TurnContext, TurnState, string, string>(),
+                new TestActions<TurnContext, TestTurnState, string, string>(),
                 typeof(object),
                 typeof(string),
             };
             yield return new object[]
             {
-                new TestActions<TurnContext, TurnState, object, int>(),
+                new TestActions<TurnContext, TestTurnState, object, int>(),
                 typeof(string),
                 typeof(int),
             };
@@ -176,7 +177,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AI
             }
         }
 
-        private class DifferentParameterAttributesActions<TState> where TState : TurnState
+        private class DifferentParameterAttributesActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
         {
             public List<object?[]> Calls { get; set; } = new List<object?[]>();
 

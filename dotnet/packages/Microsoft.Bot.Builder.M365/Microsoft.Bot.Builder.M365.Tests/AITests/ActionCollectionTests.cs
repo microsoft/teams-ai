@@ -77,7 +77,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
         public void Test_HasAction_True()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TurnState>();
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             IActionHandler<TestTurnState> handler = new TestActionHandler();
             var name = "actionName";
 
@@ -89,9 +89,9 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             Assert.True(hasAction);
         }
 
-        private class TestActionHandler : IActionHandler<TurnState>
+        private class TestActionHandler : IActionHandler<TestTurnState>
         {
-            public Task<bool> PerformAction(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null)
+            public Task<bool> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
             {
                 return Task.FromResult(true);
             }

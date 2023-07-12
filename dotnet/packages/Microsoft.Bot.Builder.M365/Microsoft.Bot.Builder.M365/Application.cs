@@ -156,7 +156,7 @@ namespace Microsoft.Bot.Builder.M365
                 if (Options.StartTypingTimer)
                 {
                     timer = new TypingTimer(_typingTimerDelay);
-                    _ = timer.Start(turnContext);
+                    timer.Start(turnContext);
                 };
 
                 // Remove @mentions
@@ -268,7 +268,7 @@ namespace Microsoft.Bot.Builder.M365
                         // If OnInvokeActivityAsync has already sent an InvokeResponse, do not send another one.
                         if (invokeResponse != null && turnContext.TurnState.Get<Activity>(BotAdapter.InvokeResponseKey) == null)
                         {
-                            _ = await turnContext.SendActivityAsync(new Activity { Value = invokeResponse, Type = ActivityTypesEx.InvokeResponse }, cancellationToken).ConfigureAwait(false);
+                            await turnContext.SendActivityAsync(new Activity { Value = invokeResponse, Type = ActivityTypesEx.InvokeResponse }, cancellationToken).ConfigureAwait(false);
                         }
 
                         break;

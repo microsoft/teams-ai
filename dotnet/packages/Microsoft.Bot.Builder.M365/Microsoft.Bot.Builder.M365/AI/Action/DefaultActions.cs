@@ -2,12 +2,13 @@
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
-{   
+{
     public class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly ILogger? _logger;
@@ -47,7 +48,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         [Action(DefaultActionTypes.PlanReadyActionName)]
         public Task<bool> PlanReadyAction([ActionEntities] Plan plan)
         {
-            Verify.NotNull(plan, nameof(plan));
+            Verify.ParamNotNull(plan, nameof(plan));
 
             return Task.FromResult(plan.Commands.Count > 0);
         }
@@ -55,7 +56,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         [Action(DefaultActionTypes.DoCommandActionName)]
         public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData, [ActionName] string action)
         {
-            Verify.NotNull(doCommandActionData, nameof(doCommandActionData));
+            Verify.ParamNotNull(doCommandActionData, nameof(doCommandActionData));
 
             if (doCommandActionData.Handler == null)
             {
@@ -75,7 +76,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         [Action(DefaultActionTypes.SayCommandActionName)]
         public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
         {
-            Verify.NotNull(command, nameof(command));
+            Verify.ParamNotNull(command, nameof(command));
             string response = command.Response;
             AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
 
@@ -89,15 +90,15 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
 
                 Attachment attachment = new() { Content = card, ContentType = AdaptiveCard.ContentType };
                 IMessageActivity activity = MessageFactory.Attachment(attachment);
-                _ = await turnContext.SendActivityAsync(activity);
+                await turnContext.SendActivityAsync(activity);
             }
             else if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                _ = await turnContext.SendActivityAsync(response.Replace("\n", "<br>"));
+                await turnContext.SendActivityAsync(response.Replace("\n", "<br>"));
             }
             else
             {
-                _ = await turnContext.SendActivityAsync(response);
+                await turnContext.SendActivityAsync(response);
             };
 
             return true;

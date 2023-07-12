@@ -1,10 +1,12 @@
-﻿namespace Microsoft.Bot.Builder.M365.AI.Action
+﻿using Microsoft.Bot.Builder.M365.State;
+
+namespace Microsoft.Bot.Builder.M365.AI.Action
 {
     /// <summary>
     /// Handler to perform the action.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state.</typeparam>
-    public interface IActionHandler<TState> where TState : TurnState
+    public interface IActionHandler<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Perform the action.
