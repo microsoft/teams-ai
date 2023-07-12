@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Bot.Builder.M365\Microsoft.Bot.Builder.M365.csproj" />
+    <ProjectReference Include="..\Microsoft.Bot.Builder.M365\Microsoft.Teams.AI.csproj" />
   </ItemGroup>
 
 </Project>
