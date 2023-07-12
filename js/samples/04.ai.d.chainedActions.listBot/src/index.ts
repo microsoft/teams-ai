@@ -12,7 +12,7 @@ import * as restify from 'restify';
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -22,7 +22,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -92,13 +97,13 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OpenAIKey) {
+if (!process.env.OPENAI_API_KEY) {
     throw new Error('Missing OpenAIKey environment variable');
 }
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey!,
+    apiKey: process.env.OPENAI_API_KEY!,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
