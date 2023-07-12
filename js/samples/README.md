@@ -55,7 +55,7 @@ It shows Teams AI SDK capabilities like:
 
 ### Intent to Action Mapping: [Light On/Off AI Assistant](04.ai.c.actionMapping.lightBot/)
 
-A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off. The bot is built using Node.js and the M365 BotBuilder library.
+A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off. The bot is built using Node.js and the Teams AI SDK library.
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams than the Santa sample. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to third party app skills.
 

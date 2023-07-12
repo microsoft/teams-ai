@@ -7,8 +7,8 @@
         "outDir": "./lib",
         "rootDir": "./src",
         "sourceMap": true,
-        "strict": false,
-        "target": "es2016",
+        "strict": true,
+        "target": "es2017",
         "tsBuildInfoFile": "./lib/.tsbuildinfo"
     }
 }
