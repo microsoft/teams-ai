@@ -2,15 +2,13 @@
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Bot.Builder.M365.Utilities;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
-{   
-    // Create work item
-    // TODO: Resolve this issue before private preview. Need more research and thinking. How are developers going to use this?
-    // 1. Unused parameters, 2. Making the data parameter type more explicit and not just "object".
+{
     public class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly ILogger? _logger;
@@ -21,44 +19,44 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         }
 
         [Action(DefaultActionTypes.UnknownActionName)]
-        public Task<bool> UnkownAction(ITurnContext turnContext, TState turnState, object data, string action)
+        public Task<bool> UnkownAction([ActionName] string action)
         {
             _logger?.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
             return Task.FromResult(true);
         }
 
         [Action(DefaultActionTypes.FlaggedInputActionName)]
-        public Task<bool> FlaggedInputAction(ITurnContext turnContext, TState turnState, object data, string action)
+        public Task<bool> FlaggedInputAction()
         {
-            _logger?.LogError($"The users input has been moderated but no handler was registered for ${DefaultActionTypes.FlaggedInputActionName}");
+            _logger?.LogError($"The users input has been moderated but no handler was registered for {DefaultActionTypes.FlaggedInputActionName}");
             return Task.FromResult(true);
         }
 
         [Action(DefaultActionTypes.FlaggedOutputActionName)]
-        public Task<bool> FlaggedOutputAction(ITurnContext turnContext, TState turnState, object data, string action)
+        public Task<bool> FlaggedOutputAction()
         {
-            _logger?.LogError($"The bots output has been moderated but no handler was registered for ${DefaultActionTypes.FlaggedOutputActionName}");
+            _logger?.LogError($"The bots output has been moderated but no handler was registered for {DefaultActionTypes.FlaggedOutputActionName}");
             return Task.FromResult(true);
         }
 
         [Action(DefaultActionTypes.RateLimitedActionName)]
-        public Task<bool> RateLimitedAction(ITurnContext turnContext, TState turnState, object data, string action)
+        public Task<bool> RateLimitedAction()
         {
             throw new AIException("An AI request failed because it was rate limited");
         }
 
         [Action(DefaultActionTypes.PlanReadyActionName)]
-        public Task<bool> PlanReadyAction(ITurnContext turnContext, TState turnState, object data, string action)
+        public Task<bool> PlanReadyAction([ActionEntities] Plan plan)
         {
-            Plan plan = data as Plan ?? throw new ArgumentException("Unexpected `data` object: It should be a Plan object");
+            Verify.ParamNotNull(plan, nameof(plan));
 
             return Task.FromResult(plan.Commands.Count > 0);
         }
 
         [Action(DefaultActionTypes.DoCommandActionName)]
-        public Task<bool> DoCommand(ITurnContext turnContext, TState turnState, object data, string action)
+        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData, [ActionName] string action)
         {
-            DoCommandActionData<TState> doCommandActionData = data as DoCommandActionData<TState> ?? throw new ArgumentException("Unexpected `data` object: It should be a PredictedDoCommand object");
+            Verify.ParamNotNull(doCommandActionData, nameof(doCommandActionData));
 
             if (doCommandActionData.Handler == null)
             {
@@ -70,15 +68,15 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
                 throw new Exception("Unexpected `data` object: PredictedDoCommand does not exist");
             }
 
-            ActionHandler<TState> handler = doCommandActionData.Handler;
+            IActionHandler<TState> handler = doCommandActionData.Handler;
 
-            return handler.Invoke(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, action);
+            return handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, doCommandActionData.PredictedDoCommand.Action);
         }
 
         [Action(DefaultActionTypes.SayCommandActionName)]
-        public async Task<bool> SayCommand(ITurnContext turnContext, TState turnState, object data, string action)
+        public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
         {
-            PredictedSayCommand command = data as PredictedSayCommand ?? throw new ArgumentException("Unexpected `data` object: It should be a PredictedDoCommand object");
+            Verify.ParamNotNull(command, nameof(command));
             string response = command.Response;
             AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
 

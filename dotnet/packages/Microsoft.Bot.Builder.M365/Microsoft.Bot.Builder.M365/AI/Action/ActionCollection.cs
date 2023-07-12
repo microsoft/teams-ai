@@ -12,7 +12,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
         }
 
         /// <inheritdoc />
-        public void SetAction(string name, ActionHandler<TState> handler, bool allowOverrides = false)
+        public void SetAction(string name, IActionHandler<TState> handler, bool allowOverrides = false)
         {
             if (_actions.ContainsKey(name))
             {

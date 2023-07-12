@@ -11,7 +11,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             // Arrange
             IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             string name = "action";
-            ActionHandler<TestTurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionHandler<TestTurnState> handler = new TestActionHandler();
             bool allowOverrides = true;
 
             // Act
@@ -32,7 +32,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             // Arrange
             IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             string name = "action";
-            ActionHandler<TestTurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionHandler<TestTurnState> handler = new TestActionHandler();
             bool allowOverrides = false;
             actionCollection.SetAction(name, handler, allowOverrides);
 
@@ -78,7 +78,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
         {
             // Arrange
             IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
-            ActionHandler<TestTurnState> handler = (turnContext, turnState, data, action) => Task.FromResult(true);
+            IActionHandler<TestTurnState> handler = new TestActionHandler();
             var name = "actionName";
 
             // Act
@@ -87,6 +87,14 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
 
             // Assert
             Assert.True(hasAction);
+        }
+
+        private class TestActionHandler : IActionHandler<TestTurnState>
+        {
+            public Task<bool> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
+            {
+                return Task.FromResult(true);
+            }
         }
     }
 }

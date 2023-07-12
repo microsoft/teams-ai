@@ -85,7 +85,7 @@ namespace Microsoft.Bot.Builder.M365.AI
         /// <param name="allowOverrides">Whether or not this action's properties can be overriden.</param>
         /// <returns>The current instance object.</returns>
         /// <exception cref="Exception"></exception>
-        public AI<TState> RegisterAction(string name, ActionHandler<TState> handler, bool allowOverrides = false)
+        public AI<TState> RegisterAction(string name, IActionHandler<TState> handler, bool allowOverrides = false)
         {
             Verify.ParamNotNull(name, nameof(name));
             Verify.ParamNotNull(handler, nameof(handler));
@@ -235,7 +235,7 @@ namespace Microsoft.Bot.Builder.M365.AI
             }
 
             // Process generated plan
-            bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler(turnContext, turnState, plan);
+            bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler.PerformAction(turnContext, turnState, plan);
             if (continueChain)
             {
                 // Update conversation history
@@ -288,21 +288,24 @@ namespace Microsoft.Bot.Builder.M365.AI
                         // Call action handler
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.DoCommandActionName)!
-                            .Handler(turnContext, turnState, data, doCommand.Action);
+                            .Handler
+                            .PerformAction(turnContext, turnState, data, doCommand.Action);
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.UnknownActionName)
-                            .Handler(turnContext, turnState, plan, doCommand.Action);
+                            .Handler
+                            .PerformAction(turnContext, turnState, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
                     continueChain = await _actions
                         .GetAction(DefaultActionTypes.SayCommandActionName)
-                        .Handler(turnContext, turnState, sayCommand, DefaultActionTypes.SayCommandActionName);
+                        .Handler
+                        .PerformAction(turnContext, turnState, sayCommand, DefaultActionTypes.SayCommandActionName);
                 }
                 else
                 {
