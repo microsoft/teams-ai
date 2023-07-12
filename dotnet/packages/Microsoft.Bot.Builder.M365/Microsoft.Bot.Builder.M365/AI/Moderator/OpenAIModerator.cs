@@ -4,6 +4,7 @@ using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.Exceptions;
 using Microsoft.Bot.Builder.M365.OpenAI;
 using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
 {
@@ -11,7 +12,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
     /// An moderator that uses OpenAI's moderation API.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public class OpenAIModerator<TState> : IModerator<TState> where TState : TurnState
+    public class OpenAIModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly OpenAIModeratorOptions _options;
         private readonly OpenAIClient _client;
@@ -41,13 +42,11 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
             {
                 case ModerationType.Input:
                 case ModerationType.Both:
-                    {
-                        // get input from turnstate
-                        // TODO: when TurnState is implemented, get the user input
-                        string input = turnContext.Activity.Text;
+                {
+                    string input = turnState.Temp?.Input ?? turnContext.Activity.Text;
 
-                        return await _HandleTextModeration(input, true);
-                    }
+                    return await _HandleTextModeration(input, true);
+                }
                 default:
                     break;
             }
@@ -97,7 +96,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
                     if (result.Flagged)
                     {
                         string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
-                        
+
                         // Flagged
                         return new Plan()
                         {

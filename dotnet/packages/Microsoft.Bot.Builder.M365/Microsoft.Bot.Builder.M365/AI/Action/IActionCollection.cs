@@ -1,7 +1,8 @@
-﻿
+﻿using Microsoft.Bot.Builder.M365.State;
+
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
-    public interface IActionCollection<TState> where TState : TurnState
+    public interface IActionCollection<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Set an action in the collection.

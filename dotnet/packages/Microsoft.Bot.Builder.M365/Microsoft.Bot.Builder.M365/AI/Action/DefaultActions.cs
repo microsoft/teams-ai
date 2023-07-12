@@ -1,14 +1,14 @@
 ﻿using AdaptiveCards;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.Exceptions;
-using Microsoft.Bot.Builder.M365.Utilities;
+using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
-{
-    public class DefaultActions<TState> where TState : TurnState
+{   
+    public class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly ILogger? _logger;
 

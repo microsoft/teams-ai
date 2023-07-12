@@ -9,6 +9,7 @@ using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
 using Microsoft.Bot.Builder.M365.Exceptions;
+using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AITests
 {
@@ -22,13 +23,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var endpoint = "randomEndpoint";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -47,7 +47,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -68,13 +68,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var endpoint = "randomEndpoint";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TurnState is implemented, get the user input
+            // TODO: when TestTurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -100,7 +100,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ReturnsAsync(response);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -133,13 +133,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var endpoint = "randomEndpoint";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TurnState is implemented, get the user input
+            // TODO: when TestTurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -165,7 +165,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ReturnsAsync(response);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -183,7 +183,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var endpoint = "randomEndpoint";
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -195,7 +195,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -216,7 +216,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var endpoint = "randomEndpoint";
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -235,7 +235,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ReturnsAsync(response);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -268,7 +268,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var endpoint = "randomEndpoint";
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -287,7 +287,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ReturnsAsync(response);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act

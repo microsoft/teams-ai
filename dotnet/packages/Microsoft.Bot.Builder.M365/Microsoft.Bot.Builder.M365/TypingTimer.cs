@@ -39,7 +39,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <returns>True if the timer was started, otherwise False.</returns>
         public bool Start(ITurnContext turnContext)
         {
-            Verify.NotNull(turnContext);
+            Verify.ParamNotNull(turnContext);
 
             if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
 
@@ -97,7 +97,10 @@ namespace Microsoft.Bot.Builder.M365
             try
             {
                 await turnContext.SendActivityAsync(new Activity { Type = ActivityTypes.Typing });
-                _timer!.Change(_interval, Timeout.Infinite);
+                if (IsRunning())
+                {
+                    _timer?.Change(_interval, Timeout.Infinite);
+                }
             } 
             catch (ObjectDisposedException)
             {

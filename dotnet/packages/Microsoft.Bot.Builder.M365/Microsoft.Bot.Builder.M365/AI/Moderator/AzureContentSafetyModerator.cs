@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder.M365.AI.AzureContentSafety;
 using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
+using Microsoft.Bot.Builder.M365.State;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
@@ -10,7 +11,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
     /// An moderator that uses Azure Content Safety API.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public class AzureContentSafetyModerator<TState>: IModerator<TState> where TState : TurnState
+    public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly AzureContentSafetyModeratorOptions _options;
         private readonly AzureContentSafetyClient _client;
@@ -40,13 +41,11 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
             {
                 case ModerationType.Input:
                 case ModerationType.Both:
-                    {
-                        // get input from turnstate
-                        // TODO: when TurnState is implemented, get the user input
-                        string input = turnContext.Activity.Text;
+                {
+                    string input = turnState.Temp?.Input ?? turnContext.Activity.Text;
 
-                        return await _HandleTextModeration(input, true);
-                    }
+                    return await _HandleTextModeration(input, true);
+                }
                 default:
                     break;
             }
@@ -61,22 +60,22 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
             {
                 case ModerationType.Output:
                 case ModerationType.Both:
+                {
+                    foreach (IPredictedCommand command in plan.Commands)
                     {
-                        foreach (IPredictedCommand command in plan.Commands)
+                        if (command is PredictedSayCommand sayCommand)
                         {
-                            if (command is PredictedSayCommand sayCommand)
-                            {
-                                string output = sayCommand.Response;
+                            string output = sayCommand.Response;
 
-                                // If plan is flagged it will be replaced
-                                Plan? newPlan = await _HandleTextModeration(output, false);
+                            // If plan is flagged it will be replaced
+                            Plan? newPlan = await _HandleTextModeration(output, false);
 
-                                return newPlan ?? plan;
-                            }
+                            return newPlan ?? plan;
                         }
-
-                        break;
                     }
+
+                    break;
+                }
                 default:
                     break;
             }

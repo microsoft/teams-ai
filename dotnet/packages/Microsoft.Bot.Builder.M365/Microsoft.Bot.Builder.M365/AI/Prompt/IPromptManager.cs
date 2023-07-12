@@ -1,7 +1,8 @@
-﻿
+﻿using Microsoft.Bot.Builder.M365.State;
+
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
-    public interface IPromptManager<TState> where TState : TurnState
+    public interface IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Adds a custom function <paramref name="name"/> to the prompt manager.

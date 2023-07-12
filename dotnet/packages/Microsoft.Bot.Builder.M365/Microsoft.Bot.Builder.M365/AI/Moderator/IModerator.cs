@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Planner;
 using Microsoft.Bot.Builder.M365.AI.Prompt;
 using Microsoft.Bot.Builder.M365.AI.Action;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Moderator
 {
@@ -8,7 +9,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Moderator
     /// A moderator is responsible for reviewing and approving AI prompts and plans.
     /// </summary>
     /// <typeparam name="TState">Type of the applications turn state.</typeparam>
-    public interface IModerator<TState> where TState : TurnState
+    public interface IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Reviews an incoming utterance and generated prompt before it's sent to the planner.

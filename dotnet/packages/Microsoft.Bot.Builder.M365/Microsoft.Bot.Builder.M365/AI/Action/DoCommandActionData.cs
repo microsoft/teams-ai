@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.M365.AI.Planner;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Action
 {
@@ -6,7 +7,7 @@ namespace Microsoft.Bot.Builder.M365.AI.Action
     /// The data for default DO command action handler.
     /// </summary>
     /// <typeparam name="TState">Type of turn state.</typeparam>
-    public class DoCommandActionData<TState> where TState : TurnState
+    public class DoCommandActionData<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// The predicted DO command.

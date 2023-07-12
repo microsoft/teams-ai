@@ -4,10 +4,11 @@ using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Security;
 using Microsoft.SemanticKernel.SkillDefinition;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365.AI.Prompt
 {
-    internal class SKFunctionWrapper<TState> : ISKFunction where TState : TurnState
+    internal class SKFunctionWrapper<TState> : ISKFunction where TState : ITurnState<StateBase, StateBase, TempState>
     {
         // TODO: This is a hack around to get the default skill name from SK's internal implementation. We need to fix this.
         public const string DefaultSkill = "_GLOBAL_FUNCTIONS_";

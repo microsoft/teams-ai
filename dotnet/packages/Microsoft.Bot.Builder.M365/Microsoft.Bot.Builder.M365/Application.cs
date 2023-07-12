@@ -7,8 +7,8 @@ using Microsoft.Bot.Builder.M365.AI;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Teams;
-using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder.M365.Utilities;
+using Microsoft.Bot.Builder.M365.State;
 
 namespace Microsoft.Bot.Builder.M365
 {
@@ -24,7 +24,9 @@ namespace Microsoft.Bot.Builder.M365
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    public class Application<TState> : IBot where TState : TurnState
+    public class Application<TState, TTurnStateManager> : IBot
+        where TState : ITurnState<StateBase, StateBase, TempState>
+        where TTurnStateManager : ITurnStateManager<TState>, new()
     {
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
@@ -33,21 +35,17 @@ namespace Microsoft.Bot.Builder.M365
         /// Creates a new Application instance.
         /// </summary>
         /// <param name="options">Optional. Options used to configure the application.</param>
-        public Application(ApplicationOptions<TState> options, ILogger? logger = null)
+        public Application(ApplicationOptions<TState, TTurnStateManager> options)
         {
-            Verify.NotNull(options);
+            Verify.ParamNotNull(options);
 
             Options = options;
 
-            if (Options.TurnStateManager == null)
-            {
-                // TODO: set to default turn state manager
-                Options.TurnStateManager = null;
-            }
+            Options.TurnStateManager ??= new TTurnStateManager();
 
             if (Options.AI != null)
             {
-                _ai = new AI<TState>(Options.AI, logger);
+                _ai = new AI<TState>(Options.AI, Options.Logger);
             }
 
             // Validate long running messages configuration
@@ -81,7 +79,7 @@ namespace Microsoft.Bot.Builder.M365
         /// <summary>
         /// The application's configured options.
         /// </summary>
-        public ApplicationOptions<TState> Options { get; }
+        public ApplicationOptions<TState, TTurnStateManager> Options { get; }
 
         /// <summary>
         /// Handler that will execute before the turn's activity handler logic is processed.
@@ -167,14 +165,21 @@ namespace Microsoft.Bot.Builder.M365
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
 
-                // TODO : Fix turn state loading, this is just a placeholder
-                TState turnState = (TState)new TurnState();
+                ITurnStateManager<TState>? turnStateManager = Options.TurnStateManager;
+                IStorage? storage = Options.Storage;
+
+                TState turnState = await turnStateManager!.LoadStateAsync(storage, turnContext);
 
                 // Call before activity handler
                 if (!await OnBeforeTurnAsync(turnContext, turnState, cancellationToken))
                 {
+                    // Save turn state
+                    // - This lets the bot keep track of why it ended the previous turn. It also
+                    //   allows the dialog system to be used before the AI system is called.
+                    await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
+
                     return;
-                }
+                };
 
                 // Call activity type specific handler
                 bool eventHandlerCalled = await RunActivityHandlerAsync(turnContext, turnState, cancellationToken);
@@ -182,13 +187,13 @@ namespace Microsoft.Bot.Builder.M365
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    _ = await _ai.ChainAsync(turnContext, turnState);
+                    await _ai.ChainAsync(turnContext, turnState);
                 }
 
                 // Call after turn activity handler
                 if (await OnAfterTurnAsync(turnContext, turnState, cancellationToken))
                 {
-                    // TODO : Save turn state to persistent storage
+                    await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
                 };
             }
             finally
@@ -912,11 +917,11 @@ namespace Microsoft.Bot.Builder.M365
                 {
                     reactionsRemovedNotImplemented = true;
                 }
-            }
 
-            if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
-            {
-                throw new NotImplementedException();
+                if (turnContext.Activity.ReactionsAdded == null && turnContext.Activity.ReactionsRemoved == null || reactionsAddedNotImplemented && reactionsRemovedNotImplemented)
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 

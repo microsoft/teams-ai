@@ -1,8 +1,10 @@
-﻿namespace Microsoft.Bot.Builder.M365.AI.Prompt
-{
-    public delegate Task<string> PromptFunction<TState>(ITurnContext turnContext, TState turnState) where TState : TurnState;
+﻿using Microsoft.Bot.Builder.M365.State;
 
-    internal class TemplateFunctionEntry<TState> where TState : TurnState
+namespace Microsoft.Bot.Builder.M365.AI.Prompt
+{
+    public delegate Task<string> PromptFunction<TState>(ITurnContext turnContext, TState turnState) where TState : ITurnState<StateBase, StateBase, TempState>;
+
+    internal class TemplateFunctionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         internal PromptFunction<TState> Handler;
 

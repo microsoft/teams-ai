@@ -9,6 +9,8 @@ using Microsoft.Bot.Builder.M365.OpenAI;
 using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
+using Microsoft.Bot.Builder.M365.State;
+using Microsoft.Bot.Builder.M365.Tests.TestUtils;
 
 namespace Microsoft.Bot.Builder.M365.Tests.AITests
 {
@@ -21,13 +23,12 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var apiKey = "randomApiKey";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -46,7 +47,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
-            var moderator = new OpenAIModerator<TurnState>(options);
+            var moderator = new OpenAIModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -66,13 +67,13 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var apiKey = "randomApiKey";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TurnState is implemented, get the user input
+            // TODO: when TestTurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -122,7 +123,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
-            var moderator = new OpenAIModerator<TurnState>(options);
+            var moderator = new OpenAIModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -151,7 +152,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var apiKey = "randomApiKey";
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -163,7 +164,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
-            var moderator = new OpenAIModerator<TurnState>(options);
+            var moderator = new OpenAIModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act
@@ -183,7 +184,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             var apiKey = "randomApiKey";
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TurnState>();
+            var turnStateMock = new Mock<TestTurnState>();
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -226,7 +227,7 @@ namespace Microsoft.Bot.Builder.M365.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
-            var moderator = new OpenAIModerator<TurnState>(options);
+            var moderator = new OpenAIModerator<TestTurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
 
             // Act

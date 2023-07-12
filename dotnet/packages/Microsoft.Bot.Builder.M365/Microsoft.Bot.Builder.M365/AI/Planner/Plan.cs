@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.Bot.Builder.M365.AI.Planner
 {
+    // TODO: Move from Newtonsoft.Json to System.Text.Json
     public class Plan
     {
         /// <summary>
@@ -29,5 +27,15 @@ namespace Microsoft.Bot.Builder.M365.AI.Planner
         {
             Commands = commands;
         }
+
+        /// <summary>
+        /// Returns a Json string representation of the plan.
+        /// </summary>
+        public string ToJsonString()
+        {
+            // TODO: Optimize
+            return JsonConvert.SerializeObject(this);
+        }
+
     }
 }
