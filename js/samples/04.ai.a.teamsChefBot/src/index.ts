@@ -81,12 +81,12 @@ if (!process.env.OpenAIKey) {
 }
 // Create AI components
 const planner = new OpenAIPlanner({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || '',
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
 const moderator = new OpenAIModerator({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || '',
     moderate: 'both'
 });
 const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
