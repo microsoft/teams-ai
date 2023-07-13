@@ -42,7 +42,10 @@ namespace Microsoft.TeamsAI
         {
             Verify.ParamNotNull(turnContext);
 
-            if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning()) return false;
+            if (turnContext.Activity.Type != ActivityTypes.Message || IsRunning())
+            {
+                return false;
+            }
 
             // Listen for outgoing activities
             turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
@@ -102,12 +105,12 @@ namespace Microsoft.TeamsAI
                 {
                     _timer?.Change(_interval, Timeout.Infinite);
                 }
-            } 
-            catch (ObjectDisposedException)
+            }
+            catch (Exception e) when (e is ObjectDisposedException || e is TaskCanceledException)
             {
                 // We're in the middle of sending an activity on a background thread when the turn ends and
-                // the turn context object is dispoed of. We can just eat the error but lets
-                // make sure our states cleaned up a bit.
+                // the turn context object is dispoed of or the request is cancelled. We can just eat the
+                // error but lets make sure our states cleaned up a bit.
                 Dispose();
             }
         }
@@ -116,7 +119,7 @@ namespace Microsoft.TeamsAI
         {
             if (_timer != null)
             {
-                foreach (var activity in activities)
+                foreach (Activity activity in activities)
                 {
                     if (activity.Type == ActivityTypes.Message)
                     {
