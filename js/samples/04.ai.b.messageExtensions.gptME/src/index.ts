@@ -92,6 +92,9 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUserState, TempState>;
 
+if (!process.env.OpenAIKey) {
+    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
+}
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.OpenAIKey,
@@ -127,7 +130,7 @@ interface SubmitData {
 
 app.messageExtensions.submitAction<SubmitData>(
     'CreatePost',
-    async (context: TurnContext, state: ApplicationTurnState, data) => {
+    async (context: TurnContext, state: ApplicationTurnState, data: SubmitData) => {
         try {
             switch (data.verb) {
                 case 'generate':
@@ -164,7 +167,7 @@ app.messageExtensions.submitAction<SubmitData>(
 
 app.messageExtensions.botMessagePreviewEdit(
     'CreatePost',
-    async (context: TurnContext, state: DefaultTurnState, previewActivity) => {
+    async (context: TurnContext, state: DefaultTurnState, previewActivity: any) => {
         // Get post text from previewed card
         const post: string = previewActivity?.attachments?.[0]?.content?.body[0]?.text ?? '';
         const card = createEditView(post, PREVIEW_MODE);
@@ -174,7 +177,7 @@ app.messageExtensions.botMessagePreviewEdit(
 
 app.messageExtensions.botMessagePreviewSend(
     'CreatePost',
-    async (context: TurnContext, state: DefaultTurnState, previewActivity) => {
+    async (context: TurnContext, state: DefaultTurnState, previewActivity: any) => {
         // Create a new activity using the card in the preview activity
         const card = previewActivity?.attachments?.[0];
         const activity = card && MessageFactory.attachment(card);
@@ -198,12 +201,14 @@ app.messageExtensions.botMessagePreviewSend(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res) => {
+server.post('/api/messages', async (req, res, next) => {
     // Route received a request to adapter for processing
     await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
+
+    return next();
 });
 
 /**

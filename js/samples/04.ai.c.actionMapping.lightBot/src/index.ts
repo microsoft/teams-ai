@@ -97,41 +97,29 @@ const app = new Application<ApplicationTurnState>({
 });
 
 // Add a prompt function for getting the current status of the lights
-app.ai.prompts.addFunction(
-    'getLightStatus',
-    async (context: TurnContext, state: ApplicationTurnState) => {
-        return state.conversation.value.lightsOn ? 'on' : 'off';
-    }
-);
+app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
+    return state.conversation.value.lightsOn ? 'on' : 'off';
+});
 
 // Register action handlers
-app.ai.action(
-    'LightsOn',
-    async (context: TurnContext, state: ApplicationTurnState) => {
-        state.conversation.value.lightsOn = true;
-        await context.sendActivity(`[lights on]`);
-        return true;
-    }
-);
+app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.value.lightsOn = true;
+    await context.sendActivity(`[lights on]`);
+    return true;
+});
 
-app.ai.action(
-    'LightsOff',
-    async (context: TurnContext, state: ApplicationTurnState) => {
-        state.conversation.value.lightsOn = false;
-        await context.sendActivity(`[lights off]`);
-        return true;
-    }
-);
+app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
+    state.conversation.value.lightsOn = false;
+    await context.sendActivity(`[lights off]`);
+    return true;
+});
 
-app.ai.action(
-    'Pause',
-    async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
+app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
     const time = data.time ? parseInt(data.time) : 1000;
-        await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
-        await new Promise((resolve) => setTimeout(resolve, time));
-        return true;
-    }
-);
+    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
+    await new Promise((resolve) => setTimeout(resolve, time));
+    return true;
+});
 
 // Register a handler to handle unknown actions that might be predicted
 app.ai.action(
@@ -143,10 +131,12 @@ app.ai.action(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res) => {
+server.post('/api/messages', async (req, res, next) => {
     // Route received a request to adapter for processing
     await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
+
+    return next();
 });

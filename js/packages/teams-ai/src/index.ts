@@ -10,6 +10,7 @@ export * from './AdaptiveCards';
 export * from './AI';
 export * from './Application';
 export * from './AzureOpenAIPlanner';
+export * from './AzureOpenAIModerator';
 export * from './ConversationHistory';
 export * from './DefaultModerator';
 export * from './DefaultPromptManager';

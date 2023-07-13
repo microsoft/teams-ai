@@ -216,6 +216,51 @@ export interface CreateEmbeddingResponseUsage {
 /**
  * @private
  */
+export interface ContentSafetyOptions {
+    /**
+     * This is assumed to be an array of category names.
+     * If no categories are specified, all four categories are used.
+     * Multiple categories are used to get scores in a single request.
+     */
+    categories?: AzureOpenAIModeratorCategory[];
+
+    /**
+     * Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. You could attach multiple lists name here.
+     */
+    blocklistNames?: string[];
+
+    /**
+     * When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
+     * When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+     * Default value is false.
+     */
+    breakByBlocklists?: boolean;
+}
+
+export interface CreateContentSafetyRequest extends ContentSafetyOptions {
+    /**
+     * @requires
+     * This is the raw text to be checked. Other non-ascii characters can be included.
+     */
+    text: string;
+}
+
+export interface ContentSafetyHarmCategory {
+    category: AzureOpenAIModeratorCategory;
+    severity: ModerationSeverity;
+}
+
+export interface CreateContentSafetyResponse {
+    blocklistsMatchResults: Array<string>;
+    hateResult: ContentSafetyHarmCategory;
+    selfHarmResult: ContentSafetyHarmCategory;
+    sexualResult: ContentSafetyHarmCategory;
+    violenceResult: ContentSafetyHarmCategory;
+}
+
+/**
+ * @private
+ */
 export type CreateCompletionRequestPrompt = Array<any> | Array<number> | Array<string> | string;
 
 /**
@@ -237,3 +282,25 @@ export type CreateModerationRequestInput = Array<string> | string;
  * @private
  */
 export type CreateEmbeddingRequestInput = Array<any> | Array<number> | Array<string> | string;
+
+/**
+ * @private
+ */
+export type AzureOpenAIModeratorCategory = 'Hate' | 'Sexual' | 'SelfHarm' | 'Violence';
+
+/**
+ * @private
+ */
+export enum ModerationSeverity {
+    Safe = 0,
+    Low = 2,
+    Medium = 4,
+    High = 6
+}
+
+/**
+ * @private
+ * Moderation API input and output types
+ */
+export type ModerationInput = CreateModerationRequest | CreateContentSafetyRequest;
+export type ModerationResponse = CreateModerationResponse | CreateContentSafetyResponse;

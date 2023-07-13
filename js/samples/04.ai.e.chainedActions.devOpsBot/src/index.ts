@@ -64,7 +64,16 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState, OpenAIPlanner, AI, DefaultConversationState, DefaultUserState, DefaultTempState, DefaultPromptManager } from "@microsoft/teams-ai";
+import {
+    AI,
+    Application,
+    DefaultConversationState,
+    DefaultPromptManager,
+    DefaultTempState,
+    DefaultTurnState,
+    DefaultUserState,
+    OpenAIPlanner
+} from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 // Strongly type the applications turn state
@@ -73,7 +82,7 @@ interface ConversationState extends DefaultConversationState {
     workItems: EntityData[];
 }
 
-interface UserState extends DefaultUserState { }
+type UserState = DefaultUserState;
 
 interface TempState extends DefaultTempState {
     workItems: EntityData[];
@@ -109,7 +118,7 @@ interface EntityData {
 }
 
 // Listen for new members to join the conversation
-app.conversationUpdate('membersAdded', async (context, state) => {
+app.conversationUpdate('membersAdded', async (context: TurnContext, state: ApplicationTurnState) => {
     if (!state.conversation.value.greeted) {
         state.conversation.value.greeted = true;
         await context.sendActivity(responses.greeting());
@@ -117,24 +126,24 @@ app.conversationUpdate('membersAdded', async (context, state) => {
 });
 
 // List for /reset command and then delete the conversation state
-app.message('/reset', async (context, state) => {
+app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
     state.conversation.delete();
     await context.sendActivity(responses.reset());
 });
 
 // Register action handlers
-app.ai.action('createWI', async (context, state, data: EntityData) => {
-    var id = createNewWorkItem(state, data);
+app.ai.action('createWI', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    const id = createNewWorkItem(state, data);
     await context.sendActivity(`New work item created with ID: ${id} and assigned to: ${data.assignedTo}`);
     return false;
 });
 
-app.ai.action('assignWI', async (context, state, data: EntityData) => {
+app.ai.action('assignWI', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     assignWorkItem(state, data);
     return true;
 });
 
-app.ai.action('updateWI', async (context, state, data: EntityData) => {
+app.ai.action('updateWI', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
     updateWorkItem(state, data);
     return true;
 });
@@ -144,8 +153,8 @@ app.ai.action('triageWI', async (context, state, data: EntityData) => {
     return true;
 });
 
-app.ai.action('summarize', async (context, state, data: EntityData) => {
-    const workItems = ensureWorkItemsInitialized(state).workItems
+app.ai.action('summarize', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    const workItems = ensureWorkItemsInitialized(state).workItems;
     if (workItems.length != 0) {
         // Chain into a new summarization prompt
         state.temp.value.workItems = workItems;
@@ -159,7 +168,6 @@ app.ai.action('summarize', async (context, state, data: EntityData) => {
 });
 
 // Register a handler to handle unknown actions that might be predicted
-// Register a handler to handle unknown actions that might be predicted
 app.ai.action(
     AI.UnknownActionName,
     async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
@@ -169,18 +177,21 @@ app.ai.action(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res) => {
+server.post('/api/messages', async (req, res, next) => {
     // Route received a request to adapter for processing
-    await adapter.process(req, res as any, async (context) => {
+    await adapter.process(req, res as any, async (context: TurnContext) => {
         // Dispatch to application for routing
         await app.run(context);
     });
+    return next();
 });
 
 /**
  * This method is used to create new work item.
- * @param state
- * @param workItemInfo
+ *
+ * @param {ApplicationTurnState} state The application turn state.
+ * @param {EntityData} workItemInfo Data containing the work item information.
+ * @returns {number} The ID of the newly created work item.
  */
 function createNewWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): number {
     const conversation = ensureWorkItemsInitialized(state);
@@ -195,14 +206,15 @@ function createNewWorkItem(state: ApplicationTurnState, workItemInfo: EntityData
 
 /**
  * This method is used to assign a work item to a person.
- * @param state
- * @param workItemInfo
+ *
+ * @param {ApplicationTurnState} state The application turn state.
+ * @param {EntityData} workItemInfo Data containing the work item information.
  */
 function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): void {
     const conversation = ensureWorkItemsInitialized(state);
 
     if (workItemInfo.id != null) {
-        var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
+        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
         if (workItem != null) {
             workItem.assignedTo = workItemInfo.assignedTo;
         }
@@ -211,14 +223,15 @@ function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to triage work item.
- * @param state
- * @param workItemInfo
+ *
+ * @param {ApplicationTurnState} state The application turn state.
+ * @param {EntityData} workItemInfo Data containing the work item information.
  */
 function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): void {
     const conversation = ensureWorkItemsInitialized(state);
 
     if (workItemInfo.id != null) {
-        var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
+        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
         if (workItem != null) {
             workItem.status = workItemInfo.status;
         }
@@ -227,7 +240,9 @@ function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to make sure that work items are initialized properly.
- * @param state 
+ *
+ * @param {ApplicationTurnState} state The application turn state.
+ * @returns {ConversationState} The conversation state
  */
 function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationState {
     const conversation = state.conversation.value;
@@ -239,21 +254,19 @@ function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationSt
 
 /**
  * This method is used to update the existing work item.
- * @param state
- * @param workItemInfo
+ *
+ * @param {ApplicationTurnState} state The application turn state.
+ * @param {EntityData} workItemInfo Data containing the work item information.
  */
 function updateWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): void {
     const conversation = ensureWorkItemsInitialized(state);
 
     if (workItemInfo.id != null) {
-        var workItem = conversation.workItems.find(x => x.id == workItemInfo.id);
+        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
         if (workItem != null) {
-            if (workItemInfo.title !== null)
-                workItem.title = workItemInfo.title;
-            if (workItemInfo.assignedTo !== null)
-                workItem.assignedTo = workItemInfo.assignedTo;
-            if (workItemInfo.status !== null)
-                workItem.status = workItemInfo.status;
+            if (workItemInfo.title !== null) workItem.title = workItemInfo.title;
+            if (workItemInfo.assignedTo !== null) workItem.assignedTo = workItemInfo.assignedTo;
+            if (workItemInfo.status !== null) workItem.status = workItemInfo.status;
         }
     }
 }
