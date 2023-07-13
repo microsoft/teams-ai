@@ -26,6 +26,7 @@
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
+        "@types/jsonwebtoken": "^9.0.2",
         "@types/restify": "8.5.7",
         "nodemon": "~1.19.4",
         "ts-node": "^10.4.0",

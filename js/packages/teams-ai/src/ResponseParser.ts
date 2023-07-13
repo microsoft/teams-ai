@@ -52,7 +52,6 @@ export interface ParsedCommandResult {
 export class ResponseParser {
     /**
      * Attempts to find an Adaptive Card in a response.
-     *
      * @param {string} text Optional. Text to parse.
      * @returns {Record<string, any> | undefined} The found Adaptive Card or undefined if no card could be detected.
      */
@@ -63,7 +62,6 @@ export class ResponseParser {
 
     /**
      * Attempts to find a JSON object with-in a response.
-     *
      * @template T Optional. Type of object to return.
      * @param {string} text Optional. Text to parse.
      * @returns The parsed object or undefined if no object could be detected.
@@ -88,7 +86,6 @@ export class ResponseParser {
 
     /**
      * Parses a response and returns a plan.
-     *
      * @summary
      * If a plan object can be detected in the response it will be returned. Otherwise a plan with
      * a single SAY command containing the response will be returned.

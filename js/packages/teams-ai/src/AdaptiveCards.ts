@@ -39,7 +39,6 @@ const SEARCH_INvOKE_NAME = `application/search`;
 
 /**
  * Strongly typed Adaptive Card.
- *
  * @remarks
  * see https://adaptivecards.io/explorer/ for schema details.
  */
@@ -61,7 +60,6 @@ export interface AdaptiveCard {
 export interface AdaptiveCardsOptions {
     /**
      * Data field used to identify the Action.Submit handler to trigger.
-     *
      * @remarks
      * When an Action.Submit is triggered, the field name specified here will be used to determine
      * the handler to route the request to.
@@ -103,7 +101,6 @@ export interface AdaptiveCardSearchResult {
 
 /**
  * AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.
- *
  * @template TState Type of the turn state object being persisted.
  */
 export class AdaptiveCards<TState extends TurnState> {
@@ -111,7 +108,6 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Creates a new instance of the AdaptiveCards class.
-     *
      * @param app Top level application class to register handlers with.
      */
     public constructor(app: Application<TState>) {
@@ -120,7 +116,6 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Adds a route to the application for handling Adaptive Card Action.Execute events.
-     *
      * @template TData Optional. Type of the data associated with the action.
      * @param verb The named action(s) to be handled.
      * @param handler The code to execute when the action is triggered.
@@ -186,7 +181,6 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Adds a route to the application for handling Adaptive Card Action.Submit events.
-     *
      * @remarks
      * The route will be added for the specified verb(s) and will be filtered using the
      * `actionSubmitFilter` option. The default filter is to use the `verb` field.

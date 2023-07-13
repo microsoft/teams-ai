@@ -54,7 +54,6 @@ const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
 
 /**
  * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
- *
  * @template TState Type of the turn state object being persisted.
  */
 export class MessageExtensions<TState extends TurnState> {
@@ -62,7 +61,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Creates a new instance of the MessageExtensions class.
-     *
      * @param {Application} app Top level application class to register handlers with.
      */
     public constructor(app: Application<TState>) {
@@ -71,7 +69,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler for a command that performs anonymous link unfurling.
-     *
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
@@ -122,7 +119,6 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the 'edit' action of a message that's being previewed by the
      * user prior to sending.
-     *
      * @summary
      * This handler is called when the user clicks the 'Edit' button on a message that's being
      * previewed prior to insertion into the current chat. The handler should return a new
@@ -171,7 +167,6 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the 'send' action of a message that's being previewed by the
      * user prior to sending.
-     *
      * @summary
      * This handler is called when the user clicks the 'Send' button on a message that's being
      * previewed prior to insertion into the current chat. The handler should complete the flow
@@ -222,7 +217,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch task for an Action based message extension.
-     *
      * @summary
      * Handlers should response with either an initial TaskInfo object or a string containing
      * a message to display to the user.
@@ -289,11 +283,9 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Search based Message Extension.
-     *
      * @summary
      * This handler is called when the user submits a query to a Search based Message Extension.
      * The handler should return a MessagingExtensionResult containing the results of the query.
-     *
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState, query: Query<TParams>) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
@@ -358,7 +350,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Link Unfurling based Message Extension.
-     *
      * @param {(string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[])} commandId - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
@@ -409,7 +400,6 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler that implements the logic to handle the tap actions for items returned
      * by a Search based message extension.
-     *
      * @summary
      * The `composeExtension/selectItem` INVOKE activity does not contain any sort of command ID,
      * so only a single select item handler can be registered. Developers will need to include a
@@ -458,7 +448,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements the submit action for an Action based Message Extension.
-     *
      * @template TData Optional. Type of data being submitted.
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState, data: TData) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>} handler Function to call when the command is received.
@@ -502,7 +491,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Sends the response for a submit action.
-     *
      * @param {TurnContext} context The context object for the current turn of conversation with the user.
      * @param {MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined} result The result of the submit action.
      * @private
@@ -555,7 +543,6 @@ export class MessageExtensions<TState extends TurnState> {
 
 /**
  * Creates a route selector function for a task module command.
- *
  * @param {string | RegExp | RouteSelector} commandId The ID of the command to register the handler for.
  * @param {string} invokeName The name of the invoke activity.
  * @param {'edit' | 'send'} botMessagePreviewAction The bot message preview action to match.
@@ -598,7 +585,6 @@ function createTaskSelector(
 
 /**
  * Checks if the bot message preview action matches the specified action.
- *
  * @param {Activity} activity The activity to check.
  * @param {'edit' | 'send'} botMessagePreviewAction The bot message preview action to match.
  * @returns {boolean} True if the bot message preview action matches, false otherwise.

@@ -23,8 +23,7 @@
         "axios": "^1.4.0",
         "botbuilder": "^4.19.3",
         "dotenv": "^16.3.0",
-        "jsonwebtoken": "^9.0.0",
-        "restify": "~8.6.0"
+        "restify": "~11.1.0"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",

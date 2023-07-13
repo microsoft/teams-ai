@@ -431,9 +431,8 @@ app.ai.prompts.addFunction('describeConditions', async (_context: TurnContext, s
 
 /**
  * Returns a string representation of the given item list.
- *
  * @param {IItemList} items - The item list to describe.
- * @param {string} [indent='\t'] - The indentation string to use.
+ * @param {string} [indent] - The indentation string to use.
  * @returns {string} The string representation of the item list.
  */
 export function describeItemList(items: IItemList, indent = '\t'): string {
@@ -468,9 +467,8 @@ export async function updateDMResponse(
 
 /**
  * Parses a string to a number.
- *
  * @param {string | undefined} text - The string to parse.
- * @param {number} [minValue=0] - The minimum value to return.
+ * @param {number} [minValue] - The minimum value to return.
  * @returns {number} The parsed number.
  */
 export function parseNumber(text: string | undefined, minValue?: number): number {
@@ -488,7 +486,6 @@ export function parseNumber(text: string | undefined, minValue?: number): number
 
 /**
  * Trims the prompt response by removing common junk that gets returned by the model.
- *
  * @param {string} response - The response to trim.
  * @returns {string} The trimmed response.
  */
@@ -499,7 +496,6 @@ export function trimPromptResponse(response: string): string {
 
 /**
  * Converts a string to title case.
- *
  * @param {string} text - The string to convert to title case.
  * @returns {string} The title case version of the input string.
  */
