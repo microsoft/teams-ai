@@ -519,7 +519,7 @@ botbuilder-stdlib@4.20.0-internal:
   resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.20.0-internal.tgz#2c145c0c988308398a4fe7a3e14b06b2e2d030d5"
   integrity sha512-WtMQkl1PHWX+GkdqufDC4nv+JZTUitvjLpdh56piQaakxozK6FQqQzJFdMvUdOMgfJ/mQMPmtojLhfbQOKYvfA==
 
-botbuilder@^4.20.0:
+botbuilder@^4.19.3:
   version "4.20.0"
   resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.20.0.tgz#2fd0fe58d7e98dec3002146669b0cb1af0406556"
   integrity sha512-YfJgAcUyjKZQP3XzXqBoQmj8S5NoIGmqX5g/5coLlsNEaFLAbQXmOEBddN+ww4gz49S246MDspoGaqtweTu/pw==
