@@ -11,8 +11,7 @@
             "outputs": [
                 ".next/**",
                 "!.next/cache/**"
-            ],
-            "cache": false
+            ]
         },
         "deploy": {
             "dependsOn": [
