@@ -57,8 +57,7 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
                 AssistantHistoryType = AssistantHistoryType.Text
             }
         },
-        Storage = sp.GetService<IStorage>(),
-        StartTypingTimer = false
+        Storage = sp.GetService<IStorage>()
     };
 
     return new TeamsChefBotApplication(applicationOptions);
