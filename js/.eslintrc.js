@@ -13,14 +13,13 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
         "plugin:import/typescript",
         "plugin:import/recommended",
-        "plugin:jsdoc/recommended",
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
         // Currently samples contain no frontend
         // "plugin:react/recommended",
         // "plugin:react/jsx-runtime"
     ],
-    "plugins": ["@typescript-eslint", "jsdoc", "mocha", "only-warn", "prettier"],
+    "plugins": ["@typescript-eslint", "mocha", "only-warn", "prettier"],
     "parserOptions": {
         "ecmaVersion": 2015,
         // Allows for the parsing of modern ECMAScript features
