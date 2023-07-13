@@ -1,4 +1,4 @@
-{
+module.exports = {
     "arrowParens": "always",
     "endOfLine": "auto",
     "printWidth": 120,
@@ -8,4 +8,4 @@
     "tabWidth": 4,
     "trailingComma": "none",
     "useTabs": false
-}
+};
