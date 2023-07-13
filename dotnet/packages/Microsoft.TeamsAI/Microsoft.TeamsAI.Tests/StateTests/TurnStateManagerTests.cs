@@ -153,9 +153,13 @@ namespace Microsoft.TeamsAI.Tests.StateTests
             var storage = new MemoryStorage();
 
             // Act
+            /// Mutate the conversation state to so that the changes are saved.
+            state.Conversation!.Set("test", "test");
+            /// Save the state first
+            await turnStateManager.SaveStateAsync(storage, turnContext, state);
             /// Delete conversation state
             state.ConversationStateEntry.Delete();
-            /// Save the state
+            /// Save the state again
             await turnStateManager.SaveStateAsync(storage, turnContext, state);
             /// Load from storage
             IDictionary<string, object> storedItems = await storage.ReadAsync(new string[] { storageKey }, default);

@@ -1,11 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.TeamsAI.Tests
 {
@@ -113,6 +108,35 @@ namespace Microsoft.TeamsAI.Tests
             turnContextMock.Verify(tc => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        [Theory]
+        [MemberData(nameof(ExceptionTestData))]
+        public void Start_ShouldIgnoreExpectedException(Exception ex)
+        {
+            // Arrange
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<ITurnContext>();
+            turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
+            turnContextMock.Setup(tc => tc.OnSendActivities(It.IsAny<SendActivitiesHandler>()));
+            turnContextMock.Setup(tc => tc.SendActivityAsync(It.IsAny<Activity>(), It.IsAny<CancellationToken>())).Callback(() =>
+            {
+                // throw expected exception
+                throw ex;
+            });
+
+            // Sending typing activity 10 times per second
+            int timerDelay = 100;
+            TypingTimer typingTimer = new(timerDelay);
+
+            // Act
+            typingTimer.Start(turnContextMock.Object);
+
+            // In the mean time, simulating sending 10 typing activities
+            Thread.Sleep(1000);
+
+            // Assert
+            Assert.False(typingTimer.IsRunning());
+        }
+
         [Fact]
         public void Dispose_ShouldResetProperties()
         {
@@ -129,6 +153,18 @@ namespace Microsoft.TeamsAI.Tests
 
             // Assert
             Assert.False(typingTimer.IsRunning());
+        }
+
+        private static IEnumerable<object[]> ExceptionTestData()
+        {
+            yield return new[]
+            {
+                new ObjectDisposedException("test")
+            };
+            yield return new[]
+{
+                new TaskCanceledException("test")
+            };
         }
     }
 }

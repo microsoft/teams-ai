@@ -101,7 +101,7 @@ namespace Microsoft.TeamsAI.State
                         {
                             if (entry.IsDeleted)
                             {
-                                deletions.Add(key);
+                                deletions.Add(entry.StorageKey);
                             }
 
                             if (entry.HasChanged)
