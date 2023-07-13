@@ -1,0 +1,11 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["./src/index.ts"],
+    "name": "Bot Builder SDK - AI",
+    "theme": "markdown",
+    "hideGenerator": true,
+    "excludePrivate": true,
+    "plugin": ["typedoc-plugin-markdown"],
+    "readme": "none",
+    "out": "docs"
+}
