@@ -1,5 +1,5 @@
 #
-# This workflow will build and run tests for the Microsoft.Bot.Builder.M365 .NET SDK.
+# This workflow will build and run tests for the Microsoft.TeamsAI .NET SDK.
 #
 
 name: dotnet-pr
@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     env:
-      SOLUTION_DIR: dotnet/packages/Microsoft.Bot.Builder.M365/
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
@@ -36,17 +36,17 @@ jobs:
       - name: Restore
         shell: bash
         working-directory: ${{ env.SOLUTION_DIR }}
-        run: dotnet restore Microsoft.Bot.Builder.M365.sln
+        run: dotnet restore Microsoft.TeamsAI.sln
 
       - name: Build
         shell: bash
         working-directory: ${{ env.SOLUTION_DIR }}
-        run: dotnet build Microsoft.Bot.Builder.M365.sln --no-restore --configuration ${{ matrix.configuration }}
+        run: dotnet build Microsoft.TeamsAI.sln --no-restore --configuration ${{ matrix.configuration }}
 
       - name: Test
         shell: bash
         working-directory: ${{ env.SOLUTION_DIR }}
-        run: dotnet test Microsoft.Bot.Builder.M365.Tests/Microsoft.Bot.Builder.M365.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration ${{ matrix.configuration }}
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.TeamsAI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration ${{ matrix.configuration }}
 
       - name: Generate coverage report
         uses: danielpalme/ReportGenerator-GitHub-Action@5.1.22
