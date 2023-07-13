@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.TeamsFx.Conversation;
 
 namespace TeamsChefBot.Controllers
 {
@@ -9,19 +8,19 @@ namespace TeamsChefBot.Controllers
     [ApiController]
     public class BotController : ControllerBase
     {
-        private readonly ConversationBot _conversation;
+        private readonly IBotFrameworkHttpAdapter _adapter;
         private readonly IBot _bot;
 
-        public BotController(ConversationBot conversation, IBot bot)
+        public BotController(IBotFrameworkHttpAdapter adapter, IBot bot)
         {
-            _conversation = conversation;
+            _adapter = adapter;
             _bot = bot;
         }
 
         [HttpPost]
         public async Task PostAsync(CancellationToken cancellationToken = default)
         {
-            await (_conversation.Adapter as CloudAdapter).ProcessAsync
+            await _adapter.ProcessAsync
             (
                 Request,
                 Response,
