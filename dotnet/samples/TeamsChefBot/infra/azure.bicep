@@ -10,6 +10,21 @@ param botAadAppClientId string
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
+@secure()
+param openAIApiKey string
+
+@secure()
+param azureOpenAIApiKey string
+
+@secure()
+param azureOpenAIEndpoint string
+
+@secure()
+param azureContentSafetyApiKey string
+
+@secure()
+param azureContentSafetyEndpoint string
+
 param webAppSKU string
 
 @maxLength(42)
@@ -41,8 +56,8 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
       alwaysOn: true
       appSettings: [
         {
-                name: 'WEBSITE_RUN_FROM_PACKAGE'
-                value: '1' // Run Azure APP Service from a package file
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1' // Run Azure APP Service from a package file
         }
         {
           name: 'RUNNING_ON_AZURE'
@@ -55,6 +70,26 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        {
+            name: 'OPENAI_API_KEY'
+            value: openAIApiKey
+        }
+        {
+            name: 'AZURE_OPENAI_API_KEY'
+            value: azureOpenAIApiKey
+        }
+        {
+            name: 'AZURE_OPENAI_ENDPOINT'
+            value: azureOpenAIEndpoint
+        }
+        {
+            name: 'AZURE_CONTENT_SAFETY_API_KEY'
+            value: azureContentSafetyApiKey
+        }
+        {
+            name: 'AZURE_CONTENT_SAFETY_ENDPOINT'
+            value: azureContentSafetyEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'

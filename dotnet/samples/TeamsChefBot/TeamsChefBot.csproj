@@ -17,14 +17,11 @@
     <PackageReference Include="Microsoft.TeamsAI" Version="1.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="infra\" />
-    <Folder Include="Prompts\Chat\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="env\.env.dev.user" />
-    <None Include="env\.env.local.user" />
-  </ItemGroup>
+<ItemGroup>
+  <Content Include="Prompts\Chat\skprompt.txt">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+  </Content>
+</ItemGroup>
 
 </Project>

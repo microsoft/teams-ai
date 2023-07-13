@@ -16,6 +16,21 @@
     },
     "botDisplayName": {
       "value": "TeamsChefBot"
+    },
+    "openAIApiKey": {
+      "value": "${{OPENAI_API_KEY}}"
+    },
+    "azureOpenAIApiKey": {
+      "value": "${{AZURE_OPENAI_API_KEY}}"
+    },
+    "azureOpenAIEndpoint": {
+      "value": "${{AZURE_OPENAI_ENDPOINT}}"
+    },
+    "azureContentSafetyApiKey": {
+      "value": "${{AZURE_CONTENT_SAFETY_API_KEY}}"
+    },
+    "azureContentSafetyEndpoint": {
+      "value": "${{AZURE_CONTENT_SAFETY_ENDPOINT}}"
     }
   }
 }
