@@ -622,6 +622,12 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * parameters to other prompts. For example, you could define a semantic function called
      * 'translator' that first translates the user's input to English before calling your main prompt:
      *
+     * ```JavaScript
+     * app.ai.prompts.addFunction('translator', app.ai.createSemanticFunction('translator-prompt'));
+     * ```
+     *
+     * You would then create a prompt called "translator-prompt" that does the translation and then in
+     * your main prompt you can call it using the template expression `{{translator}}`.
      * @returns {Promise<any>} A promise that resolves to the result of the semantic function.
      */
     public createSemanticFunction(

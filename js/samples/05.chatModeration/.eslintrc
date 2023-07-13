@@ -48,13 +48,16 @@
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "no-async-promise-executor": "off",
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "prettier/prettier": "error"
+        "prettier/prettier": "error",
+        "jsdoc/require-param-type": 0,
+        "jsdoc/require-returns": 0
         // Currently sample contains no frontend
         // "react/react-in-jsx-scope": "off",
         // "react/prop-types": "off"

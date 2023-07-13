@@ -13,8 +13,8 @@ import {
     CreateCompletionResponse,
     CreateEmbeddingRequest,
     CreateEmbeddingResponse,
-    CreateModerationRequest,
-    CreateModerationResponse
+    ModerationInput,
+    ModerationResponse
 } from './schema';
 import { OpenAIClient, OpenAIClientOptions, OpenAIClientResponse } from './OpenAIClient';
 
@@ -23,12 +23,21 @@ import { OpenAIClient, OpenAIClientOptions, OpenAIClientResponse } from './OpenA
  */
 
 export interface AzureOpenAIClientOptions extends OpenAIClientOptions {
+    /**
+     * Azure OpenAI endpoint.
+     */
     endpoint: string;
+
+    /**
+     * Optional. Which Azure API version to use. Defaults to latest.
+     */
     apiVersion?: string;
 }
 
 /**
  * @private
+ * @class
+ * @implements {OpenAIClient}
  * `AzureOpenAIClient` Allows for Azure hosted OpenAI clients to be created and used. As of 4/4/2023, access keys must be specifically assigned to be used with this client.
  */
 export class AzureOpenAIClient extends OpenAIClient {
@@ -70,17 +79,16 @@ export class AzureOpenAIClient extends OpenAIClient {
         return this.post(url, clone);
     }
 
-    /**
-     * Placeholder for future implementation.
-     *
-     * @param {CreateModerationRequest} request The input request and model payload.
-     */
-    public createModeration(request: CreateModerationRequest): Promise<OpenAIClientResponse<CreateModerationResponse>> {
-        throw new Error(`the AzureOpenAIClient does not currently support calling the Moderation API.`);
+    public createModeration(request: ModerationInput): Promise<OpenAIClientResponse<ModerationResponse>> {
+        const endpoint = (this.options as AzureOpenAIClientOptions).endpoint;
+        const url = `${endpoint}/contentsafety/text:analyze?api-version=${
+            (this.options as AzureOpenAIClientOptions).apiVersion
+        }`;
+        return this.post(url, request);
     }
 
     protected addRequestHeaders(headers: Record<string, string>, options: OpenAIClientOptions): void {
-        headers['api-key'] = options.apiKey;
+        headers[options.headerKey ?? 'api-key'] = options.apiKey;
     }
 
     private removeModel(request: { model?: string }): string {

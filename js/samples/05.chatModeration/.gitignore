@@ -1,4 +1,4 @@
-*.zip
+.zip
 
 # Logs
 logs
@@ -108,7 +108,8 @@ dist
 # TernJS port file
 .tern-port
 
-.DS_Store
-
-# api-extract temp files
-**/packages/api/temp/
+# Teams Toolkit
+env/.env.*.user
+env/.env.local
+appPackage/build
+.deployment

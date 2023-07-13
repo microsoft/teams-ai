@@ -180,13 +180,13 @@ export class OpenAIPlanner<
             const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             status = result?.status;
-            response = result.data?.choices[0]?.message?.content ?? '';
+            response = status === 200 ? result.data?.choices[0]?.message?.content ?? '' : '';
         } else {
             // Request base prompt completion
             const promptRequest = this.createCompletionRequest(prompt);
             const result = await this.createCompletion(promptRequest);
             status = result?.status;
-            response = result.data?.choices[0]?.text ?? '';
+            response = status === 200 ? result.data?.choices[0]?.text ?? '' : '';
         }
 
         // Ensure we weren't rate limited

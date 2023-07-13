@@ -50,12 +50,11 @@
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": "off",
         "no-async-promise-executor": "off",
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "object-literal-sort-keys": false,
+        "object-literal-sort-keys": "off",
         "prettier/prettier": "error"
         // Currently sample contains no frontend
         // "react/react-in-jsx-scope": "off",

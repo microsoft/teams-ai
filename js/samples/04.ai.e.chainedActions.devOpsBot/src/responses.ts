@@ -46,6 +46,7 @@ export function reset(): string {
 
 /**
  * This method return random response if the work item not found.
+ *
  * @param list
  * @param item
  */
@@ -61,6 +62,7 @@ export function itemNotFound(list: string, item: string): string {
 
 /**
  * This method return random responses if the work item found.
+ *
  * @param list
  * @param item
  */
@@ -88,6 +90,7 @@ export function noListsFound(): string {
 
 /**
  * This method return random response for any unknown action.
+ *
  * @param action
  */
 export function unknownAction(action: string): string {
@@ -115,6 +118,7 @@ export function offTopic(): string {
 
 /**
  * This method return random response from the list of items in the array.
+ *
  * @param responses
  */
 function getRandomResponse(responses: string[]): string {

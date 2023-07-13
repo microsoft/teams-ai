@@ -54,7 +54,7 @@ export class ResponseParser {
      * Attempts to find an Adaptive Card in a response.
      *
      * @param {string} text Optional. Text to parse.
-     * @returns {Record<string, any>} The found Adaptive Card or undefined if no card could be detected.
+     * @returns {Record<string, any> | undefined} The found Adaptive Card or undefined if no card could be detected.
      */
     public static parseAdaptiveCard(text?: string): Record<string, any> | undefined {
         const obj = this.parseJSON(text);
@@ -66,7 +66,7 @@ export class ResponseParser {
      *
      * @template T Optional. Type of object to return.
      * @param {string} text Optional. Text to parse.
-     * @returns {Record<string, any>} The parsed object or undefined if no object could be detected.
+     * @returns The parsed object or undefined if no object could be detected.
      */
     public static parseJSON<T = Record<string, any>>(text?: string): T | undefined {
         let obj: T | undefined;
@@ -161,6 +161,8 @@ export class ResponseParser {
 
     /**
      * @param {string[]} tokens
+     * @private
+     * @returns ParsedCommandResult
      */
     public static parseDoCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
@@ -309,8 +311,9 @@ export class ResponseParser {
     }
 
     /**
-     * @param {string[]} tokens An array of tokens to parse.
-     * @returns {ParsedCommandResult} An object containing the length of the parsed tokens and a predicted command object.
+     * @param tokens
+     * @private
+     * @returns {ParsedCommandResult}
      */
     public static parseSayCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
@@ -349,17 +352,13 @@ export class ResponseParser {
             }
         }
 
-        /**
-         * @returns An object containing the length of the parsed tokens and a predicted command object.
-         */
         return { length, command };
     }
 
     /**
-     * Tokenizes the given text into an array of strings.
-     *
-     * @param {string} text Optional. The text to tokenize.
-     * @returns {string[]} An array of tokens.
+     * @param {string} text
+     * @private
+     * @returns {string[]}
      */
     public static tokenizeText(text?: string): string[] {
         const tokens: string[] = [];
