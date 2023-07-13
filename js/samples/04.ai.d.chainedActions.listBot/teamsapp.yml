@@ -93,7 +93,7 @@ deploy:
 # Defines what the `publish` lifecycle step does with Teams Toolkit.
 # Runs with the Deploy menu or CLI using `teamsfx publish --env {environment name}`.
 publish:
-  
+
   # Optional: Automates schema and error checking of the Teams app manifest and outputs the results in the console.
   - uses: teamsApp/validateManifest
     with:
@@ -116,3 +116,4 @@ publish:
   - uses: teamsApp/update
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
+projectId: 9bfb2484-6750-4aee-bb12-aa3f197e1f31

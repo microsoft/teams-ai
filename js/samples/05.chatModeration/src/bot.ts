@@ -130,7 +130,7 @@ app.ai.action(AI.FlaggedOutputActionName, async (context, state, data) => {
 
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action: string = ' ') => {
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action = ' ') => {
         await context.sendActivity(`<strong>${action}</strong> action missing`);
         return true;
     }

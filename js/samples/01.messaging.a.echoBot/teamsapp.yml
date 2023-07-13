@@ -68,17 +68,15 @@ provision:
 # Defines what the `deploy` lifecycle step does with Teams Toolkit.
 # Runs with the Deploy menu or CLI using `teamsfx deploy --env {environment name}`.
 deploy:
-
-  # Install any dependencies and build the web app using NPM
-  - uses: cli/runNpmCommand
-    name: install dependencies
+  - uses: script
     with:
-      args: install
+      run: "yarn install"
+      timeout: 180000 # timeout in ms
 
-  - uses: cli/runNpmCommand
-    name: build app
+  - uses: script
     with:
-      args: run build --if-present
+     run: "yarn build"
+     timeout: 180000 # timeout in ms
 
   # Deploy to an Azure App Service using the zip file created in the provision step.
   - uses: azureAppService/zipDeploy
@@ -116,3 +114,4 @@ publish:
   - uses: teamsApp/update
     with:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
+projectId: 9471268d-9787-4400-814c-cc45c5d93c2d

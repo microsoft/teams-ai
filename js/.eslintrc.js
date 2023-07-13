@@ -1,4 +1,4 @@
-{
+module.exports = {
     "parser": "@typescript-eslint/parser",
     "root": true,
     "env": {
@@ -14,22 +14,13 @@
         "plugin:import/typescript",
         "plugin:import/recommended",
         "plugin:jsdoc/recommended",
-
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
-        // Currently sample contains no frontend
+        // Currently samples contain no frontend
         // "plugin:react/recommended",
         // "plugin:react/jsx-runtime"
     ],
-    "plugins": [
-        "@typescript-eslint",
-        "jsdoc",
-
-        "mocha",
-        "only-warn",
-        "prettier"
-        // "react"
-    ],
+    "plugins": ["@typescript-eslint", "jsdoc", "mocha", "only-warn", "prettier"],
     "parserOptions": {
         "ecmaVersion": 2015,
         // Allows for the parsing of modern ECMAScript features
@@ -54,8 +45,9 @@
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "prettier/prettier": "error"
-        // Currently sample contains no frontend
+        "prettier/prettier": "error",
+        "jsdoc/empty-tags": "off"
+        // Currently samples contain no frontend
         // "react/react-in-jsx-scope": "off",
         // "react/prop-types": "off"
     },
@@ -70,4 +62,4 @@
         //     "version": "detect"
         // }
     }
-}
+};

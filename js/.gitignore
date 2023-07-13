@@ -112,3 +112,12 @@ dist
 
 # api-extract temp files
 **/packages/api/temp/
+
+# turborepo
+.turbo
+build/**
+dist/**
+.next/**
+
+**/packages/**/*.lock
+**/samples/**/*.lock
