@@ -41,7 +41,7 @@ provision:
       templates:
         - path: ./infra/azure.bicep
           parameters: ./infra/azure.parameters.json
-          deploymentName: Create-resources-for-tab
+          deploymentName: Create-resources-TwentyQuestions-${{TEAMSFX_ENV}}
       bicepCliVersion: v0.9.1
 
   # Optional: Automates schema and error checking of the Teams app manifest and outputs the results in the console.
@@ -79,5 +79,5 @@ deploy:
   # Deploy to an Azure App Service using the artifact created in the above step.
   - uses: azureAppService/zipDeploy
     with:
-      artifactFolder: bin/Release/net6.0/win-x86/publish
+      artifactFolder: bin/Release/net7.0/win-x86/publish
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
