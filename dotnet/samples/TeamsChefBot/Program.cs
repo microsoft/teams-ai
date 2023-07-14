@@ -16,7 +16,7 @@ builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.
 builder.Services.AddHttpContextAccessor();
 
 // Prepare Configuration for ConfigurationBotFrameworkAuthentication
-var config = builder.Configuration.Get<ConfigOptions>();
+var config = builder.Configuration.Get<ConfigOptions>()!;
 builder.Configuration["MicrosoftAppType"] = "MultiTenant";
 builder.Configuration["MicrosoftAppId"] = config.BOT_ID;
 builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
@@ -28,31 +28,29 @@ builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFramew
 // Note: some classes expect a BotAdapter and some expect a BotFrameworkHttpAdapter, so
 // register the same adapter instance for all types.
 builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
-builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>());
-builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>());
+builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>()!);
+builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-// Use OpenAI
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OPENAI_API_KEY, "text-davinci-003"));
-builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OPENAI_API_KEY, ModerationType.Both));
+#region Use OpenAI
+if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+{
+    throw new Exception("Missing OpenAI configuration.");
+}
 
-// Use Azure OpenAI and Azure Content Safety
-// builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new AzureOpenAIPlannerOptions(config.AZURE_OPENAI_API_KEY, "text-davinci-003", config.AZURE_OPENAI_ENDPOINT));
-// builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new AzureContentSafetyModeratorOptions(config.AZURE_CONTENT_SAFETY_API_KEY, config.AZURE_CONTENT_SAFETY_ENDPOINT, ModerationType.Both));
+builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003"));
+builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OpenAI.ApiKey, ModerationType.Both));
 
 // Create the Application.
 builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
 {
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>();
+    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
     IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
 
-    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>(), loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
-    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>(), loggerFactory.CreateLogger<OpenAIModerator<TurnState>>());
-
-    // IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>(), loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
-    // IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>(), loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>());
+    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
+    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory.CreateLogger<OpenAIModerator<TurnState>>());
 
     ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
     {
@@ -70,6 +68,51 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
 
     return new TeamsChefBotApplication(applicationOptions);
 });
+#endregion
+
+#region Use Azure OpenAI and Azure Content Safety
+/**
+if (config.Azure == null
+    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
+    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
+    || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
+    || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
+{
+    throw new Exception("Missing Azure configuration.");
+}
+
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new AzureOpenAIPlannerOptions(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
+builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new AzureContentSafetyModeratorOptions(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
+
+// Create the Application.
+builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
+{
+    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
+
+    IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
+
+    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>(), loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
+    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>(), loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>());
+
+    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
+    {
+        AI = new AIOptions<TurnState>(planner, promptManager)
+        {
+            Moderator = moderator,
+            Prompt = "Chat",
+            History = new AIHistoryOptions()
+            {
+                AssistantHistoryType = AssistantHistoryType.Text
+            }
+        },
+        Storage = sp.GetService<IStorage>(),
+        StartTypingTimer = false
+    };
+
+    return new TeamsChefBotApplication(applicationOptions);
+});
+**/
+#endregion
 
 var app = builder.Build();
 
@@ -80,9 +123,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 app.Run();

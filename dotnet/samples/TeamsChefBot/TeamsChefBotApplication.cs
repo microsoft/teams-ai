@@ -19,21 +19,21 @@ namespace TeamsChefBot
         {
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
-                if (turnContext.Activity.Text == "/history")
+                if (turnContext.Activity.Text.Equals("/history", StringComparison.OrdinalIgnoreCase))
                 {
                     string history = ConversationHistory.ToString(turnState, 2000, "\n\n");
                     await turnContext.SendActivityAsync(history);
                     return;
                 }
             }
-            await AI.ChainAsync(turnContext, turnState, "Chat");
+            await AI.ChainAsync(turnContext, turnState, "Chat", AI.Options, cancellationToken);
         }
     }
 
     internal class TeamsChefBotActions
     {
         [Action(DefaultActionTypes.FlaggedInputActionName)]
-        public async Task<bool> FlaggedInputAction([ActionTurnContext] TurnContext turnContext, [ActionEntities] Dictionary<string, object> entities)
+        public async Task<bool> FlaggedInputAction([ActionTurnContext] ITurnContext turnContext, [ActionEntities] Dictionary<string, object> entities)
         {
             string entitiesJsonString = JsonSerializer.Serialize(entities);
             await turnContext.SendActivityAsync($"I'm sorry your message was flagged: {entitiesJsonString}");
@@ -41,7 +41,7 @@ namespace TeamsChefBot
         }
 
         [Action(DefaultActionTypes.FlaggedOutputActionName)]
-        public async Task<bool> FlaggedOutputAction([ActionTurnContext] TurnContext turnContext)
+        public async Task<bool> FlaggedOutputAction([ActionTurnContext] ITurnContext turnContext)
         {
             await turnContext.SendActivityAsync("I'm not allowed to talk about such things.");
             return false;

@@ -18,19 +18,19 @@
       "value": "TeamsChefBot"
     },
     "openAIApiKey": {
-      "value": "${{OPENAI_API_KEY}}"
+      "value": "${{OPENAI__APIKEY}}"
     },
     "azureOpenAIApiKey": {
-      "value": "${{AZURE_OPENAI_API_KEY}}"
+      "value": "${{AZURE__OPENAIAPIKEY}}"
     },
     "azureOpenAIEndpoint": {
-      "value": "${{AZURE_OPENAI_ENDPOINT}}"
+      "value": "${{AZURE__OPENAIENDPOINT}}"
     },
     "azureContentSafetyApiKey": {
-      "value": "${{AZURE_CONTENT_SAFETY_API_KEY}}"
+      "value": "${{AZURE__CONTENTSAFETYAPIKEY}}"
     },
     "azureContentSafetyEndpoint": {
-      "value": "${{AZURE_CONTENT_SAFETY_ENDPOINT}}"
+      "value": "${{AZURE__CONTENTSAFETYENDPOINT}}"
     }
   }
 }

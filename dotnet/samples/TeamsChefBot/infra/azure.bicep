@@ -72,23 +72,23 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: botAadAppClientSecret
         }
         {
-            name: 'OPENAI_API_KEY'
+            name: 'OPENAI__APIKEY'
             value: openAIApiKey
         }
         {
-            name: 'AZURE_OPENAI_API_KEY'
+            name: 'AZURE__OPENAIAPIKEY'
             value: azureOpenAIApiKey
         }
         {
-            name: 'AZURE_OPENAI_ENDPOINT'
+            name: 'AZURE__OPENAIENDPOINT'
             value: azureOpenAIEndpoint
         }
         {
-            name: 'AZURE_CONTENT_SAFETY_API_KEY'
+            name: 'AZURE__CONTENTSAFETYAPIKEY'
             value: azureContentSafetyApiKey
         }
         {
-            name: 'AZURE_CONTENT_SAFETY_ENDPOINT'
+            name: 'AZURE__CONTENTSAFETYENDPOINT'
             value: azureContentSafetyEndpoint
         }
       ]

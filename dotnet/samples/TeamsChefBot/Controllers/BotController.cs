@@ -8,10 +8,10 @@ namespace TeamsChefBot.Controllers
     [ApiController]
     public class BotController : ControllerBase
     {
-        private readonly IBotFrameworkHttpAdapter _adapter;
+        private readonly CloudAdapter _adapter;
         private readonly IBot _bot;
 
-        public BotController(IBotFrameworkHttpAdapter adapter, IBot bot)
+        public BotController(CloudAdapter adapter, IBot bot)
         {
             _adapter = adapter;
             _bot = bot;
