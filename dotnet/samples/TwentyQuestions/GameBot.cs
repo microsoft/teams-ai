@@ -2,7 +2,6 @@
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.State;
 
 namespace TwentyQuestions
 {

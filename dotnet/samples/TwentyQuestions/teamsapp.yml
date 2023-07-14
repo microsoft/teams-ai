@@ -20,7 +20,7 @@ provision:
   - uses: teamsApp/create
     with:
       name: TwentyQuestions-${{TEAMSFX_ENV}}
-    writeToEnvironmentFile: 
+    writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
   # Automates the creation an Azure AD app registration which is required for a bot.
@@ -76,7 +76,7 @@ deploy:
     with:
       args: publish --configuration Release --runtime win-x86 --self-contained
 
-# Deploy to an Azure App Service using the artifact created in the above step.
+  # Deploy to an Azure App Service using the artifact created in the above step.
   - uses: azureAppService/zipDeploy
     with:
       artifactFolder: bin/Release/net6.0/win-x86/publish
