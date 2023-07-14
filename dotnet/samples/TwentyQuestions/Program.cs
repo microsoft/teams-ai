@@ -84,18 +84,18 @@ builder.Services.AddTransient<IBot>(sp =>
 });
 #endregion
 
-#region Use Azure OpenAI
-/** Following code is for using Azure OpenAI
-if (config.AzureOpenAI == null
-    || string.IsNullOrEmpty(config.AzureOpenAI.ApiKey) 
-    || string.IsNullOrEmpty(config.AzureOpenAI.Endpoint)
-    || string.IsNullOrEmpty(config.AzureOpenAI.ContentSafetyApiKey)
-    || string.IsNullOrEmpty(config.AzureOpenAI.ContentSafetyEndpoint))
+#region Use Azure OpenAI and Azure Content Safety
+/** Following code is for using Azure OpenAI and Azure Content Safety
+if (config.Azure == null
+    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
+    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
+    || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
+    || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
 {
-    throw new Exception("Missing AzureOpenAI configuration.");
+    throw new Exception("Missing Azure configuration.");
 }
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.AzureOpenAI.ApiKey, "text-davinci-003", config.AzureOpenAI.Endpoint));
-builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.AzureOpenAI.ApiKey, config.AzureOpenAI.ContentSafetyEndpoint, ModerationType.Both));
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
+builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
