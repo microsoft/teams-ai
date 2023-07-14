@@ -26,7 +26,7 @@ namespace TeamsChefBot
                     return;
                 }
             }
-            throw new NotImplementedException();
+            await AI.ChainAsync(turnContext, turnState, "Chat");
         }
     }
 

@@ -32,23 +32,27 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Clou
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>());
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-//builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OPENAI_API_KEY, "text-davinci-003"));
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new AzureOpenAIPlannerOptions(config.AZURE_OPENAI_API_KEY, "gpt-4-32k", config.AZURE_OPENAI_ENDPOINT));
-//builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OPENAI_API_KEY, ModerationType.Both));
-builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new AzureContentSafetyModeratorOptions(config.AZURE_CONTENT_SAFETY_API_KEY, config.AZURE_CONTENT_SAFETY_ENDPOINT, ModerationType.Both));
+
+// Use OpenAI
+builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OPENAI_API_KEY, "text-davinci-003"));
+builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OPENAI_API_KEY, ModerationType.Both));
+
+// Use Azure OpenAI and Azure Content Safety
+// builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new AzureOpenAIPlannerOptions(config.AZURE_OPENAI_API_KEY, "text-davinci-003", config.AZURE_OPENAI_ENDPOINT));
+// builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new AzureContentSafetyModeratorOptions(config.AZURE_CONTENT_SAFETY_API_KEY, config.AZURE_CONTENT_SAFETY_ENDPOINT, ModerationType.Both));
 
 // Create the Application.
 builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
 {
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>();
 
-    //IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>(), loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
-    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>(), loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
-
     IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
 
-    //IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>(), loggerFactory.CreateLogger<OpenAIModerator<TurnState>>());
-    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>(), loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>());
+    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>(), loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
+    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>(), loggerFactory.CreateLogger<OpenAIModerator<TurnState>>());
+
+    // IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>(), loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
+    // IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>(), loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>());
 
     ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
     {
