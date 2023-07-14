@@ -33,8 +33,15 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OPENAI_API_KEY!, "text-davinci-003"));
-builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new(config.OPENAI_API_KEY!, ModerationType.Both));
+
+#region Use OpenAI
+// Use OpenAI
+if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+{
+    throw new Exception("Missing OpenAI configuration.");
+}
+builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "text-davinci-003"));
+builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new(config.OpenAI.ApiKey, ModerationType.Both));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -46,10 +53,10 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
 
     // Create OpenAIPlanner
-    IPlanner <GameTurnState> planner = new OpenAIPlanner<GameTurnState>(
+    IPlanner<GameTurnState> planner = new OpenAIPlanner<GameTurnState>(
         sp.GetService<OpenAIPlannerOptions>()!,
         loggerFactory.CreateLogger<OpenAIPlanner<GameTurnState>>());
-    
+
     // Create OpenAIModerator
     IModerator<GameTurnState> moderator = new OpenAIModerator<GameTurnState>(
         sp.GetService<OpenAIModeratorOptions>()!,
@@ -75,6 +82,62 @@ builder.Services.AddTransient<IBot>(sp =>
     };
     return new GameBot(ApplicationOptions);
 });
+#endregion
+
+#region Use Azure OpenAI
+/** Following code is for using Azure OpenAI
+if (config.AzureOpenAI == null
+    || string.IsNullOrEmpty(config.AzureOpenAI.ApiKey) 
+    || string.IsNullOrEmpty(config.AzureOpenAI.Endpoint)
+    || string.IsNullOrEmpty(config.AzureOpenAI.ContentSafetyApiKey)
+    || string.IsNullOrEmpty(config.AzureOpenAI.ContentSafetyEndpoint))
+{
+    throw new Exception("Missing AzureOpenAI configuration.");
+}
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.AzureOpenAI.ApiKey, "text-davinci-003", config.AzureOpenAI.Endpoint));
+builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.AzureOpenAI.ApiKey, config.AzureOpenAI.ContentSafetyEndpoint, ModerationType.Both));
+
+// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+builder.Services.AddTransient<IBot>(sp =>
+{
+    // Create loggers
+    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
+
+    // Get HttpClient
+    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
+
+    // Create AzureOpenAIPlanner
+    IPlanner<GameTurnState> planner = new AzureOpenAIPlanner<GameTurnState>(
+        sp.GetService<AzureOpenAIPlannerOptions>()!,
+        loggerFactory.CreateLogger<AzureOpenAIPlanner<GameTurnState>>());
+
+    // Create AzureContentSafetyModerator
+    IModerator<GameTurnState> moderator = new AzureContentSafetyModerator<GameTurnState>(
+        sp.GetService<AzureContentSafetyModeratorOptions>()!,
+        loggerFactory.CreateLogger<AzureContentSafetyModerator<GameTurnState>>(),
+        moderatorHttpClient);
+
+    // Create Application
+    AIHistoryOptions aiHistoryOptions = new()
+    {
+        AssistantHistoryType = AssistantHistoryType.Text
+    };
+    AIOptions<GameTurnState> aiOptions = new(
+        planner: planner,
+        promptManager: new PromptManager<GameTurnState>("./Prompts"),
+        moderator: moderator,
+        prompt: "Chat",
+        history: aiHistoryOptions);
+    ApplicationOptions<GameTurnState, GameTurnStateManager> ApplicationOptions = new()
+    {
+        TurnStateManager = new GameTurnStateManager(),
+        Storage = sp.GetService<IStorage>(),
+        AI = aiOptions,
+    };
+    return new GameBot(ApplicationOptions);
+});
+**/
+#endregion
 
 var app = builder.Build();
 
