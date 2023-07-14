@@ -63,6 +63,18 @@ AI:
 
 ## Deploy to Azure
 
+You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
+
+To configure the Azure resources to have an environment variable for the OpenAI Key:
+
+1. Add a `./env/.env.dev.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
+
+The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
+
+Use the "Teams Toolkit" > "Provision in the Cloud...", "Teams Toolkit" > "Deploy to the Cloud" from project right-click menu, or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
+
+Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
+
 ## Further reading
 
 - [Teams Toolkit overview](https://aka.ms/vs-teams-toolkit-getting-started)
