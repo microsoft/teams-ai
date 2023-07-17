@@ -6,6 +6,14 @@ namespace Microsoft.TeamsAI.AI.Prompt
     public interface IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
+        /// Register prompt variables.
+        /// </summary>
+        /// <remarks>
+        /// You will be able to reference these variables in the prompt template string by using this format: `{{ $key }}`.
+        /// </remarks>
+        IDictionary<string, string> Variables { get; }
+
+        /// <summary>
         /// Adds a custom function <paramref name="name"/> to the prompt manager.
         /// </summary>
         /// <remarks>

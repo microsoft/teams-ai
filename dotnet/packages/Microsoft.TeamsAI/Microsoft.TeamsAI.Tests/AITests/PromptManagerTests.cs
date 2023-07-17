@@ -8,7 +8,7 @@ using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.AI
+namespace Microsoft.TeamsAI.Tests.AITests
 {
     public class PromptManagerTests
     {
@@ -20,7 +20,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TestTurnState>();
             var name = "promptFunctionName";
-            PromptFunction<TestTurnState> promptFunction = (ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(name);
+            PromptFunction<TestTurnState> promptFunction = (turnContext, turnState) => Task.FromResult(name);
 
             // Act
             promptManager.AddFunction(name, promptFunction);
@@ -38,8 +38,8 @@ namespace Microsoft.TeamsAI.Tests.AI
             var turnStateMock = new Mock<TestTurnState>();
             var name = "promptFunctionName";
             var nameOverride = "promptFunctionNameOverride";
-            PromptFunction<TestTurnState> promptFunction = (ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(name);
-            PromptFunction<TestTurnState> promptFunctionOverride = (ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(nameOverride);
+            PromptFunction<TestTurnState> promptFunction = (turnContext, turnState) => Task.FromResult(name);
+            PromptFunction<TestTurnState> promptFunctionOverride = (turnContext, turnState) => Task.FromResult(nameOverride);
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
@@ -287,7 +287,7 @@ namespace Microsoft.TeamsAI.Tests.AI
                 promptString,
                 configuration
             );
-            
+
             // Act
             promptManager.AddFunction(promptFunctionName, promptFunction);
             var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
@@ -314,7 +314,7 @@ namespace Microsoft.TeamsAI.Tests.AI
                     TopP = 0.5,
                 }
             };
-            
+
             /// Prompt function not configured
 
             /// Configure prompt
@@ -338,7 +338,7 @@ namespace Microsoft.TeamsAI.Tests.AI
         public async void RenderPrompt_ResolveVariable()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            IPromptManager<TestTurnState> promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
