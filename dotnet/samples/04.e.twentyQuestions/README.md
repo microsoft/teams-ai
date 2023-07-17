@@ -31,15 +31,12 @@ AI:
 
 </details>
 
-## Setting up the sample
+## Set up instructions
 
-1. Setup [prerequisites](../README.md) for using Teams Toolkit in Visual Studio.
+All the samples in for the C# .NET SDK can be set up in the same way: You can find the step by step instructions here:
+ [Setup Instructions](../README.md).
 
-1. Get this sample from GitHub. Clone or download the whole *TwentyQuestions* project.
-
-1. In the project folder *TwentyQuestions/*, put the Microsoft.TeamAI package (*Microsoft.TeamsAI.\<version\>.nupkg*) under *LocalPkg/* folder.
-
-## Local Debug (F5)
+Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
 
 1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
 
@@ -49,19 +46,19 @@ AI:
       },
     ```
 
-1. In the debug target dropdown menu, select "Dev Tunnels" > "Create A Tunnel..." (set authentication type to Public) or select an existing public dev tunnel.
+## Interacting with the Bot
 
-1. Right-click your project and select "Teams Toolkit" > "Prepare Teams App Dependencies".
+At this point you should have set up the bot and installed it in Teams. You can interact with the bot by sending it a message.
 
-1. If prompted, sign in with a Microsoft 365 account for the Teams organization you want to install the app to.
+Here's a sample interaction with the bot:
 
-1. Press F5, or select the debug target "Microsoft Teams (browser)" in Visual Studio.
+![Sample interaction](assets/interaction.png)
 
-1. In the launched browser, select the Add button to load the app in Teams.
+You can quit the game by sending the message `/quit`.
 
-1. In the chat bar, type and send any message (e.g. "*let's start*") to your app to start the game.
+![Quit interaction](assets/quit.png)
 
-## Deploy to Azure
+## Deploy to Azure with Teams Toolkit
 
 You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
@@ -84,7 +81,7 @@ Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI 
 1. Prepare your own Azure OpenAI service and Azure AI Content Safety service.
 1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI and Azure Content Safety*" part.
 
-**For Local Debug (F5)**
+**For Local Debug (F5) with Teams Toolkit for Visual Studio**
 
 1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
 
@@ -97,7 +94,7 @@ Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI 
       }
     ```
 
-**For Deploy to Azure**
+**For Deploy to Azure with Teams Toolkit for Visual Studio**
 
 To configure the Azure resources to have Azure OpenAI environment variables:
 

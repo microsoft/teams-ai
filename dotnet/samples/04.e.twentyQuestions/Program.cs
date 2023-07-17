@@ -53,14 +53,14 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
 
     // Create OpenAIPlanner
-    IPlanner<GameTurnState> planner = new OpenAIPlanner<GameTurnState>(
+    IPlanner<GameState> planner = new OpenAIPlanner<GameState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<GameTurnState>>());
+        loggerFactory.CreateLogger<OpenAIPlanner<GameState>>());
 
     // Create OpenAIModerator
-    IModerator<GameTurnState> moderator = new OpenAIModerator<GameTurnState>(
+    IModerator<GameState> moderator = new OpenAIModerator<GameState>(
         sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory.CreateLogger<OpenAIModerator<GameTurnState>>(),
+        loggerFactory.CreateLogger<OpenAIModerator<GameState>>(),
         moderatorHttpClient);
 
     // Create Application
@@ -68,15 +68,15 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         AssistantHistoryType = AssistantHistoryType.Text
     };
-    AIOptions<GameTurnState> aiOptions = new(
+    AIOptions<GameState> aiOptions = new(
         planner: planner,
-        promptManager: new PromptManager<GameTurnState>("./Prompts"),
+        promptManager: new PromptManager<GameState>("./Prompts"),
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameTurnState, GameTurnStateManager> ApplicationOptions = new()
+    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
     {
-        TurnStateManager = new GameTurnStateManager(),
+        TurnStateManager = new GameStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
     };
@@ -85,7 +85,7 @@ builder.Services.AddTransient<IBot>(sp =>
 #endregion
 
 #region Use Azure OpenAI and Azure Content Safety
-/** Following code is for using Azure OpenAI and Azure Content Safety
+/** // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
@@ -107,14 +107,14 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
 
     // Create AzureOpenAIPlanner
-    IPlanner<GameTurnState> planner = new AzureOpenAIPlanner<GameTurnState>(
+    IPlanner<GameState> planner = new AzureOpenAIPlanner<GameState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<GameTurnState>>());
+        loggerFactory.CreateLogger<AzureOpenAIPlanner<GameState>>());
 
     // Create AzureContentSafetyModerator
-    IModerator<GameTurnState> moderator = new AzureContentSafetyModerator<GameTurnState>(
+    IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(
         sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<GameTurnState>>(),
+        loggerFactory.CreateLogger<AzureContentSafetyModerator<GameState>>(),
         moderatorHttpClient);
 
     // Create Application
@@ -122,15 +122,15 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         AssistantHistoryType = AssistantHistoryType.Text
     };
-    AIOptions<GameTurnState> aiOptions = new(
+    AIOptions<GameState> aiOptions = new(
         planner: planner,
-        promptManager: new PromptManager<GameTurnState>("./Prompts"),
+        promptManager: new PromptManager<GameState>("./Prompts"),
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameTurnState, GameTurnStateManager> ApplicationOptions = new()
+    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
     {
-        TurnStateManager = new GameTurnStateManager(),
+        TurnStateManager = new GameStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
     };

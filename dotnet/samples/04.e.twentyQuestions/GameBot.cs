@@ -1,21 +1,20 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI.Prompt;
 
 namespace TwentyQuestions
 {
-    public class GameBot : Application<GameTurnState, GameTurnStateManager>
+    public class GameBot : Application<GameState, GameStateManager>
     {
-        public GameBot(ApplicationOptions<GameTurnState, GameTurnStateManager> options)
+        public GameBot(ApplicationOptions<GameState, GameStateManager> options)
             : base(options)
         {
         }
 
-        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, GameTurnState turnState, CancellationToken cancellationToken)
+        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, GameState turnState, CancellationToken cancellationToken)
         {
             string? input = turnContext.Activity.Text?.Trim();
-            string? secretWord = turnState.SecretWord;
+            string? secretWord = turnState.Conversation!.SecretWord;
             if (string.Equals("/quit", input, StringComparison.OrdinalIgnoreCase))
             {
                 // Quit Game
@@ -25,15 +24,15 @@ namespace TwentyQuestions
             else if (string.IsNullOrEmpty(secretWord))
             {
                 // No secret word assigned, start game
-                turnState.SecretWord = ResponseBuilder.PickSecretWord();
-                turnState.GuessCount = 0;
-                turnState.RemainingGuesses = 20;
+                turnState.Conversation!.SecretWord = ResponseBuilder.PickSecretWord();
+                turnState.Conversation!.GuessCount = 0;
+                turnState.Conversation!.RemainingGuesses = 20;
                 await turnContext.SendActivityAsync(ResponseBuilder.StartGame(), cancellationToken: cancellationToken);
             }
             else
             {
-                int guessCount = turnState.GuessCount;
-                int remainingGuesses = turnState.RemainingGuesses;
+                int guessCount = turnState.Conversation!.GuessCount;
+                int remainingGuesses = turnState.Conversation!.RemainingGuesses;
                 guessCount++;
                 remainingGuesses--;
 
@@ -71,20 +70,19 @@ namespace TwentyQuestions
                 }
 
                 // Save game state
-                turnState.SecretWord = secretWord;
-                turnState.GuessCount = guessCount;
-                turnState.RemainingGuesses = remainingGuesses;
+                turnState.Conversation!.SecretWord = secretWord;
+                turnState.Conversation!.GuessCount = guessCount;
+                turnState.Conversation!.RemainingGuesses = remainingGuesses;
             }
         }
 
-        private async Task<string> GetHint(ITurnContext turnContext, GameTurnState turnState, CancellationToken cancellationToken)
+        private async Task<string> GetHint(ITurnContext turnContext, GameState turnState, CancellationToken cancellationToken)
         {
-            turnState.Temp!.Input = turnContext.Activity.Text;
-
             // Set prompt variables
-            AI.Prompts.Variables.Add("guessCount", turnState.GuessCount.ToString());
-            AI.Prompts.Variables.Add("remainingGuesses", turnState.RemainingGuesses.ToString());
-            AI.Prompts.Variables.Add("secretWord", turnState.SecretWord!);
+            AI.Prompts.Variables.Add("guessCount", turnState.Conversation!.GuessCount.ToString());
+            AI.Prompts.Variables.Add("remainingGuesses", turnState.Conversation!.RemainingGuesses.ToString());
+            AI.Prompts.Variables.Add("secretWord", turnState.Conversation!.SecretWord!);
+            AI.Prompts.Variables.Add("input", turnContext.Activity.Text);
 
             string hint = await AI.CompletePromptAsync(turnContext, turnState, "Hint", null, cancellationToken);
             return hint ?? throw new Exception("The request to OpenAI was rate limited. Please try again later.");
