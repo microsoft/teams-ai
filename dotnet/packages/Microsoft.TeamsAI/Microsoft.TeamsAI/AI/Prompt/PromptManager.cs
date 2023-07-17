@@ -29,12 +29,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             _functions = new Dictionary<string, TemplateFunctionEntry<TState>>();
         }
 
-        /// <summary>
-        /// Register prompt variables.
-        /// </summary>
-        /// <remarks>
-        /// You will be able to reference these variables in the prompt template string by using this format: `{{ $key }}`.
-        /// </remarks>
+        /// <inheritdoc />
         public IDictionary<string, string> Variables => _promptVariables;
 
         /// <inheritdoc />
