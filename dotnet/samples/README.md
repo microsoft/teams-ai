@@ -49,7 +49,7 @@ There are a few ways to get the application up and running. The latest way is us
 
 #### Additional Prerequisites
 
-- [Visual Studio 2022 v17.3.0+ (Preview version)](https://visualstudio.microsoft.com/vs/preview/)
+- [Visual Studio 2022 17.7.0 Preview 3.0](https://visualstudio.microsoft.com/vs/preview/)
 - Teams Toolkit extension (installed through the Visual Studio installer)
   - Select Microsoft Teams development tools under ASP.NET and web development.
   - ![Teams Toolkit Installation](/dotnet/samples/assets/ttk-install.png)
