@@ -29,7 +29,7 @@ The development versions of the library might not be available on NuGet's public
 
 6. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the `LocalPkg/` folder within the sample folder.
 
-7. Now you can install the `Microsoft.TeamsAI` package from the Visual Studio's `Manage NuGet Packages` flow or by running `dotnet add Microsoft.TeamsAI`.
+7. Now you can install the `Microsoft.TeamsAI` package from the Visual Studio's `Manage NuGet Packages` flow or by running `dotnet add package Microsoft.TeamsAI`.
 
 Now can you proceed to setting up the sample.
 
