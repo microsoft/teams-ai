@@ -17,20 +17,20 @@
     "botDisplayName": {
       "value": "TwentyQuestionsInfra"
     },
-    "openAiApiKey": {
+    "openAIApiKey": {
       "value": "${{SECRET_OPENAI_API_KEY}}"
     },
     "azureOpenAIApiKey": {
       "value": "${{SECRET_AZURE_OPENAI_API_KEY}}"
     },
-    "azureOpenAIApiEndpoint": {
-      "value": "${{SECRET_AZURE_OPENAI_API_ENDPOINT}}"
+    "azureOpenAIEndpoint": {
+      "value": "${{SECRET_AZURE_OPENAI_ENDPOINT}}"
     },
     "azureContentSafetyApiKey": {
       "value": "${{SECRET_AZURE_CONTENT_SAFETY_API_KEY}}"
     },
-    "azureContentSafetyApiEndpoint": {
-      "value": "${{SECRET_AZURE_CONTENT_SAFETY_API_ENDPOINT}}"
+    "azureContentSafetyEndpoint": {
+      "value": "${{SECRET_AZURE_CONTENT_SAFETY_ENDPOINT}}"
     }
   }
 }

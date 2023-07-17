@@ -12,22 +12,22 @@ param botAadAppClientSecret string
 
 @secure()
 @description('The OpenAI API Key to be added to App Service Settings')
-param openAiApiKey string
+param openAIApiKey string
 
 @secure()
 @description('The Azure OpenAI API Key to be added to App Service Settings')
-param azureOpenAiApiKey string
+param azureOpenAIApiKey string
 
 @secure()
-@description('The Azure OpenAI API Endpoint to be added to App Service Settings')
-param azureOpenAiApiEndpoint string
+@description('The Azure OpenAI Endpoint to be added to App Service Settings')
+param azureOpenAIEndpoint string
 
 @secure()
 @description('The Azure Content Safety API Key to be added to App Service Settings')
 param azureContentSafetyApiKey string
 
 @secure()
-@description('The Azure Content Safety API Endpoint to be added to App Service Settings')
+@description('The Azure Content Safety Endpoint to be added to App Service Settings')
 param azureContentSafetyEndpoint string
 
 param webAppSKU string
@@ -75,15 +75,15 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         // ASP.NET Core treats double underscore (__) as colon (:) to support hierarchical keys
         {
           name: 'OpenAI__ApiKey'
-          value: openAiApiKey
+          value: openAIApiKey
         }
         {
           name: 'Azure__OpenAIApiKey'
-          value: azureOpenAiApiKey
+          value: azureOpenAIApiKey
         }
         {
           name: 'Azure__OpenAIEndpoint'
-          value: azureOpenAiApiEndpoint
+          value: azureOpenAIEndpoint
         }
         {
           name: 'Azure__ContentSafetyApiKey'

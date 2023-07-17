@@ -41,7 +41,7 @@ AI:
 
 ## Local Debug (F5)
 
-1. Set your OpenAI API Key to *appsettings.Development.json*.
+1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
 
     ```json
       "OpenAI": {
@@ -59,7 +59,7 @@ AI:
 
 1. In the launched browser, select the Add button to load the app in Teams.
 
-1. In the chat bar, type and send any message (e.g. "let's start") to your app to start the game.
+1. In the chat bar, type and send any message (e.g. "*let's start*") to your app to start the game.
 
 ## Deploy to Azure
 
@@ -67,13 +67,48 @@ You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.dev.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
+1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
 Use the "Teams Toolkit" > "Provision in the Cloud...", "Teams Toolkit" > "Deploy to the Cloud" from project right-click menu, or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
 
 Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
+
+## Use Azure OpenAI
+
+Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI as AI service.
+
+**As prerequisites**
+
+1. Prepare your own Azure OpenAI service and Azure AI Content Safety service.
+1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI and Azure Content Safety*" part.
+
+**For Local Debug (F5)**
+
+1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
+
+    ```json
+      "Azure": {
+        "OpenAIApiKey": "<your-azure-openai-api-key>",
+        "OpenAIEndpoint": "<your-azure-openai-endpoint>",
+        "ContentSafetyApiKey": "<your-azure-content-safety-api-key>",
+        "ContentSafetyEndpoint": "<your-azure-content-safety-endpoint>"
+      }
+    ```
+
+**For Deploy to Azure**
+
+To configure the Azure resources to have Azure OpenAI environment variables:
+
+1. In `./env/.env.dev.user` file, paste your Azure OpenAI related variables.
+
+    ```bash
+    SECRET_AZURE_OPENAI_API_KEY=
+    SECRET_AZURE_OPENAI_ENDPOINT=
+    SECRET_AZURE_CONTENT_SAFETY_API_KEY=
+    SECRET_AZURE_CONTENT_SAFETY_ENDPOINT=
+    ```
 
 ## Further reading
 
