@@ -6,8 +6,9 @@ using Microsoft.Bot.Builder;
 namespace Microsoft.TeamsAI.State
 {
     /// <summary>
-    /// Defines the default state scopes persisted by the `DefaultTurnStateManager`.
+    /// Handles loading and saving of the configured turn state class.
     /// </summary>
+    /// <typeparam name="TState">Optional. Type of turn state that encompasses the conversation, user and temp state.</typeparam>
     /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
     /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
     /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>

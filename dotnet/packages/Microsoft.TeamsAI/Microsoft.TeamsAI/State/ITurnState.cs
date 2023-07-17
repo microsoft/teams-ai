@@ -10,6 +10,6 @@ namespace Microsoft.TeamsAI.State
 
         public TUserState? User { get; }
 
-        public TTempState? Temp{ get; }
+        public TTempState? Temp { get; }
     }
 }

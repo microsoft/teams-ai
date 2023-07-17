@@ -373,14 +373,14 @@ namespace Microsoft.TeamsAI.Tests.AITests
         }
 
         [Fact]
-        public async void RenderPrompt_ResolveVariable_DefaultTurnState()
+        public async void RenderPrompt_ResolveVariable_TestTurnState()
         {
             // Arrange
             var promptManager = new PromptManager<TestTurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
-            var defaultTurnState = new TestTurnState();
+            var turnState = new TestTurnState();
             var inputValue = "input";
             var outputValue = "output";
             var historyValue = "history";
@@ -390,16 +390,16 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Output = outputValue,
                 History = historyValue
             };
-            defaultTurnState.TempStateEntry = new TurnStateEntry<TempState>(tempState);
+            turnState.TempStateEntry = new TurnStateEntry<TempState>(tempState);
 
             var configuration = new PromptTemplateConfiguration
             {
                 Completion =
-                        {
-                            MaxTokens = 2000,
-                            Temperature = 0.2,
-                            TopP = 0.5,
-                        }
+                {
+                    MaxTokens = 2000,
+                    Temperature = 0.2,
+                    TopP = 0.5,
+                }
             };
 
             /// Configure prompt
@@ -411,7 +411,52 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, defaultTurnState, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnState, promptTemplate);
+
+            // Assert
+            Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
+        }
+
+        [Fact]
+        public async void RenderPrompt_ResolveVariable_CustomTurnState()
+        {
+            // Arrange
+            var promptManager = new PromptManager<CustomTurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
+
+            var turnState = new CustomTurnState();
+            var inputValue = "input";
+            var outputValue = "output";
+            var historyValue = "history";
+            var tempState = new CustomTempState()
+            {
+                Input = inputValue,
+                Output = outputValue,
+                History = historyValue
+            };
+            turnState.TempStateEntry = new TurnStateEntry<CustomTempState>(tempState);
+
+            var configuration = new PromptTemplateConfiguration
+            {
+                Completion =
+                {
+                    MaxTokens = 2000,
+                    Temperature = 0.2,
+                    TopP = 0.5,
+                }
+            };
+
+            /// Configure prompt
+            var promptString = "{{ $input }}, {{ $output }}, {{ $history }}";
+            var expectedRenderedPrompt = $"{inputValue}, {outputValue}, {historyValue}";
+            var promptTemplate = new PromptTemplate(
+                promptString,
+                configuration
+            );
+
+            // Act
+            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnState, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -449,6 +494,13 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Assert
             Assert.Equal("", renderedPrompt.Text);
+        }
+
+        private IEnumerable<object[]> GetTurnStates()
+        {
+            yield return new object[] { new TestTurnState() };
+            yield return new object[] { new CustomTurnState() };
+
         }
     }
 }
