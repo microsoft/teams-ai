@@ -372,7 +372,7 @@ app.message('/profile', async (context: TurnContext, state: ApplicationTurnState
 
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, _state: ApplicationTurnState, _data: Record<string, any>, action = ' ') => {
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action = ' ') => {
         await context.sendActivity(`<strong>${action}</strong> action missing`);
         return true;
     }

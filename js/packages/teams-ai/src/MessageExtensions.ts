@@ -356,7 +356,6 @@ export class MessageExtensions<TState extends TurnState> {
         return this._app;
     }
 
-
     /**
      * Registers a handler that implements a Link Unfurling based Message Extension.
      *
