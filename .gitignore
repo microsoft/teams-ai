@@ -115,4 +115,4 @@ dist
 /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj/Debug/net6.0
 /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj
 /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/IntegrationTests/testsettings.json
-/dotnet/samples/01.echoBot/EchoBot/.vs/*
+/dotnet/samples/01.echoBot/.vs/*
