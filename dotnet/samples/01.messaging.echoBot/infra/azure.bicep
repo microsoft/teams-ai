@@ -41,8 +41,8 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
       alwaysOn: true
       appSettings: [
         {
-                name: 'WEBSITE_RUN_FROM_PACKAGE'
-                value: '1' // Run Azure APP Service from a package file
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1' // Run Azure APP Service from a package file
         }
         {
           name: 'RUNNING_ON_AZURE'

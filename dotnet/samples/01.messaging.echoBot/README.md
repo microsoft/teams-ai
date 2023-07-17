@@ -8,7 +8,7 @@ It also illustrates a few of the Teams specific calls you can make from your bot
 ## Set up instructions
 
 All the samples in for the C# .NET SDK can be set up in the same way: You can find the step by step instructions here:
- [Setup Instructions](../../README.md).
+ [Setup Instructions](../README.md).
 
 ## Interacting with the Bot
 
@@ -22,7 +22,7 @@ You can reset the message count by sending the bot the message `/reset`.
 
 ![Reset interaction](assets/reset.png)
 
-## Deploy to Azure with Teams Toolkit for Visual Studio
+## Deploy to Azure
 
 You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
