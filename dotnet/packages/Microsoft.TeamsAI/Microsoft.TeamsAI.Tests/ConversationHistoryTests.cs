@@ -9,7 +9,7 @@ namespace Microsoft.TeamsAI.Tests
         public void AddLine_AddsLineToHistory()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line = "This is a line of text";
             int maxLines = 10;
 
@@ -26,7 +26,7 @@ namespace Microsoft.TeamsAI.Tests
         public void AddLine_PrunesHistoryIfTooLong()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             int maxLines = 10;
             var lines = new List<string>();
             for (int i = 0; i < maxLines + 1; i++)
@@ -51,7 +51,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Clear_RemovesAllLinesFromHistory()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line = "This is a line of text";
             ConversationHistory.AddLine(turnState, line);
 
@@ -87,7 +87,7 @@ namespace Microsoft.TeamsAI.Tests
         public void HasMoreLines_ReturnsTrueIfHistoryHasOneLine()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line = "This is a line of text";
             ConversationHistory.AddLine(turnState, line);
 
@@ -102,7 +102,7 @@ namespace Microsoft.TeamsAI.Tests
         public void HasMoreLines_ReturnsTrueIfHistoryHasMultipleLines()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var lines = new[] { "Line 1", "Line 2", "Line 3" };
             foreach (var line in lines)
             {
@@ -120,7 +120,7 @@ namespace Microsoft.TeamsAI.Tests
         public void HasMoreLines_ReturnsFalseIfHistoryIsEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
 
             // Act
             var result = ConversationHistory.HasMoreLines(turnState);
@@ -143,7 +143,7 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastLine_ReturnsEmptyStringIfHistoryIsEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
 
             // Act
             var lastLine = ConversationHistory.GetLastLine(turnState);
@@ -156,7 +156,7 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastLine_ReturnsLastLineIfHistoryIsNotEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "This is the first line";
             var line2 = "This is the second line";
             ConversationHistory.AddLine(turnState, line1);
@@ -183,7 +183,7 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastSay_ReturnsEmptyStringIfHistoryIsEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
 
             // Act
             var result = ConversationHistory.GetLastSay(turnState);
@@ -196,7 +196,7 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastSay_ReturnsLastSayTextIfHistoryHasSayResponse()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "User: Hello";
             var line2 = "Assistant: Hi, how can I help you? SAY Welcome to the assistant.";
             ConversationHistory.AddLine(turnState, line1);
@@ -213,7 +213,7 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastSay_ReturnsLastSayTextWithoutDoStatementsIfHistoryHasSayAndDoResponse()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "User: What is the weather like?";
             var line2 = "Assistant: It is sunny and warm. SAY The weather is nice today. THEN DO ShowWeatherCard";
             ConversationHistory.AddLine(turnState, line1);
@@ -230,7 +230,7 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastSay_ReturnsEmptyStringIfHistoryHasNoSayResponse()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "User: How are you?";
             var line2 = "Assistant: DO GreetUser";
             ConversationHistory.AddLine(turnState, line1);
@@ -244,7 +244,7 @@ namespace Microsoft.TeamsAI.Tests
         }
 
 
-        private TurnState _GetDefaultTurnStateWithConversationState()
+        private static TurnState _GetTurnStateWithConversationState()
         {
             TurnState state = new()
             {
@@ -258,7 +258,7 @@ namespace Microsoft.TeamsAI.Tests
         public void RemoveLastLine_RemovesLastLineFromHistory()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "This is the first line";
             var line2 = "This is the second line";
             ConversationHistory.AddLine(turnState, line1);
@@ -279,7 +279,7 @@ namespace Microsoft.TeamsAI.Tests
         public void RemoveLastLine_ReturnsNullIfHistoryIsEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
 
             // Act
             var removedLine = ConversationHistory.RemoveLastLine(turnState);
@@ -304,7 +304,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ReplaceLastLine_ReplacesLastLineOfHistory()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "This is the first line of history";
             var line2 = "This is the second line of history";
             var line3 = "This is the new line of history";
@@ -326,7 +326,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ReplaceLastLine_AddsLineIfHistoryIsEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line = "This is the only line of history";
 
             // Act
@@ -342,7 +342,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ReplaceLastSay_ReplacesLastSayWithNewResponse()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "User: Hello";
             var line2 = "User: I'm fine";
             var line3 = "Assistant: Hi SAY How are you?";
@@ -368,7 +368,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ReplaceLastSay_AppendsThenSayIfLastLineHasDo()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "User: What time is it?";
             var line2 = "Assistant: It's 10:00 AM DO Show clock";
             var newResponse = "Do you have an appointment?";
@@ -391,7 +391,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ReplaceLastSay_ReplacesEntireLineIfNoSayOrDo()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "User: Tell me a joke";
             var line2 = "Assistant: Why did the chicken cross the road?";
             var newResponse = "To get to the other side";
@@ -414,7 +414,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ReplaceLastSay_AddsLineWithPrefixIfHistoryIsEmpty()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var newResponse = "Welcome to the chatbot";
             var expectedLine = "Assistant: Welcome to the chatbot";
 
@@ -431,7 +431,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ToString_ReturnsHistoryAsText()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "Hello, how are you?";
             var line2 = "I'm fine, thank you.";
             var line3 = "That's good to hear.";
@@ -452,7 +452,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ToString_ReturnsEmptyStringIfHistoryTooLong()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line = "This is a very long line of text that exceeds the maximum number of tokens allowed.";
             var maxTokens = 10;
             ConversationHistory.AddLine(turnState, line);
@@ -468,7 +468,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ToArray_ReturnsHistoryAsArray()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line1 = "Hello, how are you?";
             var line2 = "I'm fine, thank you.";
             var line3 = "That's good to hear.";
@@ -488,7 +488,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ToArray_ReturnsEmptyArrayIfHistoryTooLong()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var line = "This is a very long line of text that exceeds the maximum number of tokens allowed.";
             var maxTokens = 10;
             ConversationHistory.AddLine(turnState, line);
@@ -504,7 +504,7 @@ namespace Microsoft.TeamsAI.Tests
         public void ToArray_SkipLastLineIfItExceedsMaxToken()
         {
             // Arrange
-            var turnState = _GetDefaultTurnStateWithConversationState();
+            var turnState = _GetTurnStateWithConversationState();
             var shortLine = "fits in max tokens";
             var longLine = "This is a very long line of text that exceeds the maximum number of tokens allowed.";
             var maxTokens = 10;
