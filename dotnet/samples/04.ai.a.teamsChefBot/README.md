@@ -1,18 +1,5 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
 
--   [Microsoft Teams Conversational Bot with AI: Teams Chef](#microsoft-teams-conversational-bot-with-ai-teams-chef)
-    -   [Summary](#summary)
-    -   [Prerequisites](#prerequisites)
-    -   [Setting up the sample](#setting-up-the-sample)
-    -   [Multiple ways to test](#multiple-ways-to-test)
-        -   [Using Teams Toolkit for Visual Studio](#using-teams-toolkit-for-visual-studio)
-        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
-    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
-        -   [Directions](#directions)
-    -   [Interacting with the bot](#interacting-with-the-bot)
-    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
-    -   [Further reading](#further-reading)
-
 ## Summary
 
 This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook Teams apps. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
@@ -69,91 +56,9 @@ Notice that the bot remembered Dave's first message when responding to the secon
     Because this sample leverages GPT for all its natural language modelling, the user can talk to an AI bot in any language of their choosing. The bot will understand and respond appropriately with no additional code required.
 </details>
 
-## Prerequisites
-
--   Global Administrator access to a [Microsoft 365 tenant](https://developer.microsoft.com/microsoft-365/dev-program?ocid=MSlearn&WT.mc_id=m365-16105-cxa) with [uploading Teams custom apps enabled](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant#enable-custom-teams-apps-and-turn-on-custom-app-uploading?WT.mc_id=m365-84637-cxa).
--   Visual Studio 2022 version 17.7 Preview 3 with Teams Toolkit installed.
--   [OpenAI](https://openai.com/api/) key for leveraging GPT.
-
 ## Setting up the sample
 
-1. Clone the repository.
-
-    ```bash
-    git clone https://github.com/Microsoft/teams-ai.git
-    ```
-
-2. Open `teams-ai/dotnet/samples/TeamsChefBot` with Visual Studio.
-
-## Multiple ways to test
-
-The easiest and fastest way to get up and running is with Teams Toolkit. To use Teams Toolkit to continue setup and debugging, please continue below.
-
-Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
-
-### Using Teams Toolkit for Visual Studio
-
-The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio.
-
-1. Ensure you have installed Visual Studio 2022 version 17.7 Preview 3 with Teams Toolkit installed.
-1. Select **File > Open Project** in Visual Studio and choose this samples directory from the repo.
-1. Select **Dev Tunnels > Create a Tunnel** from  Startup Projects list.
-1. Select **Project > Teams Toolkit > Prepare Teams App Dependencies**.
-1. Select **Microsoft Teams (Browser)** from Startup Projects list.
-
-> If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
-
-### Manually upload the app to a Teams desktop client
-
-> If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `appPackage/build/appPackage.local.zip` file created by the tools and skip to step 6.
-
-1. In a terminal, navigate to `teams-ai/dotnet/samples/TeamsChefBot`
-
-    ```bash
-    cd teams-ai/dotnet/samples/TeamsChefBot
-    ```
-
-1. Run ngrok tunneling service - point to port 5130
-
-    ```bash
-    ngrok http --host-header=rewrite 5130
-    ```
-
-1. Create [Bot Framework registration resource](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration) in Azure
-
-    - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample.
-    - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
-
-1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
-
-1. **_This step is specific to Teams._**
-
-    - **Edit** the `manifest.json` contained in the `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `${{TEAMS_APP_ID}}` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `${{BOT_ID}}`. Replace everywhere you see `${{BOT_DOMAIN}}` with the domain part of the URL created by your tunneling solution.
-    - **Zip** up the contents of the `appPackage` folder to create a `manifest.zip`
-
-1. Run your app from the command line:
-
-    ```bash
-    dotnet run
-    ```
-
-1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
-
-## Testing in BotFramework Emulator
-
-[Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) Allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
-
-### Directions
-
-1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
-2. Launch Bot Framework Emulator
-3. Run the app you are in the directory for.
-
-```bash
-dotnet run
-```
-
-4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:5130/api/messages`.
+All the samples in for the C# .NET SDK can be set up in the same way: You can find the step by step instructions here: [Setup Instructions](../README.md).
 
 ## Interacting with the bot
 
@@ -161,15 +66,56 @@ Interacting with the bot is simple - talk to it! You can invoke it by using @ me
 
 The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation. This is possible due to the `skprompt.txt` file's contents.
 
-## Deploy the bot to Azure
+## Deploy to Azure
 
-To learn more about deploying a bot to Azure, see [Deploy your bot to Azure](https://aka.ms/azuredeployment) for a complete list of deployment instructions or use the Teams Toolkit to help you.
+You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
-### Using Teams Toolkit for Visual Studio
-1. Select **Project > Teams Toolkit > Provision to the Cloud**.
-2. Select **Project > Teams Toolkit > Deploy to the Cloud**.
+To configure the Azure resources to have an environment variable for the OpenAI Key:
+
+1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
+
+The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
+
+Use the "Teams Toolkit" > "Provision in the Cloud...", "Teams Toolkit" > "Deploy to the Cloud" from project right-click menu, or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
+
+Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
+
+## Use Azure OpenAI
+
+Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI as AI service.
+
+**As prerequisites**
+
+1. Prepare your own Azure OpenAI service and Azure AI Content Safety service.
+1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI and Azure Content Safety*" part.
+
+**For debugging (F5)**
+
+1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
+
+    ```json
+      "Azure": {
+        "OpenAIApiKey": "<your-azure-openai-api-key>",
+        "OpenAIEndpoint": "<your-azure-openai-endpoint>",
+        "ContentSafetyApiKey": "<your-azure-content-safety-api-key>",
+        "ContentSafetyEndpoint": "<your-azure-content-safety-endpoint>"
+      }
+    ```
+
+**For deployment to Azure**
+
+To configure the Azure resources to have Azure OpenAI environment variables:
+
+1. In `./env/.env.dev.user` file, paste your Azure OpenAI related variables.
+
+    ```bash
+    SECRET_AZURE_OPENAI_API_KEY=
+    SECRET_AZURE_OPENAI_ENDPOINT=
+    SECRET_AZURE_CONTENT_SAFETY_API_KEY=
+    SECRET_AZURE_CONTENT_SAFETY_ENDPOINT=
+    ```
 
 ## Further reading
 
-- [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=csharp)
 - [Teams Toolkit overview](https://aka.ms/vs-teams-toolkit-getting-started)
+- [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=csharp)
