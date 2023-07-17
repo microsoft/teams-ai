@@ -72,24 +72,24 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: botAadAppClientSecret
         }
         {
-            name: 'OPENAI__APIKEY'
-            value: openAIApiKey
+          name: 'OpenAI__ApiKey'
+          value: openAIApiKey
         }
         {
-            name: 'AZURE__OPENAIAPIKEY'
-            value: azureOpenAIApiKey
+          name: 'Azure__OpenAIApiKey'
+          value: azureOpenAIApiKey
         }
         {
-            name: 'AZURE__OPENAIENDPOINT'
-            value: azureOpenAIEndpoint
+          name: 'Azure__OpenAIEndpoint'
+          value: azureOpenAIEndpoint
         }
         {
-            name: 'AZURE__CONTENTSAFETYAPIKEY'
-            value: azureContentSafetyApiKey
+          name: 'Azure__ContentSafetyApiKey'
+          value: azureContentSafetyApiKey
         }
         {
-            name: 'AZURE__CONTENTSAFETYENDPOINT'
-            value: azureContentSafetyEndpoint
+          name: 'Azure__ContentSafetyEndpoint'
+          value: azureContentSafetyEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'
