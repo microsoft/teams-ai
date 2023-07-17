@@ -495,12 +495,5 @@ namespace Microsoft.TeamsAI.Tests.AITests
             // Assert
             Assert.Equal("", renderedPrompt.Text);
         }
-
-        private IEnumerable<object[]> GetTurnStates()
-        {
-            yield return new object[] { new TestTurnState() };
-            yield return new object[] { new CustomTurnState() };
-
-        }
     }
 }
