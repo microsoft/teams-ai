@@ -8,11 +8,7 @@ using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 
-<<<<<<< HEAD:dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/AITests/PromptManagerTests.cs
 namespace Microsoft.TeamsAI.Tests.AITests
-=======
-namespace Microsoft.TeamsAI.Tests.AI
->>>>>>> rename project:dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.TeamsAI.Tests/AITests/PromptManagerTests.cs
 {
     public class PromptManagerTests
     {
