@@ -23,3 +23,6 @@ bld/
 
 # Notification local store
 .notification.localstore.json
+
+# Visual Studio files
+.vs/
