@@ -77,10 +77,10 @@ a free program to get your own dev environment sandbox that includes Teams.
 - [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 
 #### Steps
-1) Run ngrok - point to port 3978
+1) Run ngrok - point to port 5130
 
     ```bash
-    ngrok http 3978 --host-header="localhost:3978"
+    ngrok http 5130 --host-header="localhost:5130"
     ```
 
 1) Setup for Bot
