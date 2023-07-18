@@ -33,4 +33,13 @@
     <None Include="infra/**/*" />
   </ItemGroup>
 
+  <!-- Exclude local settings from publish -->
+  <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Include="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>None</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+	
 </Project>

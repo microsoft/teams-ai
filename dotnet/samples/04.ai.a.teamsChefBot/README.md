@@ -9,8 +9,8 @@ This sample illustrates basic conversational bot behavior in Microsoft Teams. Th
 It shows SDK capabilities like:
 
 <details open>
-    <summary><h3>bot scaffolding</h3></summary>
-    Throughout the 'Program.cs' file you'll see the scaffolding created to run a simple conversational bot, like storage, authentication, and conversation state.
+    <summary><h3>Bot scaffolding</h3></summary>
+    Throughout the 'Program.cs' file you'll see the scaffolding created to run a simple conversational bot, e.g. storage, authentication, and conversation state.
 </details>
 
 </details>
@@ -43,9 +43,9 @@ AI: Hi there! My name is Teams Chef. It's nice to meet you. What's your name?
 DAVE: My name is Dave.
 AI:Hi Dave! It's great to meet you. Let me help you get started with Microsoft Teams app development. Have you ever cooked before?
 DAVE: No, not yet, why?
-AI:Cooking is a great way to learn how to develop apps for Microsoft Teams. Just like cooking, developing apps requires you to have the right ingredients and tools, and to follow a set of instructions. It also requires creativity and problem-solving skills. So, let's get started! What would you like to learn first?
+AI:Cooking is a great way to learn ...
 DAVE: Which kind of apps can I build for Microsoft Teams?
-AI: Great question! You can build a variety of apps for Microsoft Teams, including bots, messaging extensions, tabs, and connectors. Bots are like the main course of your app - they provide the core functionality. Messaging extensions are like side dishes - they add extra features to your app. Tabs are like garnishes - they provide additional information or visuals. And connectors are like spices - they allow you to integrate with other services.
+AI: Great question! You can build a variety ...
 ```
 
 Notice that the bot remembered Dave's first message when responding to the second.
