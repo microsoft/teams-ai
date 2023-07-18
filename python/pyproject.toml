@@ -19,6 +19,7 @@ lint = "scripts:lint"
 fmt = "scripts:fmt"
 test = "scripts:test"
 clean = "scripts:clean"
+ci = "scripts:ci"
 
 [build-system]
 requires = ["poetry-core"]
