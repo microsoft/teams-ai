@@ -18,7 +18,7 @@ The development versions of the library might not be available on NuGet's public
 `git clone https://github.com/Microsoft/teams-ai.git`
 
 2. Checkout the `DOTNET` branch.
-
+`git checkout DOTNET`
 3. Navigate to the `teams-ai/dotnet/packages/Microsoft.TeamsAI` folder.
 
 4. Run `dotnet pack` in terminal.
@@ -29,7 +29,7 @@ The development versions of the library might not be available on NuGet's public
 
 6. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the `LocalPkg/` folder within the sample folder.
 
-7. Now you can install the `Microsoft.TeamsAI` package from the Visual Studio's `Manage NuGet Packages` flow or by running `dotnet add Microsoft.TeamsAI`.
+7. Now you can install the `Microsoft.TeamsAI` package from the Visual Studio's `Manage NuGet Packages` flow or by running `dotnet add package Microsoft.TeamsAI`.
 
 Now can you proceed to setting up the sample.
 
@@ -116,7 +116,7 @@ a free program to get your own dev environment sandbox that includes Teams.
         </details>
 </details>
 
-## Samples
+## List of Samples
 Follow the above instructions to run the C# .NET samples. Here's a list of the samples:
 
 ### Basic Conversational Experience
