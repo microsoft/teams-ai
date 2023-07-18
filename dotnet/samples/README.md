@@ -128,4 +128,17 @@ A conversational bot that listens for specific commands and offers a simple conv
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the Teams AI SDK's ability to scaffold conversational bot components.
 
+<hr />
+
+## Miscellanous Resources
+In this section you can find miscellanous instructions.
+
+### Deploy to Azure
+
+You can also deploy the samples to Azure, both manually or using Teams Toolkit. 
+
+Use the "Teams Toolkit" > "Provision in the Cloud...", "Teams Toolkit" > "Deploy to the Cloud" from project right-click menu, or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
+
+Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
+
 <!--  ### AI Powered Experience -->
