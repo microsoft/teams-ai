@@ -87,7 +87,7 @@ a free program to get your own dev environment sandbox that includes Teams.
     ngrok http 5130 --host-header="localhost:5130"
     ```
 
-1) Provision Azure Resources for the Bot
+1) Provision Azure resources for the Bot
 
    In Azure portal, create a [Azure Bot resource](https://docs.microsoft.com/azure/bot-service/bot-service-quickstart-registration).
     - For bot handle, make up a name.
@@ -104,18 +104,18 @@ a free program to get your own dev environment sandbox that includes Teams.
 
 1) Run your bot, either from Visual Studio with `F5` or using `dotnet run` in the appropriate folder.
 
-1) __*This step is specific to Teams.*__
-    <details>
-        <summary>See more</summary>
-        - **Edit** the `manifest.json` contained in the  `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) *everywhere* you see the place holder string `${{TEAMS_APP_ID}}` or `${{BOT_ID}}` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`).
-        - **Edit** the `manifest.json` for `validDomains` with base Url domain. E.g. if you are using ngrok it would be `https://1234.ngrok-free.app` then your domain-name will be `1234.ngrok-free.app`.
-        - **Zip** up the contents of the `appPackage` folder to create a `manifest.zip` (Make sure that zip file does not contains any subfolder otherwise you will get error while uploading your .zip package)
-        - **Upload** the `manifest.zip` to Teams (In Teams Apps/Manage your apps click "Upload an app". Browse to and Open the .zip file. At the next dialog, click the Add button.)
-        - Add the app to personal/team/groupChat scope (Supported scopes)
-        <hr />
-        </details>
-</details>
+<details>
+    <summary>6. <b><em>This step is specific to Teams.</em></b></summary>
 
+- **Edit** the `manifest.json` contained in the  `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) *everywhere* you see the place holder string `${{TEAMS_APP_ID}}` or `${{BOT_ID}}` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`).
+- **Edit** the `manifest.json` for `validDomains` with base Url domain. E.g. if you are using ngrok it would be `https://1234.ngrok-free.app` then your domain-name will be `1234.ngrok-free.app`.
+- **Zip** up the contents of the `appPackage` folder to create a `manifest.zip` (Make sure that zip file does not contains any subfolder otherwise you will get error while uploading your .zip package)
+- **Upload** the `manifest.zip` to Teams (In Teams Apps/Manage your apps click "Upload an app". Browse to and Open the .zip file. At the next dialog, click the Add button.)
+Add the app to personal/team/groupChat scope (Supported scopes)
+    </details>
+
+</details>
+<hr />
 ## List of Samples
 Follow the above instructions to run the C# .NET samples. Here's a list of the samples:
 
