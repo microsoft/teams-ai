@@ -3,7 +3,7 @@
 namespace Microsoft.TeamsAI.State
 {
     /// <summary>
-    /// Defines the default state scopes persisted by the `DefaultTurnStateManager`.
+    /// Defines the default state scopes persisted by the <see cref="TurnStateManager{TurnState, TConversationState, TUserState, TTempState}"/>.
     /// </summary>
     /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
     /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
