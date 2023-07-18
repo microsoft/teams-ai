@@ -29,11 +29,17 @@ Human: {{$input}}
 AI: 
 ```
 
+- The major section ("*You are the AI ... the secret word.*") defines the basic direction, to tell how AI should behave on human's input.
+- Variables "*{{$guessCount}}*", "*{{$remainingGuesses}}*" and "*{{$secretWord}}*" are set via `AI.Prompt.Variables` in `GameBot.cs`.
+- You can also add function call via `AI.Prompt.AddFunction`, then reference it as "*{{function}}*" in prompt.
+- The final section ("*Human: ... AI: ...*") defines the input of current turn. In addition, you can also add "*{{$history}}*" here to let AI to know the context about previous turns.
+- "*{{input}}*", "*{{output}}*" and "*{{history}}*" are automatically resolved from `TurnState.Temp`.
+
 </details>
 
 ## Set up instructions
 
-All the samples in for the C# .NET SDK can be set up in the same way: You can find the step by step instructions here:
+All the samples in for the C# .NET SDK can be set up in the same way. You can find the step by step instructions here:
  [Setup Instructions](../README.md).
 
 Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).

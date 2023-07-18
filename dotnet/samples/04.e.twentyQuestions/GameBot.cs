@@ -78,11 +78,13 @@ namespace TwentyQuestions
 
         private async Task<string> GetHint(ITurnContext turnContext, GameState turnState, CancellationToken cancellationToken)
         {
+            // Set input for prompt
+            turnState.Temp!.Input = turnContext.Activity.Text;
+
             // Set prompt variables
             AI.Prompts.Variables.Add("guessCount", turnState.Conversation!.GuessCount.ToString());
             AI.Prompts.Variables.Add("remainingGuesses", turnState.Conversation!.RemainingGuesses.ToString());
             AI.Prompts.Variables.Add("secretWord", turnState.Conversation!.SecretWord!);
-            AI.Prompts.Variables.Add("input", turnContext.Activity.Text);
 
             string hint = await AI.CompletePromptAsync(turnContext, turnState, "Hint", null, cancellationToken);
             return hint ?? throw new Exception("The request to OpenAI was rate limited. Please try again later.");
