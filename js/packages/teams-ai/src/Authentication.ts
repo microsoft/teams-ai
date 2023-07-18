@@ -26,21 +26,30 @@ import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnStateProperty } from './TurnStateProperty';
 import { Application } from './Application';
+import { SsoPrompt } from './Sso/SsoPrompt';
+import { SsoPromptSettings } from './Sso/SsoPromptSettings';
+import { AuthDialog } from './Sso/AuthDialog';
+
+const promptName = "prompt";
 
 /**
  * Authentication service.
  */
 export class Authentication<TState extends TurnState = DefaultTurnState> {
-    private readonly _oauthPrompt: OAuthPrompt;
+    private readonly _prompt: OAuthPrompt | SsoPrompt;
 
     /**
      * Creates a new instance of the `Authentication` class.
      * @param app Application for adding routes.
      * @param settings Authentication settings.
      */
-    constructor(app: Application<TState>, settings: OAuthPromptSettings) {
+    constructor(app: Application<TState>, settings: OAuthPromptSettings | SsoPromptSettings) {
         // Create OAuthPrompt
-        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', settings);
+        if ((settings as SsoPromptSettings).scopes) {
+          this._prompt = new SsoPrompt(promptName, settings as SsoPromptSettings, (settings as SsoPromptSettings).initialLoginEndpoint);
+        } else {
+          this._prompt = new OAuthPrompt(promptName, settings as OAuthPromptSettings);
+        }
 
         // Add application routes to handle OAuth callbacks
         app.addRoute(
@@ -55,10 +64,10 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
                 await this.runDialog(context, state, userDialogStatePropertyName);
-                await context.sendActivity({
-                    value: { status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
+                // await context.sendActivity({
+                //     value: { status: 200 } as InvokeResponse,
+                //     type: ActivityTypes.InvokeResponse
+                // });
             },
             true);
         app.addRoute(
@@ -131,7 +140,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             delete state.conversation.value[userDialogStatePropertyName];
         }
 
-        return this._oauthPrompt.signOutUser(context);
+        return (this._prompt as OAuthPrompt).signOutUser(context);
     }
 
     /**
@@ -155,11 +164,12 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         // Save the
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
-        dialogSet.add(this._oauthPrompt);
+        const authDialog = new AuthDialog(promptName, this._prompt);
+        dialogSet.add(authDialog);
         const dialogContext = await dialogSet.createContext(context);
         let results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
-            results = await dialogContext.beginDialog(this._oauthPrompt.id);
+            results = await dialogContext.beginDialog(authDialog.id);
         }
         return results;
     }

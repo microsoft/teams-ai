@@ -23,6 +23,7 @@ import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { Authentication } from './Authentication';
+import { SsoPromptSettings } from './Sso/SsoPromptSettings';
 
 /**
  * @private
@@ -66,7 +67,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. OAuth prompt settings to use for authentication.
      */
-    authentication?: OAuthPromptSettings;
+    authentication?: OAuthPromptSettings | SsoPromptSettings;
 
     /**
      * Optional. Application ID of the bot.
