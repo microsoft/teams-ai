@@ -18,7 +18,7 @@ The development versions of the library might not be available on NuGet's public
 `git clone https://github.com/Microsoft/teams-ai.git`
 
 2. Checkout the `DOTNET` branch.
-
+`git checkout DOTNET`
 3. Navigate to the `teams-ai/dotnet/packages/Microsoft.TeamsAI` folder.
 
 4. Run `dotnet pack` in terminal.
