@@ -116,6 +116,7 @@ Add the app to personal/team/groupChat scope (Supported scopes)
 
 </details>
 <hr />
+
 ## List of Samples
 Follow the above instructions to run the C# .NET samples. Here's a list of the samples:
 
