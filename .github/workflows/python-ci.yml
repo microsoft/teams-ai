@@ -1,0 +1,45 @@
+#
+# This workflow will build, run tests, and pack for the Microsoft.TeamsAI .NET SDK.
+#
+
+name: python-ci
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'python/**'
+
+jobs:
+  python-build-test-lint:
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    env:
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+      - name: Check Dependencies
+        run: |
+          poetry check
+      - name: Lint
+        run: |
+          poetry run lint
+      - name: Test
+        run: |
+          poetry run test
+      - name: Build
+        run: |
+          poetry build
