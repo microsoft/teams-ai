@@ -42,6 +42,12 @@ $: poetry run lint
 $: poetry run fmt
 ```
 
+## Clean
+
+```bash
+$: poetry run clean
+```
+
 ### Install Local
 
 ```bash
