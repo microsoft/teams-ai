@@ -107,7 +107,7 @@ a free program to get your own dev environment sandbox that includes Teams.
     - **Upload** the `manifest.zip` to Teams (In Teams Apps/Manage your apps click "Upload an app". Browse to and Open the .zip file. At the next dialog, click the Add button.)
     - Add the app to personal/team/groupChat scope (Supported scopes)
 
-## Samples
+## List of Samples
 Follow the above instructions to run the C# .NET samples. Here's a list of the samples:
 
 ### Basic Conversational Experience
