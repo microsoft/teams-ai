@@ -7,15 +7,11 @@
       "type": "TextBlock",
       "size": "Medium",
       "weight": "Bolder",
-      "text": "${name}"
+      "text": "${id}"
     },
     {
       "type": "FactSet",
       "facts": [
-        {
-          "title": "Scope",
-          "value": "${scope}"
-        },
         {
           "title": "Version",
           "value": "${version}"
@@ -25,24 +21,16 @@
           "value": "${description}"
         },
         {
-          "title": "Keywords",
-          "value": "${keywords}"
+          "title": "Tags",
+          "value": "${tags}"
         },
         {
-          "title": "Date",
-          "value": "${date}"
+          "title": "Authors",
+          "value": "${authors}"
         },
         {
-          "title": "Author",
-          "value": "${author}"
-        },
-        {
-          "title": "Publisher",
-          "value": "${publisher}"
-        },
-        {
-          "title": "Maintainers",
-          "value": "${maintainers}"
+          "title": "Owners",
+          "value": "${owners}"
         }
       ]
     }
@@ -50,23 +38,18 @@
   "actions": [
     {
       "type": "Action.OpenUrl",
-      "title": "NPM",
-      "url": "${npmLink}"
+      "title": "NuGet",
+      "url": "${nugetUrl}"
     },
     {
       "type": "Action.OpenUrl",
-      "title": "Homepage",
-      "url": "${homepageLink}"
+      "title": "Project",
+      "url": "${projectUrl}"
     },
     {
       "type": "Action.OpenUrl",
-      "title": "Repository",
-      "url": "${repositoryLink}"
-    },
-    {
-      "type": "Action.OpenUrl",
-      "title": "Bugs",
-      "url": "${bugsLink}"
+      "title": "License",
+      "url": "${licenseUrl}"
     }
   ]
 }

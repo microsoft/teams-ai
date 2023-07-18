@@ -1,6 +1,6 @@
 ## Summary
 
-This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search npmjs for packages.
+This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search nuget.org for packages.
 
 ## Set up instructions
 
@@ -9,7 +9,7 @@ All the samples in for the C# .NET SDK can be set up in the same way. You can fi
 
 ## Interacting with the Message Extension
 
-You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NPM for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
+You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NuGet for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
 
 Here's a sample search result:
 

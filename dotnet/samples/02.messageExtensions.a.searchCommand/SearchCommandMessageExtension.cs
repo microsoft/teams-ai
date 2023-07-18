@@ -1,19 +1,16 @@
 ﻿using System.Collections.Specialized;
 using System.Web;
 
+using AdaptiveCards;
+using AdaptiveCards.Templating;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
-using Newtonsoft.Json.Linq;
-
-using SearchCommand.Card;
-using Microsoft.Bot.Connector;
-using AdaptiveCards.Templating;
-using AdaptiveCards;
 using Newtonsoft.Json;
-using System.Net.Mail;
+using Newtonsoft.Json.Linq;
+using SearchCommand.Card;
 
 namespace SearchCommand
 {
@@ -30,7 +27,7 @@ namespace SearchCommand
         protected override async Task<MessagingExtensionResponse> OnMessagingExtensionQueryAsync(MessagingExtensionQuery query, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             string text = query?.Parameters?[0]?.Value as string ?? string.Empty;
-            int count = query?.QueryOptions.Count ?? 10;
+            int count = query?.QueryOptions?.Count ?? 10;
             Package[] packages = await SearchPackages(text, count, cancellationToken);
 
             // Format search results
@@ -39,12 +36,12 @@ namespace SearchCommand
                 ContentType = HeroCard.ContentType,
                 Content = new HeroCard
                 {
-                    Title = package.Name,
+                    Title = package.Id,
                     Text = package.Description
                 },
                 Preview = new HeroCard
                 {
-                    Title = package.Name,
+                    Title = package.Id,
                     Text = package.Description,
                     Tap = new CardAction
                     {
@@ -68,16 +65,17 @@ namespace SearchCommand
 
         protected override async Task<MessagingExtensionResponse> OnMessagingExtensionSelectItemAsync(JObject query, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
+            // Generate detailed result
             CardPackage package = CardPackage.Create(query.ToObject<Package>()!);
             string cardTemplate = await File.ReadAllTextAsync(_packageCardFilePath, cancellationToken)!;
             string cardContent = new AdaptiveCardTemplate(cardTemplate).Expand(package);
-
             MessagingExtensionAttachment attachment = new()
             {
                 ContentType = AdaptiveCard.ContentType,
                 Content = JsonConvert.DeserializeObject(cardContent)
             };
 
+            // Return results
             return new MessagingExtensionResponse
             {
                 ComposeExtension = new MessagingExtensionResult
@@ -91,15 +89,32 @@ namespace SearchCommand
 
         private async Task<Package[]> SearchPackages(string text, int size, CancellationToken cancellationToken)
         {
+            // Call NuGet Search API
             NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
-            query["text"] = text;
-            query["size"] = size.ToString();
+            query["q"] = text;
+            query["take"] = size.ToString();
             string queryString = query.ToString()!;
-            string responseContent = await _httpClient.GetStringAsync($"http://registry.npmjs.com/-/v1/search?{queryString}", cancellationToken);
-            JObject responseObj = JObject.Parse(responseContent);
-            return responseObj["objects"]?
-                .Select(obj => obj["package"]?.ToObject<Package>()!)?
-                .ToArray() ?? Array.Empty<Package>();
+            string responseContent;
+            try
+            {
+                responseContent = await _httpClient.GetStringAsync($"https://azuresearch-usnc.nuget.org/query?{queryString}", cancellationToken);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            if (!string.IsNullOrWhiteSpace(responseContent))
+            {
+                JObject responseObj = JObject.Parse(responseContent);
+                return responseObj["data"]?
+                    .Select(obj => obj.ToObject<Package>()!)?
+                    .ToArray() ?? Array.Empty<Package>();
+            }
+            else
+            {
+                return Array.Empty<Package>();
+            }
         }
     }
 }

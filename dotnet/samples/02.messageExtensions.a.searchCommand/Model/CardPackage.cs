@@ -3,15 +3,12 @@
 namespace SearchCommand.Card
 {
     /// <summary>
-    /// The strongly typed NPM package model for Adaptive Card
+    /// The strongly typed NuGet package model for Adaptive Card
     /// </summary>
     public class CardPackage
     {
-        [JsonProperty("name")]
-        public string? Name { get; set; }
-
-        [JsonProperty("scope")]
-        public string? Scope { get; set; }
+        [JsonProperty("id")]
+        public string? Id { get; set; }
 
         [JsonProperty("version")]
         public string? Version { get; set; }
@@ -19,50 +16,37 @@ namespace SearchCommand.Card
         [JsonProperty("description")]
         public string? Description { get; set; }
 
-        [JsonProperty("keywords")]
-        public string? Keywords { get; set; }
+        [JsonProperty("tags")]
+        public string? Tags { get; set; }
 
-        [JsonProperty("date")]
-        public DateTime? Date { get; set; }
+        [JsonProperty("authors")]
+        public string? Authors { get; set; }
 
-        [JsonProperty("author")]
-        public string? Author { get; set; }
+        [JsonProperty("owners")]
+        public string? Owners { get; set; }
 
-        [JsonProperty("publisher")]
-        public string? Publisher { get; set; }
+        [JsonProperty("licenseUrl")]
+        public string? LicenseUrl { get; set; }
 
-        [JsonProperty("maintainers")]
-        public string? Maintainers { get; set; }
+        [JsonProperty("projectUrl")]
+        public string? ProjectUrl { get; set; }
 
-        [JsonProperty("npmLink")]
-        public string? NpmLink { get; set; }
-
-        [JsonProperty("homepageLink")]
-        public string? HomepageLink { get; set; }
-
-        [JsonProperty("repositoryLink")]
-        public string? RepositoryLink { get; set; }
-
-        [JsonProperty("bugsLink")]
-        public string? BugsLink { get; set; }
+        [JsonProperty("nugetUrl")]
+        public string? NuGetUrl { get; set; }
 
         public static CardPackage Create(Package package)
         {
             return new CardPackage
             {
-                Name = package.Name ?? string.Empty,
-                Scope = package.Scope ?? string.Empty,
+                Id = package.Id ?? string.Empty,
                 Version = package.Version ?? string.Empty,
                 Description = package.Description ?? string.Empty,
-                Keywords = package.Keywords == null ? string.Empty : string.Join(", ", package.Keywords),
-                Date = package.Date,
-                Author = package.Author?.Name ?? string.Empty,
-                Publisher = package.Publisher?.Username ?? string.Empty,
-                Maintainers = package.Maintainers == null ? string.Empty : string.Join(", ", package.Maintainers.Select(m => m.Email)),
-                NpmLink = package.Links?.Npm ?? string.Empty,
-                HomepageLink = package.Links?.Homepage ?? string.Empty,
-                RepositoryLink = package.Links?.Repository ?? string.Empty,
-                BugsLink = package.Links?.Bugs ?? string.Empty
+                Tags = package.Tags == null ? string.Empty : string.Join(", ", package.Tags),
+                Authors = package.Authors == null ? string.Empty : string.Join(", ", package.Authors),
+                Owners = package.Owners == null ? string.Empty : string.Join(", ", package.Owners),
+                LicenseUrl = package.LicenseUrl ?? string.Empty,
+                ProjectUrl = package.ProjectUrl ?? string.Empty,
+                NuGetUrl = $"https://www.nuget.org/packages/{package.Id}"
             };
         }
     }
