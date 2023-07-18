@@ -115,7 +115,6 @@ Add the app to personal/team/groupChat scope (Supported scopes)
     </details>
 
 </details>
-<hr />
 
 ## List of Samples
 Follow the above instructions to run the C# .NET samples. Here's a list of the samples:
@@ -127,8 +126,6 @@ Follow the above instructions to run the C# .NET samples. Here's a list of the s
 A conversational bot that listens for specific commands and offers a simple conversational flow: echoing the user's message back to them.
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the Teams AI SDK's ability to scaffold conversational bot components.
-
-<hr />
 
 ## Miscellanous Resources
 In this section you can find miscellanous instructions.
