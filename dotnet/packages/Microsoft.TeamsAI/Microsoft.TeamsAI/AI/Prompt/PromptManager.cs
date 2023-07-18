@@ -177,14 +177,11 @@ namespace Microsoft.TeamsAI.AI.Prompt
             {
                 context.Variables.Set(pair.Key, pair.Value);
             }
-            
+
             // Temp state values override the user configured variables
-            if (turnState as object is TurnState defaultTurnState)
-            {
-                context[TempState.OutputKey] = defaultTurnState.Temp?.Output ?? string.Empty;
-                context[TempState.InputKey] = defaultTurnState.Temp?.Input ?? turnContext.Activity.Text;
-                context[TempState.HistoryKey] = defaultTurnState.Temp?.History ?? string.Empty;
-            }
+            context[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
+            context[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
+            context[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)

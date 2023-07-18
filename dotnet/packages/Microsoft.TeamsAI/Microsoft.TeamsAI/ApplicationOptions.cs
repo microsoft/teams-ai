@@ -40,8 +40,8 @@ namespace Microsoft.TeamsAI
         public AIOptions<TState>? AI { get; set; }
 
         /// <summary>
-        /// Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
-        /// be created.
+        /// Optional. Turn state manager to use. If omitted, an instance of TTurnStateManager will
+        /// be created using the parameterless constructor.
         /// </summary>
         public TTurnStateManager? TurnStateManager { get; set; }
 
