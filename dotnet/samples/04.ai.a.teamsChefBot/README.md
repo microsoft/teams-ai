@@ -31,6 +31,10 @@ Human: {{$input}}
 AI:
 ```
 
+- The major section ("*The following is ... for Microsoft Teams.*") defines the basic direction, to tell how AI should behave on human's input.
+- The final section ("*Human: ... AI: ...*") defines the input of current turn. The variable "*{{$history}}*" lets AI know the context about previous turns.
+- The variables "*{{input}}*", and "*{{history}}*" are automatically resolved from `TurnState.Temp`.
+
 </details>
 <details open>
     <summary><h3>Conversational session history</h3></summary>
