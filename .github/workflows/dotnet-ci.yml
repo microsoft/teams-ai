@@ -57,7 +57,7 @@ jobs:
       - name: Publish
         shell: bash
         working-directory: ${{ env.SOLUTION_DIR }}
-        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json --skip-duplicate --no-symbols
 
       - name: Upload package
         uses: actions/upload-artifact@v3
