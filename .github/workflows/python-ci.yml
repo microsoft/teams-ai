@@ -1,5 +1,5 @@
 #
-# This workflow will build, run tests, and pack for the Microsoft.TeamsAI .NET SDK.
+# This workflow will build, run tests, and pack for the Microsoft.TeamsAI Python SDK.
 #
 
 name: python-ci
