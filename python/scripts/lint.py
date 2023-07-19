@@ -7,4 +7,4 @@ import subprocess
 
 
 def lint():
-    subprocess.run(["poetry", "run", "pylint", "./teamsai"])
+    subprocess.run(["poetry", "run", "pylint", "./teams_ai"])

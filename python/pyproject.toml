@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "teamsai"
+name = "teams-ai"
 version = "0.0.0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 authors = ["Microsoft Corp."]
