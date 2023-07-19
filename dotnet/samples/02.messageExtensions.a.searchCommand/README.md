@@ -9,7 +9,7 @@ All the samples in for the C# .NET SDK can be set up in the same way. You can fi
 
 ## Interacting with the Message Extension
 
-You can interact with this app by selecting it's app icon in the chat compose area. This opens a dialog that allows you to search NuGet for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
+You can interact with this app by selecting its app icon in the chat compose area. This opens a dialog that allows you to search NuGet for a package. Selecting a package will output an Adaptive Card with its description to the chat.
 
 Here's a sample search result:
 
