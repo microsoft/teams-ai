@@ -19,13 +19,11 @@ And after selecting it outputs an Adaptive Card.
 
 ![Adaptive Card](assets/card.png)
 
-## Deploy to Azure with Teams Toolkit
+## Deploy to Azure
 
 You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
-Use the "Teams Toolkit" > "Provision in the Cloud...", "Teams Toolkit" > "Deploy to the Cloud" from project right-click menu, or from the CLI with `teamsfx provision` and `teamsfx deploy`. [Visit the documentation](https://learn.microsoft.com/microsoftteams/platform/toolkit/provision) for more info on hosting your app in Azure with Teams Toolkit.
-
-Alternatively, you can learn more about deploying a bot to Azure manually in the [Deploy your bot to Azure](https://aka.ms/azuredeployment) documentation.
+You can find deployment instructions [here](../README.md#deploy-to-azure).
 
 ## Further reading
 
