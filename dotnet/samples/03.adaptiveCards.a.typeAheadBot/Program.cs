@@ -34,8 +34,7 @@ builder.Services.AddTransient<ApplicationOptions<TurnState, TurnStateManager>>(s
 {
     return new ApplicationOptions<TurnState, TurnStateManager>()
     {
-        Storage = sp.GetService<IStorage>(),
-        StartTypingTimer = false
+        Storage = sp.GetService<IStorage>()
     };
 });
 builder.Services.AddTransient<IBot, TypeAheadBotApplication>();
