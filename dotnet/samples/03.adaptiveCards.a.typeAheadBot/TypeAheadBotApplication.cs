@@ -86,9 +86,9 @@ namespace TypeAheadBot
             {
                 StatusCode = 200,
                 Type = "application/vnd.microsoft.search.searchResponse",
-                Value = new
+                Value = new SearchInvokeResponseValue
                 {
-                    results = searchResults
+                    Results = searchResults
                 }
             };
 
