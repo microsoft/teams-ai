@@ -6,10 +6,10 @@ export class AuthDialog extends ComponentDialog {
     super(dialogId);
 
     this.addDialog(prompt);
-    this.addDialog(new WaterfallDialog('tasksNeedLogin', [
+    this.addDialog(new WaterfallDialog(dialogId, [
       async (step) => {
         await step.context.sendActivity(`begin prompt.`);
-        return await step.beginDialog("OAuthPrompt");
+        return await step.beginDialog(prompt.id);
       },
       async (step) => {
         const token = step.result;

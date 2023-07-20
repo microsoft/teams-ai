@@ -528,6 +528,8 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     }
                 }
 
+                // COPY HERE
+
                 // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
                 for (let i = 0; i < this._routes.length; i++) {
                     // TODO:

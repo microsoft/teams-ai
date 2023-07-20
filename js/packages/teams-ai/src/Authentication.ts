@@ -20,7 +20,8 @@ import {
     DialogTurnResult,
     DialogTurnStatus,
     OAuthPrompt,
-    OAuthPromptSettings
+    OAuthPromptSettings,
+    WaterfallDialog
 } from 'botbuilder-dialogs';
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
@@ -63,22 +64,45 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             (context) => Promise.resolve(context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                await this.runDialog(context, state, userDialogStatePropertyName);
-                // await context.sendActivity({
-                //     value: { status: 200 } as InvokeResponse,
-                //     type: ActivityTypes.InvokeResponse
-                // });
-            },
-            true);
+                const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
+                let results = await this.runDialog(context, state, userDialogStatePropertyName);
+                if (results.status === DialogTurnStatus.complete) {
+                  // Get user auth state
+                  const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
+                  if (!userAuthState.signedIn && userAuthState.message) {
+                      // Restore user message
+                      context.activity.text = userAuthState.message;
+                      userAuthState.signedIn = true;
+                      delete userAuthState.message;
+                      state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                  }
+      
+                  // Delete persisted dialog state
+                  delete state.conversation.value[userDialogStatePropertyName];
+            }
+          },
+          true);
         app.addRoute(
             (context) => Promise.resolve(context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                await this.runDialog(context, state, userDialogStatePropertyName);
-                await context.sendActivity({
-                    value: { status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
+                const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
+                let results = await this.runDialog(context, state, userDialogStatePropertyName);
+                if (results.status === DialogTurnStatus.complete) {
+                  // Get user auth state
+                  const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
+                  if (!userAuthState.signedIn && userAuthState.message) {
+                      // Restore user message
+                      context.activity.text = userAuthState.message;
+                      userAuthState.signedIn = true;
+                      delete userAuthState.message;
+                      state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                  }
+                  const token = results.result?.token;
+      
+                  // Delete persisted dialog state
+                  delete state.conversation.value[userDialogStatePropertyName];
+              }
             },
             true);
     }
@@ -164,12 +188,27 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         // Save the
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
-        const authDialog = new AuthDialog(promptName, this._prompt);
-        dialogSet.add(authDialog);
+        dialogSet.add(this._prompt);
+        dialogSet.add(new WaterfallDialog('taskNeedingLogin', [
+          async (step) => {
+            return await step.beginDialog(promptName);
+          },
+          async (step) => {
+            const token = step.result;
+            if (token) {
+              await step.context.sendActivity(`You are now logged in.`);
+              await step.context.sendActivity(token.token);
+              return await step.endDialog();
+            } else {
+              await step.context.sendActivity(`Sorry... We couldn't log you in. Try again later.`);
+              return await step.endDialog();
+            }
+          }
+        ]));
         const dialogContext = await dialogSet.createContext(context);
         let results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
-            results = await dialogContext.beginDialog(authDialog.id);
+            results = await dialogContext.beginDialog('taskNeedingLogin');
         }
         return results;
     }

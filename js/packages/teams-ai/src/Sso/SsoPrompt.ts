@@ -65,9 +65,7 @@ export class SsoPrompt extends Dialog {
     state.expires = new Date().getTime() + timeout;
 
     // Send OAuth card to get SSO token
-    await dc.context.sendActivity(`send oauth card.`);
     await this.sendOAuthCardAsync(dc.context);
-    await dc.context.sendActivity(`sent oauth card.`);
     return Dialog.EndOfTurn;
   }
 
