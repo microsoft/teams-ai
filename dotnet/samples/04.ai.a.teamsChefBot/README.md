@@ -64,6 +64,16 @@ Notice that the bot remembered Dave's first message when responding to the secon
 
 All the samples in for the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../README.md).
 
+Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
+
+1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
+
+    ```json
+      "OpenAI": {
+        "ApiKey": "<your-openai-api-key>"
+      },
+    ```
+
 ## Interacting with the bot
 
 ![Teams Chef Bot](./assets/TeamsChefBot.png)
