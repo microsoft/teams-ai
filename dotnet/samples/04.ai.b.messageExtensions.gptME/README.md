@@ -54,6 +54,10 @@ Here's a sample interaction with the app:
 
 ![Start](assets/start.png)
 
+You can always update the post with new prompt.
+
+![Update](assets/update.png)
+
 And after clicking "Post" it outputs an Adaptive Card.
 
 ![Create Post](assets/post.png)

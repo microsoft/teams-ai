@@ -8,6 +8,7 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
+using Microsoft.TeamsAI.State;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,11 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
+// This Message Extension can either drop the created card into the compose window (default.)
+// Or use Teams botMessagePreview feature to post the activity directly to the feed onBehalf of the user.
+// Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
+bool PREVIEW_MODE = false;
+
 #region Use OpenAI
 // Use OpenAI
 if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
@@ -53,34 +59,28 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
 
     // Create OpenAIPlanner
-    IPlanner<GameState> planner = new OpenAIPlanner<GameState>(
+    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<GameState>>());
+        loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
 
     // Create OpenAIModerator
-    IModerator<GameState> moderator = new OpenAIModerator<GameState>(
+    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(
         sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory.CreateLogger<OpenAIModerator<GameState>>(),
+        loggerFactory.CreateLogger<OpenAIModerator<TurnState>>(),
         moderatorHttpClient);
 
     // Create Application
-    AIHistoryOptions aiHistoryOptions = new()
-    {
-        AssistantHistoryType = AssistantHistoryType.Text
-    };
-    AIOptions<GameState> aiOptions = new(
+    AIOptions<TurnState> aiOptions = new(
         planner: planner,
-        promptManager: new PromptManager<GameState>("./Prompts"),
-        moderator: moderator,
-        prompt: "Chat",
-        history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
+        promptManager: new PromptManager<TurnState>("./Prompts"),
+        moderator: moderator);
+    ApplicationOptions<TurnState, TurnStateManager> ApplicationOptions = new()
     {
-        TurnStateManager = new GameStateManager(),
+        TurnStateManager = new TurnStateManager(),
         Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
+        AI = aiOptions
     };
-    return new GameBot(ApplicationOptions);
+    return new GPtMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });
 #endregion
 
@@ -107,34 +107,28 @@ builder.Services.AddTransient<IBot>(sp =>
     HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
 
     // Create AzureOpenAIPlanner
-    IPlanner<GameState> planner = new AzureOpenAIPlanner<GameState>(
+    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<GameState>>());
+        loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
 
     // Create AzureContentSafetyModerator
-    IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(
+    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(
         sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<GameState>>(),
+        loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>(),
         moderatorHttpClient);
 
     // Create Application
-    AIHistoryOptions aiHistoryOptions = new()
-    {
-        AssistantHistoryType = AssistantHistoryType.Text
-    };
-    AIOptions<GameState> aiOptions = new(
+    AIOptions<TurnState> aiOptions = new(
         planner: planner,
-        promptManager: new PromptManager<GameState>("./Prompts"),
-        moderator: moderator,
-        prompt: "Chat",
-        history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
+        promptManager: new PromptManager<TurnState>("./Prompts"),
+        moderator: moderator);
+    ApplicationOptions<TurnState, TurnStateManager> ApplicationOptions = new()
     {
-        TurnStateManager = new GameStateManager(),
+        TurnStateManager = new TurnStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
     };
-    return new GameBot(ApplicationOptions);
+    return new GPtMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });
 **/
 #endregion
