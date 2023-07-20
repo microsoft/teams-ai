@@ -23,13 +23,12 @@ import {
     OAuthPromptSettings,
     WaterfallDialog
 } from 'botbuilder-dialogs';
-import { TurnState } from './TurnState';
+import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnStateProperty } from './TurnStateProperty';
-import { Application } from './Application';
+import { AppRoute, Application } from './Application';
 import { SsoPrompt } from './Sso/SsoPrompt';
 import { SsoPromptSettings } from './Sso/SsoPromptSettings';
-import { AuthDialog } from './Sso/AuthDialog';
 
 const promptName = "prompt";
 
@@ -38,6 +37,9 @@ const promptName = "prompt";
  */
 export class Authentication<TState extends TurnState = DefaultTurnState> {
     private readonly _prompt: OAuthPrompt | SsoPrompt;
+    private _route: AppRoute<TState> | undefined;
+    private _state: TState | undefined;
+    private _message: string | undefined;
 
     /**
      * Creates a new instance of the `Authentication` class.
@@ -79,6 +81,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
       
                   // Delete persisted dialog state
                   delete state.conversation.value[userDialogStatePropertyName];
+                  app.options.turnStateManager?.saveState(app.options.storage, context, this._state!);
             }
           },
           true);
@@ -98,10 +101,10 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
                       delete userAuthState.message;
                       state.conversation.value[userAuthStatePropertyName] = userAuthState;
                   }
-                  const token = results.result?.token;
       
                   // Delete persisted dialog state
                   delete state.conversation.value[userDialogStatePropertyName];
+                  app.options.turnStateManager?.saveState(app.options.storage, context, this._state!);
               }
             },
             true);
@@ -115,10 +118,16 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @param state Application state.
      * @returns The authentication token or undefined if the user is still login in.
      */
-    public async signInUser(context: TurnContext, state: TState): Promise<string|undefined> {
+    public async handleSsoCommands(context: TurnContext, state: TState, route: AppRoute<TState>): Promise<string|undefined> {
         // Get property names to use
         const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
         const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+
+        if (route) {
+          this._route = route;
+          this._message = context.activity.text;
+          this._state = state;
+        }
 
         // Save message if not signed in
         if (!state.conversation.value[userAuthStatePropertyName]) {
@@ -141,7 +150,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             delete state.conversation.value[userDialogStatePropertyName];
 
             // Return token
-            return results.result?.token;
+            return results.result?.token.token;
         } else {
             return undefined;
         }
@@ -184,7 +193,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     /**
      * @private
      */
-    private async runDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<OAuthPromptResult>> {
+    private async runDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<any>> {
         // Save the
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
@@ -198,6 +207,12 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             if (token) {
               await step.context.sendActivity(`You are now logged in.`);
               await step.context.sendActivity(token.token);
+              if (this._route && this._state && this._message) {
+                context.activity.text = this._message;
+                await this._route.handler(context, this._state);
+                this._route = undefined;
+                this._message = undefined;
+              }
               return await step.endDialog();
             } else {
               await step.context.sendActivity(`Sorry... We couldn't log you in. Try again later.`);

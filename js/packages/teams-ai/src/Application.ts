@@ -480,21 +480,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
                 // Load turn state
                 const { storage, turnStateManager } = this._options;
-                const state = await turnStateManager!.loadState(storage, context);
-
-                // Sign the user in
-                if (this._authentication && context.activity.type === ActivityTypes.Message) {
-                    // Get the auth token
-                    const token = await this._authentication.signInUser(context, state);
-                    if (token) {
-                        state['temp'].value.authToken = token;
-                    } else {
-                        // Save turn state and end
-                        // - This saves the current dialog stack.
-                        await turnStateManager!.saveState(storage, context, state);
-                        return false;
-                    }
-                }
+                const state = await turnStateManager!.loadState(storage, context)
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
@@ -528,7 +514,26 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     }
                 }
 
-                // COPY HERE
+                // Sign the user in
+                if (this._authentication && context.activity.type === ActivityTypes.Message) {
+                  let currentRoute;
+                  for (let i = 0; i < this._routes.length; i++) {
+                    const route = this._routes[i];
+                    if (await route.selector(context)) {
+                      currentRoute = route;
+                    }
+                  }
+                  // Get the auth token
+                  const token = await this._authentication.handleSsoCommands(context, state, currentRoute!);
+                  if (token) {
+                      state['temp'].value.authToken = token;
+                  } else {
+                      // Save turn state and end
+                      // - This saves the current dialog stack.
+                      await turnStateManager!.saveState(storage, context, state);
+                      return false;
+                  }
+                }
 
                 // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
                 for (let i = 0; i < this._routes.length; i++) {
@@ -764,7 +769,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 /**
  * @private
  */
-interface AppRoute<TState extends TurnState> {
+export interface AppRoute<TState extends TurnState> {
     selector: RouteSelector;
     handler: RouteHandler<TState>;
 }
