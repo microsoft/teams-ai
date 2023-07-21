@@ -106,7 +106,7 @@ namespace Microsoft.TeamsAI
                     _timer?.Change(_interval, Timeout.Infinite);
                 }
             }
-            catch (Exception e) when (e is ObjectDisposedException || e is TaskCanceledException)
+            catch (Exception e) when (e is ObjectDisposedException || e is TaskCanceledException || e is NullReferenceException)
             {
                 // We're in the middle of sending an activity on a background thread when the turn ends and
                 // the turn context object is dispoed of or the request is cancelled. We can just eat the
