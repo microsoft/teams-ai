@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
+builder.Logging.AddConsole();
 
 // Prepare Configuration for ConfigurationBotFrameworkAuthentication
 var config = builder.Configuration.Get<ConfigOptions>();
