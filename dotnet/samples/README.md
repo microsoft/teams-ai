@@ -128,6 +128,12 @@ A conversational bot that listens for specific commands and offers a simple conv
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the Teams AI SDK's ability to scaffold conversational bot components.
 
+#### [Light Bot](/dotnet/samples/04.ai.c.actionMapping.lightBot)
+A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
+
+This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
+
+
 ## Miscellanous Resources
 In this section you can find miscellanous instructions.
 
