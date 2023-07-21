@@ -162,9 +162,18 @@ namespace Microsoft.TeamsAI.Tests
                 new ObjectDisposedException("test")
             };
             yield return new[]
-{
+            {
                 new TaskCanceledException("test")
             };
+
+            yield return new[]
+            {
+#pragma warning disable CA2201 // Do not raise reserved exception types
+                // For test purpose only
+                new NullReferenceException()
+#pragma warning restore CA2201 // Do not raise reserved exception types
+            };
+
         }
     }
 }

@@ -54,6 +54,11 @@ jobs:
         working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet pack --no-build --output . --configuration ${{ matrix.configuration }} Microsoft.TeamsAI/Microsoft.TeamsAI.csproj
 
+      - name: Publish
+        shell: bash
+        working-directory: ${{ env.SOLUTION_DIR }}
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json --skip-duplicate --no-symbols
+
       - name: Upload package
         uses: actions/upload-artifact@v3
         with:
