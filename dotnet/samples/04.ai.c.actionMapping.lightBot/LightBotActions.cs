@@ -34,7 +34,7 @@ namespace LightBot
                     if (int.TryParse(timeString, out int timeInt))
                     {
                         await turnContext.SendActivityAsync(MessageFactory.Text($"[pausing for {timeInt/1000} seconds]"));
-                        Thread.Sleep(timeInt);
+                        await Task.Delay(timeInt);
                     }
                 }
             }
