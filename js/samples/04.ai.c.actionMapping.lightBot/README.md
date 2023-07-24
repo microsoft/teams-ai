@@ -72,6 +72,7 @@ app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState,
     return true;
 });
 
+````
 </details>
 
 This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
