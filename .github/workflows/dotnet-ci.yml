@@ -79,6 +79,16 @@ jobs:
           name: testresults-dotnet-${{ matrix.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
 
+  dotnet-security-lint:
+    runs-on: ubuntu-latest
+    env:
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          clean: true
+
       - name: Security Lint
         uses: microsoft/devskim-action@v1
         with:

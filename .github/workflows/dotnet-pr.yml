@@ -60,6 +60,16 @@ jobs:
         shell: bash
         run: cat ${{ env.SOLUTION_DIR }}TestResults/coverage/*.txt
 
+  dotnet-security-lint:
+    runs-on: ubuntu-latest
+    env:
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          clean: true
+
       - name: Security Lint
         uses: microsoft/devskim-action@v1
         with:
