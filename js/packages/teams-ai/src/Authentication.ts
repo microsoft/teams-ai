@@ -67,22 +67,14 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
                 const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
-                let results = await this.runDialog(context, state, userDialogStatePropertyName);
-                if (results.status === DialogTurnStatus.complete) {
-                  // Get user auth state
-                  const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
-                  if (!userAuthState.signedIn && userAuthState.message) {
-                      // Restore user message
-                      context.activity.text = userAuthState.message;
-                      userAuthState.signedIn = true;
-                      delete userAuthState.message;
-                      state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                await this.runDialog(context, state, userDialogStatePropertyName);
+                if (this._state) {
+                  for (const key in this._state.conversation.value) {
+                    if (key != userDialogStatePropertyName && key != userAuthStatePropertyName && key != "eTag") {
+                      state.conversation.value[key] = this._state.conversation.value[key];
+                    }
                   }
-      
-                  // Delete persisted dialog state
-                  delete state.conversation.value[userDialogStatePropertyName];
-                  app.options.turnStateManager?.saveState(app.options.storage, context, this._state!);
-            }
+                }
           },
           true);
         app.addRoute(
@@ -90,22 +82,14 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
                 const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
-                let results = await this.runDialog(context, state, userDialogStatePropertyName);
-                if (results.status === DialogTurnStatus.complete) {
-                  // Get user auth state
-                  const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
-                  if (!userAuthState.signedIn && userAuthState.message) {
-                      // Restore user message
-                      context.activity.text = userAuthState.message;
-                      userAuthState.signedIn = true;
-                      delete userAuthState.message;
-                      state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                await this.runDialog(context, state, userDialogStatePropertyName);
+                if (this._state) {
+                  for (const key in this._state.conversation.value) {
+                    if (key != userDialogStatePropertyName && key != userAuthStatePropertyName && key != "eTag") {
+                      state.conversation.value[key] = this._state.conversation.value[key];
+                    }
                   }
-      
-                  // Delete persisted dialog state
-                  delete state.conversation.value[userDialogStatePropertyName];
-                  app.options.turnStateManager?.saveState(app.options.storage, context, this._state!);
-              }
+                }
             },
             true);
     }
