@@ -78,3 +78,14 @@ jobs:
         with:
           name: testresults-dotnet-${{ matrix.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
+
+      - name: Security Lint
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: ${{ env.SOLUTION_DIR }}
+          output-filename: ${{ env.SOLUTION_DIR }}devskim-results.sarif
+
+      - name: Upload security results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ env.SOLUTION_DIR }}devskim-results.sarif
