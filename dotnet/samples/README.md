@@ -130,9 +130,15 @@ This sample illustrates basic conversational bot behavior in Microsoft Teams and
 
 #### [Search Command](/dotnet/samples/02.messageExtensions.a.searchCommand/)
 
-A message extension that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
+A Message Extension (ME) built to search NuGet for a specific package and return the result as an Adaptive Card.
 
-This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search nuget.org for packages.
+This sample illustrates the Teams AI SDK's ability to scaffold search-based Message Extensions and return Adaptive Card components.
+
+#### [Type Ahead Bot](/dotnet/samples/03.adaptiveCards.a.typeAheadBot/)
+
+A conversational bot that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
+
+This sample illustrates the Teams AI SDK's ability to scaffold conversational bot and Adaptive Card components.
 
 ### AI-Powered Experiences
 
@@ -142,7 +148,14 @@ A conversational bot for Microsoft Teams, designed as a helper bot for building 
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
 
-#### [Light Bot](/dotnet/samples/04.ai.c.actionMapping.lightBot)
+#### [GPT ME](/dotnet/samples/04.ai.b.messageExtensions.gptME/)
+
+A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
+
+This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. e.g., "Make my post sound more professional."
+
+#### [Light Bot](/dotnet/samples/04.ai.c.actionMapping.lightBot/)
+
 A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
