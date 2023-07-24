@@ -9,7 +9,7 @@ from botbuilder.core import TurnContext
 from ..turn_state import TurnState
 from .prompt_template import PromptTemplate
 
-T = TypeVar("T", TurnState)
+T = TypeVar("T", bound=TurnState)
 
 
 class PromptManager(abc.ABC, Generic[T]):
