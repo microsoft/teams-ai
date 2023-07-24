@@ -1,0 +1,66 @@
+{
+  "name": "@microsoft/teams-connector",
+  "author": "Microsoft Corp.",
+  "description": "Bot Connector for Microsoft Teams.",
+  "version": "0.1.0-preview.1",
+  "license": "MIT",
+  "keywords": [
+    "botbuilder",
+    "botframework",
+    "bots",
+    "chatbots",
+    "teams"
+  ],
+  "bugs": {
+    "url": "https://github.com/microsoft/teams-ai/issues"
+},
+"repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/teams-ai.git"
+},
+"main": "./lib/index.js",
+"types": "./lib/index.d.ts",
+"typesVersions": {
+    "<3.9": {
+      "*": [
+        "_ts3.4/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "@azure/identity": "^2.0.4",
+    "@azure/ms-rest-js": "^2.6.1",
+    "adal-node": "0.2.3",
+    "axios": "^0.25.0",
+    "base64url": "^3.0.0",
+    "cross-fetch": "^3.0.5",
+    "jsonwebtoken": "^9.0.0",
+    "rsa-pem-from-mod-exp": "^0.8.4",
+    "uuid": "^9.0.0",
+    "zod": "~1.11.17"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "8.3.5",
+    "@types/node": "^10.17.27",
+    "@types/uuid": "9.0.2",
+    "dotenv": "^6.2.0",
+    "nock": "^11.9.1",
+    "should": "^13.2.3"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "build-docs": "typedoc --theme markdown --entryPoint teams-ai --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
+    "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
+    "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
+    "depcheck": "depcheck --config ../../.depcheckrc",
+    "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
+    "test": "npm-run-all build test:mocha",
+    "test:mocha": "nyc mocha tests",
+    "test:compat": "api-extractor run --verbose"
+  },
+  "files": [
+    "_ts3.4",
+    "lib",
+    "src"
+  ]
+}
