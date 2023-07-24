@@ -21,6 +21,22 @@ The development versions of the library might not be available on NuGet's public
 `git checkout DOTNET`
 3. Navigate to the `teams-ai/dotnet/packages/Microsoft.TeamsAI` folder.
 
+### Install Package
+
+4. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with the `package:read` permission.
+
+5. Update the `Nuget.Config` file with your Github username and your new access token as the password.
+
+![Nuget.Config](./assets/screenshot-1.png)
+
+6. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
+
+![Install Package](./assets/screenshot-0.png)
+
+### Build/Install Package
+
+Alternatively if you want to build the package locally:
+
 4. Run `dotnet pack` in terminal.
 
 5. You should then see the following output: 
