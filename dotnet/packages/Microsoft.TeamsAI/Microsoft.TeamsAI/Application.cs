@@ -14,7 +14,7 @@ using Microsoft.Bot.Builder;
 namespace Microsoft.TeamsAI
 {
     /// <summary>
-    /// Application class for routing and processing incoming requests
+    /// Application class for routing and processing incoming requests.
     /// </summary>
     /// <remarks>
     /// The Application object replaces the traditional ActivityHandler that a bot would use. It supports
