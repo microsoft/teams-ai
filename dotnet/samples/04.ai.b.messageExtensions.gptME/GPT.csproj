@@ -3,21 +3,28 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Use Teams Toolkit Visual Studio Extension for development -->
   <ItemGroup>
     <ProjectCapability Include="TeamsFx" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="build/**/*" />
-    <Content Remove="build/**/*" />
+    <PackageReference Include="AdaptiveCards.Templating" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.19.3" />
+    <PackageReference Include="Microsoft.TeamsAI" Version="1.0.0" />
   </ItemGroup>
 
+  <!-- Include prompt as content in build output -->
   <ItemGroup>
-    <PackageReference Include="AdaptiveCards.Templating" Version="1.3.1" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.19.3" />
-    <PackageReference Include="Microsoft.TeamsAI" Version="*" />
+    <Folder Include="Prompts/Generate/" />
+    <Folder Include="Prompts/Update/" />
+    <Content Include="Prompts/*/skprompt.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <!-- Exclude Teams Toolkit files from build output, but can still be viewed from Solution Explorer -->
@@ -29,10 +36,6 @@
     <None Include="infra/**/*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="assets\" />
-  </ItemGroup>
-
   <!-- Exclude local settings from publish -->
   <ItemGroup>
     <Content Remove="appsettings.Development.json" />
@@ -41,5 +44,5 @@
       <CopyToPublishDirectory>None</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-	
+
 </Project>

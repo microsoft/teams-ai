@@ -1,0 +1,15 @@
+{
+    "schema": 1,
+    "description": "Updates a post being created for Teams",
+    "type": "completion",
+    "completion": {
+      "max_tokens": 512,
+      "temperature": 0.7,
+      "top_p": 0.0,
+      "presence_penalty": 0.6,
+      "frequency_penalty": 0.0
+    },
+    "default_backends": [
+        "text-davinci-003"
+    ]
+}
