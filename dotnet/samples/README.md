@@ -128,11 +128,30 @@ A conversational bot that listens for specific commands and offers a simple conv
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the Teams AI SDK's ability to scaffold conversational bot components.
 
+#### [Search Command](/dotnet/samples/02.messageExtensions.a.searchCommand/)
+
+A message extension that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
+
+This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search nuget.org for packages.
+
+### AI-Powered Experiences
+
+#### [Chef Bot](/dotnet/samples/04.ai.a.teamsChefBot/)
+
+A conversational bot for Microsoft Teams, designed as a helper bot for building Teams app. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+
+This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
+
 #### [Light Bot](/dotnet/samples/04.ai.c.actionMapping.lightBot)
 A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
 
+#### [Twenty Questions](/dotnet/samples/04.e.twentyQuestions/)
+
+A conversational bot for Microsoft Teams, designed as an AI assistant of the Ultimate Guessing Game!
+
+This sample showcases the incredible capabilities of language models and the concept of user intent. Challenge your skills as the human player and try to guess a secret within 20 questions, while the AI-powered bot answers your queries about the secret.
 
 ## Miscellanous Resources
 In this section you can find miscellanous instructions.
