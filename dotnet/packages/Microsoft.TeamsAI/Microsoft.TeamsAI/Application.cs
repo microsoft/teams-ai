@@ -14,7 +14,7 @@ using Microsoft.Bot.Builder;
 namespace Microsoft.TeamsAI
 {
     /// <summary>
-    /// Application class for routing and processing incoming requests.
+    /// Application class for routing and processing incoming requests
     /// </summary>
     /// <remarks>
     /// The Application object replaces the traditional ActivityHandler that a bot would use. It supports
@@ -212,7 +212,7 @@ namespace Microsoft.TeamsAI
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
-        /// <returns>True if and only if the executed handler method was implemented. That is, the handler method does not 
+        /// <returns>True if and only if the executed handler method was implemented. That is, the handler method does not
         /// throw a <see cref="NotImplementedException"/>.</returns>
         /// <remarks>
         /// This method calls other methods in this class based on the type of the activity to
@@ -1899,7 +1899,7 @@ namespace Microsoft.TeamsAI
         /// <remarks>
         /// When the <see cref="RunActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a command activity, it calls this method.
-        /// 
+        ///
         /// In a derived class, override this method to add logic that applies to all comand activities.
         /// Add logic to apply before the specific command-handling logic before the call to the base class
         /// <see cref="OnCommandActivityAsync(ITurnContext{ICommandActivity}, TState, CancellationToken)"/> method.
@@ -1930,7 +1930,7 @@ namespace Microsoft.TeamsAI
         /// <remarks>
         /// When the <see cref="RunActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a CommandResult activity, it calls this method.
-        /// 
+        ///
         /// In a derived class, override this method to add logic that applies to all comand activities.
         /// Add logic to apply before the specific CommandResult-handling logic before the call to the base class
         /// <see cref="OnCommandResultActivityAsync(ITurnContext{ICommandResultActivity}, TState, CancellationToken)"/> method.
