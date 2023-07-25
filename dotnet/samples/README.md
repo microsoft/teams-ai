@@ -23,7 +23,7 @@ The development versions of the library might not be available on NuGet's public
 
 ### Install Package
 
-4. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with the `package:read` permission.
+4. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the `package:read` permission.
 
 5. Update the `Nuget.Config` file with your Github username and your new access token as the password.
 
