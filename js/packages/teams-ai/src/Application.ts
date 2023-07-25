@@ -525,14 +525,8 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                   }
                   // Get the auth token
                   const token = await this._authentication.handleSsoCommands(context, state, currentRoute!);
-                  if (token) {
-                      state['temp'].value.authToken = token;
-                  } else {
-                      // Save turn state and end
-                      // - This saves the current dialog stack.
-                      await turnStateManager!.saveState(storage, context, state);
-                      return false;
-                  }
+                  await turnStateManager!.saveState(storage, context, state);
+                  return false;
                 }
 
                 // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.

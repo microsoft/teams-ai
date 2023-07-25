@@ -38,7 +38,6 @@ const promptName = "prompt";
 export class Authentication<TState extends TurnState = DefaultTurnState> {
     private readonly _prompt: OAuthPrompt | SsoPrompt;
     private _route: AppRoute<TState> | undefined;
-    private _state: TState | undefined;
     private _message: string | undefined;
 
     /**
@@ -66,30 +65,14 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
             (context) => Promise.resolve(context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
                 await this.runDialog(context, state, userDialogStatePropertyName);
-                if (this._state) {
-                  for (const key in this._state.conversation.value) {
-                    if (key != userDialogStatePropertyName && key != userAuthStatePropertyName && key != "eTag") {
-                      state.conversation.value[key] = this._state.conversation.value[key];
-                    }
-                  }
-                }
           },
           true);
         app.addRoute(
             (context) => Promise.resolve(context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
                 await this.runDialog(context, state, userDialogStatePropertyName);
-                if (this._state) {
-                  for (const key in this._state.conversation.value) {
-                    if (key != userDialogStatePropertyName && key != userAuthStatePropertyName && key != "eTag") {
-                      state.conversation.value[key] = this._state.conversation.value[key];
-                    }
-                  }
-                }
             },
             true);
     }
@@ -110,7 +93,6 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         if (route) {
           this._route = route;
           this._message = context.activity.text;
-          this._state = state;
         }
 
         // Save message if not signed in
@@ -182,24 +164,24 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this._prompt);
-        dialogSet.add(new WaterfallDialog('taskNeedingLogin', [
+        dialogSet.add(new WaterfallDialog('taskNeedingAuth', [
           async (step) => {
             return await step.beginDialog(promptName);
           },
           async (step) => {
             const token = step.result;
             if (token) {
-              await step.context.sendActivity(`You are now logged in.`);
-              await step.context.sendActivity(token.token);
-              if (this._route && this._state && this._message) {
+              await step.context.sendActivity(`Your token: ${token.token}`);
+              state['temp'].value.authToken = token.token;
+              if (this._route && this._message) {
                 context.activity.text = this._message;
-                await this._route.handler(context, this._state);
+                await this._route.handler(context, state);
                 this._route = undefined;
                 this._message = undefined;
               }
               return await step.endDialog();
             } else {
-              await step.context.sendActivity(`Sorry... We couldn't log you in. Try again later.`);
+              await step.context.sendActivity(`Sorry... Some error occurs. Try again later.`);
               return await step.endDialog();
             }
           }
@@ -207,7 +189,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         const dialogContext = await dialogSet.createContext(context);
         let results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
-            results = await dialogContext.beginDialog('taskNeedingLogin');
+            results = await dialogContext.beginDialog('taskNeedingAuth');
         }
         return results;
     }
