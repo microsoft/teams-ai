@@ -1,0 +1,19 @@
+{
+  "extension": [
+    ".js"
+  ],
+  "include": [
+    "lib/**/*.js"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/tests/**",
+    "**/coverage/**",
+    "**/*.d.ts"
+  ],
+  "reporter": [
+    "html"
+  ],
+  "all": true,
+  "cache": true
+}

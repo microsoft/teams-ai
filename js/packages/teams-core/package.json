@@ -1,0 +1,63 @@
+{
+  "name": "@microsoft/teams-core",
+  "author": "Microsoft Corp.",
+  "description": "Core components for creating bots and applications for Microsoft Teams.",
+  "version": "0.1.0-preview.1",
+  "license": "MIT",
+  "keywords": [
+    "botbuilder",
+    "botframework",
+    "bots",
+    "chatbots"
+  ],
+  "bugs": {
+    "url": "https://github.com/Microsoft/botbuilder-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/botbuilder-js.git"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "typesVersions": {
+    "<3.9": {
+      "*": [
+        "_ts3.4/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "@microsoft/teams-connector": "0.1.0-preview.1",
+    "@azure/ms-rest-js": "^2.6.1",
+    "axios": "^0.25.0",
+    "botframework-streaming": "4.20.0",
+    "dayjs": "^1.10.3",
+    "filenamify": "^4.1.0",
+    "fs-extra": "^7.0.1",
+    "htmlparser2": "^6.0.1",
+    "uuid": "^9.0.0",
+    "zod": "~1.11.17"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "11.0.1",
+    "chatdown": "^1.2.4",
+    "request": "^2.88.2",
+    "unzipper": "^0.10.9"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "build-docs": "typedoc --theme markdown --entryPoint teams-ai --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
+    "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
+    "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
+    "depcheck": "depcheck --config ../../.depcheckrc",
+    "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
+    "test": "npm-run-all build test:mocha",
+    "test:mocha": "nyc mocha tests",
+    "test:compat": "api-extractor run --verbose"
+},
+  "files": [
+    "_ts3.4",
+    "lib",
+    "src"
+  ]
+}
