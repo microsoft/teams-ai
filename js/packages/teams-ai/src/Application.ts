@@ -516,7 +516,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
                 // Sign the user in
                 if (this._authentication && context.activity.type === ActivityTypes.Message) {
-                  let currentRoute;
+                  let currentRoute = undefined;
                   for (let i = 0; i < this._routes.length; i++) {
                     const route = this._routes[i];
                     if (await route.selector(context)) {

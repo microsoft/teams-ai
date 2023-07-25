@@ -3,7 +3,7 @@ import { ActionTypes, Activity, ActivityTypes, CardFactory, MessageFactory, OAut
 import { v4 as uuidv4 } from "uuid";
 import jwt_decode from "jwt-decode";
 import { SsoPromptSettings } from "./SsoPromptSettings";
-import { OnBehalfOfUserCredential } from "@microsoft/teamsfx";
+import { OnBehalfOfUserCredential } from "./OnBehalfOfUserCredential";
 
 const invokeResponseType = "invokeResponse";
 
