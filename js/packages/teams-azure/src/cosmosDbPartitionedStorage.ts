@@ -9,7 +9,7 @@
 
 import { Container, CosmosClient, CosmosClientOptions } from '@azure/cosmos';
 import { CosmosDbKeyEscape } from './cosmosDbKeyEscape';
-import { DoOnce } from './doOnce';
+import { DoOnce } from './internals';
 import { Storage, StoreItems } from '@microsoft/teams-core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
