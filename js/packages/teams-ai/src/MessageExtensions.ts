@@ -18,7 +18,7 @@ import {
     MessagingExtensionParameter,
     MessagingExtensionQuery,
     Activity
-} from 'botbuilder';
+} from '@microsoft/teams-core';
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 

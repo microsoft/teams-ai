@@ -10,7 +10,7 @@
 import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
 import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import { OpenAIClient, CreateModerationResponseResultsInner } from './OpenAIClients';
 import { PromptTemplate } from './Prompts';
 import { Moderator } from './Moderator';

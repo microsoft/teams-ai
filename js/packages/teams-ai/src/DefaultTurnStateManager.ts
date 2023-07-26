@@ -8,7 +8,7 @@
 
 // TODO:
 /* eslint-disable security/detect-object-injection */
-import { TurnContext, Storage, StoreItems } from 'botbuilder';
+import { TurnContext, Storage, StoreItems } from '@microsoft/teams-core';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
 

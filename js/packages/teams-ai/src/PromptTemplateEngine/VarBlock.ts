@@ -7,7 +7,7 @@
  */
 // TODO:
 /* eslint-disable security/detect-object-injection */
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import { stringify } from 'yaml';
 import { TurnState } from '../TurnState';
 import { Block, BlockTypes } from './Block';

@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext, Storage } from 'botbuilder';
+import { TurnContext, Storage } from '@microsoft/teams-core';
 
 /**
  * Base interface defining a collection of turn state scopes.

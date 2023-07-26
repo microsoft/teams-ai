@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
+import { CardFactory, Channels, MessageFactory, TurnContext } from '@microsoft/teams-core';
 import { ConversationHistory } from './ConversationHistory';
 import { DefaultModerator } from './DefaultModerator';
 import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';

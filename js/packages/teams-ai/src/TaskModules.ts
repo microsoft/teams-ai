@@ -13,7 +13,7 @@ import {
     InvokeResponse,
     INVOKE_RESPONSE_KEY,
     TaskModuleResponse
-} from 'botbuilder';
+} from '@microsoft/teams-core';
 import { Application, RouteSelector } from './Application';
 import { TurnState } from './TurnState';
 

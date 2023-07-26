@@ -10,7 +10,7 @@
 import { PredictedDoCommand, Planner, Plan } from './Planner';
 import { TurnState } from './TurnState';
 import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import {
     OpenAIClient,
     OpenAIClientResponse,

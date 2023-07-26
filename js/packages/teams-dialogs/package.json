@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-dialogs",
     "author": "Microsoft Corp.",
     "description": "A dialog stack based conversation manager for Microsoft Teams.",
-    "version": "4.1.6",
+    "version": "0.1.0-preview.1",
     "license": "MIT",
     "keywords": [
         "botbuilder",

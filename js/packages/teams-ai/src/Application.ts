@@ -14,7 +14,7 @@ import {
     ConversationReference,
     Activity,
     ResourceResponse
-} from 'botbuilder';
+} from '@microsoft/teams-core';
 import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';

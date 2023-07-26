@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { DefaultTurnState } from './DefaultTurnStateManager';

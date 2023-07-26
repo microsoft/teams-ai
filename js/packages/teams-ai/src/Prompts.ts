@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import { TurnState } from './TurnState';
 
 /**

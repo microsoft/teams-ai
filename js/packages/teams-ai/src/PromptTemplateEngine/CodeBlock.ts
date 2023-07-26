@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import { DefaultTempState, DefaultTurnState } from '../DefaultTurnStateManager';
 import { PromptManager } from '../Prompts';
 import { TurnState } from '../TurnState';

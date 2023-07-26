@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from 'botbuilder-core';
+import { TurnContext } from '@microsoft/teams-core';
 import { ConfiguredAIOptions } from './AI';
 import { Plan } from './Planner';
 import { PromptTemplate } from './Prompts';

@@ -2089,23 +2089,6 @@ botbuilder-dialogs-adaptive-runtime-core@4.20.0-preview:
     uuid "^8.3.2"
     zod "~1.11.17"
 
-botbuilder-dialogs@^4.19.3:
-  version "4.19.3"
-  resolved "https://registry.yarnpkg.com/botbuilder-dialogs/-/botbuilder-dialogs-4.19.3.tgz#8e22b2d9cf8e8587ed17480d4c938bfdee7a81a3"
-  integrity sha512-TBHnAe6U+/bcdtKILIpkBvGw0nzRs6A5ArFIAg11ja+riEyU9VVptx9rkka1++C/9tWWGF+3grJ2dA3UFkUkrA==
-  dependencies:
-    "@microsoft/recognizers-text-choice" "1.1.4"
-    "@microsoft/recognizers-text-date-time" "1.1.4"
-    "@microsoft/recognizers-text-number" "1.1.4"
-    "@microsoft/recognizers-text-suite" "1.1.4"
-    botbuilder-core "4.19.3"
-    botbuilder-dialogs-adaptive-runtime-core "4.19.3-preview"
-    botframework-connector "4.19.3"
-    globalize "^1.4.2"
-    lodash "^4.17.21"
-    uuid "^8.3.2"
-    zod "~1.11.17"
-
 botbuilder-stdlib@4.19.3-internal:
   version "4.19.3-internal"
   resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.19.3-internal.tgz#781a7671f4e07ae0efdf84035ca93c7973a2876d"
