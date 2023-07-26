@@ -4,12 +4,6 @@ using Microsoft.TeamsAI.AI.Action;
 
 using DevOpsBot.Model;
 using Newtonsoft.Json;
-using AdaptiveCards;
-using Microsoft.Bot.Connector;
-using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.Utilities;
 
 namespace DevOpsBot
 {
@@ -89,38 +83,6 @@ namespace DevOpsBot
 
             await turnContext.SendActivityAsync(ResponseBuilder.UnknownAction(action)).ConfigureAwait(false);
             return false;
-        }
-
-        [Action(DefaultActionTypes.SayCommandActionName)]
-        public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
-        {
-            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
-            _ = command ?? throw new ArgumentNullException(nameof(command));
-            string response = command.Response;
-            AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
-
-            if (card != null)
-            {
-                if (card.Warnings.Count > 0)
-                {
-                    string warnings = string.Join("\n", card.Warnings.Select(w => w.Message));
-                    // _logger?.LogWarning($"{card.Warnings.Count} warnings found in the model generated adaptive card:\n {warnings}");
-                }
-
-                Attachment attachment = new() { Content = card, ContentType = AdaptiveCard.ContentType };
-                IMessageActivity activity = MessageFactory.Attachment(attachment);
-                await turnContext.SendActivityAsync(activity).ConfigureAwait(false);
-            }
-            else if (turnContext.Activity.ChannelId == Channels.Msteams)
-            {
-                await turnContext.SendActivityAsync(response.Replace("\n", "<br>")).ConfigureAwait(false);
-            }
-            else
-            {
-                await turnContext.SendActivityAsync(response).ConfigureAwait(false);
-            };
-
-            return true;
         }
 
         private static EntityData GetEntityData(Dictionary<string, object> entities)

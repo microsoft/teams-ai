@@ -79,6 +79,16 @@ At this point you should have set up the bot and installed it in Teams. You can 
 
 Here's a sample interaction with the bot:
 
+![Create Work Item](assets/create.png)
+
+You can update the work item:
+
+![Update Work Item](assets/update.png)
+
+Or summarize work items to Adaptive Card
+
+![Summarize](assets/summarize.png)
+
 ## Deploy to Azure
 
 You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.

@@ -36,7 +36,7 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
 #region Use OpenAI
-/** // Use OpenAI
+// Use OpenAI
 if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new ArgumentException("Missing OpenAI configuration.");
@@ -69,7 +69,11 @@ builder.Services.AddTransient<IBot>(sp =>
         planner: planner,
         promptManager: new PromptManager<DevOpsState>("./Prompts"),
         prompt: "ChatGPT",
-        moderator: moderator);
+        moderator: moderator,
+        history: new AIHistoryOptions
+        {
+            TrackHistory = false
+        });
     ApplicationOptions<DevOpsState, DevOpsStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new DevOpsStateManager(),
@@ -78,11 +82,11 @@ builder.Services.AddTransient<IBot>(sp =>
     };
     return new TeamsDevOpsBot(ApplicationOptions);
 });
-**/
+
 #endregion
 
 #region Use Azure OpenAI and Azure Content Safety
-// Following code is for using Azure OpenAI and Azure Content Safety
+/** // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
@@ -128,12 +132,11 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         TurnStateManager = new DevOpsStateManager(),
         Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        StartTypingTimer = false
+        AI = aiOptions
     };
     return new TeamsDevOpsBot(ApplicationOptions);
 });
-
+**/
 #endregion
 
 WebApplication app = builder.Build();
