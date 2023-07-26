@@ -1,8 +1,8 @@
 {
-    "name": "@microsoft/teams-core",
+    "name": "@microsoft/teams-dialogs",
     "author": "Microsoft Corp.",
-    "description": "Core components for creating bots and applications for Microsoft Teams.",
-    "version": "0.1.0-preview.1",
+    "description": "A dialog stack based conversation manager for Microsoft Teams.",
+    "version": "4.1.6",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -27,22 +27,20 @@
         }
     },
     "dependencies": {
+        "@microsoft/recognizers-text-choice": "1.1.4",
+        "@microsoft/recognizers-text-date-time": "1.1.4",
+        "@microsoft/recognizers-text-number": "1.1.4",
+        "@microsoft/recognizers-text-suite": "1.1.4",
+        "@microsoft/teams-core": "0.1.0-preview.1",
         "@microsoft/teams-connector": "0.1.0-preview.1",
-        "@azure/ms-rest-js": "^2.6.1",
-        "axios": "^0.25.0",
-        "botframework-streaming": "4.20.0",
-        "dayjs": "^1.10.3",
-        "filenamify": "^4.1.0",
-        "fs-extra": "^7.0.1",
-        "htmlparser2": "^6.0.1",
+        "globalize": "^1.4.2",
+        "lodash": "^4.17.21",
         "uuid": "^9.0.0",
         "zod": "~1.11.17"
     },
     "devDependencies": {
-        "@types/fs-extra": "11.0.1",
-        "chatdown": "^1.2.4",
-        "request": "^2.88.2",
-        "unzipper": "^0.10.9"
+        "@types/globalize": "^1.5.0",
+        "line-reader": "^0.4.0"
     },
     "scripts": {
         "build": "tsc -b",
@@ -58,6 +56,7 @@
     "files": [
         "_ts3.4",
         "lib",
-        "src"
+        "src",
+        "vendor"
     ]
 }

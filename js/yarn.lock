@@ -962,6 +962,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/cldrjs@*":
+  version "0.4.24"
+  resolved "https://registry.yarnpkg.com/@types/cldrjs/-/cldrjs-0.4.24.tgz#50ee2f072231468cb8982d97856d967b217dadc6"
+  integrity sha512-IXH0rekSjPD0ZDz4gb5U52PW/Fi64vE7C1Q8p2aYAAuzxkGhqux1BZlm+BA5vpV2MmpXhT80MsvYFJxJ+6zNrg==
+
 "@types/dotenv@6.1.1":
   version "6.1.1"
   resolved "https://registry.npmjs.org/@types/dotenv/-/dotenv-6.1.1.tgz"
@@ -990,6 +995,13 @@
   dependencies:
     "@types/jsonfile" "*"
     "@types/node" "*"
+
+"@types/globalize@^1.5.0":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@types/globalize/-/globalize-1.5.2.tgz#facc6b0e03ae257f9a5c488b74f477eb9fd1e5d6"
+  integrity sha512-h4+lLnsttn12wOuUs0WuVJie5Lg+H/0WMaOSSgwycOOmA2Ukj/fX+GkvNcjw1OY5CtViCCEBc3xClsXInL/r9g==
+  dependencies:
+    "@types/cldrjs" "*"
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.4"
@@ -5840,6 +5852,11 @@ levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
+
+line-reader@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/line-reader/-/line-reader-0.4.0.tgz#17e44818da0ac335675ba300954f94ef670e66fd"
+  integrity sha512-AYJ8g+eE7v+Ba4s/cuYqzuNulH/WbjdKQ55fvx8fNVn8WQzTpioY6vI1MoxTuMgcHYX3VlmZWbVvnkIqkyJbCA==
 
 lines-and-columns@^1.1.6:
   version "1.2.4"

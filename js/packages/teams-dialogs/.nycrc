@@ -1,0 +1,21 @@
+{
+  "extension": [
+    ".js"
+  ],
+  "include": [
+    "lib/**/*.js"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/tests/**",
+    "**/coverage/**",
+    "**/*.d.ts",
+    "lib/choices/modelResult.js",
+    "lib/memory/pathResolvers/pathResolver.js"
+  ],
+  "reporter": [
+    "html"
+  ],
+  "all": true,
+  "cache": true
+}

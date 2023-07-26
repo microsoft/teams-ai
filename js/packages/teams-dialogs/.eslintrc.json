@@ -1,0 +1,5 @@
+{
+    "extends": "../../.eslintrc.json",
+    "plugins": ["only-warn"],
+    "ignorePatterns": ["vendor/"]
+}
