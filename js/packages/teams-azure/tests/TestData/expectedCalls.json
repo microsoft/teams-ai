@@ -1,0 +1,191 @@
+{
+	"deleteTranscript" : [
+		{
+			"constructor": {
+				"storageAccount": "UseDevelopmentStorage=true;",
+				"storageAccessKey": "*(^&%*",
+				"host": "none"
+			}
+		},
+		{
+			"withFilter": [
+				{
+					"retryCount": 5,
+					"retryInterval": 500
+				}
+			]
+		},
+		{
+			"createContainerIfNotExistsAsync": [
+				"test-transcript"
+			]
+		},
+		{
+			"listBlobsSegmentedWithPrefixAsync": [
+				"test-transcript",
+				"deleteTranscript/1234/",
+				null,
+				null
+			]
+		},
+		{
+			"deleteBlobIfExistsAsync": [
+				"test-transcript",
+				null
+			]
+		},
+		{
+			"deleteBlobIfExistsAsync": [
+				"test-transcript",
+				null
+			]
+		},
+		{
+			"deleteBlobIfExistsAsync": [
+				"test-transcript",
+				null
+			]
+		}
+	],
+	"logActivity": [
+		{
+			"constructor": {
+				"storageAccount": "UseDevelopmentStorage=true;",
+				"storageAccessKey": "*(^&%*",
+				"host": "none"
+			}
+		},
+		{
+			"withFilter": [
+				{
+					"retryCount": 5,
+					"retryInterval": 500
+				}
+			]
+		},
+		{
+			"createContainerIfNotExistsAsync": [
+				"test-transcript"
+			]
+		},
+		{
+			"createBlockBlobFromTextAsync": [
+				"test-transcript",
+				"test/logActivityTest/8d66eb2e84b8000-1.json",
+				"{\"type\":\"message\",\"timestamp\":\"2018-12-31T00:00:00.000Z\",\"id\":1,\"text\":\"testMessage\",\"channelId\":\"test\",\"from\":{\"id\":\"User1\"},\"conversation\":{\"id\":\"logActivityTest\"},\"recipient\":{\"id\":\"Bot1\",\"name\":\"2\"},\"serviceUrl\":\"http://foo.com/api/messages\"}",
+				null
+			]
+		},
+		{
+			"setBlobMetadataAsync": [
+				"test-transcript",
+				"test/logActivityTest/8d66eb2e84b8000-1.json",
+				{
+					"fromid": "User1",
+					"recipientid": "Bot1",
+					"timestamp": "2018-12-31T00:00:00.000Z"
+				}
+			]
+		},
+		{
+			"setBlobPropertiesAsync": [
+				"test-transcript",
+				"test/logActivityTest/8d66eb2e84b8000-1.json",
+				{
+					"contentType": "application/json"
+				}
+			]
+		}
+	],
+	"getTranscriptActivities": [
+		{
+			"constructor": {
+				"storageAccount": "UseDevelopmentStorage=true;",
+				"storageAccessKey": "*(^&%*",
+				"host": "none"
+			}
+		},
+		{
+			"withFilter": [
+				{
+					"retryCount": 5,
+					"retryInterval": 500
+				}
+			]
+		},
+		{
+			"createContainerIfNotExistsAsync": [
+				"test-transcript"
+			]
+		},
+		{
+			"listBlobsSegmentedWithPrefixAsync": [
+				"test-transcript",
+				"getTranscriptActivities/1234/",
+				null,
+				{
+					"include": "metadata"
+				}
+			]
+		},
+		{
+			"getBlobToTextAsync": [
+				"test-transcript",
+				null
+			]
+		},
+		{
+			"getBlobToTextAsync": [
+				"test-transcript",
+				null
+			]
+		},
+		{
+			"getBlobToTextAsync": [
+				"test-transcript",
+				null
+			]
+		}
+	],
+	"listTranscripts": [
+		{
+			"constructor": {
+				"storageAccount": "UseDevelopmentStorage=true;",
+				"storageAccessKey": "*(^&%*",
+				"host": "none"
+			}
+		},
+		{
+			"withFilter": [
+				{
+					"retryCount": 5,
+					"retryInterval": 500
+				}
+			]
+		},
+		{
+			"createContainerIfNotExistsAsync": [
+				"test-transcript"
+			]
+		},
+		{
+			"listBlobDirectoriesSegmentedWithPrefixAsync": [
+				"test-transcript",
+				"listTranscripts/",
+				null
+			]
+		}
+	],
+	"listTranscriptResult": {
+		"items": [
+			{
+				"channelId": "listTranscripts",
+				"id": "blob1"
+			},
+			{
+				"channelId": "listTranscripts",
+				"id": "blob2"
+			}
+		]
+	}
+}

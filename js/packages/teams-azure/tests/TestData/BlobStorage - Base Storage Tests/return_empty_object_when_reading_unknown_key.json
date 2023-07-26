@@ -1,0 +1,70 @@
+[
+    {
+        "scope": "http://127.0.0.1:10000",
+        "method": "HEAD",
+        "path": "/devstoreaccount1/test?restype=container",
+        "body": "",
+        "status": 404,
+        "response": "",
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Server",
+            "Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0",
+            "x-ms-request-id",
+            "fc30b1c2-b381-43c0-8435-df5130b09d5f",
+            "x-ms-version",
+            "2018-03-28",
+            "x-ms-error-code",
+            "ContainerNotFound",
+            "Date",
+            "Thu, 12 Dec 2019 23:27:13 GMT"
+        ]
+    },
+    {
+        "scope": "http://127.0.0.1:10000",
+        "method": "PUT",
+        "path": "/devstoreaccount1/test?restype=container",
+        "body": "",
+        "status": 201,
+        "response": "",
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Last-Modified",
+            "Thu, 12 Dec 2019 23:27:13 GMT",
+            "ETag",
+            "\"0x8D77F5AD1831EF0\"",
+            "Server",
+            "Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0",
+            "x-ms-request-id",
+            "c723de89-f3d3-4e63-ac59-7dc952aa1c2d",
+            "x-ms-version",
+            "2018-03-28",
+            "Date",
+            "Thu, 12 Dec 2019 23:27:13 GMT"
+        ]
+    },
+    {
+        "scope": "http://127.0.0.1:10000",
+        "method": "HEAD",
+        "path": "/devstoreaccount1/test/unknown",
+        "body": "",
+        "status": 404,
+        "response": "",
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Server",
+            "Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0",
+            "x-ms-request-id",
+            "49100bb5-340f-402a-ad18-d207041d1035",
+            "x-ms-version",
+            "2018-03-28",
+            "x-ms-error-code",
+            "BlobNotFound",
+            "Date",
+            "Thu, 12 Dec 2019 23:27:13 GMT"
+        ]
+    }
+]

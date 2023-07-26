@@ -1,0 +1,1898 @@
+[
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/",
+        "body": "",
+        "status": 200,
+        "response": {
+            "_self": "",
+            "id": "localhost",
+            "_rid": "localhost",
+            "media": "//media/",
+            "addresses": "//addresses/",
+            "_dbs": "//dbs/",
+            "writableLocations": [
+                {
+                    "name": "South Central US",
+                    "databaseAccountEndpoint": "https://127.0.0.1:8081/"
+                }
+            ],
+            "readableLocations": [
+                {
+                    "name": "South Central US",
+                    "databaseAccountEndpoint": "https://127.0.0.1:8081/"
+                }
+            ],
+            "enableMultipleWriteLocations": false,
+            "userReplicationPolicy": {
+                "asyncReplication": false,
+                "minReplicaSetSize": 1,
+                "maxReplicasetSize": 4
+            },
+            "userConsistencyPolicy": {
+                "defaultConsistencyLevel": "Session"
+            },
+            "systemReplicationPolicy": {
+                "minReplicaSetSize": 1,
+                "maxReplicasetSize": 4
+            },
+            "readPolicy": {
+                "primaryReadCoefficient": 1,
+                "secondaryReadCoefficient": 1
+            },
+            "queryEngineConfiguration": "{\"maxSqlQueryInputLength\":262144,\"maxJoinsPerSqlQuery\":5,\"maxLogicalAndPerSqlQuery\":500,\"maxLogicalOrPerSqlQuery\":500,\"maxUdfRefPerSqlQuery\":10,\"maxInExpressionItemsCount\":16000,\"queryMaxInMemorySortDocumentCount\":500,\"maxQueryRequestTimeoutFraction\":0.9,\"sqlAllowNonFiniteNumbers\":false,\"sqlAllowAggregateFunctions\":true,\"sqlAllowSubQuery\":true,\"sqlAllowScalarSubQuery\":true,\"allowNewKeywords\":true,\"sqlAllowLike\":false,\"sqlAllowGroupByClause\":true,\"maxSpatialQueryCells\":12,\"spatialMaxGeometryPointCount\":256,\"sqlDisableQueryILOptimization\":false,\"sqlAllowTop\":true,\"enableSpatialIndexing\":true}"
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-max-media-storage-usage-mb",
+            "10240",
+            "x-ms-media-storage-usage-mb",
+            "0",
+            "x-ms-databaseaccount-consumed-mb",
+            "0",
+            "x-ms-databaseaccount-reserved-mb",
+            "0",
+            "x-ms-databaseaccount-provisioned-mb",
+            "0",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+        "body": "",
+        "status": 404,
+        "response": {
+            "code": "NotFound",
+            "message": "Message: {\"Errors\":[\"Resource Not Found\"]}\r\nActivityId: 368402d6-d0d6-4e1e-be36-85524060205c, Request URI: /apps/DocDbApp/services/DocDbMaster0/partitions/780e44f4-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, RequestStats: \r\nRequestStartTime: 2020-07-21T00:00:21.1584023Z, RequestEndTime: 2020-07-21T00:00:21.1593902Z,  Number of regions attempted:1\r\nResponseTime: 2020-07-21T00:00:21.1593902Z, StoreResult: StorePhysicalAddress: rntbd://127.0.0.1:10251/apps/DocDbApp/services/DocDbMaster0/partitions/780e44f4-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, LSN: 5675, GlobalCommittedLsn: -1, PartitionKeyRangeId: , IsValid: True, StatusCode: 404, SubStatusCode: 0, RequestCharge: 1, ItemLSN: -1, SessionToken: -1#5675, UsingLocalLSN: False, TransportException: null, ResourceType: Collection, OperationType: Read\r\nResponseTime: 2020-07-21T00:00:21.1593902Z, StoreResult: StorePhysicalAddress: rntbd://127.0.0.1:10251/apps/DocDbApp/services/DocDbMaster0/partitions/780e44f4-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, LSN: 5675, GlobalCommittedLsn: -1, PartitionKeyRangeId: , IsValid: True, StatusCode: 404, SubStatusCode: 0, RequestCharge: 1, ItemLSN: -1, SessionToken: -1#5675, UsingLocalLSN: False, TransportException: null, ResourceType: Collection, OperationType: Read\r\n, SDK: Microsoft.Azure.Documents.Common/2.9.2"
+        },
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:34.506 GMT",
+            "lsn",
+            "5675",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-quorum-acked-lsn",
+            "5675",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "428",
+            "x-ms-cosmos-llsn",
+            "5675",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "5675",
+            "x-ms-session-token",
+            "0:-1#5675",
+            "x-ms-request-charge",
+            "2",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "368402d6-d0d6-4e1e-be36-85524060205c",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+        "body": "",
+        "status": 404,
+        "response": {
+            "code": "NotFound",
+            "message": "Message: {\"Errors\":[\"Resource Not Found\"]}\r\nActivityId: 845a920d-4591-47d6-94ab-ce8330b810ed, Request URI: /apps/DocDbApp/services/DocDbMaster0/partitions/780e44f4-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, RequestStats: \r\nRequestStartTime: 2020-07-21T00:00:21.1693907Z, RequestEndTime: 2020-07-21T00:00:21.1714027Z,  Number of regions attempted:1\r\nResponseTime: 2020-07-21T00:00:21.1714027Z, StoreResult: StorePhysicalAddress: rntbd://127.0.0.1:10251/apps/DocDbApp/services/DocDbMaster0/partitions/780e44f4-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, LSN: 5675, GlobalCommittedLsn: -1, PartitionKeyRangeId: , IsValid: True, StatusCode: 404, SubStatusCode: 0, RequestCharge: 1, ItemLSN: -1, SessionToken: -1#5675, UsingLocalLSN: False, TransportException: null, ResourceType: Collection, OperationType: Read\r\nResponseTime: 2020-07-21T00:00:21.1714027Z, StoreResult: StorePhysicalAddress: rntbd://127.0.0.1:10251/apps/DocDbApp/services/DocDbMaster0/partitions/780e44f4-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, LSN: 5675, GlobalCommittedLsn: -1, PartitionKeyRangeId: , IsValid: True, StatusCode: 404, SubStatusCode: 0, RequestCharge: 1, ItemLSN: -1, SessionToken: -1#5675, UsingLocalLSN: False, TransportException: null, ResourceType: Collection, OperationType: Read\r\n, SDK: Microsoft.Azure.Documents.Common/2.9.2"
+        },
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:34.506 GMT",
+            "lsn",
+            "5675",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-quorum-acked-lsn",
+            "5675",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "430",
+            "x-ms-cosmos-llsn",
+            "5675",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "5675",
+            "x-ms-session-token",
+            "0:-1#5675",
+            "x-ms-request-charge",
+            "2",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "845a920d-4591-47d6-94ab-ce8330b810ed",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls",
+        "body": {
+            "id": "CosmosPartitionedStorageTestContainer-33",
+            "partitionKey": {
+                "paths": [
+                    "/id"
+                ]
+            }
+        },
+        "status": 201,
+        "response": {
+            "id": "CosmosPartitionedStorageTestContainer-33",
+            "indexingPolicy": {
+                "indexingMode": "consistent",
+                "automatic": true,
+                "includedPaths": [
+                    {
+                        "path": "/*"
+                    }
+                ],
+                "excludedPaths": [
+                    {
+                        "path": "/\"_etag\"/?"
+                    }
+                ]
+            },
+            "partitionKey": {
+                "paths": [
+                    "/id"
+                ],
+                "kind": "Hash"
+            },
+            "conflictResolutionPolicy": {
+                "mode": "LastWriterWins",
+                "conflictResolutionPath": "/_ts",
+                "conflictResolutionProcedure": ""
+            },
+            "geospatialConfig": {
+                "type": "Geography"
+            },
+            "_rid": "xb1bANYLSNM=",
+            "_ts": 1595289621,
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed1fb34801d6\"",
+            "_docs": "docs/",
+            "_sprocs": "sprocs/",
+            "_triggers": "triggers/",
+            "_udfs": "udfs/",
+            "_conflicts": "conflicts/"
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed1fb34801d6\"",
+            "collection-partition-index",
+            "0",
+            "collection-service-index",
+            "0",
+            "lsn",
+            "3706",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb",
+            "x-ms-quorum-acked-lsn",
+            "3706",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3706",
+            "x-ms-transport-request-id",
+            "174",
+            "x-ms-cosmos-llsn",
+            "3706",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3706",
+            "x-ms-cosmos-item-llsn",
+            "3706",
+            "x-ms-session-token",
+            "0:-1#3706",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "8fb64c54-1489-4155-8887-470c2fe5b7d1",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+        "body": "",
+        "status": 404,
+        "response": {
+            "code": "NotFound",
+            "message": "Message: {\"Errors\":[\"Resource Not Found\"]}\r\nActivityId: 6cd7becd-0ece-4026-8b36-4da5b8ab679c, Request URI: /apps/DocDbApp/services/DocDbServer15/partitions/a4cb495b-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, RequestStats: \r\nRequestStartTime: 2020-07-21T00:00:21.4453893Z, RequestEndTime: 2020-07-21T00:00:21.4543907Z,  Number of regions attempted:1\r\nResponseTime: 2020-07-21T00:00:21.4543907Z, StoreResult: StorePhysicalAddress: rntbd://127.0.0.1:10253/apps/DocDbApp/services/DocDbServer15/partitions/a4cb495b-38c8-11e6-8106-8cdcd42c33be/replicas/1p/, LSN: 3706, GlobalCommittedLsn: -1, PartitionKeyRangeId: 0, IsValid: True, StatusCode: 404, SubStatusCode: 0, RequestCharge: 1, ItemLSN: -1, SessionToken: -1#3706, UsingLocalLSN: True, TransportException: null, ResourceType: Document, OperationType: Read\r\n, SDK: Microsoft.Azure.Documents.Common/2.9.2"
+        },
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "lsn",
+            "3706",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-quorum-acked-lsn",
+            "3706",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "175",
+            "x-ms-cosmos-llsn",
+            "3706",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3706",
+            "x-ms-session-token",
+            "0:-1#3706",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "6cd7becd-0ece-4026-8b36-4da5b8ab679c",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+        "body": "",
+        "status": 200,
+        "response": {
+            "id": "CosmosPartitionedStorageTestContainer-33",
+            "indexingPolicy": {
+                "indexingMode": "consistent",
+                "automatic": true,
+                "includedPaths": [
+                    {
+                        "path": "/*"
+                    }
+                ],
+                "excludedPaths": [
+                    {
+                        "path": "/\"_etag\"/?"
+                    }
+                ]
+            },
+            "partitionKey": {
+                "paths": [
+                    "/id"
+                ],
+                "kind": "Hash"
+            },
+            "conflictResolutionPolicy": {
+                "mode": "LastWriterWins",
+                "conflictResolutionPath": "/_ts",
+                "conflictResolutionProcedure": ""
+            },
+            "geospatialConfig": {
+                "type": "Geography"
+            },
+            "_rid": "xb1bANYLSNM=",
+            "_ts": 1595289621,
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed1fb34801d6\"",
+            "_docs": "docs/",
+            "_sprocs": "sprocs/",
+            "_triggers": "triggers/",
+            "_udfs": "udfs/",
+            "_conflicts": "conflicts/"
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed1fb34801d6\"",
+            "collection-partition-index",
+            "0",
+            "collection-service-index",
+            "0",
+            "lsn",
+            "3706",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb",
+            "x-ms-content-path",
+            "xb1bAA==",
+            "x-ms-quorum-acked-lsn",
+            "3706",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3706",
+            "x-ms-transport-request-id",
+            "176",
+            "x-ms-cosmos-llsn",
+            "3706",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3706",
+            "x-ms-cosmos-item-llsn",
+            "3706",
+            "x-ms-session-token",
+            "0:-1#3706",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "c7fa953e-7407-4aa3-9429-e5885aa47bcb",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs",
+        "body": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fakeInstanceId"
+                                },
+                                "stepIndex": 0
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "status": 201,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed44783301d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed44783301d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=1;documentsCount=0;collectionSize=1;",
+            "lsn",
+            "3707",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3706",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "177",
+            "x-ms-cosmos-llsn",
+            "3707",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3706",
+            "x-ms-session-token",
+            "0:-1#3707",
+            "x-ms-request-charge",
+            "9.71",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "a12e40ab-537c-49e2-b0f4-dd4640dc4334",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+        "body": "",
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 0
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed44783301d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed44783301d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=1;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3707",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3707",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3707",
+            "x-ms-transport-request-id",
+            "178",
+            "x-ms-cosmos-llsn",
+            "3707",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3707",
+            "x-ms-cosmos-item-llsn",
+            "3707",
+            "x-ms-session-token",
+            "0:-1#3707",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "93310f53-82d4-42fb-9f57-3d8d20c0a8f8",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs",
+        "body": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fakeInstanceId"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {}
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {}
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed4ac40b01d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed4ac40b01d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=1;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3708",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3707",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "179",
+            "x-ms-cosmos-llsn",
+            "3708",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3707",
+            "x-ms-session-token",
+            "0:-1#3708",
+            "x-ms-request-charge",
+            "15.24",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "2f5da2c3-4aa2-4f69-9668-122f35e94be8",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+        "body": "",
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {}
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed4ac40b01d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed4ac40b01d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=1;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3708",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3708",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3708",
+            "x-ms-transport-request-id",
+            "180",
+            "x-ms-cosmos-llsn",
+            "3708",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3708",
+            "x-ms-cosmos-item-llsn",
+            "3708",
+            "x-ms-session-token",
+            "0:-1#3708",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "02144c8b-49c8-424c-8d55-8706e11d2292",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs",
+        "body": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fakeInstanceId"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed50c46701d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed50c46701d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=1;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3709",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3708",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "181",
+            "x-ms-cosmos-llsn",
+            "3709",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3708",
+            "x-ms-session-token",
+            "0:-1#3709",
+            "x-ms-request-charge",
+            "12.95",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "ca299bb8-1701-41a7-9f23-a2828b3fdaf5",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+        "body": "",
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed50c46701d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed50c46701d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=1;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3709",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3709",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3709",
+            "x-ms-transport-request-id",
+            "182",
+            "x-ms-cosmos-llsn",
+            "3709",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3709",
+            "x-ms-cosmos-item-llsn",
+            "3709",
+            "x-ms-session-token",
+            "0:-1#3709",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "1e0532a3-d977-40b1-8475-5e25ae88b4f2",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs",
+        "body": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fakeInstanceId"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 2
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 2
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed5642af01d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed5642af01d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=0;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3710",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3709",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "183",
+            "x-ms-cosmos-llsn",
+            "3710",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3709",
+            "x-ms-session-token",
+            "0:-1#3710",
+            "x-ms-request-charge",
+            "12.95",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "cc026290-83df-4dbd-aba2-7e8e3dce8766",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+        "body": "",
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 2
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed5642af01d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed5642af01d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=0;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3710",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3710",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3710",
+            "x-ms-transport-request-id",
+            "184",
+            "x-ms-cosmos-llsn",
+            "3710",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3710",
+            "x-ms-cosmos-item-llsn",
+            "3710",
+            "x-ms-session-token",
+            "0:-1#3710",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "bda6a424-f4ee-4e73-a44b-0557accff08f",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs",
+        "body": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fakeInstanceId"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 3
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 3
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed5b6d3f01d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed5b6d3f01d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=0;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3711",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3710",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "185",
+            "x-ms-cosmos-llsn",
+            "3711",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3710",
+            "x-ms-session-token",
+            "0:-1#3711",
+            "x-ms-request-charge",
+            "12.95",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "527b7cc1-b6c7-4c8c-b282-5436172d7794",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "GET",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+        "body": "",
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 1
+                            }
+                        },
+                        {
+                            "id": "textPrompt",
+                            "state": {
+                                "options": {
+                                    "prompt": {
+                                        "type": "message",
+                                        "text": "Please type your name.",
+                                        "inputHint": "acceptingInput"
+                                    }
+                                },
+                                "state": {
+                                    "attemptCount": 3
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed5b6d3f01d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Content-Location",
+            "https://localhost:8081/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs/test*2fconversations*2fConvo1*2f",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed5b6d3f01d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=0;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3711",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3711",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-item-lsn",
+            "3711",
+            "x-ms-transport-request-id",
+            "186",
+            "x-ms-cosmos-llsn",
+            "3711",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3711",
+            "x-ms-cosmos-item-llsn",
+            "3711",
+            "x-ms-session-token",
+            "0:-1#3711",
+            "x-ms-request-charge",
+            "1",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "4c863440-7b21-403c-ac89-9d6846cc326b",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    },
+    {
+        "scope": "https://localhost:8081",
+        "method": "POST",
+        "path": "/dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33/docs",
+        "body": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fakeInstanceId"
+                                },
+                                "stepIndex": 2
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "status": 200,
+        "response": {
+            "id": "test*2fconversations*2fConvo1*2f",
+            "realId": "test/conversations/Convo1/",
+            "document": {
+                "dialogState": {
+                    "dialogStack": [
+                        {
+                            "id": "waterfallDialog",
+                            "state": {
+                                "options": {},
+                                "values": {
+                                    "instanceId": "fbbc6223-540c-b7b0-aed9-01c835237fba"
+                                },
+                                "stepIndex": 2
+                            }
+                        }
+                    ]
+                }
+            },
+            "_rid": "xb1bANYLSNMBAAAAAAAAAA==",
+            "_self": "dbs/xb1bAA==/colls/xb1bANYLSNM=/docs/xb1bANYLSNMBAAAAAAAAAA==/",
+            "_etag": "\"00000000-0000-0000-5ef1-ed6198c801d6\"",
+            "_attachments": "attachments/",
+            "_ts": 1595289621
+        },
+        "rawHeaders": [
+            "Cache-Control",
+            "no-store, no-cache",
+            "Pragma",
+            "no-cache",
+            "Transfer-Encoding",
+            "chunked",
+            "Content-Type",
+            "application/json",
+            "Server",
+            "Microsoft-HTTPAPI/2.0",
+            "Access-Control-Allow-Origin",
+            "",
+            "Access-Control-Allow-Credentials",
+            "true",
+            "x-ms-last-state-change-utc",
+            "Mon, 20 Jul 2020 23:59:48.586 GMT",
+            "etag",
+            "\"00000000-0000-0000-5ef1-ed6198c801d6\"",
+            "x-ms-resource-quota",
+            "documentSize=10240;documentsSize=10485760;documentsCount=-1;collectionSize=10485760;",
+            "x-ms-resource-usage",
+            "documentSize=0;documentsSize=0;documentsCount=1;collectionSize=1;",
+            "lsn",
+            "3712",
+            "x-ms-schemaversion",
+            "1.9",
+            "x-ms-alt-content-path",
+            "dbs/CosmosPartitionedStorageTestDb/colls/CosmosPartitionedStorageTestContainer-33",
+            "x-ms-content-path",
+            "xb1bANYLSNM=",
+            "x-ms-quorum-acked-lsn",
+            "3711",
+            "x-ms-current-write-quorum",
+            "1",
+            "x-ms-current-replica-set-size",
+            "1",
+            "x-ms-xp-role",
+            "0",
+            "x-ms-global-Committed-lsn",
+            "-1",
+            "x-ms-number-of-read-regions",
+            "0",
+            "x-ms-transport-request-id",
+            "187",
+            "x-ms-cosmos-llsn",
+            "3712",
+            "x-ms-cosmos-quorum-acked-llsn",
+            "3711",
+            "x-ms-session-token",
+            "0:-1#3712",
+            "x-ms-request-charge",
+            "15.62",
+            "x-ms-serviceversion",
+            "version=2.9.0.0",
+            "x-ms-activity-id",
+            "3b158b6e-934a-45a3-9652-14b372be2735",
+            "x-ms-gatewayversion",
+            "version=2.9.2",
+            "Date",
+            "Tue, 21 Jul 2020 00:00:20 GMT",
+            "Connection",
+            "close"
+        ],
+        "responseIsBinary": false
+    }
+]

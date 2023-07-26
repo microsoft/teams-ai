@@ -1,0 +1,24 @@
+[
+    {
+        "scope": "http://127.0.0.1:10000",
+        "method": "HEAD",
+        "path": "/devstoreaccount1/test/unknown_key",
+        "body": "",
+        "status": 404,
+        "response": "",
+        "rawHeaders": [
+            "Transfer-Encoding",
+            "chunked",
+            "Server",
+            "Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0",
+            "x-ms-request-id",
+            "d1c3f38e-a5d8-4587-a0d0-2e2427212001",
+            "x-ms-version",
+            "2018-03-28",
+            "x-ms-error-code",
+            "BlobNotFound",
+            "Date",
+            "Thu, 12 Dec 2019 23:27:14 GMT"
+        ]
+    }
+]
