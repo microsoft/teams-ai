@@ -2,5 +2,5 @@
 
 namespace ListBot.Model
 {
-    public class ListStateManager : TurnStateManager<ListState, ConversationState, StateBase, ListTempState> { }
+    public class ListStateManager : TurnStateManager<ListState, ConversationState, StateBase, TempState> { }
 }

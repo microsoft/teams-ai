@@ -2,7 +2,7 @@
 
 namespace ListBot.Model
 {
-    public class ListState : TurnState<ConversationState, StateBase, ListTempState> { }
+    public class ListState : TurnState<ConversationState, StateBase, TempState> { }
 
     public class ConversationState : StateBase
     {
@@ -21,17 +21,6 @@ namespace ListBot.Model
             get => Get<IList<string>>(_listNamesKey);
             set => Set(_listNamesKey, value);
         }
-
-        public Dictionary<string, IList<string>>? Lists
-        {
-            get => Get<Dictionary<string, IList<string>>>(_listsKey);
-            set => Set(_listsKey, value);
-        }
-    }
-
-    public class ListTempState : TempState
-    {
-        private const string _listsKey = "listsKey";
 
         public Dictionary<string, IList<string>>? Lists
         {
