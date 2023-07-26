@@ -3,6 +3,13 @@ using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.AI.Action;
 
 using DevOpsBot.Model;
+using Newtonsoft.Json;
+using AdaptiveCards;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Schema;
+using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.TeamsAI.AI;
+using Microsoft.TeamsAI.Utilities;
 
 namespace DevOpsBot
 {
@@ -16,44 +23,41 @@ namespace DevOpsBot
         }
 
         [Action("CreateWI")]
-        public async Task<bool> CreateWI([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] DevOpsState turnState, [ActionEntities] EntityData data)
+        public async Task<bool> CreateWI([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
             _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
-            _ = data ?? throw new ArgumentNullException(nameof(data));
 
-            int id = CreateNewWorkItem(turnState, data);
-            await turnContext.SendActivityAsync($"New work item created with ID: {id} and assigned to: {data.AssignedTo}").ConfigureAwait(false);
+            EntityData workItem = GetEntityData(entities);
+            int id = CreateNewWorkItem(turnState, workItem);
+            await turnContext.SendActivityAsync($"New work item created with ID: {id} and assigned to: {workItem.AssignedTo}").ConfigureAwait(false);
             return false;
         }
 
         [Action("AssignWI")]
-        public bool AssignWI([ActionTurnState] DevOpsState turnState, [ActionEntities] EntityData data)
+        public bool AssignWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
-            _ = data ?? throw new ArgumentNullException(nameof(data));
 
-            AssignWorkItem(turnState, data);
+            AssignWorkItem(turnState, GetEntityData(entities));
             return true;
         }
 
         [Action("UpdateWI")]
-        public bool UpdateWI([ActionTurnState] DevOpsState turnState, [ActionEntities] EntityData data)
+        public bool UpdateWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
-            _ = data ?? throw new ArgumentNullException(nameof(data));
 
-            UpdateWorkItem(turnState, data);
+            UpdateWorkItem(turnState, GetEntityData(entities));
             return true;
         }
 
         [Action("TriageWI")]
-        public bool TriageWI([ActionTurnState] DevOpsState turnState, [ActionEntities] EntityData data)
+        public bool TriageWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
-            _ = data ?? throw new ArgumentNullException(nameof(data));
 
-            TriageWorkItem(turnState, data);
+            TriageWorkItem(turnState, GetEntityData(entities));
             return true;
         }
 
@@ -85,6 +89,49 @@ namespace DevOpsBot
 
             await turnContext.SendActivityAsync(ResponseBuilder.UnknownAction(action)).ConfigureAwait(false);
             return false;
+        }
+
+        [Action(DefaultActionTypes.SayCommandActionName)]
+        public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
+        {
+            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
+            _ = command ?? throw new ArgumentNullException(nameof(command));
+            string response = command.Response;
+            AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
+
+            if (card != null)
+            {
+                if (card.Warnings.Count > 0)
+                {
+                    string warnings = string.Join("\n", card.Warnings.Select(w => w.Message));
+                    // _logger?.LogWarning($"{card.Warnings.Count} warnings found in the model generated adaptive card:\n {warnings}");
+                }
+
+                Attachment attachment = new() { Content = card, ContentType = AdaptiveCard.ContentType };
+                IMessageActivity activity = MessageFactory.Attachment(attachment);
+                await turnContext.SendActivityAsync(activity).ConfigureAwait(false);
+            }
+            else if (turnContext.Activity.ChannelId == Channels.Msteams)
+            {
+                await turnContext.SendActivityAsync(response.Replace("\n", "<br>")).ConfigureAwait(false);
+            }
+            else
+            {
+                await turnContext.SendActivityAsync(response).ConfigureAwait(false);
+            };
+
+            return true;
+        }
+
+        private static EntityData GetEntityData(Dictionary<string, object> entities)
+        {
+            _ = entities ?? throw new ArgumentNullException(nameof(entities));
+
+            EntityData workItem =
+                JsonConvert.DeserializeObject<EntityData>(JsonConvert.SerializeObject(entities))
+                ?? throw new ArgumentException("Action data is not work item.");
+
+            return workItem;
         }
 
         /// <summary>

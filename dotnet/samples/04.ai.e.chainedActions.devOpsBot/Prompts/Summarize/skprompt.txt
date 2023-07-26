@@ -1,4 +1,4 @@
-Here is an adaptive card template for showing 1 or more lists to a user
+Here is an adaptive card template for showing 1 or more work items to a user
 
 {
     "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
@@ -19,19 +19,19 @@ Here is an adaptive card template for showing 1 or more lists to a user
                     "facts": [
                         {
                             "title": "Id",
-                            "value": "id1"
+                            "value": "id-1"
                         },
                         {
                             "title": "Title",
-                            "value": "title1"
+                            "value": "title-1"
                         },
                         {
                             "title": "Assigned To",
-                            "value": "assignedTo1"
+                            "value": "assignedTo-1"
                         },
                         {
                             "title": "Status",
-                            "value": "status1"
+                            "value": "status-1"
                         }
                     ],
                     "separator": true
@@ -46,19 +46,19 @@ Here is an adaptive card template for showing 1 or more lists to a user
                     "facts": [
                         {
                             "title": "Id",
-                            "value": "id2"
+                            "value": "id-2"
                         },
                         {
                             "title": "Title",
-                            "value": "title2"
+                            "value": "title-2"
                         },
                         {
                             "title": "Assigned To",
-                            "value": "assignedTo2"
+                            "value": "assignedTo-2"
                         },
                         {
                             "title": "Status",
-                            "value": "status2"
+                            "value": "status-2"
                         }
                     ],
                     "separator": true
@@ -68,7 +68,7 @@ Here is an adaptive card template for showing 1 or more lists to a user
     ]
 }
 
-Here's a set of lists. The key is the id of the work item and title:
+Here's a set of work items. The key is the id of the work item and title:
 
 {{getWorkItems}}
 
@@ -78,8 +78,8 @@ Here's the user's query:
 {{$input}}
 ```
 
-Use the template to create an Adaptive Card.
+Use the template to create an Adaptive Card, include "$schema" and "version" fields.
 Take into account any changes asked for by the user.
-Always replace the placeholder text, List n and Item n, with real data.
+Always replace the placeholder: "id-n", "title-n", "assignedTo-n", and "status-n", with real data.
 
 AdaptiveCard:

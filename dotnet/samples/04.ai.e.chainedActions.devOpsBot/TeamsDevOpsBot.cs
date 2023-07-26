@@ -46,6 +46,11 @@ namespace DevOpsBot
                 turnState.ConversationStateEntry?.Delete();
                 await turnContext.SendActivityAsync(ResponseBuilder.Reset(), cancellationToken: cancellationToken).ConfigureAwait(false);
             }
+            else
+            {
+                // call base message handler to go the AI flow
+                await base.OnMessageActivityAsync(turnContext, turnState, cancellationToken).ConfigureAwait(false);
+            }
 
         }
     }

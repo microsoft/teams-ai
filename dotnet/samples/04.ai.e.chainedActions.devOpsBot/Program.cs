@@ -36,7 +36,7 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
 #region Use OpenAI
-// Use OpenAI
+/** // Use OpenAI
 if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new ArgumentException("Missing OpenAI configuration.");
@@ -78,10 +78,11 @@ builder.Services.AddTransient<IBot>(sp =>
     };
     return new TeamsDevOpsBot(ApplicationOptions);
 });
+**/
 #endregion
 
 #region Use Azure OpenAI and Azure Content Safety
-/** // Following code is for using Azure OpenAI and Azure Content Safety
+// Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
@@ -90,7 +91,7 @@ if (config.Azure == null
 {
     throw new ArgumentException("Missing Azure configuration.");
 }
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "gpt-3.5-turbo", config.Azure.OpenAIEndpoint));
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint));
 builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
@@ -118,16 +119,21 @@ builder.Services.AddTransient<IBot>(sp =>
         planner: planner,
         promptManager: new PromptManager<DevOpsState>("./Prompts"),
         prompt: "ChatGPT",
-        moderator: moderator);
+        moderator: moderator,
+        history: new AIHistoryOptions
+        {
+            TrackHistory = false
+        });
     ApplicationOptions<DevOpsState, DevOpsStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new DevOpsStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
+        StartTypingTimer = false
     };
     return new TeamsDevOpsBot(ApplicationOptions);
 });
-**/
+
 #endregion
 
 WebApplication app = builder.Build();
