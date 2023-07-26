@@ -106,9 +106,9 @@ Note that, this sample requires AI service so you need one more pre-step before 
 
 ## Interacting with the bot
 
-At this point you should have set up the bot and installed it in Teams. You can interact with the bot by sending it a message.
+![List Bot](./assets/ListBot.png)
 
-TODO: screenshots
+At this point you should have set up the bot and installed it in Teams. You can interact with the bot by sending it a message.
 
 ## Deploy to Azure
 
