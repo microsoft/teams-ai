@@ -13,7 +13,7 @@ It shows SDK capabilities like:
 
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
-The `Prompts/Chat/`, `Prompts/ChatGPT/` and `Prompts/Summarize` directories have descriptive prompt engineering that, in plain language, instructs GPT how the bot should conduct itself at submit time. For example, in `Prompts/ChatGPT/skprompt.txt`:
+The `Prompts/Chat/`, `Prompts/ChatGPT/` and `Prompts/Summarize` directories have descriptive prompt engineering that, in plain language, instructs GPT how the bot should conduct itself at submit time. For example, in `Prompts/Chat/skprompt.txt`:
 
 #### skprompt.txt
 
