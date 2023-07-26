@@ -25,12 +25,6 @@
     },
     "azureOpenAIEndpoint": {
       "value": "${{SECRET_AZURE_OPENAI_ENDPOINT}}"
-    },
-    "azureContentSafetyApiKey": {
-      "value": "${{SECRET_AZURE_CONTENT_SAFETY_API_KEY}}"
-    },
-    "azureContentSafetyEndpoint": {
-      "value": "${{SECRET_AZURE_CONTENT_SAFETY_ENDPOINT}}"
     }
   }
 }

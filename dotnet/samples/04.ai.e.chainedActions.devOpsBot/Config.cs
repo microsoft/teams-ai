@@ -1,4 +1,4 @@
-namespace DevOpsBot
+﻿namespace DevOpsBot
 {
     public class ConfigOptions
     {
@@ -17,13 +17,11 @@ namespace DevOpsBot
     }
 
     /// <summary>
-    /// Options for Azure OpenAI and Azure Content Safety
+    /// Options for Azure OpenAI
     /// </summary>
     public class AzureConfigOptions
     {
         public string? OpenAIApiKey { get; set; }
         public string? OpenAIEndpoint { get; set; }
-        public string? ContentSafetyApiKey { get; set; }
-        public string? ContentSafetyEndpoint { get; set; }
     }
 }

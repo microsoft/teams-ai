@@ -22,14 +22,6 @@ param azureOpenAIApiKey string
 @description('The Azure OpenAI Endpoint to be added to App Service Settings')
 param azureOpenAIEndpoint string
 
-@secure()
-@description('The Azure Content Safety API Key to be added to App Service Settings')
-param azureContentSafetyApiKey string
-
-@secure()
-@description('The Azure Content Safety Endpoint to be added to App Service Settings')
-param azureContentSafetyEndpoint string
-
 param webAppSKU string
 
 @maxLength(42)
@@ -84,14 +76,6 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'Azure__OpenAIEndpoint'
           value: azureOpenAIEndpoint
-        }
-        {
-          name: 'Azure__ContentSafetyApiKey'
-          value: azureContentSafetyApiKey
-        }
-        {
-          name: 'Azure__ContentSafetyEndpoint'
-          value: azureContentSafetyEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'

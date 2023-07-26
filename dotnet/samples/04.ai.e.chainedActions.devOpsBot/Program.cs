@@ -6,7 +6,6 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 
@@ -42,7 +41,6 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
     throw new ArgumentException("Missing OpenAI configuration.");
 }
 builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
-builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new(config.OpenAI.ApiKey, ModerationType.Both));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -50,26 +48,16 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
     // Create OpenAIPlanner
     IPlanner<DevOpsState> planner = new OpenAIPlanner<DevOpsState>(
         sp.GetService<OpenAIPlannerOptions>()!,
         loggerFactory.CreateLogger<OpenAIPlanner<DevOpsState>>());
-
-    // Create OpenAIModerator
-    IModerator<DevOpsState> moderator = new OpenAIModerator<DevOpsState>(
-        sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory.CreateLogger<OpenAIModerator<DevOpsState>>(),
-        moderatorHttpClient);
 
     // Create Application
     AIOptions<DevOpsState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<DevOpsState>("./Prompts"),
         prompt: "ChatGPT",
-        moderator: moderator,
         history: new AIHistoryOptions
         {
             TrackHistory = false
@@ -85,18 +73,15 @@ builder.Services.AddTransient<IBot>(sp =>
 
 #endregion
 
-#region Use Azure OpenAI and Azure Content Safety
-/** // Following code is for using Azure OpenAI and Azure Content Safety
+#region Use Azure OpenAI
+/** // Following code is for using Azure OpenAI
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
-    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
-    || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
-    || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
+    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
     throw new ArgumentException("Missing Azure configuration.");
 }
 builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint));
-builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -104,26 +89,16 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
     // Create AzureOpenAIPlanner
     IPlanner<DevOpsState> planner = new AzureOpenAIPlanner<DevOpsState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
         loggerFactory.CreateLogger<AzureOpenAIPlanner<DevOpsState>>());
-
-    // Create AzureContentSafetyModerator
-    IModerator<DevOpsState> moderator = new AzureContentSafetyModerator<DevOpsState>(
-        sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<DevOpsState>>(),
-        moderatorHttpClient);
 
     // Create Application
     AIOptions<DevOpsState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<DevOpsState>("./Prompts"),
         prompt: "ChatGPT",
-        moderator: moderator,
         history: new AIHistoryOptions
         {
             TrackHistory = false

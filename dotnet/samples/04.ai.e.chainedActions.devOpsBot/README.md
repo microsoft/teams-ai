@@ -107,8 +107,8 @@ Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI 
 
 **As prerequisites**
 
-1. Prepare your own Azure OpenAI service and Azure AI Content Safety service.
-1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI and Azure Content Safety*" part.
+1. Prepare your own Azure OpenAI service.
+1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI*" part.
 
 **For Local Debug (F5) with Teams Toolkit for Visual Studio**
 
@@ -117,9 +117,7 @@ Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI 
     ```json
       "Azure": {
         "OpenAIApiKey": "<your-azure-openai-api-key>",
-        "OpenAIEndpoint": "<your-azure-openai-endpoint>",
-        "ContentSafetyApiKey": "<your-azure-content-safety-api-key>",
-        "ContentSafetyEndpoint": "<your-azure-content-safety-endpoint>"
+        "OpenAIEndpoint": "<your-azure-openai-endpoint>"
       }
     ```
 
@@ -132,8 +130,6 @@ To configure the Azure resources to have Azure OpenAI environment variables:
     ```bash
     SECRET_AZURE_OPENAI_API_KEY=
     SECRET_AZURE_OPENAI_ENDPOINT=
-    SECRET_AZURE_CONTENT_SAFETY_API_KEY=
-    SECRET_AZURE_CONTENT_SAFETY_ENDPOINT=
     ```
 
 ## Further reading
