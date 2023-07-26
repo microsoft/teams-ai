@@ -23,7 +23,9 @@ namespace Microsoft.TeamsAI.AI.Planner
                     string? planTypeString = planType.Value<string>();
                     if (string.Equals(AITypes.Plan, planTypeString, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        return item.ToObject<Plan>(serializer);
+                        Plan result = new();
+                        serializer.Populate(item.CreateReader(), result);
+                        return result;
                     }
                 }
             }
