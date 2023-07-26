@@ -46,18 +46,18 @@ namespace Microsoft.TeamsAI.AI
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
 
                     // Validate string to be a valid JSON
-                try
-                {
+                    try
+                    {
                         JToken.Parse(possibleJSON);
-                }
-                catch (JsonReaderException)
-                {
-                    continue;
-                }
+                    }
+                    catch (JsonReaderException)
+                    {
+                        continue;
+                    }
 
                     result.Add(possibleJSON);
                     break;
-            }
+                }
             }
 
             return result;
@@ -378,7 +378,7 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="text">Any input string</param>
         /// <returns>A list of tokens</returns>
         public static List<string> TokenizeText(string text)
-            {
+        {
             List<string> tokens = new();
 
             if (text.Length < 1) return tokens;
@@ -389,12 +389,12 @@ namespace Microsoft.TeamsAI.AI
             {
                 string c = text[i].ToString();
                 if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
-            {
+                {
                     // Push token onto list
                     if (token.Length > 0)
-            {
+                    {
                         tokens.Add(token);
-        }
+                    }
 
                     // Push breaking character onto list as a separate token
                     tokens.Add(c);
@@ -403,7 +403,7 @@ namespace Microsoft.TeamsAI.AI
                     token = "";
                 }
                 else
-            {
+                {
                     // Add to existing token
                     token += c;
                 }
@@ -419,20 +419,20 @@ namespace Microsoft.TeamsAI.AI
         }
 
         private static string? GetFirstJsonString(string text)
-                {
+        {
             string? firstJSON;
             try
-                    {
+            {
                 firstJSON = ParseJSON(text)?.First();
-                    }
+            }
             catch (InvalidOperationException)
-                    {
+            {
                 // Empty sequence
                 return null;
-                }
+            }
 
             return firstJSON;
-            }
+        }
 
         private static Plan? GetFirstPlanObject(string text)
         {

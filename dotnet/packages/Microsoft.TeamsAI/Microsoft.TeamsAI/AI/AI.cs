@@ -50,7 +50,7 @@ namespace Microsoft.TeamsAI.AI
         /// <remarks>
         /// The default moderator simply allows all messages and plans through without intercepting them.
         /// </remarks>
-        public IModerator<TState> Moderator => _options.Moderator;
+        public IModerator<TState> Moderator => _options.Moderator!;
 
         /// <summary>
         /// Returns the options for the AI system.
@@ -226,7 +226,7 @@ namespace Microsoft.TeamsAI.AI
             PromptTemplate renderedPrompt = await opts.PromptManager.RenderPrompt(turnContext, turnState, prompt);
 
             // Review prompt
-            Plan? plan = await opts.Moderator.ReviewPrompt(turnContext, turnState, renderedPrompt);
+            Plan? plan = await opts.Moderator!.ReviewPrompt(turnContext, turnState, renderedPrompt);
 
             if (plan == null)
             {
@@ -290,7 +290,7 @@ namespace Microsoft.TeamsAI.AI
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.DoCommandActionName)!
                             .Handler
-                            .PerformAction(turnContext, turnState, data, doCommand.Action);
+                            .PerformAction(turnContext, turnState!, data, doCommand.Action);
                     }
                     else
                     {
@@ -298,7 +298,7 @@ namespace Microsoft.TeamsAI.AI
                         continueChain = await _actions
                             .GetAction(DefaultActionTypes.UnknownActionName)
                             .Handler
-                            .PerformAction(turnContext, turnState, plan, doCommand.Action);
+                            .PerformAction(turnContext, turnState!, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
@@ -306,7 +306,7 @@ namespace Microsoft.TeamsAI.AI
                     continueChain = await _actions
                         .GetAction(DefaultActionTypes.SayCommandActionName)
                         .Handler
-                        .PerformAction(turnContext, turnState, sayCommand, DefaultActionTypes.SayCommandActionName);
+                        .PerformAction(turnContext, turnState!, sayCommand, DefaultActionTypes.SayCommandActionName);
                 }
                 else
                 {
