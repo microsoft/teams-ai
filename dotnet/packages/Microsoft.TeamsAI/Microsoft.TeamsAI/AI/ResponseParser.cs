@@ -439,9 +439,9 @@ namespace Microsoft.TeamsAI.AI
             string? firstJSON = GetFirstJsonString(text);
             if (firstJSON == null) return null;
 
-            JsonSerializerSettings settings = new JsonSerializerSettings
+            JsonSerializerSettings settings = new()
             {
-                Converters = new List<JsonConverter> { new PredictedCommandJsonConverter() }
+                Converters = new List<JsonConverter> { new PlanJsonConverter(), new PredictedCommandJsonConverter() }
             };
             return JsonConvert.DeserializeObject<Plan>(firstJSON, settings);
         }

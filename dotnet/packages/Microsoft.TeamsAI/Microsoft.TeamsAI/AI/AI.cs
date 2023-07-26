@@ -422,12 +422,12 @@ namespace Microsoft.TeamsAI.AI
 
             if (tempState != null)
             {
-                if (tempState.Input == null || tempState.Input == string.Empty)
+                if (string.IsNullOrEmpty(tempState.Input))
                 {
                     tempState.Input = turnContext.Activity.Text;
                 }
 
-                if (tempState.History == null && options?.History != null && options.History.TrackHistory)
+                if (string.IsNullOrEmpty(tempState.History) && options?.History != null && options.History.TrackHistory)
                 {
                     tempState.History = ConversationHistory.ToString(turnState, options.History.MaxTokens, options.History.LineSeparator);
                 }

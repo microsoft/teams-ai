@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.20.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.20.0" />
     <PackageReference Include="Microsoft.Bot.Connector" Version="4.20.0" />
-    <PackageReference Include="Microsoft.TeamsAI" Version="1.0.0-alpha0" />
+    <PackageReference Include="Microsoft.TeamsAI" Version="1.0.*-*" />
   </ItemGroup>
 
   <ItemGroup>
