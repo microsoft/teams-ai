@@ -38,7 +38,7 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
     throw new Exception("Missing OpenAI configuration.");
 }
 
-builder.Services.AddSingleton(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo")
+builder.Services.AddSingleton(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003")
 {
     LogRequests = true
 });
@@ -56,11 +56,7 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
     {
         AI = new AIOptions<ListState>(planner, promptManager)
         {
-            Prompt = "ChatGPT",
-            History = new AIHistoryOptions()
-            {
-                AssistantHistoryType = AssistantHistoryType.Text
-            }
+            Prompt = "Chat"
         },
         Storage = sp.GetService<IStorage>()
     };
@@ -78,7 +74,7 @@ if (config.Azure == null
     throw new Exception("Missing Azure configuration.");
 }
 
-builder.Services.AddSingleton(_ => new AzureOpenAIPlannerOptions(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint)
+builder.Services.AddSingleton(_ => new AzureOpenAIPlannerOptions(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint)
 {
     LogRequests = true
 });
@@ -96,11 +92,7 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
     {
         AI = new AIOptions<ListState>(planner, promptManager)
         {
-            Prompt = "ChatGPT",
-            History = new AIHistoryOptions()
-            {
-                TrackHistory = false,
-            }
+            Prompt = "Chat"
         },
         Storage = sp.GetService<IStorage>()
     };
