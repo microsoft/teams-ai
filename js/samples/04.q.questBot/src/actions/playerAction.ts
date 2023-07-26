@@ -1,4 +1,4 @@
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import { Application, ResponseParser } from '@microsoft/teams-ai';
 import {
     ApplicationTurnState,

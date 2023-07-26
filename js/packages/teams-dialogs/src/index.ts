@@ -17,8 +17,6 @@ export * from './dialogEvents';
 export * from './dialogManager';
 export * from './dialogSet';
 export * from './dialogTurnStateConstants';
-export * from './dialogsBotComponent';
-export * from './memory';
 export * from './prompts';
 export * from './recognizer';
 export * from './skillDialog';

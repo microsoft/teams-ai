@@ -5,7 +5,7 @@
 
 import { INVOKE_RESPONSE_KEY } from '.';
 import { BotAdapter } from './botAdapter';
-import { shallowCopy } from './internal';
+import { shallowCopy } from './internals/utils';
 import { TurnContextStateCollection } from './turnContextStateCollection';
 
 import {

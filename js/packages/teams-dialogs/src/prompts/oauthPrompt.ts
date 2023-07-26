@@ -26,7 +26,7 @@ import {
 } from '@microsoft/teams-core';
 
 import * as UserTokenAccess from './userTokenAccess';
-import { ClaimsIdentity, JwtTokenValidation, SkillValidation } from 'botframework-connector';
+import { ClaimsIdentity, JwtTokenValidation, SkillValidation } from '@microsoft/teams-connector';
 import { Dialog, DialogTurnResult } from '../dialog';
 import { DialogContext } from '../dialogContext';
 import { PromptOptions, PromptRecognizerResult, PromptValidator } from './prompt';

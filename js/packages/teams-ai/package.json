@@ -39,7 +39,9 @@
     "resolutions": {
         "follow-redirects": "1.14.7"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "@types/node": "^18.11.9"
+    },
     "scripts": {
         "build": "tsc -b",
         "build-docs": "typedoc --theme markdown --entryPoint teams-ai --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",

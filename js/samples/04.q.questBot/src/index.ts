@@ -13,7 +13,7 @@ import {
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
     TurnContext
-} from 'botbuilder';
+} from '@microsoft/teams-core';
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');

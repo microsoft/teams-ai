@@ -233,15 +233,17 @@ export abstract class Prompt<T> extends Dialog {
             return Dialog.EndOfTurn;
         }
 
+        // @stevenic removed DialogStateManager 7/26/2023
+        // @bugbug re-think how interruptions should work.
         // Are we being continued after an interruption?
         // - The stepCount will be 1 or more if we're running in the context of an AdaptiveDialog
         //   and we're coming back from an interruption.
-        const stepCount = dc.state.getValue('turn.stepCount');
-        if (typeof stepCount == 'number' && stepCount > 0) {
-            // re-prompt and then end
-            await this.repromptDialog(dc.context, dc.activeDialog!);
-            return Dialog.EndOfTurn;
-        }
+        // const stepCount = dc.state.getValue('turn.stepCount');
+        // if (typeof stepCount == 'number' && stepCount > 0) {
+        //     // re-prompt and then end
+        //     await this.repromptDialog(dc.context, dc.activeDialog!);
+        //     return Dialog.EndOfTurn;
+        // }
 
         // Perform base recognition
         const state: PromptState = dc.activeDialog!.state as PromptState;

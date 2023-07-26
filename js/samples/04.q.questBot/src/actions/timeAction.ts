@@ -1,4 +1,4 @@
-import { TurnContext } from 'botbuilder';
+import { TurnContext } from '@microsoft/teams-core';
 import { Application, OpenAIPlanner } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from '../bot';
 import { describeConditions, describeSeason, generateTemperature, generateWeather } from '../conditions';

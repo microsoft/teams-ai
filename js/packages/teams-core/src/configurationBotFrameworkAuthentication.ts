@@ -3,7 +3,6 @@
 
 import * as z from 'zod';
 import { Activity } from '@microsoft/teams-connector/src/schema';
-import { Configuration } from 'botbuilder-dialogs-adaptive-runtime-core';
 
 import {
     AuthenticateRequestResult,
@@ -230,35 +229,4 @@ export class ConfigurationBotFrameworkAuthentication extends BotFrameworkAuthent
     createUserTokenClient(claimsIdentity: ClaimsIdentity): Promise<UserTokenClient> {
         return this.inner.createUserTokenClient(claimsIdentity);
     }
-}
-
-/**
- * Creates a new instance of the [ConfigurationBotFrameworkAuthentication](xref:botbuilder-core.ConfigurationBotFrameworkAuthentication) class.
- *
- * @remarks
- * The [Configuration](xref:botbuilder-dialogs-adaptive-runtime-core.Configuration) instance provided to the constructor should
- * have the desired authentication values available at the root, using the properties of [ConfigurationBotFrameworkAuthenticationOptions](xref:botbuilder-core.ConfigurationBotFrameworkAuthenticationOptions) as its keys.
- * @param configuration A [Configuration](xref:botbuilder-dialogs-adaptive-runtime-core.Configuration) instance.
- * @param credentialsFactory A [ServiceClientCredentialsFactory](xref:botframework-connector.ServiceClientCredentialsFactory) instance.
- * @param authConfiguration A [Configuration](xref:botframework-connector.AuthenticationConfiguration) object.
- * @param botFrameworkClientFetch A custom Fetch implementation to be used in the [BotFrameworkClient](xref:botframework-connector.BotFrameworkClient).
- * @param connectorClientOptions A [ConnectorClientOptions](xref:botframework-connector.ConnectorClientOptions) object.
- * @returns A [ConfigurationBotFrameworkAuthentication](xref:botbuilder-core.ConfigurationBotFrameworkAuthentication) instance.
- */
-export function createBotFrameworkAuthenticationFromConfiguration(
-    configuration: Configuration,
-    credentialsFactory?: ServiceClientCredentialsFactory,
-    authConfiguration?: AuthenticationConfiguration,
-    botFrameworkClientFetch?: (input: RequestInfo|URL, init?: RequestInit) => Promise<Response>,
-    connectorClientOptions: ConnectorClientOptions = {}
-): BotFrameworkAuthentication {
-    const botFrameworkAuthConfig = configuration?.get<ConfigurationBotFrameworkAuthenticationOptions>();
-
-    return new ConfigurationBotFrameworkAuthentication(
-        botFrameworkAuthConfig,
-        credentialsFactory,
-        authConfiguration,
-        botFrameworkClientFetch,
-        connectorClientOptions
-    );
 }

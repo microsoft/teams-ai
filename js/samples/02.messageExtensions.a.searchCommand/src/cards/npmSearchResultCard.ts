@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { CardAction, CardFactory, MessagingExtensionAttachment } from 'botbuilder';
+import { CardAction, CardFactory, MessagingExtensionAttachment } from '@microsoft/teams-core';
 
 export function createNpmSearchResultCard(result: any): MessagingExtensionAttachment {
     // TODO: Use "Adaptive Card Hero Card" since Hero card is considered deprecated

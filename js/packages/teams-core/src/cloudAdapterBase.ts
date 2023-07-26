@@ -4,7 +4,7 @@
 import { BotAdapter } from './botAdapter';
 import { BotCallbackHandlerKey, TurnContext } from './turnContext';
 import { INVOKE_RESPONSE_KEY } from './activityHandlerBase';
-import { delay } from 'botbuilder-stdlib';
+import { delay } from './internals';
 import { v4 as uuid } from 'uuid';
 
 import {

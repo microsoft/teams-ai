@@ -4,7 +4,7 @@
  */
 import { ClaimsIdentity } from '@microsoft/teams-connector';
 import { Activity, ConversationParameters, ConversationReference, ResourceResponse } from '@microsoft/teams-connector/src/schema';
-import { makeRevocable } from './internal';
+import { makeRevocable } from './internals/utils';
 import { Middleware, MiddlewareHandler, MiddlewareSet } from './middlewareSet';
 import { TurnContext } from './turnContext';
 

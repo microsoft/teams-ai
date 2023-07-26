@@ -12,7 +12,7 @@ import {
     SignInUrlResponse,
     TokenExchangeRequest,
     UserTokenClient,
-} from 'botframework-connector';
+} from '@microsoft/teams-connector';
 
 const ExtendedUserTokenProviderT = z.custom<ExtendedUserTokenProvider>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

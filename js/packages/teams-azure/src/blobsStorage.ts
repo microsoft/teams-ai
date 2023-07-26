@@ -2,11 +2,12 @@
 // Licensed under the MIT License.
 
 import * as z from 'zod';
-import getStream from 'get-stream';
 import pmap from 'p-map';
 import { ContainerClient, StoragePipelineOptions } from '@azure/storage-blob';
 import { Storage, StoreItems } from '@microsoft/teams-core';
 import { ignoreError, isStatusCodeError, sanitizeBlobKey } from './internals';
+
+const getStream = require('get-stream');
 
 /**
  * Optional settings for BlobsStorage

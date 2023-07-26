@@ -13,7 +13,7 @@ import {
     OpenAIPlanner,
     ResponseParser
 } from '@microsoft/teams-ai';
-import { ActivityTypes, TurnContext } from 'botbuilder';
+import { ActivityTypes, TurnContext } from '@microsoft/teams-core';
 import * as path from 'path';
 import * as responses from './responses';
 import { IItemList } from './interfaces';

@@ -21,7 +21,6 @@ import { internalRun } from './dialogHelper';
 import { DialogSet } from './dialogSet';
 import { DialogTurnStateConstants } from './dialogTurnStateConstants';
 import { Dialog, DialogTurnResult } from './dialog';
-import { DialogStateManagerConfiguration } from './memory';
 
 const LAST_ACCESS = '_lastAccess';
 const CONVERSATION_STATE = 'ConversationState';
@@ -55,7 +54,8 @@ export interface DialogManagerConfiguration {
     /**
      * Optional. Path resolvers and memory scopes used for conversations with the bot.
      */
-    stateConfiguration?: DialogStateManagerConfiguration;
+    // @stevenic removed DialogStateManager 7/26/2023
+    // stateConfiguration?: DialogStateManagerConfiguration;
 }
 
 /**
@@ -133,7 +133,8 @@ export class DialogManager {
     /**
      * Optional. Path resolvers and memory scopes used for conversations with the bot.
      */
-    stateConfiguration?: DialogStateManagerConfiguration;
+    // @stevenic removed DialogStateManager 7/26/2023
+    // stateConfiguration?: DialogStateManagerConfiguration;
 
     /**
      * Optional. Number of milliseconds to expire the bots conversation state after.
@@ -202,7 +203,7 @@ export class DialogManager {
         const dc = new DialogContext(this.dialogs, context, dialogState);
 
         // Call the common dialog "continue/begin" execution pattern shared with the classic RunAsync extension method
-        const turnResult = await internalRun(context, this._rootDialogId, dc, this.stateConfiguration);
+        const turnResult = await internalRun(context, this._rootDialogId, dc);
 
         // Save BotState changes
         await botStateSet.saveAllChanges(dc.context, false);

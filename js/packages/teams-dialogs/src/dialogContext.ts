@@ -7,7 +7,6 @@ import { Choice } from './choices';
 import { Dialog, DialogInstance, DialogReason, DialogTurnResult, DialogTurnStatus, DialogEvent } from './dialog';
 import { DialogSet } from './dialogSet';
 import { PromptOptions } from './prompts';
-import { DialogStateManager, TurnPath } from './memory';
 import { DialogContainer } from './dialogContainer';
 import { DialogEvents } from './dialogEvents';
 import { DialogManager } from './dialogManager';
@@ -121,8 +120,9 @@ export class DialogContext {
             state.dialogStack = [];
         }
         this.stack = state.dialogStack;
-        this.state = new DialogStateManager(this);
-        this.state.setValue(TurnPath.activity, this.context.activity);
+        // @stevenic removed DialogStateManager 7/26/2023
+        // this.state = new DialogStateManager(this);
+        // this.state.setValue(TurnPath.activity, this.context.activity);
     }
 
     /**
@@ -174,10 +174,8 @@ export class DialogContext {
         return this.stack.length > 0 ? this.stack[this.stack.length - 1] : undefined;
     }
 
-    /**
-     * Gets the DialogStateManager which manages view of all memory scopes.
-     */
-    state: DialogStateManager;
+    // @stevenic removed DialogStateManager 7/26/2023
+    //state: DialogStateManager;
 
     /**
      * Gets the services collection which is contextual to this dialog context.
@@ -198,12 +196,14 @@ export class DialogContext {
      * @returns a locale string.
      */
     getLocale(): string {
-        const _turnLocaleProperty = 'turn.locale';
+        // @stevenic removed DialogStateManager 7/26/2023
+        // @bugbug need to replace this with something new.
+        // const _turnLocaleProperty = 'turn.locale';
 
-        const turnLocaleValue = this.state.getValue(_turnLocaleProperty);
-        if (turnLocaleValue) {
-            return turnLocaleValue;
-        }
+        // const turnLocaleValue = this.state.getValue(_turnLocaleProperty);
+        // if (turnLocaleValue) {
+        //     return turnLocaleValue;
+        // }
 
         const locale = this.context.activity?.locale;
         if (locale !== undefined) {
@@ -657,7 +657,8 @@ export class DialogContext {
             // Pop dialog off stack
             this.stack.pop();
 
-            this.state.setValue(TurnPath.lastResult, result);
+            // @stevenic removed DialogStateManager 7/26/2023
+            // this.state.setValue(TurnPath.lastResult, result);
         }
     }
 }

@@ -165,7 +165,7 @@ export class BlobsTranscriptStore implements TranscriptStore {
                             return null;
                         }
 
-                        const contents = await getStream(stream);
+                        const contents = await getStream(stream as any);
 
                         const activity = JSON.parse(contents);
                         return { ...activity, timestamp: new Date(activity.timestamp) } as Activity;

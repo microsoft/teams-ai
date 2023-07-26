@@ -1,5 +1,5 @@
-import { MemoryStorage, StoreItems, StoreItem } from 'botbuilder';
-import { BlobsStorage } from 'botbuilder-azure-blobs';
+import { MemoryStorage, StoreItems, StoreItem } from '@microsoft/teams-core';
+import { BlobsStorage } from '@microsoft/teams-azure';
 
 export class LastWriterWinsStore extends BlobsStorage {
     public write(changes: StoreItems): Promise<void> {

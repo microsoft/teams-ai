@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Attachment, CardFactory } from 'botbuilder';
+import { Attachment, CardFactory } from '@microsoft/teams-core';
 
 /**
  * Create a static search card. This card has a static list of IDEs.

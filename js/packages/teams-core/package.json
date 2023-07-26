@@ -39,6 +39,7 @@
         "zod": "~1.11.17"
     },
     "devDependencies": {
+        "@types/node": "^18.11.9",
         "@types/fs-extra": "11.0.1",
         "chatdown": "^1.2.4",
         "request": "^2.88.2",

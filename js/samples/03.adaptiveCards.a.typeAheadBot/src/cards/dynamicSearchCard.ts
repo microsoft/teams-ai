@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Attachment, CardFactory } from 'botbuilder';
+import { Attachment, CardFactory } from '@microsoft/teams-core';
 
 /**
  * Creates an Adaptive Card with dynamic search control.

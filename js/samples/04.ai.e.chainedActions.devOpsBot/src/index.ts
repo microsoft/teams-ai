@@ -14,7 +14,7 @@ import {
     ConfigurationBotFrameworkAuthenticationOptions,
     MemoryStorage,
     TurnContext
-} from 'botbuilder';
+} from '@microsoft/teams-core';
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
@@ -227,7 +227,7 @@ function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to make sure that work items are initialized properly.
- * @param state 
+ * @param state
  */
 function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationState {
     const conversation = state.conversation.value;

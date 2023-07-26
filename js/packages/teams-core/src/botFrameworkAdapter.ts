@@ -12,7 +12,7 @@ import { ConnectorClientBuilder, Request, Response, ResponseT, WebRequest, WebRe
 import { HttpClient, RequestPolicyFactory, userAgentPolicy } from '@azure/ms-rest-js';
 import { INodeBufferT, INodeSocketT, LogicT } from './zod';
 import { arch, release, type } from 'os';
-import { delay, retry } from 'botbuilder-stdlib';
+import { delay, retry } from './internals';
 import { validateAndFixActivity } from './activityValidator';
 
 import {

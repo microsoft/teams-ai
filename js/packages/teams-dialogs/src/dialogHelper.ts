@@ -6,12 +6,11 @@
  * Licensed under the MIT License.
  */
 
-import { AuthenticationConstants, ClaimsIdentity, GovernmentConstants, SkillValidation } from 'botframework-connector';
+import { AuthenticationConstants, ClaimsIdentity, GovernmentConstants, SkillValidation } from '@microsoft/teams-connector';
 import { Dialog, DialogTurnStatus, DialogTurnResult } from './dialog';
 import { DialogContext, DialogState } from './dialogContext';
 import { DialogEvents } from './dialogEvents';
 import { DialogSet } from './dialogSet';
-import { DialogStateManager, DialogStateManagerConfiguration } from './memory';
 
 import {
     Activity,
@@ -69,24 +68,23 @@ export async function runDialog(
  * @param context The [TurnContext](xref:botbuilder-core.TurnContext) for the turn.
  * @param dialogId The dialog ID.
  * @param dialogContext The [DialogContext](xref:botbuilder-dialogs.DialogContext) for the current turn of conversation.
- * @param dialogStateManagerConfiguration Configuration for the dialog state manager.
  * @returns {Promise<DialogTurnResult>} a promise resolving to the dialog turn result.
  */
 export async function internalRun(
     context: TurnContext,
     dialogId: string,
-    dialogContext: DialogContext,
-    dialogStateManagerConfiguration?: DialogStateManagerConfiguration
+    dialogContext: DialogContext
 ): Promise<DialogTurnResult> {
     // map TurnState into root dialog context.services
     context.turnState.forEach((service, key) => {
         dialogContext.services.push(key, service);
     });
 
-    const dialogStateManager = new DialogStateManager(dialogContext, dialogStateManagerConfiguration);
+    // @stevenic removed DialogStateManager 7/26/2023
+    // const dialogStateManager = new DialogStateManager(dialogContext, dialogStateManagerConfiguration);
+    // await dialogStateManager.loadAllScopes();
+    // dialogContext.context.turnState.push('DialogStateManager', dialogStateManager);
 
-    await dialogStateManager.loadAllScopes();
-    dialogContext.context.turnState.push('DialogStateManager', dialogStateManager);
     let dialogTurnResult: DialogTurnResult|undefined = undefined;
 
     // Loop as long as we are getting valid OnError handled we should continue executing the actions for the turn.
@@ -112,8 +110,9 @@ export async function internalRun(
         }
     }
 
+    // @stevenic removed DialogStateManager 7/26/2023
     // save all state scopes to their respective botState locations.
-    await dialogStateManager.saveAllChanges();
+    // await dialogStateManager.saveAllChanges();
 
     // return the redundant result because the DialogManager contract expects it
     return dialogTurnResult!;
@@ -253,13 +252,15 @@ const sendStateSnapshotTrace = async (dialogContext: DialogContext): Promise<voi
     const traceLabel =
         claimIdentity && SkillValidation.isSkillClaim(claimIdentity.claims) ? 'Skill State' : 'Bot State';
 
+    // @stevenic removed DialogStateManager 7/26/2023
     // Send trace of memory
-    const snapshot = getActiveDialogContext(dialogContext).state.getMemorySnapshot();
-    const traceActivity = ActivityEx.createTraceActivity(
-        'BotState',
-        'https://www.botframework.com/schemas/botState',
-        snapshot,
-        traceLabel
-    );
-    await dialogContext.context.sendActivity(traceActivity);
+    // const snapshot = getActiveDialogContext(dialogContext).state.getMemorySnapshot();
+    // const traceActivity = ActivityEx.createTraceActivity(
+    //     'BotState',
+    //     'https://www.botframework.com/schemas/botState',
+    //     snapshot,
+    //     traceLabel
+    // );
+    // await dialogContext.context.sendActivity(traceActivity);
+    throw new Error(`Sending state snapshots is currently not supported.`);
 };

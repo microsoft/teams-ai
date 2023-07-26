@@ -1,4 +1,4 @@
-import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
+import { CardFactory, MessageFactory, TurnContext } from '@microsoft/teams-core';
 import { Application, ResponseParser } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
 import { normalizeItemName, searchItemList, textToItemList } from '../items';

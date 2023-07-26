@@ -29,7 +29,6 @@ import { Dialog, DialogInstance, DialogReason, DialogTurnResult } from './dialog
 import { DialogContext } from './dialogContext';
 import { DialogEvents } from './dialogEvents';
 import { SkillDialogOptions } from './skillDialogOptions';
-import { TurnPath } from './memory/turnPath';
 
 /**
  * A specialized Dialog that can wrap remote calls to a skill.
@@ -112,13 +111,14 @@ export class SkillDialog extends Dialog<Partial<BeginSkillDialogOptions>> {
      * return value.
      */
     async continueDialog(dc: DialogContext): Promise<DialogTurnResult> {
+        // @stevenic removed DialogStateManager 7/26/2023
         // with adaptive dialogs, ResumeDialog is not called directly. Instead the Interrupted flag is set, which
         // acts as the signal to the SkillDialog to resume the skill.
-        if (dc.state.getValue<boolean>(TurnPath.interrupted)) {
-            // resume dialog execution
-            dc.state.setValue(TurnPath.interrupted, false);
-            return this.resumeDialog(dc, DialogReason.endCalled);
-        }
+        // if (dc.state.getValue<boolean>(TurnPath.interrupted)) {
+        //     // resume dialog execution
+        //     dc.state.setValue(TurnPath.interrupted, false);
+        //     return this.resumeDialog(dc, DialogReason.endCalled);
+        // }
 
         if (!this.onValidateActivity(dc.context.activity)) {
             return Dialog.EndOfTurn;

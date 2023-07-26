@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders, HttpOperationResponse, WebResource } from '@az
 import { INodeBufferT, INodeSocketT, LogicT } from './zod';
 import { Request, Response, ResponseT } from './interfaces';
 import { USER_AGENT } from './botFrameworkAdapter';
-import { retry } from 'botbuilder-stdlib';
+import { retry } from './internals';
 import { validateAndFixActivity } from './activityValidator';
 
 import {

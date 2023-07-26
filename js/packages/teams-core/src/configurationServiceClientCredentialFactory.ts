@@ -3,7 +3,6 @@
 
 import * as z from 'zod';
 import { ok } from 'assert';
-import { Configuration } from 'botbuilder-dialogs-adaptive-runtime-core';
 import {
     JwtTokenProviderFactory,
     ManagedIdentityServiceClientCredentialsFactory,
@@ -121,20 +120,4 @@ export class ConfigurationServiceClientCredentialFactory extends PasswordService
     ): Promise<ServiceClientCredentials> {
         return this.inner.createCredentials(microsoftAppId, audience, loginEndpoint, validateAuthority);
     }
-}
-
-/**
- * Creates a new instance of the [ConfigurationServiceClientCredentialFactory](xref:botbuilder-core.ConfigurationServiceClientCredentialFactory) class.
- *
- * @remarks
- * The [Configuration](xref:botbuilder-dialogs-adaptive-runtime-core.Configuration) instance provided to the constructor should
- * have the desired authentication values available at the root, using the properties of [ConfigurationServiceClientCredentialFactoryOptions](xref:botbuilder-core.ConfigurationServiceClientCredentialFactoryOptions) as its keys.
- * @param configuration A [Configuration](xref:botbuilder-dialogs-adaptive-runtime-core.Configuration) instance.
- * @returns A [ConfigurationServiceClientCredentialFactory](xref:botbuilder-core.ConfigurationServiceClientCredentialFactory) instance.
- */
-export function createServiceClientCredentialFactoryFromConfiguration(
-    configuration: Configuration
-): ConfigurationServiceClientCredentialFactory {
-    const factoryOptions = configuration.get<ConfigurationServiceClientCredentialFactoryOptions>();
-    return new ConfigurationServiceClientCredentialFactory(factoryOptions);
 }
