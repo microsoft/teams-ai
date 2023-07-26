@@ -14,7 +14,7 @@ namespace ListBot
             _application = application;
         }
 
-        [Action("createList")]
+        [Action("CreateList")]
         public bool CreateList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             if (turnState == null)
@@ -30,7 +30,7 @@ namespace ListBot
             return true;
         }
 
-        [Action("deleteList")]
+        [Action("DeleteList")]
         public bool DeleteList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             if (turnState == null)
@@ -46,7 +46,7 @@ namespace ListBot
             return true;
         }
 
-        [Action("addItem")]
+        [Action("AddItem")]
         public bool AddItem([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             if (turnState == null)
@@ -65,7 +65,7 @@ namespace ListBot
             return true;
         }
 
-        [Action("removeItem")]
+        [Action("RemoveItem")]
         public async Task<bool> RemoveItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             if (turnContext == null)
@@ -99,7 +99,7 @@ namespace ListBot
             }
         }
 
-        [Action("findItem")]
+        [Action("FindItem")]
         public async Task<bool> FindItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
             if (turnContext == null)
@@ -130,7 +130,7 @@ namespace ListBot
             return false;
         }
 
-        [Action("summarizeLists")]
+        [Action("SummarizeLists")]
         public async Task<bool> SummarizeLists([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState)
         {
             if (turnContext == null)

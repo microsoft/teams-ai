@@ -6,12 +6,12 @@ The assistant must return the following JSON structure:
 
 The following actions are supported:
 
-- createList list="<list name>"
-- deleteList list="<list name>"
-- addItem list="<list name>" item="<text>"
-- removeItem list="<list name>" item="<text>"
-- findItem list="<list name>" item="<text>"
-- summarizeLists
+- CreateList list="<list name>"
+- DeleteList list="<list name>"
+- AddItem list="<list name>" item="<text>"
+- RemoveItem list="<list name>" item="<text>"
+- FindItem list="<list name>" item="<text>"
+- SummarizeLists
 
 All entities are required parameters to actions
 

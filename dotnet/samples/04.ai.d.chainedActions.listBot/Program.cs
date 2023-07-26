@@ -102,8 +102,7 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
                 TrackHistory = false,
             }
         },
-        Storage = sp.GetService<IStorage>(),
-        StartTypingTimer = false
+        Storage = sp.GetService<IStorage>()
     };
 
     return new ListBotApplication(applicationOptions);
