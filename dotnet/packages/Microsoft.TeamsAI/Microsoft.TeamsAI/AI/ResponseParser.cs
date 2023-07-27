@@ -275,7 +275,7 @@ namespace Microsoft.TeamsAI.AI
                             if (token == quoteType)
                             {
                                 // Save pair and look for additional pairs
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities![entityName] = entityValue;
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = entityValue = "";
                             }
@@ -289,7 +289,7 @@ namespace Microsoft.TeamsAI.AI
                             {
                                 // Save pair and look for additional pairs
                                 length += 2;
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities![entityName] = entityValue;
                                 entityName = entityValue = "";
                             }
                             else
@@ -301,7 +301,7 @@ namespace Microsoft.TeamsAI.AI
                             // Accumulate tokens until you hit a space
                             if (SPACE_CHARACTERS.Contains(token))
                             {
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities![entityName] = entityValue;
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = entityValue = "";
                             }
@@ -322,7 +322,7 @@ namespace Microsoft.TeamsAI.AI
 
                 if (command != null && entityName.Length > 0)
                 {
-                    command.Entities[entityName] = entityValue;
+                    command.Entities![entityName] = entityValue;
                 }
 
             }

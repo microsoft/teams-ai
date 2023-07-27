@@ -26,13 +26,13 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Any entities that the AI system should use to perform the action.
         /// </summary>
         [JsonProperty("entities")]
-        public Dictionary<string, object> Entities { get; }
+        public Dictionary<string, object>? Entities { get; }
 
         [JsonConstructor]
         public PredictedDoCommand(string action, Dictionary<string, object> entities)
         {
             Action = action;
-            Entities = entities ?? new Dictionary<string, object>();
+            Entities = entities;
         }
 
         public PredictedDoCommand(string action)
