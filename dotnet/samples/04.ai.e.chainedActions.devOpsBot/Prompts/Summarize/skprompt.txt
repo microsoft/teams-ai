@@ -78,7 +78,7 @@ Here's the user's query:
 {{$input}}
 ```
 
-Use the template to create an Adaptive Card, include "$schema" and "version" fields.
+Use the template to create an Adaptive Card.
 Take into account any changes asked for by the user.
 Always replace the placeholder: "id-n", "title-n", "assignedTo-n", and "status-n", with real data.
 

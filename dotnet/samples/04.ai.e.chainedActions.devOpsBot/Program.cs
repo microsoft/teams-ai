@@ -40,7 +40,7 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new ArgumentException("Missing OpenAI configuration.");
 }
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
+builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "text-davinci-003"));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -57,11 +57,7 @@ builder.Services.AddTransient<IBot>(sp =>
     AIOptions<DevOpsState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<DevOpsState>("./Prompts"),
-        prompt: "ChatGPT",
-        history: new AIHistoryOptions
-        {
-            TrackHistory = false
-        });
+        prompt: "Chat");
     ApplicationOptions<DevOpsState, DevOpsStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new DevOpsStateManager(),
@@ -81,7 +77,7 @@ if (config.Azure == null
 {
     throw new ArgumentException("Missing Azure configuration.");
 }
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint));
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -98,11 +94,7 @@ builder.Services.AddTransient<IBot>(sp =>
     AIOptions<DevOpsState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<DevOpsState>("./Prompts"),
-        prompt: "ChatGPT",
-        history: new AIHistoryOptions
-        {
-            TrackHistory = false
-        });
+        prompt: "Chat");
     ApplicationOptions<DevOpsState, DevOpsStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new DevOpsStateManager(),
