@@ -69,7 +69,7 @@ namespace Microsoft.TeamsAI.Tests
             // Assert
             Assert.Equal(AITypes.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
-            
+
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Empty(predictedDoCommand.Entities);
             Assert.Equal("actionValue", predictedDoCommand.Action);
@@ -209,17 +209,20 @@ namespace Microsoft.TeamsAI.Tests
         }
 
         [Fact]
-        public void Test_ParsePlan_Invalid_Format_Type_IsNot_Plan()
+        public void Test_ParsePlan_Not_Plan_Type_Default_Command()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'notPlan','commands':[] }";
+            var notPlanJSON = @"{ 'type':'notPlan','commands':[] }";
 
             // Act
-            Plan responsePlan = ResponseParser.ParseResponse(planJSON);
+            Plan responsePlan = ResponseParser.ParseResponse(notPlanJSON);
 
-            // Assert - returns empty plan
+            // Assert - returns plan with default (say) command
             Assert.Equal(AITypes.Plan, responsePlan.Type);
-            Assert.Empty(responsePlan.Commands);
+            Assert.Single(responsePlan.Commands);
+
+            PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
+            Assert.Equal(notPlanJSON, predictedSayCommand.Response);
         }
 
         [Fact]
@@ -248,6 +251,45 @@ namespace Microsoft.TeamsAI.Tests
             // Assert
             Assert.Equal(AITypes.Plan, responsePlan.Type);
             Assert.Empty(responsePlan.Commands);
+        }
+
+        [Fact]
+        public void Test_ParsePlan_AnyJSON_Response_Say_Command()
+        {
+            // Arrange 
+            var anyJSON = @"{ 'foo':'bar' }";
+
+            // Act
+            Plan responsePlan = ResponseParser.ParseResponse(anyJSON);
+
+            // Assert
+            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Single(responsePlan.Commands);
+
+            PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
+            Assert.Equal(anyJSON, predictedSayCommand.Response);
+        }
+
+        [Fact]
+        public void Test_ParsePlan_AdaptiveCardJSON_Response_Say_Command()
+        {
+            // Arrange 
+            var adaptiveCardJSON =
+@"{
+  ""type"": ""AdaptiveCard"",
+  ""version"": ""1.4"",
+  ""body"": []
+}";
+
+            // Act
+            Plan responsePlan = ResponseParser.ParseResponse(adaptiveCardJSON);
+
+            // Assert
+            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Single(responsePlan.Commands);
+
+            PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
+            Assert.Equal(adaptiveCardJSON, predictedSayCommand.Response);
         }
 
         [Fact]
