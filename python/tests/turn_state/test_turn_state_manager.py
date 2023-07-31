@@ -65,9 +65,9 @@ class TestTurnStateManager:
         state = await self.manager.load_state(storage=storage,
                                               context=TurnContext(
                                                   SimpleAdapter(), ACTIVITY))
-        assert state["conversation"].empty is True
-        assert state["user"].empty is True
-        assert state["temp"].empty is True
+        assert state["conversation"].value is None
+        assert state["user"].value is None
+        assert state["temp"].value is None
 
     @pytest.mark.asyncio
     async def test_load_state_non_empty(self):
@@ -78,19 +78,21 @@ class TestTurnStateManager:
                                               context=TurnContext(
                                                   SimpleAdapter(), ACTIVITY))
         TestCase().assertIsInstance(state["conversation"].value, StoreItem)
-        assert state["user"].empty is True
-        assert state["temp"].empty is True
+        assert state["user"].value is None
+        assert state["temp"].value is None
 
     @pytest.mark.asyncio
     async def test_save_state(self):
         storage = MemoryStorage()
         key = f"UnitTest/bot/conversations/convo"
+        stateValue = {}
         state: TurnState = {
-            "conversation":
-            TurnStateEntry(value=StoreItem(hello="world"), storage_key=key)
+            "conversation": TurnStateEntry(value=stateValue, storage_key=key)
         }
 
+        # Mutate the conversation state to so that the changes are saved.
+        stateValue["test_key"] = "test_value"
         await self.manager.save_state(storage=storage, state=state)
         value = await storage.read([key])
 
-        TestCase().assertIsInstance(value[key], StoreItem)
+        TestCase().assertEqual(value[key], {"test_key": "test_value"})

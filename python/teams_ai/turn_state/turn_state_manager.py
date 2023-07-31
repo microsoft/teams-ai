@@ -41,22 +41,23 @@ class TurnStateManager(Generic[TurnStateT]):
             raise ValueError("missing context.activity.from_property.id")
 
         channel_id = context.activity.channel_id
-        convo_id = context.activity.conversation.id
+        conversation_id = context.activity.conversation.id
         bot_id = context.activity.recipient.id
         user_id = context.activity.from_property.id
-        convo_key = f"{channel_id}/{bot_id}/conversations/{convo_id}"
+        conversation_key = f"{channel_id}/{bot_id}/conversations/{conversation_id}"
         user_key = f"{channel_id}/{bot_id}/users/{user_id}"
 
         items = {}
 
         if storage:
-            items = await storage.read([convo_key, user_key])
+            items = await storage.read([conversation_key, user_key])
 
-        convo = items[convo_key] if convo_key in items else None
+        conversation = items[
+            conversation_key] if conversation_key in items else None
         user = items[user_key] if user_key in items else None
 
-        return TurnState(conversation=TurnStateEntry(value=convo,
-                                                     storage_key=convo_key),
+        return TurnState(conversation=TurnStateEntry(
+            value=conversation, storage_key=conversation_key),
                          user=TurnStateEntry(value=user, storage_key=user_key),
                          temp=TurnStateEntry())
 
@@ -71,9 +72,9 @@ class TurnStateManager(Generic[TurnStateT]):
 
         for key in state:
             if state[key].storage_key:
-                if state[key].deleted:
+                if state[key].is_deleted:
                     to_delete.append(state[key].storage_key)
-                else:
+                elif state[key].has_changed:
                     changes[state[key].storage_key] = state[key].value
 
         if len(changes) > 0:

@@ -11,18 +11,18 @@ from teams_ai.turn_state import TurnStateEntry
 class TestTurnStateEntry:
 
     def test_changed(self):
-        entry = TurnStateEntry()
-        assert entry.changed is False
+        entry = TurnStateEntry({"hello": "world"})
+        assert entry.has_changed is False
 
-        entry.value = {"hello": "world"}
-        assert entry.changed is True
+        entry.value["hello"] = "hello"
+        assert entry.has_changed is True
 
     def test_deleted(self):
         entry = TurnStateEntry()
-        assert entry.deleted is False
+        assert entry.is_deleted is False
 
         entry.delete()
-        assert entry.deleted is True
+        assert entry.is_deleted is True
 
     def test_storage_key(self):
         entry = TurnStateEntry(value={"hello": "world"},
@@ -31,9 +31,9 @@ class TestTurnStateEntry:
 
     def test_value(self):
         entry = TurnStateEntry(value={"hello": "world"})
-        assert entry.deleted is False
+        assert entry.is_deleted is False
 
         entry.delete()
-        assert entry.deleted is True
-        assert entry.value is not None
-        assert entry.deleted is False
+        assert entry.is_deleted is True
+        entry.replace({"another": "hello"})
+        assert entry.is_deleted is False

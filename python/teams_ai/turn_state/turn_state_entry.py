@@ -24,22 +24,16 @@ class TurnStateEntry(Generic[ValueT]):
         self._hash = str(self._value)
 
     @property
-    def changed(self) -> bool:
+    def has_changed(self) -> bool:
         "gets a value indicating whether the state scope has changed since it was last loaded"
 
         return self._hash != str(self._value)
 
     @property
-    def deleted(self) -> bool:
+    def is_deleted(self) -> bool:
         "gets the value indicating whether the state scope has been deleted"
 
         return self._deleted
-
-    @property
-    def empty(self) -> bool:
-        "is the stored values empty"
-
-        return self._value is None
 
     @property
     def storage_key(self) -> Optional[str]:
@@ -51,16 +45,17 @@ class TurnStateEntry(Generic[ValueT]):
     def value(self) -> ValueT:
         "gets the value of the state scope"
 
-        if self.deleted:
+        if self.is_deleted:
+            self._value = None
             self._deleted = False
 
         return self._value
 
-    @value.setter
-    def value(self, value: ValueT):
+    def replace(self, value: ValueT):
         "sets the value of the state scope"
 
         self._value = value
+        self._deleted = False
 
     def delete(self):
         "delete state scope"
