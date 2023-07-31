@@ -176,6 +176,12 @@ A conversational bot for Microsoft Teams, designed as an AI assistant. The bot c
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
 
+#### [List Generator AI Assistant](/dotnet/samples/04.ai.d.chainedActions.listBot/)
+
+Similar to the Light On/Off sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
+
+This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
+
 #### [DevOps AI Assistant](/dotnet/samples/04.ai.e.chainedActions.devOpsBot/)
 
 Similar to the List Generator AI Assistant sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
