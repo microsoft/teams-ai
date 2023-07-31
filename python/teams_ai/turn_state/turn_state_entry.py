@@ -3,58 +3,61 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import TypeVar, Generic, TypedDict, Union
+from typing import TypeVar, Generic, Optional
 
-T = TypeVar("T", TypedDict)
+ValueT = TypeVar("ValueT")
 
 
-class TurnStateEntry(Generic[T]):
+class TurnStateEntry(Generic[ValueT]):
     "accessor class for managing an individual state scope"
 
-    __value: T
-    __storage_key: Union[str, None]
-    __deleted = False
-    __hash: str
+    _value: ValueT
+    _storage_key: Optional[str]
+    _hash: str
+    _deleted = False
 
-    def __init__(self, value: T, storage_key=None) -> None:
-        self.__value = value
-        self.__storage_key = storage_key
-        self.__hash = value.__str__()
+    def __init__(self,
+                 value: Optional[ValueT] = None,
+                 storage_key: Optional[str] = None) -> None:
+        self._value = value
+        self._storage_key = storage_key
+        self._hash = str(self._value)
 
     @property
-    def changed(self) -> bool:
+    def has_changed(self) -> bool:
         "gets a value indicating whether the state scope has changed since it was last loaded"
 
-        return self.__hash != str(self.__value)
+        return self._hash != str(self._value)
 
     @property
-    def deleted(self) -> bool:
+    def is_deleted(self) -> bool:
         "gets the value indicating whether the state scope has been deleted"
 
-        return self.__deleted
+        return self._deleted
 
     @property
-    def value(self) -> T:
-        "gets the value of the state scope"
-
-        if self.__deleted:
-            self.__value = {}
-            self.__deleted = False
-
-        return self.__value
-
-    @property
-    def storage_key(self) -> Union[str, None]:
+    def storage_key(self) -> Optional[str]:
         "gets the storage key used to persist the state scope"
 
-        return self.__storage_key
+        return self._storage_key
 
-    def delete(self) -> None:
-        "clears the state scope"
+    @property
+    def value(self) -> ValueT:
+        "gets the value of the state scope"
 
-        self.__deleted = True
+        if self.is_deleted:
+            self._value = None
+            self._deleted = False
 
-    def replace(self, value: T) -> None:
-        "replaces the state scope with a new value"
+        return self._value
 
-        self.__value = value
+    def replace(self, value: ValueT):
+        "sets the value of the state scope"
+
+        self._value = value
+        self._deleted = False
+
+    def delete(self):
+        "delete state scope"
+
+        self._deleted = True
