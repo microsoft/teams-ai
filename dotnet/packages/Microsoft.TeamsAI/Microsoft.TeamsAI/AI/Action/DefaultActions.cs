@@ -89,7 +89,7 @@ namespace Microsoft.TeamsAI.AI.Action
                     _logger?.LogWarning($"{card.Warnings.Count} warnings found in the model generated adaptive card:\n {warnings}");
                 }
 
-                Attachment attachment = new() { Content = card, ContentType = AdaptiveCard.ContentType };
+                Attachment attachment = new() { Content = card.Card, ContentType = AdaptiveCard.ContentType };
                 IMessageActivity activity = MessageFactory.Attachment(attachment);
                 await turnContext.SendActivityAsync(activity);
             }

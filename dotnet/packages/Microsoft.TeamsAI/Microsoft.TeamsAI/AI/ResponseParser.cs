@@ -46,18 +46,18 @@ namespace Microsoft.TeamsAI.AI
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
 
                     // Validate string to be a valid JSON
-                try
-                {
+                    try
+                    {
                         JToken.Parse(possibleJSON);
-                }
-                catch (JsonReaderException)
-                {
-                    continue;
-                }
+                    }
+                    catch (JsonReaderException)
+                    {
+                        continue;
+                    }
 
                     result.Add(possibleJSON);
                     break;
-            }
+                }
             }
 
             return result;
@@ -275,7 +275,7 @@ namespace Microsoft.TeamsAI.AI
                             if (token == quoteType)
                             {
                                 // Save pair and look for additional pairs
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities![entityName] = entityValue;
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = entityValue = "";
                             }
@@ -289,7 +289,7 @@ namespace Microsoft.TeamsAI.AI
                             {
                                 // Save pair and look for additional pairs
                                 length += 2;
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities![entityName] = entityValue;
                                 entityName = entityValue = "";
                             }
                             else
@@ -301,7 +301,7 @@ namespace Microsoft.TeamsAI.AI
                             // Accumulate tokens until you hit a space
                             if (SPACE_CHARACTERS.Contains(token))
                             {
-                                command!.Entities[entityName] = entityValue;
+                                command!.Entities![entityName] = entityValue;
                                 parseState = DoCommandParseState.FindEntityName;
                                 entityName = entityValue = "";
                             }
@@ -322,7 +322,7 @@ namespace Microsoft.TeamsAI.AI
 
                 if (command != null && entityName.Length > 0)
                 {
-                    command.Entities[entityName] = entityValue;
+                    command.Entities![entityName] = entityValue;
                 }
 
             }
@@ -378,7 +378,7 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="text">Any input string</param>
         /// <returns>A list of tokens</returns>
         public static List<string> TokenizeText(string text)
-            {
+        {
             List<string> tokens = new();
 
             if (text.Length < 1) return tokens;
@@ -389,12 +389,12 @@ namespace Microsoft.TeamsAI.AI
             {
                 string c = text[i].ToString();
                 if (BREAKING_CHARACTERS.IndexOf(c) >= 0)
-            {
+                {
                     // Push token onto list
                     if (token.Length > 0)
-            {
+                    {
                         tokens.Add(token);
-        }
+                    }
 
                     // Push breaking character onto list as a separate token
                     tokens.Add(c);
@@ -403,7 +403,7 @@ namespace Microsoft.TeamsAI.AI
                     token = "";
                 }
                 else
-            {
+                {
                     // Add to existing token
                     token += c;
                 }
@@ -419,29 +419,29 @@ namespace Microsoft.TeamsAI.AI
         }
 
         private static string? GetFirstJsonString(string text)
-                {
+        {
             string? firstJSON;
             try
-                    {
+            {
                 firstJSON = ParseJSON(text)?.First();
-                    }
+            }
             catch (InvalidOperationException)
-                    {
+            {
                 // Empty sequence
                 return null;
-                }
+            }
 
             return firstJSON;
-            }
+        }
 
         private static Plan? GetFirstPlanObject(string text)
         {
             string? firstJSON = GetFirstJsonString(text);
             if (firstJSON == null) return null;
 
-            JsonSerializerSettings settings = new JsonSerializerSettings
+            JsonSerializerSettings settings = new()
             {
-                Converters = new List<JsonConverter> { new PredictedCommandJsonConverter() }
+                Converters = new List<JsonConverter> { new PlanJsonConverter(), new PredictedCommandJsonConverter() }
             };
             return JsonConvert.DeserializeObject<Plan>(firstJSON, settings);
         }

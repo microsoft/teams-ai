@@ -12,11 +12,11 @@ namespace Microsoft.TeamsAI.AI.Planner
 
         public override bool CanWrite => false;
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             JObject item = JObject.Load(reader);
 
-            if (item.TryGetValue("type", StringComparison.InvariantCultureIgnoreCase, out JToken commandType))
+            if (item.TryGetValue("type", StringComparison.InvariantCultureIgnoreCase, out JToken? commandType))
             {
                 if (commandType.Type != JTokenType.String)
                 {
