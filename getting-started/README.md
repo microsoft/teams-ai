@@ -1,11 +1,19 @@
-# Migration documentation
+# Getting Started
+
+1. [Prompts](./00.PROMPTS.md)
+2. [Templates](./01.TEMPLATES.md)
+3. [Actions](./02.ACTIONS.md)
+4. [Plans](./03.PLANS.md)
+5. [Chaining](./04.CHAINING.md)
+
+## Migration Documentation
 
 Welcome to the migration docs! Please note that we currently have two sections:
 
 1. [`js` guidance](./js/)
 1. [`dotnet` guidance](./dotnet/)
 
-## Migration
+### Migration
 
 If you are migrating your existing bot, we recommend starting with the respective 00.MIGRATION in the programming language of your bot. Please note that while the content of both sections will be extremely similar, our goal is to provide code examples in the corresponding language.
 
@@ -17,7 +25,3 @@ Otherwise, please feel free to browse other pages, including Concepts and Prompt
 ## Concepts
 
 TBD.
-
-## Prompt Injection
-
-- [Prompt injection](./PROMPT-INJECTION.md) is one method malicious users might use to alter the directions (prompts) of your bot. These are suggestions only, but may be helpful on top of moderation in protecting the purpose and goals of the bot you have engineered.
