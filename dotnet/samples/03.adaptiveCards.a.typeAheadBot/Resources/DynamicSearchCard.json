@@ -1,0 +1,60 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.3",
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "text": "Please search for Nuget packages using dynamic search control.",
+      "wrap": true,
+      "type": "TextBlock"
+    },
+    {
+      "columns": [
+        {
+          "width": "stretch",
+          "items": [
+            {
+              "choices": [
+                {
+                  "title": "Microsoft.TeamsAI",
+                  "value": "static_option_1"
+                },
+                {
+                  "title": "Microsoft.Bot.Builder",
+                  "value": "static_option_2"
+                },
+                {
+                  "title": "Microsoft.Bot.Schema",
+                  "value": "static_option_3"
+                }
+              ],
+              "choices.data": {
+                "type": "Data.Query",
+                "dataset": "nugetpackages"
+              },
+              "id": "choiceSelect",
+              "type": "Input.ChoiceSet",
+              "placeholder": "Package name",
+              "label": "Nuget package search",
+              "isRequired": true,
+              "errorMessage": "There was an error",
+              "isMultiSelect": true,
+              "style": "filtered"
+            }
+          ],
+          "type": "Column"
+        }
+      ],
+      "type": "ColumnSet"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Submit",
+      "data": {
+        "verb": "DynamicSubmit"
+      }
+    }
+  ]
+}

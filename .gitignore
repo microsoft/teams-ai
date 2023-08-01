@@ -108,9 +108,11 @@ dist
 
 .DS_Store
 /.vs
-/dotnet/packages/Microsoft.Bot.Builder.M365/.vs
-/dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365/bin/Debug/netstandard2.0
-/dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365/obj
-/dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365.Tests/bin/Debug/net6.0
-/dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365.Tests/obj/Debug/net6.0
-/dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365.Tests/obj
+/dotnet/packages/Microsoft.TeamsAI/.vs
+/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/bin
+/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/obj
+/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/bin/Debug/net6.0
+/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj/Debug/net6.0
+/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj
+/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/IntegrationTests/testsettings.json
+/dotnet/samples/01.echoBot/.vs/*

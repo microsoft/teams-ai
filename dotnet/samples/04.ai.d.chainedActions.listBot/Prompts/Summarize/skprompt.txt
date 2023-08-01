@@ -1,0 +1,59 @@
+Here is an adaptive card template for showing 1 or more lists to a user
+
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.3",
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Your Lists",
+            "weight": "bolder",
+            "size": "large"
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "List 1",
+                    "weight": "bolder"
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "* Item 1\n* Item 2\n* Item 3"
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "TextBlock",
+                    "text": "List 2",
+                    "weight": "bolder"
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "* Item 4\n* Item 5\n* Item 6"
+                }
+            ]
+        }
+    ]
+}
+
+Here's a set of lists. The key is the title of the list and the arrays contain a lists items:
+
+{{getLists}}
+
+Here's the users query:
+
+```
+{{$input}}
+```
+
+Use the template to create an adaptive card.
+Take into account any changes asked for by the user.
+Always replace the placeholder text, List n and Item n, with real data.
+
+AdaptiveCard:
