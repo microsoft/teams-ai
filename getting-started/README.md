@@ -23,7 +23,3 @@ If you are migrating your existing bot, we recommend starting with the respectiv
 - [dotnet](./dotnet/00.MIGRATION.md)
 
 Otherwise, please feel free to browse other pages, including Concepts and Prompt Injection.
-
-## Concepts
-
-TBD.
