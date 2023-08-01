@@ -4,12 +4,13 @@
     "version": "0.1.0",
     "workspaces": [
         "./packages/*",
-        "./samples/*"
+        "./samples/*",
+        "!./samples/chatmoderation"
     ],
     "scripts": {
         "build": "wsrun -e -m -t build",
         "build-docs": "wsrun -e -m build-docs",
-        "clean": "wsrun -m clean",
+        "clean": "wsrun -m clean && npx rimraf node_modules",
         "depcheck": "wsrun -m -l depcheck",
         "dev:link": "wsrun --if is-not-private --bin=yarn link",
         "dev:unlink": "wsrun --if is-not-private --bin=yarn unlink",

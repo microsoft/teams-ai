@@ -11,10 +11,10 @@
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { TurnState, TurnStateEntry, TurnStateManager } from './TurnState';
 
-
 /**
  * Default conversation state
- * @remarks
+ *
+ * @summary
  * Inherit a new interface from this base interface to strongly type the applications conversation
  * state.
  */
@@ -23,7 +23,8 @@ export interface DefaultConversationState {}
 
 /**
  * Default user state
- * @remarks
+ *
+ * @summary
  * Inherit a new interface from this base interface to strongly type the applications user
  * state.
  */
@@ -32,7 +33,8 @@ export interface DefaultUserState {}
 
 /**
  * Default temp state
- * @remarks
+ *
+ * @summary
  * Inherit a new interface from this base interface to strongly type the applications temp
  * state.
  */
@@ -54,6 +56,7 @@ export interface DefaultTempState {
 }
 /**
  * Defines the default state scopes persisted by the `DefaultTurnStateManager`.
+ *
  * @template TConversationState Optional. Type of the conversation state object being persisted.
  * @template TUserState Optional. Type of the user state object being persisted.
  * @template TTempState Optional. Type of the temp state object being persisted.
@@ -70,6 +73,7 @@ export interface DefaultTurnState<
 
 /**
  * Default turn state manager implementation.
+ *
  * @template TConversationState Optional. Type of the conversation state object being persisted.
  * @template TUserState Optional. Type of the user state object being persisted.
  * @template TTempState Optional. Type of the temp state object being persisted.
@@ -82,9 +86,10 @@ export class DefaultTurnStateManager<
 {
     /**
      * Loads all of the state scopes for the current turn.
-     * @param storage Storage provider to load state scopes from.
-     * @param context Context for the current turn of conversation with the user.
-     * @returns The loaded state scopes.
+     *
+     * @param {Storage} storage - Storage provider to load state scopes from.
+     * @param {TurnContext} context - Context for the current turn of conversation with the user.
+     * @returns {Promise<DefaultTurnState<TConversationState, TUserState, TTempState>>} The loaded state scopes.
      */
     public async loadState(
         storage: Storage,
@@ -131,9 +136,10 @@ export class DefaultTurnStateManager<
 
     /**
      * Saves all of the state scopes for the current turn.
-     * @param storage Storage provider to save state scopes to.
-     * @param context Context for the current turn of conversation with the user.
-     * @param state State scopes to save.
+     *
+     * @param {Storage} storage - Storage provider to save state scopes to.
+     * @param {TurnContext} context - Context for the current turn of conversation with the user.
+     * @param {DefaultTurnState<TConversationState, TUserState, TTempState>} state - State scopes to save.
      */
     public async saveState(
         storage: Storage,

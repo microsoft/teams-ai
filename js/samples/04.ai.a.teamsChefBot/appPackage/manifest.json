@@ -1,0 +1,48 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
+    "version": "1.1.0",
+    "manifestVersion": "1.15",
+    "id": "${{TEAMS_APP_ID}}",
+    "packageName": "com.package.name",
+    "name": {
+        "short": "TeamsChef-${{TEAMSFX_ENV}}",
+        "full": "Teams Developer Chef"
+    },
+    "developer": {
+        "name": "TeamsChef",
+        "mpnId": "",
+        "websiteUrl": "https://en.wikipedia.org/wiki/HAL_9000",
+        "privacyUrl": "https://en.wikipedia.org/wiki/HAL_9000",
+        "termsOfUseUrl": "https://en.wikipedia.org/wiki/HAL_9000"
+    },
+    "description": {
+        "short": "Sample bot that thinks it's a Chef to help you cook Teams apps",
+        "full": "Sample bot that thinks it's a Chef to help you cook Teams apps"
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#FFFFFF",
+    "staticTabs": [
+        {
+            "entityId": "conversations",
+            "scopes": ["personal"]
+        },
+        {
+            "entityId": "about",
+            "scopes": ["personal"]
+        }
+    ],
+    "bots": [
+        {
+            "botId": "${{BOT_ID}}",
+            "scopes": ["personal", "team", "groupChat"],
+            "isNotificationOnly": false,
+            "supportsCalling": false,
+            "supportsVideo": false,
+            "supportsFiles": false
+        }
+    ],
+    "validDomains": []
+}

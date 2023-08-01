@@ -3,6 +3,9 @@
 
 import { Attachment, CardFactory } from 'botbuilder';
 
+/**
+ * @param result
+ */
 export function createNpmPackageCard(result: any): Attachment {
     return CardFactory.adaptiveCard({
         $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',

@@ -28,6 +28,7 @@ export interface AzureOpenAIPlannerOptions extends OpenAIPlannerOptions {
 
 /**
  * Planner that uses the Azure OpenAI service.
+ *
  * @template TState Optional. Type of the applications turn state.
  */
 export class AzureOpenAIPlanner<TState extends TurnState = DefaultTurnState> extends OpenAIPlanner<
@@ -35,7 +36,9 @@ export class AzureOpenAIPlanner<TState extends TurnState = DefaultTurnState> ext
     AzureOpenAIPlannerOptions
 > {
     /**
+     * @param {AzureOpenAIPlannerOptions} options Options for the AzureOpenAIPlanner
      * @private
+     * @returns {AzureOpenAIClient} A planner that uses Azure OpenAI to generate plans
      */
     protected createClient(options: AzureOpenAIPlannerOptions): OpenAIClient {
         return new AzureOpenAIClient({
