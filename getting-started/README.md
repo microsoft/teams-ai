@@ -5,6 +5,8 @@
 3. [Actions](./02.ACTIONS.md)
 4. [Plans](./03.PLANS.md)
 5. [Chaining](./04.CHAINING.md)
+6. [Storage](./05.STORAGE.md)
+7. [Turns](./06.TURNS.md)
 
 ## Migration Documentation
 
