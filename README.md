@@ -14,7 +14,7 @@ The SDK also facilitates the creation of bots that uses an [OpenAI](https://open
 
 This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
 
-**To get started, head over to the [00.Migration](getting-started/00.MIGRATION.md) guide.**
+**To get started, head over to the [Getting Started Guide](getting-started/README.md).**
 
 ## Capabilities
 
