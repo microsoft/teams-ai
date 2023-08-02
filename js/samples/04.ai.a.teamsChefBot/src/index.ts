@@ -65,6 +65,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import {
     AI,
     Application,
+    AzureOpenAIPlanner,
     ConversationHistory,
     DefaultPromptManager,
     DefaultTurnState,
@@ -76,19 +77,23 @@ import {
 interface ConversationState {}
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
-}
 // Create AI components
 const planner = new OpenAIPlanner({
     apiKey: process.env.OPENAI_API_KEY || '',
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
-const moderator = new OpenAIModerator({
-    apiKey: process.env.OPENAI_API_KEY || '',
-    moderate: 'both'
-});
+// const planner = new AzureOpenAIPlanner({
+//     apiKey: process.env.AzureOpenAIKey || '',
+//     defaultModel: 'gpt-3.5-turbo',
+//     endpoint: process.env.AzureOpenAIEndpoint || '',
+//     apiVersion: '2023-03-15-preview'
+// });
+
+// const moderator = new OpenAIModerator({
+//     apiKey: process.env.OPENAI_API_KEY || '',
+//     moderate: 'both'
+// });
 const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
@@ -97,7 +102,7 @@ const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
-        moderator,
+        // moderator,
         promptManager,
         prompt: 'chat',
         history: {
@@ -125,9 +130,9 @@ app.message('/history', async (context: TurnContext, state: ApplicationTurnState
 });
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res, next) => {
+server.post('/api/messages', (req, res, next) => {
     // Route received a request to adapter for processing
-    await adapter.process(req, res as any, async (context) => {
+    adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });

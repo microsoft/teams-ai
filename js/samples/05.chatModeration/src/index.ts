@@ -74,12 +74,14 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import * as bot from './bot';
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res) => {
+server.post('/api/messages', (req, res, next) => {
     // Route received a request to adapter for processing
-    await adapter.process(req, res as any, async (context) => {
+    adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await bot.run(context);
     });
+
+    return next();
 });
 
 server.get(
