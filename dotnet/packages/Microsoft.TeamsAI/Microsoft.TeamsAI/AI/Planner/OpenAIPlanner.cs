@@ -13,7 +13,10 @@ using AIException = Microsoft.SemanticKernel.AI.AIException;
 using PromptTemplate = Microsoft.TeamsAI.AI.Prompt.PromptTemplate;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
+using System.Runtime.CompilerServices;
 
+// For Unit Test
+[assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
 namespace Microsoft.TeamsAI.AI.Planner
 {
     /// <summary>
@@ -31,7 +34,6 @@ namespace Microsoft.TeamsAI.AI.Planner
         private TOptions _options { get; }
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
-        
         public OpenAIPlanner(TOptions options, ILogger? logger = null)
         {
             // TODO: Configure Retry Handler
@@ -39,12 +41,10 @@ namespace Microsoft.TeamsAI.AI.Planner
             KernelBuilder builder = Kernel.Builder
                 .WithDefaultAIService(_CreateTextCompletionService(options))
                 .WithDefaultAIService(_CreateChatCompletionService(options));
-                
             if (options.LogRequests && logger == null)
             {
                 throw new ArgumentException("Logger parameter cannot be null if `LogRequests` option is set to true");
             }
-            
             if (logger != null)
             {
                 builder.WithLogger(logger);
@@ -102,10 +102,10 @@ namespace Microsoft.TeamsAI.AI.Planner
                     string? userMessage = turnState?.Temp?.Input;
 
                     // Request base chat completion
-                    IChatResult response = await _CreateChatCompletion(turnState, options, promptTemplate, userMessage, cancellationToken);
+                    IChatResult response = await _CreateChatCompletion(turnState!, options, promptTemplate, userMessage, cancellationToken);
                     ChatMessageBase message = await response.GetChatMessageAsync(cancellationToken).ConfigureAwait(false);
                     CompletionsUsage usage = ((ITextResult)response).ModelResult.GetOpenAIChatResult().Usage;
-                    
+
                     completionTokens = usage.CompletionTokens;
                     promptTokens = usage.PromptTokens;
                     result = message.Content.ToString();
@@ -115,9 +115,9 @@ namespace Microsoft.TeamsAI.AI.Planner
                     // Request base text completion
                     ITextResult response = await _CreateTextCompletion(promptTemplate, cancellationToken);
                     CompletionsUsage usage = response.ModelResult.GetOpenAITextResult().Usage;
-                    
+
                     completionTokens = usage.CompletionTokens;
-                    promptTokens = usage.PromptTokens; 
+                    promptTokens = usage.PromptTokens;
                     result = await response.GetCompletionAsync(cancellationToken).ConfigureAwait(false);
                 }
 
@@ -145,7 +145,8 @@ namespace Microsoft.TeamsAI.AI.Planner
             try
             {
                 result = await CompletePromptAsync(turnContext, turnState, promptTemplate, options, cancellationToken);
-            } catch (PlannerException ex)
+            }
+            catch (PlannerException ex)
             {
                 // Ensure we weren't rate limited
                 if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
@@ -187,7 +188,8 @@ namespace Microsoft.TeamsAI.AI.Planner
                 {
                     plan = ResponseParser.ParseResponse(result.Trim());
                     Verify.ParamNotNull(plan, nameof(plan));
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
                 }
@@ -222,7 +224,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         {
             Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
 
-            var skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
+            PromptTemplateConfig skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
 
             ITextCompletion textCompletion = _kernel.GetService<ITextCompletion>();
 
@@ -247,15 +249,16 @@ namespace Microsoft.TeamsAI.AI.Planner
                 MaxTokens = templateConfig.Completion.MaxTokens
             };
 
-            var chatCompletion = _kernel.GetService<IChatCompletion>();
+            IChatCompletion chatCompletion = _kernel.GetService<IChatCompletion>();
 
-            var chatHistory = chatCompletion.CreateNewChat();
+            ChatHistory chatHistory = chatCompletion.CreateNewChat();
 
 
             if (_options.UseSystemMessage)
             {
                 chatHistory.AddSystemMessage(promptTemplate.Text);
-            } else
+            }
+            else
             {
                 chatHistory.AddUserMessage(promptTemplate.Text);
             }
@@ -279,7 +282,6 @@ namespace Microsoft.TeamsAI.AI.Planner
                     else if (line.StartsWith(assistantPrefix, StringComparison.OrdinalIgnoreCase))
                     {
                         line = line.Substring(assistantPrefix.Length).Trim();
-                        
                         chatHistory.AddAssistantMessage(line);
                     }
                 }
@@ -301,7 +303,8 @@ namespace Microsoft.TeamsAI.AI.Planner
             if (promptTemplate.Configuration.DefaultBackends.Count > 0)
             {
                 return promptTemplate.Configuration.DefaultBackends[0];
-            } else
+            }
+            else
             {
                 return _options.DefaultModel;
             }

@@ -1,16 +1,20 @@
-﻿
+using System.Reflection;
+
+using Azure.AI.OpenAI;
+using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging;
+using AIException = Microsoft.SemanticKernel.AI.AIException;
+using Microsoft.SemanticKernel.AI.TextCompletion;
+using Microsoft.SemanticKernel.AI.ChatCompletion;
+using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.TeamsAI.AI;
+using Microsoft.TeamsAI.AI.Action;
+using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.AI;
-using Moq;
 using Microsoft.TeamsAI.Exceptions;
-using AIException = Microsoft.SemanticKernel.AI.AIException;
-using Microsoft.TeamsAI.AI.Action;
-using Microsoft.Extensions.Logging;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
-using Microsoft.Bot.Builder;
+using Moq;
 
 namespace Microsoft.TeamsAI.Tests.AITests
 {
@@ -23,7 +27,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions(apiKey,model);
+            var options = new OpenAIPlannerOptions(apiKey, model);
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TestTurnState>();
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
@@ -54,7 +58,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var doCommand = (PredictedDoCommand)result.Commands[0];
             Assert.Equal(DefaultActionTypes.RateLimitedActionName, doCommand.Action);
-            Assert.Empty(doCommand.Entities);
+            Assert.Empty(doCommand.Entities!);
 
         }
 
@@ -120,7 +124,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            static string emptyStringFunc() => String.Empty;
+            static string emptyStringFunc() => string.Empty;
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, emptyStringFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
@@ -222,8 +226,55 @@ namespace Microsoft.TeamsAI.Tests.AITests
             Assert.Equal("actionName", doCommand.Action);
         }
 
+        [Fact]
+        public async void Test_CompletePromptAsync_TextCompletion()
+        {
+            // Arrange
+            var apiKey = "randomApiKey";
+            var model = "randomModelId";
+
+            var options = new OpenAIPlannerOptions(apiKey, model);
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnStateMock = new Mock<TestTurnState>();
+            var promptTemplate = new PromptTemplate("Test", new());
+
+            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>());
+            MockTextCompletion(planner.TextCompletionMock, "text-completion");
+
+            // Act
+            var result = await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
+
+            // Assert
+            Assert.Equal("text-completion", result);
+        }
+
+        [Fact]
+        public async void Test_CompletePromptAsync_ChatCompletion()
+        {
+            // Arrange
+            var apiKey = "randomApiKey";
+            var model = "gpt-randomModelId";
+
+            var options = new OpenAIPlannerOptions(apiKey, model);
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnStateMock = new Mock<TestTurnState>();
+            var promptTemplate = new PromptTemplate("Test", new());
+
+            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>());
+            MockChatCompletion(planner.ChatCompletionMock, "chat-completion");
+
+            // Act
+            var result = await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
+
+            // Assert
+            Assert.Equal("chat-completion", result);
+        }
+
         private class CustomCompletePromptOpenAIPlanner<TState> : OpenAIPlanner<TState>
-            where TState : TestTurnState {
+            where TState : TestTurnState
+        {
             private Func<string> customFunction;
 
             public CustomCompletePromptOpenAIPlanner(OpenAIPlannerOptions options, Func<string> customFunction, ILogger? logger = null) : base(options, logger)
@@ -236,6 +287,80 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 return Task.FromResult(customFunction.Invoke());
             }
 
+        }
+
+        private class CustomCompletionOpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions>
+            where TState : TestTurnState
+        {
+            public Mock<ITextCompletion> TextCompletionMock { get; } = new Mock<ITextCompletion>();
+
+            public Mock<IChatCompletion> ChatCompletionMock { get; } = new Mock<IChatCompletion>();
+
+            public CustomCompletionOpenAIPlanner(OpenAIPlannerOptions options, ILogger? logger = null) : base(options, logger)
+            {
+            }
+
+            private protected override ITextCompletion _CreateTextCompletionService(OpenAIPlannerOptions options)
+            {
+                return TextCompletionMock.Object;
+            }
+
+            private protected override IChatCompletion _CreateChatCompletionService(OpenAIPlannerOptions options)
+            {
+                return ChatCompletionMock.Object;
+            }
+        }
+
+        /// <summary>
+        /// Setup mock of ITextCompletion 
+        /// </summary>
+        private static void MockTextCompletion(Mock<ITextCompletion> mock, string completionResult)
+        {
+            // Create Completions and CompletionsUsage
+            // Early version does not expose public constructor.
+            var completionsUsage = (CompletionsUsage)typeof(CompletionsUsage)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(int), typeof(int), typeof(int) })!
+                .Invoke(new object[] { 1, 1, 1 })!;
+            var completions = (Completions)typeof(Completions)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(CompletionsUsage) })!
+                .Invoke(new[] { completionsUsage });
+
+            var textResultMock = new Mock<ITextResult>();
+            textResultMock.Setup(tr => tr.ModelResult).Returns(new ModelResult(completions));
+            textResultMock.Setup(tr => tr.GetCompletionAsync(It.IsAny<CancellationToken>())).ReturnsAsync(completionResult);
+            mock
+                .Setup(m => m.GetCompletionsAsync(It.IsAny<string>(), It.IsAny<CompleteRequestSettings>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<ITextResult> { textResultMock.Object });
+        }
+
+        /// <summary>
+        /// Setup mock of IChatCompletion 
+        /// </summary>
+        private static void MockChatCompletion(Mock<IChatCompletion> mock, string completionResult)
+        {
+            // Create ChatCompletions and CompletionsUsage
+            // Early version does not expose public constructor.
+            var completionsUsage = (CompletionsUsage)typeof(CompletionsUsage)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(int), typeof(int), typeof(int) })!
+                .Invoke(new object[] { 1, 1, 1 })!;
+            var completions = (ChatCompletions)typeof(ChatCompletions)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(string), typeof(int?), typeof(IReadOnlyList<ChatChoice>), typeof(CompletionsUsage) })!
+                .Invoke(new object[] { "", 0, Array.Empty<ChatChoice>(), completionsUsage });
+
+            var chatHistory = new ChatHistory();
+            chatHistory.AddMessage(AuthorRole.User, completionResult);
+            var chatResultMock = new Mock<IChatResult>();
+            chatResultMock
+                .Setup(cr => cr.GetChatMessageAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(chatHistory[0]);
+            chatResultMock.As<ITextResult>().Setup(tr => tr.ModelResult).Returns(new ModelResult(completions));
+            chatResultMock.As<ITextResult>().Setup(tr => tr.GetCompletionAsync(It.IsAny<CancellationToken>())).ReturnsAsync(completionResult);
+            mock
+                .Setup(m => m.CreateNewChat(It.IsAny<string?>()))
+                .Returns(chatHistory);
+            mock
+                .Setup(m => m.GetChatCompletionsAsync(It.IsAny<ChatHistory>(), It.IsAny<ChatRequestSettings>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<IChatResult> { chatResultMock.Object });
         }
     }
 }
