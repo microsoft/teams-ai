@@ -6,17 +6,17 @@ This sample shows how to incorporate Azure Open AI Content Safety control into a
 
 <!-- code_chunk_output -->
 
-- [Chat Moderation Bot](#chat-bot-with-moderation-control)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Multiple ways to test](#multiple-ways-to-test)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-    - [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
-    - [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
-  - [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
-    - [Directions](#directions)
-  - [Deploy the bot to Azure](#deploy-the-bot-to-azure)
-  - [Further reading](#further-reading)
+-   [Chat Moderation Bot](#chat-bot-with-moderation-control)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Multiple ways to test](#multiple-ways-to-test)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+        -   [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+    -   [Testing in BotFramework Emulator](#testing-in-botframework-emulator)
+        -   [Directions](#directions)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
 
 <!-- /code_chunk_output -->
 
@@ -59,7 +59,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this samples directory from the repo
+1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
@@ -163,9 +163,9 @@ yarn start
 
 ![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
 
-- In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
-- Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
-- If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+-   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
+-   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 
 ## Deploy the bot to Azure
 
@@ -175,5 +175,5 @@ Alternatively, you can learn more about deploying a bot to Azure manually in the
 
 ## Further reading
 
-- [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
-- [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
+-   [Teams Toolkit overview](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
+-   [How Microsoft Teams bots work](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
