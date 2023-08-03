@@ -68,8 +68,8 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
 import * as responses from './responses';
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment OpenAIKey');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment OPENAI_API_KEY');
 }
 
 // Strongly type the applications turn state
@@ -82,7 +82,7 @@ type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
@@ -159,8 +159,11 @@ server.post('/api/messages', async (req, res) => {
 });
 
 /**
- * @param context
- * @param state
+ * Generates a hint for the user based on their input using OpenAI's GPT-3 API.
+ * @param {TurnContext} context The current turn context.
+ * @param {ApplicationTurnState} state The current turn state.
+ * @returns {Promise<string>} A promise that resolves to a string containing the generated hint.
+ * @throws {Error} If the request to OpenAI was rate limited.
  */
 async function getHint(context: TurnContext, state: ApplicationTurnState): Promise<string> {
     state.temp.value.input = context.activity.text;
