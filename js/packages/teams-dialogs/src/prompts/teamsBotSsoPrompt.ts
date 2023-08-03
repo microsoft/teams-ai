@@ -13,7 +13,7 @@ import { ConfidentialClientApplication, NodeAuthOptions } from "@azure/msal-node
 
 const invokeResponseType = "invokeResponse";
 
-type TeamsBotSsoPromptAppCredentials = {
+type TeamsBotSsoPromptAuthConfig = {
   /**
    * Hostname of AAD authority.
    */
@@ -53,7 +53,6 @@ export interface TeamsBotSsoPromptSettings {
   scopes: string[];
   timeout?: number;
   endOnInvalidMessage?: boolean;
-  appCredentials: TeamsBotSsoPromptAppCredentials;
   initialLoginEndpoint: string;
 }
 
@@ -77,13 +76,16 @@ class TokenExchangeInvokeResponse {
 export class TeamsBotSsoPrompt extends Dialog {
   private initiateLoginEndpoint: string;
   private settings: TeamsBotSsoPromptSettings;
+  private authConfig: TeamsBotSsoPromptAuthConfig;
 
   constructor(
+    authConfig: TeamsBotSsoPromptAuthConfig,
+    initiateLoginEndpoint: string,
     dialogId: string,
     settings: TeamsBotSsoPromptSettings,
-    initiateLoginEndpoint: string,
   ) {
     super(dialogId);
+    this.authConfig = authConfig;
     this.settings = settings;
     this.initiateLoginEndpoint = initiateLoginEndpoint;
 
@@ -193,7 +195,7 @@ export class TeamsBotSsoPrompt extends Dialog {
   private getSignInResource(loginHint: string) {
     const signInLink = `${this.initiateLoginEndpoint}?scope=${encodeURI(
       this.settings.scopes.join(" ")
-    )}&clientId=${this.settings.appCredentials.clientId}&tenantId=${this.settings.appCredentials.tenantId
+    )}&clientId=${this.authConfig.clientId}&tenantId=${this.authConfig.tenantId
       }&loginHint=${loginHint}`;
 
     const tokenExchangeResource: TokenExchangeResource = {
@@ -241,10 +243,10 @@ export class TeamsBotSsoPrompt extends Dialog {
         const ssoToken = context.activity.value.token;
 
         const auth: NodeAuthOptions = {
-          clientId: this.settings.appCredentials.clientId!,
-          authority: this.settings.appCredentials.authorityHost.replace(/\/+$/g, "") + "/" + this.settings.appCredentials.tenantId,
+          clientId: this.authConfig.clientId!,
+          authority: this.authConfig.authorityHost.replace(/\/+$/g, "") + "/" + this.authConfig.tenantId,
         };
-        auth.clientSecret = this.settings.appCredentials.clientSecret;
+        auth.clientSecret = this.authConfig.clientSecret;
         const msalClient = new ConfidentialClientApplication({
           auth
         });
