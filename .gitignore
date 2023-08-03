@@ -114,3 +114,8 @@ dist
 /dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365.Tests/bin/Debug/net6.0
 /dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365.Tests/obj/Debug/net6.0
 /dotnet/packages/Microsoft.Bot.Builder.M365/Microsoft.Bot.Builder.M365.Tests/obj
+
+env/.env.*.user
+env/.env.local
+env/.env.staging
+.env*
