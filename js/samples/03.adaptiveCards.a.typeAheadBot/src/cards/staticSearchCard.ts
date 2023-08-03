@@ -5,7 +5,6 @@ import { Attachment, CardFactory } from 'botbuilder';
 
 /**
  * Create a static search card. This card has a static list of IDEs.
- *
  * @returns {Attachment} Static search card.
  */
 export function createStaticSearchCard(): Attachment {

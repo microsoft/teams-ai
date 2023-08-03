@@ -5,7 +5,6 @@ import { Attachment, CardFactory } from 'botbuilder';
 
 /**
  * Creates an Adaptive Card with dynamic search control.
- *
  * @returns {Attachment} Adaptive Card with dynamic search control.
  */
 export function createDynamicSearchCard(): Attachment {
