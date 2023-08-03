@@ -13,6 +13,9 @@ import { ConfidentialClientApplication, NodeAuthOptions } from "@azure/msal-node
 
 const invokeResponseType = "invokeResponse";
 
+/**
+ * Authentication configuration for TeamsBotSsoPrompt
+ */
 type TeamsBotSsoPromptAuthConfig = {
   /**
    * Hostname of AAD authority.
@@ -47,15 +50,35 @@ type TeamsBotSsoPromptAuthConfig = {
        */
       certificateContent: string;
     }
-  );
+);
 
+/**
+ * Settings used to configure an TeamsBotSsoPrompt instance.
+ */
 export interface TeamsBotSsoPromptSettings {
+  /**
+   * The array of strings that declare the desired permissions and the resources requested.
+   */
   scopes: string[];
+
+  /**
+   * (Optional) number of milliseconds the prompt will wait for the user to authenticate.
+   * Defaults to a value `900,000` (15 minutes.)
+   */
   timeout?: number;
+
+  /**
+   * (Optional) value indicating whether the TeamsBotSsoPrompt should end upon receiving an
+   * invalid message.  Generally the TeamsBotSsoPrompt will end the auth flow when receives user
+   * message not related to the auth flow. Setting the flag to false ignores the user's message instead.
+   * Defaults to value `true`
+   */
   endOnInvalidMessage?: boolean;
-  initialLoginEndpoint: string;
 }
 
+/**
+ * Response body returned for a token exchange invoke activity.
+ */
 class TokenExchangeInvokeResponse {
   /**
    * Response id
@@ -73,6 +96,61 @@ class TokenExchangeInvokeResponse {
   }
 }
 
+/**
+ * Creates a new prompt that leverage Teams Single Sign On (SSO) support for bot to automatically sign in user and
+ * help receive oauth token, asks the user to consent if needed.
+ * 
+ * @remarks
+ * The prompt will attempt to retrieve the users current token of the desired scopes and store it in
+ * the token store.
+ * 
+ * User will be automatically signed in leveraging Teams support of Bot Single Sign On(SSO):
+ * https://docs.microsoft.com/en-us/microsoftteams/platform/bots/how-to/authentication/auth-aad-sso-bots
+ * 
+ * > [!NOTE]
+ * > You should avoid persisting the access token with your bots other state. The Bot Frameworks
+ * > SSO service will securely store the token on your behalf. If you store it in your bots state
+ * > it could expire or be revoked in between turns.
+ * >
+ * > When calling the prompt from within a waterfall step you should use the token within the step
+ * > following the prompt and then let the token go out of scope at the end of your function.
+ * 
+ * @example
+ * When used with your bots `DialogSet` you can simply add a new instance of the prompt as a named
+ * dialog using `DialogSet.add()`. You can then start the prompt from a waterfall step using either
+ * `DialogContext.beginDialog()` or `DialogContext.prompt()`. The user will be prompted to sign in as
+ * needed and their access token will be passed as an argument to the callers next waterfall step:
+ *
+ * ```JavaScript
+ * const { ConversationState, MemoryStorage } = require('botbuilder');
+ * const { DialogSet, WaterfallDialog, TeamsBotSsoPrompt } = require('botbuilder-dialogs');
+ *
+ * const convoState = new ConversationState(new MemoryStorage());
+ * const dialogState = convoState.createProperty('dialogState');
+ * const dialogs = new DialogSet(dialogState);
+ *
+ * dialogs.add(new TeamsBotSsoPrompt('TeamsBotSsoPrompt', {
+ *    scopes: ["User.Read"],
+ * }));
+ *
+ * dialogs.add(new WaterfallDialog('taskNeedingLogin', [
+ *      async (step) => {
+ *          return await step.beginDialog('TeamsBotSsoPrompt');
+ *      },
+ *      async (step) => {
+ *          const token = step.result;
+ *          if (token) {
+ *
+ *              // ... continue with task needing access token ...
+ *
+ *          } else {
+ *              await step.context.sendActivity(`Sorry... We couldn't log you in. Try again later.`);
+ *              return await step.endDialog();
+ *          }
+ *      }
+ * ]));
+ * ```
+ */
 export class TeamsBotSsoPrompt extends Dialog {
   private initiateLoginEndpoint: string;
   private settings: TeamsBotSsoPromptSettings;
@@ -92,6 +170,16 @@ export class TeamsBotSsoPrompt extends Dialog {
     this.validateScopesType(settings.scopes);
   }
 
+  /**
+   * Called when a prompt dialog is pushed onto the dialog stack and is being activated.
+   * @remarks
+   * If the task is successful, the result indicates whether the prompt is still
+   * active after the turn has been processed by the prompt.
+   *
+   * @param dc The DialogContext for the current turn of the conversation.
+   *
+   * @returns A `Promise` representing the asynchronous operation.
+   */
   public async beginDialog(dc: any, options: any): Promise<any> {
     const default_timeout = 900000;
     let timeout: number = default_timeout;
@@ -121,6 +209,19 @@ export class TeamsBotSsoPrompt extends Dialog {
     return Dialog.EndOfTurn;
   }
 
+  /**
+   * Called when a prompt dialog is the active dialog and the user replied with a new activity.
+   *
+   * @remarks
+   * If the task is successful, the result indicates whether the dialog is still
+   * active after the turn has been processed by the dialog.
+   * The prompt generally continues to receive the user's replies until it accepts the
+   * user's reply as valid input for the prompt.
+   *
+   * @param dc The DialogContext for the current turn of the conversation.
+   *
+   * @returns A `Promise` representing the asynchronous operation.
+   */
   public async continueDialog(dc: any): Promise<any> {
     const state = dc.activeDialog?.state;
     const isMessage: boolean = dc.context.activity.type === ActivityTypes.Message;
@@ -150,6 +251,9 @@ export class TeamsBotSsoPrompt extends Dialog {
     }
   }
 
+  /**
+   * @private
+   */
   private validateScopesType(value: any): void {
     // string
     if (typeof value === "string" || value instanceof String) {
@@ -170,6 +274,9 @@ export class TeamsBotSsoPrompt extends Dialog {
     throw new Error(errorMsg);
   }
 
+  /**
+   * @private
+   */
   private async sendOAuthCardAsync(context: TurnContext): Promise<void> {
     const account: TeamsChannelAccount = await TeamsInfo.getMember(
       context,
@@ -192,6 +299,9 @@ export class TeamsBotSsoPrompt extends Dialog {
     await context.sendActivity(msg);
   }
 
+  /**
+   * @private
+   */
   private getSignInResource(loginHint: string) {
     const signInLink = `${this.initiateLoginEndpoint}?scope=${encodeURI(
       this.settings.scopes.join(" ")
@@ -208,22 +318,34 @@ export class TeamsBotSsoPrompt extends Dialog {
     };
   }
 
+  /**
+   * @private
+   */
   private isTeamsVerificationInvoke(context: TurnContext): boolean {
     const activity: Activity = context.activity;
 
     return activity.type === ActivityTypes.Invoke && activity.name === verifyStateOperationName;
   }
 
+  /**
+   * @private
+   */
   private isTokenExchangeRequestInvoke(context: TurnContext): boolean {
     const activity: Activity = context.activity;
 
     return activity.type === ActivityTypes.Invoke && activity.name === tokenExchangeOperationName;
   }
 
+  /**
+   * @private
+   */
   private isTokenExchangeRequest(obj: any): obj is TokenExchangeInvokeRequest {
     return obj.hasOwnProperty("token");
   }
 
+  /**
+   * @private
+   */
   private async recognizeToken(
     dc: DialogContext
   ): Promise<PromptRecognizerResult<any>> {
@@ -304,6 +426,9 @@ export class TeamsBotSsoPrompt extends Dialog {
       : { succeeded: false };
   }
 
+  /**
+   * @private
+   */
   private getTokenExchangeInvokeResponse(
     status: number,
     failureDetail: string,
@@ -316,6 +441,9 @@ export class TeamsBotSsoPrompt extends Dialog {
     return invokeResponse as Activity;
   }
 
+  /**
+   * @private
+   */
   private parseJwt(token: string): any {
     try {
       const tokenObj = jwt_decode(token) as any;
@@ -332,6 +460,9 @@ export class TeamsBotSsoPrompt extends Dialog {
     }
   }
 
+  /**
+   * @private
+   */
   private getScopesArray(scopes: string | string[]): string[] {
     const scopesArray: string[] = typeof scopes === "string" ? scopes.split(" ") : scopes;
     return scopesArray.filter((x) => x !== null && x !== "");
