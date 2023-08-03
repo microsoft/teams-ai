@@ -76,6 +76,7 @@ typings/
 # dotenv environment variables file
 .env
 .env.test
+**/samples/**/env/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -112,3 +113,8 @@ dist
 
 # api-extract temp files
 **/packages/api/temp/
+
+**/packages/**/*.lock
+**/samples/**/*.lock
+**/packages/**/package-lock.json
+**/samples/**/package-lock.json
