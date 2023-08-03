@@ -46,7 +46,6 @@ export interface OpenAIPlannerOptions {
 
     /**
      * The default model to use.
-     *
      * @summary
      * Prompts can override this model.
      */
@@ -54,7 +53,6 @@ export interface OpenAIPlannerOptions {
 
     /**
      * Optional. A flag indicating if the planner should only say one thing per turn.
-     *
      * @summary
      * The planner will attempt to combine multiple SAY commands into a single SAY command when true.
      * Defaults to false.
@@ -64,7 +62,6 @@ export interface OpenAIPlannerOptions {
     /**
      * Optional. A flag indicating if the planner should use the 'system' role when calling OpenAI's
      * chatCompletion API.
-     *
      * @summary
      * The planner current uses the 'user' role by default as this tends to generate more reliable
      * instruction following. Defaults to false.
@@ -73,7 +70,6 @@ export interface OpenAIPlannerOptions {
 
     /**
      * Optional. A flag indicating if the planner should log requests to the console.
-     *
      * @summary
      * Both the prompt text and the completion response will be logged to the console. For
      * chatCompletion calls the outgoing messages array will also be logged.
@@ -84,7 +80,6 @@ export interface OpenAIPlannerOptions {
 
 /**
  * A planner that uses OpenAI's textCompletion and chatCompletion API's to generate plans.
- *
  * @summary
  * This planner can be configured to use different models for different prompts. The prompts model
  * will determine which API is used to generate the plan. Any model that starts with 'gpt-' will
@@ -102,7 +97,6 @@ export class OpenAIPlanner<
 
     /**
      * Creates a new instance of the OpenAI based planner.
-     *
      * @param {TOptions} options Options for the OpenAI based planner.
      */
     public constructor(options: TOptions) {
@@ -126,7 +120,6 @@ export class OpenAIPlanner<
 
     /**
      * Completes a prompt without returning a plan.
-     *
      * @param {TurnContext} context Context for the current turn of conversation.
      * @param {TState} state Application state for the current turn of conversation.
      * @param {PromptTemplate} prompt Prompt to complete.
@@ -157,7 +150,6 @@ export class OpenAIPlanner<
 
     /**
      * Completes a prompt and generates a plan for the AI system to execute.
-     *
      * @param {TurnContext} context Context for the current turn of conversation.
      * @param {TState} state Application state for the current turn of conversation.
      * @param {PromptTemplate} prompt Prompt to complete.
@@ -248,7 +240,6 @@ export class OpenAIPlanner<
 
     /**
      * Creates a new OpenAI client with the provided options.
-     *
      * @param {TOptions} options The options to use when creating the client.
      * @returns {OpenAIClient} The newly created OpenAI client.
      */
@@ -267,7 +258,6 @@ export class OpenAIPlanner<
 
     /**
      * Returns the model to use for the given prompt.
-     *
      * @param {PromptTemplate} prompt The prompt to get the model for.
      * @returns {string} The model to use for the given prompt.
      */
@@ -284,7 +274,6 @@ export class OpenAIPlanner<
 
     /**
      * Creates a chat completion request for the given prompt and user message.
-     *
      * @param {TState} state Application state for the current turn of conversation.
      * @param {PromptTemplate} prompt Prompt to complete.
      * @param {string} userMessage The user's message to include in the chat completion request.
@@ -357,7 +346,6 @@ export class OpenAIPlanner<
 
     /**
      * Creates a completion request for the given prompt.
-     *
      * @param {PromptTemplate} prompt The prompt to create the completion request for.
      * @returns {CreateCompletionRequest} The completion request that was generated.
      * @private
@@ -384,7 +372,6 @@ export class OpenAIPlanner<
 
     /**
      * Creates a chat completion request for the given prompt and user message.
-     *
      * @param {CreateChatCompletionRequest} request The request to create a chat completion for.
      * @returns {Promise<OpenAIClientResponse<CreateChatCompletionResponse>>} The chat completion response.
      * @private
@@ -435,7 +422,6 @@ export class OpenAIPlanner<
 
     /**
      * Creates a completion request for the given prompt.
-     *
      * @param {CreateCompletionRequest} request The request to create the completion for.
      * @returns {Promise<OpenAIClientResponse<CreateCompletionResponse>>} The completion response.
      * @private
@@ -466,9 +452,9 @@ export class OpenAIPlanner<
                                 : '';
                         // TODO: telemetry
                         console.log(
-                            `PROMPT SUCCEEDED: status=${response.status} duration=${duration} prompt=${
-                                response.data!.usage?.prompt_tokens
-                            } completion=${response.data!.usage?.completion_tokens} response=${choice}`
+                            `PROMPT SUCCEEDED: status=${response.status} duration=${duration} prompt=${response.data!
+                                .usage?.prompt_tokens} completion=${response.data!.usage
+                                ?.completion_tokens} response=${choice}`
                         );
                     } else {
                         console.error(
@@ -491,7 +477,6 @@ export class OpenAIPlanner<
 
 /**
  * Prints the chat messages from a chat completion request.
- *
  * @param {ChatCompletionRequestMessage[]} messages The messages to print.
  * @returns {string} The formatted chat messages.
  * @private
