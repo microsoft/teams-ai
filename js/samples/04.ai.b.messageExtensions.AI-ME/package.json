@@ -1,7 +1,7 @@
 {
-    "name": "gptme-demo",
+    "name": "aime-demo",
     "version": "1.0.0",
-    "description": "Sample Message Extension that leverages GPT to create posts",
+    "description": "Sample Message Extension that leverages AI to create posts",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",

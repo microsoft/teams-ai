@@ -108,7 +108,7 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: Tur
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/04.ai.b.messageExtensions.gptME/
+    cd teams-ai/js/samples/04.ai.b.messageExtensions.aime/
     ```
 
 ## Multiple ways to test
@@ -159,7 +159,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/04.ai.b.messagingextension.gptme/
+    cd teams-ai/js/samples/04.ai.b.messagingextension.aime/
     teamsfx provision --env local
 
     ```
@@ -180,10 +180,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/04.ai.b.messagingextension.gptme/`
+1. In a terminal, navigate to `teams-ai/js/samples/04.ai.b.messagingextension.aime/`
 
     ```bash
-    cd teams-ai/js/samples/04.ai.b.messagingextension.gptme
+    cd teams-ai/js/samples/04.ai.b.messagingextension.aime
     ```
 
 1. Run ngrok tunneling service - point to port 3978

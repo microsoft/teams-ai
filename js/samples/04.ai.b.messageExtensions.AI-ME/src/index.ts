@@ -81,8 +81,8 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment OpenAIKey');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment OPENAI_API_KEY');
 }
 
 interface TempState extends DefaultTempState {
@@ -92,12 +92,12 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUserState, TempState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
