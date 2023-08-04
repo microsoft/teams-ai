@@ -4,8 +4,7 @@
     "version": "0.1.0",
     "workspaces": [
         "./packages/*",
-        "./samples/*",
-        "!./samples/chatmoderation"
+        "./samples/*"
     ],
     "scripts": {
         "build": "wsrun -e -m -t build",
