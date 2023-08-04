@@ -287,6 +287,7 @@ export class MessageExtensions<TState extends TurnState> {
      * This handler is called when the user submits a query to a Search based Message Extension.
      * The handler should return a MessagingExtensionResult containing the results of the query.
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
+     * @template TParams
      * @param {(context: TurnContext, state: TState, query: Query<TParams>) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.

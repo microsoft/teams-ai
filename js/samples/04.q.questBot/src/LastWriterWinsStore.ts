@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { MemoryStorage, StoreItems, StoreItem } from 'botbuilder';
 import { BlobsStorage } from 'botbuilder-azure-blobs';
 

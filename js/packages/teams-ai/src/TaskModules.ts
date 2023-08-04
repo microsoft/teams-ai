@@ -221,9 +221,11 @@ function createTaskSelector(
             if (
                 isInvoke &&
                 typeof data == 'object' &&
+                // eslint-disable-next-line security/detect-object-injection
                 typeof data[filterField] == 'string' &&
                 Object.keys(data).length === 1 // Ensure that data only contains the filterField property
             ) {
+                // eslint-disable-next-line security/detect-object-injection
                 return Promise.resolve(verb.test(data[filterField]));
             } else {
                 return Promise.resolve(false);
@@ -235,6 +237,7 @@ function createTaskSelector(
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             const data = context?.activity?.value?.data;
             return Promise.resolve(
+                // eslint-disable-next-line security/detect-object-injection
                 isInvoke && typeof data == 'object' && data[filterField] == verb && Object.keys(data).length === 1 // Ensure that data only contains the filterField property
             );
         };

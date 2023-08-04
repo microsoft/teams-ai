@@ -438,11 +438,10 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * This method should be called from your bot's "turn handler" (its primary message handler)
      *
      * ```JavaScript
-     * server.post('/api/messages', (req, res, next) => {
-     *    adapter.processActivity(req, res, async (context) => {
+     * server.post('/api/messages', async (req, res) => {
+     *    await adapter.processActivity(req, res, async (context) => {
      *      await bot.run(context);
      *   });
-     * return next();
      * });
      * ```
      * @param {TurnContext} turnContext Context class for the current turn of conversation with the user.
@@ -728,6 +727,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     try {
                         // Copy original activity to new context
                         for (const key in context.activity) {
+                            // eslint-disable-next-line security/detect-object-injection
                             (ctx.activity as any)[key] = (context.activity as any)[key];
                         }
 

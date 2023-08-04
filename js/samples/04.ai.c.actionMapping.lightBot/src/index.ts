@@ -131,12 +131,10 @@ app.ai.action(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', (req, res, next) => {
+server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
-    adapter.process(req, res as any, async (context) => {
+    await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-
-    return next();
 });

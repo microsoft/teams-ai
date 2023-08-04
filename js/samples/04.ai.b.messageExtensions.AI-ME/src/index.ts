@@ -201,18 +201,18 @@ app.messageExtensions.botMessagePreviewSend(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', (req, res, next) => {
+server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
-    adapter.process(req, res as any, async (context) => {
+    await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-
-    return next();
 });
 
 /**
- * @param card
+ * Creates a task module task info object with the given card.
+ * @param {Attachment} card - The card to include in the task module task info object.
+ * @returns {TaskModuleTaskInfo} The task module task info object.
  */
 function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
     return {
@@ -224,10 +224,12 @@ function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
 }
 
 /**
- * @param context
- * @param state
- * @param prompt
- * @param data
+ * Updates a post with the given data and returns a task module task info object with the updated post.
+ * @param {TurnContext} context - The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state - The state object for the current turn of conversation.
+ * @param {string} prompt - The prompt to use for generating the updated post.
+ * @param {SubmitData} data - The data to use for updating the post.
+ * @returns {Promise<TaskModuleTaskInfo>} A task module task info object with the updated post.
  */
 async function updatePost(
     context: TurnContext,

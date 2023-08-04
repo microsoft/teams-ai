@@ -4,7 +4,8 @@
 import { Attachment, CardFactory } from 'botbuilder';
 
 /**
- *
+ * Creates an initial view for the adaptive card.
+ * @returns {Attachment} The adaptive card attachment.
  */
 export function createInitialView(): Attachment {
     return CardFactory.adaptiveCard({

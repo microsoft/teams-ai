@@ -450,9 +450,11 @@ export function describeItemList(items: IItemList, indent = '\t'): string {
 }
 
 /**
- * @param context
- * @param state
- * @param newResponse
+ * Updates the conversation history with the new response and sends the response to the user.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state The state object for the current turn of conversation.
+ * @param {string} newResponse The new response to add to the conversation history and send to the user.
+ * @returns {Promise<void>} A promise that resolves when the response has been sent to the user.
  */
 export async function updateDMResponse(
     context: TurnContext,

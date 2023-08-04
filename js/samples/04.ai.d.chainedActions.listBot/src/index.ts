@@ -210,19 +210,19 @@ app.ai.action(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', (req, res, next) => {
+server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
-    adapter.process(req, res as any, async (context) => {
+    await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-
-    return next();
 });
 
 /**
- * @param state
- * @param list
+ * Retrieves the items for a given list from the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} list - The name of the list to retrieve items for.
+ * @returns {string[]} - The items in the specified list.
  */
 function getItems(state: ApplicationTurnState, list: string): string[] {
     ensureListExists(state, list);
@@ -230,9 +230,10 @@ function getItems(state: ApplicationTurnState, list: string): string[] {
 }
 
 /**
- * @param state
- * @param list
- * @param items
+ * Sets the items for a given list in the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} list - The name of the list to set items for.
+ * @param {string[]} items - The items to set for the specified list.
  */
 function setItems(state: ApplicationTurnState, list: string, items: string[]): void {
     ensureListExists(state, list);
@@ -240,8 +241,9 @@ function setItems(state: ApplicationTurnState, list: string, items: string[]): v
 }
 
 /**
- * @param state
- * @param listName
+ * Ensures that a list with the given name exists in the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} listName - The name of the list to ensure exists.
  */
 function ensureListExists(state: ApplicationTurnState, listName: string): void {
     const conversation = state.conversation.value;
@@ -257,8 +259,9 @@ function ensureListExists(state: ApplicationTurnState, listName: string): void {
 }
 
 /**
- * @param state
- * @param listName
+ * Deletes a list from the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} listName - The name of the list to delete.
  */
 function deleteList(state: ApplicationTurnState, listName: string): void {
     const conversation = state.conversation.value;
