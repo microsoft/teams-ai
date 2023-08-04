@@ -17,7 +17,7 @@ class Moderator(ABC):
         Reviews user input before it's sent to the planner.
 
         Args:
-            input (str): The user input.
+            input (str): The content to review.
         
         Returns:
             Optional[Plan]: Returns None if the moderator approves the input, otherwise returns a new plan to bypass the planner and redirects to a new set of actions. Typically the moderator will return a new plan with a single DO command that calls `AI.FlaggedInputActionName` to flag the input for review.
