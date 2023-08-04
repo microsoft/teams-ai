@@ -1,5 +1,5 @@
 #
-# Place holder to enable dotnet-pr workflow
+# This workflow will build and run tests for the Microsoft.TeamsAI .NET SDK.
 #
 
 name: dotnet-pr
@@ -7,14 +7,76 @@ name: dotnet-pr
 on:
   pull_request:
     branches:
-      - DOTNET
+      - '**'
     paths:
-      - 'dotnet/**'
+      - 'dotnet/packages/**'
 
 jobs:
-  echo:
-    runs-on: "windows-latest"
+  dotnet-build-test:
+    strategy:
+      matrix:
+        os: [windows-latest]
+        dotnet-version: ['6.0', '7.0']
+        configuration: [Release]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    env:
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
     steps:
-      - name: echo
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          clean: true
+
+      - name: Setup .NET SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore
         shell: bash
-        run: echo dotnet
+        working-directory: ${{ env.SOLUTION_DIR }}
+        run: dotnet restore Microsoft.TeamsAI.sln
+
+      - name: Build
+        shell: bash
+        working-directory: ${{ env.SOLUTION_DIR }}
+        run: dotnet build Microsoft.TeamsAI.sln --no-restore --configuration ${{ matrix.configuration }}
+
+      - name: Test
+        shell: bash
+        working-directory: ${{ env.SOLUTION_DIR }}
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.TeamsAI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration ${{ matrix.configuration }}
+
+      - name: Generate coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.22
+        with:
+          reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
+          targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
+          reporttypes: TextSummary
+          toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
+
+      - name: Show coverage
+        shell: bash
+        run: cat ${{ env.SOLUTION_DIR }}TestResults/coverage/*.txt
+
+  dotnet-security-lint:
+    runs-on: ubuntu-latest
+    env:
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          clean: true
+
+      - name: Security Lint
+        uses: microsoft/devskim-action@v1
+        with:
+          directory-to-scan: ${{ env.SOLUTION_DIR }}
+          output-filename: ${{ env.SOLUTION_DIR }}devskim-results.sarif
+
+      - name: Upload Security Results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ env.SOLUTION_DIR }}devskim-results.sarif
