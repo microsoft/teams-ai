@@ -4,7 +4,9 @@
 import { Attachment, CardFactory } from 'botbuilder';
 
 /**
- * @param post
+ * Creates an adaptive card for a post.
+ * @param {string} post The post to create the card for.
+ * @returns {Attachment} The adaptive card attachment for the post.
  */
 export function createPostCard(post: string): Attachment {
     return CardFactory.adaptiveCard({

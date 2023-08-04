@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 
 /**
- *
+ * Returns a random secret word from an array of words.
+ * @returns {string} A random secret word.
  */
 export function pickSecretWord(): string {
     return getRandomResponse([
@@ -253,7 +254,8 @@ export function pickSecretWord(): string {
 }
 
 /**
- *
+ * Starts a game of 20 questions with the user.
+ * @returns {string} The response message.
  */
 export function startGame(): string {
     return (
@@ -269,7 +271,9 @@ export function startGame(): string {
 }
 
 /**
- * @param secretWord
+ * Returns a message indicating that the game has been quit.
+ * @param {string} secretWord The secret word or phrase that was being guessed.
+ * @returns {string} The response message.
  */
 export function quitGame(secretWord: string): string {
     if (secretWord) {
@@ -294,7 +298,8 @@ export function quitGame(secretWord: string): string {
 }
 
 /**
- *
+ * Returns a response indicating that the secret word cannot be revealed.
+ * @returns {string} The response message.
  */
 export function blockSecretWord(): string {
     return getRandomResponse([
@@ -307,7 +312,9 @@ export function blockSecretWord(): string {
 }
 
 /**
- * @param response
+ * Prompts the user for their last chance at guessing.
+ * @param {string} response - The response message to append to.
+ * @returns {string} The response message with the last chance prompt.
  */
 export function lastGuess(response: string): string {
     return (
@@ -323,7 +330,9 @@ export function lastGuess(response: string): string {
 }
 
 /**
- * @param secretWord
+ * Announces that the user correctly guessed the secret word.
+ * @param {string} secretWord The secret word in the current game.
+ * @returns {string} The response message.
  */
 export function youWin(secretWord: string): string {
     return getRandomResponse([
@@ -336,7 +345,9 @@ export function youWin(secretWord: string): string {
 }
 
 /**
- * @param secretWord
+ * Returns a message indicating that the user lost the game.
+ * @param {string} secretWord The secret word or phrase that was being guessed.
+ * @returns {string} The response message.
  */
 export function youLose(secretWord: string): string {
     return getRandomResponse([
@@ -349,7 +360,9 @@ export function youLose(secretWord: string): string {
 }
 
 /**
- * @param responses
+ * Fetch from an array of possible responses.
+ * @param {string[]} responses Array of responses.
+ * @returns {string} a random string from the array.
  */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));

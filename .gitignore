@@ -116,3 +116,8 @@ dist
 /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/obj
 /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests/IntegrationTests/testsettings.json
 /dotnet/samples/01.echoBot/.vs/*
+
+env/.env.*.user
+env/.env.local
+env/.env.staging
+.env*

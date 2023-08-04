@@ -4,8 +4,10 @@
 import { Attachment, CardFactory } from 'botbuilder';
 
 /**
- * @param post
- * @param previewMode
+ * Creates an adaptive card for editing a post.
+ * @param {string} post - The post to be edited.
+ * @param {boolean} previewMode - Whether the card is in preview mode.
+ * @returns {Attachment} - The adaptive card attachment.
  */
 export function createEditView(post: string, previewMode: boolean): Attachment {
     return CardFactory.adaptiveCard({

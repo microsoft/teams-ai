@@ -17,9 +17,6 @@
 
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
-        // Currently sample contains no frontend
-        // "plugin:react/recommended",
-        // "plugin:react/jsx-runtime"
     ],
     "plugins": [
         "@typescript-eslint",
@@ -58,9 +55,6 @@
         "prettier/prettier": "error",
         "jsdoc/require-param-type": 0,
         "jsdoc/require-returns": 0
-        // Currently sample contains no frontend
-        // "react/react-in-jsx-scope": "off",
-        // "react/prop-types": "off"
     },
     "overrides": [
         {

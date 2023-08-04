@@ -81,8 +81,8 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment OpenAIKey');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment OPENAI_API_KEY');
 }
 
 interface TempState extends DefaultTempState {
@@ -92,12 +92,12 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUserState, TempState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
@@ -201,18 +201,18 @@ app.messageExtensions.botMessagePreviewSend(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res, next) => {
+server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
     await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-
-    return next();
 });
 
 /**
- * @param card
+ * Creates a task module task info object with the given card.
+ * @param {Attachment} card - The card to include in the task module task info object.
+ * @returns {TaskModuleTaskInfo} The task module task info object.
  */
 function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
     return {
@@ -224,10 +224,12 @@ function createTaskInfo(card: Attachment): TaskModuleTaskInfo {
 }
 
 /**
- * @param context
- * @param state
- * @param prompt
- * @param data
+ * Updates a post with the given data and returns a task module task info object with the updated post.
+ * @param {TurnContext} context - The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state - The state object for the current turn of conversation.
+ * @param {string} prompt - The prompt to use for generating the updated post.
+ * @param {SubmitData} data - The data to use for updating the post.
+ * @returns {Promise<TaskModuleTaskInfo>} A task module task info object with the updated post.
  */
 async function updatePost(
     context: TurnContext,

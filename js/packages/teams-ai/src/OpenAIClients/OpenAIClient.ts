@@ -6,6 +6,7 @@
  * Licensed under the MIT License.
  */
 
+// eslint-disable-next-line import/named
 import axios, { AxiosInstance } from 'axios';
 import {
     CreateChatCompletionRequest,

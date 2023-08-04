@@ -19,7 +19,7 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "botbuilder": "^4.19.3",
+        "botbuilder": "^4.20.0",
         "@microsoft/teams-ai": "~0.1.0-preview.2",
         "dotenv": "^8.2.0",
         "replace": "~1.2.0",
@@ -29,9 +29,8 @@
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.7",
         "nodemon": "~1.19.4",
-        "tslint": "~5.20.0",
-        "typescript": "^4.6.4",
+        "typescript": "^5.1.6",
         "shx": "^0.3.3",
-        "ts-node": "^10.4.0"
+        "ts-node": "^10.9.1"
     }
 }

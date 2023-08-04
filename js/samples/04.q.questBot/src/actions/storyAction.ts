@@ -3,7 +3,7 @@ import { Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities } from '../bot';
 
 /**
- * @param app
+ * @param {Application<ApplicationTurnState>} app - The application instance.
  */
 export function storyAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('story', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -20,9 +20,11 @@ export function storyAction(app: Application<ApplicationTurnState>): void {
 }
 
 /**
- * @param context
- * @param state
- * @param data
+ * Updates the story in the conversation state.
+ * @param {TurnContext} context - The context object for the turn.
+ * @param {ApplicationTurnState} state - The state object for the application.
+ * @param {IDataEntities} data - The data object for the turn.
+ * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the update was successful.
  */
 async function updateStory(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const description = (data.description ?? '').trim();

@@ -1,6 +1,5 @@
 /**
  * Returns a string describing the current conditions.
- *
  * @param {number} time - The current time.
  * @param {number} day - The current day.
  * @param {string} temperature - The current temperature.
@@ -13,7 +12,6 @@ export function describeConditions(time: number, day: number, temperature: strin
 
 /**
  * Returns a string describing the time of day.
- *
  * @param {number} time - The current time.
  * @returns {'dawn' | 'morning' | 'noon' | 'afternoon' | 'evening' | 'night'} A string describing the time of day.
  */
@@ -35,7 +33,6 @@ export function describeTimeOfDay(time: number): 'dawn' | 'morning' | 'noon' | '
 
 /**
  * Returns the current season based on the day of the year.
- *
  * @param {number} day - The current day of the year.
  * @returns {'spring' | 'summer' | 'fall' | 'winter'} The current season.
  */
@@ -133,8 +130,7 @@ export function generateWeather(season: string): string {
 
 /**
 /**
- * Generates a temperature string based on the given season.
- *
+Generates a temperature string based on the given season.
  * @param {string} season The season to generate temperature for.
  * @returns {string} A string representing the generated temperature.
  */

@@ -52,7 +52,6 @@ export interface ParsedCommandResult {
 export class ResponseParser {
     /**
      * Attempts to find an Adaptive Card in a response.
-     *
      * @param {string} text Optional. Text to parse.
      * @returns {Record<string, any> | undefined} The found Adaptive Card or undefined if no card could be detected.
      */
@@ -63,10 +62,9 @@ export class ResponseParser {
 
     /**
      * Attempts to find a JSON object with-in a response.
-     *
      * @template T Optional. Type of object to return.
      * @param {string} text Optional. Text to parse.
-     * @returns The parsed object or undefined if no object could be detected.
+     * @returns {T} obj The parsed object or undefined if no object could be detected.
      */
     public static parseJSON<T = Record<string, any>>(text?: string): T | undefined {
         let obj: T | undefined;
@@ -88,7 +86,6 @@ export class ResponseParser {
 
     /**
      * Parses a response and returns a plan.
-     *
      * @summary
      * If a plan object can be detected in the response it will be returned. Otherwise a plan with
      * a single SAY command containing the response will be returned.
@@ -160,9 +157,11 @@ export class ResponseParser {
     }
 
     /**
-     * @param {string[]} tokens
+     * Parses a DO command from a list of tokens.
      * @private
-     * @returns ParsedCommandResult
+     * @param {string[]} tokens The list of tokens to parse.
+     * @returns {ParsedCommandResult} The parsed command result.
+     * @throws {Error} Throws an error if the token list passed in doesn't start with 'DO' token.
      */
     public static parseDoCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
@@ -311,9 +310,11 @@ export class ResponseParser {
     }
 
     /**
-     * @param tokens
+     * Parses a SAY command from a list of tokens.
      * @private
-     * @returns {ParsedCommandResult}
+     * @param {string[]} tokens The list of tokens to parse.
+     * @returns {ParsedCommandResult} The parsed command result.
+     * @throws {Error} Throws an error if the token list passed in doesn't start with 'SAY' token.
      */
     public static parseSayCommand(tokens: string[]): ParsedCommandResult {
         let length = 0;
@@ -356,9 +357,10 @@ export class ResponseParser {
     }
 
     /**
-     * @param {string} text
+     * Tokenizes a string of text into an array of tokens.
      * @private
-     * @returns {string[]}
+     * @param {string} text The text to tokenize.
+     * @returns {string[]} The array of tokens.
      */
     public static tokenizeText(text?: string): string[] {
         const tokens: string[] = [];

@@ -73,13 +73,13 @@ interface ConversationState {
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 type TData = Record<string, any>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
@@ -131,12 +131,10 @@ app.ai.action(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res, next) => {
+server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
     await adapter.process(req, res as any, async (context) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-
-    return next();
 });

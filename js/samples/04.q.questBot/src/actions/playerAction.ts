@@ -28,7 +28,6 @@ export function playerAction(app: Application<ApplicationTurnState>): void {
 
 /**
  * Updates the player's information.
- *
  * @param {Application<ApplicationTurnState>} app - The application.
  * @param {TurnContext} context - The context object for the current turn of conversation.
  * @param {ApplicationTurnState} state - The state object for the current turn of conversation.

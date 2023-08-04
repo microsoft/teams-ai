@@ -177,18 +177,16 @@ app.ai.action(
 );
 
 // Listen for incoming server requests.
-server.post('/api/messages', async (req, res, next) => {
+server.post('/api/messages', async (req, res) => {
     // Route received a request to adapter for processing
     await adapter.process(req, res as any, async (context: TurnContext) => {
         // Dispatch to application for routing
         await app.run(context);
     });
-    return next();
 });
 
 /**
  * This method is used to create new work item.
- *
  * @param {ApplicationTurnState} state The application turn state.
  * @param {EntityData} workItemInfo Data containing the work item information.
  * @returns {number} The ID of the newly created work item.
@@ -206,7 +204,6 @@ function createNewWorkItem(state: ApplicationTurnState, workItemInfo: EntityData
 
 /**
  * This method is used to assign a work item to a person.
- *
  * @param {ApplicationTurnState} state The application turn state.
  * @param {EntityData} workItemInfo Data containing the work item information.
  */
@@ -223,7 +220,6 @@ function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to triage work item.
- *
  * @param {ApplicationTurnState} state The application turn state.
  * @param {EntityData} workItemInfo Data containing the work item information.
  */
@@ -240,7 +236,6 @@ function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): 
 
 /**
  * This method is used to make sure that work items are initialized properly.
- *
  * @param {ApplicationTurnState} state The application turn state.
  * @returns {ConversationState} The conversation state
  */
@@ -254,7 +249,6 @@ function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationSt
 
 /**
  * This method is used to update the existing work item.
- *
  * @param {ApplicationTurnState} state The application turn state.
  * @param {EntityData} workItemInfo Data containing the work item information.
  */

@@ -19,7 +19,8 @@ The variations should always include ${item} and ${list} variables.
 */
 
 /**
- *
+ * Generates a response for when the player has no active quests.
+ * @returns {string} A string containing a random response.
  */
 export function noQuests(): string {
     return (
@@ -40,7 +41,8 @@ export function noQuests(): string {
     );
 }
 /**
- *
+ * Generates a response for when the player's movement is blocked.
+ * @returns {string} A string containing a random response.
  */
 export function moveBlocked(): string {
     return getRandomResponse([
@@ -53,7 +55,8 @@ export function moveBlocked(): string {
 }
 
 /**
- *
+ * Generates a response for when the player's inventory is empty.
+ * @returns {string} A string containing a random response.
  */
 export function emptyInventory(): string {
     return getRandomResponse([
@@ -66,7 +69,8 @@ export function emptyInventory(): string {
 }
 
 /**
- *
+ * Generates a response for when there are no items on the ground.
+ * @returns {string} A string containing a random response.
  */
 export function emptyDropped(): string {
     return getRandomResponse([
@@ -79,7 +83,9 @@ export function emptyDropped(): string {
 }
 
 /**
- * @param name
+ * Generates a response for when an item is not on the ground.
+ * @param {string} name The name of the item that is not on the ground.
+ * @returns {string} A string containing a random response.
  */
 export function notDropped(name: string): string {
     return getRandomResponse([
@@ -92,7 +98,9 @@ export function notDropped(name: string): string {
 }
 
 /**
- * @param name
+ * Generates a response for when an item is not in the player's inventory.
+ * @param {string} name The name of the item that is not in the inventory.
+ * @returns {string} A string containing a random response.
  */
 export function notInInventory(name: string): string {
     return getRandomResponse([
@@ -105,7 +113,9 @@ export function notInInventory(name: string): string {
 }
 
 /**
- * @param name
+ * Generates a response for when the player does not have enough of an item.
+ * @param {string} name The name of the item the player does not have enough of.
+ * @returns {string} A string containing a random response.
  */
 export function notEnoughItems(name: string): string {
     return getRandomResponse([
@@ -118,7 +128,10 @@ export function notEnoughItems(name: string): string {
 }
 
 /**
- * @param gold
+/**
+ * Generates a response for when the player does not have enough gold.
+ * @param {number} gold The amount of gold the player does not have.
+ * @returns {string} A string containing a random response.
  */
 export function notEnoughGold(gold: number): string {
     if (gold > 0) {
@@ -141,7 +154,9 @@ export function notEnoughGold(gold: number): string {
 }
 
 /**
- * @param direction
+ * Generates a response for when the player's movement in a certain direction is not available.
+ * @param {string} direction The direction the player is trying to move in.
+ * @returns {string} A string containing a random response.
  */
 export function directionNotAvailableExample(direction: string): string {
     return (
@@ -155,7 +170,8 @@ export function directionNotAvailableExample(direction: string): string {
 }
 
 /**
- *
+ * Generates a response for when the player's action is not allowed.
+ * @returns {string} A string containing a random response.
  */
 export function notAllowed(): string {
     return getRandomResponse([
@@ -168,7 +184,8 @@ export function notAllowed(): string {
 }
 
 /**
- *
+ * Generates a response for when the player's action is not allowed.
+ * @returns {string} A string containing a random response.
  */
 export function dataError(): string {
     return getRandomResponse([
@@ -181,7 +198,9 @@ export function dataError(): string {
 }
 
 /**
- * @param action
+ * Generates a response for when the player's action is unknown.
+ * @param {string} action The unknown action the player attempted to perform.
+ * @returns {string} A string containing a random response.
  */
 export function unknownAction(action: string): string {
     return getRandomResponse([
@@ -194,9 +213,13 @@ export function unknownAction(action: string): string {
 }
 
 /**
- * @param responses
+ * Returns a random response from an array of responses.
+ * @param {string[]} responses An array of strings containing possible responses.
+ * @returns {string} A randomly selected response from the array.
+ * @throws {Error} If the responses array is empty.
  */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));
+    // eslint-disable-next-line security/detect-object-injection
     return responses[i];
 }

@@ -4,7 +4,7 @@ import { ApplicationTurnState, IDataEntities, trimPromptResponse, updateDMRespon
 import * as responses from '../responses';
 
 /**
- * @param app
+ * @param {Application<ApplicationTurnState>} app The bot's application object.
  */
 export function mapAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('map', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -20,9 +20,10 @@ export function mapAction(app: Application<ApplicationTurnState>): void {
 }
 
 /**
- * @param app
- * @param context
- * @param state
+ * @param {Application} app The bot's application object.
+ * @param {TurnContext} context The current turn context.
+ * @param {ApplicationTurnState} state The current application state.
+ * @returns {Promise<boolean>} A boolean indicating whether the query was successful.
  */
 async function queryMap(
     app: Application<ApplicationTurnState>,
