@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Utilities;
 using Microsoft.TeamsAI.State;
-using Microsoft.Extensions.Options;
 using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.AI
@@ -94,13 +93,15 @@ namespace Microsoft.TeamsAI.AI
             if (!_actions.HasAction(name) || allowOverrides)
             {
                 _actions.SetAction(name, handler, allowOverrides);
-            } else
+            }
+            else
             {
                 ActionEntry<TState> entry = _actions.GetAction(name);
                 if (entry.AllowOverrides)
                 {
                     entry.Handler = handler;
-                } else
+                }
+                else
                 {
                     throw new Exception($"Attempting to register an already existing action `{name}` that does not allow overrides.");
                 }
@@ -139,7 +140,7 @@ namespace Microsoft.TeamsAI.AI
             List<ActionEntry<TState>> result = (from function in functions where function != null select function).ToList();
 
             // Fail if two functions have the same name
-            var uniquenessCheck = new HashSet<string>(from x in result select x.Name, StringComparer.OrdinalIgnoreCase);
+            HashSet<string> uniquenessCheck = new(from x in result select x.Name, StringComparer.OrdinalIgnoreCase);
             if (result.Count > uniquenessCheck.Count)
             {
                 throw new Exception("Function overloads are not supported, please differentiate function names");
@@ -181,18 +182,19 @@ namespace Microsoft.TeamsAI.AI
                 if (aIOptions.Prompt == null)
                 {
                     throw new AIException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
-                } else
+                }
+                else
                 {
                     prompt = aIOptions.Prompt;
                 }
             }
 
-            _SetTempStateValues(turnState, turnContext, options);
+            _SetTempStateValues(turnState, turnContext, aIOptions);
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
 
-            return await ChainAsync(turnContext, turnState, renderedPrompt, options, cancellationToken);
+            return await ChainAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
         }
 
         /// <summary>
@@ -220,7 +222,7 @@ namespace Microsoft.TeamsAI.AI
 
             AIOptions<TState> opts = _ConfigureOptions(options);
 
-            _SetTempStateValues(turnState, turnContext, options);
+            _SetTempStateValues(turnState, turnContext, opts);
 
             // Render the prompt
             PromptTemplate renderedPrompt = await opts.PromptManager.RenderPrompt(turnContext, turnState, prompt);
@@ -408,7 +410,8 @@ namespace Microsoft.TeamsAI.AI
 
                 // Disable history tracking by default
                 options.History ??= new AIHistoryOptions() { TrackHistory = false };
-            } else
+            }
+            else
             {
                 configuredOptions = _options;
             }
@@ -418,7 +421,7 @@ namespace Microsoft.TeamsAI.AI
 
         private void _SetTempStateValues(TState turnState, ITurnContext turnContext, AIOptions<TState>? options)
         {
-            TempState? tempState =  turnState.Temp;
+            TempState? tempState = turnState.Temp;
 
             if (tempState != null)
             {
@@ -433,5 +436,5 @@ namespace Microsoft.TeamsAI.AI
                 }
             }
         }
-    }   
+    }
 }
