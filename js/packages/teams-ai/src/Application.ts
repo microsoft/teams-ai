@@ -201,7 +201,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
             {
                 removeRecipientMention: true,
                 startTypingTimer: true,
-                longRunningMessages: false,
+                longRunningMessages: false
             } as ApplicationOptions<TState>,
             options
         ) as ApplicationOptions<TState>;

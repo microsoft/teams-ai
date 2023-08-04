@@ -1,14 +1,14 @@
-import { strict as assert } from "assert";
-import { TestAdapter, MemoryStorage, ActivityTypes } from "botbuilder";
-import { Application } from "./Application";
-import { TestPlanner } from "./TestPlanner";
-import { TestPromptManager } from "./TestPromptManager";
-import { AdaptiveCardsOptions } from "./AdaptiveCards";
-import { AIOptions } from "./AI";
-import { DefaultTurnState, DefaultTurnStateManager } from "./DefaultTurnStateManager";
-import { TaskModulesOptions } from "./TaskModules";
+import { strict as assert } from 'assert';
+import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
+import { Application } from './Application';
+import { TestPlanner } from './TestPlanner';
+import { TestPromptManager } from './TestPromptManager';
+import { AdaptiveCardsOptions } from './AdaptiveCards';
+import { AIOptions } from './AI';
+import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
+import { TaskModulesOptions } from './TaskModules';
 
-describe("Application", () => {
+describe('Application', () => {
     const adapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
     const ai: AIOptions<DefaultTurnState> = {
@@ -23,8 +23,8 @@ describe("Application", () => {
     const taskModules: TaskModulesOptions = { taskDataFilter: 'taskFilter' };
     const turnStateManager = new DefaultTurnStateManager();
 
-    describe("constructor()", () => {
-        it("should create an Application with default options", () => {
+    describe('constructor()', () => {
+        it('should create an Application with default options', () => {
             const app = new Application();
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, undefined);
@@ -39,7 +39,7 @@ describe("Application", () => {
             assert.notEqual(app.options.turnStateManager, undefined);
         });
 
-        it("should create an Application with custom options", () => {
+        it('should create an Application with custom options', () => {
             const app = new Application({
                 adapter,
                 adaptiveCards,
@@ -66,20 +66,20 @@ describe("Application", () => {
         });
     });
 
-    describe("adaptiveCards", () => {
-        it("should return the adaptiveCards property", () => {
+    describe('adaptiveCards', () => {
+        it('should return the adaptiveCards property', () => {
             const app = new Application();
             assert.notEqual(app.adaptiveCards, undefined);
         });
     });
 
-    describe("ai", () => {
-        it("should throw exception if ai not configured", () => {
+    describe('ai', () => {
+        it('should throw exception if ai not configured', () => {
             const app = new Application();
             assert.throws(() => app.ai);
         });
 
-        it("should return the ai property", () => {
+        it('should return the ai property', () => {
             const app = new Application({
                 ai
             });
@@ -87,22 +87,22 @@ describe("Application", () => {
         });
     });
 
-    describe("messageExtensions", () => {
-        it("should return the messageExtensions property", () => {
+    describe('messageExtensions', () => {
+        it('should return the messageExtensions property', () => {
             const app = new Application();
             assert.notEqual(app.messageExtensions, undefined);
         });
     });
 
-    describe("taskModules", () => {
-        it("should return the taskModules property", () => {
+    describe('taskModules', () => {
+        it('should return the taskModules property', () => {
             const app = new Application();
             assert.notEqual(app.taskModules, undefined);
         });
     });
 
-    describe("activity", () => {
-        it("should route to an activity handler", async () => {
+    describe('activity', () => {
+        it('should route to an activity handler', async () => {
             let called = false;
             const app = new Application();
             app.activity(ActivityTypes.Message, async (context, state) => {
@@ -126,7 +126,7 @@ describe("Application", () => {
             });
         });
 
-        it("should route to first registered activity handler", async () => {
+        it('should route to first registered activity handler', async () => {
             let called = false;
             const app = new Application();
             app.activity(ActivityTypes.Message, async (context, state) => {
@@ -142,6 +142,5 @@ describe("Application", () => {
                 assert.equal(handled, true);
             });
         });
-
     });
 });

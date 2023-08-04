@@ -1,16 +1,33 @@
-import { TurnContext } from "botbuilder";
-import { DefaultConversationState, DefaultTempState, DefaultTurnState, DefaultUserState } from "./DefaultTurnStateManager";
-import { PromptManager, PromptTemplate } from "./Prompts";
-
+import { TurnContext } from 'botbuilder';
+import {
+    DefaultConversationState,
+    DefaultTempState,
+    DefaultTurnState,
+    DefaultUserState
+} from './DefaultTurnStateManager';
+import { PromptManager, PromptTemplate } from './Prompts';
 
 /**
  * A prompt manager used for testing.
  */
 export class TestPromptManager implements PromptManager<DefaultTurnState> {
-    public readonly functions: Map<string, (context: TurnContext, state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>) => Promise<any>> = new Map();
+    public readonly functions: Map<
+        string,
+        (
+            context: TurnContext,
+            state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>
+        ) => Promise<any>
+    > = new Map();
     public readonly templates: Map<string, PromptTemplate> = new Map();
 
-    public addFunction(name: string, handler: (context: TurnContext, state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>) => Promise<any>, allowOverrides?: boolean | undefined): this {
+    public addFunction(
+        name: string,
+        handler: (
+            context: TurnContext,
+            state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>
+        ) => Promise<any>,
+        allowOverrides?: boolean | undefined
+    ): this {
         this.functions.set(name, handler);
         return this;
     }
@@ -20,7 +37,11 @@ export class TestPromptManager implements PromptManager<DefaultTurnState> {
         return this;
     }
 
-    public invokeFunction(context: TurnContext, state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>, name: string): Promise<any> {
+    public invokeFunction(
+        context: TurnContext,
+        state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>,
+        name: string
+    ): Promise<any> {
         if (this.functions.has(name)) {
             return this.functions.get(name)!(context, state);
         } else {
@@ -28,7 +49,11 @@ export class TestPromptManager implements PromptManager<DefaultTurnState> {
         }
     }
 
-    public renderPrompt(context: TurnContext, state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>, nameOrTemplate: string | PromptTemplate): Promise<PromptTemplate> {
+    public renderPrompt(
+        context: TurnContext,
+        state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>,
+        nameOrTemplate: string | PromptTemplate
+    ): Promise<PromptTemplate> {
         if (typeof nameOrTemplate === 'string') {
             if (this.templates.has(nameOrTemplate)) {
                 return Promise.resolve(this.templates.get(nameOrTemplate)!);
