@@ -13,11 +13,12 @@ class Planner(ABC):
     """
 
     @abstractclassmethod
-    async def generate_plan(self, state: TurnState, prompt_name_or_template: Union[str, PromptTemplate], *, history_options: AIHistoryOptions) -> Plan:
+    async def generate_plan(self, turn_context:TurnContext, state: TurnState, prompt_name_or_template: Union[str, PromptTemplate], *, history_options: AIHistoryOptions) -> Plan:
         """
         Generates a plan based on the given turn state and prompt name or template.
 
         Args:
+            turn_context (TurnContext): The turn context for current turn of conversation
             state (TurnState): The current turn state.
             prompt_name_or_template (Union[str, PromptTemplate]): The name of the prompt or a prompt template to use.
             history_options (AIHistoryOptions): The options for the AI history.
