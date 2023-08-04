@@ -29,7 +29,7 @@
         "@types/jsonwebtoken": "^9.0.2",
         "@types/restify": "8.5.7",
         "nodemon": "~1.19.4",
-        "shx": "^0.3.3",
+        "shx": "^0.3.4",
         "ts-node": "^10.9.1",
         "typescript": "^5.1.6"
     }
