@@ -10,8 +10,7 @@
         "bots",
         "chatbots",
         "teams",
-        "ai",
-        "gpt"
+        "ai"
     ],
     "bugs": {
         "url": "https://github.com/microsoft/teams-ai/issues"
@@ -52,7 +51,6 @@
         "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
-        "test": "ts-mocha src/**/*.spec.ts --timeout 10000",
         "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
         "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
         "test:compat": "api-extractor run --verbose"

@@ -15,8 +15,8 @@
         "dev:unlink": "wsrun --if is-not-private --bin=yarn unlink",
         "lint": "wsrun -m -l lint",
         "package": "wsrun -e -t -l --if is-not-private --bin yarn pack",
-        "test": "npm-run-all build test:mocha test:nyc:report",
-        "test:mocha": "nyc --silent mocha \"./packages/teams-ai/src/*.spec.ts\" --exit --check-leaks",
+        "test": "yarn tsc -b packages/teams-ai && npx mocha -r ts-node/register packages/teams-ai/src/**/*.spec.ts",
+        "test:mocha": "nyc --silent mocha --require ts-node/register \"./packages/teams-ai/src/*.spec.ts\" --exit --check-leaks",
         "test:nyc:report": "nyc report"
     },
     "devDependencies": {
