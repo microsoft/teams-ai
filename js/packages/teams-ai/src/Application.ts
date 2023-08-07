@@ -83,7 +83,7 @@ export interface ApplicationOptions<TState extends TurnState> {
      * Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
      * be created.
      */
-    turnStateManager?: TurnStateManager<TState>;
+    turnStateManager: TurnStateManager<TState>;
 
     /**
      * Optional. Options used to customize the processing of Adaptive Card requests.
@@ -99,14 +99,14 @@ export interface ApplicationOptions<TState extends TurnState> {
      * Optional. If true, the bot will automatically remove mentions of the bot's name from incoming
      * messages. Defaults to true.
      */
-    removeRecipientMention?: boolean;
+    removeRecipientMention: boolean;
 
     /**
      * Optional. If true, the bot will automatically start a typing timer when messages are received.
      * This allows the bot to automatically indicate that it's received the message and is processing
      * the request. Defaults to true.
      */
-    startTypingTimer?: boolean;
+    startTypingTimer: boolean;
 
     /**
      * Optional. If true, the bot supports long running messages that can take longer then the 10 - 15
@@ -116,7 +116,7 @@ export interface ApplicationOptions<TState extends TurnState> {
      * be used for bots that operate in a shared hosting environment. The incoming request is immediately
      * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
      */
-    longRunningMessages?: boolean;
+    longRunningMessages: boolean;
 }
 
 /**
@@ -196,11 +196,12 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * Creates a new Application instance.
      * @param {ApplicationOptions<TState>} options Optional. Options used to configure the application.
      */
-    public constructor(options?: ApplicationOptions<TState>) {
+    public constructor(options?: Partial<ApplicationOptions<TState>>) {
         this._options = Object.assign(
             {
                 removeRecipientMention: true,
-                startTypingTimer: true
+                startTypingTimer: true,
+                longRunningMessages: false
             } as ApplicationOptions<TState>,
             options
         ) as ApplicationOptions<TState>;

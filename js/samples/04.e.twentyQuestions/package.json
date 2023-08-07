@@ -1,5 +1,5 @@
 {
-    "name": "twentyQuestions-demo",
+    "name": "twenty-questions-demo",
     "version": "1.0.0",
     "description": "GPT powered bot that plays a game of 20 questions.",
     "author": "Microsoft",
@@ -30,7 +30,7 @@
         "@types/restify": "8.5.7",
         "nodemon": "~1.19.4",
         "typescript": "^5.1.6",
-        "shx": "^0.3.3",
+        "shx": "^0.3.4",
         "ts-node": "^10.9.1"
     }
 }
