@@ -11,4 +11,4 @@ def install():
     for e in Path("./packages").glob("*"):
         if e.is_dir():
             print("------ " + e.name + " ------")
-            subprocess.run(["poetry", "install"], cwd=e.absolute())
+            subprocess.run(["poetry", "install"], cwd=e.absolute()).check_returncode()

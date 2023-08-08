@@ -10,4 +10,4 @@ def fmt():
     subprocess.run([
         "poetry", "run", "yapf", "./teams", "--recursive", "--in-place",
         "--parallel", "--print-modified"
-    ])
+    ]).check_returncode()

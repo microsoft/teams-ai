@@ -7,4 +7,4 @@ import subprocess
 
 
 def lint():
-    subprocess.run(["poetry", "run", "pylint", "./teams"])
+    subprocess.run(["poetry", "run", "pylint", "./teams"]).check_returncode()

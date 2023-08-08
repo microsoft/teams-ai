@@ -7,4 +7,4 @@ import subprocess
 
 
 def test():
-    subprocess.run(["poetry", "run", "pytest"])
+    subprocess.run(["poetry", "run", "pytest"]).check_returncode()
