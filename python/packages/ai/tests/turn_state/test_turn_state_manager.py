@@ -65,9 +65,9 @@ class TestTurnStateManager:
         state = await self.manager.load_state(storage=storage,
                                               context=TurnContext(
                                                   SimpleAdapter(), ACTIVITY))
-        assert state["conversation"].value is None
-        assert state["user"].value is None
-        assert state["temp"].value is None
+        assert state.conversation.value is None
+        assert state.user.value is None
+        assert state.temp.value is None
 
     @pytest.mark.asyncio
     async def test_load_state_non_empty(self):
@@ -77,9 +77,9 @@ class TestTurnStateManager:
         state = await self.manager.load_state(storage=storage,
                                               context=TurnContext(
                                                   SimpleAdapter(), ACTIVITY))
-        TestCase().assertIsInstance(state["conversation"].value, StoreItem)
-        assert state["user"].value is None
-        assert state["temp"].value is None
+        TestCase().assertIsInstance(state.conversation.value, StoreItem)
+        assert state.user.value is None
+        assert state.temp.value is None
 
     @pytest.mark.asyncio
     async def test_save_state(self):

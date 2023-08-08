@@ -4,7 +4,7 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from typing import TypedDict, TypeVar, Generic
+from typing import TypeVar, Generic
 
 from .turn_state_entry import TurnStateEntry
 from .conversation_state import ConversationState
@@ -17,7 +17,7 @@ TempT = TypeVar("TempT", bound=TempState)
 
 
 @dataclass
-class TurnState(TypedDict, Generic[ConversationT, UserT, TempT]):
+class TurnState(Generic[ConversationT, UserT, TempT]):
     "defines the default state scopes persisted by the `TurnStateManager`"
 
     conversation: TurnStateEntry[ConversationT]
