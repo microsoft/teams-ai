@@ -17,7 +17,6 @@ import { TurnState } from './TurnState';
 export interface Planner<TState extends TurnState> {
     /**
      * Completes a prompt without returning a plan.
-     *
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      * @param prompt Prompt to complete.
@@ -33,7 +32,6 @@ export interface Planner<TState extends TurnState> {
 
     /**
      * Completes a prompt and generates a plan for the AI system to execute.
-     *
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      * @param prompt Prompt to complete.
@@ -69,7 +67,6 @@ export interface Plan {
 export interface PredictedCommand {
     /**
      * Type of command to execute.
-     *
      * @summary
      * DO commands are actions that the AI system should perform. SAY commands are responses that
      * the AI system should say.

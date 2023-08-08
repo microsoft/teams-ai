@@ -97,13 +97,13 @@ export interface ILocation {
 
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing environment variables - please check that OpenAIKey is set.');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
@@ -251,6 +251,7 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
         if (Object.entries(campaign).length > 0) {
             campaignFinished = true;
             for (let i = 0; i < campaign.objectives.length; i++) {
+                // eslint-disable-next-line security/detect-object-injection
                 const objective = campaign.objectives[i];
                 if (!objective.completed) {
                     // Ignore if the objective is already a quest
@@ -400,6 +401,7 @@ app.ai.prompts.addFunction('describeQuests', async (_context: TurnContext, state
     let text = '';
     let connector = '';
     for (const key in conversation.quests) {
+        // eslint-disable-next-line security/detect-object-injection
         const quest = conversation.quests[key];
         text += `${connector}"${quest.title}" - ${quest.description}`;
         connector = '\n\n';
@@ -431,15 +433,15 @@ app.ai.prompts.addFunction('describeConditions', async (_context: TurnContext, s
 
 /**
  * Returns a string representation of the given item list.
- *
  * @param {IItemList} items - The item list to describe.
- * @param {string} [indent='\t'] - The indentation string to use.
+ * @param {string} [indent] - The indentation string to use.
  * @returns {string} The string representation of the item list.
  */
 export function describeItemList(items: IItemList, indent = '\t'): string {
     let text = '';
     let delim = '';
     for (const key in items) {
+        // eslint-disable-next-line security/detect-object-injection
         text += `${delim}\t\t${key}: ${items[key]}`;
         delim = '\n';
     }
@@ -448,9 +450,11 @@ export function describeItemList(items: IItemList, indent = '\t'): string {
 }
 
 /**
- * @param context
- * @param state
- * @param newResponse
+ * Updates the conversation history with the new response and sends the response to the user.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state The state object for the current turn of conversation.
+ * @param {string} newResponse The new response to add to the conversation history and send to the user.
+ * @returns {Promise<void>} A promise that resolves when the response has been sent to the user.
  */
 export async function updateDMResponse(
     context: TurnContext,
@@ -468,9 +472,8 @@ export async function updateDMResponse(
 
 /**
  * Parses a string to a number.
- *
  * @param {string | undefined} text - The string to parse.
- * @param {number} [minValue=0] - The minimum value to return.
+ * @param {number} [minValue] - The minimum value to return.
  * @returns {number} The parsed number.
  */
 export function parseNumber(text: string | undefined, minValue?: number): number {
@@ -488,7 +491,6 @@ export function parseNumber(text: string | undefined, minValue?: number): number
 
 /**
  * Trims the prompt response by removing common junk that gets returned by the model.
- *
  * @param {string} response - The response to trim.
  * @returns {string} The trimmed response.
  */
@@ -499,7 +501,6 @@ export function trimPromptResponse(response: string): string {
 
 /**
  * Converts a string to title case.
- *
  * @param {string} text - The string to convert to title case.
  * @returns {string} The title case version of the input string.
  */

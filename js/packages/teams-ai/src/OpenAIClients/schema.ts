@@ -239,7 +239,9 @@ export interface ContentSafetyOptions {
 
 export interface CreateContentSafetyRequest extends ContentSafetyOptions {
     /**
-     * @requires
+     * The raw text to be checked. Other non-ascii characters can be included.
+     * @requires text
+     * @name text
      * This is the raw text to be checked. Other non-ascii characters can be included.
      */
     text: string;

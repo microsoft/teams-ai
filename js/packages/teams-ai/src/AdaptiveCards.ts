@@ -39,8 +39,7 @@ const SEARCH_INvOKE_NAME = `application/search`;
 
 /**
  * Strongly typed Adaptive Card.
- *
- * @remarks
+ * @summary
  * see https://adaptivecards.io/explorer/ for schema details.
  */
 export interface AdaptiveCard {
@@ -61,8 +60,7 @@ export interface AdaptiveCard {
 export interface AdaptiveCardsOptions {
     /**
      * Data field used to identify the Action.Submit handler to trigger.
-     *
-     * @remarks
+     * @summary
      * When an Action.Submit is triggered, the field name specified here will be used to determine
      * the handler to route the request to.
      *
@@ -103,7 +101,6 @@ export interface AdaptiveCardSearchResult {
 
 /**
  * AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.
- *
  * @template TState Type of the turn state object being persisted.
  */
 export class AdaptiveCards<TState extends TurnState> {
@@ -111,8 +108,8 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Creates a new instance of the AdaptiveCards class.
-     *
-     * @param app Top level application class to register handlers with.
+     * @param {Application<TState>} app The top level application class to register handlers with.
+     * @template TState The type of the state object used by the application.
      */
     public constructor(app: Application<TState>) {
         this._app = app;
@@ -120,14 +117,13 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Adds a route to the application for handling Adaptive Card Action.Execute events.
-     *
      * @template TData Optional. Type of the data associated with the action.
-     * @param verb The named action(s) to be handled.
-     * @param handler The code to execute when the action is triggered.
-     * @param handler.context The current turn context.
-     * @param handler.state The current turn state.
-     * @param handler.data The data associated with the action.
-     * @returns The application for chaining purposes.
+     * @param {string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[]} verb The named action(s) to be handled.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<AdaptiveCard | string>} handler The code to execute when the action is triggered.
+     * @param {TurnContext} handler.context The current turn context.
+     * @param {TState} handler.state The current turn state.
+     * @param {TData} handler.data The data associated with the action.
+     * @returns {Application<TState>} The application for chaining purposes.
      */
     public actionExecute<TData = Record<string, any>>(
         verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
@@ -186,8 +182,7 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Adds a route to the application for handling Adaptive Card Action.Submit events.
-     *
-     * @remarks
+     * @summary
      * The route will be added for the specified verb(s) and will be filtered using the
      * `actionSubmitFilter` option. The default filter is to use the `verb` field.
      *
@@ -284,7 +279,7 @@ export class AdaptiveCards<TState extends TurnState> {
 }
 
 /**
- * @param verb
+ * @param {string | RegExp | RouteSelector} verb The named action to be handled, or a regular expression to match the verb.
  * @private
  * @returns {RouteSelector} A function that matches the verb using a RegExp or attempts to match verb.
  */
@@ -324,8 +319,8 @@ function createActionExecuteSelector(verb: string | RegExp | RouteSelector): Rou
 }
 
 /**
- * @param verb
- * @param filter
+ * @param {string | RegExp | RouteSelector} verb The named action to be handled, or a regular expression to match the verb.
+ * @param {RouteSelector} filter Optional. A filter function to further refine the selection.
  * @private
  * @returns {RouteSelector} A function that matches the verb using a RegExp or attempts to match verb.
  */
@@ -355,9 +350,9 @@ function createActionSubmitSelector(verb: string | RegExp | RouteSelector, filte
 }
 
 /**
- * @param dataset
+ * Creates a route selector function for handling Adaptive Card Search.Invoke events.
+ * @param {string | RegExp | RouteSelector} dataset The dataset to match, or a regular expression to match the dataset.
  * @private
- * @param {string | RegExp | RouteSelector} dataset - The dataset to match.
  * @returns {RouteSelector} A function that matches the dataset using a RegExp or attempts to match dataset.
  */
 function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSelector {

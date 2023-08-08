@@ -9,8 +9,8 @@ import { storyAction } from './storyAction';
 import { timeAction } from './timeAction';
 
 /**
- * @param app
- * @param planner
+ * Adds all the actions to the given application.
+ * @param {Application<ApplicationTurnState>} app The application to add the actions to.
  */
 export function addActions(app: Application<ApplicationTurnState>): void {
     inventoryAction(app);

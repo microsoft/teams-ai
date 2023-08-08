@@ -4,7 +4,9 @@
 import { Attachment, CardFactory } from 'botbuilder';
 
 /**
- * @param result
+ * Creates an adaptive card for an npm package search result.
+ * @param {any} result The search result to create the card for.
+ * @returns {Attachment} The adaptive card attachment for the search result.
  */
 export function createNpmPackageCard(result: any): Attachment {
     return CardFactory.adaptiveCard({

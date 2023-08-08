@@ -3,6 +3,7 @@
 // Licensed under the MIT License.
 
 // Import required packages
+import { config } from 'dotenv';
 import * as restify from 'restify';
 import * as path from 'path';
 
@@ -16,11 +17,11 @@ import {
 } from 'botbuilder';
 
 // Load environment variables from .env file.
-import dotenv from 'dotenv';
-dotenv.config();
+const ENV_FILE = path.join(__dirname, '..', '.env');
+config({ path: ENV_FILE });
 
-if (!process.env.AZURE_OPENAI_KEY) {
-    throw new Error('Missing AZURE_OPENAI_KEY environment variable');
+if (!process.env.AZURE_OPENAI_API_KEY) {
+    throw new Error('Missing AZURE_OPENAI_API_KEY environment variable');
 }
 
 // Import required bot configuration.

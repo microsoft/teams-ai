@@ -1,0 +1,85 @@
+Here is an adaptive card template for showing 1 or more work items to a user
+
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.4",
+    "type": "AdaptiveCard",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Your Work Items",
+            "weight": "Bolder",
+            "size": "Large"
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {
+                            "title": "Id",
+                            "value": "id-1"
+                        },
+                        {
+                            "title": "Title",
+                            "value": "title-1"
+                        },
+                        {
+                            "title": "Assigned To",
+                            "value": "assignedTo-1"
+                        },
+                        {
+                            "title": "Status",
+                            "value": "status-1"
+                        }
+                    ],
+                    "separator": true
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "items": [
+                {
+                    "type": "FactSet",
+                    "facts": [
+                        {
+                            "title": "Id",
+                            "value": "id-2"
+                        },
+                        {
+                            "title": "Title",
+                            "value": "title-2"
+                        },
+                        {
+                            "title": "Assigned To",
+                            "value": "assignedTo-2"
+                        },
+                        {
+                            "title": "Status",
+                            "value": "status-2"
+                        }
+                    ],
+                    "separator": true
+                }
+            ]
+        }
+    ]
+}
+
+Here's a set of work items. The key is the id of the work item and title:
+
+{{getWorkItems}}
+
+Here's the user's query:
+
+```
+{{$input}}
+```
+
+Use the template to create an Adaptive Card.
+Take into account any changes asked for by the user.
+Always replace the placeholder: "id-n", "title-n", "assignedTo-n", and "status-n", with real data.
+
+AdaptiveCard:

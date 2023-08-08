@@ -26,7 +26,6 @@ export interface DefaultPromptManagerOptions {
 
 /**
  * A filesystem based prompt manager.
- *
  * @summary
  * The default prompt manager uses the file system to define prompts that are compatible with
  * Microsoft's Semantic Kernel SDK (see: https://github.com/microsoft/semantic-kernel)
@@ -53,11 +52,9 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Adds a custom function to the prompt manager.
-     *
      * @summary
      * Functions can be used with a prompt template using a syntax of `{{name}}`. Function
      * arguments are not currently supported.
-     *
      * @param {string} name - The name of the function.
      * @param {(context: TurnContext, state: TState) => Promise<any>} handler - Promise to return on function name match.
      * @param {boolean} allowOverrides - Whether to allow overriding an existing function.
@@ -86,7 +83,6 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Adds a prompt template to the prompt manager.
-     *
      * @summary
      * The template will be pre-parsed and cached for use when the template is rendered by name.
      * @param {string} name - Name of the prompt template.
@@ -121,7 +117,6 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Invokes a function by name.
-     *
      * @param {TurnContext} context - Current application turn context.
      * @param {TState} state - Current turn state.
      * @param {string} name - Name of the function to invoke.
@@ -139,7 +134,6 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Loads a named prompt template from the filesystem.
-     *
      * @summary
      * The template will be pre-parsed and cached for use when the template is rendered by name.
      * @param {string} name - Name of the template to load.
@@ -195,7 +189,6 @@ export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> i
 
     /**
      * Renders a prompt template by name.
-     *
      * @summary
      * The prompt will be automatically loaded from disk if needed and cached for future use.
      * @param {TurnContext} context - Current application turn context.

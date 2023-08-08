@@ -23,4 +23,6 @@ export * from './Planner';
 export * from './Prompts';
 export * from './ResponseParser';
 export * from './TaskModules';
+export * from './TestPlanner';
+export * from './TestPromptManager';
 export * from './TurnState';
