@@ -7,6 +7,8 @@ name: python-ci
 on:
   workflow_dispatch:
   push:
+    branches:
+      - '**'
     paths:
       - 'python/**'
 
@@ -15,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python ${{ matrix.python-version }}
@@ -28,19 +30,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
-      - name: Check Dependencies
+          poetry run install
+      - name: Run CI
         working-directory: ./python
         run: |
-          poetry check
-      - name: Lint
-        working-directory: ./python
-        run: |
-          poetry run lint
-      - name: Test
-        working-directory: ./python
-        run: |
-          poetry run test
-      - name: Build
-        working-directory: ./python
-        run: |
-          poetry build
+          poetry run ci
