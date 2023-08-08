@@ -2,6 +2,12 @@
 
 Within the Teams Bot Framework, the Connector service enables your bot to exchange messages with users on channels that are configured in the Bot Framework Portal.
 
+## Install
+
+```bash
+$: pip install teams-connector
+```
+
 ## Development
 
 ### Prerequisites

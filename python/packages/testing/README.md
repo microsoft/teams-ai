@@ -2,6 +2,12 @@
 
 Some helper classes useful for testing bots built with the Microsoft Teams Bot Framework.
 
+## Install
+
+```bash
+$: pip install teams-testing
+```
+
 ## Development
 
 ### Prerequisites

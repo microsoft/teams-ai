@@ -2,6 +2,12 @@
 
 Contains the serialized data sent across the wire between user and bot when using the Teams Bot Framework.
 
+## Install
+
+```bash
+$: pip install teams-schema
+```
+
 ## Development
 
 ### Prerequisites

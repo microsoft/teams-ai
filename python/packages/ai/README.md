@@ -2,6 +2,12 @@
 
 SDK focused on building AI based applications for Microsoft Teams.
 
+## Install
+
+```bash
+$: pip install teams-ai
+```
+
 ## Development
 
 ### Prerequisites

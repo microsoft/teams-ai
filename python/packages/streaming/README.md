@@ -2,6 +2,12 @@
 
 Streaming Extensions for the Teams Bot Framework.
 
+## Install
+
+```bash
+$: pip install teams-streaming
+```
+
 ## Development
 
 ### Prerequisites

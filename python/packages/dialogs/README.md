@@ -2,6 +2,12 @@
 
 A dialog stack based conversation manager for Microsoft Teams.
 
+## Install
+
+```bash
+$: pip install teams-dialogs
+```
+
 ## Development
 
 ### Prerequisites

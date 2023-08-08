@@ -2,6 +2,12 @@
 
 Azure extensions for Microsoft Teams.
 
+## Install
+
+```bash
+$: pip install teams-azure
+```
+
 ## Development
 
 ### Prerequisites

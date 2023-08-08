@@ -4,6 +4,12 @@ Within the Bot Framework, BotBuilder-ApplicationInsights enables the Azure Appli
 
 Application Insights is an extensible Application Performance Management (APM) service for developers on multiple platforms. Use it to monitor your live bot application. It includes powerful analytics tools to help you diagnose issues and to understand what users actually do with your bot.
 
+## Install
+
+```bash
+$: pip install teams-applicationinsights
+```
+
 ## Development
 
 ### Prerequisites
