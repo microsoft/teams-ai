@@ -32,6 +32,4 @@ class PrivateConversationState(BotState):
         else:
             raise Exception("missing activity.from_property.id")
 
-        return (
-            f"{channel_id}/conversations/{ conversation_id }/users/{ user_id }/{ self.namespace }"
-        )
+        return f"{channel_id}/conversations/{ conversation_id }/users/{ user_id }/{ self.namespace }"

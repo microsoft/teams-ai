@@ -51,9 +51,7 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
     async def get_conversation_reference(self, skill_conversation_id: str) -> ConversationReference:
         return await super().get_conversation_reference(skill_conversation_id)
 
-    async def get_skill_conversation_reference(
-        self, skill_conversation_id: str
-    ) -> SkillConversationReference:
+    async def get_skill_conversation_reference(self, skill_conversation_id: str) -> SkillConversationReference:
         """
         Retrieve a `SkillConversationReference` with the specified ID.
 

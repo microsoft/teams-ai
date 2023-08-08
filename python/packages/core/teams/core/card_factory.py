@@ -40,8 +40,7 @@ class CardFactory:
         """
         if not isinstance(card, dict):
             raise TypeError(
-                "CardFactory.adaptive_card(): `card` argument is not of type dict, unable to prepare "
-                "attachment."
+                "CardFactory.adaptive_card(): `card` argument is not of type dict, unable to prepare " "attachment."
             )
 
         return Attachment(content_type=CardFactory.content_types.adaptive_card, content=card)

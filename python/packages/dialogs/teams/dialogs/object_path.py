@@ -50,9 +50,7 @@ class ObjectPath:
                             merge(target_value.__dict__, source_value.__dict__)
 
             target_dict = merged if isinstance(merged, dict) else merged.__dict__
-            overlay_dict = (
-                overlay_object if isinstance(overlay_object, dict) else overlay_object.__dict__
-            )
+            overlay_dict = overlay_object if isinstance(overlay_object, dict) else overlay_object.__dict__
             merge(target_dict, overlay_dict)
 
             return merged

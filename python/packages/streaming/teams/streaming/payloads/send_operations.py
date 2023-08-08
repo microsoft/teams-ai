@@ -25,9 +25,7 @@ class SendOperations:
 
         if request.streams:
             tasks = [
-                ResponseMessageStreamDisassembler(
-                    self._payload_sender, content_stream
-                ).disassemble()
+                ResponseMessageStreamDisassembler(self._payload_sender, content_stream).disassemble()
                 for content_stream in request.streams
             ]
 
@@ -40,9 +38,7 @@ class SendOperations:
 
         if response.streams:
             tasks = [
-                ResponseMessageStreamDisassembler(
-                    self._payload_sender, content_stream
-                ).disassemble()
+                ResponseMessageStreamDisassembler(self._payload_sender, content_stream).disassemble()
                 for content_stream in response.streams
             ]
 

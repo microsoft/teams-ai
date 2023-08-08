@@ -93,9 +93,7 @@ class TranscriptLoggerMiddleware(Middleware):
         context.on_send_activities(send_activities_handler)
 
         # hook up update activity pipeline
-        async def update_activity_handler(
-            ctx: TurnContext, activity: Activity, next_update: Callable[[], Awaitable]
-        ):
+        async def update_activity_handler(ctx: TurnContext, activity: Activity, next_update: Callable[[], Awaitable]):
             # Run full pipeline
             response = await next_update()
             update_activity = copy.copy(activity)
@@ -115,9 +113,7 @@ class TranscriptLoggerMiddleware(Middleware):
             await next_delete()
 
             delete_msg = Activity(type=ActivityTypes.message_delete, id=reference.activity_id)
-            deleted_activity: Activity = TurnContext.apply_conversation_reference(
-                delete_msg, reference, False
-            )
+            deleted_activity: Activity = TurnContext.apply_conversation_reference(delete_msg, reference, False)
             await self.log_activity(transcript, deleted_activity)
 
         context.on_delete_activity(delete_activity_handler)

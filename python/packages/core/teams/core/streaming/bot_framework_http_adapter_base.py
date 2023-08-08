@@ -49,8 +49,7 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
         request_handler = [
             handler
             for handler in self.request_handlers
-            if handler.service_url == activity.service_url
-            and handler.has_conversation(activity.conversation.id)
+            if handler.service_url == activity.service_url and handler.has_conversation(activity.conversation.id)
         ]
         request_handler = request_handler[-1] if request_handler else None
         context = TurnContext(self, activity)
@@ -81,9 +80,7 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
 
         return not activity.service_url.startswith("https")
 
-    async def process_outgoing_activity(
-        self, turn_context: TurnContext, activity: Activity
-    ) -> ResourceResponse:
+    async def process_outgoing_activity(self, turn_context: TurnContext, activity: Activity) -> ResourceResponse:
         if not activity:
             raise TypeError(f"'activity: {activity.__class__.__name__}' argument can't be None")
 

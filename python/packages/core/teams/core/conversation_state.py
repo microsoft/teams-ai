@@ -15,9 +15,7 @@ class ConversationState(BotState):
         in a group conversation.
     """
 
-    no_key_error_message = (
-        "ConversationState: channelId and/or conversation missing from context.activity."
-    )
+    no_key_error_message = "ConversationState: channelId and/or conversation missing from context.activity."
 
     def __init__(self, storage: Storage):
         """
@@ -46,9 +44,7 @@ class ConversationState(BotState):
         .. remarks::
             Conversation state includes the channel ID and conversation ID as part of its storage key.
         """
-        channel_id = turn_context.activity.channel_id or self.__raise_type_error(
-            "invalid activity-missing channel_id"
-        )
+        channel_id = turn_context.activity.channel_id or self.__raise_type_error("invalid activity-missing channel_id")
         conversation_id = turn_context.activity.conversation.id or self.__raise_type_error(
             "invalid activity-missing conversation.id"
         )

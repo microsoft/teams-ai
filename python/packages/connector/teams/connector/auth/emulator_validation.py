@@ -149,9 +149,7 @@ class EmulatorValidation:
             app_id_claim = identity.get_claim_value(EmulatorValidation.APP_ID_CLAIM)
             if not app_id_claim:
                 # No claim around AppID. Not Authorized.
-                raise PermissionError(
-                    "Unauthorized. " '"appid" claim is required on Emulator Token version "1.0".'
-                )
+                raise PermissionError("Unauthorized. " '"appid" claim is required on Emulator Token version "1.0".')
 
             app_id = app_id_claim
         elif version_claim == "2.0":
@@ -159,16 +157,12 @@ class EmulatorValidation:
             app_authz_claim = identity.get_claim_value(AuthenticationConstants.AUTHORIZED_PARTY)
             if not app_authz_claim:
                 # No claim around AppID. Not Authorized.
-                raise PermissionError(
-                    "Unauthorized. " '"azp" claim is required on Emulator Token version "2.0".'
-                )
+                raise PermissionError("Unauthorized. " '"azp" claim is required on Emulator Token version "2.0".')
 
             app_id = app_authz_claim
         else:
             # Unknown Version. Not Authorized.
-            raise PermissionError(
-                "Unauthorized. Unknown Emulator Token version ", version_claim, "."
-            )
+            raise PermissionError("Unauthorized. Unknown Emulator Token version ", version_claim, ".")
 
         is_valid_app_id = await credentials.is_valid_appid(app_id)
 

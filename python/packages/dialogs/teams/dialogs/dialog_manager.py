@@ -96,9 +96,7 @@ class DialogManager:
         conversation_state_name = ConversationState.__name__
         if self.conversation_state is None:
             if conversation_state_name not in context.turn_state:
-                raise Exception(
-                    f"Unable to get an instance of {conversation_state_name} from turn_context."
-                )
+                raise Exception(f"Unable to get an instance of {conversation_state_name} from turn_context.")
             self.conversation_state: ConversationState = context.turn_state[conversation_state_name]
         else:
             context.turn_state[conversation_state_name] = self.conversation_state
@@ -162,21 +160,15 @@ class DialogManager:
             "This method will be deprecated as no longer is necesary",
             PendingDeprecationWarning,
         )
-        await DialogExtensions._send_state_snapshot_trace(  # pylint: disable=protected-access
-            dialog_context
-        )
+        await DialogExtensions._send_state_snapshot_trace(dialog_context)  # pylint: disable=protected-access
 
     @staticmethod
     def is_from_parent_to_skill(turn_context: TurnContext) -> bool:
         if turn_context.turn_state.get(SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY, None):
             return False
 
-        claims_identity: ClaimsIdentity = turn_context.turn_state.get(
-            BotAdapter.BOT_IDENTITY_KEY, None
-        )
-        return isinstance(claims_identity, ClaimsIdentity) and SkillValidation.is_skill_claim(
-            claims_identity.claims
-        )
+        claims_identity: ClaimsIdentity = turn_context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY, None)
+        return isinstance(claims_identity, ClaimsIdentity) and SkillValidation.is_skill_claim(claims_identity.claims)
 
     # Recursively walk up the DC stack to find the active DC.
     @staticmethod
@@ -190,30 +182,21 @@ class DialogManager:
             "This method will be deprecated as no longer is necesary",
             PendingDeprecationWarning,
         )
-        return DialogExtensions._get_active_dialog_context(  # pylint: disable=protected-access
-            dialog_context
-        )
+        return DialogExtensions._get_active_dialog_context(dialog_context)  # pylint: disable=protected-access
 
     @staticmethod
-    def should_send_end_of_conversation_to_parent(
-        context: TurnContext, turn_result: DialogTurnResult
-    ) -> bool:
+    def should_send_end_of_conversation_to_parent(context: TurnContext, turn_result: DialogTurnResult) -> bool:
         """
         Helper to determine if we should send an EndOfConversation to the parent or not.
         :param context:
         :param turn_result:
         :return:
         """
-        if not (
-            turn_result.status == DialogTurnStatus.Complete
-            or turn_result.status == DialogTurnStatus.Cancelled
-        ):
+        if not (turn_result.status == DialogTurnStatus.Complete or turn_result.status == DialogTurnStatus.Cancelled):
             # The dialog is still going, don't return EoC.
             return False
         claims_identity: ClaimsIdentity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY, None)
-        if isinstance(claims_identity, ClaimsIdentity) and SkillValidation.is_skill_claim(
-            claims_identity.claims
-        ):
+        if isinstance(claims_identity, ClaimsIdentity) and SkillValidation.is_skill_claim(claims_identity.claims):
             # EoC Activities returned by skills are bounced back to the bot by SkillHandler.
             # In those cases we will have a SkillConversationReference instance in state.
             skill_conversation_reference: SkillConversationReference = context.turn_state.get(

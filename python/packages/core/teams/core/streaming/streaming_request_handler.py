@@ -44,9 +44,7 @@ class StreamingRequestHandler(RequestHandler):
         if not bot:
             raise TypeError(f"'bot: {bot.__class__.__name__}' argument can't be None")
         if not activity_processor:
-            raise TypeError(
-                f"'activity_processor: {activity_processor.__class__.__name__}' argument can't be None"
-            )
+            raise TypeError(f"'activity_processor: {activity_processor.__class__.__name__}' argument can't be None")
 
         self._bot = bot
         self._activity_processor = activity_processor
@@ -128,8 +126,7 @@ class StreamingRequestHandler(RequestHandler):
 
             if len(request.streams) > 1:
                 stream_attachments = [
-                    Attachment(content_type=stream.content_type, content=stream.stream)
-                    for stream in request.streams
+                    Attachment(content_type=stream.content_type, content=stream.stream) for stream in request.streams
                 ]
 
                 if activity.attachments:
@@ -138,9 +135,7 @@ class StreamingRequestHandler(RequestHandler):
                     activity.attachments = stream_attachments
 
             # Now that the request has been converted into an activity we can send it to the adapter.
-            adapter_response = await self._activity_processor.process_streaming_activity(
-                activity, self._bot.on_turn
-            )
+            adapter_response = await self._activity_processor.process_streaming_activity(activity, self._bot.on_turn)
 
             # Now we convert the invokeResponse returned by the adapter into a StreamingResponse we can send back
             # to the channel.
@@ -178,9 +173,7 @@ class StreamingRequestHandler(RequestHandler):
 
         try:
             if not self._server_is_connected:
-                raise Exception(
-                    "Error while attempting to send: Streaming transport is disconnected."
-                )
+                raise Exception("Error while attempting to send: Streaming transport is disconnected.")
 
             server_response = await self._server.send(request)
 
@@ -195,9 +188,7 @@ class StreamingRequestHandler(RequestHandler):
     async def send_streaming_request(self, request: StreamingRequest) -> ReceiveResponse:
         try:
             if not self._server_is_connected:
-                raise Exception(
-                    "Error while attempting to send: Streaming transport is disconnected."
-                )
+                raise Exception("Error while attempting to send: Streaming transport is disconnected.")
 
             return await self._server.send(request)
         except Exception:
@@ -227,16 +218,12 @@ class StreamingRequestHandler(RequestHandler):
             return all(isinstance(element, int) for element in obj)
 
         stream_attachments = [
-            attachment
-            for attachment in activity.attachments
-            if validate_int_list(attachment.content)
+            attachment for attachment in activity.attachments if validate_int_list(attachment.content)
         ]
 
         if stream_attachments:
             activity.attachments = [
-                attachment
-                for attachment in activity.attachments
-                if not validate_int_list(attachment.content)
+                attachment for attachment in activity.attachments if not validate_int_list(attachment.content)
             ]
 
             # TODO: validate StreamContent parallel
@@ -257,9 +244,7 @@ class StreamingRequestHandler(RequestHandler):
     ):
         self._server_is_connected = False
 
-    def _handle_custom_paths(
-        self, request: ReceiveRequest, response: StreamingResponse
-    ) -> StreamingResponse:
+    def _handle_custom_paths(self, request: ReceiveRequest, response: StreamingResponse) -> StreamingResponse:
         if not request or not request.verb or not request.path:
             response.status_code = int(HTTPStatus.BAD_REQUEST)
             # TODO: log error

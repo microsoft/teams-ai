@@ -45,9 +45,7 @@ class CloudAdapterBase(BotAdapter, ABC):
 
         self.bot_framework_authentication = bot_framework_authentication
 
-    async def send_activities(
-        self, context: TurnContext, activities: List[Activity]
-    ) -> List[ResourceResponse]:
+    async def send_activities(self, context: TurnContext, activities: List[Activity]) -> List[ResourceResponse]:
         if not context:
             raise TypeError("Expected TurnContext but got None instead")
 
@@ -73,9 +71,7 @@ class CloudAdapterBase(BotAdapter, ABC):
                 # no-op
                 pass
             else:
-                connector_client: ConnectorClient = context.turn_state.get(
-                    self.BOT_CONNECTOR_CLIENT_KEY
-                )
+                connector_client: ConnectorClient = context.turn_state.get(self.BOT_CONNECTOR_CLIENT_KEY)
                 if not connector_client:
                     raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -124,9 +120,7 @@ class CloudAdapterBase(BotAdapter, ABC):
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
-        await connector_client.conversations.delete_activity(
-            reference.conversation.id, reference.activity_id
-        )
+        await connector_client.conversations.delete_activity(reference.conversation.id, reference.activity_id)
 
     async def continue_conversation(  # pylint: disable=arguments-differ
         self,
@@ -158,9 +152,7 @@ class CloudAdapterBase(BotAdapter, ABC):
         audience: str,
         logic: Callable[[TurnContext], Awaitable],
     ):
-        return await self.process_proactive(
-            claims_identity, get_continuation_activity(reference), audience, logic
-        )
+        return await self.process_proactive(claims_identity, get_continuation_activity(reference), audience, logic)
 
     async def process_proactive(
         self,
@@ -171,19 +163,13 @@ class CloudAdapterBase(BotAdapter, ABC):
     ):
         # Create the connector factory and  the inbound request, extracting parameters and then create a
         # connector for outbound requests.
-        connector_factory = self.bot_framework_authentication.create_connector_factory(
-            claims_identity
-        )
+        connector_factory = self.bot_framework_authentication.create_connector_factory(claims_identity)
 
         # Create the connector client to use for outbound requests.
-        connector_client = await connector_factory.create(
-            continuation_activity.service_url, audience
-        )
+        connector_client = await connector_factory.create(continuation_activity.service_url, audience)
 
         # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
-        user_token_client = await self.bot_framework_authentication.create_user_token_client(
-            claims_identity
-        )
+        user_token_client = await self.bot_framework_authentication.create_user_token_client(claims_identity)
 
         # Create a turn context and run the pipeline.
         context = self._create_turn_context(

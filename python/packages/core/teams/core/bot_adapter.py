@@ -24,9 +24,7 @@ class BotAdapter(ABC):
         self.on_turn_error = on_turn_error
 
     @abstractmethod
-    async def send_activities(
-        self, context: TurnContext, activities: List[Activity]
-    ) -> List[ResourceResponse]:
+    async def send_activities(self, context: TurnContext, activities: List[Activity]) -> List[ResourceResponse]:
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
 
@@ -99,14 +97,10 @@ class BotAdapter(ABC):
         :param audience:A value signifying the recipient of the proactive message.
         :type audience: str
         """
-        context = TurnContext(
-            self, conversation_reference_extension.get_continuation_activity(reference)
-        )
+        context = TurnContext(self, conversation_reference_extension.get_continuation_activity(reference))
         return await self.run_pipeline(context, callback)
 
-    async def run_pipeline(
-        self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None
-    ):
+    async def run_pipeline(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None):
         """
         Called by the parent class to run the adapters middleware set and calls the passed in `callback()` handler at
         the end of the chain.

@@ -13,9 +13,7 @@ class GovernmentConstants(ABC):
     """
     TO CHANNEL FROM BOT: Login URL
     """
-    TO_CHANNEL_FROM_BOT_LOGIN_URL = (
-        "https://login.microsoftonline.us/MicrosoftServices.onmicrosoft.us"
-    )
+    TO_CHANNEL_FROM_BOT_LOGIN_URL = "https://login.microsoftonline.us/MicrosoftServices.onmicrosoft.us"
     """
     TO CHANNEL FROM BOT: OAuth scope to request
     """
@@ -31,9 +29,7 @@ class GovernmentConstants(ABC):
     """
     TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
     """
-    TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (
-        "https://login.teams.azure.us/v1/.well-known/openidconfiguration"
-    )
+    TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = "https://login.teams.azure.us/v1/.well-known/openidconfiguration"
     """
     TO BOT FROM GOV EMULATOR: OpenID metadata document for tokens coming from MSA
     """

@@ -35,9 +35,7 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
         credentials: MicrosoftAppCredentials = None
         normalized_endpoint = login_endpoint.lower() if login_endpoint else ""
 
-        if normalized_endpoint.startswith(
-            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
-        ):
+        if normalized_endpoint.startswith(AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX):
             # TODO: Unpack necessity of these empty credentials based on the
             # loginEndpoint as no tokensare fetched when auth is disabled.
             credentials = (
@@ -59,9 +57,7 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
             normalized_endpoint = login_endpoint
         else:
             credentials = (
-                _PrivateCloudAppCredentials(
-                    None, None, None, normalized_endpoint, validate_authority
-                )
+                _PrivateCloudAppCredentials(None, None, None, normalized_endpoint, validate_authority)
                 if not app_id
                 else MicrosoftAppCredentials(
                     app_id,

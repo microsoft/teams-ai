@@ -81,9 +81,7 @@ class Dialog(ABC):
         return await dialog_context.end_dialog(result)
 
     # TODO: instance is DialogInstance
-    async def reprompt_dialog(  # pylint: disable=unused-argument
-        self, context: TurnContext, instance: DialogInstance
-    ):
+    async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):  # pylint: disable=unused-argument
         """
         :param context:
         :param instance:
@@ -108,9 +106,7 @@ class Dialog(ABC):
     def get_version(self) -> str:
         return self.id
 
-    async def on_dialog_event(
-        self, dialog_context: "DialogContext", dialog_event: DialogEvent
-    ) -> bool:
+    async def on_dialog_event(self, dialog_context: "DialogContext", dialog_event: DialogEvent) -> bool:
         """
         Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
          dialog that the current dialog started.
@@ -123,9 +119,7 @@ class Dialog(ABC):
 
         # Bubble as needed
         if (not handled) and dialog_event.bubble and dialog_context.parent:
-            handled = await dialog_context.parent.emit(
-                dialog_event.name, dialog_event.value, True, False
-            )
+            handled = await dialog_context.parent.emit(dialog_event.name, dialog_event.value, True, False)
 
         # Post bubble
         if not handled:
@@ -167,9 +161,7 @@ class Dialog(ABC):
         """
         return self.__class__.__name__
 
-    def _register_source_location(
-        self, path: str, line_number: int
-    ):  # pylint: disable=unused-argument
+    def _register_source_location(self, path: str, line_number: int):  # pylint: disable=unused-argument
         """
         Registers a SourceRange in the provided location.
         :param path: The path to the source file.

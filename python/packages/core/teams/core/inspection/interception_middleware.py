@@ -19,13 +19,8 @@ class InterceptionMiddleware(Middleware):
 
         if should_intercept:
 
-            async def aux_on_send(
-                ctx: TurnContext, activities: List[Activity], next_send: Callable
-            ):
-                trace_activities = [
-                    from_activity(activity, "SentActivity", "Sent Activity")
-                    for activity in activities
-                ]
+            async def aux_on_send(ctx: TurnContext, activities: List[Activity], next_send: Callable):
+                trace_activities = [from_activity(activity, "SentActivity", "Sent Activity") for activity in activities]
                 await self._invoke_outbound(ctx, trace_activities)
                 return await next_send()
 

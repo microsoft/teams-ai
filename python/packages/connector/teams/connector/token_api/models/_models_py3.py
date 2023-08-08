@@ -42,9 +42,7 @@ class Error(Model):
         "inner_http_error": {"key": "innerHttpError", "type": "InnerHttpError"},
     }
 
-    def __init__(
-        self, *, code: str = None, message: str = None, inner_http_error=None, **kwargs
-    ) -> None:
+    def __init__(self, *, code: str = None, message: str = None, inner_http_error=None, **kwargs) -> None:
         super(Error, self).__init__(**kwargs)
         self.code = code
         self.message = message
@@ -157,9 +155,7 @@ class TokenExchangeResource(Model):
         "provider_id": {"key": "providerId", "type": "str"},
     }
 
-    def __init__(
-        self, *, id: str = None, uri: str = None, provider_id: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, id: str = None, uri: str = None, provider_id: str = None, **kwargs) -> None:
         super(TokenExchangeResource, self).__init__(**kwargs)
         self.id = id
         self.uri = uri

@@ -28,8 +28,6 @@ class ResponsePayload(Serializable):
         stream_list = obj.get("streams")
 
         if stream_list:
-            self.streams = [
-                StreamDescription().from_dict(stream_dict) for stream_dict in stream_list
-            ]
+            self.streams = [StreamDescription().from_dict(stream_dict) for stream_dict in stream_list]
 
         return self

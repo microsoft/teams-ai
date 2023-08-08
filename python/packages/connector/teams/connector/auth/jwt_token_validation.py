@@ -151,15 +151,13 @@ class JwtTokenValidation:
 
             # Otherwise use Enterprise Channel Validation
             if service_url:
-                return (
-                    await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
-                        auth_header,
-                        credentials,
-                        service_url,
-                        channel_id,
-                        channel_service_or_provider,
-                        auth_configuration,
-                    )
+                return await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
+                    auth_header,
+                    credentials,
+                    service_url,
+                    channel_id,
+                    channel_service_or_provider,
+                    auth_configuration,
                 )
 
             return await EnterpriseChannelValidation.authenticate_channel_token(
@@ -183,9 +181,7 @@ class JwtTokenValidation:
             await auth_config.claims_validator(claims)
         elif SkillValidation.is_skill_claim(claims):
             # Skill claims must be validated using AuthenticationConfiguration claims_validator
-            raise PermissionError(
-                "Unauthorized Access. Request is not authorized. Skill Claims require validation."
-            )
+            raise PermissionError("Unauthorized Access. Request is not authorized. Skill Claims require validation.")
 
     @staticmethod
     def is_government(channel_service: str) -> bool:

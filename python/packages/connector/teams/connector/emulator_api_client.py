@@ -7,9 +7,7 @@ from .auth import AppCredentials
 
 class EmulatorApiClient:
     @staticmethod
-    async def emulate_oauth_cards(
-        credentials: AppCredentials, emulator_url: str, emulate: bool
-    ) -> bool:
+    async def emulate_oauth_cards(credentials: AppCredentials, emulator_url: str, emulate: bool) -> bool:
         token = await credentials.get_token()
         request_url = (
             emulator_url

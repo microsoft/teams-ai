@@ -198,9 +198,7 @@ class TeamsOperations(object):
 
         return deserialized
 
-    fetch_participant.metadata = {
-        "url": "/v1/meetings/{meetingId}/participants/{participantId}?tenantId={tenantId}"
-    }
+    fetch_participant.metadata = {"url": "/v1/meetings/{meetingId}/participants/{participantId}?tenantId={tenantId}"}
 
     def fetch_meeting(self, meeting_id: str, custom_headers=None, raw=False, **operation_config):
         """Fetch meeting information.

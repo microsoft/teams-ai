@@ -34,23 +34,15 @@ class TurnContext:
             self._activity = request
             self.responses: List[Activity] = []
             self._services: dict = {}
-            self._on_send_activities: Callable[
-                ["TurnContext", List[Activity], Callable], List[ResourceResponse]
-            ] = []
-            self._on_update_activity: Callable[
-                ["TurnContext", Activity, Callable], ResourceResponse
-            ] = []
-            self._on_delete_activity: Callable[
-                ["TurnContext", ConversationReference, Callable], None
-            ] = []
+            self._on_send_activities: Callable[["TurnContext", List[Activity], Callable], List[ResourceResponse]] = []
+            self._on_update_activity: Callable[["TurnContext", Activity, Callable], ResourceResponse] = []
+            self._on_delete_activity: Callable[["TurnContext", ConversationReference, Callable], None] = []
             self._responded: bool = False
 
         if self.adapter is None:
             raise TypeError("TurnContext must be instantiated with an adapter.")
         if self.activity is None:
-            raise TypeError(
-                "TurnContext must be instantiated with a request parameter of type Activity."
-            )
+            raise TypeError("TurnContext must be instantiated with a request parameter of type Activity.")
 
         self._turn_state = {}
 
@@ -187,8 +179,7 @@ class TurnContext:
             return activity
 
         output = [
-            activity_validator(TurnContext.apply_conversation_reference(deepcopy(act), ref))
-            for act in activities
+            activity_validator(TurnContext.apply_conversation_reference(deepcopy(act), ref)) for act in activities
         ]
 
         # send activities through adapter
@@ -362,9 +353,7 @@ class TurnContext:
         return activity
 
     @staticmethod
-    def get_reply_conversation_reference(
-        activity: Activity, reply: ResourceResponse
-    ) -> ConversationReference:
+    def get_reply_conversation_reference(activity: Activity, reply: ResourceResponse) -> ConversationReference:
         reference: ConversationReference = TurnContext.get_conversation_reference(activity)
 
         # Update the reference with the new outgoing Activity's id.

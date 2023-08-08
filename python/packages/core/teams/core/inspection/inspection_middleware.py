@@ -30,9 +30,7 @@ class InspectionMiddleware(InterceptionMiddleware):
         credentials: MicrosoftAppCredentials = None,
     ):
         self.inspection_state = inspection_state
-        self.inspection_state_accessor = inspection_state.create_property(
-            "InspectionSessionByStatus"
-        )
+        self.inspection_state_accessor = inspection_state.create_property("InspectionSessionByStatus")
         self.user_state = user_state
         self.conversation_state = conversation_state
         self.credentials = MicrosoftAppCredentials(
@@ -88,9 +86,7 @@ class InspectionMiddleware(InterceptionMiddleware):
             bot_state = {}
 
             if self.user_state:
-                bot_state["user_state"] = InspectionMiddleware._get_serialized_context(
-                    self.user_state, context
-                )
+                bot_state["user_state"] = InspectionMiddleware._get_serialized_context(self.user_state, context)
 
             if self.conversation_state:
                 bot_state["conversation_state"] = InspectionMiddleware._get_serialized_context(
@@ -100,26 +96,16 @@ class InspectionMiddleware(InterceptionMiddleware):
             await self._invoke_send(context, session, from_state(bot_state))
 
     async def _process_open_command(self, context: TurnContext) -> Any:
-        sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
-        session_id = self._open_command(
-            sessions, TurnContext.get_conversation_reference(context.activity)
-        )
-        await context.send_activity(
-            make_command_activity(f"{InspectionMiddleware._COMMAND} attach {session_id}")
-        )
+        sessions = await self.inspection_state_accessor.get(context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
+        session_id = self._open_command(sessions, TurnContext.get_conversation_reference(context.activity))
+        await context.send_activity(make_command_activity(f"{InspectionMiddleware._COMMAND} attach {session_id}"))
         await self.inspection_state.save_changes(context, False)
 
     async def process_attach_command(self, context: TurnContext, session_id: str) -> None:
-        sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+        sessions = await self.inspection_state_accessor.get(context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
 
         if self._attach_comamnd(context.activity.conversation.id, sessions, session_id):
-            await context.send_activity(
-                "Attached to session, all traffic is being replicated for inspection."
-            )
+            await context.send_activity("Attached to session, all traffic is being replicated for inspection.")
         else:
             await context.send_activity(f"Open session with id {session_id} does not exist.")
 
@@ -154,9 +140,7 @@ class InspectionMiddleware(InterceptionMiddleware):
         return Pickler(unpicklable=False).flatten(ctx)
 
     async def _find_session(self, context: TurnContext) -> Any:
-        sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+        sessions = await self.inspection_state_accessor.get(context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
 
         conversation_reference = sessions.attached_sessions.get(context.activity.conversation.id)
         if conversation_reference:
@@ -164,9 +148,7 @@ class InspectionMiddleware(InterceptionMiddleware):
 
         return None
 
-    async def _invoke_send(
-        self, context: TurnContext, session: InspectionSession, activity: Activity
-    ) -> bool:
+    async def _invoke_send(self, context: TurnContext, session: InspectionSession, activity: Activity) -> bool:
         if await session.send(activity):
             return True
 
@@ -174,9 +156,7 @@ class InspectionMiddleware(InterceptionMiddleware):
         return False
 
     async def _clean_up_session(self, context: TurnContext) -> None:
-        sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+        sessions = await self.inspection_state_accessor.get(context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
 
         del sessions.attached_sessions[context.activity.conversation.id]
         await self.inspection_state.save_changes(context, False)

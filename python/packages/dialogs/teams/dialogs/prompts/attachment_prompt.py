@@ -32,9 +32,7 @@ class AttachmentPrompt(Prompt):
             raise TypeError("AttachmentPrompt.on_prompt(): TurnContext cannot be None.")
 
         if not isinstance(options, PromptOptions):
-            raise TypeError(
-                "AttachmentPrompt.on_prompt(): PromptOptions are required for Attachment Prompt dialogs."
-            )
+            raise TypeError("AttachmentPrompt.on_prompt(): PromptOptions are required for Attachment Prompt dialogs.")
 
         if is_retry and options.retry_prompt:
             await turn_context.send_activity(options.retry_prompt)

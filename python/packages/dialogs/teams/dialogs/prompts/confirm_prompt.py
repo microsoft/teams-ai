@@ -65,18 +65,12 @@ class ConfirmPrompt(Prompt):
         culture = self._determine_culture(turn_context.activity)
         defaults = self._default_choice_options[culture]
         choice_opts = self.choice_options if self.choice_options is not None else defaults[2]
-        confirms = (
-            self.confirm_choices if self.confirm_choices is not None else (defaults[0], defaults[1])
-        )
+        confirms = self.confirm_choices if self.confirm_choices is not None else (defaults[0], defaults[1])
         choices = [confirms[0], confirms[1]]
         if is_retry and options.retry_prompt is not None:
-            prompt = self.append_choices(
-                options.retry_prompt, channel_id, choices, self.style, choice_opts
-            )
+            prompt = self.append_choices(options.retry_prompt, channel_id, choices, self.style, choice_opts)
         else:
-            prompt = self.append_choices(
-                options.prompt, channel_id, choices, self.style, choice_opts
-            )
+            prompt = self.append_choices(options.prompt, channel_id, choices, self.style, choice_opts)
         await turn_context.send_activity(prompt)
 
     async def on_recognize(
@@ -112,9 +106,7 @@ class ConfirmPrompt(Prompt):
                 if opts.include_numbers is None or opts.include_numbers:
                     # The text may be a number in which case we will interpret that as a choice.
                     confirm_choices = (
-                        self.confirm_choices
-                        if self.confirm_choices is not None
-                        else (defaults[0], defaults[1])
+                        self.confirm_choices if self.confirm_choices is not None else (defaults[0], defaults[1])
                     )
                     choices = {confirm_choices[0], confirm_choices[1]}
                     second_attempt_results = ChoiceRecognizers.recognize_choices(utterance, choices)

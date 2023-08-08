@@ -49,9 +49,7 @@ class DialogContextMemoryScope(MemoryScope):
 
         # top of stack is stack[0].
         memory[self.STACK] = stack
-        memory[self.ACTIVE_DIALOG] = (
-            dialog_context.active_dialog.id if dialog_context.active_dialog else None
-        )
+        memory[self.ACTIVE_DIALOG] = dialog_context.active_dialog.id if dialog_context.active_dialog else None
         memory[self.PARENT] = (
             dialog_context.parent.active_dialog.id
             if dialog_context.parent and dialog_context.parent.active_dialog

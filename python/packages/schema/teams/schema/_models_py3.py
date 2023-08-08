@@ -383,9 +383,7 @@ class Activity(Model):
         self.semantic_action = semantic_action
         self.caller_id = caller_id
 
-    def apply_conversation_reference(
-        self, reference: ConversationReference, is_incoming: bool = False
-    ):
+    def apply_conversation_reference(self, reference: ConversationReference, is_incoming: bool = False):
         """
         Updates this activity with the delivery information from an existing ConversationReference
 
@@ -649,9 +647,7 @@ class Activity(Model):
             entities=[],
         )
 
-    def create_trace(
-        self, name: str, value: object = None, value_type: str = None, label: str = None
-    ):
+    def create_trace(self, name: str, value: object = None, value_type: str = None, label: str = None):
         """
         Creates a new trace activity based on this activity.
 
@@ -692,9 +688,7 @@ class Activity(Model):
         ).as_trace_activity()
 
     @staticmethod
-    def create_trace_activity(
-        name: str, value: object = None, value_type: str = None, label: str = None
-    ):
+    def create_trace_activity(name: str, value: object = None, value_type: str = None, label: str = None):
         """
         Creates an instance of the :class:`Activity` class as a TraceActivity object.
 
@@ -826,10 +820,7 @@ class Activity(Model):
             result = len(type_attribute) == len(activity_type)
 
             if not result:
-                result = (
-                    len(type_attribute) > len(activity_type)
-                    and type_attribute[len(activity_type)] == "/"
-                )
+                result = len(type_attribute) > len(activity_type) and type_attribute[len(activity_type)] == "/"
 
         return result
 
@@ -1274,9 +1265,7 @@ class ChannelAccount(Model):
         "role": {"key": "role", "type": "str"},
     }
 
-    def __init__(
-        self, *, id: str = None, name: str = None, aad_object_id: str = None, role=None, **kwargs
-    ) -> None:
+    def __init__(self, *, id: str = None, name: str = None, aad_object_id: str = None, role=None, **kwargs) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
         self.name = name
@@ -1437,9 +1426,7 @@ class ConversationResourceResponse(Model):
         "id": {"key": "id", "type": "str"},
     }
 
-    def __init__(
-        self, *, activity_id: str = None, service_url: str = None, id: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, activity_id: str = None, service_url: str = None, id: str = None, **kwargs) -> None:
         super(ConversationResourceResponse, self).__init__(**kwargs)
         self.activity_id = activity_id
         self.service_url = service_url
@@ -1513,9 +1500,7 @@ class Error(Model):
         "inner_http_error": {"key": "innerHttpError", "type": "InnerHttpError"},
     }
 
-    def __init__(
-        self, *, code: str = None, message: str = None, inner_http_error=None, **kwargs
-    ) -> None:
+    def __init__(self, *, code: str = None, message: str = None, inner_http_error=None, **kwargs) -> None:
         super(Error, self).__init__(**kwargs)
         self.code = code
         self.message = message
@@ -1932,9 +1917,7 @@ class Place(Model):
         "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(
-        self, *, address=None, geo=None, has_map=None, type: str = None, name: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, address=None, geo=None, has_map=None, type: str = None, name: str = None, **kwargs) -> None:
         super(Place, self).__init__(**kwargs)
         self.address = address
         self.geo = geo
@@ -2518,9 +2501,7 @@ class AdaptiveCardInvokeAction(Model):
         "data": {"key": "data", "type": "{object}"},
     }
 
-    def __init__(
-        self, *, type: str = None, id: str = None, verb: str = None, data=None, **kwargs
-    ) -> None:
+    def __init__(self, *, type: str = None, id: str = None, verb: str = None, data=None, **kwargs) -> None:
         super(AdaptiveCardInvokeAction, self).__init__(**kwargs)
         self.type = type
         self.id = id

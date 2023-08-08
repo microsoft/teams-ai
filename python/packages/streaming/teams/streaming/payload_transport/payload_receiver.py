@@ -95,9 +95,7 @@ class PayloadReceiver:
 
                     if length == 0:
                         # TODO: make custom exception
-                        raise Exception(
-                            "TransportDisconnectedException: Stream closed while reading header bytes"
-                        )
+                        raise Exception("TransportDisconnectedException: Stream closed while reading header bytes")
 
                     header_offset += length
 
@@ -110,9 +108,7 @@ class PayloadReceiver:
                 content_stream = self._get_stream(header)
 
                 buffer = (
-                    [None] * header.payload_length
-                    if PayloadTypes.is_stream(header)
-                    else self._receive_content_buffer
+                    [None] * header.payload_length if PayloadTypes.is_stream(header) else self._receive_content_buffer
                 )
                 offset = 0
 
@@ -127,9 +123,7 @@ class PayloadReceiver:
                         length = await self._receiver.receive(buffer, offset, count)
                         if length == 0:
                             # TODO: make custom exception
-                            raise Exception(
-                                "TransportDisconnectedException: Stream closed while reading header bytes"
-                            )
+                            raise Exception("TransportDisconnectedException: Stream closed while reading header bytes")
 
                         if content_stream is not None:
                             # write chunks to the content_stream if it's not a stream type
@@ -141,9 +135,7 @@ class PayloadReceiver:
                         offset += length
 
                     # give the full payload buffer to the contentStream if it's a stream
-                    if PayloadTypes.is_stream(header) and isinstance(
-                        content_stream, streaming.PayloadStream
-                    ):
+                    if PayloadTypes.is_stream(header) and isinstance(content_stream, streaming.PayloadStream):
                         content_stream.give_buffer(buffer)
 
                     self._receive_action(header, content_stream, offset)

@@ -21,9 +21,7 @@ from .telemetry_logger_constants import TelemetryLoggerConstants
 class TelemetryLoggerMiddleware(Middleware):
     """Middleware for logging incoming, outgoing, updated or deleted Activity messages."""
 
-    def __init__(
-        self, telemetry_client: BotTelemetryClient, log_personal_information: bool
-    ) -> None:
+    def __init__(self, telemetry_client: BotTelemetryClient, log_personal_information: bool) -> None:
         super(TelemetryLoggerMiddleware, self).__init__()
         self._telemetry_client = telemetry_client or NullTelemetryClient()
         self._log_personal_information = log_personal_information
@@ -40,9 +38,7 @@ class TelemetryLoggerMiddleware(Middleware):
         return self._log_personal_information
 
     # pylint: disable=arguments-differ
-    async def on_turn(
-        self, context: TurnContext, logic_fn: Callable[[TurnContext], Awaitable]
-    ) -> None:
+    async def on_turn(self, context: TurnContext, logic_fn: Callable[[TurnContext], Awaitable]) -> None:
         """Logs events based on incoming and outgoing activities using
         BotTelemetryClient base class
 
@@ -75,9 +71,7 @@ class TelemetryLoggerMiddleware(Middleware):
         context.on_send_activities(send_activities_handler)
 
         # hook up update activity pipeline
-        async def update_activity_handler(
-            ctx: TurnContext, activity: Activity, next_update: Callable[[], Awaitable]
-        ):
+        async def update_activity_handler(ctx: TurnContext, activity: Activity, next_update: Callable[[], Awaitable]):
             # Run full pipeline
             response = await next_update()
             await self.on_update_activity(activity)
@@ -95,9 +89,7 @@ class TelemetryLoggerMiddleware(Middleware):
             await next_delete()
 
             delete_msg = Activity(type=ActivityTypes.message_delete, id=reference.activity_id)
-            deleted_activity: Activity = TurnContext.apply_conversation_reference(
-                delete_msg, reference, False
-            )
+            deleted_activity: Activity = TurnContext.apply_conversation_reference(delete_msg, reference, False)
             await self.on_delete_activity(deleted_activity)
 
         context.on_delete_activity(delete_activity_handler)
@@ -162,9 +154,7 @@ class TelemetryLoggerMiddleware(Middleware):
         BotTelemetryClient.track_event method for the BotMessageReceived event.
         """
         properties = {
-            TelemetryConstants.FROM_ID_PROPERTY: activity.from_property.id
-            if activity.from_property
-            else None,
+            TelemetryConstants.FROM_ID_PROPERTY: activity.from_property.id if activity.from_property else None,
             TelemetryConstants.CONVERSATION_NAME_PROPERTY: activity.conversation.name,
             TelemetryConstants.LOCALE_PROPERTY: activity.locale,
             TelemetryConstants.RECIPIENT_ID_PROPERTY: activity.recipient.id,
@@ -172,11 +162,7 @@ class TelemetryLoggerMiddleware(Middleware):
         }
 
         if self.log_personal_information:
-            if (
-                activity.from_property
-                and activity.from_property.name
-                and activity.from_property.name.strip()
-            ):
+            if activity.from_property and activity.from_property.name and activity.from_property.name.strip():
                 properties[TelemetryConstants.FROM_NAME_PROPERTY] = activity.from_property.name
             if activity.text and activity.text.strip():
                 properties[TelemetryConstants.TEXT_PROPERTY] = activity.text
@@ -293,19 +279,13 @@ class TelemetryLoggerMiddleware(Middleware):
         properties: dict,
     ):
         if activity.channel_id == Channels.ms_teams:
-            teams_channel_data: TeamsChannelData = TeamsChannelData().deserialize(
-                activity.channel_data
-            )
+            teams_channel_data: TeamsChannelData = TeamsChannelData().deserialize(activity.channel_data)
 
             properties["TeamsTenantId"] = (
-                teams_channel_data.tenant.id
-                if teams_channel_data and teams_channel_data.tenant
-                else ""
+                teams_channel_data.tenant.id if teams_channel_data and teams_channel_data.tenant else ""
             )
 
-            properties["TeamsUserAadObjectId"] = (
-                activity.from_property.aad_object_id if activity.from_property else ""
-            )
+            properties["TeamsUserAadObjectId"] = activity.from_property.aad_object_id if activity.from_property else ""
 
             if teams_channel_data and teams_channel_data.team:
                 properties["TeamsTeamInfo"] = TeamInfo.serialize(teams_channel_data.team)

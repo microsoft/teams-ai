@@ -97,10 +97,7 @@ class StorageBaseTests:
         read_store_items = await storage.read(store_items.keys())
 
         assert store_items["createPoco"]["id"] == read_store_items["createPoco"]["id"]
-        assert (
-            store_items["createPocoStoreItem"]["id"]
-            == read_store_items["createPocoStoreItem"]["id"]
-        )
+        assert store_items["createPocoStoreItem"]["id"] == read_store_items["createPocoStoreItem"]["id"]
 
         # If decided to validate e_tag integrity again, uncomment this code
         # assert read_store_items["createPoco"]["e_tag"] is not None

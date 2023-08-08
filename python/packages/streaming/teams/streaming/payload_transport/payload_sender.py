@@ -109,9 +109,7 @@ class PayloadSender:
                 # If we did not, read from the stream until we've sent that amount
                 if not packet.is_length_known:
                     # Send: Packet content
-                    length = await self._sender.send(
-                        self._send_content_buffer, 0, packet.header.payload_length
-                    )
+                    length = await self._sender.send(self._send_content_buffer, 0, packet.header.payload_length)
                     if length == 0:
                         # TODO: make custom exception
                         raise Exception("TransportDisconnectedException")

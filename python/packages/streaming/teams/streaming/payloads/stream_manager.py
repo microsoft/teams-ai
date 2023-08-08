@@ -37,9 +37,5 @@ class StreamManager:
         if assembler:
             del self._active_assemblers[identifier]
             stream = assembler.get_payload_as_stream()
-            if (
-                assembler.content_length
-                and len(stream) < assembler.content_length
-                or not assembler.end
-            ):
+            if assembler.content_length and len(stream) < assembler.content_length or not assembler.end:
                 self._on_cancel_stream(assembler)

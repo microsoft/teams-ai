@@ -52,9 +52,7 @@ class ActivityPrompt(Dialog):
             raise TypeError("validator was expected but received None")
         self._validator = validator
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: PromptOptions = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self, dialog_context: DialogContext, options: PromptOptions = None) -> DialogTurnResult:
         """
         Called when a prompt dialog is pushed onto the dialog stack and is being activated.
 
@@ -68,9 +66,7 @@ class ActivityPrompt(Dialog):
         if not dialog_context:
             raise TypeError("ActivityPrompt.begin_dialog(): dc cannot be None.")
         if not isinstance(options, PromptOptions):
-            raise TypeError(
-                "ActivityPrompt.begin_dialog(): Prompt options are required for ActivityPrompts."
-            )
+            raise TypeError("ActivityPrompt.begin_dialog(): Prompt options are required for ActivityPrompts.")
 
         # Ensure prompts have input hint set
         if options.prompt is not None and not options.prompt.input_hint:
@@ -110,9 +106,7 @@ class ActivityPrompt(Dialog):
         instance = dialog_context.active_dialog
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: Dict[str, object] = instance.state[self.persisted_options]
-        recognized: PromptRecognizerResult = await self.on_recognize(
-            dialog_context.context, state, options
-        )
+        recognized: PromptRecognizerResult = await self.on_recognize(dialog_context.context, state, options)
 
         # Increment attempt count
         state[Prompt.ATTEMPT_COUNT_KEY] += 1
@@ -120,9 +114,7 @@ class ActivityPrompt(Dialog):
         # Validate the return value
         is_valid = False
         if self._validator is not None:
-            prompt_context = PromptValidatorContext(
-                dialog_context.context, recognized, state, options
-            )
+            prompt_context = PromptValidatorContext(dialog_context.context, recognized, state, options)
             is_valid = await self._validator(prompt_context)
 
             if options is None:
@@ -136,10 +128,7 @@ class ActivityPrompt(Dialog):
         if is_valid:
             return await dialog_context.end_dialog(recognized.value)
 
-        if (
-            dialog_context.context.activity.type == ActivityTypes.message
-            and not dialog_context.context.responded
-        ):
+        if dialog_context.context.activity.type == ActivityTypes.message and not dialog_context.context.responded:
             await self.on_prompt(dialog_context.context, state, options, True)
 
         return Dialog.end_of_turn

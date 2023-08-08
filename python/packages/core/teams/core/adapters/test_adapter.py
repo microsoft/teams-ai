@@ -74,11 +74,7 @@ class ExchangeableToken(UserToken):
         self.exchangeable_item = exchangeable_item
 
     def equals_key(self, rhs: "ExchangeableToken") -> bool:
-        return (
-            rhs is not None
-            and self.exchangeable_item == rhs.exchangeable_item
-            and super().equals_key(rhs)
-        )
+        return rhs is not None and self.exchangeable_item == rhs.exchangeable_item and super().equals_key(rhs)
 
     def to_key(self) -> str:
         return self.exchangeable_item
@@ -168,9 +164,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             return ResourceResponse(id=str(self._next_id))
 
         return [
-            id_mapper(activity)
-            for activity in activities
-            if self.send_trace_activities or activity.type != "trace"
+            id_mapper(activity) for activity in activities if self.send_trace_activities or activity.type != "trace"
         ]
 
     async def delete_activity(self, context, reference: ConversationReference):
@@ -211,9 +205,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
         """
         await super().continue_conversation(reference, callback, bot_id, claims_identity, audience)
 
-    async def create_conversation(
-        self, channel_id: str, callback: Callable  # pylint: disable=unused-argument
-    ):
+    async def create_conversation(self, channel_id: str, callback: Callable):  # pylint: disable=unused-argument
         self.activity_buffer.clear()
         update = Activity(
             type=ActivityTypes.conversation_update,
@@ -296,9 +288,7 @@ class TestAdapter(BotAdapter, ExtendedUserTokenProvider):
             await self.test(arg[0], arg[1], description, timeout)
 
     @staticmethod
-    def create_conversation_reference(
-        name: str, user: str = "User1", bot: str = "Bot"
-    ) -> ConversationReference:
+    def create_conversation_reference(name: str, user: str = "User1", bot: str = "Bot") -> ConversationReference:
         return ConversationReference(
             channel_id="test",
             service_url="https://test.com",
@@ -561,9 +551,7 @@ class TestFlow:
         :return:
         """
         test_flow = await self.send(user_says)
-        return await test_flow.assert_reply(
-            expected, description or f'test("{user_says}", "{expected}")', timeout
-        )
+        return await test_flow.assert_reply(expected, description or f'test("{user_says}", "{expected}")', timeout)
 
     async def send(self, user_says) -> "TestFlow":
         """
@@ -605,9 +593,7 @@ class TestFlow:
                 if is_substring:
                     assert expected in reply.text.strip(), description + f" text == {reply.text}"
                 else:
-                    assert reply.text.strip() == expected.strip(), (
-                        description + f" text == {reply.text}"
-                    )
+                    assert reply.text.strip() == expected.strip(), description + f" text == {reply.text}"
 
         if description is None:
             description = ""
@@ -632,8 +618,7 @@ class TestFlow:
                     else:
                         expecting = str(expected)
                     raise RuntimeError(
-                        f"TestAdapter.assert_reply({expecting}): {description} Timed out after "
-                        f"{current - start}ms."
+                        f"TestAdapter.assert_reply({expecting}): {description} Timed out after " f"{current - start}ms."
                     )
                 if adapter.activity_buffer:
                     reply = adapter.activity_buffer.pop(0)

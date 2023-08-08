@@ -125,15 +125,11 @@ class _SkillHandlerImpl(SkillHandler):
             activity,
         )
 
-    async def on_delete_activity(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str
-    ):
+    async def on_delete_activity(self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str):
         skill_conversation_reference = await self._get_skill_conversation_reference(conversation_id)
 
         async def callback(turn_context: TurnContext):
-            turn_context.turn_state[
-                self.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = skill_conversation_reference
+            turn_context.turn_state[self.SKILL_CONVERSATION_REFERENCE_KEY] = skill_conversation_reference
             await turn_context.delete_activity(activity_id)
 
         await self._adapter.continue_conversation(
@@ -156,12 +152,8 @@ class _SkillHandlerImpl(SkillHandler):
 
         async def callback(turn_context: TurnContext):
             nonlocal resource_response
-            turn_context.turn_state[
-                self.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = skill_conversation_reference
-            activity.apply_conversation_reference(
-                skill_conversation_reference.conversation_reference
-            )
+            turn_context.turn_state[self.SKILL_CONVERSATION_REFERENCE_KEY] = skill_conversation_reference
+            activity.apply_conversation_reference(skill_conversation_reference.conversation_reference)
             turn_context.activity.id = activity_id
             turn_context.activity.caller_id = (
                 f"{CallerIdConstants.bot_to_bot_prefix}"
@@ -209,13 +201,9 @@ class _SkillHandlerImpl(SkillHandler):
 
         async def callback(context: TurnContext):
             nonlocal resource_response
-            context.turn_state[
-                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
-            ] = skill_conversation_reference
+            context.turn_state[SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY] = skill_conversation_reference
 
-            TurnContext.apply_conversation_reference(
-                activity, skill_conversation_reference.conversation_reference
-            )
+            TurnContext.apply_conversation_reference(activity, skill_conversation_reference.conversation_reference)
 
             context.activity.id = reply_to_activity_id
 
@@ -249,15 +237,11 @@ class _SkillHandlerImpl(SkillHandler):
 
         return resource_response
 
-    async def _get_skill_conversation_reference(
-        self, conversation_id: str
-    ) -> SkillConversationReference:
+    async def _get_skill_conversation_reference(self, conversation_id: str) -> SkillConversationReference:
         # Get the SkillsConversationReference
         try:
-            skill_conversation_reference = (
-                await self._conversation_id_factory.get_skill_conversation_reference(
-                    conversation_id
-                )
+            skill_conversation_reference = await self._conversation_id_factory.get_skill_conversation_reference(
+                conversation_id
             )
         except (NotImplementedError, AttributeError):
             if self._logger:
@@ -272,19 +256,15 @@ class _SkillHandlerImpl(SkillHandler):
             # or a ConversationReference (the old way, but still here for compatibility).  If a
             # ConversationReference is returned, build a new SkillConversationReference to simplify
             # the remainder of this method.
-            conversation_reference_result = (
-                await self._conversation_id_factory.get_conversation_reference(conversation_id)
+            conversation_reference_result = await self._conversation_id_factory.get_conversation_reference(
+                conversation_id
             )
             if isinstance(conversation_reference_result, SkillConversationReference):
-                skill_conversation_reference: SkillConversationReference = (
-                    conversation_reference_result
-                )
+                skill_conversation_reference: SkillConversationReference = conversation_reference_result
             else:
-                skill_conversation_reference: SkillConversationReference = (
-                    SkillConversationReference(
-                        conversation_reference=conversation_reference_result,
-                        oauth_scope=self._get_oauth_scope(),
-                    )
+                skill_conversation_reference: SkillConversationReference = SkillConversationReference(
+                    conversation_reference=conversation_reference_result,
+                    oauth_scope=self._get_oauth_scope(),
                 )
 
         if not skill_conversation_reference:

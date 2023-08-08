@@ -55,9 +55,7 @@ class Prompt(Dialog):
 
         self._validator = validator
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: object = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self, dialog_context: DialogContext, options: object = None) -> DialogTurnResult:
         """
         Starts a prompt dialog. Called when a prompt dialog is pushed onto the dialog stack and is being activated.
 
@@ -131,9 +129,7 @@ class Prompt(Dialog):
         # Validate the return value
         is_valid = False
         if self._validator is not None:
-            prompt_context = PromptValidatorContext(
-                dialog_context.context, recognized, state, options
-            )
+            prompt_context = PromptValidatorContext(dialog_context.context, recognized, state, options)
             is_valid = await self._validator(prompt_context)
             if options is None:
                 options = PromptOptions()

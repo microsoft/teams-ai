@@ -9,9 +9,7 @@ class DialogInstance:
     Tracking information for a dialog on the stack.
     """
 
-    def __init__(
-        self, id: str = None, state: Dict[str, object] = None
-    ):  # pylint: disable=invalid-name
+    def __init__(self, id: str = None, state: Dict[str, object] = None):  # pylint: disable=invalid-name
         """
         Gets or sets the ID of the dialog and gets or sets the instance's persisted state.
 

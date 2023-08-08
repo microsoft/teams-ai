@@ -311,8 +311,7 @@ class DialogContext:
                 dialog = await self.find_dialog(self.active_dialog.id)
                 if not dialog:
                     raise Exception(
-                        "DialogSet.reprompt_dialog(): Can't find A dialog with an id of '%s'."
-                        % self.active_dialog.id
+                        "DialogSet.reprompt_dialog(): Can't find A dialog with an id of '%s'." % self.active_dialog.id
                     )
 
                 # Ask dialog to re-prompt if supported

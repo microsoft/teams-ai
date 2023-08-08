@@ -25,9 +25,7 @@ DEPENDICIES_DICT = {dependency.__name__: dependency for dependency in DEPENDICIE
 
 def deserializer_helper(msrest_cls: Type[Model], dict_to_deserialize: dict) -> Model:
     deserializer = Deserializer(DEPENDICIES_DICT)
-    _clean_data_for_serialization(
-        deserializer.dependencies[msrest_cls.__name__], dict_to_deserialize
-    )
+    _clean_data_for_serialization(deserializer.dependencies[msrest_cls.__name__], dict_to_deserialize)
     return deserializer(msrest_cls.__name__, dict_to_deserialize)
 
 
@@ -50,9 +48,5 @@ def _clean_data_for_serialization(msrest_cls: Type[Model], dict_to_deserialize: 
         if key != value["key"]:
             serialization_model[value["key"]] = value
     for prop, prop_value in dict_to_deserialize.items():
-        if (
-            prop in serialization_model
-            and serialization_model[prop]["type"] in DEPENDICIES_DICT
-            and not prop_value
-        ):
+        if prop in serialization_model and serialization_model[prop]["type"] in DEPENDICIES_DICT and not prop_value:
             dict_to_deserialize[prop] = None

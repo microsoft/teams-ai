@@ -79,9 +79,7 @@ class BlobStorage(Storage):
             raise Exception("Container name is required.")
 
         if settings.connection_string:
-            blob_service_client = BlobServiceClient.from_connection_string(
-                settings.connection_string
-            )
+            blob_service_client = BlobServiceClient.from_connection_string(settings.connection_string)
         else:
             blob_service_client = BlobServiceClient.from_connection_string(
                 convert_account_name_and_key_to_connection_string(settings)
@@ -156,9 +154,7 @@ class BlobStorage(Storage):
             item_str = self._store_item_to_str(item)
 
             if e_tag:
-                await blob_reference.upload_blob(
-                    item_str, match_condition=MatchConditions.IfNotModified, etag=e_tag
-                )
+                await blob_reference.upload_blob(item_str, match_condition=MatchConditions.IfNotModified, etag=e_tag)
             else:
                 await blob_reference.upload_blob(item_str, overwrite=True)
 

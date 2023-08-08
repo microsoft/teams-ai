@@ -207,9 +207,7 @@ class BotState(PropertyManager):
         cached_state = self.get_cached_state(turn_context)
         del cached_state.state[property_name]
 
-    async def set_property_value(
-        self, turn_context: TurnContext, property_name: str, value: object
-    ) -> None:
+    async def set_property_value(self, turn_context: TurnContext, property_name: str, value: object) -> None:
         """
         Sets a property to the specified value in the turn context.
 
@@ -285,9 +283,7 @@ class BotStatePropertyAccessor(StatePropertyAccessor):
             if not default_value_or_factory:
                 return None
             result = (
-                default_value_or_factory()
-                if callable(default_value_or_factory)
-                else deepcopy(default_value_or_factory)
+                default_value_or_factory() if callable(default_value_or_factory) else deepcopy(default_value_or_factory)
             )
             # save default value for any further calls
             await self.set(turn_context, result)

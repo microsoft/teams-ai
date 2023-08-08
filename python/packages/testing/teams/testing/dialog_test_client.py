@@ -58,9 +58,7 @@ class DialogTestClient:
             ConversationState(MemoryStorage()) if conversation_state is None else conversation_state
         )
         dialog_state = self.conversation_state.create_property("DialogState")
-        self._callback = self._get_default_callback(
-            target_dialog, initial_dialog_options, dialog_state
-        )
+        self._callback = self._get_default_callback(target_dialog, initial_dialog_options, dialog_state)
 
         if isinstance(channel_or_adapter, str):
             conversation_reference = ConversationReference(channel_id=channel_or_adapter)

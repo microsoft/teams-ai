@@ -76,9 +76,7 @@ class EnterpriseChannelValidation(ABC):
         return identity
 
     @staticmethod
-    async def validate_identity(
-        identity: ClaimsIdentity, credentials: CredentialProvider
-    ) -> ClaimsIdentity:
+    async def validate_identity(identity: ClaimsIdentity, credentials: CredentialProvider) -> ClaimsIdentity:
         if identity is None:
             # No valid identity. Not Authorized.
             raise PermissionError("Unauthorized. No valid identity.")

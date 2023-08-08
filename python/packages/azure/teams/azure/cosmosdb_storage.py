@@ -45,12 +45,8 @@ class CosmosDbConfig:
         self.database = database or kwargs.get("database", "bot_db")
         self.container = container or kwargs.get("container", "bot_container")
         self.partition_key = partition_key or kwargs.get("partition_key")
-        self.database_creation_options = database_creation_options or kwargs.get(
-            "database_creation_options"
-        )
-        self.container_creation_options = container_creation_options or kwargs.get(
-            "container_creation_options"
-        )
+        self.database_creation_options = database_creation_options or kwargs.get("database_creation_options")
+        self.container_creation_options = container_creation_options or kwargs.get("container_creation_options")
 
 
 class CosmosDbKeyEscape:
@@ -104,9 +100,7 @@ class CosmosDbStorage(Storage):
         """
         super(CosmosDbStorage, self).__init__()
         self.config = config
-        self.client = client or cosmos_client.CosmosClient(
-            self.config.endpoint, {"masterKey": self.config.masterkey}
-        )
+        self.client = client or cosmos_client.CosmosClient(self.config.endpoint, {"masterKey": self.config.masterkey})
         # these are set by the functions that check
         # the presence of the database and container or creates them
         self.database = None
@@ -358,7 +352,5 @@ class CosmosDbStorage(Storage):
             return containers[0]["id"]
 
         # Create a container if it didn't exist
-        res = doc_client.CreateContainer(
-            self.__database_link, {"id": container}, self._container_creation_options
-        )
+        res = doc_client.CreateContainer(self.__database_link, {"id": container}, self._container_creation_options)
         return res["id"]

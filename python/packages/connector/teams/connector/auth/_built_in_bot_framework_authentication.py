@@ -63,9 +63,7 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
             app_id = claims_identity.get_claim_value(AuthenticationConstants.APP_ID_CLAIM)
         return app_id
 
-    async def authenticate_request(
-        self, activity: Activity, auth_header: str
-    ) -> AuthenticateRequestResult:
+    async def authenticate_request(self, activity: Activity, auth_header: str) -> AuthenticateRequestResult:
         credential_provider = _DelegatingCredentialProvider(self._credentials_factory)
 
         claims_identity = await JwtTokenValidation.authenticate_request(
@@ -200,8 +198,4 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         )
 
     def _get_channel_provider(self) -> Optional[ChannelProvider]:
-        return (
-            SimpleChannelProvider(self._channel_service)
-            if self._channel_service is not None
-            else None
-        )
+        return SimpleChannelProvider(self._channel_service) if self._channel_service is not None else None

@@ -163,9 +163,7 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
                     TokenExchangeRequest(token=token_exchange_request.token),
                 )
             else:
-                raise Exception(
-                    "Not supported: Token Exchange is not supported by the current adapter."
-                )
+                raise Exception("Not supported: Token Exchange is not supported by the current adapter.")
         except:
             traceback.print_exc()
         if not token_exchange_response or not token_exchange_response.token:
@@ -178,9 +176,7 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
                 failure_detail="The bot is unable to exchange token. Proceed with regular login.",
             )
 
-            await self._send_invoke_response(
-                turn_context, invoke_response, HTTPStatus.PRECONDITION_FAILED
-            )
+            await self._send_invoke_response(turn_context, invoke_response, HTTPStatus.PRECONDITION_FAILED)
 
             return False
 

@@ -42,18 +42,12 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
     ):
         self._instrumentation_key = instrumentation_key
 
-        self._client = (
-            telemetry_client
-            if telemetry_client is not None
-            else TelemetryClient(self._instrumentation_key)
-        )
+        self._client = telemetry_client if telemetry_client is not None else TelemetryClient(self._instrumentation_key)
         if client_queue_size:
             self._client.channel.queue.max_queue_length = client_queue_size
 
         # Telemetry Processor
-        processor = (
-            telemetry_processor if telemetry_processor is not None else bot_telemetry_processor
-        )
+        processor = telemetry_processor if telemetry_processor is not None else bot_telemetry_processor
         self._client.add_telemetry_processor(processor)
 
     def track_pageview(
@@ -155,13 +149,9 @@ class ApplicationInsightsTelemetryClient(BotTelemetryClient):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         :type properties: :class:`typing.Dict[str, object]`
         """
-        self._client.track_metric(
-            name, value, tel_type, count, min_val, max_val, std_dev, properties
-        )
+        self._client.track_metric(name, value, tel_type, count, min_val, max_val, std_dev, properties)
 
-    def track_trace(
-        self, name: str, properties: Dict[str, object] = None, severity: Severity = None
-    ):
+    def track_trace(self, name: str, properties: Dict[str, object] = None, severity: Severity = None):
         """
         Sends a single trace statement.
 

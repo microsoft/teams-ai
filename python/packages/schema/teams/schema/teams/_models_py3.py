@@ -254,9 +254,7 @@ class FileInfoCard(Model):
         "etag": {"key": "etag", "type": "object"},
     }
 
-    def __init__(
-        self, *, unique_id: str = None, file_type: str = None, etag=None, **kwargs
-    ) -> None:
+    def __init__(self, *, unique_id: str = None, file_type: str = None, etag=None, **kwargs) -> None:
         super(FileInfoCard, self).__init__(**kwargs)
         self.unique_id = unique_id
         self.file_type = file_type
@@ -325,9 +323,7 @@ class MessageActionsPayloadApp(Model):
         "display_name": {"key": "displayName", "type": "str"},
     }
 
-    def __init__(
-        self, *, application_identity_type=None, id: str = None, display_name: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, application_identity_type=None, id: str = None, display_name: str = None, **kwargs) -> None:
         super(MessageActionsPayloadApp, self).__init__(**kwargs)
         self.application_identity_type = application_identity_type
         self.id = id
@@ -426,9 +422,7 @@ class MessageActionsPayloadConversation(Model):
         "display_name": {"key": "displayName", "type": "str"},
     }
 
-    def __init__(
-        self, *, conversation_identity_type=None, id: str = None, display_name: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, conversation_identity_type=None, id: str = None, display_name: str = None, **kwargs) -> None:
         super(MessageActionsPayloadConversation, self).__init__(**kwargs)
         self.conversation_identity_type = conversation_identity_type
         self.id = id
@@ -483,9 +477,7 @@ class MessageActionsPayloadMention(Model):
         "mentioned": {"key": "mentioned", "type": "MessageActionsPayloadFrom"},
     }
 
-    def __init__(
-        self, *, id: int = None, mention_text: str = None, mentioned=None, **kwargs
-    ) -> None:
+    def __init__(self, *, id: int = None, mention_text: str = None, mentioned=None, **kwargs) -> None:
         super(MessageActionsPayloadMention, self).__init__(**kwargs)
         self.id = id
         self.mention_text = mention_text
@@ -511,9 +503,7 @@ class MessageActionsPayloadReaction(Model):
         "user": {"key": "user", "type": "MessageActionsPayloadFrom"},
     }
 
-    def __init__(
-        self, *, reaction_type=None, created_date_time: str = None, user=None, **kwargs
-    ) -> None:
+    def __init__(self, *, reaction_type=None, created_date_time: str = None, user=None, **kwargs) -> None:
         super(MessageActionsPayloadReaction, self).__init__(**kwargs)
         self.reaction_type = reaction_type
         self.created_date_time = created_date_time
@@ -538,9 +528,7 @@ class MessageActionsPayloadUser(Model):
         "display_name": {"key": "displayName", "type": "str"},
     }
 
-    def __init__(
-        self, *, user_identity_type=None, id: str = None, display_name: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, user_identity_type=None, id: str = None, display_name: str = None, **kwargs) -> None:
         super(MessageActionsPayloadUser, self).__init__(**kwargs)
         self.user_identity_type = user_identity_type
         self.id = id
@@ -738,9 +726,7 @@ class MessagingExtensionActionResponse(Model):
         "cache_info": {"key": "cacheInfo", "type": "CacheInfo"},
     }
 
-    def __init__(
-        self, *, task=None, compose_extension=None, cache_info: CacheInfo = None, **kwargs
-    ) -> None:
+    def __init__(self, *, task=None, compose_extension=None, cache_info: CacheInfo = None, **kwargs) -> None:
         super(MessagingExtensionActionResponse, self).__init__(**kwargs)
         self.task = task
         self.compose_extension = compose_extension
@@ -1146,9 +1132,7 @@ class O365ConnectorCardActionCard(O365ConnectorCardActionBase):
         "actions": {"key": "actions", "type": "[O365ConnectorCardActionBase]"},
     }
 
-    def __init__(
-        self, *, type=None, name: str = None, id: str = None, inputs=None, actions=None, **kwargs
-    ) -> None:
+    def __init__(self, *, type=None, name: str = None, id: str = None, inputs=None, actions=None, **kwargs) -> None:
         super(O365ConnectorCardActionCard, self).__init__(type=type, name=name, id=id, **kwargs)
         self.inputs = inputs
         self.actions = actions
@@ -1264,9 +1248,7 @@ class O365ConnectorCardHttpPOST(O365ConnectorCardActionBase):
         "body": {"key": "body", "type": "str"},
     }
 
-    def __init__(
-        self, *, type=None, name: str = None, id: str = None, body: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, type=None, name: str = None, id: str = None, body: str = None, **kwargs) -> None:
         super(O365ConnectorCardHttpPOST, self).__init__(type=type, name=name, id=id, **kwargs)
         self.body = body
 
@@ -1395,9 +1377,7 @@ class O365ConnectorCardOpenUri(O365ConnectorCardActionBase):
         "targets": {"key": "targets", "type": "[O365ConnectorCardOpenUriTarget]"},
     }
 
-    def __init__(
-        self, *, type=None, name: str = None, id: str = None, targets=None, **kwargs
-    ) -> None:
+    def __init__(self, *, type=None, name: str = None, id: str = None, targets=None, **kwargs) -> None:
         super(O365ConnectorCardOpenUri, self).__init__(type=type, name=name, id=id, **kwargs)
         self.targets = targets
 
@@ -1576,9 +1556,7 @@ class O365ConnectorCardViewAction(O365ConnectorCardActionBase):
         "target": {"key": "target", "type": "[str]"},
     }
 
-    def __init__(
-        self, *, type=None, name: str = None, id: str = None, target=None, **kwargs
-    ) -> None:
+    def __init__(self, *, type=None, name: str = None, id: str = None, target=None, **kwargs) -> None:
         super(O365ConnectorCardViewAction, self).__init__(type=type, name=name, id=id, **kwargs)
         self.target = target
 
@@ -1803,9 +1781,7 @@ class TeamInfo(Model):
         "aad_group_id": {"key": "aadGroupId", "type": "str"},
     }
 
-    def __init__(
-        self, *, id: str = None, name: str = None, aad_group_id: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, id: str = None, name: str = None, aad_group_id: str = None, **kwargs) -> None:
         super(TeamInfo, self).__init__(**kwargs)
         self.id = id
         self.name = name
@@ -1882,12 +1858,8 @@ class TeamsPagedMembersResult(PagedMembersResult):
         "members": {"key": "members", "type": "[TeamsChannelAccount]"},
     }
 
-    def __init__(
-        self, *, continuation_token: str = None, members: List[TeamsChannelAccount] = None, **kwargs
-    ) -> None:
-        super(TeamsPagedMembersResult, self).__init__(
-            continuation_token=continuation_token, members=members, **kwargs
-        )
+    def __init__(self, *, continuation_token: str = None, members: List[TeamsChannelAccount] = None, **kwargs) -> None:
+        super(TeamsPagedMembersResult, self).__init__(continuation_token=continuation_token, members=members, **kwargs)
         self.continuation_token = continuation_token
         self.members = members
 
@@ -2316,9 +2288,7 @@ class MeetingDetailsBase(Model):
         "title": {"key": "title", "type": "str"},
     }
 
-    def __init__(
-        self, *, id: str = None, join_url: str = None, title: str = None, **kwargs
-    ) -> None:
+    def __init__(self, *, id: str = None, join_url: str = None, title: str = None, **kwargs) -> None:
         super(MeetingDetailsBase, self).__init__(**kwargs)
         self.id = id
         self.join_url = join_url

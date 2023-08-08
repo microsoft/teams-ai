@@ -97,9 +97,7 @@ class MemoryTranscriptStore(TranscriptStore):
             if conversation_id in self.channels[channel_id]:
                 del self.channels[channel_id][conversation_id]
 
-    async def list_transcripts(
-        self, channel_id: str, continuation_token: str = None
-    ) -> "PagedResult[TranscriptInfo]":
+    async def list_transcripts(self, channel_id: str, continuation_token: str = None) -> "PagedResult[TranscriptInfo]":
         if not channel_id:
             raise TypeError("Missing channel_id")
 

@@ -112,9 +112,7 @@ class OAuthPrompt(Dialog):
         self._settings = settings
         self._validator = validator
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: PromptOptions = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self, dialog_context: DialogContext, options: PromptOptions = None) -> DialogTurnResult:
         """
         Starts an authentication prompt dialog. Called when an authentication prompt dialog is pushed onto the
         dialog stack and is being activated.
@@ -133,9 +131,7 @@ class OAuthPrompt(Dialog):
             has been processed.
         """
         if dialog_context is None:
-            raise TypeError(
-                f"OAuthPrompt.begin_dialog(): Expected DialogContext but got NoneType instead"
-            )
+            raise TypeError(f"OAuthPrompt.begin_dialog(): Expected DialogContext but got NoneType instead")
 
         options = options or PromptOptions()
 
@@ -152,9 +148,7 @@ class OAuthPrompt(Dialog):
         state[OAuthPrompt.PERSISTED_STATE] = {}
         state[OAuthPrompt.PERSISTED_OPTIONS] = options
         state[OAuthPrompt.PERSISTED_EXPIRES] = datetime.now() + timedelta(seconds=timeout / 1000)
-        state[OAuthPrompt.PERSISTED_CALLER] = OAuthPrompt.__create_caller_info(
-            dialog_context.context
-        )
+        state[OAuthPrompt.PERSISTED_CALLER] = OAuthPrompt.__create_caller_info(dialog_context.context)
 
         output = await _UserTokenAccess.get_user_token(dialog_context.context, self._settings, None)
 
@@ -191,9 +185,7 @@ class OAuthPrompt(Dialog):
             or OAuthPrompt._is_token_exchange_request_invoke(dialog_context.context)
         )
 
-        has_timed_out = is_timeout_activity_type and (
-            datetime.now() > state[OAuthPrompt.PERSISTED_EXPIRES]
-        )
+        has_timed_out = is_timeout_activity_type and (datetime.now() > state[OAuthPrompt.PERSISTED_EXPIRES])
 
         if has_timed_out:
             return await dialog_context.end_dialog(None)
@@ -233,9 +225,7 @@ class OAuthPrompt(Dialog):
             and is_message
             and state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt is not None
         ):
-            await dialog_context.context.send_activity(
-                state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt
-            )
+            await dialog_context.context.send_activity(state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt)
 
         return Dialog.end_of_turn
 
@@ -291,14 +281,9 @@ class OAuthPrompt(Dialog):
         prompt.attachments = prompt.attachments or []
 
         if OAuthPrompt._channel_suppports_oauth_card(context.activity.channel_id):
-            if not any(
-                att.content_type == CardFactory.content_types.oauth_card
-                for att in prompt.attachments
-            ):
+            if not any(att.content_type == CardFactory.content_types.oauth_card for att in prompt.attachments):
                 card_action_type = ActionTypes.signin
-                sign_in_resource = await _UserTokenAccess.get_sign_in_resource(
-                    context, self._settings
-                )
+                sign_in_resource = await _UserTokenAccess.get_sign_in_resource(context, self._settings)
                 link = sign_in_resource.sign_in_link
                 bot_identity: ClaimsIdentity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
 
@@ -337,10 +322,7 @@ class OAuthPrompt(Dialog):
                     )
                 )
         else:
-            if not any(
-                att.content_type == CardFactory.content_types.signin_card
-                for att in prompt.attachments
-            ):
+            if not any(att.content_type == CardFactory.content_types.signin_card for att in prompt.attachments):
                 if not hasattr(context.adapter, "get_oauth_sign_in_link"):
                     raise Exception(
                         "OAuthPrompt._send_oauth_card(): get_oauth_sign_in_link() not supported by the current adapter"
@@ -418,13 +400,9 @@ class OAuthPrompt(Dialog):
                 )
         elif self._is_token_exchange_request_invoke(context):
             if isinstance(context.activity.value, dict):
-                context.activity.value = TokenExchangeInvokeRequest().from_dict(
-                    context.activity.value
-                )
+                context.activity.value = TokenExchangeInvokeRequest().from_dict(context.activity.value)
 
-            if not (
-                context.activity.value and self._is_token_exchange_request(context.activity.value)
-            ):
+            if not (context.activity.value and self._is_token_exchange_request(context.activity.value)):
                 # Received activity is not a token exchange request.
                 await context.send_activity(
                     self._get_token_exchange_invoke_response(
@@ -454,9 +432,7 @@ class OAuthPrompt(Dialog):
                     )
                 )
 
-                raise AttributeError(
-                    "OAuthPrompt._recognize_token(): not supported by the current adapter."
-                )
+                raise AttributeError("OAuthPrompt._recognize_token(): not supported by the current adapter.")
             else:
                 # No errors. Proceed with token exchange.
                 token_exchange_response = None
@@ -481,9 +457,7 @@ class OAuthPrompt(Dialog):
                     )
                 else:
                     await context.send_activity(
-                        self._get_token_exchange_invoke_response(
-                            int(HTTPStatus.OK), None, context.activity.value.id
-                        )
+                        self._get_token_exchange_invoke_response(int(HTTPStatus.OK), None, context.activity.value.id)
                     )
                     token = TokenResponse(
                         channel_id=token_exchange_response.channel_id,
@@ -496,13 +470,9 @@ class OAuthPrompt(Dialog):
             if match:
                 token = await _UserTokenAccess.get_user_token(context, self._settings, match[0])
 
-        return (
-            PromptRecognizerResult(True, token) if token is not None else PromptRecognizerResult()
-        )
+        return PromptRecognizerResult(True, token) if token is not None else PromptRecognizerResult()
 
-    def _get_token_exchange_invoke_response(
-        self, status: int, failure_detail: str, identifier: str = None
-    ) -> Activity:
+    def _get_token_exchange_invoke_response(self, status: int, failure_detail: str, identifier: str = None) -> Activity:
         return Activity(
             type=ActivityTypes.invoke_response,
             value=InvokeResponse(
@@ -519,19 +489,13 @@ class OAuthPrompt(Dialog):
     def _is_token_response_event(context: TurnContext) -> bool:
         activity = context.activity
 
-        return (
-            activity.type == ActivityTypes.event
-            and activity.name == SignInConstants.token_response_event_name
-        )
+        return activity.type == ActivityTypes.event and activity.name == SignInConstants.token_response_event_name
 
     @staticmethod
     def _is_teams_verification_invoke(context: TurnContext) -> bool:
         activity = context.activity
 
-        return (
-            activity.type == ActivityTypes.invoke
-            and activity.name == SignInConstants.verify_state_operation_name
-        )
+        return activity.type == ActivityTypes.invoke and activity.name == SignInConstants.verify_state_operation_name
 
     @staticmethod
     def _channel_suppports_oauth_card(channel_id: str) -> bool:
@@ -555,10 +519,7 @@ class OAuthPrompt(Dialog):
     def _is_token_exchange_request_invoke(context: TurnContext) -> bool:
         activity = context.activity
 
-        return (
-            activity.type == ActivityTypes.invoke
-            and activity.name == SignInConstants.token_exchange_operation_name
-        )
+        return activity.type == ActivityTypes.invoke and activity.name == SignInConstants.token_exchange_operation_name
 
     @staticmethod
     def _is_token_exchange_request(obj: TokenExchangeInvokeRequest) -> bool:

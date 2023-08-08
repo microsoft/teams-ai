@@ -27,9 +27,7 @@ class AdapterExtensions:
         return adapter.use(RegisterClassMiddleware(storage))
 
     @staticmethod
-    def use_bot_state(
-        bot_adapter: BotAdapter, *bot_states: BotState, auto: bool = True
-    ) -> BotAdapter:
+    def use_bot_state(bot_adapter: BotAdapter, *bot_states: BotState, auto: bool = True) -> BotAdapter:
         """
         Registers bot state object into the TurnContext. The botstate will be available via the turn context.
 
@@ -41,9 +39,7 @@ class AdapterExtensions:
             raise TypeError("At least one BotAdapter is required")
 
         for bot_state in bot_states:
-            bot_adapter.use(
-                RegisterClassMiddleware(bot_state, AdapterExtensions.fullname(bot_state))
-            )
+            bot_adapter.use(RegisterClassMiddleware(bot_state, AdapterExtensions.fullname(bot_state)))
 
         if auto:
             bot_adapter.use(AutoSaveStateMiddleware(bot_states))

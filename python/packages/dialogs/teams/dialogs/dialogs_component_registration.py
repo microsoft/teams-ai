@@ -31,9 +31,7 @@ from teams.dialogs.memory.path_resolvers import (
 )
 
 
-class DialogsComponentRegistration(
-    ComponentRegistration, ComponentMemoryScopesBase, ComponentPathResolversBase
-):
+class DialogsComponentRegistration(ComponentRegistration, ComponentMemoryScopesBase, ComponentPathResolversBase):
     def get_memory_scopes(self) -> Iterable[MemoryScope]:
         yield TurnMemoryScope()
         yield SettingsMemoryScope()

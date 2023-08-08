@@ -57,9 +57,7 @@ class UserTokenClient(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_token_status(
-        self, user_id: str, channel_id: str, include_filter: str
-    ) -> List[TokenStatus]:
+    async def get_token_status(self, user_id: str, channel_id: str, include_filter: str) -> List[TokenStatus]:
         """
         Retrieves the token status for each configured connection for the given user.
 

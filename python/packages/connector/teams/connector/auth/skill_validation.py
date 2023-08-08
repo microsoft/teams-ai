@@ -64,10 +64,7 @@ class SkillValidation:
         :param claims: A dict of claims.
         :return bool:
         """
-        if (
-            claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
-            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
-        ):
+        if claims.get(AuthenticationConstants.APP_ID_CLAIM, None) == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID:
             return True
 
         if AuthenticationConstants.VERSION_CLAIM not in claims:
@@ -98,9 +95,7 @@ class SkillValidation:
         auth_configuration: AuthenticationConfiguration,
     ) -> ClaimsIdentity:
         if auth_configuration is None:
-            raise Exception(
-                "auth_configuration cannot be None in SkillValidation.authenticate_channel_token"
-            )
+            raise Exception("auth_configuration cannot be None in SkillValidation.authenticate_channel_token")
 
         from .jwt_token_validation import JwtTokenValidation
 
@@ -153,17 +148,13 @@ class SkillValidation:
         version_claim = identity.claims.get(AuthenticationConstants.VERSION_CLAIM)
         if not version_claim:
             # No version claim
-            raise PermissionError(
-                f"'{AuthenticationConstants.VERSION_CLAIM}' claim is required on skill Tokens."
-            )
+            raise PermissionError(f"'{AuthenticationConstants.VERSION_CLAIM}' claim is required on skill Tokens.")
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
         audience_claim = identity.claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
         if not audience_claim:
             # Claim is not present or doesn't have a value. Not Authorized.
-            raise PermissionError(
-                f"'{AuthenticationConstants.AUDIENCE_CLAIM}' claim is required on skill Tokens."
-            )
+            raise PermissionError(f"'{AuthenticationConstants.AUDIENCE_CLAIM}' claim is required on skill Tokens.")
 
         if not await credentials.is_valid_appid(audience_claim):
             # The AppId is not valid. Not Authorized.

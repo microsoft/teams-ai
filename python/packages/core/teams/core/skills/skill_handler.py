@@ -138,9 +138,7 @@ class SkillHandler(ChannelServiceHandler):
             activity,
         )
 
-    async def on_delete_activity(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str
-    ):
+    async def on_delete_activity(self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str):
         await self._inner.on_delete_activity(claims_identity, conversation_id, activity_id)
 
     async def on_update_activity(
@@ -150,6 +148,4 @@ class SkillHandler(ChannelServiceHandler):
         activity_id: str,
         activity: Activity,
     ) -> ResourceResponse:
-        return await self._inner.on_update_activity(
-            claims_identity, conversation_id, activity_id, activity
-        )
+        return await self._inner.on_update_activity(claims_identity, conversation_id, activity_id, activity)

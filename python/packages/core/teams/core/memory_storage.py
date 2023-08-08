@@ -69,10 +69,7 @@ class MemoryStorage(Storage):
                     and new_value_etag != "*"
                     and new_value_etag != old_state_etag
                 ):
-                    raise KeyError(
-                        "Etag conflict.\nOriginal: %s\r\nCurrent: %s"
-                        % (new_value_etag, old_state_etag)
-                    )
+                    raise KeyError("Etag conflict.\nOriginal: %s\r\nCurrent: %s" % (new_value_etag, old_state_etag))
 
                 # If the original object didn't have an e_tag, don't set one (C# behavior)
                 if old_state_etag:

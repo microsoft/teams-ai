@@ -62,17 +62,13 @@ class ReceiveResponseAssembler(Assembler):
                 try:
                     identifier = UUID(int=int(stream_description.id))
                 except Exception:
-                    raise ValueError(
-                        f"Stream description id '{stream_description.id}' is not a Guid"
-                    )
+                    raise ValueError(f"Stream description id '{stream_description.id}' is not a Guid")
 
                 stream_assembler = self._stream_manager.get_payload_assembler(identifier)
                 stream_assembler.content_type = stream_description.content_type
                 stream_assembler.content_length = stream_description.length
 
-                content_stream = payloads.ContentStream(
-                    identifier=identifier, assembler=stream_assembler
-                )
+                content_stream = payloads.ContentStream(identifier=identifier, assembler=stream_assembler)
                 content_stream.length = stream_description.length
                 content_stream.content_type = stream_description.content_type
                 response.streams.append(content_stream)

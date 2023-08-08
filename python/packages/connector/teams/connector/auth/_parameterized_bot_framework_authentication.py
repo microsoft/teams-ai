@@ -61,12 +61,8 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         self._connector_client_configuration = connector_client_configuration
         self._logger = logger
 
-    async def authenticate_request(
-        self, activity: Activity, auth_header: str
-    ) -> AuthenticateRequestResult:
-        claims_identity = await self._jwt_token_validation_authenticate_request(
-            activity, auth_header
-        )
+    async def authenticate_request(self, activity: Activity, auth_header: str) -> AuthenticateRequestResult:
+        claims_identity = await self._jwt_token_validation_authenticate_request(activity, auth_header)
 
         outbound_audience = (
             JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
@@ -106,9 +102,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             if not is_auth_disabled:
                 raise PermissionError("Unauthorized Access. Request is not authorized")
 
-        claims_identity = await self._jwt_token_validation_validate_auth_header(
-            auth_header, channel_id_header
-        )
+        claims_identity = await self._jwt_token_validation_validate_auth_header(auth_header, channel_id_header)
 
         outbound_audience = (
             JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
@@ -164,13 +158,9 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         return self._to_channel_from_bot_oauth_scope
 
     async def authenticate_channel_request(self, auth_header: str) -> ClaimsIdentity:
-        return await self._jwt_token_validation_validate_auth_header(
-            auth_header, channel_id="unknown"
-        )
+        return await self._jwt_token_validation_validate_auth_header(auth_header, channel_id="unknown")
 
-    async def _jwt_token_validation_authenticate_request(
-        self, activity: Activity, auth_header: str
-    ) -> ClaimsIdentity:
+    async def _jwt_token_validation_authenticate_request(self, activity: Activity, auth_header: str) -> ClaimsIdentity:
         if auth_header is None:
             is_auth_disabled = await self._credentials_factory.is_authentication_disabled()
             if not is_auth_disabled:
@@ -178,10 +168,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
                 raise PermissionError("Unauthorized Access. Request is not authorized")
 
             # Check if the activity is for a skill call and is coming from the Emulator.
-            if (
-                activity.channel_id == Channels.emulator
-                and activity.recipient.role == RoleTypes.skill
-            ):
+            if activity.channel_id == Channels.emulator and activity.recipient.role == RoleTypes.skill:
                 # Return an anonymous claim with an anonymous skill AppId
                 return SkillValidation.create_anonymous_skill_claim()
 
@@ -200,9 +187,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
     async def _jwt_token_validation_validate_auth_header(
         self, auth_header: str, channel_id: str, service_url: Optional[str] = None
     ) -> ClaimsIdentity:
-        identity = await self._jwt_token_validation_authenticate_token(
-            auth_header, channel_id, service_url
-        )
+        identity = await self._jwt_token_validation_authenticate_token(auth_header, channel_id, service_url)
 
         await self._jwt_token_validation_validate_claims(identity.claims)
 
@@ -222,9 +207,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
             return await self._skill_validation_authenticate_channel_token(auth_header, channel_id)
 
         if EmulatorValidation.is_token_from_emulator(auth_header):
-            return await self._emulator_validation_authenticate_emulator_token(
-                auth_header, channel_id
-            )
+            return await self._emulator_validation_authenticate_emulator_token(auth_header, channel_id)
 
         return await self._government_channel_validation_authenticate_channel_token(
             auth_header, service_url, channel_id
@@ -292,17 +275,13 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
         version_claim = identity.get_claim_value(AuthenticationConstants.VERSION_CLAIM)
         if not version_claim:
             # No version claim
-            raise PermissionError(
-                f"'{AuthenticationConstants.VERSION_CLAIM}' claim is required on skill Tokens."
-            )
+            raise PermissionError(f"'{AuthenticationConstants.VERSION_CLAIM}' claim is required on skill Tokens.")
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
         audience_claim = identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
         if not audience_claim:
             # Claim is not present or doesn't have a value. Not Authorized.
-            raise PermissionError(
-                f"'{AuthenticationConstants.AUDIENCE_CLAIM}' claim is required on skill Tokens."
-            )
+            raise PermissionError(f"'{AuthenticationConstants.AUDIENCE_CLAIM}' claim is required on skill Tokens.")
 
         is_valid_app_id = await self._credentials_factory.is_valid_app_id(audience_claim)
         if not is_valid_app_id:
@@ -432,9 +411,7 @@ class _ParameterizedBotFrameworkAuthentication(BotFrameworkAuthentication):
 
         return identity
 
-    async def _government_channel_validation_validate_identity(
-        self, identity: ClaimsIdentity, service_url: str
-    ):
+    async def _government_channel_validation_validate_identity(self, identity: ClaimsIdentity, service_url: str):
         if identity is None:
             # No valid identity. Not Authorized.
             raise PermissionError()

@@ -76,9 +76,7 @@ def get_telemetry_client_with_processor(
     :rtype: TelemetryClient
     """
     client = TelemetryClient(key, channel)
-    processor = (
-        telemetry_processor if telemetry_processor is not None else DjangoTelemetryProcessor()
-    )
+    processor = telemetry_processor if telemetry_processor is not None else DjangoTelemetryProcessor()
     client.add_telemetry_processor(processor)
     return client
 
@@ -117,16 +115,12 @@ def create_client(aisettings=None, telemetry_processor: TelemetryProcessor = Non
     return client
 
 
-def dummy_client(
-    reason: str, telemetry_processor: TelemetryProcessor = None
-):  # pylint: disable=unused-argument
+def dummy_client(reason: str, telemetry_processor: TelemetryProcessor = None):  # pylint: disable=unused-argument
     """Creates a dummy channel so even if we're not logging telemetry, we can still send
     along the real object to things that depend on it to exist"""
 
     sender = NullSender()
     queue = SynchronousQueue(sender)
     channel = TelemetryChannel(None, queue)
-    client = get_telemetry_client_with_processor(
-        "00000000-0000-0000-0000-000000000000", channel, telemetry_processor
-    )
+    client = get_telemetry_client_with_processor("00000000-0000-0000-0000-000000000000", channel, telemetry_processor)
     return client

@@ -53,9 +53,7 @@ class CosmosDbPartitionedConfig:
         self.auth_key = auth_key or kwargs.get("auth_key")
         self.database_id = database_id or kwargs.get("database_id")
         self.container_id = container_id or kwargs.get("container_id")
-        self.cosmos_client_options = cosmos_client_options or kwargs.get(
-            "cosmos_client_options", {}
-        )
+        self.cosmos_client_options = cosmos_client_options or kwargs.get("cosmos_client_options", {})
         self.container_throughput = container_throughput or kwargs.get("container_throughput")
         self.key_suffix = key_suffix or kwargs.get("key_suffix")
         self.compatibility_mode = compatibility_mode or kwargs.get("compatibility_mode")
@@ -84,9 +82,7 @@ class CosmosDbPartitionedStorage(Storage):
                 raise Exception("compatibilityMode cannot be true while using a keySuffix.")
             suffix_escaped = CosmosDbKeyEscape.sanitize_key(config.key_suffix)
             if not suffix_escaped.__eq__(config.key_suffix):
-                raise Exception(
-                    f"Cannot use invalid Row Key characters: {config.key_suffix} in keySuffix."
-                )
+                raise Exception(f"Cannot use invalid Row Key characters: {config.key_suffix} in keySuffix.")
 
     async def read(self, keys: List[str]) -> Dict[str, object]:
         """Read storeitems from storage.
@@ -112,9 +108,7 @@ class CosmosDbPartitionedStorage(Storage):
                 )
                 document_store_item = read_item_response
                 if document_store_item:
-                    store_items[document_store_item["realId"]] = self.__create_si(
-                        document_store_item
-                    )
+                    store_items[document_store_item["realId"]] = self.__create_si(document_store_item)
             # When an item is not found a CosmosException is thrown, but we want to
             # return an empty collection so in this instance we catch and do not rethrow.
             # Throw for any other exception.
@@ -146,9 +140,7 @@ class CosmosDbPartitionedStorage(Storage):
             elif hasattr(change, "e_tag"):
                 e_tag = change.e_tag
             doc = {
-                "id": CosmosDbKeyEscape.sanitize_key(
-                    key, self.config.key_suffix, self.config.compatibility_mode
-                ),
+                "id": CosmosDbKeyEscape.sanitize_key(key, self.config.key_suffix, self.config.compatibility_mode),
                 "realId": key,
                 "document": self.__create_dict(change),
             }
@@ -177,9 +169,7 @@ class CosmosDbPartitionedStorage(Storage):
         await self.initialize()
 
         for key in keys:
-            escaped_key = CosmosDbKeyEscape.sanitize_key(
-                key, self.config.key_suffix, self.config.compatibility_mode
-            )
+            escaped_key = CosmosDbKeyEscape.sanitize_key(key, self.config.key_suffix, self.config.compatibility_mode)
             try:
                 self.client.DeleteItem(
                     document_link=self.__item_link(escaped_key),
@@ -206,9 +196,7 @@ class CosmosDbPartitionedStorage(Storage):
                 with self.__lock:
                     try:
                         if not self.database:
-                            self.database = self.client.CreateDatabase(
-                                {"id": self.config.database_id}
-                            )
+                            self.database = self.client.CreateDatabase({"id": self.config.database_id})
                     except cosmos_errors.HTTPFailure:
                         self.database = self.client.ReadDatabase("dbs/" + self.config.database_id)
 

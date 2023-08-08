@@ -17,9 +17,7 @@ class Middleware(ABC):
 class AnonymousReceiveMiddleware(Middleware):
     def __init__(self, anonymous_handler):
         if not iscoroutinefunction(anonymous_handler):
-            raise TypeError(
-                "AnonymousReceiveMiddleware must be instantiated with a valid coroutine function."
-            )
+            raise TypeError("AnonymousReceiveMiddleware must be instantiated with a valid coroutine function.")
         self._to_call = anonymous_handler
 
     def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
@@ -47,9 +45,7 @@ class MiddlewareSet(Middleware):
             if hasattr(mid, "on_turn") and callable(mid.on_turn):
                 self._middleware.append(mid)
                 return self
-            raise TypeError(
-                'MiddlewareSet.use(): invalid middleware at index "%s" being added.' % idx
-            )
+            raise TypeError('MiddlewareSet.use(): invalid middleware at index "%s" being added.' % idx)
 
     async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
@@ -58,9 +54,7 @@ class MiddlewareSet(Middleware):
         await self.receive_activity_internal(context, None)
         await logic()
 
-    async def receive_activity_with_status(
-        self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]
-    ):
+    async def receive_activity_with_status(self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]):
         return await self.receive_activity_internal(context, callback)
 
     async def receive_activity_internal(
@@ -76,9 +70,7 @@ class MiddlewareSet(Middleware):
         next_middleware = self._middleware[next_middleware_index]
 
         async def call_next_middleware():
-            return await self.receive_activity_internal(
-                context, callback, next_middleware_index + 1
-            )
+            return await self.receive_activity_internal(context, callback, next_middleware_index + 1)
 
         try:
             return await next_middleware.on_turn(context, call_next_middleware)

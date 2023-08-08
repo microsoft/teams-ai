@@ -20,9 +20,7 @@ class _UserTokenAccess(ABC):
     async def get_user_token(
         turn_context: TurnContext, settings: OAuthPromptSettings, magic_code: str
     ) -> TokenResponse:
-        user_token_client: UserTokenClient = turn_context.turn_state.get(
-            UserTokenClient.__name__, None
-        )
+        user_token_client: UserTokenClient = turn_context.turn_state.get(UserTokenClient.__name__, None)
         if user_token_client:
             return await user_token_client.get_user_token(
                 turn_context.activity.from_property.id,
@@ -41,16 +39,10 @@ class _UserTokenAccess(ABC):
         raise TypeError("OAuthPrompt is not supported by the current adapter")
 
     @staticmethod
-    async def get_sign_in_resource(
-        turn_context: TurnContext, settings: OAuthPromptSettings
-    ) -> SignInUrlResponse:
-        user_token_client: UserTokenClient = turn_context.turn_state.get(
-            UserTokenClient.__name__, None
-        )
+    async def get_sign_in_resource(turn_context: TurnContext, settings: OAuthPromptSettings) -> SignInUrlResponse:
+        user_token_client: UserTokenClient = turn_context.turn_state.get(UserTokenClient.__name__, None)
         if user_token_client:
-            return await user_token_client.get_sign_in_resource(
-                settings.connection_name, turn_context.activity, None
-            )
+            return await user_token_client.get_sign_in_resource(settings.connection_name, turn_context.activity, None)
         if isinstance(turn_context.adapter, ExtendedUserTokenProvider):
             return await turn_context.adapter.get_sign_in_resource_from_user_and_credentials(
                 turn_context,
@@ -65,9 +57,7 @@ class _UserTokenAccess(ABC):
 
     @staticmethod
     async def sign_out_user(turn_context: TurnContext, settings: OAuthPromptSettings):
-        user_token_client: UserTokenClient = turn_context.turn_state.get(
-            UserTokenClient.__name__, None
-        )
+        user_token_client: UserTokenClient = turn_context.turn_state.get(UserTokenClient.__name__, None)
         if user_token_client:
             return await user_token_client.sign_out_user(
                 turn_context.activity.from_property.id,
@@ -92,9 +82,7 @@ class _UserTokenAccess(ABC):
         settings: OAuthPromptSettings,
         token_exchange_request: TokenExchangeRequest,
     ) -> TokenResponse:
-        user_token_client: UserTokenClient = turn_context.turn_state.get(
-            UserTokenClient.__name__, None
-        )
+        user_token_client: UserTokenClient = turn_context.turn_state.get(UserTokenClient.__name__, None)
         user_id = turn_context.activity.from_property.id
         if user_token_client:
             channel_id = turn_context.activity.channel_id
@@ -120,9 +108,7 @@ class _UserTokenAccess(ABC):
         claims_identity: ClaimsIdentity,
         audience: str,
     ) -> ConnectorClient:
-        connector_factory: ConnectorFactory = turn_context.turn_state.get(
-            ConnectorFactory.__name__, None
-        )
+        connector_factory: ConnectorFactory = turn_context.turn_state.get(ConnectorFactory.__name__, None)
         if connector_factory:
             return await connector_factory.create(service_url, audience)
         if isinstance(turn_context.adapter, ConnectorClientBuilder):

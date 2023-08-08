@@ -60,9 +60,7 @@ class TeamsInfo:
             team_id = TeamsInfo.get_team_id(turn_context)
 
         if not team_id:
-            raise TypeError(
-                "TeamsInfo.get_team_details: method is only valid within the scope of MS Teams Team."
-            )
+            raise TypeError("TeamsInfo.get_team_details: method is only valid within the scope of MS Teams Team.")
 
         teams_connector = await TeamsInfo.get_teams_connector_client(turn_context)
         return teams_connector.teams.get_team_details(team_id)
@@ -73,24 +71,18 @@ class TeamsInfo:
             team_id = TeamsInfo.get_team_id(turn_context)
 
         if not team_id:
-            raise TypeError(
-                "TeamsInfo.get_team_channels: method is only valid within the scope of MS Teams Team."
-            )
+            raise TypeError("TeamsInfo.get_team_channels: method is only valid within the scope of MS Teams Team.")
 
         teams_connector = await TeamsInfo.get_teams_connector_client(turn_context)
         return teams_connector.teams.get_teams_channels(team_id).conversations
 
     @staticmethod
-    async def get_team_members(
-        turn_context: TurnContext, team_id: str = ""
-    ) -> List[TeamsChannelAccount]:
+    async def get_team_members(turn_context: TurnContext, team_id: str = "") -> List[TeamsChannelAccount]:
         if not team_id:
             team_id = TeamsInfo.get_team_id(turn_context)
 
         if not team_id:
-            raise TypeError(
-                "TeamsInfo.get_team_members: method is only valid within the scope of MS Teams Team."
-            )
+            raise TypeError("TeamsInfo.get_team_members: method is only valid within the scope of MS Teams Team.")
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_members(
@@ -119,9 +111,7 @@ class TeamsInfo:
             team_id = TeamsInfo.get_team_id(turn_context)
 
         if not team_id:
-            raise TypeError(
-                "TeamsInfo.get_team_members: method is only valid within the scope of MS Teams Team."
-            )
+            raise TypeError("TeamsInfo.get_team_members: method is only valid within the scope of MS Teams Team.")
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
         return await TeamsInfo._get_paged_members(
@@ -139,13 +129,9 @@ class TeamsInfo:
         if not team_id:
             conversation_id = turn_context.activity.conversation.id
             connector_client = await TeamsInfo._get_connector_client(turn_context)
-            return await TeamsInfo._get_paged_members(
-                connector_client, conversation_id, continuation_token, page_size
-            )
+            return await TeamsInfo._get_paged_members(connector_client, conversation_id, continuation_token, page_size)
 
-        return await TeamsInfo.get_paged_team_members(
-            turn_context, team_id, continuation_token, page_size
-        )
+        return await TeamsInfo.get_paged_team_members(turn_context, team_id, continuation_token, page_size)
 
     @staticmethod
     async def get_team_member(
@@ -155,17 +141,13 @@ class TeamsInfo:
             team_id = TeamsInfo.get_team_id(turn_context)
 
         if not team_id:
-            raise TypeError(
-                "TeamsInfo.get_team_member: method is only valid within the scope of MS Teams Team."
-            )
+            raise TypeError("TeamsInfo.get_team_member: method is only valid within the scope of MS Teams Team.")
 
         if not member_id:
             raise TypeError("TeamsInfo.get_team_member: method requires a member_id")
 
         connector_client = await TeamsInfo._get_connector_client(turn_context)
-        return await TeamsInfo._get_member(
-            connector_client, turn_context.activity.conversation.id, member_id
-        )
+        return await TeamsInfo._get_member(connector_client, turn_context.activity.conversation.id, member_id)
 
     @staticmethod
     async def get_member(turn_context: TurnContext, member_id: str) -> TeamsChannelAccount:
@@ -188,15 +170,11 @@ class TeamsInfo:
         if meeting_id is None:
             raise TypeError("TeamsInfo._get_meeting_participant: method requires a meeting_id")
 
-        participant_id = (
-            participant_id if participant_id else turn_context.activity.from_property.aad_object_id
-        )
+        participant_id = participant_id if participant_id else turn_context.activity.from_property.aad_object_id
         if participant_id is None:
             raise TypeError("TeamsInfo._get_meeting_participant: method requires a participant_id")
 
-        tenant_id = (
-            tenant_id if tenant_id else teams_get_channel_data(turn_context.activity).tenant.id
-        )
+        tenant_id = tenant_id if tenant_id else teams_get_channel_data(turn_context.activity).tenant.id
         if tenant_id is None:
             raise TypeError("TeamsInfo._get_meeting_participant: method requires a tenant_id")
 
@@ -240,9 +218,7 @@ class TeamsInfo:
         return await turn_context.adapter.create_connector_client(turn_context.activity.service_url)
 
     @staticmethod
-    async def _get_members(
-        connector_client: ConnectorClient, conversation_id: str
-    ) -> List[TeamsChannelAccount]:
+    async def _get_members(connector_client: ConnectorClient, conversation_id: str) -> List[TeamsChannelAccount]:
         if connector_client is None:
             raise TypeError("TeamsInfo._get_members.connector_client: cannot be None.")
 
@@ -254,9 +230,7 @@ class TeamsInfo:
 
         for member in members:
             teams_members.append(
-                TeamsChannelAccount().deserialize(
-                    dict(member.serialize(), **member.additional_properties)
-                )
+                TeamsChannelAccount().deserialize(dict(member.serialize(), **member.additional_properties))
             )
 
         return teams_members
@@ -295,6 +269,4 @@ class TeamsInfo:
             conversation_id, member_id
         )
 
-        return TeamsChannelAccount().deserialize(
-            dict(member.serialize(), **member.additional_properties)
-        )
+        return TeamsChannelAccount().deserialize(dict(member.serialize(), **member.additional_properties))

@@ -16,9 +16,7 @@ class AzureQueueStorage(QueueStorage):
         if not queue_name:
             raise Exception("queue_name cannot be empty.")
 
-        self.__queue_client = QueueClient.from_connection_string(
-            queues_storage_connection_string, queue_name
-        )
+        self.__queue_client = QueueClient.from_connection_string(queues_storage_connection_string, queue_name)
 
         self.__initialized = False
 

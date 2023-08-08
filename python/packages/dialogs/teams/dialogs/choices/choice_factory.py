@@ -95,9 +95,7 @@ class ChoiceFactory:
             inline_separator=options.inline_separator or ", ",
             inline_or=options.inline_or or " or ",
             inline_or_more=options.inline_or_more or ", or ",
-            include_numbers=(
-                options.include_numbers if options.include_numbers is not None else True
-            ),
+            include_numbers=(options.include_numbers if options.include_numbers is not None else True),
         )
 
         # Format list of choices
@@ -106,9 +104,7 @@ class ChoiceFactory:
         txt_builder.append(" ")
         for index, choice in enumerate(choices):
             title = (
-                choice.action.title
-                if (choice.action is not None and choice.action.title is not None)
-                else choice.value
+                choice.action.title if (choice.action is not None and choice.action.title is not None) else choice.value
             )
             txt_builder.append(connector)
             if opt.include_numbers is True:
@@ -163,9 +159,7 @@ class ChoiceFactory:
 
         for index, choice in enumerate(choices):
             title = (
-                choice.action.title
-                if choice.action is not None and choice.action.title is not None
-                else choice.value
+                choice.action.title if choice.action is not None and choice.action.title is not None else choice.value
             )
 
             txt_builder.append(connector)
@@ -196,15 +190,11 @@ class ChoiceFactory:
         )
 
     @staticmethod
-    def hero_card(
-        choices: List[Union[Choice, str]], text: str = None, speak: str = None
-    ) -> Activity:
+    def hero_card(choices: List[Union[Choice, str]], text: str = None, speak: str = None) -> Activity:
         """
         Creates a message activity that includes a lsit of coices that have been added as `HeroCard`'s
         """
-        attachment = CardFactory.hero_card(
-            HeroCard(text=text, buttons=ChoiceFactory._extract_actions(choices))
-        )
+        attachment = CardFactory.hero_card(HeroCard(text=text, buttons=ChoiceFactory._extract_actions(choices)))
 
         # Return activity with choices as HeroCard with buttons
         return MessageFactory.attachment(attachment, None, speak, InputHints.expecting_input)
@@ -228,9 +218,7 @@ class ChoiceFactory:
             if choice.action is not None:
                 card_action = choice.action
             else:
-                card_action = CardAction(
-                    type=ActionTypes.im_back, value=choice.value, title=choice.value
-                )
+                card_action = CardAction(type=ActionTypes.im_back, value=choice.value, title=choice.value)
 
             card_actions.append(card_action)
 

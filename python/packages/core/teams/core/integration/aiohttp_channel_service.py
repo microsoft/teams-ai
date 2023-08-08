@@ -34,9 +34,7 @@ def get_serialized_response(model_or_list: Union[Model, List[Model]]) -> Respons
     return Response(body=json.dumps(json_obj), content_type="application/json")
 
 
-def aiohttp_channel_service_routes(
-    handler: ChannelServiceHandler, base_url: str = ""
-) -> RouteTableDef:
+def aiohttp_channel_service_routes(handler: ChannelServiceHandler, base_url: str = "") -> RouteTableDef:
     # pylint: disable=unused-variable
     routes = RouteTableDef()
 
@@ -98,9 +96,7 @@ def aiohttp_channel_service_routes(
     @routes.post(base_url + "/")
     async def create_conversation(request: Request):
         conversation_parameters = deserialize_from_body(request, ConversationParameters)
-        result = await handler.handle_create_conversation(
-            request.headers.get("Authorization"), conversation_parameters
-        )
+        result = await handler.handle_create_conversation(request.headers.get("Authorization"), conversation_parameters)
 
         return get_serialized_response(result)
 

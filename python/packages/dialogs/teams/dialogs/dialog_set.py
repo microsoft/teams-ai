@@ -85,14 +85,10 @@ class DialogSet:
         :param dialog: The dialog to add.
         """
         if dialog is None or not isinstance(dialog, Dialog):
-            raise TypeError(
-                "DialogSet.add(): dialog cannot be None and must be a Dialog or derived class."
-            )
+            raise TypeError("DialogSet.add(): dialog cannot be None and must be a Dialog or derived class.")
 
         if dialog.id in self._dialogs:
-            raise TypeError(
-                "DialogSet.add(): A dialog with an id of '%s' already added." % dialog.id
-            )
+            raise TypeError("DialogSet.add(): A dialog with an id of '%s' already added." % dialog.id)
 
         # dialog.telemetry_client = this._telemetry_client;
         self._dialogs[dialog.id] = dialog
@@ -108,9 +104,7 @@ class DialogSet:
         BotAssert.context_not_none(turn_context)
 
         if not self._dialog_state:
-            raise RuntimeError(
-                "DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor."
-            )
+            raise RuntimeError("DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor.")
 
         state: DialogState = await self._dialog_state.get(turn_context, lambda: DialogState())
 

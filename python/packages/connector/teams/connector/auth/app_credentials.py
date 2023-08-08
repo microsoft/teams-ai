@@ -38,11 +38,7 @@ class AppCredentials(Authentication):
         Initializes a new instance of MicrosoftAppCredentials class
         :param channel_auth_tenant: Optional. The oauth token tenant.
         """
-        tenant = (
-            channel_auth_tenant
-            if channel_auth_tenant
-            else AuthenticationConstants.DEFAULT_CHANNEL_AUTH_TENANT
-        )
+        tenant = channel_auth_tenant if channel_auth_tenant else AuthenticationConstants.DEFAULT_CHANNEL_AUTH_TENANT
         self.oauth_endpoint = AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX + tenant
         self.oauth_scope = oauth_scope or AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
 
@@ -97,9 +93,7 @@ class AppCredentials(Authentication):
 
         return session
 
-    def _should_authorize(
-        self, session: requests.Session  # pylint: disable=unused-argument
-    ) -> bool:
+    def _should_authorize(self, session: requests.Session) -> bool:  # pylint: disable=unused-argument
         # We don't set the token if the AppId is not set, since it means that we are in an un-authenticated scenario.
         return (
             self.microsoft_app_id != AuthenticationConstants.ANONYMOUS_SKILL_APP_ID

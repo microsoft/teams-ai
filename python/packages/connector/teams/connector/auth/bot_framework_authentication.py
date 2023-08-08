@@ -18,9 +18,7 @@ from .skill_validation import SkillValidation
 
 class BotFrameworkAuthentication(ABC):
     @abstractmethod
-    async def authenticate_request(
-        self, activity: Activity, auth_header: str
-    ) -> AuthenticateRequestResult:
+    async def authenticate_request(self, activity: Activity, auth_header: str) -> AuthenticateRequestResult:
         """
         Validate Bot Framework Protocol requests.
 

@@ -31,11 +31,7 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
         logger: Logger = None,
     ):
         self._credentials_factory = credentials_factory
-        self._http_client = (
-            http_client_factory.create_client()
-            if http_client_factory
-            else _NotImplementedHttpClient()
-        )
+        self._http_client = http_client_factory.create_client() if http_client_factory else _NotImplementedHttpClient()
         self._login_endpoint = login_endpoint
         self._logger = logger
 

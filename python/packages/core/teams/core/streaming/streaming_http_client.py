@@ -50,9 +50,7 @@ class StreamingHttpDriver(AsyncRequestsHTTPDriver):
     ):
         super().__init__(config)
         if not request_handler:
-            raise TypeError(
-                f"'request_handler: {request_handler.__class__.__name__}' argument can't be None"
-            )
+            raise TypeError(f"'request_handler: {request_handler.__class__.__name__}' argument can't be None")
         self._request_handler = request_handler
         self._logger = logger
 
@@ -60,9 +58,7 @@ class StreamingHttpDriver(AsyncRequestsHTTPDriver):
         self, request: ClientRequest, **config: Any  # pylint: disable=unused-argument
     ) -> AsyncClientResponse:
         # TODO: validate form of request to perform operations
-        streaming_request = StreamingRequest(
-            path=request.url[request.url.index("v3/") :], verb=request.method
-        )
+        streaming_request = StreamingRequest(path=request.url[request.url.index("v3/") :], verb=request.method)
         streaming_request.set_body(request.data)
 
         return await self._send_request(streaming_request)

@@ -80,9 +80,5 @@ class ConnectorClient(BotFrameworkSDKClientAsync):
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
-        self.attachments = AttachmentsOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
-        self.conversations = ConversationsOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
+        self.attachments = AttachmentsOperations(self._client, self.config, self._serialize, self._deserialize)
+        self.conversations = ConversationsOperations(self._client, self.config, self._serialize, self._deserialize)

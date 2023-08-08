@@ -13,9 +13,7 @@ class ReceiveResponse:
         self.status_code = status_code
         self.streams = streams or []
 
-    def read_body_as_json(
-        self, cls: Union[Type[Model], Type[Serializable]]
-    ) -> Union[Model, Serializable]:
+    def read_body_as_json(self, cls: Union[Type[Model], Type[Serializable]]) -> Union[Model, Serializable]:
         try:
             body_str = self.read_body_as_str()
             body = None

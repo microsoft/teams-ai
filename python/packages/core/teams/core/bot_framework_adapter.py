@@ -152,18 +152,14 @@ class BotFrameworkAdapterSettings:
         self.oauth_endpoint = oauth_endpoint
         self.channel_provider = channel_provider if channel_provider else SimpleChannelProvider()
         self.credential_provider = (
-            credential_provider
-            if credential_provider
-            else SimpleCredentialProvider(self.app_id, self.app_password)
+            credential_provider if credential_provider else SimpleCredentialProvider(self.app_id, self.app_password)
         )
         self.auth_configuration = auth_configuration or AuthenticationConfiguration()
 
         # If no open_id_metadata values were passed in the settings, check the
         # process' Environment Variable.
         self.open_id_metadata = (
-            open_id_metadata
-            if open_id_metadata
-            else os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
+            open_id_metadata if open_id_metadata else os.environ.get(AuthenticationConstants.BOT_OPEN_ID_METADATA_KEY)
         )
 
 
@@ -193,9 +189,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         self.settings = settings or BotFrameworkAdapterSettings("", "")
 
         self._credentials = self.settings.app_credentials
-        self._credential_provider = SimpleCredentialProvider(
-            self.settings.app_id, self.settings.app_password
-        )
+        self._credential_provider = SimpleCredentialProvider(self.settings.app_id, self.settings.app_password)
 
         self._channel_provider = self.settings.channel_provider
 
@@ -277,14 +271,12 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         # request received by the root bot
         app_id_from_claims = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
         if app_id_from_claims:
-            if SkillValidation.is_skill_claim(
-                claims_identity.claims
-            ) or await self._credential_provider.is_valid_appid(app_id_from_claims):
+            if SkillValidation.is_skill_claim(claims_identity.claims) or await self._credential_provider.is_valid_appid(
+                app_id_from_claims
+            ):
                 AppCredentials.trust_service_url(reference.service_url)
 
-        client = await self.create_connector_client(
-            reference.service_url, claims_identity, audience
-        )
+        client = await self.create_connector_client(reference.service_url, claims_identity, audience)
         context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = client
 
         return await self.run_pipeline(context, callback)
@@ -347,9 +339,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             parameters = (
                 conversation_parameters
                 if conversation_parameters
-                else ConversationParameters(
-                    bot=reference.bot, members=[reference.user], is_group=False
-                )
+                else ConversationParameters(bot=reference.bot, members=[reference.user], is_group=False)
             )
 
             # Mix in the tenant ID if specified. This is required for MS Teams.
@@ -367,9 +357,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             app_credentials = (
                 credentials
                 if credentials
-                else await self.__get_app_credentials(
-                    self.settings.app_id, self.__get_botframework_oauth_scope()
-                )
+                else await self.__get_app_credentials(self.settings.app_id, self.__get_botframework_oauth_scope())
             )
 
             # Create conversation
@@ -382,9 +370,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
                 name=ActivityEventNames.create_conversation,
                 channel_id=channel_id,
                 service_url=service_url,
-                id=resource_response.activity_id
-                if resource_response.activity_id
-                else str(uuid.uuid4()),
+                id=resource_response.activity_id if resource_response.activity_id else str(uuid.uuid4()),
                 conversation=ConversationAccount(
                     id=resource_response.id,
                     tenant_id=parameters.tenant_id,
@@ -437,9 +423,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         identity = await self._authenticate_request(activity, auth_header)
         return await self.process_activity_with_identity(activity, identity, logic)
 
-    async def process_activity_with_identity(
-        self, activity: Activity, identity: ClaimsIdentity, logic: Callable
-    ):
+    async def process_activity_with_identity(self, activity: Activity, identity: ClaimsIdentity, logic: Callable):
         context = self._create_context(activity)
 
         activity.caller_id = await self.__generate_callerid(identity)
@@ -481,9 +465,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         # should deserialize accordingly:
         #    activities = ExpectedReplies().deserialize(response.body).activities
         if context.activity.delivery_mode == DeliveryModes.expect_replies:
-            expected_replies = ExpectedReplies(
-                activities=context.buffered_reply_activities
-            ).serialize()
+            expected_replies = ExpectedReplies(activities=context.buffered_reply_activities).serialize()
             return InvokeResponse(status=int(HTTPStatus.OK), body=expected_replies)
 
         # Handle Invoke scenarios, which deviate from the request/request model in that
@@ -568,9 +550,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
 
         async def validate_activity(activity: Activity):
             if not isinstance(activity.type, str):
-                raise TypeError(
-                    "BotFrameworkAdapter.parse_request(): invalid or missing activity type."
-                )
+                raise TypeError("BotFrameworkAdapter.parse_request(): invalid or missing activity type.")
             return True
 
         if not isinstance(req, Activity):
@@ -623,9 +603,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         """
         try:
             client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-            return await client.conversations.update_activity(
-                activity.conversation.id, activity.id, activity
-            )
+            return await client.conversations.update_activity(activity.conversation.id, activity.id, activity)
         except Exception as error:
             raise error
 
@@ -649,15 +627,11 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         """
         try:
             client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-            await client.conversations.delete_activity(
-                reference.conversation.id, reference.activity_id
-            )
+            await client.conversations.delete_activity(reference.conversation.id, reference.activity_id)
         except Exception as error:
             raise error
 
-    async def send_activities(
-        self, context: TurnContext, activities: List[Activity]
-    ) -> List[ResourceResponse]:
+    async def send_activities(self, context: TurnContext, activities: List[Activity]) -> List[ResourceResponse]:
         try:
             responses: List[ResourceResponse] = []
             for activity in activities:
@@ -666,9 +640,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
                     try:
                         delay_in_ms = float(activity.value) / 1000
                     except TypeError:
-                        raise TypeError(
-                            "Unexpected delay value passed. Expected number or str type."
-                        )
+                        raise TypeError("Unexpected delay value passed. Expected number or str type.")
                     except AttributeError:
                         raise Exception("activity.value was not found.")
                     else:
@@ -677,17 +649,13 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
                     context.turn_state[self._INVOKE_RESPONSE_KEY] = activity
                 else:
                     if not getattr(activity, "service_url", None):
-                        raise TypeError(
-                            "BotFrameworkAdapter.send_activity(): service_url can not be None."
-                        )
+                        raise TypeError("BotFrameworkAdapter.send_activity(): service_url can not be None.")
                     if (
                         not hasattr(activity, "conversation")
                         or not activity.conversation
                         or not getattr(activity.conversation, "id", None)
                     ):
-                        raise TypeError(
-                            "BotFrameworkAdapter.send_activity(): conversation.id can not be None."
-                        )
+                        raise TypeError("BotFrameworkAdapter.send_activity(): conversation.id can not be None.")
 
                     if activity.type == "trace" and activity.channel_id != "emulator":
                         pass
@@ -698,9 +666,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
                         )
                     else:
                         client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-                        response = await client.conversations.send_to_conversation(
-                            activity.conversation.id, activity
-                        )
+                        response = await client.conversations.send_to_conversation(activity.conversation.id, activity)
 
                 if not response:
                     response = ResourceResponse(id=activity.id or "")
@@ -725,19 +691,14 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         """
         try:
             if not context.activity.service_url:
-                raise TypeError(
-                    "BotFrameworkAdapter.delete_conversation_member(): missing service_url"
-                )
+                raise TypeError("BotFrameworkAdapter.delete_conversation_member(): missing service_url")
             if not context.activity.conversation or not context.activity.conversation.id:
                 raise TypeError(
-                    "BotFrameworkAdapter.delete_conversation_member(): missing conversation or "
-                    "conversation.id"
+                    "BotFrameworkAdapter.delete_conversation_member(): missing conversation or " "conversation.id"
                 )
 
             client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-            return await client.conversations.delete_conversation_member(
-                context.activity.conversation.id, member_id
-            )
+            return await client.conversations.delete_conversation_member(context.activity.conversation.id, member_id)
         except AttributeError as attr_e:
             raise attr_e
         except Exception as error:
@@ -762,19 +723,14 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             if not context.activity.service_url:
                 raise TypeError("BotFrameworkAdapter.get_activity_member(): missing service_url")
             if not context.activity.conversation or not context.activity.conversation.id:
-                raise TypeError(
-                    "BotFrameworkAdapter.get_activity_member(): missing conversation or conversation.id"
-                )
+                raise TypeError("BotFrameworkAdapter.get_activity_member(): missing conversation or conversation.id")
             if not activity_id:
                 raise TypeError(
-                    "BotFrameworkAdapter.get_activity_member(): missing both activity_id and "
-                    "context.activity.id"
+                    "BotFrameworkAdapter.get_activity_member(): missing both activity_id and " "context.activity.id"
                 )
 
             client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-            return await client.conversations.get_activity_members(
-                context.activity.conversation.id, activity_id
-            )
+            return await client.conversations.get_activity_members(context.activity.conversation.id, activity_id)
         except Exception as error:
             raise error
 
@@ -794,8 +750,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             raise TypeError("BotFrameworkAdapter.get_conversation_members(): missing service_url")
         if not context.activity.conversation or not context.activity.conversation.id:
             raise TypeError(
-                "BotFrameworkAdapter.get_conversation_members(): missing conversation or "
-                "conversation.id"
+                "BotFrameworkAdapter.get_conversation_members(): missing conversation or " "conversation.id"
             )
 
         client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
@@ -817,17 +772,12 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         if not context.activity.service_url:
             raise TypeError("BotFrameworkAdapter.get_conversation_member(): missing service_url")
         if not context.activity.conversation or not context.activity.conversation.id:
-            raise TypeError(
-                "BotFrameworkAdapter.get_conversation_member(): missing conversation or "
-                "conversation.id"
-            )
+            raise TypeError("BotFrameworkAdapter.get_conversation_member(): missing conversation or " "conversation.id")
         if not member_id:
             raise TypeError("BotFrameworkAdapter.get_conversation_member(): missing memberId")
 
         client = context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY]
-        return await client.conversations.get_conversation_member(
-            context.activity.conversation.id, member_id
-        )
+        return await client.conversations.get_conversation_member(context.activity.conversation.id, member_id)
 
     async def get_conversations(
         self,
@@ -924,9 +874,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         :type oauth_app_credentials: :class:`teams.connector.auth.AppCredential`
         """
         if not context.activity.from_property or not context.activity.from_property.id:
-            raise Exception(
-                "BotFrameworkAdapter.sign_out_user(): missing from_property or from_property.id"
-            )
+            raise Exception("BotFrameworkAdapter.sign_out_user(): missing from_property or from_property.id")
         if not user_id:
             user_id = context.activity.from_property.id
 
@@ -964,9 +912,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             relates_to=context.activity.relates_to,
         )
 
-        final_state = base64.b64encode(
-            json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")
-        ).decode()
+        final_state = base64.b64encode(json.dumps(state.serialize()).encode(encoding="UTF-8", errors="strict")).decode()
 
         return client.bot_sign_in.get_sign_in_url(final_state)
 
@@ -996,19 +942,13 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         :returns: Array of :class:`teams.connector.token_api.modelsTokenStatus`
         """
 
-        if not user_id and (
-            not context.activity.from_property or not context.activity.from_property.id
-        ):
-            raise Exception(
-                "BotFrameworkAdapter.get_token_status(): missing from_property or from_property.id"
-            )
+        if not user_id and (not context.activity.from_property or not context.activity.from_property.id):
+            raise Exception("BotFrameworkAdapter.get_token_status(): missing from_property or from_property.id")
 
         client = await self._create_token_api_client(context, oauth_app_credentials)
 
         user_id = user_id or context.activity.from_property.id
-        return client.user_token.get_token_status(
-            user_id, context.activity.channel_id, include_filter
-        )
+        return client.user_token.get_token_status(user_id, context.activity.channel_id, include_filter)
 
     async def get_aad_tokens(
         self,
@@ -1037,9 +977,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         :rtype: :class:`typing.Dict`
         """
         if not context.activity.from_property or not context.activity.from_property.id:
-            raise Exception(
-                "BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id"
-            )
+            raise Exception("BotFrameworkAdapter.get_aad_tokens(): missing from_property or from_property.id")
 
         client = await self._create_token_api_client(context, oauth_app_credentials)
         return client.user_token.get_aad_tokens(
@@ -1077,9 +1015,9 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
         # For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim.
         # For unauthenticated requests we have anonymous claimsIdentity provided auth is disabled.
         # For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
-        bot_app_id = identity.claims.get(
-            AuthenticationConstants.AUDIENCE_CLAIM
-        ) or identity.claims.get(AuthenticationConstants.APP_ID_CLAIM)
+        bot_app_id = identity.claims.get(AuthenticationConstants.AUDIENCE_CLAIM) or identity.claims.get(
+            AuthenticationConstants.APP_ID_CLAIM
+        )
 
         # Anonymous claims and non-skill claims should fall through without modifying the scope.
         credentials = None
@@ -1096,9 +1034,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
 
         return self._get_or_create_connector_client(service_url, credentials)
 
-    def _get_or_create_connector_client(
-        self, service_url: str, credentials: AppCredentials
-    ) -> ConnectorClient:
+    def _get_or_create_connector_client(self, service_url: str, credentials: AppCredentials) -> ConnectorClient:
         if not credentials:
             credentials = MicrosoftAppCredentials.empty()
 
@@ -1138,9 +1074,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
                 "BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing connection_name"
             )
         if not user_id:
-            raise TypeError(
-                "BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing user_id"
-            )
+            raise TypeError("BotFrameworkAdapter.get_sign_in_resource_from_user_and_credentials(): missing user_id")
 
         activity = turn_context.activity
 
@@ -1218,14 +1152,10 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             )
         raise TypeError(f"exchange token returned improper result: {type(result)}")
 
-    def can_process_outgoing_activity(
-        self, activity: Activity  # pylint: disable=unused-argument
-    ) -> bool:
+    def can_process_outgoing_activity(self, activity: Activity) -> bool:  # pylint: disable=unused-argument
         return False
 
-    async def process_outgoing_activity(
-        self, turn_context: TurnContext, activity: Activity
-    ) -> ResourceResponse:
+    async def process_outgoing_activity(self, turn_context: TurnContext, activity: Activity) -> ResourceResponse:
         raise Exception("NotImplemented")
 
     @staticmethod
@@ -1279,11 +1209,7 @@ class BotFrameworkAdapter(BotAdapter, ExtendedUserTokenProvider, ConnectorClient
             if self.settings.oauth_endpoint:
                 url = self.settings.oauth_endpoint
             else:
-                url = (
-                    US_GOV_OAUTH_ENDPOINT
-                    if self.settings.channel_provider.is_government()
-                    else OAUTH_ENDPOINT
-                )
+                url = US_GOV_OAUTH_ENDPOINT if self.settings.channel_provider.is_government() else OAUTH_ENDPOINT
 
         return url
 

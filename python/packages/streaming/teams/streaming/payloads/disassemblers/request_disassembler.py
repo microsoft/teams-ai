@@ -29,10 +29,7 @@ class RequestDisassembler(PayloadDisassembler):
         payload = RequestPayload(verb=self.request.verb, path=self.request.path)
 
         if self.request.streams:
-            payload.streams = [
-                self.get_stream_description(content_stream)
-                for content_stream in self.request.streams
-            ]
+            payload.streams = [self.get_stream_description(content_stream) for content_stream in self.request.streams]
 
         memory_stream: List[int] = []
         stream_length: List[int] = []

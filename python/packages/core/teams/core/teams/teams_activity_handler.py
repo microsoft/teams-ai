@@ -48,10 +48,7 @@ class TeamsActivityHandler(ActivityHandler):
             which is meaningful within the scope of a channel.
         """
         try:
-            if (
-                not turn_context.activity.name
-                and turn_context.activity.channel_id == Channels.ms_teams
-            ):
+            if not turn_context.activity.name and turn_context.activity.channel_id == Channels.ms_teams:
                 return await self.on_teams_card_action_invoke(turn_context)
 
             if turn_context.activity.name == SignInConstants.token_exchange_operation_name:
@@ -89,9 +86,7 @@ class TeamsActivityHandler(ActivityHandler):
 
             if turn_context.activity.name == "composeExtension/selectItem":
                 return self._create_invoke_response(
-                    await self.on_teams_messaging_extension_select_item(
-                        turn_context, turn_context.activity.value
-                    )
+                    await self.on_teams_messaging_extension_select_item(turn_context, turn_context.activity.value)
                 )
 
             if turn_context.activity.name == "composeExtension/submitAction":
@@ -122,15 +117,11 @@ class TeamsActivityHandler(ActivityHandler):
                 )
 
             if turn_context.activity.name == "composeExtension/setting":
-                await self.on_teams_messaging_extension_configuration_setting(
-                    turn_context, turn_context.activity.value
-                )
+                await self.on_teams_messaging_extension_configuration_setting(turn_context, turn_context.activity.value)
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "composeExtension/onCardButtonClicked":
-                await self.on_teams_messaging_extension_card_button_clicked(
-                    turn_context, turn_context.activity.value
-                )
+                await self.on_teams_messaging_extension_card_button_clicked(turn_context, turn_context.activity.value)
                 return self._create_invoke_response()
 
             if turn_context.activity.name == "task/fetch":
@@ -329,14 +320,10 @@ class TeamsActivityHandler(ActivityHandler):
             return await self.on_teams_messaging_extension_submit_action(turn_context, action)
 
         if action.bot_message_preview_action == "edit":
-            return await self.on_teams_messaging_extension_bot_message_preview_edit(
-                turn_context, action
-            )
+            return await self.on_teams_messaging_extension_bot_message_preview_edit(turn_context, action)
 
         if action.bot_message_preview_action == "send":
-            return await self.on_teams_messaging_extension_bot_message_preview_send(
-                turn_context, action
-            )
+            return await self.on_teams_messaging_extension_bot_message_preview_send(turn_context, action)
 
         raise _InvokeResponseException(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -523,13 +510,9 @@ class TeamsActivityHandler(ActivityHandler):
                         turn_context,
                     )
                 if channel_data.event_type == "channelDeleted":
-                    return await self.on_teams_channel_deleted(
-                        channel_data.channel, channel_data.team, turn_context
-                    )
+                    return await self.on_teams_channel_deleted(channel_data.channel, channel_data.team, turn_context)
                 if channel_data.event_type == "channelRenamed":
-                    return await self.on_teams_channel_renamed(
-                        channel_data.channel, channel_data.team, turn_context
-                    )
+                    return await self.on_teams_channel_renamed(channel_data.channel, channel_data.team, turn_context)
                 if channel_data.event_type == "teamArchived":
                     return await self.on_teams_team_archived(channel_data.team, turn_context)
                 if channel_data.event_type == "teamDeleted":
@@ -537,9 +520,7 @@ class TeamsActivityHandler(ActivityHandler):
                 if channel_data.event_type == "teamHardDeleted":
                     return await self.on_teams_team_hard_deleted(channel_data.team, turn_context)
                 if channel_data.event_type == "channelRestored":
-                    return await self.on_teams_channel_restored(
-                        channel_data.channel, channel_data.team, turn_context
-                    )
+                    return await self.on_teams_channel_restored(channel_data.channel, channel_data.team, turn_context)
                 if channel_data.event_type == "teamRenamed":
                     return await self.on_teams_team_renamed(channel_data.team, turn_context)
                 if channel_data.event_type == "teamRestored":
@@ -685,10 +666,7 @@ class TeamsActivityHandler(ActivityHandler):
         """
         team_members_added = []
         for member in members_added:
-            is_bot = (
-                turn_context.activity.recipient is not None
-                and member.id == turn_context.activity.recipient.id
-            )
+            is_bot = turn_context.activity.recipient is not None and member.id == turn_context.activity.recipient.id
             if member.additional_properties != {} or is_bot:
                 team_members_added.append(deserializer_helper(TeamsChannelAccount, member))
             else:
@@ -697,11 +675,7 @@ class TeamsActivityHandler(ActivityHandler):
                     team_member = await TeamsInfo.get_member(turn_context, member.id)
                     team_members_added.append(team_member)
                 except ErrorResponseException as ex:
-                    if (
-                        ex.error
-                        and ex.error.error
-                        and ex.error.error.code == "ConversationNotFound"
-                    ):
+                    if ex.error and ex.error.error and ex.error.error.code == "ConversationNotFound":
                         new_teams_channel_account = TeamsChannelAccount(
                             id=member.id,
                             name=member.name,
@@ -731,9 +705,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :returns: A task that represents the work queued to execute.
         """
-        teams_members_added = [
-            ChannelAccount().deserialize(member.serialize()) for member in teams_members_added
-        ]
+        teams_members_added = [ChannelAccount().deserialize(member.serialize()) for member in teams_members_added]
         return await self.on_members_added_activity(teams_members_added, turn_context)
 
     async def on_teams_members_removed_dispatch(  # pylint: disable=unused-argument
@@ -780,9 +752,7 @@ class TeamsActivityHandler(ActivityHandler):
 
         :returns: A task that represents the work queued to execute.
         """
-        members_removed = [
-            ChannelAccount().deserialize(member.serialize()) for member in teams_members_removed
-        ]
+        members_removed = [ChannelAccount().deserialize(member.serialize()) for member in teams_members_removed]
         return await self.on_members_removed_activity(members_removed, turn_context)
 
     async def on_teams_channel_deleted(  # pylint: disable=unused-argument
@@ -855,13 +825,9 @@ class TeamsActivityHandler(ActivityHandler):
         """
         if turn_context.activity.channel_id == Channels.ms_teams:
             if turn_context.activity.name == "application/vnd.microsoft.meetingStart":
-                return await self.on_teams_meeting_start_event(
-                    turn_context.activity.value, turn_context
-                )
+                return await self.on_teams_meeting_start_event(turn_context.activity.value, turn_context)
             if turn_context.activity.name == "application/vnd.microsoft.meetingEnd":
-                return await self.on_teams_meeting_end_event(
-                    turn_context.activity.value, turn_context
-                )
+                return await self.on_teams_meeting_end_event(turn_context.activity.value, turn_context)
 
         return await super().on_event_activity(turn_context)
 

@@ -11,9 +11,7 @@ class UserState(BotState):
     Reads and writes user state for your bot to storage.
     """
 
-    no_key_error_message = (
-        "UserState: channel_id and/or conversation missing from context.activity."
-    )
+    no_key_error_message = "UserState: channel_id and/or conversation missing from context.activity."
 
     def __init__(self, storage: Storage, namespace=""):
         """
@@ -31,9 +29,7 @@ class UserState(BotState):
         :param turn_context:
         :return:
         """
-        channel_id = turn_context.activity.channel_id or self.__raise_type_error(
-            "invalid activity-missing channelId"
-        )
+        channel_id = turn_context.activity.channel_id or self.__raise_type_error("invalid activity-missing channelId")
         user_id = turn_context.activity.from_property.id or self.__raise_type_error(
             "invalid activity-missing from_property.id"
         )

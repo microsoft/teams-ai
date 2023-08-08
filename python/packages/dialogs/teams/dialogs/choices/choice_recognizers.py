@@ -50,9 +50,7 @@ class ChoiceRecognizers:
             utterance = ""
 
         # Normalize list of choices
-        choices_list = [
-            Choice(value=choice) if isinstance(choice, str) else choice for choice in choices
-        ]
+        choices_list = [Choice(value=choice) if isinstance(choice, str) else choice for choice in choices]
 
         # Try finding choices by text search first
         # - We only want to use a single strategy for returning results to avoid issues where utterances
@@ -89,9 +87,7 @@ class ChoiceRecognizers:
         return list(map(ChoiceRecognizers._found_choice_constructor, model.parse(utterance)))
 
     @staticmethod
-    def _match_choice_by_index(
-        choices: List[Choice], matched: List[ModelResult], match: ModelResult
-    ):
+    def _match_choice_by_index(choices: List[Choice], matched: List[ModelResult], match: ModelResult):
         try:
             index: int = int(match.resolution.value) - 1
             if 0 <= index < len(choices):

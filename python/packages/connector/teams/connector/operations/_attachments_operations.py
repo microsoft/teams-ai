@@ -33,9 +33,7 @@ class AttachmentsOperations:
         self.config = config
         self.api_version = "v3"
 
-    def get_attachment_info(
-        self, attachment_id, custom_headers=None, raw=False, **operation_config
-    ):
+    def get_attachment_info(self, attachment_id, custom_headers=None, raw=False, **operation_config):
         """GetAttachmentInfo.
 
         Get AttachmentInfo structure describing the attachment views.
@@ -55,9 +53,7 @@ class AttachmentsOperations:
         """
         # Construct URL
         url = self.get_attachment_info.metadata["url"]
-        path_format_arguments = {
-            "attachmentId": self._serialize.url("attachment_id", attachment_id, "str")
-        }
+        path_format_arguments = {"attachmentId": self._serialize.url("attachment_id", attachment_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters

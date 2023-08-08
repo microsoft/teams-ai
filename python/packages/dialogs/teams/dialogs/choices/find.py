@@ -30,9 +30,7 @@ class Find:
         opt = options if options else FindChoicesOptions()
 
         # Normalize list of choices
-        choices_list = [
-            Choice(value=choice) if isinstance(choice, str) else choice for choice in choices
-        ]
+        choices_list = [Choice(value=choice) if isinstance(choice, str) else choice for choice in choices]
 
         # Build up full list of synonyms to search over.
         # - Each entry in the list contains the index of the choice it belongs to which will later be
@@ -43,11 +41,7 @@ class Find:
             if not opt.no_value:
                 synonyms.append(SortedValue(value=choice.value, index=index))
 
-            if (
-                getattr(choice, "action", False)
-                and getattr(choice.action, "title", False)
-                and not opt.no_value
-            ):
+            if getattr(choice, "action", False) and getattr(choice.action, "title", False) and not opt.no_value:
                 synonyms.append(SortedValue(value=choice.action.title, index=index))
 
             if choice.synonyms is not None:
@@ -74,18 +68,14 @@ class Find:
         return list(map(found_choice_constructor, Find.find_values(utterance, synonyms, options)))
 
     @staticmethod
-    def find_values(
-        utterance: str, values: List[SortedValue], options: FindValuesOptions = None
-    ) -> List[ModelResult]:
+    def find_values(utterance: str, values: List[SortedValue], options: FindValuesOptions = None) -> List[ModelResult]:
         # Sort values in descending order by length, so that the longest value is searchd over first.
         sorted_values = sorted(values, key=lambda sorted_val: len(sorted_val.value), reverse=True)
 
         # Search for each value within the utterance.
         matches: [ModelResult] = []
         opt = options if options else FindValuesOptions()
-        tokenizer: Callable[[str, str], List[Token]] = (
-            opt.tokenizer if opt.tokenizer else Tokenizer.default_tokenizer
-        )
+        tokenizer: Callable[[str, str], List[Token]] = opt.tokenizer if opt.tokenizer else Tokenizer.default_tokenizer
         tokens = tokenizer(utterance, opt.locale)
         max_distance = opt.max_token_distance if opt.max_token_distance is not None else 2
 

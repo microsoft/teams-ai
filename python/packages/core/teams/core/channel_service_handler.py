@@ -51,35 +51,23 @@ class ChannelServiceHandler:
         self._auth_config = auth_config
         self._channel_provider = channel_provider
 
-    async def handle_send_to_conversation(
-        self, auth_header, conversation_id, activity
-    ) -> ResourceResponse:
+    async def handle_send_to_conversation(self, auth_header, conversation_id, activity) -> ResourceResponse:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_send_to_conversation(claims_identity, conversation_id, activity)
 
-    async def handle_reply_to_activity(
-        self, auth_header, conversation_id, activity_id, activity
-    ) -> ResourceResponse:
+    async def handle_reply_to_activity(self, auth_header, conversation_id, activity_id, activity) -> ResourceResponse:
         claims_identity = await self._authenticate(auth_header)
-        return await self.on_reply_to_activity(
-            claims_identity, conversation_id, activity_id, activity
-        )
+        return await self.on_reply_to_activity(claims_identity, conversation_id, activity_id, activity)
 
-    async def handle_update_activity(
-        self, auth_header, conversation_id, activity_id, activity
-    ) -> ResourceResponse:
+    async def handle_update_activity(self, auth_header, conversation_id, activity_id, activity) -> ResourceResponse:
         claims_identity = await self._authenticate(auth_header)
-        return await self.on_update_activity(
-            claims_identity, conversation_id, activity_id, activity
-        )
+        return await self.on_update_activity(claims_identity, conversation_id, activity_id, activity)
 
     async def handle_delete_activity(self, auth_header, conversation_id, activity_id):
         claims_identity = await self._authenticate(auth_header)
         await self.on_delete_activity(claims_identity, conversation_id, activity_id)
 
-    async def handle_get_activity_members(
-        self, auth_header, conversation_id, activity_id
-    ) -> List[ChannelAccount]:
+    async def handle_get_activity_members(self, auth_header, conversation_id, activity_id) -> List[ChannelAccount]:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_get_activity_members(claims_identity, conversation_id, activity_id)
 
@@ -89,21 +77,15 @@ class ChannelServiceHandler:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_create_conversation(claims_identity, parameters)
 
-    async def handle_get_conversations(
-        self, auth_header, continuation_token: str = ""
-    ) -> ConversationsResult:
+    async def handle_get_conversations(self, auth_header, continuation_token: str = "") -> ConversationsResult:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_get_conversations(claims_identity, continuation_token)
 
-    async def handle_get_conversation_members(
-        self, auth_header, conversation_id
-    ) -> List[ChannelAccount]:
+    async def handle_get_conversation_members(self, auth_header, conversation_id) -> List[ChannelAccount]:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_get_conversation_members(claims_identity, conversation_id)
 
-    async def handle_get_conversation_member(
-        self, auth_header, conversation_id, member_id
-    ) -> ChannelAccount:
+    async def handle_get_conversation_member(self, auth_header, conversation_id, member_id) -> ChannelAccount:
         claims_identity = await self._authenticate(auth_header)
         return await self.on_get_conversation_member(claims_identity, conversation_id, member_id)
 

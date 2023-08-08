@@ -40,9 +40,5 @@ class TokenApiClient(SDKClient):
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
-        self.bot_sign_in = BotSignInOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
-        self.user_token = UserTokenOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
+        self.bot_sign_in = BotSignInOperations(self._client, self.config, self._serialize, self._deserialize)
+        self.user_token = UserTokenOperations(self._client, self.config, self._serialize, self._deserialize)

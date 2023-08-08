@@ -70,16 +70,12 @@ class UserTokenOperations:
         # Construct parameters
         query_parameters = {}
         query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
-        query_parameters["connectionName"] = self._serialize.query(
-            "connection_name", connection_name, "str"
-        )
+        query_parameters["connectionName"] = self._serialize.query("connection_name", connection_name, "str")
         if channel_id is not None:
             query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
         if code is not None:
             query_parameters["code"] = self._serialize.query("code", code, "str")
-        query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str"
-        )
+        query_parameters["api-version"] = self._serialize.query("self.api_version", self.api_version, "str")
 
         # Construct headers
         header_parameters = {}
@@ -147,14 +143,10 @@ class UserTokenOperations:
         # Construct parameters
         query_parameters = {}
         query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
-        query_parameters["connectionName"] = self._serialize.query(
-            "connection_name", connection_name, "str"
-        )
+        query_parameters["connectionName"] = self._serialize.query("connection_name", connection_name, "str")
         if channel_id is not None:
             query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
-        query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str"
-        )
+        query_parameters["api-version"] = self._serialize.query("self.api_version", self.api_version, "str")
 
         # Construct headers
         header_parameters = {}
@@ -219,14 +211,10 @@ class UserTokenOperations:
         query_parameters = {}
         query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
         if connection_name is not None:
-            query_parameters["connectionName"] = self._serialize.query(
-                "connection_name", connection_name, "str"
-            )
+            query_parameters["connectionName"] = self._serialize.query("connection_name", connection_name, "str")
         if channel_id is not None:
             query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
-        query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str"
-        )
+        query_parameters["api-version"] = self._serialize.query("self.api_version", self.api_version, "str")
 
         # Construct headers
         header_parameters = {}
@@ -291,9 +279,7 @@ class UserTokenOperations:
             query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
         if include is not None:
             query_parameters["include"] = self._serialize.query("include", include, "str")
-        query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str"
-        )
+        query_parameters["api-version"] = self._serialize.query("self.api_version", self.api_version, "str")
 
         # Construct headers
         header_parameters = {}
@@ -361,9 +347,7 @@ class UserTokenOperations:
         # Construct parameters
         query_parameters = {}
         query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
-        query_parameters["connectionName"] = self._serialize.query(
-            "connection_name", connection_name, "str"
-        )
+        query_parameters["connectionName"] = self._serialize.query("connection_name", connection_name, "str")
         query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
 
         # Construct headers

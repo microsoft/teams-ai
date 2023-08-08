@@ -10,9 +10,7 @@ class Tokenizer:
     """Provides a default tokenizer implementation."""
 
     @staticmethod
-    def default_tokenizer(  # pylint: disable=unused-argument
-        text: str, locale: str = None
-    ) -> [Token]:
+    def default_tokenizer(text: str, locale: str = None) -> [Token]:  # pylint: disable=unused-argument
         """
         Simple tokenizer that breaks on spaces and punctuation. The only normalization is to lowercase.
 

@@ -23,9 +23,7 @@ class WebSocketServer:
         if socket is None:
             raise TypeError(f"'socket: {socket.__class__.__name__}' argument can't be None")
         if not request_handler:
-            raise TypeError(
-                f"'request_handler: {request_handler.__class__.__name__}' argument can't be None"
-            )
+            raise TypeError(f"'request_handler: {request_handler.__class__.__name__}' argument can't be None")
 
         self.disconnected_event_handler: Callable[[object, DisconnectedEventArgs], None] = None
 
@@ -66,9 +64,7 @@ class WebSocketServer:
         await self._sender.disconnect()
         await self._receiver.disconnect()
 
-    async def _on_connection_disconnected(
-        self, sender: object, event_args: object  # pylint: disable=unused-argument
-    ):
+    async def _on_connection_disconnected(self, sender: object, event_args: object):  # pylint: disable=unused-argument
         if not self._is_disconnecting:
             self._is_disconnecting = True
 

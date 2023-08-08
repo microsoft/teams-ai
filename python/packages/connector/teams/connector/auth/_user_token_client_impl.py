@@ -75,9 +75,7 @@ class _UserTokenClientImpl(UserTokenClient):
 
         await self._client.user_token.sign_out(user_id, connection_name, channel_id)
 
-    async def get_token_status(
-        self, user_id: str, channel_id: str, include_filter: str
-    ) -> List[TokenStatus]:
+    async def get_token_status(self, user_id: str, channel_id: str, include_filter: str) -> List[TokenStatus]:
         if user_id is None or not isinstance(user_id, str):
             raise TypeError("user_id")
         if channel_id is None or not isinstance(channel_id, str):
@@ -101,9 +99,7 @@ class _UserTokenClientImpl(UserTokenClient):
         if channel_id is None or not isinstance(channel_id, str):
             raise TypeError("channel_id")
 
-        result = await self._client.user_token.get_aad_tokens(
-            user_id, connection_name, channel_id, resource_urls
-        )
+        result = await self._client.user_token.get_aad_tokens(user_id, connection_name, channel_id, resource_urls)
 
         return result
 
@@ -121,12 +117,8 @@ class _UserTokenClientImpl(UserTokenClient):
         if channel_id is None or not isinstance(channel_id, str):
             raise TypeError("channel_id")
 
-        (uri, token) = (
-            (exchange_request.uri, exchange_request.token) if exchange_request else (None, None)
-        )
+        (uri, token) = (exchange_request.uri, exchange_request.token) if exchange_request else (None, None)
 
-        result = await self._client.user_token.exchange_async(
-            user_id, connection_name, channel_id, uri, token
-        )
+        result = await self._client.user_token.exchange_async(user_id, connection_name, channel_id, uri, token)
 
         return result

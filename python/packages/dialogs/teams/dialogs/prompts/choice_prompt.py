@@ -91,13 +91,9 @@ class ChoicePrompt(Prompt):
         choice_style = 0 if options.style == 0 else options.style if options.style else self.style
 
         if is_retry and options.retry_prompt is not None:
-            prompt = self.append_choices(
-                options.retry_prompt, channel_id, choices, choice_style, choice_options
-            )
+            prompt = self.append_choices(options.retry_prompt, channel_id, choices, choice_style, choice_options)
         else:
-            prompt = self.append_choices(
-                options.prompt, channel_id, choices, choice_style, choice_options
-            )
+            prompt = self.append_choices(options.prompt, channel_id, choices, choice_style, choice_options)
 
         # Send prompt
         await turn_context.send_activity(prompt)
@@ -119,9 +115,7 @@ class ChoicePrompt(Prompt):
             utterance: str = activity.text
             if not utterance:
                 return result
-            opt: FindChoicesOptions = (
-                self.recognizer_options if self.recognizer_options else FindChoicesOptions()
-            )
+            opt: FindChoicesOptions = self.recognizer_options if self.recognizer_options else FindChoicesOptions()
             opt.locale = self._determine_culture(turn_context.activity, opt)
             results = ChoiceRecognizers.recognize_choices(utterance, choices, opt)
 
@@ -131,9 +125,7 @@ class ChoicePrompt(Prompt):
 
         return result
 
-    def _determine_culture(
-        self, activity: Activity, opt: FindChoicesOptions = FindChoicesOptions()
-    ) -> str:
+    def _determine_culture(self, activity: Activity, opt: FindChoicesOptions = FindChoicesOptions()) -> str:
         culture = (
             PromptCultureModels.map_to_nearest_language(activity.locale)
             or opt.locale

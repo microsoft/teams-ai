@@ -50,9 +50,7 @@ class DialogContainer(Dialog, ABC):
         # TODO: deprecate DialogSet.find
         return self.dialogs.find_dialog(dialog_id)
 
-    async def on_dialog_event(
-        self, dialog_context: DialogContext, dialog_event: DialogEvent
-    ) -> bool:
+    async def on_dialog_event(self, dialog_context: DialogContext, dialog_event: DialogEvent) -> bool:
         """
         Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
          dialog that the current dialog started.
@@ -65,8 +63,7 @@ class DialogContainer(Dialog, ABC):
         # Trace unhandled "versionChanged" events.
         if not handled and dialog_event.name == DialogEvents.version_changed:
             trace_message = (
-                f"Unhandled dialog event: {dialog_event.name}. Active Dialog: "
-                f"{dialog_context.active_dialog.id}"
+                f"Unhandled dialog event: {dialog_event.name}. Active Dialog: " f"{dialog_context.active_dialog.id}"
             )
 
             await dialog_context.context.send_trace_activity(trace_message)

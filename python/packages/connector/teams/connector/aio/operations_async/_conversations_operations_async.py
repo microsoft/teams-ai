@@ -34,9 +34,7 @@ class ConversationsOperations:
         self.config = config
         self.api_version = "v3"
 
-    async def get_conversations(
-        self, continuation_token=None, *, custom_headers=None, raw=False, **operation_config
-    ):
+    async def get_conversations(self, continuation_token=None, *, custom_headers=None, raw=False, **operation_config):
         """GetConversations.
 
         List the Conversations in which this bot has participated.
@@ -98,9 +96,7 @@ class ConversationsOperations:
 
     get_conversations.metadata = {"url": "/v3/conversations"}
 
-    async def create_conversation(
-        self, parameters, *, custom_headers=None, raw=False, **operation_config
-    ):
+    async def create_conversation(self, parameters, *, custom_headers=None, raw=False, **operation_config):
         """CreateConversation.
 
         Create a new Conversation.
@@ -211,9 +207,7 @@ class ConversationsOperations:
         """
         # Construct URL
         url = self.send_to_conversation.metadata["url"]
-        path_format_arguments = {
-            "conversationId": self._serialize.url("conversation_id", conversation_id, "str")
-        }
+        path_format_arguments = {"conversationId": self._serialize.url("conversation_id", conversation_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters
@@ -290,9 +284,7 @@ class ConversationsOperations:
 
         # Construct URL
         url = self.send_conversation_history.metadata["url"]
-        path_format_arguments = {
-            "conversationId": self._serialize.url("conversation_id", conversation_id, "str")
-        }
+        path_format_arguments = {"conversationId": self._serialize.url("conversation_id", conversation_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters
@@ -329,9 +321,7 @@ class ConversationsOperations:
 
         return deserialized
 
-    send_conversation_history.metadata = {
-        "url": "/v3/conversations/{conversationId}/activities/history"
-    }
+    send_conversation_history.metadata = {"url": "/v3/conversations/{conversationId}/activities/history"}
 
     async def update_activity(
         self,
@@ -496,9 +486,7 @@ class ConversationsOperations:
 
         return deserialized
 
-    reply_to_activity.metadata = {
-        "url": "/v3/conversations/{conversationId}/activities/{activityId}"
-    }
+    reply_to_activity.metadata = {"url": "/v3/conversations/{conversationId}/activities/{activityId}"}
 
     async def delete_activity(
         self, conversation_id, activity_id, *, custom_headers=None, raw=False, **operation_config
@@ -552,9 +540,7 @@ class ConversationsOperations:
 
     delete_activity.metadata = {"url": "/v3/conversations/{conversationId}/activities/{activityId}"}
 
-    async def get_conversation_members(
-        self, conversation_id, *, custom_headers=None, raw=False, **operation_config
-    ):
+    async def get_conversation_members(self, conversation_id, *, custom_headers=None, raw=False, **operation_config):
         """GetConversationMembers.
 
         Enumerate the members of a conversation.
@@ -576,9 +562,7 @@ class ConversationsOperations:
         """
         # Construct URL
         url = self.get_conversation_members.metadata["url"]
-        path_format_arguments = {
-            "conversationId": self._serialize.url("conversation_id", conversation_id, "str")
-        }
+        path_format_arguments = {"conversationId": self._serialize.url("conversation_id", conversation_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters
@@ -667,9 +651,7 @@ class ConversationsOperations:
 
         return deserialized
 
-    get_conversation_member.metadata = {
-        "url": "/v3/conversations/{conversationId}/members/{memberId}"
-    }
+    get_conversation_member.metadata = {"url": "/v3/conversations/{conversationId}/members/{memberId}"}
 
     async def get_conversation_paged_members(
         self,
@@ -717,9 +699,7 @@ class ConversationsOperations:
         """
         # Construct URL
         url = self.get_conversation_paged_members.metadata["url"]
-        path_format_arguments = {
-            "conversationId": self._serialize.url("conversation_id", conversation_id, "str")
-        }
+        path_format_arguments = {"conversationId": self._serialize.url("conversation_id", conversation_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters
@@ -754,9 +734,7 @@ class ConversationsOperations:
 
         return deserialized
 
-    get_conversation_paged_members.metadata = {
-        "url": "/v3/conversations/{conversationId}/pagedmembers"
-    }
+    get_conversation_paged_members.metadata = {"url": "/v3/conversations/{conversationId}/pagedmembers"}
 
     async def get_teams_conversation_paged_members(
         self,
@@ -803,9 +781,7 @@ class ConversationsOperations:
         """
         # Construct URL
         url = self.get_conversation_paged_members.metadata["url"]
-        path_format_arguments = {
-            "conversationId": self._serialize.url("conversation_id", conversation_id, "str")
-        }
+        path_format_arguments = {"conversationId": self._serialize.url("conversation_id", conversation_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters
@@ -840,9 +816,7 @@ class ConversationsOperations:
 
         return deserialized
 
-    get_conversation_paged_members.metadata = {
-        "url": "/v3/conversations/{conversationId}/pagedmembers"
-    }
+    get_conversation_paged_members.metadata = {"url": "/v3/conversations/{conversationId}/pagedmembers"}
 
     async def delete_conversation_member(
         self, conversation_id, member_id, *, custom_headers=None, raw=False, **operation_config
@@ -896,9 +870,7 @@ class ConversationsOperations:
             client_raw_response = ClientRawResponse(None, response)
             return client_raw_response
 
-    delete_conversation_member.metadata = {
-        "url": "/v3/conversations/{conversationId}/members/{memberId}"
-    }
+    delete_conversation_member.metadata = {"url": "/v3/conversations/{conversationId}/members/{memberId}"}
 
     async def get_activity_members(
         self, conversation_id, activity_id, *, custom_headers=None, raw=False, **operation_config
@@ -959,9 +931,7 @@ class ConversationsOperations:
 
         return deserialized
 
-    get_activity_members.metadata = {
-        "url": "/v3/conversations/{conversationId}/activities/{activityId}/members"
-    }
+    get_activity_members.metadata = {"url": "/v3/conversations/{conversationId}/activities/{activityId}/members"}
 
     async def upload_attachment(
         self,
@@ -997,9 +967,7 @@ class ConversationsOperations:
         """
         # Construct URL
         url = self.upload_attachment.metadata["url"]
-        path_format_arguments = {
-            "conversationId": self._serialize.url("conversation_id", conversation_id, "str")
-        }
+        path_format_arguments = {"conversationId": self._serialize.url("conversation_id", conversation_id, "str")}
         url = self._client.format_url(url, **path_format_arguments)
 
         # Construct parameters

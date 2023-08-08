@@ -94,9 +94,7 @@ class DialogStateManager:
                     self._configuration.path_resolvers.append(path_resolver)
 
         # cache for any other new dialog_state_manager instances in this turn.
-        dialog_context.context.turn_state[
-            self._configuration.__class__.__name__
-        ] = self._configuration
+        dialog_context.context.turn_state[self._configuration.__class__.__name__] = self._configuration
 
     def __len__(self) -> int:
         """
@@ -127,10 +125,7 @@ class DialogStateManager:
         Gets a Iterable containing the values of the memory scopes.
         :return: Values of the memory scopes.
         """
-        return [
-            memory_scope.get_memory(self._dialog_context)
-            for memory_scope in self.configuration.memory_scopes
-        ]
+        return [memory_scope.get_memory(self._dialog_context) for memory_scope in self.configuration.memory_scopes]
 
     # <summary>
     # Gets a value indicating whether the dialog state manager is read-only.
@@ -465,9 +460,7 @@ class DialogStateManager:
         :param key: The key to locate in the dialog state manager.
         :return: True if the dialog state manager contains an element with the key otherwise, False.
         """
-        scopes_with_key = [
-            ms for ms in self.configuration.memory_scopes if ms.name.upper == key.upper()
-        ]
+        scopes_with_key = [ms for ms in self.configuration.memory_scopes if ms.name.upper == key.upper()]
         return bool(scopes_with_key)
 
     def remove(self, key: str):

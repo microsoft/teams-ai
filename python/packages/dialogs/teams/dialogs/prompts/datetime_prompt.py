@@ -50,11 +50,7 @@ class DateTimePrompt(Prompt):
             if not utterance:
                 return result
             # TODO: English constant needs to be ported.
-            culture = (
-                turn_context.activity.locale
-                if turn_context.activity.locale is not None
-                else "English"
-            )
+            culture = turn_context.activity.locale if turn_context.activity.locale is not None else "English"
 
             results = recognize_datetime(utterance, culture)
             if results:

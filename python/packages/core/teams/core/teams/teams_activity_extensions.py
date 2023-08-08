@@ -42,9 +42,7 @@ def teams_get_team_info(activity: Activity) -> TeamInfo:
     return None
 
 
-def teams_notify_user(
-    activity: Activity, alert_in_meeting: bool = None, external_resource_url: str = None
-):
+def teams_notify_user(activity: Activity, alert_in_meeting: bool = None, external_resource_url: str = None):
     if not activity:
         return
 

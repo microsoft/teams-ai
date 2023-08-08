@@ -72,20 +72,12 @@ class BotSignInOperations:
         query_parameters = {}
         query_parameters["state"] = self._serialize.query("state", state, "str")
         if code_challenge is not None:
-            query_parameters["code_challenge"] = self._serialize.query(
-                "code_challenge", code_challenge, "str"
-            )
+            query_parameters["code_challenge"] = self._serialize.query("code_challenge", code_challenge, "str")
         if emulator_url is not None:
-            query_parameters["emulatorUrl"] = self._serialize.query(
-                "emulator_url", emulator_url, "str"
-            )
+            query_parameters["emulatorUrl"] = self._serialize.query("emulator_url", emulator_url, "str")
         if final_redirect is not None:
-            query_parameters["finalRedirect"] = self._serialize.query(
-                "final_redirect", final_redirect, "str"
-            )
-        query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str"
-        )
+            query_parameters["finalRedirect"] = self._serialize.query("final_redirect", final_redirect, "str")
+        query_parameters["api-version"] = self._serialize.query("self.api_version", self.api_version, "str")
 
         # Construct headers
         header_parameters = {}
@@ -151,17 +143,11 @@ class BotSignInOperations:
         query_parameters = {}
         query_parameters["state"] = self._serialize.query("state", state, "str")
         if code_challenge is not None:
-            query_parameters["code_challenge"] = self._serialize.query(
-                "code_challenge", code_challenge, "str"
-            )
+            query_parameters["code_challenge"] = self._serialize.query("code_challenge", code_challenge, "str")
         if emulator_url is not None:
-            query_parameters["emulatorUrl"] = self._serialize.query(
-                "emulator_url", emulator_url, "str"
-            )
+            query_parameters["emulatorUrl"] = self._serialize.query("emulator_url", emulator_url, "str")
         if final_redirect is not None:
-            query_parameters["finalRedirect"] = self._serialize.query(
-                "final_redirect", final_redirect, "str"
-            )
+            query_parameters["finalRedirect"] = self._serialize.query("final_redirect", final_redirect, "str")
 
         # Construct headers
         header_parameters = {}

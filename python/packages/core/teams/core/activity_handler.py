@@ -52,14 +52,10 @@ class ActivityHandler(Bot):
             raise TypeError("ActivityHandler.on_turn(): turn_context cannot be None.")
 
         if hasattr(turn_context, "activity") and turn_context.activity is None:
-            raise TypeError(
-                "ActivityHandler.on_turn(): turn_context must have a non-None activity."
-            )
+            raise TypeError("ActivityHandler.on_turn(): turn_context must have a non-None activity.")
 
         if hasattr(turn_context.activity, "type") and turn_context.activity.type is None:
-            raise TypeError(
-                "ActivityHandler.on_turn(): turn_context activity must have a non-None type."
-            )
+            raise TypeError("ActivityHandler.on_turn(): turn_context activity must have a non-None type.")
 
         if turn_context.activity.type == ActivityTypes.message:
             await self.on_message_activity(turn_context)
@@ -76,9 +72,7 @@ class ActivityHandler(Bot):
             if invoke_response and not turn_context.turn_state.get(
                 BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
             ):
-                await turn_context.send_activity(
-                    Activity(value=invoke_response, type=ActivityTypes.invoke_response)
-                )
+                await turn_context.send_activity(Activity(value=invoke_response, type=ActivityTypes.invoke_response))
         elif turn_context.activity.type == ActivityTypes.end_of_conversation:
             await self.on_end_of_conversation_activity(turn_context)
         elif turn_context.activity.type == ActivityTypes.typing:
@@ -88,9 +82,7 @@ class ActivityHandler(Bot):
         else:
             await self.on_unrecognized_activity_type(turn_context)
 
-    async def on_message_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_message_activity(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Override this method in a derived class to provide logic specific to activities,
         such as the conversational logic.
@@ -124,16 +116,9 @@ class ActivityHandler(Bot):
             Add logic to apply before the member added or removed logic before the call to this base class method.
         """
         if turn_context.activity.members_added is not None and turn_context.activity.members_added:
-            return await self.on_members_added_activity(
-                turn_context.activity.members_added, turn_context
-            )
-        if (
-            turn_context.activity.members_removed is not None
-            and turn_context.activity.members_removed
-        ):
-            return await self.on_members_removed_activity(
-                turn_context.activity.members_removed, turn_context
-            )
+            return await self.on_members_added_activity(turn_context.activity.members_added, turn_context)
+        if turn_context.activity.members_removed is not None and turn_context.activity.members_removed:
+            return await self.on_members_removed_activity(turn_context.activity.members_removed, turn_context)
         return
 
     async def on_members_added_activity(
@@ -292,9 +277,7 @@ class ActivityHandler(Bot):
 
         return await self.on_event(turn_context)
 
-    async def on_token_response_event(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_token_response_event(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Invoked when a `tokens/response` event is received when the base behavior of
         :meth:`on_event_activity()` is used.
@@ -330,9 +313,7 @@ class ActivityHandler(Bot):
         """
         return
 
-    async def on_end_of_conversation_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_end_of_conversation_activity(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Invoked when a conversation end activity is received from the channel.
 
@@ -342,9 +323,7 @@ class ActivityHandler(Bot):
         """
         return
 
-    async def on_typing_activity(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_typing_activity(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Override this in a derived class to provide logic specific to
         ActivityTypes.typing activities, such as the conversational logic.
@@ -355,9 +334,7 @@ class ActivityHandler(Bot):
         """
         return
 
-    async def on_installation_update(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_installation_update(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Override this in a derived class to provide logic specific to
         ActivityTypes.InstallationUpdate activities.
@@ -372,9 +349,7 @@ class ActivityHandler(Bot):
             return await self.on_installation_update_remove(turn_context)
         return
 
-    async def on_installation_update_add(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_installation_update_add(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Override this in a derived class to provide logic specific to
         ActivityTypes.InstallationUpdate activities with 'action' set to 'add'.
@@ -385,9 +360,7 @@ class ActivityHandler(Bot):
         """
         return
 
-    async def on_installation_update_remove(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_installation_update_remove(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Override this in a derived class to provide logic specific to
         ActivityTypes.InstallationUpdate activities with 'action' set to 'remove'.
@@ -398,9 +371,7 @@ class ActivityHandler(Bot):
         """
         return
 
-    async def on_unrecognized_activity_type(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext
-    ):
+    async def on_unrecognized_activity_type(self, turn_context: TurnContext):  # pylint: disable=unused-argument
         """
         Invoked when an activity other than a message, conversation update, or event is received when the base
         behavior of :meth:`on_turn()` is used.
@@ -438,9 +409,7 @@ class ActivityHandler(Bot):
 
             if turn_context.activity.name == "adaptiveCard/action":
                 invoke_value = self._get_adaptive_card_invoke_value(turn_context.activity)
-                return self._create_invoke_response(
-                    await self.on_adaptive_card_invoke(turn_context, invoke_value)
-                )
+                return self._create_invoke_response(await self.on_adaptive_card_invoke(turn_context, invoke_value))
 
             raise _InvokeResponseException(HTTPStatus.NOT_IMPLEMENTED)
         except _InvokeResponseException as invoke_exception:
@@ -515,9 +484,7 @@ class ActivityHandler(Bot):
 
         return invoke_value
 
-    def _create_adaptive_card_invoke_error_response(
-        self, status_code: HTTPStatus, code: str, message: str
-    ):
+    def _create_adaptive_card_invoke_error_response(self, status_code: HTTPStatus, code: str, message: str):
         return AdaptiveCardInvokeResponse(
             status_code=status_code,
             type="application/vnd.microsoft.error",

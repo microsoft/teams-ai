@@ -40,9 +40,7 @@ class WaterfallDialog(Dialog):
         self._steps.append(step)
         return self
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: object = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self, dialog_context: DialogContext, options: object = None) -> DialogTurnResult:
         if not dialog_context:
             raise TypeError("WaterfallDialog.begin_dialog(): dc cannot be None.")
 
@@ -80,9 +78,7 @@ class WaterfallDialog(Dialog):
             dialog_context.context.activity.text,
         )
 
-    async def resume_dialog(
-        self, dialog_context: DialogContext, reason: DialogReason, result: object
-    ):
+    async def resume_dialog(self, dialog_context: DialogContext, reason: DialogReason, result: object):
         if dialog_context is None:
             raise TypeError("WaterfallDialog.resume_dialog(): dc cannot be None.")
 
@@ -143,9 +139,7 @@ class WaterfallDialog(Dialog):
             # Create step context
             options = state[self.PersistedOptions]
             values = state[self.PersistedValues]
-            step_context = WaterfallStepContext(
-                self, dialog_context, options, values, index, reason, result
-            )
+            step_context = WaterfallStepContext(self, dialog_context, options, values, index, reason, result)
             return await self.on_step(step_context)
 
         # End of waterfall so just return any result to parent

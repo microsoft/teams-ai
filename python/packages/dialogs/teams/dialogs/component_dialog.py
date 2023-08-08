@@ -39,9 +39,7 @@ class ComponentDialog(Dialog):
 
     # TODO: Add TelemetryClient
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: object = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self, dialog_context: DialogContext, options: object = None) -> DialogTurnResult:
         """
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
@@ -152,9 +150,7 @@ class ComponentDialog(Dialog):
         # Notify component
         await self.on_reprompt_dialog(context, instance)
 
-    async def end_dialog(
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
-    ) -> None:
+    async def end_dialog(self, context: TurnContext, instance: DialogInstance, reason: DialogReason) -> None:
         """
         Called when the dialog is ending.
 

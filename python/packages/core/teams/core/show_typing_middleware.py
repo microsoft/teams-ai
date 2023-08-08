@@ -64,9 +64,7 @@ class ShowTypingMiddleware(Middleware):
 
                 conversation_reference = TurnContext.get_conversation_reference(context.activity)
 
-                typing_activity = TurnContext.apply_conversation_reference(
-                    typing_activity, conversation_reference
-                )
+                typing_activity = TurnContext.apply_conversation_reference(typing_activity, conversation_reference)
 
                 asyncio.ensure_future(context.adapter.send_activities(context, [typing_activity]))
 
@@ -81,10 +79,7 @@ class ShowTypingMiddleware(Middleware):
 
         # Start a timer to periodically send the typing activity
         # (bots running as skills should not send typing activity)
-        if (
-            context.activity.type == ActivityTypes.message
-            and not ShowTypingMiddleware._is_skill_bot(context)
-        ):
+        if context.activity.type == ActivityTypes.message and not ShowTypingMiddleware._is_skill_bot(context):
             start_interval(context, self._delay, self._period)
 
         # call the bot logic
@@ -97,6 +92,4 @@ class ShowTypingMiddleware(Middleware):
     @staticmethod
     def _is_skill_bot(context: TurnContext) -> bool:
         claims_identity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
-        return isinstance(claims_identity, ClaimsIdentity) and SkillValidation.is_skill_claim(
-            claims_identity.claims
-        )
+        return isinstance(claims_identity, ClaimsIdentity) and SkillValidation.is_skill_claim(claims_identity.claims)

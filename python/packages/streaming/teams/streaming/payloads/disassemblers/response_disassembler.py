@@ -29,10 +29,7 @@ class ResponseDisassembler(PayloadDisassembler):
         payload = ResponsePayload(status_code=self.response.status_code)
 
         if self.response.streams:
-            payload.streams = [
-                self.get_stream_description(content_stream)
-                for content_stream in self.response.streams
-            ]
+            payload.streams = [self.get_stream_description(content_stream) for content_stream in self.response.streams]
 
         memory_stream: List[int] = []
         stream_length: List[int] = []

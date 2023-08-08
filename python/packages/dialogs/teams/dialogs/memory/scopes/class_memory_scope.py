@@ -39,9 +39,7 @@ class ClassMemoryScope(MemoryScope):
                     if hasattr(prop_value, "try_get_value"):
                         clone[prop] = prop_value.try_get_value(dialog_context.state)
                     elif hasattr(prop_value, "__dict__") and not isinstance(prop_value, type):
-                        clone[prop] = ClassMemoryScope._bind_to_dialog_context(
-                            prop_value, dialog_context
-                        )
+                        clone[prop] = ClassMemoryScope._bind_to_dialog_context(prop_value, dialog_context)
                     else:
                         clone[prop] = prop_value
         if clone:
