@@ -21,7 +21,7 @@ class Dialog(ABC):
         self._id = dialog_id
 
     @property
-    def id(self) -> str:  # pylint: disable=invalid-name
+    def id(self) -> str:    # pylint: disable=invalid-name
         return self._id
 
     @property
@@ -42,9 +42,9 @@ class Dialog(ABC):
             self._telemetry_client = value
 
     @abstractmethod
-    async def begin_dialog(
-        self, dialog_context: "DialogContext", options: object = None
-    ):
+    async def begin_dialog(self,
+                           dialog_context: "DialogContext",
+                           options: object = None):
         """
         Method called when a new dialog has been pushed onto the stack and is being activated.
         :param dialog_context: The dialog context for the current turn of conversation.
@@ -64,9 +64,9 @@ class Dialog(ABC):
         # By default just end the current dialog.
         return await dialog_context.end_dialog(None)
 
-    async def resume_dialog(  # pylint: disable=unused-argument
-        self, dialog_context: "DialogContext", reason: DialogReason, result: object
-    ):
+    async def resume_dialog(    # pylint: disable=unused-argument
+            self, dialog_context: "DialogContext", reason: DialogReason,
+            result: object):
         """
         Method called when an instance of the dialog is being returned to from another
         dialog that was started by the current instance using `begin_dialog()`.
@@ -83,9 +83,8 @@ class Dialog(ABC):
         return await dialog_context.end_dialog(result)
 
     # TODO: instance is DialogInstance
-    async def reprompt_dialog(  # pylint: disable=unused-argument
-        self, context: TurnContext, instance: DialogInstance
-    ):
+    async def reprompt_dialog(    # pylint: disable=unused-argument
+            self, context: TurnContext, instance: DialogInstance):
         """
         :param context:
         :param instance:
@@ -95,9 +94,9 @@ class Dialog(ABC):
         return
 
     # TODO: instance is DialogInstance
-    async def end_dialog(  # pylint: disable=unused-argument
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
-    ):
+    async def end_dialog(    # pylint: disable=unused-argument
+            self, context: TurnContext, instance: DialogInstance,
+            reason: DialogReason):
         """
         :param context:
         :param instance:
@@ -110,9 +109,8 @@ class Dialog(ABC):
     def get_version(self) -> str:
         return self.id
 
-    async def on_dialog_event(
-        self, dialog_context: "DialogContext", dialog_event: DialogEvent
-    ) -> bool:
+    async def on_dialog_event(self, dialog_context: "DialogContext",
+                              dialog_event: DialogEvent) -> bool:
         """
         Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
          dialog that the current dialog started.
@@ -125,19 +123,20 @@ class Dialog(ABC):
 
         # Bubble as needed
         if (not handled) and dialog_event.bubble and dialog_context.parent:
-            handled = await dialog_context.parent.emit(
-                dialog_event.name, dialog_event.value, True, False
-            )
+            handled = await dialog_context.parent.emit(dialog_event.name,
+                                                       dialog_event.value,
+                                                       True, False)
 
         # Post bubble
         if not handled:
-            handled = await self._on_post_bubble_event(dialog_context, dialog_event)
+            handled = await self._on_post_bubble_event(dialog_context,
+                                                       dialog_event)
 
         return handled
 
-    async def _on_pre_bubble_event(  # pylint: disable=unused-argument
-        self, dialog_context: "DialogContext", dialog_event: DialogEvent
-    ) -> bool:
+    async def _on_pre_bubble_event(    # pylint: disable=unused-argument
+            self, dialog_context: "DialogContext",
+            dialog_event: DialogEvent) -> bool:
         """
         Called before an event is bubbled to its parent.
         This is a good place to perform interception of an event as returning `true` will prevent
@@ -149,9 +148,9 @@ class Dialog(ABC):
         """
         return False
 
-    async def _on_post_bubble_event(  # pylint: disable=unused-argument
-        self, dialog_context: "DialogContext", dialog_event: DialogEvent
-    ) -> bool:
+    async def _on_post_bubble_event(    # pylint: disable=unused-argument
+            self, dialog_context: "DialogContext",
+            dialog_event: DialogEvent) -> bool:
         """
         Called after an event was bubbled to all parents and wasn't handled.
         This is a good place to perform default processing logic for an event. Returning `true` will
@@ -169,9 +168,7 @@ class Dialog(ABC):
         """
         return self.__class__.__name__
 
-    def _register_source_location(
-        self, path: str, line_number: int
-    ):  # pylint: disable=unused-argument
+    def _register_source_location(self, path: str, line_number: int):    # pylint: disable=unused-argument
         """
         Registers a SourceRange in the provided location.
         :param path: The path to the source file.

@@ -15,11 +15,14 @@ from .stream_manager import StreamManager
 
 
 class PayloadAssemblerManager:
+
     def __init__(
         self,
         stream_manager: StreamManager,
-        on_receive_request: Callable[[UUID, "streaming.ReceiveRequest"], Awaitable],
-        on_receive_response: Callable[[UUID, "streaming.ReceiveResponse"], Awaitable],
+        on_receive_request: Callable[[UUID, "streaming.ReceiveRequest"],
+                                     Awaitable],
+        on_receive_response: Callable[[UUID, "streaming.ReceiveResponse"],
+                                      Awaitable],
     ):
         self._on_receive_request = on_receive_request
         self._on_receive_response = on_receive_response
@@ -27,8 +30,8 @@ class PayloadAssemblerManager:
         self._active_assemblers: Dict[UUID, Assembler] = {}
 
     def get_payload_stream(
-        self, header: Header
-    ) -> Union[List[int], "streaming.PayloadStream"]:
+            self,
+            header: Header) -> Union[List[int], "streaming.PayloadStream"]:
         # TODO: The return value SHOULDN'T be a union, we should interface List[int] into a BFStream class
         if self._is_stream_payload(header):
             return self._stream_manager.get_payload_stream(header)
@@ -41,11 +44,11 @@ class PayloadAssemblerManager:
 
         return None
 
-    def on_receive(
-        self, header: Header, content_stream: List[int], content_length: int
-    ):
+    def on_receive(self, header: Header, content_stream: List[int],
+                   content_length: int):
         if self._is_stream_payload(header):
-            self._stream_manager.on_receive(header, content_stream, content_length)
+            self._stream_manager.on_receive(header, content_stream,
+                                            content_length)
         else:
             assembler = self._active_assemblers.get(header.id)
             if assembler:
@@ -59,13 +62,11 @@ class PayloadAssemblerManager:
 
     def _create_payload_assembler(self, header: Header) -> Assembler:
         if header.type == PayloadTypes.REQUEST:
-            return ReceiveRequestAssembler(
-                header, self._stream_manager, self._on_receive_request
-            )
+            return ReceiveRequestAssembler(header, self._stream_manager,
+                                           self._on_receive_request)
         if header.type == PayloadTypes.RESPONSE:
-            return ReceiveResponseAssembler(
-                header, self._stream_manager, self._on_receive_response
-            )
+            return ReceiveResponseAssembler(header, self._stream_manager,
+                                            self._on_receive_response)
 
         return None
 

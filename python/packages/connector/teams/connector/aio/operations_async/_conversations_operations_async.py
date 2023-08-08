@@ -35,14 +35,12 @@ class ConversationsOperations:
         self.config = config
         self.api_version = "v3"
 
-    async def get_conversations(
-        self,
-        continuation_token=None,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_conversations(self,
+                                continuation_token=None,
+                                *,
+                                custom_headers=None,
+                                raw=False,
+                                **operation_config):
         """GetConversations.
 
         List the Conversations in which this bot has participated.
@@ -76,8 +74,7 @@ class ConversationsOperations:
         query_parameters = {}
         if continuation_token is not None:
             query_parameters["continuationToken"] = self._serialize.query(
-                "continuation_token", continuation_token, "str"
-            )
+                "continuation_token", continuation_token, "str")
 
         # Construct headers
         header_parameters = {}
@@ -87,9 +84,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -106,9 +103,12 @@ class ConversationsOperations:
 
     get_conversations.metadata = {"url": "/v3/conversations"}
 
-    async def create_conversation(
-        self, parameters, *, custom_headers=None, raw=False, **operation_config
-    ):
+    async def create_conversation(self,
+                                  parameters,
+                                  *,
+                                  custom_headers=None,
+                                  raw=False,
+                                  **operation_config):
         """CreateConversation.
 
         Create a new Conversation.
@@ -158,26 +158,29 @@ class ConversationsOperations:
             header_parameters.update(custom_headers)
 
         # Construct body
-        body_content = self._serialize.body(parameters, "ConversationParameters")
+        body_content = self._serialize.body(parameters,
+                                            "ConversationParameters")
 
         # Construct and send request
-        request = self._client.post(
-            url, query_parameters, header_parameters, body_content
-        )
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        request = self._client.post(url, query_parameters, header_parameters,
+                                    body_content)
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
         if response.status_code == 200:
-            deserialized = self._deserialize("ConversationResourceResponse", response)
+            deserialized = self._deserialize("ConversationResourceResponse",
+                                             response)
         if response.status_code == 201:
-            deserialized = self._deserialize("ConversationResourceResponse", response)
+            deserialized = self._deserialize("ConversationResourceResponse",
+                                             response)
         if response.status_code == 202:
-            deserialized = self._deserialize("ConversationResourceResponse", response)
+            deserialized = self._deserialize("ConversationResourceResponse",
+                                             response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
@@ -187,15 +190,13 @@ class ConversationsOperations:
 
     create_conversation.metadata = {"url": "/v3/conversations"}
 
-    async def send_to_conversation(
-        self,
-        conversation_id,
-        activity,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def send_to_conversation(self,
+                                   conversation_id,
+                                   activity,
+                                   *,
+                                   custom_headers=None,
+                                   raw=False,
+                                   **operation_config):
         """SendToConversation.
 
         This method allows you to send an activity to the end of a
@@ -230,9 +231,8 @@ class ConversationsOperations:
         # Construct URL
         url = self.send_to_conversation.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            )
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -250,12 +250,11 @@ class ConversationsOperations:
         body_content = self._serialize.body(activity, "Activity")
 
         # Construct and send request
-        request = self._client.post(
-            url, query_parameters, header_parameters, body_content
-        )
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        request = self._client.post(url, query_parameters, header_parameters,
+                                    body_content)
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -278,15 +277,13 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/activities"
     }
 
-    async def send_conversation_history(
-        self,
-        conversation_id,
-        activities=None,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def send_conversation_history(self,
+                                        conversation_id,
+                                        activities=None,
+                                        *,
+                                        custom_headers=None,
+                                        raw=False,
+                                        **operation_config):
         """SendConversationHistory.
 
         This method allows you to upload the historic activities to the
@@ -317,9 +314,8 @@ class ConversationsOperations:
         # Construct URL
         url = self.send_conversation_history.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            )
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -337,12 +333,11 @@ class ConversationsOperations:
         body_content = self._serialize.body(history, "Transcript")
 
         # Construct and send request
-        request = self._client.post(
-            url, query_parameters, header_parameters, body_content
-        )
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        request = self._client.post(url, query_parameters, header_parameters,
+                                    body_content)
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -365,16 +360,14 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/activities/history"
     }
 
-    async def update_activity(
-        self,
-        conversation_id,
-        activity_id,
-        activity,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def update_activity(self,
+                              conversation_id,
+                              activity_id,
+                              activity,
+                              *,
+                              custom_headers=None,
+                              raw=False,
+                              **operation_config):
         """UpdateActivity.
 
         Edit an existing activity.
@@ -403,10 +396,10 @@ class ConversationsOperations:
         # Construct URL
         url = self.update_activity.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            ),
-            "activityId": self._serialize.url("activity_id", activity_id, "str"),
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str"),
+            "activityId":
+            self._serialize.url("activity_id", activity_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -424,12 +417,11 @@ class ConversationsOperations:
         body_content = self._serialize.body(activity, "Activity")
 
         # Construct and send request
-        request = self._client.put(
-            url, query_parameters, header_parameters, body_content
-        )
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        request = self._client.put(url, query_parameters, header_parameters,
+                                   body_content)
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -452,16 +444,14 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/activities/{activityId}"
     }
 
-    async def reply_to_activity(
-        self,
-        conversation_id,
-        activity_id,
-        activity,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def reply_to_activity(self,
+                                conversation_id,
+                                activity_id,
+                                activity,
+                                *,
+                                custom_headers=None,
+                                raw=False,
+                                **operation_config):
         """ReplyToActivity.
 
         This method allows you to reply to an activity.
@@ -497,10 +487,10 @@ class ConversationsOperations:
         # Construct URL
         url = self.reply_to_activity.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            ),
-            "activityId": self._serialize.url("activity_id", activity_id, "str"),
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str"),
+            "activityId":
+            self._serialize.url("activity_id", activity_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -518,12 +508,11 @@ class ConversationsOperations:
         body_content = self._serialize.body(activity, "Activity")
 
         # Construct and send request
-        request = self._client.post(
-            url, query_parameters, header_parameters, body_content
-        )
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        request = self._client.post(url, query_parameters, header_parameters,
+                                    body_content)
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -546,15 +535,13 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/activities/{activityId}"
     }
 
-    async def delete_activity(
-        self,
-        conversation_id,
-        activity_id,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def delete_activity(self,
+                              conversation_id,
+                              activity_id,
+                              *,
+                              custom_headers=None,
+                              raw=False,
+                              **operation_config):
         """DeleteActivity.
 
         Delete an existing activity.
@@ -578,10 +565,10 @@ class ConversationsOperations:
         # Construct URL
         url = self.delete_activity.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            ),
-            "activityId": self._serialize.url("activity_id", activity_id, "str"),
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str"),
+            "activityId":
+            self._serialize.url("activity_id", activity_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -595,9 +582,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.delete(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 202]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -610,9 +597,12 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/activities/{activityId}"
     }
 
-    async def get_conversation_members(
-        self, conversation_id, *, custom_headers=None, raw=False, **operation_config
-    ):
+    async def get_conversation_members(self,
+                                       conversation_id,
+                                       *,
+                                       custom_headers=None,
+                                       raw=False,
+                                       **operation_config):
         """GetConversationMembers.
 
         Enumerate the members of a conversation.
@@ -635,9 +625,8 @@ class ConversationsOperations:
         # Construct URL
         url = self.get_conversation_members.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            )
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -652,9 +641,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -673,14 +662,12 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/members"
     }
 
-    async def get_conversation_member(
-        self,
-        conversation_id,
-        member_id,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_conversation_member(self,
+                                      conversation_id,
+                                      member_id,
+                                      custom_headers=None,
+                                      raw=False,
+                                      **operation_config):
         """GetConversationMember.
 
         Get a member of a conversation.
@@ -705,10 +692,10 @@ class ConversationsOperations:
         # Construct URL
         url = self.get_conversation_member.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            ),
-            "memberId": self._serialize.url("member_id", member_id, "str"),
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str"),
+            "memberId":
+            self._serialize.url("member_id", member_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -723,9 +710,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -744,16 +731,14 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/members/{memberId}"
     }
 
-    async def get_conversation_paged_members(
-        self,
-        conversation_id,
-        page_size=None,
-        continuation_token=None,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_conversation_paged_members(self,
+                                             conversation_id,
+                                             page_size=None,
+                                             continuation_token=None,
+                                             *,
+                                             custom_headers=None,
+                                             raw=False,
+                                             **operation_config):
         """GetConversationPagedMembers.
 
         Enumerate the members of a conversation one page at a time.
@@ -791,9 +776,8 @@ class ConversationsOperations:
         # Construct URL
         url = self.get_conversation_paged_members.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            )
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -801,12 +785,10 @@ class ConversationsOperations:
         query_parameters = {}
         if page_size is not None:
             query_parameters["pageSize"] = self._serialize.query(
-                "page_size", page_size, "int"
-            )
+                "page_size", page_size, "int")
         if continuation_token is not None:
             query_parameters["continuationToken"] = self._serialize.query(
-                "continuation_token", continuation_token, "str"
-            )
+                "continuation_token", continuation_token, "str")
 
         # Construct headers
         header_parameters = {}
@@ -816,9 +798,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise HttpOperationError(self._deserialize, response)
@@ -837,15 +819,13 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/pagedmembers"
     }
 
-    async def get_teams_conversation_paged_members(
-        self,
-        conversation_id,
-        page_size=None,
-        continuation_token=None,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_teams_conversation_paged_members(self,
+                                                   conversation_id,
+                                                   page_size=None,
+                                                   continuation_token=None,
+                                                   custom_headers=None,
+                                                   raw=False,
+                                                   **operation_config):
         """GetTeamsConversationPagedMembers.
 
         Enumerate the members of a Teams conversation one page at a time.
@@ -883,9 +863,8 @@ class ConversationsOperations:
         # Construct URL
         url = self.get_conversation_paged_members.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            )
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -893,12 +872,10 @@ class ConversationsOperations:
         query_parameters = {}
         if page_size is not None:
             query_parameters["pageSize"] = self._serialize.query(
-                "page_size", page_size, "int"
-            )
+                "page_size", page_size, "int")
         if continuation_token is not None:
             query_parameters["continuationToken"] = self._serialize.query(
-                "continuation_token", continuation_token, "str"
-            )
+                "continuation_token", continuation_token, "str")
 
         # Construct headers
         header_parameters = {}
@@ -908,16 +885,17 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise HttpOperationError(self._deserialize, response)
 
         deserialized = None
         if response.status_code == 200:
-            deserialized = self._deserialize("TeamsPagedMembersResult", response)
+            deserialized = self._deserialize("TeamsPagedMembersResult",
+                                             response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
@@ -929,15 +907,13 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/pagedmembers"
     }
 
-    async def delete_conversation_member(
-        self,
-        conversation_id,
-        member_id,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def delete_conversation_member(self,
+                                         conversation_id,
+                                         member_id,
+                                         *,
+                                         custom_headers=None,
+                                         raw=False,
+                                         **operation_config):
         """DeleteConversationMember.
 
         Deletes a member from a conversation.
@@ -963,10 +939,10 @@ class ConversationsOperations:
         # Construct URL
         url = self.delete_conversation_member.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            ),
-            "memberId": self._serialize.url("member_id", member_id, "str"),
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str"),
+            "memberId":
+            self._serialize.url("member_id", member_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -980,9 +956,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.delete(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 204]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -995,15 +971,13 @@ class ConversationsOperations:
         "url": "/v3/conversations/{conversationId}/members/{memberId}"
     }
 
-    async def get_activity_members(
-        self,
-        conversation_id,
-        activity_id,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_activity_members(self,
+                                   conversation_id,
+                                   activity_id,
+                                   *,
+                                   custom_headers=None,
+                                   raw=False,
+                                   **operation_config):
         """GetActivityMembers.
 
         Enumerate the members of an activity.
@@ -1029,10 +1003,10 @@ class ConversationsOperations:
         # Construct URL
         url = self.get_activity_members.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            ),
-            "activityId": self._serialize.url("activity_id", activity_id, "str"),
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str"),
+            "activityId":
+            self._serialize.url("activity_id", activity_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -1047,9 +1021,9 @@ class ConversationsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -1065,18 +1039,17 @@ class ConversationsOperations:
         return deserialized
 
     get_activity_members.metadata = {
-        "url": "/v3/conversations/{conversationId}/activities/{activityId}/members"
+        "url":
+        "/v3/conversations/{conversationId}/activities/{activityId}/members"
     }
 
-    async def upload_attachment(
-        self,
-        conversation_id,
-        attachment_upload,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def upload_attachment(self,
+                                conversation_id,
+                                attachment_upload,
+                                *,
+                                custom_headers=None,
+                                raw=False,
+                                **operation_config):
         """UploadAttachment.
 
         Upload an attachment directly into a channel's blob storage.
@@ -1103,9 +1076,8 @@ class ConversationsOperations:
         # Construct URL
         url = self.upload_attachment.metadata["url"]
         path_format_arguments = {
-            "conversationId": self._serialize.url(
-                "conversation_id", conversation_id, "str"
-            )
+            "conversationId":
+            self._serialize.url("conversation_id", conversation_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -1120,15 +1092,15 @@ class ConversationsOperations:
             header_parameters.update(custom_headers)
 
         # Construct body
-        body_content = self._serialize.body(attachment_upload, "AttachmentData")
+        body_content = self._serialize.body(attachment_upload,
+                                            "AttachmentData")
 
         # Construct and send request
-        request = self._client.post(
-            url, query_parameters, header_parameters, body_content
-        )
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        request = self._client.post(url, query_parameters, header_parameters,
+                                    body_content)
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200, 201, 202]:
             raise models.ErrorResponseException(self._deserialize, response)

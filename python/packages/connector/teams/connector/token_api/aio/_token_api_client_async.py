@@ -37,15 +37,16 @@ class TokenApiClient(SDKClientAsync):
         super(TokenApiClient, self).__init__(self.config)
 
         client_models = {
-            k: v for k, v in models.__dict__.items() if isinstance(v, type)
+            k: v
+            for k, v in models.__dict__.items() if isinstance(v, type)
         }
         self.api_version = "token"
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
-        self.bot_sign_in = BotSignInOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
-        self.user_token = UserTokenOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
+        self.bot_sign_in = BotSignInOperations(self._client, self.config,
+                                               self._serialize,
+                                               self._deserialize)
+        self.user_token = UserTokenOperations(self._client, self.config,
+                                              self._serialize,
+                                              self._deserialize)

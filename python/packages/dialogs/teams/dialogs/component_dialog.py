@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
 from teams.core import TurnContext
 from .dialog import Dialog
 from .dialog_context import DialogContext
@@ -40,9 +39,9 @@ class ComponentDialog(Dialog):
 
     # TODO: Add TelemetryClient
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: object = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self,
+                           dialog_context: DialogContext,
+                           options: object = None) -> DialogTurnResult:
         """
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
@@ -57,12 +56,15 @@ class ComponentDialog(Dialog):
         :rtype: :class:`teams.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
-            raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
+            raise TypeError(
+                "ComponentDialog.begin_dialog(): outer_dc cannot be None.")
 
         # Start the inner dialog.
         dialog_state = DialogState()
-        dialog_context.active_dialog.state[self.persisted_dialog_state] = dialog_state
-        inner_dc = DialogContext(self._dialogs, dialog_context.context, dialog_state)
+        dialog_context.active_dialog.state[
+            self.persisted_dialog_state] = dialog_state
+        inner_dc = DialogContext(self._dialogs, dialog_context.context,
+                                 dialog_state)
         inner_dc.parent = dialog_context
         turn_result = await self.on_begin_dialog(inner_dc, options)
 
@@ -74,7 +76,8 @@ class ComponentDialog(Dialog):
         # Just signal waiting
         return Dialog.end_of_turn
 
-    async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
+    async def continue_dialog(
+            self, dialog_context: DialogContext) -> DialogTurnResult:
         """
         Called when the dialog is continued, where it is the active dialog and the
         user replies with a new activity.
@@ -97,10 +100,13 @@ class ComponentDialog(Dialog):
         :rtype: :class:`teams.dialogs.Dialog.end_of_turn`
         """
         if dialog_context is None:
-            raise TypeError("ComponentDialog.begin_dialog(): outer_dc cannot be None.")
+            raise TypeError(
+                "ComponentDialog.begin_dialog(): outer_dc cannot be None.")
         # Continue execution of inner dialog.
-        dialog_state = dialog_context.active_dialog.state[self.persisted_dialog_state]
-        inner_dc = DialogContext(self._dialogs, dialog_context.context, dialog_state)
+        dialog_state = dialog_context.active_dialog.state[
+            self.persisted_dialog_state]
+        inner_dc = DialogContext(self._dialogs, dialog_context.context,
+                                 dialog_state)
         inner_dc.parent = dialog_context
         turn_result = await self.on_continue_dialog(inner_dc)
 
@@ -109,9 +115,10 @@ class ComponentDialog(Dialog):
 
         return Dialog.end_of_turn
 
-    async def resume_dialog(
-        self, dialog_context: DialogContext, reason: DialogReason, result: object = None
-    ) -> DialogTurnResult:
+    async def resume_dialog(self,
+                            dialog_context: DialogContext,
+                            reason: DialogReason,
+                            result: object = None) -> DialogTurnResult:
         """
         Called when a child dialog on the parent's dialog stack completed this turn, returning
         control to this dialog component.
@@ -133,12 +140,12 @@ class ComponentDialog(Dialog):
         :rtype: :class:`teams.dialogs.Dialog.end_of_turn`
         """
 
-        await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
+        await self.reprompt_dialog(dialog_context.context,
+                                   dialog_context.active_dialog)
         return Dialog.end_of_turn
 
-    async def reprompt_dialog(
-        self, context: TurnContext, instance: DialogInstance
-    ) -> None:
+    async def reprompt_dialog(self, context: TurnContext,
+                              instance: DialogInstance) -> None:
         """
         Called when the dialog should re-prompt the user for input.
 
@@ -155,9 +162,8 @@ class ComponentDialog(Dialog):
         # Notify component
         await self.on_reprompt_dialog(context, instance)
 
-    async def end_dialog(
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
-    ) -> None:
+    async def end_dialog(self, context: TurnContext, instance: DialogInstance,
+                         reason: DialogReason) -> None:
         """
         Called when the dialog is ending.
 
@@ -198,9 +204,8 @@ class ComponentDialog(Dialog):
         """
         return await self._dialogs.find(dialog_id)
 
-    async def on_begin_dialog(
-        self, inner_dc: DialogContext, options: object
-    ) -> DialogTurnResult:
+    async def on_begin_dialog(self, inner_dc: DialogContext,
+                              options: object) -> DialogTurnResult:
         """
         Called when the dialog is started and pushed onto the parent's dialog stack.
 
@@ -220,7 +225,8 @@ class ComponentDialog(Dialog):
         """
         return await inner_dc.begin_dialog(self.initial_dialog_id, options)
 
-    async def on_continue_dialog(self, inner_dc: DialogContext) -> DialogTurnResult:
+    async def on_continue_dialog(self,
+                                 inner_dc: DialogContext) -> DialogTurnResult:
         """
         Called when the dialog is continued, where it is the active dialog and the user replies with a new activity.
 
@@ -229,9 +235,9 @@ class ComponentDialog(Dialog):
         """
         return await inner_dc.continue_dialog()
 
-    async def on_end_dialog(  # pylint: disable=unused-argument
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
-    ) -> None:
+    async def on_end_dialog(    # pylint: disable=unused-argument
+            self, context: TurnContext, instance: DialogInstance,
+            reason: DialogReason) -> None:
         """
         Ends the component dialog in its parent's context.
 
@@ -244,9 +250,8 @@ class ComponentDialog(Dialog):
         """
         return
 
-    async def on_reprompt_dialog(  # pylint: disable=unused-argument
-        self, turn_context: TurnContext, instance: DialogInstance
-    ) -> None:
+    async def on_reprompt_dialog(    # pylint: disable=unused-argument
+            self, turn_context: TurnContext, instance: DialogInstance) -> None:
         """
         :param turn_context: The :class:`teams.core.TurnContext` for the current turn of the conversation.
         :type turn_context: :class:`teams.dialogs.DialogInstance`
@@ -256,7 +261,9 @@ class ComponentDialog(Dialog):
         return
 
     async def end_component(
-        self, outer_dc: DialogContext, result: object  # pylint: disable=unused-argument
+        self,
+        outer_dc: DialogContext,
+        result: object    # pylint: disable=unused-argument
     ) -> DialogTurnResult:
         """
         Ends the component dialog in its parent's context.

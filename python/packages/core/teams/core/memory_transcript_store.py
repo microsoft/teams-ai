@@ -56,25 +56,21 @@ class MemoryTranscriptStore(TranscriptStore):
             if conversation_id in channel:
                 transcript = channel[conversation_id]
                 if continuation_token:
-                    paged_result.items = (
-                        [
-                            x
-                            for x in sorted(
-                                transcript,
-                                key=lambda x: x.timestamp or str(datetime.datetime.min),
-                                reverse=False,
-                            )
-                            if x.timestamp >= start_date
-                        ]
-                        .dropwhile(lambda x: x.id != continuation_token)
-                        .Skip(1)[:20]
-                    )
+                    paged_result.items = ([
+                        x for x in sorted(
+                            transcript,
+                            key=lambda x: x.timestamp or str(datetime.datetime.
+                                                             min),
+                            reverse=False,
+                        ) if x.timestamp >= start_date
+                    ].dropwhile(lambda x: x.id != continuation_token).Skip(1)
+                                          [:20])
                     if paged_result.items.count == 20:
-                        paged_result.continuation_token = paged_result.items[-1].id
+                        paged_result.continuation_token = paged_result.items[
+                            -1].id
                 else:
                     paged_result.items = [
-                        x
-                        for x in sorted(
+                        x for x in sorted(
                             transcript,
                             key=lambda x: x.timestamp or datetime.datetime.min,
                             reverse=False,
@@ -82,11 +78,13 @@ class MemoryTranscriptStore(TranscriptStore):
                         if (x.timestamp or datetime.datetime.min) >= start_date
                     ][:20]
                     if paged_result.items.count == 20:
-                        paged_result.continuation_token = paged_result.items[-1].id
+                        paged_result.continuation_token = paged_result.items[
+                            -1].id
 
         return paged_result
 
-    async def delete_transcript(self, channel_id: str, conversation_id: str) -> None:
+    async def delete_transcript(self, channel_id: str,
+                                conversation_id: str) -> None:
         if not channel_id:
             raise TypeError("channel_id should not be None")
 
@@ -98,8 +96,9 @@ class MemoryTranscriptStore(TranscriptStore):
                 del self.channels[channel_id][conversation_id]
 
     async def list_transcripts(
-        self, channel_id: str, continuation_token: str = None
-    ) -> "PagedResult[TranscriptInfo]":
+            self,
+            channel_id: str,
+            continuation_token: str = None) -> "PagedResult[TranscriptInfo]":
         if not channel_id:
             raise TypeError("Missing channel_id")
 
@@ -109,43 +108,33 @@ class MemoryTranscriptStore(TranscriptStore):
             channel: Dict[str, List[Activity]] = self.channels[channel_id]
 
             if continuation_token:
-                paged_result.items = (
-                    sorted(
-                        [
-                            TranscriptInfo(
-                                channel_id,
-                                c.value()[0].timestamp if c.value() else None,
-                                c.id,
-                            )
-                            for c in channel
-                        ],
-                        key=lambda x: x.created,
-                        reverse=True,
-                    )
-                    .dropwhile(lambda x: x.id != continuation_token)
-                    .Skip(1)
-                    .Take(20)
-                )
+                paged_result.items = (sorted(
+                    [
+                        TranscriptInfo(
+                            channel_id,
+                            c.value()[0].timestamp if c.value() else None,
+                            c.id,
+                        ) for c in channel
+                    ],
+                    key=lambda x: x.created,
+                    reverse=True,
+                ).dropwhile(lambda x: x.id != continuation_token).Skip(1).Take(
+                    20))
                 if paged_result.items.count == 20:
                     paged_result.continuation_token = paged_result.items[-1].id
             else:
-                paged_result.items = (
-                    sorted(
-                        [
-                            TranscriptInfo(
-                                channel_id,
-                                c.value()[0].timestamp if c.value() else None,
-                                c.id,
-                            )
-                            for c in channel
-                        ],
-                        key=lambda x: x.created,
-                        reverse=True,
-                    )
-                    .dropwhile(lambda x: x.id != continuation_token)
-                    .Skip(1)
-                    .Take(20)
-                )
+                paged_result.items = (sorted(
+                    [
+                        TranscriptInfo(
+                            channel_id,
+                            c.value()[0].timestamp if c.value() else None,
+                            c.id,
+                        ) for c in channel
+                    ],
+                    key=lambda x: x.created,
+                    reverse=True,
+                ).dropwhile(lambda x: x.id != continuation_token).Skip(1).Take(
+                    20))
                 if paged_result.items.count == 20:
                     paged_result.continuation_token = paged_result.items[-1].id
 

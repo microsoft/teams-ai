@@ -25,7 +25,8 @@ from .streaming_request_handler import StreamingRequestHandler
 from .streaming_http_client import StreamingHttpDriver
 
 
-class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcessor):
+class BotFrameworkHttpAdapterBase(BotFrameworkAdapter,
+                                  StreamingActivityProcessor):
     # pylint: disable=pointless-string-statement
     def __init__(self, settings: BotFrameworkAdapterSettings):
         super().__init__(settings)
@@ -43,15 +44,13 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
             raise TypeError(
                 f"'activity: {activity.__class__.__name__}' argument can't be None"
             )
-
         """
         If a conversation has moved from one connection to another for the same Channel or Skill and
         hasn't been forgotten by the previous StreamingRequestHandler. The last requestHandler
         the conversation has been associated with should always be the active connection.
         """
         request_handler = [
-            handler
-            for handler in self.request_handlers
+            handler for handler in self.request_handlers
             if handler.service_url == activity.service_url
             and handler.has_conversation(activity.conversation.id)
         ]
@@ -62,14 +61,14 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
             context.turn_state[self.BOT_IDENTITY_KEY] = self.claims_identity
 
         connector_client = self._create_streaming_connector_client(
-            activity, request_handler
-        )
+            activity, request_handler)
         context.turn_state[self.BOT_CONNECTOR_CLIENT_KEY] = connector_client
 
         await self.run_pipeline(context, bot_callback_handler)
 
         if activity.type == ActivityTypes.invoke:
-            activity_invoke_response = context.turn_state.get(self._INVOKE_RESPONSE_KEY)
+            activity_invoke_response = context.turn_state.get(
+                self._INVOKE_RESPONSE_KEY)
 
             if not activity_invoke_response:
                 return InvokeResponse(status=HTTPStatus.NOT_IMPLEMENTED)
@@ -77,7 +76,8 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
 
         return None
 
-    async def send_streaming_activity(self, activity: Activity) -> ResourceResponse:
+    async def send_streaming_activity(self,
+                                      activity: Activity) -> ResourceResponse:
         raise NotImplementedError()
 
     def can_process_outgoing_activity(self, activity: Activity) -> bool:
@@ -89,8 +89,8 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
         return not activity.service_url.startswith("https")
 
     async def process_outgoing_activity(
-        self, turn_context: TurnContext, activity: Activity
-    ) -> ResourceResponse:
+            self, turn_context: TurnContext,
+            activity: Activity) -> ResourceResponse:
         if not activity:
             raise TypeError(
                 f"'activity: {activity.__class__.__name__}' argument can't be None"
@@ -105,13 +105,12 @@ class BotFrameworkHttpAdapterBase(BotFrameworkAdapter, StreamingActivityProcesso
         return await self.send_streaming_activity(activity)
 
     def _create_streaming_connector_client(
-        self, activity: Activity, request_handler: StreamingRequestHandler
-    ) -> ConnectorClient:
-        empty_credentials = (
-            MicrosoftAppCredentials.empty()
-            if self._channel_provider and self._channel_provider.is_government()
-            else MicrosoftGovernmentAppCredentials.empty()
-        )
+            self, activity: Activity,
+            request_handler: StreamingRequestHandler) -> ConnectorClient:
+        empty_credentials = (MicrosoftAppCredentials.empty()
+                             if self._channel_provider
+                             and self._channel_provider.is_government() else
+                             MicrosoftGovernmentAppCredentials.empty())
         streaming_driver = StreamingHttpDriver(request_handler)
         config = BotFrameworkConnectorConfiguration(
             empty_credentials,

@@ -14,6 +14,7 @@ USER_AGENT = f"Microsoft-BotFramework/3.1 (BotBuilder Python/{__version__})"
 
 
 class _ConnectorFactoryImpl(ConnectorFactory):
+
     def __init__(
         self,
         app_id: str,
@@ -21,7 +22,8 @@ class _ConnectorFactoryImpl(ConnectorFactory):
         login_endpoint: str,
         validate_authority: bool,
         credential_factory: ServiceClientCredentialsFactory,
-        connector_client_configuration: BotFrameworkConnectorConfiguration = None,
+        connector_client_configuration:
+        BotFrameworkConnectorConfiguration = None,
         logger: Logger = None,
     ) -> None:
         self._app_id = app_id
@@ -32,7 +34,9 @@ class _ConnectorFactoryImpl(ConnectorFactory):
         self._connector_client_configuration = connector_client_configuration
         self._logger = logger
 
-    async def create(self, service_url: str, audience: str = None) -> ConnectorClient:
+    async def create(self,
+                     service_url: str,
+                     audience: str = None) -> ConnectorClient:
         # Use the credentials factory to create credentails specific to this particular cloud environment.
         credentials = await self._credential_factory.create_credentials(
             self._app_id,

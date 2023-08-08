@@ -12,9 +12,12 @@ from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
-    def __init__(
-        self, app_id: str = None, password: str = None, *, logger: Logger = None
-    ) -> None:
+
+    def __init__(self,
+                 app_id: str = None,
+                 password: str = None,
+                 *,
+                 logger: Logger = None) -> None:
         self.app_id = app_id
         self.password = password
         self._logger = logger
@@ -25,9 +28,9 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
     async def is_authentication_disabled(self) -> bool:
         return not self.app_id
 
-    async def create_credentials(
-        self, app_id: str, audience: str, login_endpoint: str, validate_authority: bool
-    ) -> Authentication:
+    async def create_credentials(self, app_id: str, audience: str,
+                                 login_endpoint: str,
+                                 validate_authority: bool) -> Authentication:
         if await self.is_authentication_disabled():
             return MicrosoftAppCredentials.empty()
 
@@ -38,46 +41,37 @@ class PasswordServiceClientCredentialFactory(ServiceClientCredentialsFactory):
         normalized_endpoint = login_endpoint.lower() if login_endpoint else ""
 
         if normalized_endpoint.startswith(
-            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX
-        ):
+                AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX):
             # TODO: Unpack necessity of these empty credentials based on the
             # loginEndpoint as no tokensare fetched when auth is disabled.
-            credentials = (
-                MicrosoftAppCredentials.empty()
-                if not app_id
-                else MicrosoftAppCredentials(app_id, self.password, None, audience)
-            )
+            credentials = (MicrosoftAppCredentials.empty()
+                           if not app_id else MicrosoftAppCredentials(
+                               app_id, self.password, None, audience))
         elif normalized_endpoint == GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL:
-            credentials = (
-                MicrosoftAppCredentials(
-                    None,
-                    None,
-                    None,
-                    GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
-                )
-                if not app_id
-                else MicrosoftAppCredentials(app_id, self.password, None, audience)
-            )
+            credentials = (MicrosoftAppCredentials(
+                None,
+                None,
+                None,
+                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE,
+            ) if not app_id else MicrosoftAppCredentials(
+                app_id, self.password, None, audience))
             normalized_endpoint = login_endpoint
         else:
-            credentials = (
-                _PrivateCloudAppCredentials(
-                    None, None, None, normalized_endpoint, validate_authority
-                )
-                if not app_id
-                else MicrosoftAppCredentials(
-                    app_id,
-                    self.password,
-                    audience,
-                    normalized_endpoint,
-                    validate_authority,
-                )
-            )
+            credentials = (_PrivateCloudAppCredentials(
+                None, None, None, normalized_endpoint, validate_authority)
+                           if not app_id else MicrosoftAppCredentials(
+                               app_id,
+                               self.password,
+                               audience,
+                               normalized_endpoint,
+                               validate_authority,
+                           ))
 
         return credentials
 
 
 class _PrivateCloudAppCredentials(MicrosoftAppCredentials):
+
     def __init__(
         self,
         app_id: str,
@@ -86,9 +80,10 @@ class _PrivateCloudAppCredentials(MicrosoftAppCredentials):
         oauth_endpoint: str,
         validate_authority: bool,
     ):
-        super().__init__(
-            app_id, password, channel_auth_tenant=None, oauth_scope=oauth_scope
-        )
+        super().__init__(app_id,
+                         password,
+                         channel_auth_tenant=None,
+                         oauth_scope=oauth_scope)
 
         self.oauth_endpoint = oauth_endpoint
         self._validate_authority = validate_authority

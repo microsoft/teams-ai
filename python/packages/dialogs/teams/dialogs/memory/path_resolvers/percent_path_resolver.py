@@ -5,5 +5,6 @@ from .alias_path_resolver import AliasPathResolver
 
 
 class PercentPathResolver(AliasPathResolver):
+
     def __init__(self):
         super().__init__(alias="%", prefix="class.")

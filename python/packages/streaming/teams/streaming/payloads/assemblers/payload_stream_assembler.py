@@ -37,7 +37,8 @@ class PayloadStreamAssembler(Assembler):
 
         return self._stream
 
-    def on_receive(self, header: Header, stream: List[int], content_length: int):
+    def on_receive(self, header: Header, stream: List[int],
+                   content_length: int):
         if header.end:
             self.end = True
             self._stream.done_producing()

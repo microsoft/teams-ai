@@ -32,16 +32,15 @@ class UserState(BotState):
         :return:
         """
         channel_id = turn_context.activity.channel_id or self.__raise_type_error(
-            "invalid activity-missing channelId"
-        )
+            "invalid activity-missing channelId")
         user_id = turn_context.activity.from_property.id or self.__raise_type_error(
-            "invalid activity-missing from_property.id"
-        )
+            "invalid activity-missing from_property.id")
 
         storage_key = None
         if channel_id and user_id:
             storage_key = "%s/users/%s" % (channel_id, user_id)
         return storage_key
 
-    def __raise_type_error(self, err: str = "NoneType found while expecting value"):
+    def __raise_type_error(self,
+                           err: str = "NoneType found while expecting value"):
         raise TypeError(err)

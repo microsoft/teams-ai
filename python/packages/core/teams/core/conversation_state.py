@@ -25,7 +25,8 @@ class ConversationState(BotState):
         :param storage: The storage containing the conversation state.
         :type storage: :class:`Storage`
         """
-        super(ConversationState, self).__init__(storage, "Internal.ConversationState")
+        super(ConversationState, self).__init__(storage,
+                                                "Internal.ConversationState")
 
     def get_storage_key(self, turn_context: TurnContext) -> object:
         """
@@ -45,19 +46,18 @@ class ConversationState(BotState):
             Conversation state includes the channel ID and conversation ID as part of its storage key.
         """
         channel_id = turn_context.activity.channel_id or self.__raise_type_error(
-            "invalid activity-missing channel_id"
-        )
-        conversation_id = (
-            turn_context.activity.conversation.id
-            or self.__raise_type_error("invalid activity-missing conversation.id")
-        )
+            "invalid activity-missing channel_id")
+        conversation_id = (turn_context.activity.conversation.id
+                           or self.__raise_type_error(
+                               "invalid activity-missing conversation.id"))
 
         storage_key = None
         if channel_id and conversation_id:
             storage_key = "%s/conversations/%s" % (channel_id, conversation_id)
         return storage_key
 
-    def __raise_type_error(self, err: str = "NoneType found while expecting value"):
+    def __raise_type_error(self,
+                           err: str = "NoneType found while expecting value"):
         """Raise type error exception
         :raises: :class:`TypeError`
         """

@@ -48,18 +48,20 @@ class ConnectorClient(SDKClient):
     def __init__(self, credentials, base_url=None):
 
         self.config = ConnectorClientConfiguration(credentials, base_url)
-        super(ConnectorClient, self).__init__(self.config.credentials, self.config)
+        super(ConnectorClient, self).__init__(self.config.credentials,
+                                              self.config)
 
         client_models = {
-            k: v for k, v in models.__dict__.items() if isinstance(v, type)
+            k: v
+            for k, v in models.__dict__.items() if isinstance(v, type)
         }
         self.api_version = "v3"
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
-        self.attachments = AttachmentsOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
-        self.conversations = ConversationsOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
+        self.attachments = AttachmentsOperations(self._client, self.config,
+                                                 self._serialize,
+                                                 self._deserialize)
+        self.conversations = ConversationsOperations(self._client, self.config,
+                                                     self._serialize,
+                                                     self._deserialize)

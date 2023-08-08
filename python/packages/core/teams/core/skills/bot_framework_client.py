@@ -8,6 +8,7 @@ from teams.core import InvokeResponse
 
 
 class BotFrameworkClient(ABC):
+
     def post_activity(
         self,
         from_bot_id: str,

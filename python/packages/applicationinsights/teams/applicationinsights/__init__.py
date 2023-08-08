@@ -11,7 +11,6 @@ from .application_insights_telemetry_client import (
 )
 from .bot_telemetry_processor import BotTelemetryProcessor
 
-
 __all__ = [
     "ApplicationInsightsTelemetryClient",
     "BotTelemetryProcessor",

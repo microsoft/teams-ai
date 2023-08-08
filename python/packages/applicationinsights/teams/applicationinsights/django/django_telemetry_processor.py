@@ -8,6 +8,7 @@ from .bot_telemetry_middleware import retrieve_bot_body
 
 
 class DjangoTelemetryProcessor(TelemetryProcessor):
+
     def can_process(self) -> bool:
         return self.detect_django()
 

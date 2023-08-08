@@ -41,12 +41,10 @@ class CardFactory:
         if not isinstance(card, dict):
             raise TypeError(
                 "CardFactory.adaptive_card(): `card` argument is not of type dict, unable to prepare "
-                "attachment."
-            )
+                "attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.adaptive_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.adaptive_card,
+                          content=card)
 
     @staticmethod
     def animation_card(card: AnimationCard) -> Attachment:
@@ -59,12 +57,11 @@ class CardFactory:
         if not isinstance(card, AnimationCard):
             raise TypeError(
                 "CardFactory.animation_card(): `card` argument is not an instance of an AnimationCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
         return Attachment(
-            content_type=CardFactory.content_types.animation_card, content=card
-        )
+            content_type=CardFactory.content_types.animation_card,
+            content=card)
 
     @staticmethod
     def audio_card(card: AudioCard) -> Attachment:
@@ -76,12 +73,10 @@ class CardFactory:
         if not isinstance(card, AudioCard):
             raise TypeError(
                 "CardFactory.audio_card(): `card` argument is not an instance of an AudioCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.audio_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.audio_card,
+                          content=card)
 
     @staticmethod
     def hero_card(card: HeroCard) -> Attachment:
@@ -95,12 +90,10 @@ class CardFactory:
         if not isinstance(card, HeroCard):
             raise TypeError(
                 "CardFactory.hero_card(): `card` argument is not an instance of an HeroCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.hero_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.hero_card,
+                          content=card)
 
     @staticmethod
     def oauth_card(card: OAuthCard) -> Attachment:
@@ -113,12 +106,10 @@ class CardFactory:
         if not isinstance(card, OAuthCard):
             raise TypeError(
                 "CardFactory.oauth_card(): `card` argument is not an instance of an OAuthCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.oauth_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.oauth_card,
+                          content=card)
 
     @staticmethod
     def receipt_card(card: ReceiptCard) -> Attachment:
@@ -130,12 +121,10 @@ class CardFactory:
         if not isinstance(card, ReceiptCard):
             raise TypeError(
                 "CardFactory.receipt_card(): `card` argument is not an instance of an ReceiptCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.receipt_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.receipt_card,
+                          content=card)
 
     @staticmethod
     def signin_card(card: SigninCard) -> Attachment:
@@ -148,12 +137,10 @@ class CardFactory:
         if not isinstance(card, SigninCard):
             raise TypeError(
                 "CardFactory.signin_card(): `card` argument is not an instance of an SigninCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.signin_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.signin_card,
+                          content=card)
 
     @staticmethod
     def thumbnail_card(card: ThumbnailCard) -> Attachment:
@@ -168,12 +155,11 @@ class CardFactory:
         if not isinstance(card, ThumbnailCard):
             raise TypeError(
                 "CardFactory.thumbnail_card(): `card` argument is not an instance of an ThumbnailCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
         return Attachment(
-            content_type=CardFactory.content_types.thumbnail_card, content=card
-        )
+            content_type=CardFactory.content_types.thumbnail_card,
+            content=card)
 
     @staticmethod
     def video_card(card: VideoCard) -> Attachment:
@@ -185,9 +171,7 @@ class CardFactory:
         if not isinstance(card, VideoCard):
             raise TypeError(
                 "CardFactory.video_card(): `card` argument is not an instance of an VideoCard, "
-                "unable to prepare attachment."
-            )
+                "unable to prepare attachment.")
 
-        return Attachment(
-            content_type=CardFactory.content_types.video_card, content=card
-        )
+        return Attachment(content_type=CardFactory.content_types.video_card,
+                          content=card)

@@ -8,6 +8,7 @@ from .http_response_base import HttpResponseBase
 
 
 class HttpClientBase(ABC):
+
     @abstractmethod
     async def post(self, *, request: HttpRequest) -> HttpResponseBase:
         raise NotImplementedError()

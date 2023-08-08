@@ -14,6 +14,7 @@ from teams.core import (
 
 
 class AdapterExtensions:
+
     @staticmethod
     def use_storage(adapter: BotAdapter, storage: Storage) -> BotAdapter:
         """
@@ -27,9 +28,9 @@ class AdapterExtensions:
         return adapter.use(RegisterClassMiddleware(storage))
 
     @staticmethod
-    def use_bot_state(
-        bot_adapter: BotAdapter, *bot_states: BotState, auto: bool = True
-    ) -> BotAdapter:
+    def use_bot_state(bot_adapter: BotAdapter,
+                      *bot_states: BotState,
+                      auto: bool = True) -> BotAdapter:
         """
         Registers bot state object into the TurnContext. The botstate will be available via the turn context.
 
@@ -42,10 +43,8 @@ class AdapterExtensions:
 
         for bot_state in bot_states:
             bot_adapter.use(
-                RegisterClassMiddleware(
-                    bot_state, AdapterExtensions.fullname(bot_state)
-                )
-            )
+                RegisterClassMiddleware(bot_state,
+                                        AdapterExtensions.fullname(bot_state)))
 
         if auto:
             bot_adapter.use(AutoSaveStateMiddleware(bot_states))
@@ -56,7 +55,7 @@ class AdapterExtensions:
     def fullname(obj):
         module = obj.__class__.__module__
         if module is None or module == str.__class__.__module__:
-            return obj.__class__.__name__  # Avoid reporting __builtin__
+            return obj.__class__.__name__    # Avoid reporting __builtin__
         return module + "." + obj.__class__.__name__
 
     @staticmethod
@@ -94,6 +93,7 @@ class AdapterExtensions:
         adapter.use(RegisterClassMiddleware(conversation_state))
 
         if auto:
-            adapter.use(AutoSaveStateMiddleware([user_state, conversation_state]))
+            adapter.use(
+                AutoSaveStateMiddleware([user_state, conversation_state]))
 
         return adapter

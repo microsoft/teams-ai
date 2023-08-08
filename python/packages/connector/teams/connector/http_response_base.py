@@ -7,6 +7,7 @@ from typing import Union
 
 
 class HttpResponseBase(ABC):
+
     @property
     @abstractmethod
     def status_code(self) -> Union[HTTPStatus, int]:

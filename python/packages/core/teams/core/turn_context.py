@@ -36,18 +36,17 @@ class TurnContext:
             self.responses: List[Activity] = []
             self._services: dict = {}
             self._on_send_activities: Callable[
-                ["TurnContext", List[Activity], Callable], List[ResourceResponse]
-            ] = []
+                ["TurnContext", List[Activity], Callable],
+                List[ResourceResponse]] = []
             self._on_update_activity: Callable[
-                ["TurnContext", Activity, Callable], ResourceResponse
-            ] = []
+                ["TurnContext", Activity, Callable], ResourceResponse] = []
             self._on_delete_activity: Callable[
-                ["TurnContext", ConversationReference, Callable], None
-            ] = []
+                ["TurnContext", ConversationReference, Callable], None] = []
             self._responded: bool = False
 
         if self.adapter is None:
-            raise TypeError("TurnContext must be instantiated with an adapter.")
+            raise TypeError(
+                "TurnContext must be instantiated with an adapter.")
         if self.activity is None:
             raise TypeError(
                 "TurnContext must be instantiated with a request parameter of type Activity."
@@ -70,13 +69,13 @@ class TurnContext:
         :return:
         """
         for attribute in [
-            "adapter",
-            "activity",
-            "_responded",
-            "_services",
-            "_on_send_activities",
-            "_on_update_activity",
-            "_on_delete_activity",
+                "adapter",
+                "activity",
+                "_responded",
+                "_services",
+                "_on_send_activities",
+                "_on_update_activity",
+                "_on_delete_activity",
         ]:
             setattr(context, attribute, getattr(self, attribute))
 
@@ -112,7 +111,8 @@ class TurnContext:
     @responded.setter
     def responded(self, value: bool):
         if not value:
-            raise ValueError("TurnContext: cannot set TurnContext.responded to False.")
+            raise ValueError(
+                "TurnContext: cannot set TurnContext.responded to False.")
         self._responded = True
 
     @property
@@ -175,8 +175,7 @@ class TurnContext:
         return result[0] if result else None
 
     async def send_activities(
-        self, activities: List[Activity]
-    ) -> List[ResourceResponse]:
+            self, activities: List[Activity]) -> List[ResourceResponse]:
         sent_non_trace_activity = False
         ref = TurnContext.get_conversation_reference(self.activity)
 
@@ -193,8 +192,7 @@ class TurnContext:
 
         output = [
             activity_validator(
-                TurnContext.apply_conversation_reference(deepcopy(act), ref)
-            )
+                TurnContext.apply_conversation_reference(deepcopy(act), ref))
             for act in activities
         ]
 
@@ -209,7 +207,8 @@ class TurnContext:
                     # Ensure the TurnState has the InvokeResponseKey, since this activity
                     # is not being sent through the adapter, where it would be added to TurnState.
                     if activity.type == ActivityTypes.invoke_response:
-                        self.turn_state[TurnContext._INVOKE_RESPONSE_KEY] = activity
+                        self.turn_state[
+                            TurnContext._INVOKE_RESPONSE_KEY] = activity
 
                     responses.append(ResourceResponse())
 
@@ -239,7 +238,9 @@ class TurnContext:
             self.adapter.update_activity(self, activity),
         )
 
-    async def delete_activity(self, id_or_reference: Union[str, ConversationReference]):
+    async def delete_activity(self,
+                              id_or_reference: Union[str,
+                                                     ConversationReference]):
         """
         Deletes an existing activity.
         :param id_or_reference:
@@ -303,9 +304,11 @@ class TurnContext:
         # logic does not use parentheses because it's a coroutine
         return await logic
 
-    async def send_trace_activity(
-        self, name: str, value: object = None, value_type: str = None, label: str = None
-    ) -> ResourceResponse:
+    async def send_trace_activity(self,
+                                  name: str,
+                                  value: object = None,
+                                  value_type: str = None,
+                                  label: str = None) -> ResourceResponse:
         trace_activity = Activity(
             type=ActivityTypes.trace,
             timestamp=datetime.utcnow(),
@@ -318,7 +321,8 @@ class TurnContext:
         return await self.send_activity(trace_activity)
 
     @staticmethod
-    def get_conversation_reference(activity: Activity) -> ConversationReference:
+    def get_conversation_reference(
+            activity: Activity) -> ConversationReference:
         """
         Returns the conversation reference for an activity. This can be saved as a plain old JSON
         object and then later used to message the user proactively.
@@ -339,9 +343,9 @@ class TurnContext:
         )
 
     @staticmethod
-    def apply_conversation_reference(
-        activity: Activity, reference: ConversationReference, is_incoming: bool = False
-    ) -> Activity:
+    def apply_conversation_reference(activity: Activity,
+                                     reference: ConversationReference,
+                                     is_incoming: bool = False) -> Activity:
         """
         Updates an activity with the delivery information from a conversation reference. Calling
         this after get_conversation_reference on an incoming activity
@@ -370,11 +374,10 @@ class TurnContext:
 
     @staticmethod
     def get_reply_conversation_reference(
-        activity: Activity, reply: ResourceResponse
-    ) -> ConversationReference:
+            activity: Activity,
+            reply: ResourceResponse) -> ConversationReference:
         reference: ConversationReference = TurnContext.get_conversation_reference(
-            activity
-        )
+            activity)
 
         # Update the reference with the new outgoing Activity's id.
         reference.activity_id = reply.id
@@ -396,9 +399,8 @@ class TurnContext:
                     re.IGNORECASE,
                 )
                 if mention_name_match:
-                    activity.text = re.sub(
-                        mention_name_match.groups()[1], "", activity.text
-                    )
+                    activity.text = re.sub(mention_name_match.groups()[1], "",
+                                           activity.text)
                     activity.text = re.sub(r"<at><\/at>", "", activity.text)
         return activity.text
 

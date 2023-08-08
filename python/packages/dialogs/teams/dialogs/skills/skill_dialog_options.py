@@ -10,6 +10,7 @@ from teams.core.skills import (
 
 
 class SkillDialogOptions:
+
     def __init__(
         self,
         bot_id: str = None,

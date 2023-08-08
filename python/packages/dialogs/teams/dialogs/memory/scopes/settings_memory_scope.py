@@ -7,6 +7,7 @@ from .memory_scope import MemoryScope
 
 
 class SettingsMemoryScope(MemoryScope):
+
     def __init__(self):
         super().__init__(scope_path.SETTINGS)
         self._empty_settings = {}
@@ -17,8 +18,7 @@ class SettingsMemoryScope(MemoryScope):
             raise TypeError(f"Expecting: DialogContext, but received None")
 
         settings: dict = dialog_context.context.turn_state.get(
-            scope_path.SETTINGS, None
-        )
+            scope_path.SETTINGS, None)
 
         if not settings:
             settings = self._empty_settings
@@ -27,5 +27,4 @@ class SettingsMemoryScope(MemoryScope):
 
     def set_memory(self, dialog_context: "DialogContext", memory: object):
         raise Exception(
-            f"{self.__class__.__name__}.set_memory not supported (read only)"
-        )
+            f"{self.__class__.__name__}.set_memory not supported (read only)")

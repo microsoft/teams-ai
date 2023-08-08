@@ -11,6 +11,7 @@ from .payload_disassembler import PayloadDisassembler
 
 
 class ResponseDisassembler(PayloadDisassembler):
+
     def __init__(
         self,
         sender: PayloadSender,

@@ -8,5 +8,6 @@ from .bot_state_memory_scope import BotStateMemoryScope
 
 
 class ConversationMemoryScope(BotStateMemoryScope):
+
     def __init__(self):
         super().__init__(ConversationState, scope_path.CONVERSATION)

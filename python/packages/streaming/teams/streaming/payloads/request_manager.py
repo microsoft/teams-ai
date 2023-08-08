@@ -9,16 +9,16 @@ import teams.streaming as streaming
 
 
 class RequestManager:
+
     def __init__(
         self,
         *,
-        pending_requests: Dict[UUID, "Future[streaming.ReceiveResponse]"] = None
-    ):
+        pending_requests: Dict[UUID,
+                               "Future[streaming.ReceiveResponse]"] = None):
         self._pending_requests = pending_requests or {}
 
-    async def signal_response(
-        self, request_id: UUID, response: "streaming.ReceiveResponse"
-    ) -> bool:
+    async def signal_response(self, request_id: UUID,
+                              response: "streaming.ReceiveResponse") -> bool:
         # TODO: dive more into this logic
         signal: Future = self._pending_requests.get(request_id)
         if signal:
@@ -30,7 +30,8 @@ class RequestManager:
 
         return False
 
-    async def get_response(self, request_id: UUID) -> "streaming.ReceiveResponse":
+    async def get_response(self,
+                           request_id: UUID) -> "streaming.ReceiveResponse":
         if request_id in self._pending_requests:
             return None
 

@@ -7,6 +7,7 @@ from teams.streaming.payloads.models import Serializable
 
 
 class VersionInfo(Serializable):
+
     def __init__(self, *, user_agent: str = None):
         self.user_agent = user_agent
 

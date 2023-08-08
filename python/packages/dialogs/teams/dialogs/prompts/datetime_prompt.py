@@ -12,9 +12,11 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class DateTimePrompt(Prompt):
-    def __init__(
-        self, dialog_id: str, validator: object = None, default_locale: str = None
-    ):
+
+    def __init__(self,
+                 dialog_id: str,
+                 validator: object = None,
+                 default_locale: str = None):
         super(DateTimePrompt, self).__init__(dialog_id, validator)
         self.default_locale = default_locale
 
@@ -26,9 +28,11 @@ class DateTimePrompt(Prompt):
         is_retry: bool,
     ):
         if not turn_context:
-            raise TypeError("DateTimePrompt.on_prompt(): turn_context cannot be None.")
+            raise TypeError(
+                "DateTimePrompt.on_prompt(): turn_context cannot be None.")
         if not options:
-            raise TypeError("DateTimePrompt.on_prompt(): options cannot be None.")
+            raise TypeError(
+                "DateTimePrompt.on_prompt(): options cannot be None.")
 
         if is_retry and options.retry_prompt is not None:
             await turn_context.send_activity(options.retry_prompt)
@@ -44,8 +48,7 @@ class DateTimePrompt(Prompt):
     ) -> PromptRecognizerResult:
         if not turn_context:
             raise TypeError(
-                "DateTimePrompt.on_recognize(): turn_context cannot be None."
-            )
+                "DateTimePrompt.on_recognize(): turn_context cannot be None.")
 
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
@@ -54,11 +57,8 @@ class DateTimePrompt(Prompt):
             if not utterance:
                 return result
             # TODO: English constant needs to be ported.
-            culture = (
-                turn_context.activity.locale
-                if turn_context.activity.locale is not None
-                else "English"
-            )
+            culture = (turn_context.activity.locale if
+                       turn_context.activity.locale is not None else "English")
 
             results = recognize_datetime(utterance, culture)
             if results:
@@ -70,7 +70,8 @@ class DateTimePrompt(Prompt):
 
         return result
 
-    def read_resolution(self, resolution: Dict[str, str]) -> DateTimeResolution:
+    def read_resolution(self, resolution: Dict[str,
+                                               str]) -> DateTimeResolution:
         result = DateTimeResolution()
 
         if "timex" in resolution:

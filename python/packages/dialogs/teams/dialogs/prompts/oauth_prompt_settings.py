@@ -4,6 +4,7 @@ from teams.connector.auth import AppCredentials
 
 
 class OAuthPromptSettings:
+
     def __init__(
         self,
         connection_name: str,

@@ -23,6 +23,7 @@ from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class _BotFrameworkClientImpl(BotFrameworkClient):
+
     def __init__(
         self,
         credentials_factory: ServiceClientCredentialsFactory,
@@ -31,11 +32,9 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
         logger: Logger = None,
     ):
         self._credentials_factory = credentials_factory
-        self._http_client = (
-            http_client_factory.create_client()
-            if http_client_factory
-            else _NotImplementedHttpClient()
-        )
+        self._http_client = (http_client_factory.create_client()
+                             if http_client_factory else
+                             _NotImplementedHttpClient())
         self._login_endpoint = login_endpoint
         self._logger = logger
 
@@ -65,11 +64,11 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
             self._logger.log(20, f"post to skill '{to_bot_id}' at '{to_url}'")
 
         credentials = await self._credentials_factory.create_credentials(
-            from_bot_id, to_bot_id, self._login_endpoint, True
-        )
+            from_bot_id, to_bot_id, self._login_endpoint, True)
 
         # Get token for the skill call
-        token = credentials.get_access_token() if credentials.microsoft_app_id else None
+        token = credentials.get_access_token(
+        ) if credentials.microsoft_app_id else None
 
         # Clone the activity so we can modify it before sending without impacting the original object.
         activity_copy = deepcopy(activity)
@@ -102,16 +101,14 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
             "Content-type": "application/json; charset=utf-8",
         }
         if token:
-            headers_dict.update(
-                {
-                    "Authorization": f"Bearer {token}",
-                }
-            )
+            headers_dict.update({
+                "Authorization": f"Bearer {token}",
+            })
         json_content = dumps(activity_copy.serialize()).encode("utf-8")
 
-        request = HttpRequest(
-            request_uri=to_url, content=json_content, headers=headers_dict
-        )
+        request = HttpRequest(request_uri=to_url,
+                              content=json_content,
+                              headers=headers_dict)
         response = await self._http_client.post(request=request)
 
         data = await response.read_content_str()
@@ -123,6 +120,5 @@ class _BotFrameworkClientImpl(BotFrameworkClient):
                 f"Bot Framework call failed to '{to_url}' returning '{int(response.status_code)}' and '{data}'",
             )
 
-        return InvokeResponse(
-            status=response.status_code, body=loads(data) if data else None
-        )
+        return InvokeResponse(status=response.status_code,
+                              body=loads(data) if data else None)

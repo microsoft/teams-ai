@@ -24,8 +24,7 @@ from teams.connector.auth import (
     ClaimsIdentity,
 )
 from teams.connector.auth.authenticate_request_result import (
-    AuthenticateRequestResult,
-)
+    AuthenticateRequestResult, )
 from teams.connector.auth.connector_factory import ConnectorFactory
 from teams.connector.auth.user_token_client import UserTokenClient
 from .bot_adapter import BotAdapter
@@ -38,18 +37,19 @@ class CloudAdapterBase(BotAdapter, ABC):
     USER_TOKEN_CLIENT_KEY = "UserTokenClient"
 
     def __init__(
-        self, bot_framework_authentication: BotFrameworkAuthentication
-    ) -> None:
+            self,
+            bot_framework_authentication: BotFrameworkAuthentication) -> None:
         super().__init__()
 
         if not bot_framework_authentication:
-            raise TypeError("Expected BotFrameworkAuthentication but got None instead")
+            raise TypeError(
+                "Expected BotFrameworkAuthentication but got None instead")
 
         self.bot_framework_authentication = bot_framework_authentication
 
     async def send_activities(
-        self, context: TurnContext, activities: List[Activity]
-    ) -> List[ResourceResponse]:
+            self, context: TurnContext,
+            activities: List[Activity]) -> List[ResourceResponse]:
         if not context:
             raise TypeError("Expected TurnContext but got None instead")
 
@@ -57,7 +57,8 @@ class CloudAdapterBase(BotAdapter, ABC):
             raise TypeError("Expected Activities list but got None instead")
 
         if len(activities) == 0:
-            raise TypeError("Expecting one or more activities, but the list was empty.")
+            raise TypeError(
+                "Expecting one or more activities, but the list was empty.")
 
         responses = []
 
@@ -71,29 +72,26 @@ class CloudAdapterBase(BotAdapter, ABC):
                 await sleep(delay_time)
             elif activity.type == ActivityTypes.invoke_response:
                 context.turn_state[self._INVOKE_RESPONSE_KEY] = activity
-            elif (
-                activity.type == ActivityTypes.trace
-                and activity.channel_id != Channels.emulator
-            ):
+            elif (activity.type == ActivityTypes.trace
+                  and activity.channel_id != Channels.emulator):
                 # no-op
                 pass
             else:
                 connector_client: ConnectorClient = context.turn_state.get(
-                    self.BOT_CONNECTOR_CLIENT_KEY
-                )
+                    self.BOT_CONNECTOR_CLIENT_KEY)
                 if not connector_client:
-                    raise Error("Unable to extract ConnectorClient from turn context.")
+                    raise Error(
+                        "Unable to extract ConnectorClient from turn context.")
 
                 if activity.reply_to_id:
                     response = await connector_client.conversations.reply_to_activity(
-                        activity.conversation.id, activity.reply_to_id, activity
-                    )
+                        activity.conversation.id, activity.reply_to_id,
+                        activity)
                 else:
                     response = (
-                        await connector_client.conversations.send_to_conversation(
-                            activity.conversation.id, activity
-                        )
-                    )
+                        await
+                        connector_client.conversations.send_to_conversation(
+                            activity.conversation.id, activity))
 
             response = response or ResourceResponse(activity.id or "")
 
@@ -109,39 +107,35 @@ class CloudAdapterBase(BotAdapter, ABC):
             raise TypeError("Expected Activity but got None instead")
 
         connector_client: ConnectorClient = context.turn_state.get(
-            self.BOT_CONNECTOR_CLIENT_KEY
-        )
+            self.BOT_CONNECTOR_CLIENT_KEY)
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
         response = await connector_client.conversations.update_activity(
-            activity.conversation.id, activity.reply_to_id, activity
-        )
+            activity.conversation.id, activity.reply_to_id, activity)
 
         response_id = response.id if response and response.id else None
 
         return ResourceResponse(id=response_id) if response_id else None
 
-    async def delete_activity(
-        self, context: TurnContext, reference: ConversationReference
-    ):
+    async def delete_activity(self, context: TurnContext,
+                              reference: ConversationReference):
         if not context:
             raise TypeError("Expected TurnContext but got None instead")
 
         if not reference:
-            raise TypeError("Expected ConversationReference but got None instead")
+            raise TypeError(
+                "Expected ConversationReference but got None instead")
 
         connector_client: ConnectorClient = context.turn_state.get(
-            self.BOT_CONNECTOR_CLIENT_KEY
-        )
+            self.BOT_CONNECTOR_CLIENT_KEY)
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
         await connector_client.conversations.delete_activity(
-            reference.conversation.id, reference.activity_id
-        )
+            reference.conversation.id, reference.activity_id)
 
-    async def continue_conversation(  # pylint: disable=arguments-differ
+    async def continue_conversation(    # pylint: disable=arguments-differ
         self,
         reference: ConversationReference,
         callback: Callable,
@@ -172,8 +166,8 @@ class CloudAdapterBase(BotAdapter, ABC):
         logic: Callable[[TurnContext], Awaitable],
     ):
         return await self.process_proactive(
-            claims_identity, get_continuation_activity(reference), audience, logic
-        )
+            claims_identity, get_continuation_activity(reference), audience,
+            logic)
 
     async def process_proactive(
         self,
@@ -185,20 +179,15 @@ class CloudAdapterBase(BotAdapter, ABC):
         # Create the connector factory and  the inbound request, extracting parameters and then create a
         # connector for outbound requests.
         connector_factory = self.bot_framework_authentication.create_connector_factory(
-            claims_identity
-        )
+            claims_identity)
 
         # Create the connector client to use for outbound requests.
         connector_client = await connector_factory.create(
-            continuation_activity.service_url, audience
-        )
+            continuation_activity.service_url, audience)
 
         # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
-        user_token_client = (
-            await self.bot_framework_authentication.create_user_token_client(
-                claims_identity
-            )
-        )
+        user_token_client = (await self.bot_framework_authentication.
+                             create_user_token_client(claims_identity))
 
         # Create a turn context and run the pipeline.
         context = self._create_turn_context(
@@ -217,8 +206,7 @@ class CloudAdapterBase(BotAdapter, ABC):
     async def process_activity(
         self,
         auth_header_or_authenticate_request_result: Union[
-            str, AuthenticateRequestResult
-        ],
+            str, AuthenticateRequestResult],
         activity: Activity,
         logic: Callable[[TurnContext], Awaitable],
     ):
@@ -246,11 +234,9 @@ class CloudAdapterBase(BotAdapter, ABC):
         # Connector for outbound requests.
         authenticate_request_result = (
             await self.bot_framework_authentication.authenticate_request(
-                activity, auth_header_or_authenticate_request_result
-            )
-            if isinstance(auth_header_or_authenticate_request_result, str)
-            else auth_header_or_authenticate_request_result
-        )
+                activity, auth_header_or_authenticate_request_result)
+            if isinstance(auth_header_or_authenticate_request_result,
+                          str) else auth_header_or_authenticate_request_result)
 
         # Set the caller_id on the activity
         activity.caller_id = authenticate_request_result.caller_id
@@ -258,11 +244,8 @@ class CloudAdapterBase(BotAdapter, ABC):
         # Create the connector client to use for outbound requests.
         connector_client = (
             await authenticate_request_result.connector_factory.create(
-                activity.service_url, authenticate_request_result.audience
-            )
-            if authenticate_request_result.connector_factory
-            else None
-        )
+                activity.service_url, authenticate_request_result.audience)
+            if authenticate_request_result.connector_factory else None)
 
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
@@ -271,9 +254,7 @@ class CloudAdapterBase(BotAdapter, ABC):
         # (For example, it would be used in a sign-in prompt.)
         user_token_client = (
             await self.bot_framework_authentication.create_user_token_client(
-                authenticate_request_result.claims_identity
-            )
-        )
+                authenticate_request_result.claims_identity))
 
         # Create a turn context and run the pipeline.
         context = self._create_turn_context(
@@ -330,14 +311,14 @@ class CloudAdapterBase(BotAdapter, ABC):
         if context.activity.delivery_mode == DeliveryModes.expect_replies:
             return InvokeResponse(
                 status=HTTPStatus.OK,
-                body=ExpectedReplies(activities=context.buffered_reply_activities),
+                body=ExpectedReplies(
+                    activities=context.buffered_reply_activities),
             )
 
         # Handle Invoke scenarios where the bot will return a specific body and return code.
         if context.activity.type == ActivityTypes.invoke:
             activity_invoke_response: Activity = context.turn_state.get(
-                self._INVOKE_RESPONSE_KEY
-            )
+                self._INVOKE_RESPONSE_KEY)
             if not activity_invoke_response:
                 return InvokeResponse(status=HTTPStatus.NOT_IMPLEMENTED)
 

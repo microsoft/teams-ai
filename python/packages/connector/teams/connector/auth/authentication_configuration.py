@@ -5,6 +5,7 @@ from typing import Awaitable, Callable, Dict, List
 
 
 class AuthenticationConfiguration:
+
     def __init__(
         self,
         required_endorsements: List[str] = None,

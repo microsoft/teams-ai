@@ -13,6 +13,7 @@ from .web_socket_state import WebSocketState
 
 
 class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
+
     def __init__(self, web_socket: WebSocket):
         self._socket = web_socket
 
@@ -42,21 +43,22 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
     # TODO: might need to remove offset and count if no segmentation possible
     # TODO: considering to create a BFTransportBuffer class to abstract the logic of binary buffers adapting to
     #  current interfaces
-    async def receive(
-        self, buffer: List[int], offset: int = 0, count: int = None
-    ) -> int:
+    async def receive(self,
+                      buffer: List[int],
+                      offset: int = 0,
+                      count: int = None) -> int:
         try:
             if self._socket:
                 result = await self._socket.receive()
                 buffer_index = offset
-                result_length = count if count is not None else len(result.data)
+                result_length = count if count is not None else len(
+                    result.data)
                 for result_index in range(result_length):
                     buffer[buffer_index] = result.data[result_index]
                     buffer_index += 1
                 if result.message_type == WebSocketMessageType.CLOSE:
                     await self._socket.close(
-                        WebSocketCloseStatus.NORMAL_CLOSURE, "Socket closed"
-                    )
+                        WebSocketCloseStatus.NORMAL_CLOSURE, "Socket closed")
 
                     # Depending on ws implementation library next line might not be necessary
                     if self._socket.status == WebSocketState.CLOSED:
@@ -70,7 +72,10 @@ class WebSocketTransport(TransportReceiverBase, TransportSenderBase):
             raise error
 
     # TODO: might need to remove offset and count if no segmentation possible (or put them in BFTransportBuffer)
-    async def send(self, buffer: List[int], offset: int = 0, count: int = None) -> int:
+    async def send(self,
+                   buffer: List[int],
+                   offset: int = 0,
+                   count: int = None) -> int:
         try:
             if self._socket:
                 await self._socket.send(

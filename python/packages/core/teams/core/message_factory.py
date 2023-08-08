@@ -57,7 +57,9 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        message = Activity(type=ActivityTypes.message, text=text, input_hint=input_hint)
+        message = Activity(type=ActivityTypes.message,
+                           text=text,
+                           input_hint=input_hint)
         if speak:
             message.speak = speak
 
@@ -87,9 +89,9 @@ class MessageFactory:
         :return:
         """
         actions = SuggestedActions(actions=actions)
-        message = Activity(
-            type=ActivityTypes.message, input_hint=input_hint, suggested_actions=actions
-        )
+        message = Activity(type=ActivityTypes.message,
+                           input_hint=input_hint,
+                           suggested_actions=actions)
         if text:
             message.text = text
         if speak:
@@ -120,9 +122,8 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        return attachment_activity(
-            AttachmentLayoutTypes.list, [attachment], text, speak, input_hint
-        )
+        return attachment_activity(AttachmentLayoutTypes.list, [attachment],
+                                   text, speak, input_hint)
 
     @staticmethod
     def list(
@@ -152,9 +153,8 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        return attachment_activity(
-            AttachmentLayoutTypes.list, attachments, text, speak, input_hint
-        )
+        return attachment_activity(AttachmentLayoutTypes.list, attachments,
+                                   text, speak, input_hint)
 
     @staticmethod
     def carousel(
@@ -184,9 +184,8 @@ class MessageFactory:
         :param input_hint:
         :return:
         """
-        return attachment_activity(
-            AttachmentLayoutTypes.carousel, attachments, text, speak, input_hint
-        )
+        return attachment_activity(AttachmentLayoutTypes.carousel, attachments,
+                                   text, speak, input_hint)
 
     @staticmethod
     def content_url(
@@ -216,6 +215,5 @@ class MessageFactory:
         attachment = Attachment(content_type=content_type, content_url=url)
         if name:
             attachment.name = name
-        return attachment_activity(
-            AttachmentLayoutTypes.list, [attachment], text, speak, input_hint
-        )
+        return attachment_activity(AttachmentLayoutTypes.list, [attachment],
+                                   text, speak, input_hint)

@@ -4,5 +4,6 @@ from teams.core.state_property_accessor import StatePropertyAccessor
 
 
 class PropertyManager:
+
     def create_property(self, name: str) -> StatePropertyAccessor:
         raise NotImplementedError()

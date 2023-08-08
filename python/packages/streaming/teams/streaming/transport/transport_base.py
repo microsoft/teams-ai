@@ -3,6 +3,7 @@
 
 
 class TransportBase:
+
     def __init__(self):
         self.is_connected: bool = None
 

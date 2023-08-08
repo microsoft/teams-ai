@@ -9,6 +9,7 @@ from .turn_context import TurnContext
 
 
 class BotAssert:
+
     @staticmethod
     def activity_not_none(activity: Activity) -> None:
         """
@@ -28,7 +29,8 @@ class BotAssert:
             raise TypeError(turn_context.__class__.__name__)
 
     @staticmethod
-    def conversation_reference_not_none(reference: ConversationReference) -> None:
+    def conversation_reference_not_none(
+            reference: ConversationReference) -> None:
         """
         Checks that a conversation reference object is not None
         :param reference: The conversation reference object

@@ -23,7 +23,8 @@ class JwtTokenExtractor:
     ):
         self.validation_parameters = validation_params
         self.validation_parameters.algorithms = allowed_algorithms
-        self.open_id_metadata = JwtTokenExtractor.get_open_id_metadata(metadata_url)
+        self.open_id_metadata = JwtTokenExtractor.get_open_id_metadata(
+            metadata_url)
 
     @staticmethod
     def get_open_id_metadata(metadata_url: str):
@@ -34,15 +35,16 @@ class JwtTokenExtractor:
         return metadata
 
     async def get_identity_from_auth_header(
-        self, auth_header: str, channel_id: str, required_endorsements: List[str] = None
-    ) -> ClaimsIdentity:
+            self,
+            auth_header: str,
+            channel_id: str,
+            required_endorsements: List[str] = None) -> ClaimsIdentity:
         if not auth_header:
             return None
         parts = auth_header.split(" ")
         if len(parts) == 2:
-            return await self.get_identity(
-                parts[0], parts[1], channel_id, required_endorsements
-            )
+            return await self.get_identity(parts[0], parts[1], channel_id,
+                                           required_endorsements)
         return None
 
     async def get_identity(
@@ -61,9 +63,8 @@ class JwtTokenExtractor:
             return None
 
         try:
-            return await self._validate_token(
-                parameter, channel_id, required_endorsements
-            )
+            return await self._validate_token(parameter, channel_id,
+                                              required_endorsements)
         except Exception as error:
             raise error
 
@@ -76,8 +77,10 @@ class JwtTokenExtractor:
         return issuer == self.validation_parameters.issuer
 
     async def _validate_token(
-        self, jwt_token: str, channel_id: str, required_endorsements: List[str] = None
-    ) -> ClaimsIdentity:
+            self,
+            jwt_token: str,
+            channel_id: str,
+            required_endorsements: List[str] = None) -> ClaimsIdentity:
         required_endorsements = required_endorsements or []
         headers = jwt.get_unverified_header(jwt_token)
 
@@ -87,18 +90,19 @@ class JwtTokenExtractor:
 
         if key_id and metadata.endorsements:
             # Verify that channelId is included in endorsements
-            if not EndorsementsValidator.validate(channel_id, metadata.endorsements):
+            if not EndorsementsValidator.validate(channel_id,
+                                                  metadata.endorsements):
                 raise Exception("Could not validate endorsement key")
 
             # Verify that additional endorsements are satisfied.
             # If no additional endorsements are expected, the requirement is satisfied as well
             for endorsement in required_endorsements:
-                if not EndorsementsValidator.validate(
-                    endorsement, metadata.endorsements
-                ):
+                if not EndorsementsValidator.validate(endorsement,
+                                                      metadata.endorsements):
                     raise Exception("Could not validate endorsement key")
 
-        if headers.get("alg", None) not in self.validation_parameters.algorithms:
+        if headers.get("alg",
+                       None) not in self.validation_parameters.algorithms:
             raise Exception("Token signing algorithm not in allowed list")
 
         options = {
@@ -120,6 +124,7 @@ class JwtTokenExtractor:
 
 
 class _OpenIdMetadata:
+
     def __init__(self, url):
         self.url = url
         self.keys = []
@@ -131,7 +136,8 @@ class _OpenIdMetadata:
             await self._refresh()
 
         key = self._find(key_id)
-        if not key and self.last_updated < (datetime.now() - timedelta(hours=1)):
+        if not key and self.last_updated < (datetime.now() -
+                                            timedelta(hours=1)):
             # Refresh the cache if a key is not found (max once per hour)
             await self._refresh()
             key = self._find(key_id)
@@ -156,6 +162,7 @@ class _OpenIdMetadata:
 
 
 class _OpenIdConfig:
+
     def __init__(self, public_key, endorsements):
         self.public_key = public_key
         self.endorsements = endorsements

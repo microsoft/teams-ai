@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
 from typing import List, Union
 
 from teams.core import (
@@ -55,24 +54,21 @@ class DialogTestClient:
         """
         self.dialog_turn_result: DialogTurnResult = None
         self.dialog_context = None
-        self.conversation_state: ConversationState = (
-            ConversationState(MemoryStorage())
-            if conversation_state is None
-            else conversation_state
-        )
+        self.conversation_state: ConversationState = (ConversationState(
+            MemoryStorage()) if conversation_state is None else
+                                                      conversation_state)
         dialog_state = self.conversation_state.create_property("DialogState")
-        self._callback = self._get_default_callback(
-            target_dialog, initial_dialog_options, dialog_state
-        )
+        self._callback = self._get_default_callback(target_dialog,
+                                                    initial_dialog_options,
+                                                    dialog_state)
 
         if isinstance(channel_or_adapter, str):
             conversation_reference = ConversationReference(
-                channel_id=channel_or_adapter
-            )
-            self.test_adapter = TestAdapter(self._callback, conversation_reference)
-            self.test_adapter.use(
-                AutoSaveStateMiddleware().add(self.conversation_state)
-            )
+                channel_id=channel_or_adapter)
+            self.test_adapter = TestAdapter(self._callback,
+                                            conversation_reference)
+            self.test_adapter.use(AutoSaveStateMiddleware().add(
+                self.conversation_state))
         else:
             self.test_adapter = channel_or_adapter
 
@@ -105,16 +101,17 @@ class DialogTestClient:
         initial_dialog_options: object,
         dialog_state: StatePropertyAccessor,
     ):
+
         async def default_callback(turn_context: TurnContext) -> None:
             dialog_set = DialogSet(dialog_state)
             dialog_set.add(target_dialog)
 
             self.dialog_context = await dialog_set.create_context(turn_context)
-            self.dialog_turn_result = await self.dialog_context.continue_dialog()
+            self.dialog_turn_result = await self.dialog_context.continue_dialog(
+            )
             if self.dialog_turn_result.status == DialogTurnStatus.Empty:
                 self.dialog_turn_result = await self.dialog_context.begin_dialog(
-                    target_dialog.id, initial_dialog_options
-                )
+                    target_dialog.id, initial_dialog_options)
 
         return default_callback
 

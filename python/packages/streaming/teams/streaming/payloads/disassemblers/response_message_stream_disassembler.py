@@ -11,7 +11,9 @@ from .payload_disassembler import PayloadDisassembler
 
 
 class ResponseMessageStreamDisassembler(PayloadDisassembler):
-    def __init__(self, sender: PayloadSender, content_stream: ResponseMessageStream):
+
+    def __init__(self, sender: PayloadSender,
+                 content_stream: ResponseMessageStream):
         super().__init__(sender, content_stream.id)
 
         self.content_stream = content_stream

@@ -1,6 +1,5 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
 """
 Base tests that all storage providers should implement in their own tests.
 They handle the storage-based assertions, internally.
@@ -89,19 +88,23 @@ class StorageBaseTests:
     @staticmethod
     async def create_object(storage) -> bool:
         store_items = {
-            "createPoco": {"id": 1},
-            "createPocoStoreItem": {"id": 2, "e_tag": "*"},
+            "createPoco": {
+                "id": 1
+            },
+            "createPocoStoreItem": {
+                "id": 2,
+                "e_tag": "*"
+            },
         }
 
         await storage.write(store_items)
 
         read_store_items = await storage.read(store_items.keys())
 
-        assert store_items["createPoco"]["id"] == read_store_items["createPoco"]["id"]
-        assert (
-            store_items["createPocoStoreItem"]["id"]
-            == read_store_items["createPocoStoreItem"]["id"]
-        )
+        assert store_items["createPoco"]["id"] == read_store_items[
+            "createPoco"]["id"]
+        assert (store_items["createPocoStoreItem"]["id"] ==
+                read_store_items["createPocoStoreItem"]["id"])
 
         # If decided to validate e_tag integrity again, uncomment this code
         # assert read_store_items["createPoco"]["e_tag"] is not None
@@ -127,8 +130,15 @@ class StorageBaseTests:
     @staticmethod
     async def update_object(storage) -> bool:
         original_store_items = {
-            "pocoItem": {"id": 1, "count": 1},
-            "pocoStoreItem": {"id": 1, "count": 1, "e_tag": "*"},
+            "pocoItem": {
+                "id": 1,
+                "count": 1
+            },
+            "pocoStoreItem": {
+                "id": 1,
+                "count": 1,
+                "e_tag": "*"
+            },
         }
 
         # 1st write should work
@@ -161,7 +171,6 @@ class StorageBaseTests:
 
         # Write with old eTag should FAIL for storeItem
         update_poco_store_item["count"] = 123
-
         """
         This assert exists in the other SDKs but can't in python, currently
         due to using "e_tag: *" above (see comment near the top of this file for details).
@@ -171,7 +180,8 @@ class StorageBaseTests:
         assert err.value is not None
         """
 
-        reloaded_store_items2 = await storage.read(["pocoItem", "pocoStoreItem"])
+        reloaded_store_items2 = await storage.read(
+            ["pocoItem", "pocoStoreItem"])
 
         reloaded_poco_item2 = reloaded_store_items2["pocoItem"]
         reloaded_poco_item2["e_tag"] = None
@@ -192,7 +202,8 @@ class StorageBaseTests:
 
         await storage.write(wildcard_etag_dict)
 
-        reloaded_store_items3 = await storage.read(["pocoItem", "pocoStoreItem"])
+        reloaded_store_items3 = await storage.read(
+            ["pocoItem", "pocoStoreItem"])
 
         assert reloaded_store_items3["pocoItem"]["count"] == 100
         assert reloaded_store_items3["pocoStoreItem"]["count"] == 100
@@ -247,13 +258,17 @@ class StorageBaseTests:
 
     @staticmethod
     async def perform_batch_operations(storage) -> bool:
-        await storage.write(
-            {
-                "batch1": {"count": 10},
-                "batch2": {"count": 20},
-                "batch3": {"count": 30},
-            }
-        )
+        await storage.write({
+            "batch1": {
+                "count": 10
+            },
+            "batch2": {
+                "count": 20
+            },
+            "batch3": {
+                "count": 30
+            },
+        })
 
         result = await storage.read(["batch1", "batch2", "batch3"])
 
@@ -312,20 +327,26 @@ class StorageBaseTests:
             await prompt_context.context.send_activity(reply)
             return False
 
-        async def step_1(step_context: WaterfallStepContext) -> DialogTurnStatus:
-            assert isinstance(step_context.active_dialog.state["stepIndex"], int)
+        async def step_1(
+                step_context: WaterfallStepContext) -> DialogTurnStatus:
+            assert isinstance(step_context.active_dialog.state["stepIndex"],
+                              int)
             await step_context.context.send_activity("step1")
             return Dialog.end_of_turn
 
         async def step_2(step_context: WaterfallStepContext) -> None:
-            assert isinstance(step_context.active_dialog.state["stepIndex"], int)
+            assert isinstance(step_context.active_dialog.state["stepIndex"],
+                              int)
             await step_context.prompt(
                 TextPrompt.__name__,
-                PromptOptions(prompt=MessageFactory.text("Please type your name")),
+                PromptOptions(
+                    prompt=MessageFactory.text("Please type your name")),
             )
 
-        async def step_3(step_context: WaterfallStepContext) -> DialogTurnStatus:
-            assert isinstance(step_context.active_dialog.state["stepIndex"], int)
+        async def step_3(
+                step_context: WaterfallStepContext) -> DialogTurnStatus:
+            assert isinstance(step_context.active_dialog.state["stepIndex"],
+                              int)
             await step_context.context.send_activity("step3")
             return Dialog.end_of_turn
 
@@ -338,19 +359,16 @@ class StorageBaseTests:
         step1 = await adapter.send("hello")
         step2 = await step1.assert_reply("step1")
         step3 = await step2.send("hello")
-        step4 = await step3.assert_reply("Please type your name")  # None
+        step4 = await step3.assert_reply("Please type your name")    # None
         step5 = await step4.send("hi")
         step6 = await step5.assert_reply(
-            "Please send a name that is longer than 3 characters. 0"
-        )
+            "Please send a name that is longer than 3 characters. 0")
         step7 = await step6.send("hi")
         step8 = await step7.assert_reply(
-            "Please send a name that is longer than 3 characters. 1"
-        )
+            "Please send a name that is longer than 3 characters. 1")
         step9 = await step8.send("hi")
         step10 = await step9.assert_reply(
-            "Please send a name that is longer than 3 characters. 2"
-        )
+            "Please send a name that is longer than 3 characters. 2")
         step11 = await step10.send("Kyle")
         step12 = await step11.assert_reply("You got it at the 3rd try!")
         await step12.assert_reply("step3")

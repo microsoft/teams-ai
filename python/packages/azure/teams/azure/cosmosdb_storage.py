@@ -9,8 +9,8 @@ from threading import Semaphore
 import json
 from jsonpickle.pickler import Pickler
 from jsonpickle.unpickler import Unpickler
-import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
-import azure.cosmos.errors as cosmos_errors  # pylint: disable=no-name-in-module,import-error
+import azure.cosmos.cosmos_client as cosmos_client    # pylint: disable=no-name-in-module,import-error
+import azure.cosmos.errors as cosmos_errors    # pylint: disable=no-name-in-module,import-error
 from teams.core.storage import Storage
 
 
@@ -46,18 +46,17 @@ class CosmosDbConfig:
         self.container = container or kwargs.get("container", "bot_container")
         self.partition_key = partition_key or kwargs.get("partition_key")
         self.database_creation_options = database_creation_options or kwargs.get(
-            "database_creation_options"
-        )
+            "database_creation_options")
         self.container_creation_options = container_creation_options or kwargs.get(
-            "container_creation_options"
-        )
+            "container_creation_options")
 
 
 class CosmosDbKeyEscape:
+
     @staticmethod
-    def sanitize_key(
-        key: str, key_suffix: str = "", compatibility_mode: bool = True
-    ) -> str:
+    def sanitize_key(key: str,
+                     key_suffix: str = "",
+                     compatibility_mode: bool = True) -> str:
         """Return the sanitized key.
 
         Replace characters that are not allowed in keys in Cosmos.
@@ -73,12 +72,14 @@ class CosmosDbKeyEscape:
         bad_chars = ["\\", "?", "/", "#", "\t", "\n", "\r", "*"]
         # replace those with with '*' and the
         # Unicode code point of the character and return the new string
-        key = "".join(map(lambda x: "*" + str(ord(x)) if x in bad_chars else x, key))
+        key = "".join(
+            map(lambda x: "*" + str(ord(x)) if x in bad_chars else x, key))
 
         if key_suffix is None:
             key_suffix = ""
 
-        return CosmosDbKeyEscape.truncate_key(f"{key}{key_suffix}", compatibility_mode)
+        return CosmosDbKeyEscape.truncate_key(f"{key}{key_suffix}",
+                                              compatibility_mode)
 
     @staticmethod
     def truncate_key(key: str, compatibility_mode: bool = True) -> str:
@@ -91,7 +92,7 @@ class CosmosDbKeyEscape:
             aux_hash = sha256(key.encode("utf-8"))
             aux_hex = aux_hash.hexdigest()
 
-            key = key[0 : max_key_len - len(aux_hex)] + aux_hex
+            key = key[0:max_key_len - len(aux_hex)] + aux_hex
 
         return key
 
@@ -99,9 +100,9 @@ class CosmosDbKeyEscape:
 class CosmosDbStorage(Storage):
     """A CosmosDB based storage provider for a bot."""
 
-    def __init__(
-        self, config: CosmosDbConfig, client: cosmos_client.CosmosClient = None
-    ):
+    def __init__(self,
+                 config: CosmosDbConfig,
+                 client: cosmos_client.CosmosClient = None):
         """Create the storage object.
 
         :param config:
@@ -109,8 +110,7 @@ class CosmosDbStorage(Storage):
         super(CosmosDbStorage, self).__init__()
         self.config = config
         self.client = client or cosmos_client.CosmosClient(
-            self.config.endpoint, {"masterKey": self.config.masterkey}
-        )
+            self.config.endpoint, {"masterKey": self.config.masterkey})
         # these are set by the functions that check
         # the presence of the database and container or creates them
         self.database = None
@@ -131,18 +131,19 @@ class CosmosDbStorage(Storage):
                 self.__create_db_and_container()
             if keys:
                 # create the parameters object
-                parameters = [
-                    {
-                        "name": f"@id{i}",
-                        "value": f"{CosmosDbKeyEscape.sanitize_key(key)}",
-                    }
-                    for i, key in enumerate(keys)
-                ]
+                parameters = [{
+                    "name":
+                    f"@id{i}",
+                    "value":
+                    f"{CosmosDbKeyEscape.sanitize_key(key)}",
+                } for i, key in enumerate(keys)]
                 # get the names of the params
-                parameter_sequence = ",".join(param.get("name") for param in parameters)
+                parameter_sequence = ",".join(
+                    param.get("name") for param in parameters)
                 # create the query
                 query = {
-                    "query": f"SELECT c.id, c.realId, c.document, c._etag FROM c WHERE c.id in ({parameter_sequence})",
+                    "query":
+                    f"SELECT c.id, c.realId, c.document, c._etag FROM c WHERE c.id in ({parameter_sequence})",
                     "parameters": parameters,
                 }
 
@@ -153,8 +154,8 @@ class CosmosDbStorage(Storage):
 
                 # run the query and store the results as a list
                 results = list(
-                    self.client.QueryItems(self.__container_link, query, options)
-                )
+                    self.client.QueryItems(self.__container_link, query,
+                                           options))
                 # return a dict with a key and an object
                 return {r.get("realId"): self.__create_si(r) for r in results}
 
@@ -205,8 +206,7 @@ class CosmosDbStorage(Storage):
                     access_condition = {"type": "IfMatch", "condition": e_tag}
                     self.client.ReplaceItem(
                         document_link=self.__item_link(
-                            CosmosDbKeyEscape.sanitize_key(key)
-                        ),
+                            CosmosDbKeyEscape.sanitize_key(key)),
                         new_document=doc,
                         options={"accessCondition": access_condition},
                     )
@@ -231,7 +231,8 @@ class CosmosDbStorage(Storage):
             # call the function for each key
             for key in keys:
                 self.client.DeleteItem(
-                    document_link=self.__item_link(CosmosDbKeyEscape.sanitize_key(key)),
+                    document_link=self.__item_link(
+                        CosmosDbKeyEscape.sanitize_key(key)),
                     options=options,
                 )
                 # print(res)
@@ -314,11 +315,11 @@ class CosmosDbStorage(Storage):
             db_id = self.config.database
             container_name = self.config.container
             self.database = self._get_or_create_database(self.client, db_id)
-            self.container = self._get_or_create_container(self.client, container_name)
+            self.container = self._get_or_create_container(
+                self.client, container_name)
 
-    def _get_or_create_database(  # pylint: disable=invalid-name
-        self, doc_client, id
-    ) -> str:
+    def _get_or_create_database(    # pylint: disable=invalid-name
+            self, doc_client, id) -> str:
         """Return the database link.
 
         Check if the database exists or create the database.
@@ -329,19 +330,21 @@ class CosmosDbStorage(Storage):
         """
         # query CosmosDB for a database with that name/id
         dbs = list(
-            doc_client.QueryDatabases(
-                {
-                    "query": "SELECT * FROM r WHERE r.id=@id",
-                    "parameters": [{"name": "@id", "value": id}],
-                }
-            )
-        )
+            doc_client.QueryDatabases({
+                "query":
+                "SELECT * FROM r WHERE r.id=@id",
+                "parameters": [{
+                    "name": "@id",
+                    "value": id
+                }],
+            }))
         # if there are results, return the first (database names are unique)
         if dbs:
             return dbs[0]["id"]
 
         # create the database if it didn't exist
-        res = doc_client.CreateDatabase({"id": id}, self._database_creation_options)
+        res = doc_client.CreateDatabase({"id": id},
+                                        self._database_creation_options)
         return res["id"]
 
     def _get_or_create_container(self, doc_client, container) -> str:
@@ -359,16 +362,18 @@ class CosmosDbStorage(Storage):
                 self.__database_link,
                 {
                     "query": "SELECT * FROM r WHERE r.id=@id",
-                    "parameters": [{"name": "@id", "value": container}],
+                    "parameters": [{
+                        "name": "@id",
+                        "value": container
+                    }],
                 },
-            )
-        )
+            ))
         # if there are results, return the first (container names are unique)
         if containers:
             return containers[0]["id"]
 
         # Create a container if it didn't exist
-        res = doc_client.CreateContainer(
-            self.__database_link, {"id": container}, self._container_creation_options
-        )
+        res = doc_client.CreateContainer(self.__database_link,
+                                         {"id": container},
+                                         self._container_creation_options)
         return res["id"]

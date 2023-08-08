@@ -7,6 +7,7 @@ from .memory_scope import MemoryScope
 
 
 class DialogMemoryScope(MemoryScope):
+
     def __init__(self):
         # pylint: disable=import-outside-toplevel
         super().__init__(scope_path.DIALOG)
@@ -22,19 +23,17 @@ class DialogMemoryScope(MemoryScope):
 
         # if active dialog is a container dialog then "dialog" binds to it.
         if dialog_context.active_dialog:
-            dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
+            dialog = dialog_context.find_dialog_sync(
+                dialog_context.active_dialog.id)
             if isinstance(dialog, self._dialog_container_cls):
                 return dialog_context.active_dialog.state
 
         # Otherwise we always bind to parent, or if there is no parent the active dialog
-        parent_state = (
-            dialog_context.parent.active_dialog.state
-            if dialog_context.parent and dialog_context.parent.active_dialog
-            else None
-        )
-        dc_state = (
-            dialog_context.active_dialog.state if dialog_context.active_dialog else None
-        )
+        parent_state = (dialog_context.parent.active_dialog.state
+                        if dialog_context.parent
+                        and dialog_context.parent.active_dialog else None)
+        dc_state = (dialog_context.active_dialog.state
+                    if dialog_context.active_dialog else None)
         return parent_state or dc_state
 
     def set_memory(self, dialog_context: "DialogContext", memory: object):
@@ -61,7 +60,8 @@ class DialogMemoryScope(MemoryScope):
 
     def is_container(self, dialog_context: "DialogContext"):
         if dialog_context and dialog_context.active_dialog:
-            dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
+            dialog = dialog_context.find_dialog_sync(
+                dialog_context.active_dialog.id)
             if isinstance(dialog, self._dialog_container_cls):
                 return True
 

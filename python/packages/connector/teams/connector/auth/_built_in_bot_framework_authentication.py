@@ -29,6 +29,7 @@ from .user_token_client import UserTokenClient
 
 
 class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
+
     def __init__(
         self,
         to_channel_from_bot_oauth_scope: str,
@@ -58,17 +59,18 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         # For requests from channel App Id is in Audience claim of JWT token. For emulator it is in AppId claim. For
         # unauthenticated requests we have anonymous claimsIdentity provided auth is disabled.
         # For Activities coming from Emulator AppId claim contains the Bot's AAD AppId.
-        app_id = claims_identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
+        app_id = claims_identity.get_claim_value(
+            AuthenticationConstants.AUDIENCE_CLAIM)
         if app_id is None:
             app_id = claims_identity.get_claim_value(
-                AuthenticationConstants.APP_ID_CLAIM
-            )
+                AuthenticationConstants.APP_ID_CLAIM)
         return app_id
 
     async def authenticate_request(
-        self, activity: Activity, auth_header: str
-    ) -> AuthenticateRequestResult:
-        credential_provider = _DelegatingCredentialProvider(self._credentials_factory)
+            self, activity: Activity,
+            auth_header: str) -> AuthenticateRequestResult:
+        credential_provider = _DelegatingCredentialProvider(
+            self._credentials_factory)
 
         claims_identity = await JwtTokenValidation.authenticate_request(
             activity,
@@ -78,11 +80,10 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
             self._auth_configuration,
         )
 
-        outbound_audience = (
-            JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
-            if SkillValidation.is_skill_claim(claims_identity.claims)
-            else self._to_channel_from_bot_oauth_scope
-        )
+        outbound_audience = (JwtTokenValidation.get_app_id_from_claims(
+            claims_identity.claims) if SkillValidation.is_skill_claim(
+                claims_identity.claims) else
+                             self._to_channel_from_bot_oauth_scope)
 
         caller_id = await self.generate_caller_id(
             credential_factory=self._credentials_factory,
@@ -91,12 +92,15 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         )
 
         connector_factory = _ConnectorFactoryImpl(
-            app_id=_BuiltinBotFrameworkAuthentication.get_app_id(claims_identity),
-            to_channel_from_bot_oauth_scope=self._to_channel_from_bot_oauth_scope,
+            app_id=_BuiltinBotFrameworkAuthentication.get_app_id(
+                claims_identity),
+            to_channel_from_bot_oauth_scope=self.
+            _to_channel_from_bot_oauth_scope,
             login_endpoint=self._login_endpoint,
             validate_authority=True,
             credential_factory=self._credentials_factory,
-            connector_client_configuration=self._connector_client_configuration,
+            connector_client_configuration=self.
+            _connector_client_configuration,
             logger=self._logger,
         )
 
@@ -109,16 +113,17 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         return result
 
     async def authenticate_streaming_request(
-        self, auth_header: str, channel_id_header: str
-    ) -> AuthenticateRequestResult:
-        credential_provider = _DelegatingCredentialProvider(self._credentials_factory)
+            self, auth_header: str,
+            channel_id_header: str) -> AuthenticateRequestResult:
+        credential_provider = _DelegatingCredentialProvider(
+            self._credentials_factory)
 
         if channel_id_header is None:
             is_auth_disabled = (
-                await self._credentials_factory.is_authentication_disabled()
-            )
+                await self._credentials_factory.is_authentication_disabled())
             if not is_auth_disabled:
-                raise PermissionError("Unauthorized Access. Request is not authorized")
+                raise PermissionError(
+                    "Unauthorized Access. Request is not authorized")
 
         claims_identity = await JwtTokenValidation.validate_auth_header(
             auth_header,
@@ -127,11 +132,10 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
             channel_id_header,
         )
 
-        outbound_audience = (
-            JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
-            if SkillValidation.is_skill_claim(claims_identity.claims)
-            else self._to_channel_from_bot_oauth_scope
-        )
+        outbound_audience = (JwtTokenValidation.get_app_id_from_claims(
+            claims_identity.claims) if SkillValidation.is_skill_claim(
+                claims_identity.claims) else
+                             self._to_channel_from_bot_oauth_scope)
 
         caller_id = await self.generate_caller_id(
             credential_factory=self._credentials_factory,
@@ -147,21 +151,22 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         return result
 
     def create_connector_factory(
-        self, claims_identity: ClaimsIdentity
-    ) -> ConnectorFactory:
+            self, claims_identity: ClaimsIdentity) -> ConnectorFactory:
         return _ConnectorFactoryImpl(
-            app_id=_BuiltinBotFrameworkAuthentication.get_app_id(claims_identity),
-            to_channel_from_bot_oauth_scope=self._to_channel_from_bot_oauth_scope,
+            app_id=_BuiltinBotFrameworkAuthentication.get_app_id(
+                claims_identity),
+            to_channel_from_bot_oauth_scope=self.
+            _to_channel_from_bot_oauth_scope,
             login_endpoint=self._login_endpoint,
             validate_authority=True,
             credential_factory=self._credentials_factory,
-            connector_client_configuration=self._connector_client_configuration,
+            connector_client_configuration=self.
+            _connector_client_configuration,
             logger=self._logger,
         )
 
     async def create_user_token_client(
-        self, claims_identity: ClaimsIdentity
-    ) -> UserTokenClient:
+            self, claims_identity: ClaimsIdentity) -> UserTokenClient:
         app_id = _BuiltinBotFrameworkAuthentication.get_app_id(claims_identity)
 
         credentials = await self._credentials_factory.create_credentials(
@@ -184,14 +189,18 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
     def get_originating_audience(self) -> str:
         return self._to_channel_from_bot_oauth_scope
 
-    async def authenticate_channel_request(self, auth_header: str) -> ClaimsIdentity:
-        credential_provider = _DelegatingCredentialProvider(self._credentials_factory)
+    async def authenticate_channel_request(self,
+                                           auth_header: str) -> ClaimsIdentity:
+        credential_provider = _DelegatingCredentialProvider(
+            self._credentials_factory)
 
         if auth_header is None:
-            is_auth_disabled = await credential_provider.is_authentication_disabled()
+            is_auth_disabled = await credential_provider.is_authentication_disabled(
+            )
             if not is_auth_disabled:
                 # No auth header. Auth is required. Request is not authorized.
-                raise PermissionError("Unauthorized Access. Request is not authorized")
+                raise PermissionError(
+                    "Unauthorized Access. Request is not authorized")
 
             # In the scenario where auth is disabled, we still want to have the
             # IsAuthenticated flag set in the ClaimsIdentity.
@@ -208,8 +217,5 @@ class _BuiltinBotFrameworkAuthentication(BotFrameworkAuthentication):
         )
 
     def _get_channel_provider(self) -> Optional[ChannelProvider]:
-        return (
-            SimpleChannelProvider(self._channel_service)
-            if self._channel_service is not None
-            else None
-        )
+        return (SimpleChannelProvider(self._channel_service)
+                if self._channel_service is not None else None)

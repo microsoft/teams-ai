@@ -30,9 +30,11 @@ class TeamsOperations(object):
 
         self.config = config
 
-    def get_teams_channels(
-        self, team_id, custom_headers=None, raw=False, **operation_config
-    ):
+    def get_teams_channels(self,
+                           team_id,
+                           custom_headers=None,
+                           raw=False,
+                           **operation_config):
         """Fetches channel list for a given team.
 
         Fetch the channel list.
@@ -86,9 +88,11 @@ class TeamsOperations(object):
 
     get_teams_channels.metadata = {"url": "/v3/teams/{teamId}/conversations"}
 
-    def get_team_details(
-        self, team_id, custom_headers=None, raw=False, **operation_config
-    ):
+    def get_team_details(self,
+                         team_id,
+                         custom_headers=None,
+                         raw=False,
+                         **operation_config):
         """Fetches details related to a team.
 
         Fetch details for a team.
@@ -142,15 +146,13 @@ class TeamsOperations(object):
 
     get_team_details.metadata = {"url": "/v3/teams/{teamId}"}
 
-    def fetch_participant(
-        self,
-        meeting_id: str,
-        participant_id: str,
-        tenant_id: str,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    def fetch_participant(self,
+                          meeting_id: str,
+                          participant_id: str,
+                          tenant_id: str,
+                          custom_headers=None,
+                          raw=False,
+                          **operation_config):
         """Fetches Teams meeting participant details.
 
         :param meeting_id: Teams meeting id
@@ -174,11 +176,12 @@ class TeamsOperations(object):
         # Construct URL
         url = self.fetch_participant.metadata["url"]
         path_format_arguments = {
-            "meetingId": self._serialize.url("meeting_id", meeting_id, "str"),
-            "participantId": self._serialize.url(
-                "participant_id", participant_id, "str"
-            ),
-            "tenantId": self._serialize.url("tenant_id", tenant_id, "str"),
+            "meetingId":
+            self._serialize.url("meeting_id", meeting_id, "str"),
+            "participantId":
+            self._serialize.url("participant_id", participant_id, "str"),
+            "tenantId":
+            self._serialize.url("tenant_id", tenant_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -201,7 +204,8 @@ class TeamsOperations(object):
         deserialized = None
 
         if response.status_code == 200:
-            deserialized = self._deserialize("TeamsMeetingParticipant", response)
+            deserialized = self._deserialize("TeamsMeetingParticipant",
+                                             response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
@@ -210,12 +214,15 @@ class TeamsOperations(object):
         return deserialized
 
     fetch_participant.metadata = {
-        "url": "/v1/meetings/{meetingId}/participants/{participantId}?tenantId={tenantId}"
+        "url":
+        "/v1/meetings/{meetingId}/participants/{participantId}?tenantId={tenantId}"
     }
 
-    def fetch_meeting(
-        self, meeting_id: str, custom_headers=None, raw=False, **operation_config
-    ):
+    def fetch_meeting(self,
+                      meeting_id: str,
+                      custom_headers=None,
+                      raw=False,
+                      **operation_config):
         """Fetch meeting information.
 
         :param meeting_id: Meeting Id, encoded as a BASE64 string.

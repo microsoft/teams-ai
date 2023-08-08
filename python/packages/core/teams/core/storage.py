@@ -7,6 +7,7 @@ from typing import List
 
 
 class Storage(ABC):
+
     @abstractmethod
     async def read(self, keys: List[str]):
         """
@@ -45,14 +46,13 @@ class StoreItem:
             setattr(self, key, value)
 
     def __str__(self):
-        non_magic_attributes = [attr for attr in dir(self) if not attr.startswith("_")]
-        output = (
-            "{"
-            + ",".join(
-                [f' "{attr}": "{getattr(self, attr)}"' for attr in non_magic_attributes]
-            )
-            + " }"
-        )
+        non_magic_attributes = [
+            attr for attr in dir(self) if not attr.startswith("_")
+        ]
+        output = ("{" + ",".join([
+            f' "{attr}": "{getattr(self, attr)}"'
+            for attr in non_magic_attributes
+        ]) + " }")
         return output
 
 

@@ -15,7 +15,8 @@ class Timer:
     clear_timer = False
 
     def set_timeout(self, func, span):
-        async def some_fn():  # pylint: disable=function-redefined
+
+        async def some_fn():    # pylint: disable=function-redefined
             await asyncio.sleep(span)
             if not self.clear_timer:
                 await func()
@@ -52,12 +53,12 @@ class ShowTypingMiddleware(Middleware):
         self._delay = delay
         self._period = period
 
-    async def on_turn(
-        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
-    ):
+    async def on_turn(self, context: TurnContext,
+                      logic: Callable[[TurnContext], Awaitable]):
         timer = Timer()
 
         def start_interval(context: TurnContext, delay, period):
+
             async def aux():
                 typing_activity = Activity(
                     type=ActivityTypes.typing,
@@ -65,16 +66,14 @@ class ShowTypingMiddleware(Middleware):
                 )
 
                 conversation_reference = TurnContext.get_conversation_reference(
-                    context.activity
-                )
+                    context.activity)
 
                 typing_activity = TurnContext.apply_conversation_reference(
-                    typing_activity, conversation_reference
-                )
+                    typing_activity, conversation_reference)
 
                 asyncio.ensure_future(
-                    context.adapter.send_activities(context, [typing_activity])
-                )
+                    context.adapter.send_activities(context,
+                                                    [typing_activity]))
 
                 # restart the timer, with the 'period' value for the delay
                 timer.set_timeout(aux, period)
@@ -87,10 +86,8 @@ class ShowTypingMiddleware(Middleware):
 
         # Start a timer to periodically send the typing activity
         # (bots running as skills should not send typing activity)
-        if (
-            context.activity.type == ActivityTypes.message
-            and not ShowTypingMiddleware._is_skill_bot(context)
-        ):
+        if (context.activity.type == ActivityTypes.message
+                and not ShowTypingMiddleware._is_skill_bot(context)):
             start_interval(context, self._delay, self._period)
 
         # call the bot logic
@@ -103,6 +100,6 @@ class ShowTypingMiddleware(Middleware):
     @staticmethod
     def _is_skill_bot(context: TurnContext) -> bool:
         claims_identity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
-        return isinstance(
-            claims_identity, ClaimsIdentity
-        ) and SkillValidation.is_skill_claim(claims_identity.claims)
+        return isinstance(claims_identity,
+                          ClaimsIdentity) and SkillValidation.is_skill_claim(
+                              claims_identity.claims)

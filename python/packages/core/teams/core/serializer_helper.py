@@ -11,23 +11,24 @@ import teams.schema as schema
 import teams.schema.teams as teams_schema
 
 DEPENDICIES = [
-    schema_cls
-    for key, schema_cls in getmembers(schema)
+    schema_cls for key, schema_cls in getmembers(schema)
     if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
 ]
 DEPENDICIES += [
-    schema_cls
-    for key, schema_cls in getmembers(teams_schema)
+    schema_cls for key, schema_cls in getmembers(teams_schema)
     if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
 ]
-DEPENDICIES_DICT = {dependency.__name__: dependency for dependency in DEPENDICIES}
+DEPENDICIES_DICT = {
+    dependency.__name__: dependency
+    for dependency in DEPENDICIES
+}
 
 
-def deserializer_helper(msrest_cls: Type[Model], dict_to_deserialize: dict) -> Model:
+def deserializer_helper(msrest_cls: Type[Model],
+                        dict_to_deserialize: dict) -> Model:
     deserializer = Deserializer(DEPENDICIES_DICT)
     _clean_data_for_serialization(
-        deserializer.dependencies[msrest_cls.__name__], dict_to_deserialize
-    )
+        deserializer.dependencies[msrest_cls.__name__], dict_to_deserialize)
     return deserializer(msrest_cls.__name__, dict_to_deserialize)
 
 
@@ -40,7 +41,8 @@ def serializer_helper(object_to_serialize: Model) -> dict:
     return serializer._serialize(object_to_serialize)
 
 
-def _clean_data_for_serialization(msrest_cls: Type[Model], dict_to_deserialize: dict):
+def _clean_data_for_serialization(msrest_cls: Type[Model],
+                                  dict_to_deserialize: dict):
     # pylint: disable=protected-access
     # Clean channel response of empty strings for expected objects.
     if not isinstance(dict_to_deserialize, dict):
@@ -50,9 +52,7 @@ def _clean_data_for_serialization(msrest_cls: Type[Model], dict_to_deserialize: 
         if key != value["key"]:
             serialization_model[value["key"]] = value
     for prop, prop_value in dict_to_deserialize.items():
-        if (
-            prop in serialization_model
-            and serialization_model[prop]["type"] in DEPENDICIES_DICT
-            and not prop_value
-        ):
+        if (prop in serialization_model
+                and serialization_model[prop]["type"] in DEPENDICIES_DICT
+                and not prop_value):
             dict_to_deserialize[prop] = None

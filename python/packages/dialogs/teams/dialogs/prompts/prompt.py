@@ -55,9 +55,9 @@ class Prompt(Dialog):
 
         self._validator = validator
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: object = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self,
+                           dialog_context: DialogContext,
+                           options: object = None) -> DialogTurnResult:
         """
         Starts a prompt dialog. Called when a prompt dialog is pushed onto the dialog stack and is being activated.
 
@@ -74,7 +74,8 @@ class Prompt(Dialog):
         if not dialog_context:
             raise TypeError("Prompt(): dc cannot be None.")
         if not isinstance(options, PromptOptions):
-            raise TypeError("Prompt(): Prompt options are required for Prompt dialogs.")
+            raise TypeError(
+                "Prompt(): Prompt options are required for Prompt dialogs.")
         # Ensure prompts have input hint set
         if options.prompt is not None and not options.prompt.input_hint:
             options.prompt.input_hint = InputHints.expecting_input
@@ -126,14 +127,14 @@ class Prompt(Dialog):
         instance = dialog_context.active_dialog
         state = instance.state[self.persisted_state]
         options = instance.state[self.persisted_options]
-        recognized = await self.on_recognize(dialog_context.context, state, options)
+        recognized = await self.on_recognize(dialog_context.context, state,
+                                             options)
 
         # Validate the return value
         is_valid = False
         if self._validator is not None:
-            prompt_context = PromptValidatorContext(
-                dialog_context.context, recognized, state, options
-            )
+            prompt_context = PromptValidatorContext(dialog_context.context,
+                                                    recognized, state, options)
             is_valid = await self._validator(prompt_context)
             if options is None:
                 options = PromptOptions()
@@ -149,9 +150,9 @@ class Prompt(Dialog):
             await self.on_prompt(dialog_context.context, state, options, True)
         return Dialog.end_of_turn
 
-    async def resume_dialog(
-        self, dialog_context: DialogContext, reason: DialogReason, result: object
-    ) -> DialogTurnResult:
+    async def resume_dialog(self, dialog_context: DialogContext,
+                            reason: DialogReason,
+                            result: object) -> DialogTurnResult:
         """
         Resumes a dialog.
 
@@ -178,10 +179,12 @@ class Prompt(Dialog):
             Simply re-prompt the user to avoid that the prompt ends prematurely.
 
         """
-        await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
+        await self.reprompt_dialog(dialog_context.context,
+                                   dialog_context.active_dialog)
         return Dialog.end_of_turn
 
-    async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
+    async def reprompt_dialog(self, context: TurnContext,
+                              instance: DialogInstance):
         """
         Reprompts user for input.
 
@@ -297,7 +300,8 @@ class Prompt(Dialog):
             return activity
 
         def default() -> Activity:
-            return ChoiceFactory.for_channel(channel_id, choices, text, None, options)
+            return ChoiceFactory.for_channel(channel_id, choices, text, None,
+                                             options)
 
         # Maps to values in ListStyle Enum
         switcher = {
@@ -318,11 +322,9 @@ class Prompt(Dialog):
 
             prompt.text = msg.text
 
-            if (
-                msg.suggested_actions is not None
-                and msg.suggested_actions.actions is not None
-                and msg.suggested_actions.actions
-            ):
+            if (msg.suggested_actions is not None
+                    and msg.suggested_actions.actions is not None
+                    and msg.suggested_actions.actions):
                 prompt.suggested_actions = msg.suggested_actions
 
             if msg.attachments:

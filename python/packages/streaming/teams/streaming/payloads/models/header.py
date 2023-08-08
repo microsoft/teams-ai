@@ -20,9 +20,8 @@ class Header:
 
     @payload_length.setter
     def payload_length(self, value: int):
-        self._validate_length(
-            value, TransportConstants.MAX_LENGTH, TransportConstants.MIN_LENGTH
-        )
+        self._validate_length(value, TransportConstants.MAX_LENGTH,
+                              TransportConstants.MIN_LENGTH)
         self._internal_payload_length = value
 
     def _validate_length(self, value: int, max_val: int, min_val: int):

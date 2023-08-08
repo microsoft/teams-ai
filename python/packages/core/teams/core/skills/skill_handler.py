@@ -22,8 +22,7 @@ from .conversation_id_factory import ConversationIdFactoryBase
 class SkillHandler(ChannelServiceHandler):
 
     SKILL_CONVERSATION_REFERENCE_KEY = (
-        "teams.core.skills.SkillConversationReference"
-    )
+        "teams.core.skills.SkillConversationReference")
 
     def __init__(
         self,
@@ -36,7 +35,8 @@ class SkillHandler(ChannelServiceHandler):
         logger: Logger = None,
     ):
         # pylint: disable=import-outside-toplevel
-        super().__init__(credential_provider, auth_configuration, channel_provider)
+        super().__init__(credential_provider, auth_configuration,
+                         channel_provider)
 
         if not adapter:
             raise TypeError("adapter can't be None")
@@ -49,11 +49,10 @@ class SkillHandler(ChannelServiceHandler):
 
         def aux_func():
             nonlocal self
-            return (
-                GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-                if self._channel_provider and self._channel_provider.is_government()
-                else AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
-            )
+            return (GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
+                    if self._channel_provider
+                    and self._channel_provider.is_government() else
+                    AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE)
 
         from ._skill_handler_impl import _SkillHandlerImpl
 
@@ -141,12 +140,10 @@ class SkillHandler(ChannelServiceHandler):
             activity,
         )
 
-    async def on_delete_activity(
-        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str
-    ):
-        await self._inner.on_delete_activity(
-            claims_identity, conversation_id, activity_id
-        )
+    async def on_delete_activity(self, claims_identity: ClaimsIdentity,
+                                 conversation_id: str, activity_id: str):
+        await self._inner.on_delete_activity(claims_identity, conversation_id,
+                                             activity_id)
 
     async def on_update_activity(
         self,
@@ -155,6 +152,6 @@ class SkillHandler(ChannelServiceHandler):
         activity_id: str,
         activity: Activity,
     ) -> ResourceResponse:
-        return await self._inner.on_update_activity(
-            claims_identity, conversation_id, activity_id, activity
-        )
+        return await self._inner.on_update_activity(claims_identity,
+                                                    conversation_id,
+                                                    activity_id, activity)

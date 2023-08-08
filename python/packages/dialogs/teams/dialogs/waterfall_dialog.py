@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-
 import uuid
 from typing import Coroutine
 from teams.core import TurnContext
@@ -26,7 +25,8 @@ class WaterfallDialog(Dialog):
             self._steps = []
         else:
             if not isinstance(steps, list):
-                raise TypeError("WaterfallDialog(): steps must be list of steps")
+                raise TypeError(
+                    "WaterfallDialog(): steps must be list of steps")
             self._steps = steps
 
     def add_step(self, step):
@@ -41,12 +41,13 @@ class WaterfallDialog(Dialog):
         self._steps.append(step)
         return self
 
-    async def begin_dialog(
-        self, dialog_context: DialogContext, options: object = None
-    ) -> DialogTurnResult:
+    async def begin_dialog(self,
+                           dialog_context: DialogContext,
+                           options: object = None) -> DialogTurnResult:
 
         if not dialog_context:
-            raise TypeError("WaterfallDialog.begin_dialog(): dc cannot be None.")
+            raise TypeError(
+                "WaterfallDialog.begin_dialog(): dc cannot be None.")
 
         # Initialize waterfall state
         state = dialog_context.active_dialog.state
@@ -62,16 +63,18 @@ class WaterfallDialog(Dialog):
         self.telemetry_client.track_event("WaterfallStart", properties)
 
         # Run first stepkinds
-        return await self.run_step(dialog_context, 0, DialogReason.BeginCalled, None)
+        return await self.run_step(dialog_context, 0, DialogReason.BeginCalled,
+                                   None)
 
-    async def continue_dialog(  # pylint: disable=unused-argument,arguments-differ
-        self,
-        dialog_context: DialogContext = None,
-        reason: DialogReason = None,
-        result: object = NotImplementedError(),
+    async def continue_dialog(    # pylint: disable=unused-argument,arguments-differ
+            self,
+            dialog_context: DialogContext = None,
+            reason: DialogReason = None,
+            result: object = NotImplementedError(),
     ) -> DialogTurnResult:
         if not dialog_context:
-            raise TypeError("WaterfallDialog.continue_dialog(): dc cannot be None.")
+            raise TypeError(
+                "WaterfallDialog.continue_dialog(): dc cannot be None.")
 
         if dialog_context.context.activity.type != ActivityTypes.message:
             return Dialog.end_of_turn
@@ -82,11 +85,11 @@ class WaterfallDialog(Dialog):
             dialog_context.context.activity.text,
         )
 
-    async def resume_dialog(
-        self, dialog_context: DialogContext, reason: DialogReason, result: object
-    ):
+    async def resume_dialog(self, dialog_context: DialogContext,
+                            reason: DialogReason, result: object):
         if dialog_context is None:
-            raise TypeError("WaterfallDialog.resume_dialog(): dc cannot be None.")
+            raise TypeError(
+                "WaterfallDialog.resume_dialog(): dc cannot be None.")
 
         # Increment step index and run step
         state = dialog_context.active_dialog.state
@@ -94,13 +97,12 @@ class WaterfallDialog(Dialog):
         # Future Me:
         # If issues with CosmosDB, see https://github.com/Microsoft/botbuilder-dotnet/issues/871
         # for hints.
-        return await self.run_step(
-            dialog_context, state[self.StepIndex] + 1, reason, result
-        )
+        return await self.run_step(dialog_context, state[self.StepIndex] + 1,
+                                   reason, result)
 
-    async def end_dialog(  # pylint: disable=unused-argument
-        self, context: TurnContext, instance: DialogInstance, reason: DialogReason
-    ) -> None:
+    async def end_dialog(    # pylint: disable=unused-argument
+            self, context: TurnContext, instance: DialogInstance,
+            reason: DialogReason) -> None:
         if reason is DialogReason.CancelCalled:
             index = instance.state[self.StepIndex]
             step_name = self.get_step_name(index)
@@ -116,13 +118,16 @@ class WaterfallDialog(Dialog):
 
                 instance_id = str(instance.state[self.PersistedInstanceId])
                 properties = {"DialogId": self.id, "InstanceId": instance_id}
-                self.telemetry_client.track_event("WaterfallComplete", properties)
+                self.telemetry_client.track_event("WaterfallComplete",
+                                                  properties)
 
         return
 
-    async def on_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def on_step(self,
+                      step_context: WaterfallStepContext) -> DialogTurnResult:
         step_name = self.get_step_name(step_context.index)
-        instance_id = str(step_context.active_dialog.state[self.PersistedInstanceId])
+        instance_id = str(
+            step_context.active_dialog.state[self.PersistedInstanceId])
         properties = {
             "DialogId": self.id,
             "StepName": step_name,
@@ -140,8 +145,7 @@ class WaterfallDialog(Dialog):
     ) -> DialogTurnResult:
         if not dialog_context:
             raise TypeError(
-                "WaterfallDialog.run_steps(): dialog_context cannot be None."
-            )
+                "WaterfallDialog.run_steps(): dialog_context cannot be None.")
         if index < len(self._steps):
             # Update persisted step index
             state = dialog_context.active_dialog.state
@@ -150,9 +154,8 @@ class WaterfallDialog(Dialog):
             # Create step context
             options = state[self.PersistedOptions]
             values = state[self.PersistedValues]
-            step_context = WaterfallStepContext(
-                self, dialog_context, options, values, index, reason, result
-            )
+            step_context = WaterfallStepContext(self, dialog_context, options,
+                                                values, index, reason, result)
             return await self.on_step(step_context)
 
         # End of waterfall so just return any result to parent

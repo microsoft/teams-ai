@@ -41,9 +41,8 @@ class TranscriptLoggerMiddleware(Middleware):
             )
         self.logger = logger
 
-    async def on_turn(
-        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
-    ):
+    async def on_turn(self, context: TurnContext,
+                      logic: Callable[[TurnContext], Awaitable]):
         """Initialization for middleware.
         :param context: Context for the current turn of conversation with the user.
         :param logic: Function to call at the end of the middleware chain.
@@ -58,10 +57,9 @@ class TranscriptLoggerMiddleware(Middleware):
                 activity.from_property.role = "user"
 
             # We should not log ContinueConversation events used by skills to initialize the middleware.
-            if not (
-                context.activity.type == ActivityTypes.event
-                and context.activity.name == ActivityEventNames.continue_conversation
-            ):
+            if not (context.activity.type == ActivityTypes.event
+                    and context.activity.name
+                    == ActivityEventNames.continue_conversation):
                 await self.log_activity(transcript, copy.copy(activity))
 
         # hook up onSend pipeline
@@ -84,8 +82,7 @@ class TranscriptLoggerMiddleware(Middleware):
                 if not cloned_activity.id:
                     alphanumeric = string.ascii_lowercase + string.digits
                     prefix = "g_" + "".join(
-                        random.choice(alphanumeric) for i in range(5)
-                    )
+                        random.choice(alphanumeric) for i in range(5))
                     epoch = datetime.datetime.utcfromtimestamp(0)
                     if cloned_activity.timestamp:
                         reference = cloned_activity.timestamp
@@ -99,9 +96,9 @@ class TranscriptLoggerMiddleware(Middleware):
         context.on_send_activities(send_activities_handler)
 
         # hook up update activity pipeline
-        async def update_activity_handler(
-            ctx: TurnContext, activity: Activity, next_update: Callable[[], Awaitable]
-        ):
+        async def update_activity_handler(ctx: TurnContext, activity: Activity,
+                                          next_update: Callable[[],
+                                                                Awaitable]):
             # Run full pipeline
             response = await next_update()
             update_activity = copy.copy(activity)
@@ -120,12 +117,10 @@ class TranscriptLoggerMiddleware(Middleware):
             # Run full pipeline
             await next_delete()
 
-            delete_msg = Activity(
-                type=ActivityTypes.message_delete, id=reference.activity_id
-            )
+            delete_msg = Activity(type=ActivityTypes.message_delete,
+                                  id=reference.activity_id)
             deleted_activity: Activity = TurnContext.apply_conversation_reference(
-                delete_msg, reference, False
-            )
+                delete_msg, reference, False)
             await self.log_activity(transcript, deleted_activity)
 
         context.on_delete_activity(delete_activity_handler)
@@ -141,7 +136,8 @@ class TranscriptLoggerMiddleware(Middleware):
             await self.logger.log_activity(activity)
             transcript.task_done()
 
-    async def log_activity(self, transcript: Queue, activity: Activity) -> None:
+    async def log_activity(self, transcript: Queue,
+                           activity: Activity) -> None:
         """Logs the activity.
         :param transcript: transcript.
         :param activity: Activity to log.
@@ -170,9 +166,8 @@ class TranscriptStore(TranscriptLogger):
         raise NotImplementedError
 
     @abstractmethod
-    async def list_transcripts(
-        self, channel_id: str, continuation_token: str
-    ) -> "PagedResult":
+    async def list_transcripts(self, channel_id: str,
+                               continuation_token: str) -> "PagedResult":
         """List conversations in the channelId.
         :param channel_id: Channel Id where conversation took place.
         :param continuation_token : Continuation token to page through results.
@@ -181,7 +176,8 @@ class TranscriptStore(TranscriptLogger):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_transcript(self, channel_id: str, conversation_id: str) -> None:
+    async def delete_transcript(self, channel_id: str,
+                                conversation_id: str) -> None:
         """Delete a specific conversation and all of it's activities.
         :param channel_id: Channel Id where conversation took place.
         :param conversation_id: Id of the conversation to delete.

@@ -6,43 +6,43 @@ from ..bot_framework_sdk_client_async import BotFrameworkConnectorConfiguration
 from ..http_client_factory import HttpClientFactory
 
 from ._government_cloud_bot_framework_authentication import (
-    _GovernmentCloudBotFrameworkAuthentication,
-)
+    _GovernmentCloudBotFrameworkAuthentication, )
 from ._parameterized_bot_framework_authentication import (
-    _ParameterizedBotFrameworkAuthentication,
-)
+    _ParameterizedBotFrameworkAuthentication, )
 from ._public_cloud_bot_framework_authentication import (
-    _PublicCloudBotFrameworkAuthentication,
-)
+    _PublicCloudBotFrameworkAuthentication, )
 
 from .authentication_configuration import AuthenticationConfiguration
 from .bot_framework_authentication import BotFrameworkAuthentication
 from .government_constants import GovernmentConstants
 from .password_service_client_credential_factory import (
-    PasswordServiceClientCredentialFactory,
-)
+    PasswordServiceClientCredentialFactory, )
 from .service_client_credentials_factory import ServiceClientCredentialsFactory
 
 
 class BotFrameworkAuthenticationFactory:
+
     @staticmethod
     def create(
-        *,
-        channel_service: str = None,
-        validate_authority: bool = False,
-        to_channel_from_bot_login_url: str = None,
-        to_channel_from_bot_oauth_scope: str = None,
-        to_bot_from_channel_token_issuer: str = None,
-        oauth_url: str = None,
-        to_bot_from_channel_open_id_metadata_url: str = None,
-        to_bot_from_emulator_open_id_metadata_url: str = None,
-        caller_id: str = None,
-        credential_factory: ServiceClientCredentialsFactory = PasswordServiceClientCredentialFactory(),
-        auth_configuration: AuthenticationConfiguration = AuthenticationConfiguration(),
-        http_client_factory: HttpClientFactory = None,
-        connector_client_configuration: BotFrameworkConnectorConfiguration = None,
-        logger: Logger = None
-    ) -> BotFrameworkAuthentication:
+            *,
+            channel_service: str = None,
+            validate_authority: bool = False,
+            to_channel_from_bot_login_url: str = None,
+            to_channel_from_bot_oauth_scope: str = None,
+            to_bot_from_channel_token_issuer: str = None,
+            oauth_url: str = None,
+            to_bot_from_channel_open_id_metadata_url: str = None,
+            to_bot_from_emulator_open_id_metadata_url: str = None,
+            caller_id: str = None,
+            credential_factory:
+        ServiceClientCredentialsFactory = PasswordServiceClientCredentialFactory(
+        ),
+            auth_configuration:
+        AuthenticationConfiguration = AuthenticationConfiguration(),
+            http_client_factory: HttpClientFactory = None,
+            connector_client_configuration:
+        BotFrameworkConnectorConfiguration = None,
+            logger: Logger = None) -> BotFrameworkAuthentication:
         """
         Creates the appropriate BotFrameworkAuthentication instance.
 
@@ -63,15 +63,10 @@ class BotFrameworkAuthenticationFactory:
         :return: A new BotFrameworkAuthentication instance.
         """
         # pylint: disable=too-many-boolean-expressions
-        if (
-            to_channel_from_bot_login_url
-            or to_channel_from_bot_oauth_scope
-            or to_bot_from_channel_token_issuer
-            or oauth_url
-            or to_bot_from_channel_open_id_metadata_url
-            or to_bot_from_emulator_open_id_metadata_url
-            or caller_id
-        ):
+        if (to_channel_from_bot_login_url or to_channel_from_bot_oauth_scope
+                or to_bot_from_channel_token_issuer or oauth_url
+                or to_bot_from_channel_open_id_metadata_url
+                or to_bot_from_emulator_open_id_metadata_url or caller_id):
             # if we have any of the 'parameterized' properties defined we'll assume this is the parameterized code
             return _ParameterizedBotFrameworkAuthentication(
                 validate_authority,
@@ -109,4 +104,5 @@ class BotFrameworkAuthenticationFactory:
 
         # The ChannelService value is used an indicator of which built in set of constants to use.
         # If it is not recognized, a full configuration is expected.
-        raise ValueError("The provided channel_service value is not supported.")
+        raise ValueError(
+            "The provided channel_service value is not supported.")

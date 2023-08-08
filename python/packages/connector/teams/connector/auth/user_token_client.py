@@ -16,10 +16,11 @@ from teams.connector.token_api.models import (
 
 
 class UserTokenClient(ABC):
+
     @abstractmethod
-    async def get_user_token(
-        self, user_id: str, connection_name: str, channel_id: str, magic_code: str
-    ) -> TokenResponse:
+    async def get_user_token(self, user_id: str, connection_name: str,
+                             channel_id: str,
+                             magic_code: str) -> TokenResponse:
         """
         Attempts to retrieve the token for a user that's in a login flow.
 
@@ -32,9 +33,9 @@ class UserTokenClient(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_sign_in_resource(
-        self, connection_name: str, activity: Activity, final_redirect: str
-    ) -> SignInUrlResponse:
+    async def get_sign_in_resource(self, connection_name: str,
+                                   activity: Activity,
+                                   final_redirect: str) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
 
@@ -46,7 +47,8 @@ class UserTokenClient(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def sign_out_user(self, user_id: str, connection_name: str, channel_id: str):
+    async def sign_out_user(self, user_id: str, connection_name: str,
+                            channel_id: str):
         """
         Signs the user out with the token server.
 
@@ -57,9 +59,8 @@ class UserTokenClient(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_token_status(
-        self, user_id: str, channel_id: str, include_filter: str
-    ) -> List[TokenStatus]:
+    async def get_token_status(self, user_id: str, channel_id: str,
+                               include_filter: str) -> List[TokenStatus]:
         """
         Retrieves the token status for each configured connection for the given user.
 
@@ -109,9 +110,8 @@ class UserTokenClient(ABC):
         raise NotImplementedError()
 
     @staticmethod
-    def create_token_exchange_state(
-        app_id: str, connection_name: str, activity: Activity
-    ) -> str:
+    def create_token_exchange_state(app_id: str, connection_name: str,
+                                    activity: Activity) -> str:
         """
         Helper function to create the Base64 encoded token exchange state used in getSignInResource calls.
 
@@ -136,8 +136,6 @@ class UserTokenClient(ABC):
 
         tes_string = b64encode(
             dumps(token_exchange_state.serialize()).encode(
-                encoding="UTF-8", errors="strict"
-            )
-        ).decode()
+                encoding="UTF-8", errors="strict")).decode()
 
         return tes_string

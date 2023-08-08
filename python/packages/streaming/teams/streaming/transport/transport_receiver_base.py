@@ -7,5 +7,6 @@ from .transport_base import TransportBase
 
 
 class TransportReceiverBase(ABC, TransportBase):
+
     async def receive(self, buffer: object, offset: int, count: int) -> int:
         raise NotImplementedError()

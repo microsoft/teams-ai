@@ -7,6 +7,7 @@ from .recognizer_result import RecognizerResult
 
 
 class Recognizer(ABC):
+
     @abstractmethod
     async def recognize(self, turn_context: TurnContext) -> RecognizerResult:
         raise NotImplementedError()

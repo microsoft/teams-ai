@@ -34,9 +34,11 @@ class AttachmentsOperations:
         self.config = config
         self.api_version = "v3"
 
-    def get_attachment_info(
-        self, attachment_id, custom_headers=None, raw=False, **operation_config
-    ):
+    def get_attachment_info(self,
+                            attachment_id,
+                            custom_headers=None,
+                            raw=False,
+                            **operation_config):
         """GetAttachmentInfo.
 
         Get AttachmentInfo structure describing the attachment views.
@@ -57,7 +59,8 @@ class AttachmentsOperations:
         # Construct URL
         url = self.get_attachment_info.metadata["url"]
         path_format_arguments = {
-            "attachmentId": self._serialize.url("attachment_id", attachment_id, "str")
+            "attachmentId":
+            self._serialize.url("attachment_id", attachment_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -89,15 +92,13 @@ class AttachmentsOperations:
 
     get_attachment_info.metadata = {"url": "/v3/attachments/{attachmentId}"}
 
-    def get_attachment(
-        self,
-        attachment_id,
-        view_id,
-        custom_headers=None,
-        raw=False,
-        callback=None,
-        **operation_config
-    ):
+    def get_attachment(self,
+                       attachment_id,
+                       view_id,
+                       custom_headers=None,
+                       raw=False,
+                       callback=None,
+                       **operation_config):
         """GetAttachment.
 
         Get the named view as binary content.
@@ -124,8 +125,10 @@ class AttachmentsOperations:
         # Construct URL
         url = self.get_attachment.metadata["url"]
         path_format_arguments = {
-            "attachmentId": self._serialize.url("attachment_id", attachment_id, "str"),
-            "viewId": self._serialize.url("view_id", view_id, "str"),
+            "attachmentId":
+            self._serialize.url("attachment_id", attachment_id, "str"),
+            "viewId":
+            self._serialize.url("view_id", view_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -153,4 +156,6 @@ class AttachmentsOperations:
 
         return deserialized
 
-    get_attachment.metadata = {"url": "/v3/attachments/{attachmentId}/views/{viewId}"}
+    get_attachment.metadata = {
+        "url": "/v3/attachments/{attachmentId}/views/{viewId}"
+    }

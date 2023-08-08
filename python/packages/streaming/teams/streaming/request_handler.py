@@ -9,7 +9,7 @@ from .streaming_response import StreamingResponse
 
 
 class RequestHandler(ABC):
-    async def process_request(
-        self, request: ReceiveRequest, logger: Logger, context: object
-    ) -> StreamingResponse:
+
+    async def process_request(self, request: ReceiveRequest, logger: Logger,
+                              context: object) -> StreamingResponse:
         raise NotImplementedError()

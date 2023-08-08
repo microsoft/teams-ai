@@ -7,9 +7,12 @@ from teams.streaming.payloads import ContentStream
 
 
 class ReceiveRequest:
-    def __init__(
-        self, *, verb: str = None, path: str = None, streams: List[ContentStream] = None
-    ):
+
+    def __init__(self,
+                 *,
+                 verb: str = None,
+                 path: str = None,
+                 streams: List[ContentStream] = None):
         self.verb = verb
         self.path = path
         self.streams: List[ContentStream] = streams or []

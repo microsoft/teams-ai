@@ -21,6 +21,7 @@ class TelemetryDataPointType(Enum):
 
 
 class BotTelemetryClient(ABC):
+
     @abstractmethod
     def track_pageview(
         self,
@@ -40,8 +41,7 @@ class BotTelemetryClient(ABC):
         (defaults to: None)
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_request(): is not implemented."
-        )
+            "BotTelemetryClient.track_request(): is not implemented.")
 
     @abstractmethod
     def track_exception(
@@ -62,8 +62,7 @@ class BotTelemetryClient(ABC):
         (defaults to: None)
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_request(): is not implemented."
-        )
+            "BotTelemetryClient.track_request(): is not implemented.")
 
     @abstractmethod
     def track_event(
@@ -80,8 +79,7 @@ class BotTelemetryClient(ABC):
         (defaults to: None)
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_event(): is not implemented."
-        )
+            "BotTelemetryClient.track_event(): is not implemented.")
 
     @abstractmethod
     def track_metric(
@@ -109,8 +107,7 @@ class BotTelemetryClient(ABC):
         :param properties: the set of custom properties the client wants attached to this data item. (defaults to: None)
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_metric(): is not implemented."
-        )
+            "BotTelemetryClient.track_metric(): is not implemented.")
 
     @abstractmethod
     def track_trace(self, name, properties=None, severity: Severity = None):
@@ -121,8 +118,7 @@ class BotTelemetryClient(ABC):
         :param severity: the severity level of this trace, one of DEBUG, INFO, WARNING, ERROR, CRITICAL
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_trace(): is not implemented."
-        )
+            "BotTelemetryClient.track_trace(): is not implemented.")
 
     @abstractmethod
     def track_request(
@@ -154,8 +150,7 @@ class BotTelemetryClient(ABC):
         :param request_id: the id for this request. If None, a new uuid will be generated. (defaults to: None)
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_request(): is not implemented."
-        )
+            "BotTelemetryClient.track_request(): is not implemented.")
 
     @abstractmethod
     def track_dependency(
@@ -193,5 +188,4 @@ class BotTelemetryClient(ABC):
         (defaults to: None)
         """
         raise NotImplementedError(
-            "BotTelemetryClient.track_dependency(): is not implemented."
-        )
+            "BotTelemetryClient.track_dependency(): is not implemented.")

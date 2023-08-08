@@ -65,15 +65,16 @@ class TeamsConnectorClient(SDKClient):
     def __init__(self, credentials, base_url=None):
 
         self.config = TeamsConnectorClientConfiguration(credentials, base_url)
-        super(TeamsConnectorClient, self).__init__(self.config.credentials, self.config)
+        super(TeamsConnectorClient, self).__init__(self.config.credentials,
+                                                   self.config)
 
         client_models = {
-            k: v for k, v in models.__dict__.items() if isinstance(v, type)
+            k: v
+            for k, v in models.__dict__.items() if isinstance(v, type)
         }
         self.api_version = "v3"
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
-        self.teams = TeamsOperations(
-            self._client, self.config, self._serialize, self._deserialize
-        )
+        self.teams = TeamsOperations(self._client, self.config,
+                                     self._serialize, self._deserialize)

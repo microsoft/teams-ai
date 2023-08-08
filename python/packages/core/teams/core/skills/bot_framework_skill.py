@@ -8,7 +8,10 @@ class BotFrameworkSkill:
     """
 
     # pylint: disable=invalid-name
-    def __init__(self, id: str = None, app_id: str = None, skill_endpoint: str = None):
+    def __init__(self,
+                 id: str = None,
+                 app_id: str = None,
+                 skill_endpoint: str = None):
         self.id = id
         self.app_id = app_id
         self.skill_endpoint = skill_endpoint

@@ -6,6 +6,7 @@ from .connector_factory import ConnectorFactory
 
 
 class AuthenticateRequestResult:
+
     def __init__(self) -> None:
         # A value for the Audience.
         self.audience: str = None

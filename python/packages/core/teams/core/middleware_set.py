@@ -9,14 +9,15 @@ from .turn_context import TurnContext
 
 
 class Middleware(ABC):
+
     @abstractmethod
-    async def on_turn(
-        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
-    ):
+    async def on_turn(self, context: TurnContext,
+                      logic: Callable[[TurnContext], Awaitable]):
         pass
 
 
 class AnonymousReceiveMiddleware(Middleware):
+
     def __init__(self, anonymous_handler):
         if not iscoroutinefunction(anonymous_handler):
             raise TypeError(
@@ -24,7 +25,8 @@ class AnonymousReceiveMiddleware(Middleware):
             )
         self._to_call = anonymous_handler
 
-    def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
+    def on_turn(self, context: TurnContext, logic: Callable[[TurnContext],
+                                                            Awaitable]):
         return self._to_call(context, logic)
 
 
@@ -51,21 +53,19 @@ class MiddlewareSet(Middleware):
                 return self
             raise TypeError(
                 'MiddlewareSet.use(): invalid middleware at index "%s" being added.'
-                % idx
-            )
+                % idx)
 
     async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
 
-    async def on_turn(
-        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
-    ):
+    async def on_turn(self, context: TurnContext,
+                      logic: Callable[[TurnContext], Awaitable]):
         await self.receive_activity_internal(context, None)
         await logic()
 
-    async def receive_activity_with_status(
-        self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]
-    ):
+    async def receive_activity_with_status(self, context: TurnContext,
+                                           callback: Callable[[TurnContext],
+                                                              Awaitable]):
         return await self.receive_activity_internal(context, callback)
 
     async def receive_activity_internal(
@@ -82,8 +82,7 @@ class MiddlewareSet(Middleware):
 
         async def call_next_middleware():
             return await self.receive_activity_internal(
-                context, callback, next_middleware_index + 1
-            )
+                context, callback, next_middleware_index + 1)
 
         try:
             return await next_middleware.on_turn(context, call_next_middleware)

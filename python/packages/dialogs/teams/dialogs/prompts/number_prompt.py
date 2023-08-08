@@ -35,9 +35,11 @@ class NumberPrompt(Prompt):
         is_retry: bool,
     ):
         if not turn_context:
-            raise TypeError("NumberPrompt.on_prompt(): turn_context cannot be None.")
+            raise TypeError(
+                "NumberPrompt.on_prompt(): turn_context cannot be None.")
         if not options:
-            raise TypeError("NumberPrompt.on_prompt(): options cannot be None.")
+            raise TypeError(
+                "NumberPrompt.on_prompt(): options cannot be None.")
 
         if is_retry and options.retry_prompt is not None:
             await turn_context.send_activity(options.retry_prompt)
@@ -51,7 +53,8 @@ class NumberPrompt(Prompt):
         options: PromptOptions,
     ) -> PromptRecognizerResult:
         if not turn_context:
-            raise TypeError("NumberPrompt.on_recognize(): turn_context cannot be None.")
+            raise TypeError(
+                "NumberPrompt.on_recognize(): turn_context cannot be None.")
 
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:
@@ -63,18 +66,14 @@ class NumberPrompt(Prompt):
 
             if results:
                 result.succeeded = True
-                result.value = parse_decimal(
-                    results[0].resolution["value"], locale=culture.replace("-", "_")
-                )
+                result.value = parse_decimal(results[0].resolution["value"],
+                                             locale=culture.replace("-", "_"))
 
         return result
 
     def _get_culture(self, turn_context: TurnContext):
-        culture = (
-            turn_context.activity.locale
-            if turn_context.activity.locale
-            else self.default_locale
-        )
+        culture = (turn_context.activity.locale
+                   if turn_context.activity.locale else self.default_locale)
 
         if not culture:
             culture = Culture.English

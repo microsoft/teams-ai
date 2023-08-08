@@ -7,7 +7,9 @@ from .storage import Storage
 
 
 class PrivateConversationState(BotState):
+
     def __init__(self, storage: Storage, namespace: str = ""):
+
         async def aux_func(context: TurnContext) -> str:
             nonlocal self
             return await self.get_storage_key(context)
@@ -27,11 +29,8 @@ class PrivateConversationState(BotState):
         else:
             raise Exception("missing activity.conversation.id")
 
-        if (
-            activity
-            and activity.from_property
-            and activity.from_property.id is not None
-        ):
+        if (activity and activity.from_property
+                and activity.from_property.id is not None):
             user_id = activity.from_property.id
         else:
             raise Exception("missing activity.from_property.id")

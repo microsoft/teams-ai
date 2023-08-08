@@ -3,7 +3,11 @@
 
 
 class DialogEvent:
-    def __init__(self, bubble: bool = False, name: str = "", value: object = None):
+
+    def __init__(self,
+                 bubble: bool = False,
+                 name: str = "",
+                 value: object = None):
         self.bubble = bubble
         self.name = name
         self.value: object = value

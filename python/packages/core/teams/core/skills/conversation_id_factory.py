@@ -20,8 +20,7 @@ class ConversationIdFactoryBase(ABC):
     async def create_skill_conversation_id(
         self,
         options_or_conversation_reference: Union[
-            SkillConversationIdFactoryOptions, ConversationReference
-        ],
+            SkillConversationIdFactoryOptions, ConversationReference],
     ) -> str:
         """
         Using the options passed in, creates a conversation id and :class:`SkillConversationReference`,
@@ -41,8 +40,7 @@ class ConversationIdFactoryBase(ABC):
         raise NotImplementedError()
 
     async def get_conversation_reference(
-        self, skill_conversation_id: str
-    ) -> ConversationReference:
+            self, skill_conversation_id: str) -> ConversationReference:
         """
         [DEPRECATED] Method is deprecated, please use get_skill_conversation_reference() instead.
 
@@ -55,8 +53,7 @@ class ConversationIdFactoryBase(ABC):
         raise NotImplementedError()
 
     async def get_skill_conversation_reference(
-        self, skill_conversation_id: str
-    ) -> SkillConversationReference:
+            self, skill_conversation_id: str) -> SkillConversationReference:
         """
         Retrieves a :class:`SkillConversationReference` using a conversation id passed in.
 

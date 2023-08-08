@@ -3,11 +3,9 @@
 
 import os
 
-
 __title__ = "teams-testing"
-__version__ = (
-    os.environ["packageVersion"] if "packageVersion" in os.environ else "4.15.0"
-)
+__version__ = (os.environ["packageVersion"]
+               if "packageVersion" in os.environ else "4.15.0")
 __uri__ = "https://www.github.com/Microsoft/botbuilder-python"
 __author__ = "Microsoft"
 __description__ = "Microsoft Bot Framework Bot Builder"

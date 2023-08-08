@@ -8,6 +8,7 @@ from .flask_telemetry_middleware import retrieve_flask_body
 
 
 class FlaskTelemetryProcessor(TelemetryProcessor):
+
     def can_process(self) -> bool:
         return self.detect_flask()
 

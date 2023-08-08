@@ -7,6 +7,7 @@ from teams.connector.aio import ConnectorClient
 
 
 class ConnectorFactory(ABC):
+
     @abstractmethod
     async def create(self, service_url: str, audience: str) -> ConnectorClient:
         """

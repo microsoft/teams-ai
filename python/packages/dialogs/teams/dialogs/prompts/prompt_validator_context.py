@@ -7,6 +7,7 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class PromptValidatorContext:
+
     def __init__(
         self,
         turn_context: TurnContext,

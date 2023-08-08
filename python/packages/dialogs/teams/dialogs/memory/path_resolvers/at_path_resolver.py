@@ -11,19 +11,17 @@ class AtPathResolver(AliasPathResolver):
     def __init__(self):
         super().__init__(alias="@", prefix="")
 
-        self._PREFIX = "turn.recognized.entities."  # pylint: disable=invalid-name
+        self._PREFIX = "turn.recognized.entities."    # pylint: disable=invalid-name
 
     def transform_path(self, path: str):
         if not path:
             raise TypeError(f"Expecting: path, but received None")
 
         path = path.strip()
-        if (
-            path.startswith("@")
-            and len(path) > 1
-            and AtPathResolver._is_path_char(path[1])
-        ):
-            end = any(delimiter in path for delimiter in AtPathResolver._DELIMITERS)
+        if (path.startswith("@") and len(path) > 1
+                and AtPathResolver._is_path_char(path[1])):
+            end = any(delimiter in path
+                      for delimiter in AtPathResolver._DELIMITERS)
             if end == -1:
                 end = len(path)
 

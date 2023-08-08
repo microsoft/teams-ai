@@ -34,9 +34,12 @@ class AttachmentsOperations:
         self.config = config
         self.api_version = "v3"
 
-    async def get_attachment_info(
-        self, attachment_id, *, custom_headers=None, raw=False, **operation_config
-    ):
+    async def get_attachment_info(self,
+                                  attachment_id,
+                                  *,
+                                  custom_headers=None,
+                                  raw=False,
+                                  **operation_config):
         """GetAttachmentInfo.
 
         Get AttachmentInfo structure describing the attachment views.
@@ -57,7 +60,8 @@ class AttachmentsOperations:
         # Construct URL
         url = self.get_attachment_info.metadata["url"]
         path_format_arguments = {
-            "attachmentId": self._serialize.url("attachment_id", attachment_id, "str")
+            "attachmentId":
+            self._serialize.url("attachment_id", attachment_id, "str")
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -72,9 +76,9 @@ class AttachmentsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -91,16 +95,14 @@ class AttachmentsOperations:
 
     get_attachment_info.metadata = {"url": "/v3/attachments/{attachmentId}"}
 
-    async def get_attachment(
-        self,
-        attachment_id,
-        view_id,
-        *,
-        custom_headers=None,
-        raw=False,
-        callback=None,
-        **operation_config
-    ):
+    async def get_attachment(self,
+                             attachment_id,
+                             view_id,
+                             *,
+                             custom_headers=None,
+                             raw=False,
+                             callback=None,
+                             **operation_config):
         """GetAttachment.
 
         Get the named view as binary content.
@@ -127,8 +129,10 @@ class AttachmentsOperations:
         # Construct URL
         url = self.get_attachment.metadata["url"]
         path_format_arguments = {
-            "attachmentId": self._serialize.url("attachment_id", attachment_id, "str"),
-            "viewId": self._serialize.url("view_id", view_id, "str"),
+            "attachmentId":
+            self._serialize.url("attachment_id", attachment_id, "str"),
+            "viewId":
+            self._serialize.url("view_id", view_id, "str"),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -143,9 +147,9 @@ class AttachmentsOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=True, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=True,
+                                                 **operation_config)
 
         if response.status_code not in [200, 301, 302]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -158,4 +162,6 @@ class AttachmentsOperations:
 
         return deserialized
 
-    get_attachment.metadata = {"url": "/v3/attachments/{attachmentId}/views/{viewId}"}
+    get_attachment.metadata = {
+        "url": "/v3/attachments/{attachmentId}/views/{viewId}"
+    }

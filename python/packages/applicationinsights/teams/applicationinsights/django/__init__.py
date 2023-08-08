@@ -7,7 +7,6 @@ from .bot_telemetry_middleware import BotTelemetryMiddleware
 from .logging import LoggingHandler
 from .middleware import ApplicationInsightsMiddleware
 
-
 __all__ = [
     "BotTelemetryMiddleware",
     "ApplicationInsightsMiddleware",

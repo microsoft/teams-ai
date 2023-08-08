@@ -17,10 +17,11 @@ from .skill_validation import SkillValidation
 
 
 class BotFrameworkAuthentication(ABC):
+
     @abstractmethod
     async def authenticate_request(
-        self, activity: Activity, auth_header: str
-    ) -> AuthenticateRequestResult:
+            self, activity: Activity,
+            auth_header: str) -> AuthenticateRequestResult:
         """
         Validate Bot Framework Protocol requests.
 
@@ -32,8 +33,8 @@ class BotFrameworkAuthentication(ABC):
 
     @abstractmethod
     async def authenticate_streaming_request(
-        self, auth_header: str, channel_id_header: str
-    ) -> AuthenticateRequestResult:
+            self, auth_header: str,
+            channel_id_header: str) -> AuthenticateRequestResult:
         """
         Validate Bot Framework Protocol requests.
 
@@ -45,8 +46,7 @@ class BotFrameworkAuthentication(ABC):
 
     @abstractmethod
     def create_connector_factory(
-        self, claims_identity: ClaimsIdentity
-    ) -> ConnectorFactory:
+            self, claims_identity: ClaimsIdentity) -> ConnectorFactory:
         """
         Creates a ConnectorFactory that can be used to create ConnectorClients that can use credentials
         from this particular Cloud Environment.
@@ -58,8 +58,7 @@ class BotFrameworkAuthentication(ABC):
 
     @abstractmethod
     async def create_user_token_client(
-        self, claims_identity: ClaimsIdentity
-    ) -> UserTokenClient:
+            self, claims_identity: ClaimsIdentity) -> UserTokenClient:
         """
         Creates the appropriate UserTokenClient instance.
 
@@ -84,7 +83,8 @@ class BotFrameworkAuthentication(ABC):
         """
         raise Exception("NotImplemented")
 
-    async def authenticate_channel_request(self, auth_header: str) -> ClaimsIdentity:
+    async def authenticate_channel_request(self,
+                                           auth_header: str) -> ClaimsIdentity:
         """
         Authenticate Bot Framework Protocol request to Skills.
 
@@ -116,6 +116,5 @@ class BotFrameworkAuthentication(ABC):
         # Is the activity from another bot?
         return (
             f"{CallerIdConstants.bot_to_bot_prefix}{JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)}"
-            if SkillValidation.is_skill_claim(claims_identity.claims)
-            else caller_id
-        )
+            if SkillValidation.is_skill_claim(
+                claims_identity.claims) else caller_id)

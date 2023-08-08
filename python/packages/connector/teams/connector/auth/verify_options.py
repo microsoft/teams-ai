@@ -6,6 +6,7 @@ from typing import List, Union
 
 
 class VerifyOptions:
+
     def __init__(self, issuer, audience, clock_tolerance, ignore_expiration):
         self.issuer: Union[List[str], str] = issuer or []
         self.audience: str = audience

@@ -8,13 +8,14 @@ from teams.streaming.payloads.assemblers import PayloadStreamAssembler
 
 
 class PayloadStream:
+
     def __init__(self, assembler: PayloadStreamAssembler):
         self._assembler = assembler
         self._buffer_queue: List[List[int]] = []
         self._lock = Lock()
         self._data_available = Semaphore(0)
-        self._producer_length = 0  # total length
-        self._consumer_position = 0  # read position
+        self._producer_length = 0    # total length
+        self._consumer_position = 0    # read position
         self._active: List[int] = []
         self._active_offset = 0
         self._end = False
@@ -32,7 +33,7 @@ class PayloadStream:
         self.give_buffer([])
 
     def write(self, buffer: List[int], offset: int, count: int):
-        buffer_copy = buffer[offset : offset + count]
+        buffer_copy = buffer[offset:offset + count]
         self.give_buffer(buffer_copy)
 
     async def read(self, buffer: List[int], offset: int, count: int):
@@ -56,10 +57,8 @@ class PayloadStream:
             self._active = []
             self._active_offset = 0
 
-        if (
-            self._assembler
-            and self._consumer_position >= self._assembler.content_length
-        ):
+        if (self._assembler
+                and self._consumer_position >= self._assembler.content_length):
             self._end = True
 
         return available_count
@@ -69,9 +68,8 @@ class PayloadStream:
         current_size = 0
 
         while not self._end:
-            count = await self.read(
-                result, current_size, self._assembler.content_length
-            )
+            count = await self.read(result, current_size,
+                                    self._assembler.content_length)
             current_size += count
 
         return result

@@ -10,6 +10,7 @@ from .dialog_state import DialogState
 
 
 class WaterfallStepContext(DialogContext):
+
     def __init__(
         self,
         parent,
@@ -20,9 +21,8 @@ class WaterfallStepContext(DialogContext):
         reason: DialogReason,
         result: object = None,
     ):
-        super(WaterfallStepContext, self).__init__(
-            dc.dialogs, dc.context, DialogState(dc.stack)
-        )
+        super(WaterfallStepContext, self).__init__(dc.dialogs, dc.context,
+                                                   DialogState(dc.stack))
         self._wf_parent = parent
         self._next_called = False
         self._index = index
@@ -56,11 +56,10 @@ class WaterfallStepContext(DialogContext):
         if self._next_called is True:
             raise Exception(
                 "WaterfallStepContext.next(): method already called for dialog and step '%s'[%s]."
-                % (self._wf_parent.id, self._index)
-            )
+                % (self._wf_parent.id, self._index))
 
         # Trigger next step
         self._next_called = True
-        return await self._wf_parent.resume_dialog(
-            self, DialogReason.NextCalled, result
-        )
+        return await self._wf_parent.resume_dialog(self,
+                                                   DialogReason.NextCalled,
+                                                   result)

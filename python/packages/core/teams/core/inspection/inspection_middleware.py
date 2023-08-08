@@ -22,7 +22,7 @@ from .trace_activity import from_state, make_command_activity
 class InspectionMiddleware(InterceptionMiddleware):
     _COMMAND = "/INSPECT"
 
-    def __init__(  # pylint: disable=super-init-not-called
+    def __init__(    # pylint: disable=super-init-not-called
         self,
         inspection_state: InspectionState,
         user_state: UserState = None,
@@ -32,8 +32,7 @@ class InspectionMiddleware(InterceptionMiddleware):
 
         self.inspection_state = inspection_state
         self.inspection_state_accessor = inspection_state.create_property(
-            "InspectionSessionByStatus"
-        )
+            "InspectionSessionByStatus")
         self.user_state = user_state
         self.conversation_state = conversation_state
         self.credentials = MicrosoftAppCredentials(
@@ -48,7 +47,8 @@ class InspectionMiddleware(InterceptionMiddleware):
             TurnContext.remove_recipient_mention(context.activity)
 
             command = context.activity.text.strip().split(" ")
-            if len(command) > 1 and command[0] == InspectionMiddleware._COMMAND:
+            if len(command
+                   ) > 1 and command[0] == InspectionMiddleware._COMMAND:
 
                 if len(command) == 2 and command[1] == "open":
                     await self._process_open_command(context)
@@ -62,7 +62,8 @@ class InspectionMiddleware(InterceptionMiddleware):
 
         return False
 
-    async def _inbound(self, context: TurnContext, trace_activity: Activity) -> Any:
+    async def _inbound(self, context: TurnContext,
+                       trace_activity: Activity) -> Any:
         if await self.process_command(context):
             return False, False
 
@@ -72,13 +73,13 @@ class InspectionMiddleware(InterceptionMiddleware):
                 return True, True
         return True, False
 
-    async def _outbound(
-        self, context: TurnContext, trace_activities: List[Activity]
-    ) -> Any:
+    async def _outbound(self, context: TurnContext,
+                        trace_activities: List[Activity]) -> Any:
         session = await self._find_session(context)
         if session:
             for trace_activity in trace_activities:
-                if not await self._invoke_send(context, session, trace_activity):
+                if not await self._invoke_send(context, session,
+                                               trace_activity):
                     break
 
     async def _trace_state(self, context: TurnContext) -> Any:
@@ -93,48 +94,40 @@ class InspectionMiddleware(InterceptionMiddleware):
             bot_state = {}
 
             if self.user_state:
-                bot_state["user_state"] = InspectionMiddleware._get_serialized_context(
-                    self.user_state, context
-                )
+                bot_state[
+                    "user_state"] = InspectionMiddleware._get_serialized_context(
+                        self.user_state, context)
 
             if self.conversation_state:
                 bot_state[
-                    "conversation_state"
-                ] = InspectionMiddleware._get_serialized_context(
-                    self.conversation_state, context
-                )
+                    "conversation_state"] = InspectionMiddleware._get_serialized_context(
+                        self.conversation_state, context)
 
             await self._invoke_send(context, session, from_state(bot_state))
 
     async def _process_open_command(self, context: TurnContext) -> Any:
         sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
         session_id = self._open_command(
-            sessions, TurnContext.get_conversation_reference(context.activity)
-        )
+            sessions, TurnContext.get_conversation_reference(context.activity))
         await context.send_activity(
             make_command_activity(
-                f"{InspectionMiddleware._COMMAND} attach {session_id}"
-            )
-        )
+                f"{InspectionMiddleware._COMMAND} attach {session_id}"))
         await self.inspection_state.save_changes(context, False)
 
-    async def process_attach_command(
-        self, context: TurnContext, session_id: str
-    ) -> None:
+    async def process_attach_command(self, context: TurnContext,
+                                     session_id: str) -> None:
         sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
 
-        if self._attach_comamnd(context.activity.conversation.id, sessions, session_id):
+        if self._attach_comamnd(context.activity.conversation.id, sessions,
+                                session_id):
             await context.send_activity(
                 "Attached to session, all traffic is being replicated for inspection."
             )
         else:
             await context.send_activity(
-                f"Open session with id {session_id} does not exist."
-            )
+                f"Open session with id {session_id} does not exist.")
 
         await self.inspection_state.save_changes(context, False)
 
@@ -155,7 +148,8 @@ class InspectionMiddleware(InterceptionMiddleware):
     ) -> bool:
         inspection_session_state = sessions.opened_sessions.get(session_id)
         if inspection_session_state:
-            sessions.attached_sessions[conversation_id] = inspection_session_state
+            sessions.attached_sessions[
+                conversation_id] = inspection_session_state
             del sessions.opened_sessions[session_id]
             return True
 
@@ -168,20 +162,18 @@ class InspectionMiddleware(InterceptionMiddleware):
 
     async def _find_session(self, context: TurnContext) -> Any:
         sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
 
         conversation_reference = sessions.attached_sessions.get(
-            context.activity.conversation.id
-        )
+            context.activity.conversation.id)
         if conversation_reference:
             return InspectionSession(conversation_reference, self.credentials)
 
         return None
 
-    async def _invoke_send(
-        self, context: TurnContext, session: InspectionSession, activity: Activity
-    ) -> bool:
+    async def _invoke_send(self, context: TurnContext,
+                           session: InspectionSession,
+                           activity: Activity) -> bool:
         if await session.send(activity):
             return True
 
@@ -190,8 +182,7 @@ class InspectionMiddleware(InterceptionMiddleware):
 
     async def _clean_up_session(self, context: TurnContext) -> None:
         sessions = await self.inspection_state_accessor.get(
-            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS
-        )
+            context, DEFAULT_INSPECTION_SESSIONS_BY_STATUS)
 
         del sessions.attached_sessions[context.activity.conversation.id]
         await self.inspection_state.save_changes(context, False)

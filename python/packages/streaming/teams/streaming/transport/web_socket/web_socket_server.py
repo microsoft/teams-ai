@@ -19,6 +19,7 @@ from .web_socket_transport import WebSocketTransport
 
 
 class WebSocketServer:
+
     def __init__(self, socket: WebSocket, request_handler: RequestHandler):
         if socket is None:
             raise TypeError(
@@ -30,8 +31,7 @@ class WebSocketServer:
             )
 
         self.disconnected_event_handler: Callable[
-            [object, DisconnectedEventArgs], None
-        ] = None
+            [object, DisconnectedEventArgs], None] = None
 
         self._web_socket_transport = WebSocketTransport(socket)
         self._request_handler = request_handler
@@ -40,9 +40,9 @@ class WebSocketServer:
         self._sender.disconnected = self._on_connection_disconnected
         self._receiver = PayloadReceiver()
         self._receiver.disconnected = self._on_connection_disconnected
-        self._protocol_adapter = ProtocolAdapter(
-            self._request_handler, self._request_manager, self._sender, self._receiver
-        )
+        self._protocol_adapter = ProtocolAdapter(self._request_handler,
+                                                 self._request_manager,
+                                                 self._sender, self._receiver)
         self._closed_signal: Future = None
         self._is_disconnecting: bool = False
 
@@ -73,7 +73,9 @@ class WebSocketServer:
         await self._receiver.disconnect()
 
     async def _on_connection_disconnected(
-        self, sender: object, event_args: object  # pylint: disable=unused-argument
+            self,
+            sender: object,
+            event_args: object    # pylint: disable=unused-argument
     ):
         if not self._is_disconnecting:
             self._is_disconnecting = True
@@ -84,14 +86,14 @@ class WebSocketServer:
 
             if sender in [self._sender, self._receiver]:
                 if iscoroutinefunction(sender.disconnect) or isfuture(
-                    sender.disconnect
-                ):
+                        sender.disconnect):
                     await sender.disconnect()
                 else:
                     sender.disconnect()
 
             if self.disconnected_event_handler:
                 # pylint: disable=not-callable
-                self.disconnected_event_handler(self, DisconnectedEventArgs.empty)
+                self.disconnected_event_handler(self,
+                                                DisconnectedEventArgs.empty)
 
             self._is_disconnecting = False

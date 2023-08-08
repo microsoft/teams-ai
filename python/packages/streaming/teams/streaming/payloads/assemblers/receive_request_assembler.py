@@ -42,7 +42,8 @@ class ReceiveRequestAssembler(Assembler):
 
         return self._stream
 
-    def on_receive(self, header: Header, stream: List[int], content_length: int):
+    def on_receive(self, header: Header, stream: List[int],
+                   content_length: int):
         if header.end:
             self.end = True
 
@@ -53,11 +54,12 @@ class ReceiveRequestAssembler(Assembler):
         self._stream_manager.close_stream(self.identifier)
 
     async def process_request(self, stream: List[int]):
-        request_payload = RequestPayload().from_json(bytes(stream).decode("utf-8-sig"))
+        request_payload = RequestPayload().from_json(
+            bytes(stream).decode("utf-8-sig"))
 
-        request = streaming.ReceiveRequest(
-            verb=request_payload.verb, path=request_payload.path, streams=[]
-        )
+        request = streaming.ReceiveRequest(verb=request_payload.verb,
+                                           path=request_payload.path,
+                                           streams=[])
 
         if request_payload.streams:
             for stream_description in request_payload.streams:
@@ -69,14 +71,12 @@ class ReceiveRequestAssembler(Assembler):
                     )
 
                 stream_assembler = self._stream_manager.get_payload_assembler(
-                    identifier
-                )
+                    identifier)
                 stream_assembler.content_type = stream_description.content_type
                 stream_assembler.content_length = stream_description.length
 
                 content_stream = payloads.ContentStream(
-                    identifier=identifier, assembler=stream_assembler
-                )
+                    identifier=identifier, assembler=stream_assembler)
                 content_stream.length = stream_description.length
                 content_stream.content_type = stream_description.content_type
                 request.streams.append(content_stream)

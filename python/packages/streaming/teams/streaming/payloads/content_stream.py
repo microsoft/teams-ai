@@ -7,6 +7,7 @@ from teams.streaming.payloads.assemblers import PayloadStreamAssembler
 
 
 class ContentStream:
+
     def __init__(self, identifier: UUID, assembler: PayloadStreamAssembler):
         if not assembler:
             raise TypeError(

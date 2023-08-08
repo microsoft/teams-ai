@@ -10,15 +10,15 @@ from .skill_conversation_reference import ConversationReference
 
 
 class SkillConversationIdFactory(ConversationIdFactoryBase):
+
     def __init__(self, storage: Storage):
         if not storage:
             raise TypeError("storage can't be None")
 
         self._storage = storage
 
-    async def create_skill_conversation_id(  # pylint: disable=arguments-differ
-        self, options: SkillConversationIdFactoryOptions
-    ) -> str:
+    async def create_skill_conversation_id(    # pylint: disable=arguments-differ
+            self, options: SkillConversationIdFactoryOptions) -> str:
         """
         Creates a new `SkillConversationReference`.
 
@@ -31,8 +31,7 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
             raise TypeError("options can't be None")
 
         conversation_reference = TurnContext.get_conversation_reference(
-            options.activity
-        )
+            options.activity)
 
         skill_conversation_id = str(uuid())
 
@@ -43,7 +42,9 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         )
 
         # Store the SkillConversationReference using the skill_conversation_id as a key.
-        skill_conversation_info = {skill_conversation_id: skill_conversation_reference}
+        skill_conversation_info = {
+            skill_conversation_id: skill_conversation_reference
+        }
 
         await self._storage.write(skill_conversation_info)
 
@@ -51,13 +52,11 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
         return skill_conversation_id
 
     async def get_conversation_reference(
-        self, skill_conversation_id: str
-    ) -> ConversationReference:
+            self, skill_conversation_id: str) -> ConversationReference:
         return await super().get_conversation_reference(skill_conversation_id)
 
     async def get_skill_conversation_reference(
-        self, skill_conversation_id: str
-    ) -> SkillConversationReference:
+            self, skill_conversation_id: str) -> SkillConversationReference:
         """
         Retrieve a `SkillConversationReference` with the specified ID.
 
@@ -70,7 +69,8 @@ class SkillConversationIdFactory(ConversationIdFactoryBase):
             raise TypeError("skill_conversation_id can't be None")
 
         # Get the SkillConversationReference from storage for the given skill_conversation_id.
-        skill_conversation_reference = await self._storage.read([skill_conversation_id])
+        skill_conversation_reference = await self._storage.read(
+            [skill_conversation_id])
 
         return skill_conversation_reference.get(skill_conversation_id)
 

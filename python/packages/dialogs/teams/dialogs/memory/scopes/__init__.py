@@ -16,7 +16,6 @@ from .this_memory_scope import ThisMemoryScope
 from .turn_memory_scope import TurnMemoryScope
 from .user_memory_scope import UserMemoryScope
 
-
 __all__ = [
     "BotStateMemoryScope",
     "ClassMemoryScope",

@@ -29,7 +29,8 @@ class ChoicePrompt(Prompt):
     """
 
     _default_choice_options: Dict[str, ChoiceFactoryOptions] = {
-        c.locale: ChoiceFactoryOptions(
+        c.locale:
+        ChoiceFactoryOptions(
             inline_separator=c.separator,
             inline_or=c.inline_or_more,
             inline_or_more=c.inline_or_more,
@@ -74,10 +75,12 @@ class ChoicePrompt(Prompt):
         is_retry: bool,
     ):
         if not turn_context:
-            raise TypeError("ChoicePrompt.on_prompt(): turn_context cannot be None.")
+            raise TypeError(
+                "ChoicePrompt.on_prompt(): turn_context cannot be None.")
 
         if not options:
-            raise TypeError("ChoicePrompt.on_prompt(): options cannot be None.")
+            raise TypeError(
+                "ChoicePrompt.on_prompt(): options cannot be None.")
 
         # Determine culture
         culture = self._determine_culture(turn_context.activity)
@@ -87,21 +90,16 @@ class ChoicePrompt(Prompt):
         channel_id: str = turn_context.activity.channel_id
         choice_options: ChoiceFactoryOptions = (
             self.choice_options
-            if self.choice_options
-            else self._default_choice_options[culture]
-        )
-        choice_style = (
-            0 if options.style == 0 else options.style if options.style else self.style
-        )
+            if self.choice_options else self._default_choice_options[culture])
+        choice_style = (0 if options.style == 0 else
+                        options.style if options.style else self.style)
 
         if is_retry and options.retry_prompt is not None:
-            prompt = self.append_choices(
-                options.retry_prompt, channel_id, choices, choice_style, choice_options
-            )
+            prompt = self.append_choices(options.retry_prompt, channel_id,
+                                         choices, choice_style, choice_options)
         else:
-            prompt = self.append_choices(
-                options.prompt, channel_id, choices, choice_style, choice_options
-            )
+            prompt = self.append_choices(options.prompt, channel_id, choices,
+                                         choice_style, choice_options)
 
         # Send prompt
         await turn_context.send_activity(prompt)
@@ -113,9 +111,11 @@ class ChoicePrompt(Prompt):
         options: PromptOptions,
     ) -> PromptRecognizerResult:
         if not turn_context:
-            raise TypeError("ChoicePrompt.on_recognize(): turn_context cannot be None.")
+            raise TypeError(
+                "ChoicePrompt.on_recognize(): turn_context cannot be None.")
 
-        choices: List[Choice] = options.choices if (options and options.choices) else []
+        choices: List[Choice] = options.choices if (
+            options and options.choices) else []
         result: PromptRecognizerResult = PromptRecognizerResult()
 
         if turn_context.activity.type == ActivityTypes.message:
@@ -123,13 +123,12 @@ class ChoicePrompt(Prompt):
             utterance: str = activity.text
             if not utterance:
                 return result
-            opt: FindChoicesOptions = (
-                self.recognizer_options
-                if self.recognizer_options
-                else FindChoicesOptions()
-            )
+            opt: FindChoicesOptions = (self.recognizer_options
+                                       if self.recognizer_options else
+                                       FindChoicesOptions())
             opt.locale = self._determine_culture(turn_context.activity, opt)
-            results = ChoiceRecognizers.recognize_choices(utterance, choices, opt)
+            results = ChoiceRecognizers.recognize_choices(
+                utterance, choices, opt)
 
             if results is not None and results:
                 result.succeeded = True
@@ -138,14 +137,12 @@ class ChoicePrompt(Prompt):
         return result
 
     def _determine_culture(
-        self, activity: Activity, opt: FindChoicesOptions = FindChoicesOptions()
-    ) -> str:
-        culture = (
-            PromptCultureModels.map_to_nearest_language(activity.locale)
-            or opt.locale
-            or self.default_locale
-            or PromptCultureModels.English.locale
-        )
+        self,
+        activity: Activity,
+        opt: FindChoicesOptions = FindChoicesOptions()) -> str:
+        culture = (PromptCultureModels.map_to_nearest_language(activity.locale)
+                   or opt.locale or self.default_locale
+                   or PromptCultureModels.English.locale)
         if not culture or not self._default_choice_options.get(culture):
             culture = PromptCultureModels.English.locale
 

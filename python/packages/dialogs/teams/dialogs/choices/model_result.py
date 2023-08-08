@@ -5,9 +5,8 @@
 class ModelResult:
     """Contains recognition result information."""
 
-    def __init__(
-        self, text: str, start: int, end: int, type_name: str, resolution: object
-    ):
+    def __init__(self, text: str, start: int, end: int, type_name: str,
+                 resolution: object):
         """
         Parameters:
         ----------

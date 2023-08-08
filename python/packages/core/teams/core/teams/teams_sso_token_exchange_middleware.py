@@ -29,6 +29,7 @@ from teams.core import (
 
 
 class _TokenStoreItem(StoreItem):
+
     def __init__(self, **kwargs):
         self.e_tag: str = None
         super().__init__(**kwargs)
@@ -47,7 +48,8 @@ class _TokenStoreItem(StoreItem):
 
         value = activity.value
         if not value or "id" not in value:
-            raise Exception("Invalid signin/tokenExchange. Missing activity.value[id]")
+            raise Exception(
+                "Invalid signin/tokenExchange. Missing activity.value[id]")
 
         return f"{channel_id}/{conversation_id}/{value['id']}"
 
@@ -89,13 +91,11 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
         self._oauth_connection_name = connection_name
         self._storage = storage
 
-    async def on_turn(
-        self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]
-    ):
-        if (
-            context.activity.channel_id == Channels.ms_teams
-            and context.activity.name == SignInConstants.token_exchange_operation_name
-        ):
+    async def on_turn(self, context: TurnContext,
+                      logic: Callable[[TurnContext], Awaitable]):
+        if (context.activity.channel_id == Channels.ms_teams
+                and context.activity.name
+                == SignInConstants.token_exchange_operation_name):
             # If the TokenExchange is NOT successful, the response will have already been sent by _exchanged_token
             if not await self._exchanged_token(context):
                 return
@@ -108,18 +108,23 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
 
         await logic()
 
-    async def _deduplicated_token_exchange_id(self, turn_context: TurnContext) -> bool:
+    async def _deduplicated_token_exchange_id(
+            self, turn_context: TurnContext) -> bool:
         # Create a StoreItem with Etag of the unique 'signin/tokenExchange' request
-        store_item = _TokenStoreItem(e_tag=turn_context.activity.value.get("id", None))
+        store_item = _TokenStoreItem(
+            e_tag=turn_context.activity.value.get("id", None))
 
-        store_items = {_TokenStoreItem.get_storage_key(turn_context): store_item}
+        store_items = {
+            _TokenStoreItem.get_storage_key(turn_context): store_item
+        }
         try:
             # Writing the IStoreItem with ETag of unique id will succeed only once
             await self._storage.write(store_items)
         except Exception as error:
             # Memory storage throws a generic exception with a Message of 'Etag conflict. [other error info]'
             # CosmosDbPartitionedStorage throws: ex.Message.Contains("precondition is not met")
-            if "Etag conflict" in str(error) or "precondition is not met" in str(error):
+            if "Etag conflict" in str(
+                    error) or "precondition is not met" in str(error):
                 # Do NOT proceed processing self message, some other thread or machine already has processed it.
 
                 # Send 200 invoke response.
@@ -140,8 +145,7 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
             Activity(
                 type=ActivityTypes.invoke_response,
                 value=InvokeResponse(status=http_status_code, body=body),
-            )
-        )
+            ))
 
     async def _exchanged_token(self, turn_context: TurnContext) -> bool:
         token_exchange_response: TokenResponse = None
@@ -177,12 +181,12 @@ class TeamsSSOTokenExchangeMiddleware(Middleware):
             invoke_response = TokenExchangeInvokeResponse(
                 id=token_exchange_request.id,
                 connection_name=self._oauth_connection_name,
-                failure_detail="The bot is unable to exchange token. Proceed with regular login.",
+                failure_detail=
+                "The bot is unable to exchange token. Proceed with regular login.",
             )
 
-            await self._send_invoke_response(
-                turn_context, invoke_response, HTTPStatus.PRECONDITION_FAILED
-            )
+            await self._send_invoke_response(turn_context, invoke_response,
+                                             HTTPStatus.PRECONDITION_FAILED)
 
             return False
 

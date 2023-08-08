@@ -35,17 +35,15 @@ class BotSignInOperations:
         self.config = config
         self.api_version = "token"
 
-    async def get_sign_in_url(
-        self,
-        state,
-        code_challenge=None,
-        emulator_url=None,
-        final_redirect=None,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_sign_in_url(self,
+                              state,
+                              code_challenge=None,
+                              emulator_url=None,
+                              final_redirect=None,
+                              *,
+                              custom_headers=None,
+                              raw=False,
+                              **operation_config):
         """
 
         :param state:
@@ -71,22 +69,19 @@ class BotSignInOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["state"] = self._serialize.query("state", state, "str")
+        query_parameters["state"] = self._serialize.query(
+            "state", state, "str")
         if code_challenge is not None:
             query_parameters["code_challenge"] = self._serialize.query(
-                "code_challenge", code_challenge, "str"
-            )
+                "code_challenge", code_challenge, "str")
         if emulator_url is not None:
             query_parameters["emulatorUrl"] = self._serialize.query(
-                "emulator_url", emulator_url, "str"
-            )
+                "emulator_url", emulator_url, "str")
         if final_redirect is not None:
             query_parameters["finalRedirect"] = self._serialize.query(
-                "final_redirect", final_redirect, "str"
-            )
+                "final_redirect", final_redirect, "str")
         query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str"
-        )
+            "self.api_version", self.api_version, "str")
 
         # Construct headers
         header_parameters = {}
@@ -96,9 +91,9 @@ class BotSignInOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise HttpOperationError(self._deserialize, response)
@@ -115,17 +110,15 @@ class BotSignInOperations:
 
     get_sign_in_url.metadata = {"url": "/api/botsignin/GetSignInUrl"}
 
-    async def get_sign_in_resource(
-        self,
-        state,
-        code_challenge=None,
-        emulator_url=None,
-        final_redirect=None,
-        *,
-        custom_headers=None,
-        raw=False,
-        **operation_config
-    ):
+    async def get_sign_in_resource(self,
+                                   state,
+                                   code_challenge=None,
+                                   emulator_url=None,
+                                   final_redirect=None,
+                                   *,
+                                   custom_headers=None,
+                                   raw=False,
+                                   **operation_config):
         """
 
         :param state:
@@ -152,19 +145,17 @@ class BotSignInOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["state"] = self._serialize.query("state", state, "str")
+        query_parameters["state"] = self._serialize.query(
+            "state", state, "str")
         if code_challenge is not None:
             query_parameters["code_challenge"] = self._serialize.query(
-                "code_challenge", code_challenge, "str"
-            )
+                "code_challenge", code_challenge, "str")
         if emulator_url is not None:
             query_parameters["emulatorUrl"] = self._serialize.query(
-                "emulator_url", emulator_url, "str"
-            )
+                "emulator_url", emulator_url, "str")
         if final_redirect is not None:
             query_parameters["finalRedirect"] = self._serialize.query(
-                "final_redirect", final_redirect, "str"
-            )
+                "final_redirect", final_redirect, "str")
 
         # Construct headers
         header_parameters = {}
@@ -174,9 +165,9 @@ class BotSignInOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(
-            request, stream=False, **operation_config
-        )
+        response = await self._client.async_send(request,
+                                                 stream=False,
+                                                 **operation_config)
 
         if response.status_code not in [200]:
             raise HttpOperationError(self._deserialize, response)

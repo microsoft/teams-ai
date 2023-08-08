@@ -15,38 +15,37 @@ from teams.streaming.payloads.models import PayloadTypes
 
 
 class SendOperations:
+
     def __init__(self, payload_sender: PayloadSender):
         self._payload_sender = payload_sender
 
-    async def send_request(
-        self, identifier: UUID, request: "streaming.StreamingRequest"
-    ):
-        disassembler = RequestDisassembler(self._payload_sender, identifier, request)
+    async def send_request(self, identifier: UUID,
+                           request: "streaming.StreamingRequest"):
+        disassembler = RequestDisassembler(self._payload_sender, identifier,
+                                           request)
 
         await disassembler.disassemble()
 
         if request.streams:
             tasks = [
                 ResponseMessageStreamDisassembler(
-                    self._payload_sender, content_stream
-                ).disassemble()
+                    self._payload_sender, content_stream).disassemble()
                 for content_stream in request.streams
             ]
 
             await asyncio.gather(*tasks)
 
-    async def send_response(
-        self, identifier: UUID, response: "streaming.StreamingResponse"
-    ):
-        disassembler = ResponseDisassembler(self._payload_sender, identifier, response)
+    async def send_response(self, identifier: UUID,
+                            response: "streaming.StreamingResponse"):
+        disassembler = ResponseDisassembler(self._payload_sender, identifier,
+                                            response)
 
         await disassembler.disassemble()
 
         if response.streams:
             tasks = [
                 ResponseMessageStreamDisassembler(
-                    self._payload_sender, content_stream
-                ).disassemble()
+                    self._payload_sender, content_stream).disassemble()
                 for content_stream in response.streams
             ]
 

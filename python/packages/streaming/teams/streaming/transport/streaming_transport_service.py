@@ -5,6 +5,7 @@ from abc import ABC
 
 
 class StreamingTransportService(ABC):
+
     async def start(self):
         raise NotImplementedError()
 

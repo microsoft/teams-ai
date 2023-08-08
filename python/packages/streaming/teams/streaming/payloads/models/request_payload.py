@@ -9,13 +9,12 @@ from .stream_description import StreamDescription
 
 
 class RequestPayload(Serializable):
-    def __init__(
-        self,
-        *,
-        verb: str = None,
-        path: str = None,
-        streams: List[StreamDescription] = None
-    ):
+
+    def __init__(self,
+                 *,
+                 verb: str = None,
+                 path: str = None,
+                 streams: List[StreamDescription] = None):
         self.verb = verb
         self.path = path
         self.streams = streams

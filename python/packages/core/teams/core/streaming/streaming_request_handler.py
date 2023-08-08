@@ -28,12 +28,14 @@ from .version_info import VersionInfo
 
 
 class StreamContent:
+
     def __init__(self, stream: List[int], *, headers: Dict[str, str] = None):
         self.stream = stream
         self.headers: Dict[str, str] = headers if headers is not None else {}
 
 
 class StreamingRequestHandler(RequestHandler):
+
     def __init__(
         self,
         bot: Bot,
@@ -42,7 +44,8 @@ class StreamingRequestHandler(RequestHandler):
         logger: Logger = None,
     ):
         if not bot:
-            raise TypeError(f"'bot: {bot.__class__.__name__}' argument can't be None")
+            raise TypeError(
+                f"'bot: {bot.__class__.__name__}' argument can't be None")
         if not activity_processor:
             raise TypeError(
                 f"'activity_processor: {activity_processor.__class__.__name__}' argument can't be None"
@@ -82,10 +85,10 @@ class StreamingRequestHandler(RequestHandler):
         del self._conversations[conversation_id]
 
     async def process_request(
-        self,
-        request: ReceiveRequest,
-        logger: Logger,  # pylint: disable=unused-argument
-        context: object,  # pylint: disable=unused-argument
+            self,
+            request: ReceiveRequest,
+            logger: Logger,    # pylint: disable=unused-argument
+            context: object,    # pylint: disable=unused-argument
     ) -> StreamingResponse:
         # pylint: disable=pointless-string-statement
         response = StreamingResponse()
@@ -118,7 +121,6 @@ class StreamingRequestHandler(RequestHandler):
             # the adapter is able to route requests to the correct handler.
             if not self.has_conversation(activity.conversation.id):
                 self._conversations[activity.conversation.id] = datetime.now()
-
             """
             Any content sent as part of a StreamingRequest, including the request body
             and inline attachments, appear as streams added to the same collection. The first
@@ -129,7 +131,8 @@ class StreamingRequestHandler(RequestHandler):
 
             if len(request.streams) > 1:
                 stream_attachments = [
-                    Attachment(content_type=stream.content_type, content=stream.stream)
+                    Attachment(content_type=stream.content_type,
+                               content=stream.stream)
                     for stream in request.streams
                 ]
 
@@ -141,9 +144,7 @@ class StreamingRequestHandler(RequestHandler):
             # Now that the request has been converted into an activity we can send it to the adapter.
             adapter_response = (
                 await self._activity_processor.process_streaming_activity(
-                    activity, self._bot.on_turn
-                )
-            )
+                    activity, self._bot.on_turn))
 
             # Now we convert the invokeResponse returned by the adapter into a StreamingResponse we can send back
             # to the channel.
@@ -166,8 +167,7 @@ class StreamingRequestHandler(RequestHandler):
         if activity.reply_to_id:
             request_path = (
                 f"/v3/conversations/{activity.conversation.id if activity.conversation else ''}/"
-                f"activities/{activity. reply_to_id}"
-            )
+                f"activities/{activity. reply_to_id}")
         else:
             request_path = f"/v3/conversations/{activity.conversation.id if activity.conversation else ''}/activities"
 
@@ -196,8 +196,7 @@ class StreamingRequestHandler(RequestHandler):
         return None
 
     async def send_streaming_request(
-        self, request: StreamingRequest
-    ) -> ReceiveResponse:
+            self, request: StreamingRequest) -> ReceiveResponse:
         try:
             if not self._server_is_connected:
                 raise Exception(
@@ -232,15 +231,13 @@ class StreamingRequestHandler(RequestHandler):
             return all(isinstance(element, int) for element in obj)
 
         stream_attachments = [
-            attachment
-            for attachment in activity.attachments
+            attachment for attachment in activity.attachments
             if validate_int_list(attachment.content)
         ]
 
         if stream_attachments:
             activity.attachments = [
-                attachment
-                for attachment in activity.attachments
+                attachment for attachment in activity.attachments
                 if not validate_int_list(attachment.content)
             ]
 
@@ -249,22 +246,20 @@ class StreamingRequestHandler(RequestHandler):
                 StreamContent(
                     attachment.content,
                     headers={"Content-Type": attachment.content_type},
-                )
-                for attachment in stream_attachments
+                ) for attachment in stream_attachments
             ]
 
         return None
 
     def _server_disconnected(
-        self,
-        sender: object,  # pylint: disable=unused-argument
-        event: DisconnectedEventArgs,  # pylint: disable=unused-argument
+            self,
+            sender: object,    # pylint: disable=unused-argument
+            event: DisconnectedEventArgs,    # pylint: disable=unused-argument
     ):
         self._server_is_connected = False
 
-    def _handle_custom_paths(
-        self, request: ReceiveRequest, response: StreamingResponse
-    ) -> StreamingResponse:
+    def _handle_custom_paths(self, request: ReceiveRequest,
+                             response: StreamingResponse) -> StreamingResponse:
         if not request or not request.verb or not request.path:
             response.status_code = int(HTTPStatus.BAD_REQUEST)
             # TODO: log error
