@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 import pytest
 
-from teams_ai.turn_state import TurnStateEntry
+from teams.ai.turn_state import TurnStateEntry
 
 
 class TestTurnStateEntry:

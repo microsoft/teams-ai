@@ -15,8 +15,7 @@ TurnStateT = TypeVar("TurnStateT", bound=TurnState)
 class TurnStateManager(Generic[TurnStateT]):
     "responsible for loading and saving an application turn state"
 
-    async def load_state(self, storage: Optional[Storage],
-                         context: TurnContext) -> TurnStateT:
+    async def load_state(self, storage: Optional[Storage], context: TurnContext) -> TurnStateT:
         """
         loads all of the state scopes for the current turn\n
         `storage`: storage provider to load state scopes from\n
@@ -52,14 +51,14 @@ class TurnStateManager(Generic[TurnStateT]):
         if storage:
             items = await storage.read([conversation_key, user_key])
 
-        conversation = items[
-            conversation_key] if conversation_key in items else None
+        conversation = items[conversation_key] if conversation_key in items else None
         user = items[user_key] if user_key in items else None
 
-        return TurnState(conversation=TurnStateEntry(
-            value=conversation, storage_key=conversation_key),
-                         user=TurnStateEntry(value=user, storage_key=user_key),
-                         temp=TurnStateEntry())
+        return TurnState(
+            conversation=TurnStateEntry(value=conversation, storage_key=conversation_key),
+            user=TurnStateEntry(value=user, storage_key=user_key),
+            temp=TurnStateEntry(),
+        )
 
     async def save_state(self, storage: Optional[Storage], state: TurnStateT):
         "saves all of the state scopes for the current turn"

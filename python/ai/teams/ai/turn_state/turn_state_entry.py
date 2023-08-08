@@ -16,9 +16,7 @@ class TurnStateEntry(Generic[ValueT]):
     _hash: str
     _deleted = False
 
-    def __init__(self,
-                 value: Optional[ValueT] = None,
-                 storage_key: Optional[str] = None) -> None:
+    def __init__(self, value: Optional[ValueT] = None, storage_key: Optional[str] = None) -> None:
         self._value = value
         self._storage_key = storage_key
         self._hash = str(self._value)

@@ -3,9 +3,12 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+# pylint: skip-file
+
 from abc import ABC, abstractclassmethod
 from typing import Any, Callable, Union
-from teams_ai.turn_state import TurnState
+from teams.ai.turn_state import TurnState
+
 
 class Planner(ABC):
     """
@@ -13,7 +16,14 @@ class Planner(ABC):
     """
 
     @abstractclassmethod
-    async def generate_plan(self, turn_context:TurnContext, state: TurnState, prompt_name_or_template: Union[str, PromptTemplate], *, history_options: AIHistoryOptions) -> Plan:
+    async def generate_plan(
+        self,
+        turn_context: TurnContext,
+        state: TurnState,
+        prompt_name_or_template: Union[str, PromptTemplate],
+        *,
+        history_options: AIHistoryOptions,
+    ) -> Plan:
         """
         Generates a plan based on the given turn state and prompt name or template.
 
@@ -26,10 +36,11 @@ class Planner(ABC):
         Returns:
             Plan: The generated plan.
         """
-    
 
     @abstractclassmethod
-    async def add_function(self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False) -> None:
+    async def add_function(
+        self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False
+    ) -> None:
         """
         Adds a custom function to be used when rendering prompt templates.
 

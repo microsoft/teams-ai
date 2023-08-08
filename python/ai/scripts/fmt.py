@@ -6,5 +6,5 @@ Licensed under the MIT License.
 import subprocess
 
 
-def lint():
-    subprocess.run(["poetry", "run", "pylint", "./teams_ai"])
+def fmt():
+    subprocess.run(["poetry", "run", "black", "teams"]).check_returncode()

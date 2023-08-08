@@ -7,7 +7,7 @@ import pytest
 
 from unittest import TestCase
 from typing import List
-from teams_ai.turn_state import TurnStateManager, TurnState, TurnStateEntry
+from teams.ai.turn_state import TurnStateManager, TurnState, TurnStateEntry
 from botbuilder.core import MemoryStorage, StoreItem, TurnContext, BotAdapter
 from botbuilder.schema import (
     Activity,
