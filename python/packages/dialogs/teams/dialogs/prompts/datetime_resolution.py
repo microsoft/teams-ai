@@ -3,12 +3,7 @@
 
 
 class DateTimeResolution:
-
-    def __init__(self,
-                 value: str = None,
-                 start: str = None,
-                 end: str = None,
-                 timex: str = None):
+    def __init__(self, value: str = None, start: str = None, end: str = None, timex: str = None):
         self.value = value
         self.start = start
         self.end = end

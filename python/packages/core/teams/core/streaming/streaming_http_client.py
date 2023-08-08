@@ -8,18 +8,16 @@ from typing import Any
 from msrest.universal_http import ClientRequest
 from msrest.universal_http.async_abc import AsyncClientResponse
 from msrest.universal_http.async_requests import (
-    AsyncRequestsHTTPSender as AsyncRequestsHTTPDriver, )
+    AsyncRequestsHTTPSender as AsyncRequestsHTTPDriver,
+)
 from teams.streaming import StreamingRequest, ReceiveResponse
 
 from .streaming_request_handler import StreamingRequestHandler
 
 
 class StreamingProtocolClientResponse(AsyncClientResponse):
-
-    def __init__(self, request: StreamingRequest,
-                 streaming_response: ReceiveResponse) -> None:
-        super(StreamingProtocolClientResponse,
-              self).__init__(request, streaming_response)
+    def __init__(self, request: StreamingRequest, streaming_response: ReceiveResponse) -> None:
+        super(StreamingProtocolClientResponse, self).__init__(request, streaming_response)
         # https://aiohttp.readthedocs.io/en/stable/client_reference.html#aiohttp.ClientResponse
         self.status_code = streaming_response.status_code
         # self.headers = streaming_response.headers
@@ -39,12 +37,10 @@ class StreamingProtocolClientResponse(AsyncClientResponse):
 
     def raise_for_status(self):
         if 400 <= self.internal_response.status_code <= 599:
-            raise Exception(
-                f"Http error: {self.internal_response.status_code}")
+            raise Exception(f"Http error: {self.internal_response.status_code}")
 
 
 class StreamingHttpDriver(AsyncRequestsHTTPDriver):
-
     def __init__(
         self,
         request_handler: StreamingRequestHandler,
@@ -61,33 +57,27 @@ class StreamingHttpDriver(AsyncRequestsHTTPDriver):
         self._logger = logger
 
     async def send(
-        self,
-        request: ClientRequest,
-        **config: Any    # pylint: disable=unused-argument
+        self, request: ClientRequest, **config: Any  # pylint: disable=unused-argument
     ) -> AsyncClientResponse:
         # TODO: validate form of request to perform operations
         streaming_request = StreamingRequest(
-            path=request.url[request.url.index("v3/"):], verb=request.method)
+            path=request.url[request.url.index("v3/") :], verb=request.method
+        )
         streaming_request.set_body(request.data)
 
         return await self._send_request(streaming_request)
 
-    async def _send_request(
-            self,
-            request: StreamingRequest) -> StreamingProtocolClientResponse:
+    async def _send_request(self, request: StreamingRequest) -> StreamingProtocolClientResponse:
         try:
-            server_response = await self._request_handler.send_streaming_request(
-                request)
+            server_response = await self._request_handler.send_streaming_request(request)
 
             if not server_response:
-                raise Exception(
-                    "Server response from streaming request is None")
+                raise Exception("Server response from streaming request is None")
 
             if server_response.status_code == HTTPStatus.OK:
                 # TODO: this should be an object read from json
 
-                return StreamingProtocolClientResponse(request,
-                                                       server_response)
+                return StreamingProtocolClientResponse(request, server_response)
         except Exception as error:
             # TODO: log error
             raise error

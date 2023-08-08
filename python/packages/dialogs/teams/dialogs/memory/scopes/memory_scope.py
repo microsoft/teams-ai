@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 
 
 class MemoryScope(ABC):
-
     def __init__(self, name: str, include_in_snapshot: bool = True):
         # <summary>
         # Gets or sets name of the scope.
@@ -28,7 +27,9 @@ class MemoryScope(ABC):
     # <param name="dc">dc.</param>
     # <returns>memory for the scope.</returns>
     @abstractmethod
-    def get_memory(self, dialog_context: "DialogContext") -> object:    # pylint: disable=unused-argument
+    def get_memory(
+        self, dialog_context: "DialogContext"
+    ) -> object:  # pylint: disable=unused-argument
         raise NotImplementedError()
 
     # <summary>
@@ -37,7 +38,9 @@ class MemoryScope(ABC):
     # <param name="dc">dc.</param>
     # <param name="memory">memory.</param>
     @abstractmethod
-    def set_memory(self, dialog_context: "DialogContext", memory: object):    # pylint: disable=unused-argument
+    def set_memory(
+        self, dialog_context: "DialogContext", memory: object
+    ):  # pylint: disable=unused-argument
         raise NotImplementedError()
 
     # <summary>
@@ -49,7 +52,9 @@ class MemoryScope(ABC):
     # <param name="cancellationToken">A cancellation token that can be used by other objects
     # or threads to receive notice of cancellation.</param>
     # <returns>A task that represents the work queued to execute.</returns>
-    async def load(self, dialog_context: "DialogContext", force: bool = False):    # pylint: disable=unused-argument
+    async def load(
+        self, dialog_context: "DialogContext", force: bool = False
+    ):  # pylint: disable=unused-argument
         return
 
     # <summary>
@@ -61,9 +66,9 @@ class MemoryScope(ABC):
     # <param name="cancellationToken">A cancellation token that can be used by other objects
     # or threads to receive notice of cancellation.</param>
     # <returns>A task that represents the work queued to execute.</returns>
-    async def save_changes(self,
-                           dialog_context: "DialogContext",
-                           force: bool = False):    # pylint: disable=unused-argument
+    async def save_changes(
+        self, dialog_context: "DialogContext", force: bool = False
+    ):  # pylint: disable=unused-argument
         return
 
     # <summary>
@@ -73,5 +78,5 @@ class MemoryScope(ABC):
     # <param name="cancellationToken">A cancellation token that can be used by other objects
     # or threads to receive notice of cancellation.</param>
     # <returns>A task that represents the work queued to execute.</returns>
-    async def delete(self, dialog_context: "DialogContext"):    # pylint: disable=unused-argument
+    async def delete(self, dialog_context: "DialogContext"):  # pylint: disable=unused-argument
         return

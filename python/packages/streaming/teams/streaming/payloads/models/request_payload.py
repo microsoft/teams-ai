@@ -9,12 +9,9 @@ from .stream_description import StreamDescription
 
 
 class RequestPayload(Serializable):
-
-    def __init__(self,
-                 *,
-                 verb: str = None,
-                 path: str = None,
-                 streams: List[StreamDescription] = None):
+    def __init__(
+        self, *, verb: str = None, path: str = None, streams: List[StreamDescription] = None
+    ):
         self.verb = verb
         self.path = path
         self.streams = streams
@@ -36,8 +33,7 @@ class RequestPayload(Serializable):
 
         if stream_list:
             self.streams = [
-                StreamDescription().from_dict(stream_dict)
-                for stream_dict in stream_list
+                StreamDescription().from_dict(stream_dict) for stream_dict in stream_list
             ]
 
         return self

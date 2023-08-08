@@ -25,15 +25,13 @@ class Find:
         """Matches user input against a list of choices"""
 
         if not choices:
-            raise TypeError(
-                "Find: choices cannot be None. Must be a [str] or [Choice].")
+            raise TypeError("Find: choices cannot be None. Must be a [str] or [Choice].")
 
         opt = options if options else FindChoicesOptions()
 
         # Normalize list of choices
         choices_list = [
-            Choice(value=choice) if isinstance(choice, str) else choice
-            for choice in choices
+            Choice(value=choice) if isinstance(choice, str) else choice for choice in choices
         ]
 
         # Build up full list of synonyms to search over.
@@ -45,11 +43,12 @@ class Find:
             if not opt.no_value:
                 synonyms.append(SortedValue(value=choice.value, index=index))
 
-            if (getattr(choice, "action", False)
-                    and getattr(choice.action, "title", False)
-                    and not opt.no_value):
-                synonyms.append(
-                    SortedValue(value=choice.action.title, index=index))
+            if (
+                getattr(choice, "action", False)
+                and getattr(choice.action, "title", False)
+                and not opt.no_value
+            ):
+                synonyms.append(SortedValue(value=choice.action.title, index=index))
 
             if choice.synonyms is not None:
                 for synonym in choice.synonyms:
@@ -72,31 +71,25 @@ class Find:
             )
 
         # Find synonyms in utterance and map back to their choices_list
-        return list(
-            map(found_choice_constructor,
-                Find.find_values(utterance, synonyms, options)))
+        return list(map(found_choice_constructor, Find.find_values(utterance, synonyms, options)))
 
     @staticmethod
-    def find_values(utterance: str,
-                    values: List[SortedValue],
-                    options: FindValuesOptions = None) -> List[ModelResult]:
+    def find_values(
+        utterance: str, values: List[SortedValue], options: FindValuesOptions = None
+    ) -> List[ModelResult]:
         # Sort values in descending order by length, so that the longest value is searchd over first.
-        sorted_values = sorted(values,
-                               key=lambda sorted_val: len(sorted_val.value),
-                               reverse=True)
+        sorted_values = sorted(values, key=lambda sorted_val: len(sorted_val.value), reverse=True)
 
         # Search for each value within the utterance.
         matches: [ModelResult] = []
         opt = options if options else FindValuesOptions()
-        tokenizer: Callable[[str, str],
-                            List[Token]] = (opt.tokenizer if opt.tokenizer else
-                                            Tokenizer.default_tokenizer)
+        tokenizer: Callable[[str, str], List[Token]] = (
+            opt.tokenizer if opt.tokenizer else Tokenizer.default_tokenizer
+        )
         tokens = tokenizer(utterance, opt.locale)
-        max_distance = (opt.max_token_distance
-                        if opt.max_token_distance is not None else 2)
+        max_distance = opt.max_token_distance if opt.max_token_distance is not None else 2
 
         for entry in sorted_values:
-
             # Find all matches for a value
             # - To match "last one" in "the last time I chose the last one" we need
             #   to re-search the string starting from the end of the previous match.
@@ -106,13 +99,13 @@ class Find:
 
             while start_pos < len(tokens):
                 match: Union[ModelResult, None] = Find._match_value(
-                        tokens,
-                        max_distance,
-                        opt,
-                        entry.index,
-                        entry.value,
-                        searched_tokens,
-                        start_pos,
+                    tokens,
+                    max_distance,
+                    opt,
+                    entry.index,
+                    entry.value,
+                    searched_tokens,
+                    start_pos,
                 )
 
                 if match is not None:
@@ -156,7 +149,7 @@ class Find:
                 # Translate start & end and populate text field
                 match.start = tokens[match.start].start
                 match.end = tokens[match.end].end
-                match.text = utterance[match.start:match.end + 1]
+                match.text = utterance[match.start : match.end + 1]
                 results.append(match)
 
         # Return the results sorted by position in the utterance
@@ -206,8 +199,7 @@ class Find:
         # - The start & end positions and the results text field will be corrected by the caller.
         result: ModelResult = None
 
-        if matched > 0 and (matched == len(searched_tokens)
-                            or options.allow_partial_matches):
+        if matched > 0 and (matched == len(searched_tokens) or options.allow_partial_matches):
             # Percentage of tokens matched. If matching "second last" in
             # "the second form last one" the completeness would be 1.0 since
             # all tokens were found.
@@ -234,8 +226,7 @@ class Find:
         return result
 
     @staticmethod
-    def _index_of_token(tokens: List[Token], token: Token,
-                        start_pos: int) -> int:
+    def _index_of_token(tokens: List[Token], token: Token, start_pos: int) -> int:
         for i in range(start_pos, len(tokens)):
             if tokens[i].normalized == token.normalized:
                 return i

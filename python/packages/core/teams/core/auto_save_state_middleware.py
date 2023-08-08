@@ -10,7 +10,6 @@ from .turn_context import TurnContext
 
 
 class AutoSaveStateMiddleware(Middleware):
-
     def __init__(self, bot_states: Union[List[BotState], BotStateSet] = None):
         if bot_states is None:
             bot_states = []
@@ -26,7 +25,6 @@ class AutoSaveStateMiddleware(Middleware):
         self.bot_state_set.add(bot_state)
         return self
 
-    async def on_turn(self, context: TurnContext,
-                      logic: Callable[[TurnContext], Awaitable]):
+    async def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         await logic()
         await self.bot_state_set.save_all_changes(context, False)

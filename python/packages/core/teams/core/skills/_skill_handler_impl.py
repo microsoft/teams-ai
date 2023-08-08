@@ -23,8 +23,7 @@ from .skill_handler import SkillHandler
 
 
 class _SkillHandlerImpl(SkillHandler):
-
-    def __init__(    # pylint: disable=super-init-not-called
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         skill_conversation_reference_key: str,
         adapter: BotAdapter,
@@ -126,15 +125,15 @@ class _SkillHandlerImpl(SkillHandler):
             activity,
         )
 
-    async def on_delete_activity(self, claims_identity: ClaimsIdentity,
-                                 conversation_id: str, activity_id: str):
-        skill_conversation_reference = await self._get_skill_conversation_reference(
-            conversation_id)
+    async def on_delete_activity(
+        self, claims_identity: ClaimsIdentity, conversation_id: str, activity_id: str
+    ):
+        skill_conversation_reference = await self._get_skill_conversation_reference(conversation_id)
 
         async def callback(turn_context: TurnContext):
             turn_context.turn_state[
-                self.
-                SKILL_CONVERSATION_REFERENCE_KEY] = skill_conversation_reference
+                self.SKILL_CONVERSATION_REFERENCE_KEY
+            ] = skill_conversation_reference
             await turn_context.delete_activity(activity_id)
 
         await self._adapter.continue_conversation(
@@ -151,18 +150,18 @@ class _SkillHandlerImpl(SkillHandler):
         activity_id: str,
         activity: Activity,
     ) -> ResourceResponse:
-        skill_conversation_reference = await self._get_skill_conversation_reference(
-            conversation_id)
+        skill_conversation_reference = await self._get_skill_conversation_reference(conversation_id)
 
         resource_response: ResourceResponse = None
 
         async def callback(turn_context: TurnContext):
             nonlocal resource_response
             turn_context.turn_state[
-                self.
-                SKILL_CONVERSATION_REFERENCE_KEY] = skill_conversation_reference
+                self.SKILL_CONVERSATION_REFERENCE_KEY
+            ] = skill_conversation_reference
             activity.apply_conversation_reference(
-                skill_conversation_reference.conversation_reference)
+                skill_conversation_reference.conversation_reference
+            )
             turn_context.activity.id = activity_id
             turn_context.activity.caller_id = (
                 f"{CallerIdConstants.bot_to_bot_prefix}"
@@ -177,12 +176,10 @@ class _SkillHandlerImpl(SkillHandler):
             audience=skill_conversation_reference.oauth_scope,
         )
 
-        return resource_response or ResourceResponse(
-            id=str(uuid4()).replace("-", ""))
+        return resource_response or ResourceResponse(id=str(uuid4()).replace("-", ""))
 
     @staticmethod
-    def _apply_skill_activity_to_turn_context_activity(context: TurnContext,
-                                                       activity: Activity):
+    def _apply_skill_activity_to_turn_context_activity(context: TurnContext, activity: Activity):
         context.activity.type = activity.type
         context.activity.text = activity.text
         context.activity.code = activity.code
@@ -205,8 +202,7 @@ class _SkillHandlerImpl(SkillHandler):
         reply_to_activity_id: str,
         activity: Activity,
     ) -> ResourceResponse:
-        skill_conversation_reference = await self._get_skill_conversation_reference(
-            conversation_id)
+        skill_conversation_reference = await self._get_skill_conversation_reference(conversation_id)
 
         # If an activity is sent, return the ResourceResponse
         resource_response: ResourceResponse = None
@@ -214,27 +210,24 @@ class _SkillHandlerImpl(SkillHandler):
         async def callback(context: TurnContext):
             nonlocal resource_response
             context.turn_state[
-                SkillHandler.
-                SKILL_CONVERSATION_REFERENCE_KEY] = skill_conversation_reference
+                SkillHandler.SKILL_CONVERSATION_REFERENCE_KEY
+            ] = skill_conversation_reference
 
             TurnContext.apply_conversation_reference(
-                activity, skill_conversation_reference.conversation_reference)
+                activity, skill_conversation_reference.conversation_reference
+            )
 
             context.activity.id = reply_to_activity_id
 
-            app_id = JwtTokenValidation.get_app_id_from_claims(
-                claims_identity.claims)
-            context.activity.caller_id = (
-                f"{CallerIdConstants.bot_to_bot_prefix}{app_id}")
+            app_id = JwtTokenValidation.get_app_id_from_claims(claims_identity.claims)
+            context.activity.caller_id = f"{CallerIdConstants.bot_to_bot_prefix}{app_id}"
 
             if activity.type == ActivityTypes.end_of_conversation:
-                await self._conversation_id_factory.delete_conversation_reference(
-                    conversation_id)
+                await self._conversation_id_factory.delete_conversation_reference(conversation_id)
                 await self._send_to_bot(activity, context)
             elif activity.type == ActivityTypes.event:
                 await self._send_to_bot(activity, context)
-            elif activity.type in (ActivityTypes.command,
-                                   ActivityTypes.command_result):
+            elif activity.type in (ActivityTypes.command, ActivityTypes.command_result):
                 if activity.name.startswith("application/"):
                     # Send to channel and capture the resource response for the SendActivityCall so we can return it.
                     resource_response = await context.send_activity(activity)
@@ -257,13 +250,15 @@ class _SkillHandlerImpl(SkillHandler):
         return resource_response
 
     async def _get_skill_conversation_reference(
-            self, conversation_id: str) -> SkillConversationReference:
+        self, conversation_id: str
+    ) -> SkillConversationReference:
         # Get the SkillsConversationReference
         try:
             skill_conversation_reference = (
-                await
-                self._conversation_id_factory.get_skill_conversation_reference(
-                    conversation_id))
+                await self._conversation_id_factory.get_skill_conversation_reference(
+                    conversation_id
+                )
+            )
         except (NotImplementedError, AttributeError):
             if self._logger:
                 self._logger.log(
@@ -278,18 +273,19 @@ class _SkillHandlerImpl(SkillHandler):
             # ConversationReference is returned, build a new SkillConversationReference to simplify
             # the remainder of this method.
             conversation_reference_result = (
-                await self._conversation_id_factory.get_conversation_reference(
-                    conversation_id))
-            if isinstance(conversation_reference_result,
-                          SkillConversationReference):
+                await self._conversation_id_factory.get_conversation_reference(conversation_id)
+            )
+            if isinstance(conversation_reference_result, SkillConversationReference):
                 skill_conversation_reference: SkillConversationReference = (
-                    conversation_reference_result)
+                    conversation_reference_result
+                )
             else:
                 skill_conversation_reference: SkillConversationReference = (
                     SkillConversationReference(
                         conversation_reference=conversation_reference_result,
                         oauth_scope=self._get_oauth_scope(),
-                    ))
+                    )
+                )
 
         if not skill_conversation_reference:
             raise KeyError("SkillConversationReference not found")
@@ -300,6 +296,5 @@ class _SkillHandlerImpl(SkillHandler):
         return skill_conversation_reference
 
     async def _send_to_bot(self, activity: Activity, context: TurnContext):
-        _SkillHandlerImpl._apply_skill_activity_to_turn_context_activity(
-            context, activity)
+        _SkillHandlerImpl._apply_skill_activity_to_turn_context_activity(context, activity)
         await self._bot.on_turn(context)

@@ -14,8 +14,7 @@ class TelemetryProcessor(ABC):
         """Retrieve the request body as json (Activity)."""
         body_text = self.get_request_body()
         if body_text:
-            return body_text if isinstance(body_text,
-                                           dict) else json.loads(body_text)
+            return body_text if isinstance(body_text, dict) else json.loads(body_text)
         return None
 
     @abstractmethod
@@ -27,7 +26,7 @@ class TelemetryProcessor(ABC):
         return False
 
     @abstractmethod
-    def get_request_body(self) -> str:    # pylint: disable=inconsistent-return-statements
+    def get_request_body(self) -> str:  # pylint: disable=inconsistent-return-statements
         """Retrieve the request body from flask/django middleware component."""
         raise NotImplementedError()
 
@@ -67,16 +66,13 @@ class TelemetryProcessor(ABC):
         # Override session and user id
         from_prop = post_data["from"] if "from" in post_data else None
         user_id = from_prop["id"] if from_prop is not None else None
-        channel_id = post_data[
-            "channelId"] if "channelId" in post_data else None
-        conversation = (post_data["conversation"]
-                        if "conversation" in post_data else None)
+        channel_id = post_data["channelId"] if "channelId" in post_data else None
+        conversation = post_data["conversation"] if "conversation" in post_data else None
 
         session_id = ""
         if "id" in conversation:
             conversation_id = conversation["id"]
-            session_id = base64.b64encode(
-                sha256(conversation_id.encode("utf-8")).digest()).decode()
+            session_id = base64.b64encode(sha256(conversation_id.encode("utf-8")).digest()).decode()
 
         # Set the user id on the Application Insights telemetry item.
         context.user.id = channel_id + user_id

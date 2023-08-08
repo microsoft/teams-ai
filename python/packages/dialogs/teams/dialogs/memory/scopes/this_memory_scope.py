@@ -7,7 +7,6 @@ from .memory_scope import MemoryScope
 
 
 class ThisMemoryScope(MemoryScope):
-
     def __init__(self):
         super().__init__(scope_path.THIS)
 
@@ -15,8 +14,7 @@ class ThisMemoryScope(MemoryScope):
         if not dialog_context:
             raise TypeError(f"Expecting: DialogContext, but received None")
 
-        return (dialog_context.active_dialog.state
-                if dialog_context.active_dialog else None)
+        return dialog_context.active_dialog.state if dialog_context.active_dialog else None
 
     def set_memory(self, dialog_context: "DialogContext", memory: object):
         if not dialog_context:

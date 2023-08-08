@@ -5,7 +5,6 @@ from teams.dialogs.memory import PathResolverBase
 
 
 class AliasPathResolver(PathResolverBase):
-
     def __init__(self, alias: str, prefix: str, postfix: str = None):
         """
         Initializes a new instance of the <see cref="AliasPathResolver"/> class.
@@ -33,12 +32,14 @@ class AliasPathResolver(PathResolverBase):
             raise TypeError(f"Expecting: path, but received None")
 
         path = path.strip()
-        if (path.startswith(self.alias) and len(path) > len(self.alias)
-                and AliasPathResolver._is_path_char(path[len(self.alias)])):
+        if (
+            path.startswith(self.alias)
+            and len(path) > len(self.alias)
+            and AliasPathResolver._is_path_char(path[len(self.alias)])
+        ):
             # here we only deals with trailing alias, alias in middle be handled in further breakdown
             # $xxx -> path.xxx
-            return f"{self._prefix}{path[len(self.alias):]}{self._postfix}".rstrip(
-                ".")
+            return f"{self._prefix}{path[len(self.alias):]}{self._postfix}".rstrip(".")
 
         return path
 

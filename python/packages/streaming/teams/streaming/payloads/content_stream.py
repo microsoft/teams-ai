@@ -7,12 +7,9 @@ from teams.streaming.payloads.assemblers import PayloadStreamAssembler
 
 
 class ContentStream:
-
     def __init__(self, identifier: UUID, assembler: PayloadStreamAssembler):
         if not assembler:
-            raise TypeError(
-                f"'assembler: {assembler.__class__.__name__}' argument can't be None"
-            )
+            raise TypeError(f"'assembler: {assembler.__class__.__name__}' argument can't be None")
 
         self.identifier = identifier
         self._assembler = assembler

@@ -26,7 +26,6 @@ class UserTokenOperations:
     models = models
 
     def __init__(self, client, config, serializer, deserializer) -> None:
-
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
@@ -34,15 +33,17 @@ class UserTokenOperations:
         self.config = config
         self.api_version = "token"
 
-    async def get_token(self,
-                        user_id,
-                        connection_name,
-                        channel_id=None,
-                        code=None,
-                        *,
-                        custom_headers=None,
-                        raw=False,
-                        **operation_config):
+    async def get_token(
+        self,
+        user_id,
+        connection_name,
+        channel_id=None,
+        code=None,
+        *,
+        custom_headers=None,
+        raw=False,
+        **operation_config,
+    ):
         """
 
         :param user_id:
@@ -69,18 +70,17 @@ class UserTokenOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["userId"] = self._serialize.query(
-            "user_id", user_id, "str")
+        query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
         query_parameters["connectionName"] = self._serialize.query(
-            "connection_name", connection_name, "str")
+            "connection_name", connection_name, "str"
+        )
         if channel_id is not None:
-            query_parameters["channelId"] = self._serialize.query(
-                "channel_id", channel_id, "str")
+            query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
         if code is not None:
-            query_parameters["code"] = self._serialize.query(
-                "code", code, "str")
+            query_parameters["code"] = self._serialize.query("code", code, "str")
         query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str")
+            "self.api_version", self.api_version, "str"
+        )
 
         # Construct headers
         header_parameters = {}
@@ -90,9 +90,7 @@ class UserTokenOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(request,
-                                                 stream=False,
-                                                 **operation_config)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 404]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -111,15 +109,17 @@ class UserTokenOperations:
 
     get_token.metadata = {"url": "/api/usertoken/GetToken"}
 
-    async def get_aad_tokens(self,
-                             user_id,
-                             connection_name,
-                             channel_id=None,
-                             resource_urls=None,
-                             *,
-                             custom_headers=None,
-                             raw=False,
-                             **operation_config):
+    async def get_aad_tokens(
+        self,
+        user_id,
+        connection_name,
+        channel_id=None,
+        resource_urls=None,
+        *,
+        custom_headers=None,
+        raw=False,
+        **operation_config,
+    ):
         """
 
         :param user_id:
@@ -148,15 +148,15 @@ class UserTokenOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["userId"] = self._serialize.query(
-            "user_id", user_id, "str")
+        query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
         query_parameters["connectionName"] = self._serialize.query(
-            "connection_name", connection_name, "str")
+            "connection_name", connection_name, "str"
+        )
         if channel_id is not None:
-            query_parameters["channelId"] = self._serialize.query(
-                "channel_id", channel_id, "str")
+            query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
         query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str")
+            "self.api_version", self.api_version, "str"
+        )
 
         # Construct headers
         header_parameters = {}
@@ -166,15 +166,11 @@ class UserTokenOperations:
             header_parameters.update(custom_headers)
 
         # Construct body
-        body_content = self._serialize.body(aad_resource_urls,
-                                            "AadResourceUrls")
+        body_content = self._serialize.body(aad_resource_urls, "AadResourceUrls")
 
         # Construct and send request
-        request = self._client.post(url, query_parameters, header_parameters,
-                                    body_content)
-        response = await self._client.async_send(request,
-                                                 stream=False,
-                                                 **operation_config)
+        request = self._client.post(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -191,14 +187,16 @@ class UserTokenOperations:
 
     get_aad_tokens.metadata = {"url": "/api/usertoken/GetAadTokens"}
 
-    async def sign_out(self,
-                       user_id,
-                       connection_name=None,
-                       channel_id=None,
-                       *,
-                       custom_headers=None,
-                       raw=False,
-                       **operation_config):
+    async def sign_out(
+        self,
+        user_id,
+        connection_name=None,
+        channel_id=None,
+        *,
+        custom_headers=None,
+        raw=False,
+        **operation_config,
+    ):
         """
 
         :param user_id:
@@ -222,16 +220,16 @@ class UserTokenOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["userId"] = self._serialize.query(
-            "user_id", user_id, "str")
+        query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
         if connection_name is not None:
             query_parameters["connectionName"] = self._serialize.query(
-                "connection_name", connection_name, "str")
+                "connection_name", connection_name, "str"
+            )
         if channel_id is not None:
-            query_parameters["channelId"] = self._serialize.query(
-                "channel_id", channel_id, "str")
+            query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
         query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str")
+            "self.api_version", self.api_version, "str"
+        )
 
         # Construct headers
         header_parameters = {}
@@ -241,9 +239,7 @@ class UserTokenOperations:
 
         # Construct and send request
         request = self._client.delete(url, query_parameters, header_parameters)
-        response = await self._client.async_send(request,
-                                                 stream=False,
-                                                 **operation_config)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 204]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -260,14 +256,16 @@ class UserTokenOperations:
 
     sign_out.metadata = {"url": "/api/usertoken/SignOut"}
 
-    async def get_token_status(self,
-                               user_id,
-                               channel_id=None,
-                               include=None,
-                               *,
-                               custom_headers=None,
-                               raw=False,
-                               **operation_config):
+    async def get_token_status(
+        self,
+        user_id,
+        channel_id=None,
+        include=None,
+        *,
+        custom_headers=None,
+        raw=False,
+        **operation_config,
+    ):
         """
 
         :param user_id:
@@ -292,16 +290,14 @@ class UserTokenOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["userId"] = self._serialize.query(
-            "user_id", user_id, "str")
+        query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
         if channel_id is not None:
-            query_parameters["channelId"] = self._serialize.query(
-                "channel_id", channel_id, "str")
+            query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
         if include is not None:
-            query_parameters["include"] = self._serialize.query(
-                "include", include, "str")
+            query_parameters["include"] = self._serialize.query("include", include, "str")
         query_parameters["api-version"] = self._serialize.query(
-            "self.api_version", self.api_version, "str")
+            "self.api_version", self.api_version, "str"
+        )
 
         # Construct headers
         header_parameters = {}
@@ -311,9 +307,7 @@ class UserTokenOperations:
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
-        response = await self._client.async_send(request,
-                                                 stream=False,
-                                                 **operation_config)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
@@ -330,16 +324,18 @@ class UserTokenOperations:
 
     get_token_status.metadata = {"url": "/api/usertoken/GetTokenStatus"}
 
-    async def exchange_async(self,
-                             user_id,
-                             connection_name,
-                             channel_id,
-                             uri=None,
-                             token=None,
-                             *,
-                             custom_headers=None,
-                             raw=False,
-                             **operation_config):
+    async def exchange_async(
+        self,
+        user_id,
+        connection_name,
+        channel_id,
+        uri=None,
+        token=None,
+        *,
+        custom_headers=None,
+        raw=False,
+        **operation_config,
+    ):
         """
 
         :param user_id:
@@ -369,12 +365,11 @@ class UserTokenOperations:
 
         # Construct parameters
         query_parameters = {}
-        query_parameters["userId"] = self._serialize.query(
-            "user_id", user_id, "str")
+        query_parameters["userId"] = self._serialize.query("user_id", user_id, "str")
         query_parameters["connectionName"] = self._serialize.query(
-            "connection_name", connection_name, "str")
-        query_parameters["channelId"] = self._serialize.query(
-            "channel_id", channel_id, "str")
+            "connection_name", connection_name, "str"
+        )
+        query_parameters["channelId"] = self._serialize.query("channel_id", channel_id, "str")
 
         # Construct headers
         header_parameters = {}
@@ -384,15 +379,11 @@ class UserTokenOperations:
             header_parameters.update(custom_headers)
 
         # Construct body
-        body_content = self._serialize.body(exchange_request,
-                                            "TokenExchangeRequest")
+        body_content = self._serialize.body(exchange_request, "TokenExchangeRequest")
 
         # Construct and send request
-        request = self._client.post(url, query_parameters, header_parameters,
-                                    body_content)
-        response = await self._client.async_send(request,
-                                                 stream=False,
-                                                 **operation_config)
+        request = self._client.post(url, query_parameters, header_parameters, body_content)
+        response = await self._client.async_send(request, stream=False, **operation_config)
 
         if response.status_code not in [200, 400, 404]:
             raise models.ErrorResponseException(self._deserialize, response)

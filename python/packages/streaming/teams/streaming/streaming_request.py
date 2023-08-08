@@ -28,9 +28,7 @@ class StreamingRequest:
         self.streams = streams
 
     @staticmethod
-    def create_request(method: str,
-                       path: str = None,
-                       body: object = None) -> "StreamingRequest":
+    def create_request(method: str, path: str = None, body: object = None) -> "StreamingRequest":
         if not method:
             return None
 
@@ -45,23 +43,19 @@ class StreamingRequest:
         return request
 
     @staticmethod
-    def create_get(path: str = None,
-                   body: object = None) -> "StreamingRequest":
+    def create_get(path: str = None, body: object = None) -> "StreamingRequest":
         return StreamingRequest.create_request("GET", path, body)
 
     @staticmethod
-    def create_post(path: str = None,
-                    body: object = None) -> "StreamingRequest":
+    def create_post(path: str = None, body: object = None) -> "StreamingRequest":
         return StreamingRequest.create_request("POST", path, body)
 
     @staticmethod
-    def create_put(path: str = None,
-                   body: object = None) -> "StreamingRequest":
+    def create_put(path: str = None, body: object = None) -> "StreamingRequest":
         return StreamingRequest.create_request("PUT", path, body)
 
     @staticmethod
-    def create_delete(path: str = None,
-                      body: object = None) -> "StreamingRequest":
+    def create_delete(path: str = None, body: object = None) -> "StreamingRequest":
         return StreamingRequest.create_request("DELETE", path, body)
 
     def set_body(self, body: Union[str, Serializable, Model, bytes]):
@@ -83,11 +77,8 @@ class StreamingRequest:
 
     def add_stream(self, content: object, stream_id: UUID = None):
         if not content:
-            raise TypeError(
-                f"'content: {content.__class__.__name__}' argument can't be None"
-            )
+            raise TypeError(f"'content: {content.__class__.__name__}' argument can't be None")
         if not self.streams:
             self.streams = []
 
-        self.streams.append(
-            ResponseMessageStream(id=stream_id or uuid4(), content=content))
+        self.streams.append(ResponseMessageStream(id=stream_id or uuid4(), content=content))

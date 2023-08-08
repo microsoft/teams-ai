@@ -12,7 +12,6 @@ from .dialog_set import DialogSet
 
 
 class DialogContainer(Dialog, ABC):
-
     def __init__(self, dialog_id: str = None):
         super().__init__(dialog_id)
 
@@ -44,16 +43,16 @@ class DialogContainer(Dialog, ABC):
             self.dialogs.telemetry_client = self._telemetry_client
 
     @abstractmethod
-    def create_child_context(self,
-                             dialog_context: DialogContext) -> DialogContext:
+    def create_child_context(self, dialog_context: DialogContext) -> DialogContext:
         raise NotImplementedError()
 
     def find_dialog(self, dialog_id: str) -> Dialog:
         # TODO: deprecate DialogSet.find
         return self.dialogs.find_dialog(dialog_id)
 
-    async def on_dialog_event(self, dialog_context: DialogContext,
-                              dialog_event: DialogEvent) -> bool:
+    async def on_dialog_event(
+        self, dialog_context: DialogContext, dialog_event: DialogEvent
+    ) -> bool:
         """
         Called when an event has been raised, using `DialogContext.emitEvent()`, by either the current dialog or a
          dialog that the current dialog started.
@@ -65,10 +64,10 @@ class DialogContainer(Dialog, ABC):
 
         # Trace unhandled "versionChanged" events.
         if not handled and dialog_event.name == DialogEvents.version_changed:
-
             trace_message = (
                 f"Unhandled dialog event: {dialog_event.name}. Active Dialog: "
-                f"{dialog_context.active_dialog.id}")
+                f"{dialog_context.active_dialog.id}"
+            )
 
             await dialog_context.context.send_trace_activity(trace_message)
 
@@ -86,8 +85,7 @@ class DialogContainer(Dialog, ABC):
         """
         return self.dialogs.get_version()
 
-    async def check_for_version_change_async(self,
-                                             dialog_context: DialogContext):
+    async def check_for_version_change_async(self, dialog_context: DialogContext):
         """
         :param dialog_context: dialog context.
         :return: task.
@@ -104,5 +102,4 @@ class DialogContainer(Dialog, ABC):
             # Give bot an opportunity to handle the change.
             # - If bot handles it the changeHash will have been updated as to avoid triggering the
             #   change again.
-            await dialog_context.emit_event(DialogEvents.version_changed,
-                                            self.id, True, False)
+            await dialog_context.emit_event(DialogEvents.version_changed, self.id, True, False)

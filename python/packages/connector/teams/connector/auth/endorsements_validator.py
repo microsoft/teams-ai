@@ -5,7 +5,6 @@ from typing import List
 
 
 class EndorsementsValidator:
-
     @staticmethod
     def validate(expected_endorsement: str, endorsements: List[str]):
         # If the Activity came in and doesn't have a Channel ID then it's making no

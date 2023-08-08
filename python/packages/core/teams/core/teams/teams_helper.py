@@ -11,21 +11,19 @@ import teams.schema as schema
 import teams.schema.teams as teams_schema
 
 DEPENDICIES = [
-    schema_cls for key, schema_cls in getmembers(schema)
+    schema_cls
+    for key, schema_cls in getmembers(schema)
     if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
 ]
 DEPENDICIES += [
-    schema_cls for key, schema_cls in getmembers(teams_schema)
+    schema_cls
+    for key, schema_cls in getmembers(teams_schema)
     if isinstance(schema_cls, type) and issubclass(schema_cls, (Model, Enum))
 ]
-DEPENDICIES_DICT = {
-    dependency.__name__: dependency
-    for dependency in DEPENDICIES
-}
+DEPENDICIES_DICT = {dependency.__name__: dependency for dependency in DEPENDICIES}
 
 
-def deserializer_helper(msrest_cls: Type[Model],
-                        dict_to_deserialize: dict) -> Model:
+def deserializer_helper(msrest_cls: Type[Model], dict_to_deserialize: dict) -> Model:
     deserializer = Deserializer(DEPENDICIES_DICT)
     return deserializer(msrest_cls.__name__, dict_to_deserialize)
 

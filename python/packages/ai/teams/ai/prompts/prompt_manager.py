@@ -16,10 +16,7 @@ class PromptManager(abc.ABC, Generic[T]):
     "interface implemented by all prompt managers"
 
     @abc.abstractmethod
-    def add_function(self,
-                     name: str,
-                     handler: Awaitable,
-                     allow_overrides=False):
+    def add_function(self, name: str, handler: Awaitable, allow_overrides=False):
         """
         adds a custom function <name> to the prompt manager
 
@@ -42,8 +39,7 @@ class PromptManager(abc.ABC, Generic[T]):
         """
 
     @abc.abstractmethod
-    async def invoke_function(self, context: TurnContext, state: T,
-                              name: str) -> Any:
+    async def invoke_function(self, context: TurnContext, state: T, name: str) -> Any:
         """
         invoke a function by name
 
@@ -56,8 +52,8 @@ class PromptManager(abc.ABC, Generic[T]):
 
     @abc.abstractmethod
     async def render_prompt(
-            self, context: TurnContext, state: T,
-            name_or_template: Union[str, PromptTemplate]) -> PromptTemplate:
+        self, context: TurnContext, state: T, name_or_template: Union[str, PromptTemplate]
+    ) -> PromptTemplate:
         """
         renders a prompt template by name
 

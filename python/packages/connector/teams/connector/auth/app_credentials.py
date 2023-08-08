@@ -19,8 +19,8 @@ class AppCredentials(Authentication):
     schema = "Bearer"
 
     trustedHostNames = {
-    # "state.botframework.com": datetime.max,
-    # "state.teams.azure.us": datetime.max,
+        # "state.botframework.com": datetime.max,
+        # "state.teams.azure.us": datetime.max,
         "api.botframework.com": datetime.max,
         "token.botframework.com": datetime.max,
         "api.teams.azure.us": datetime.max,
@@ -38,14 +38,13 @@ class AppCredentials(Authentication):
         Initializes a new instance of MicrosoftAppCredentials class
         :param channel_auth_tenant: Optional. The oauth token tenant.
         """
-        tenant = (channel_auth_tenant if channel_auth_tenant else
-                  AuthenticationConstants.DEFAULT_CHANNEL_AUTH_TENANT)
-        self.oauth_endpoint = (
-            AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX +
-            tenant)
-        self.oauth_scope = (
-            oauth_scope
-            or AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE)
+        tenant = (
+            channel_auth_tenant
+            if channel_auth_tenant
+            else AuthenticationConstants.DEFAULT_CHANNEL_AUTH_TENANT
+        )
+        self.oauth_endpoint = AuthenticationConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX + tenant
+        self.oauth_scope = oauth_scope or AuthenticationConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
 
         self.microsoft_app_id = app_id
 
@@ -81,8 +80,7 @@ class AppCredentials(Authentication):
         return expiration > (datetime.now() - timedelta(minutes=5))
 
     # pylint: disable=arguments-differ
-    def signed_session(self,
-                       session: requests.Session = None) -> requests.Session:
+    def signed_session(self, session: requests.Session = None) -> requests.Session:
         """
         Gets the signed session.  This is called by the msrest package
         :returns: Signed requests.Session object
@@ -100,13 +98,13 @@ class AppCredentials(Authentication):
         return session
 
     def _should_authorize(
-        self,
-        session: requests.Session    # pylint: disable=unused-argument
+        self, session: requests.Session  # pylint: disable=unused-argument
     ) -> bool:
         # We don't set the token if the AppId is not set, since it means that we are in an un-authenticated scenario.
-        return (self.microsoft_app_id
-                != AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
-                and self.microsoft_app_id is not None)
+        return (
+            self.microsoft_app_id != AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+            and self.microsoft_app_id is not None
+        )
 
     def get_access_token(self, force_refresh: bool = False) -> str:
         """

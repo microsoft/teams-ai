@@ -16,7 +16,6 @@ from .dialog_state import DialogState
 
 
 class DialogSet:
-
     def __init__(self, dialog_state: StatePropertyAccessor = None):
         # pylint: disable=import-outside-toplevel
         if dialog_state is None:
@@ -26,18 +25,14 @@ class DialogSet:
                 try:
                     self_obj = frame.f_locals["self"]
                 except KeyError:
-                    raise TypeError(
-                        "DialogSet(): dialog_state cannot be None.")
+                    raise TypeError("DialogSet(): dialog_state cannot be None.")
                 # Only ComponentDialog can initialize with None dialog_state
                 from .component_dialog import ComponentDialog
                 from .dialog_manager import DialogManager
                 from .dialog_container import DialogContainer
 
-                if not isinstance(
-                        self_obj,
-                    (ComponentDialog, DialogContainer, DialogManager)):
-                    raise TypeError(
-                        "DialogSet(): dialog_state cannot be None.")
+                if not isinstance(self_obj, (ComponentDialog, DialogContainer, DialogManager)):
+                    raise TypeError("DialogSet(): dialog_state cannot be None.")
             finally:
                 # make sure to clean up the frame at the end to avoid ref cycles
                 del frame
@@ -96,16 +91,15 @@ class DialogSet:
 
         if dialog.id in self._dialogs:
             raise TypeError(
-                "DialogSet.add(): A dialog with an id of '%s' already added." %
-                dialog.id)
+                "DialogSet.add(): A dialog with an id of '%s' already added." % dialog.id
+            )
 
         # dialog.telemetry_client = this._telemetry_client;
         self._dialogs[dialog.id] = dialog
 
         return self
 
-    async def create_context(self,
-                             turn_context: TurnContext) -> "DialogContext":
+    async def create_context(self, turn_context: TurnContext) -> "DialogContext":
         # This import prevents circular dependency issues
         # pylint: disable=import-outside-toplevel
         from .dialog_context import DialogContext
@@ -118,8 +112,7 @@ class DialogSet:
                 "DialogSet.CreateContextAsync(): DialogSet created with a null IStatePropertyAccessor."
             )
 
-        state: DialogState = await self._dialog_state.get(
-            turn_context, lambda: DialogState())
+        state: DialogState = await self._dialog_state.get(turn_context, lambda: DialogState())
 
         return DialogContext(self, turn_context, state)
 

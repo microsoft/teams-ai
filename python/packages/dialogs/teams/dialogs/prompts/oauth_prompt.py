@@ -44,7 +44,6 @@ from .._user_token_access import _UserTokenAccess
 
 
 class CallerInfo:
-
     def __init__(self, caller_service_url: str = None, scope: str = None):
         self.caller_service_url = caller_service_url
         self.scope = scope
@@ -108,16 +107,14 @@ class OAuthPrompt(Dialog):
         self._validator = validator
 
         if not settings:
-            raise TypeError(
-                "OAuthPrompt.__init__(): OAuthPrompt requires OAuthPromptSettings."
-            )
+            raise TypeError("OAuthPrompt.__init__(): OAuthPrompt requires OAuthPromptSettings.")
 
         self._settings = settings
         self._validator = validator
 
-    async def begin_dialog(self,
-                           dialog_context: DialogContext,
-                           options: PromptOptions = None) -> DialogTurnResult:
+    async def begin_dialog(
+        self, dialog_context: DialogContext, options: PromptOptions = None
+    ) -> DialogTurnResult:
         """
         Starts an authentication prompt dialog. Called when an authentication prompt dialog is pushed onto the
         dialog stack and is being activated.
@@ -150,18 +147,16 @@ class OAuthPrompt(Dialog):
             options.retry_prompt.input_hint = InputHints.accepting_input
 
         # Initialize prompt state
-        timeout = (self._settings.timeout if isinstance(
-            self._settings.timeout, int) else 900000)
+        timeout = self._settings.timeout if isinstance(self._settings.timeout, int) else 900000
         state = dialog_context.active_dialog.state
         state[OAuthPrompt.PERSISTED_STATE] = {}
         state[OAuthPrompt.PERSISTED_OPTIONS] = options
-        state[OAuthPrompt.PERSISTED_EXPIRES] = datetime.now() + timedelta(
-            seconds=timeout / 1000)
+        state[OAuthPrompt.PERSISTED_EXPIRES] = datetime.now() + timedelta(seconds=timeout / 1000)
         state[OAuthPrompt.PERSISTED_CALLER] = OAuthPrompt.__create_caller_info(
-            dialog_context.context)
+            dialog_context.context
+        )
 
-        output = await _UserTokenAccess.get_user_token(dialog_context.context,
-                                                       self._settings, None)
+        output = await _UserTokenAccess.get_user_token(dialog_context.context, self._settings, None)
 
         if output is not None:
             # Return token
@@ -170,8 +165,7 @@ class OAuthPrompt(Dialog):
         await self._send_oauth_card(dialog_context.context, options.prompt)
         return Dialog.end_of_turn
 
-    async def continue_dialog(
-            self, dialog_context: DialogContext) -> DialogTurnResult:
+    async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
         """
         Continues a dialog. Called when a prompt dialog is the active dialog and the user replied with a new activity.
 
@@ -192,13 +186,14 @@ class OAuthPrompt(Dialog):
         is_message = dialog_context.context.activity.type == ActivityTypes.message
         is_timeout_activity_type = (
             is_message
-            or OAuthPrompt._is_token_response_event(dialog_context.context) or
-            OAuthPrompt._is_teams_verification_invoke(dialog_context.context)
-            or OAuthPrompt._is_token_exchange_request_invoke(
-                dialog_context.context))
+            or OAuthPrompt._is_token_response_event(dialog_context.context)
+            or OAuthPrompt._is_teams_verification_invoke(dialog_context.context)
+            or OAuthPrompt._is_token_exchange_request_invoke(dialog_context.context)
+        )
 
         has_timed_out = is_timeout_activity_type and (
-            datetime.now() > state[OAuthPrompt.PERSISTED_EXPIRES])
+            datetime.now() > state[OAuthPrompt.PERSISTED_EXPIRES]
+        )
 
         if has_timed_out:
             return await dialog_context.end_dialog(None)
@@ -220,7 +215,8 @@ class OAuthPrompt(Dialog):
                     recognized,
                     state[OAuthPrompt.PERSISTED_STATE],
                     state[OAuthPrompt.PERSISTED_OPTIONS],
-                ))
+                )
+            )
         elif recognized.succeeded:
             is_valid = True
 
@@ -232,16 +228,18 @@ class OAuthPrompt(Dialog):
             return await dialog_context.end_dialog(None)
 
         # Send retry prompt
-        if (not dialog_context.context.responded and is_message and
-                state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt is not None):
+        if (
+            not dialog_context.context.responded
+            and is_message
+            and state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt is not None
+        ):
             await dialog_context.context.send_activity(
-                state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt)
+                state[OAuthPrompt.PERSISTED_OPTIONS].retry_prompt
+            )
 
         return Dialog.end_of_turn
 
-    async def get_user_token(self,
-                             context: TurnContext,
-                             code: str = None) -> TokenResponse:
+    async def get_user_token(self, context: TurnContext, code: str = None) -> TokenResponse:
         """
         Gets the user's tokeN.
 
@@ -257,8 +255,7 @@ class OAuthPrompt(Dialog):
             If the task is successful and the user already has a token or the user successfully signs in,
             the result contains the user's token.
         """
-        return await _UserTokenAccess.get_user_token(context, self._settings,
-                                                     code)
+        return await _UserTokenAccess.get_user_token(context, self._settings, code)
 
     async def sign_out_user(self, context: TurnContext):
         """
@@ -277,53 +274,51 @@ class OAuthPrompt(Dialog):
     @staticmethod
     def __create_caller_info(context: TurnContext) -> CallerInfo:
         bot_identity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
-        if bot_identity and SkillValidation.is_skill_claim(
-                bot_identity.claims):
+        if bot_identity and SkillValidation.is_skill_claim(bot_identity.claims):
             return CallerInfo(
                 caller_service_url=context.activity.service_url,
-                scope=JwtTokenValidation.get_app_id_from_claims(
-                    bot_identity.claims),
+                scope=JwtTokenValidation.get_app_id_from_claims(bot_identity.claims),
             )
 
         return None
 
-    async def _send_oauth_card(self,
-                               context: TurnContext,
-                               prompt: Union[Activity, str] = None):
+    async def _send_oauth_card(self, context: TurnContext, prompt: Union[Activity, str] = None):
         if not isinstance(prompt, Activity):
-            prompt = MessageFactory.text(prompt or "", None,
-                                         InputHints.accepting_input)
+            prompt = MessageFactory.text(prompt or "", None, InputHints.accepting_input)
         else:
             prompt.input_hint = prompt.input_hint or InputHints.accepting_input
 
         prompt.attachments = prompt.attachments or []
 
-        if OAuthPrompt._channel_suppports_oauth_card(
-                context.activity.channel_id):
-            if not any(att.content_type == CardFactory.content_types.oauth_card
-                       for att in prompt.attachments):
+        if OAuthPrompt._channel_suppports_oauth_card(context.activity.channel_id):
+            if not any(
+                att.content_type == CardFactory.content_types.oauth_card
+                for att in prompt.attachments
+            ):
                 card_action_type = ActionTypes.signin
                 sign_in_resource = await _UserTokenAccess.get_sign_in_resource(
-                    context, self._settings)
+                    context, self._settings
+                )
                 link = sign_in_resource.sign_in_link
-                bot_identity: ClaimsIdentity = context.turn_state.get(
-                    BotAdapter.BOT_IDENTITY_KEY)
+                bot_identity: ClaimsIdentity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
 
                 # use the SignInLink when in speech channel or bot is a skill or
                 # an extra OAuthAppCredentials is being passed in
-                if ((bot_identity
-                     and SkillValidation.is_skill_claim(bot_identity.claims))
-                        or not context.activity.service_url.startswith("http")
-                        or self._settings.oath_app_credentials):
+                if (
+                    (bot_identity and SkillValidation.is_skill_claim(bot_identity.claims))
+                    or not context.activity.service_url.startswith("http")
+                    or self._settings.oath_app_credentials
+                ):
                     if context.activity.channel_id == Channels.emulator:
                         card_action_type = ActionTypes.open_url
-                elif not OAuthPrompt._channel_requires_sign_in_link(
-                        context.activity.channel_id):
+                elif not OAuthPrompt._channel_requires_sign_in_link(context.activity.channel_id):
                     link = None
 
                 json_token_ex_resource = (
                     sign_in_resource.token_exchange_resource.as_dict()
-                    if sign_in_resource.token_exchange_resource else None)
+                    if sign_in_resource.token_exchange_resource
+                    else None
+                )
                 prompt.attachments.append(
                     CardFactory.oauth_card(
                         OAuthCard(
@@ -338,11 +333,14 @@ class OAuthPrompt(Dialog):
                                 )
                             ],
                             token_exchange_resource=json_token_ex_resource,
-                        )))
+                        )
+                    )
+                )
         else:
             if not any(
-                    att.content_type == CardFactory.content_types.signin_card
-                    for att in prompt.attachments):
+                att.content_type == CardFactory.content_types.signin_card
+                for att in prompt.attachments
+            ):
                 if not hasattr(context.adapter, "get_oauth_sign_in_link"):
                     raise Exception(
                         "OAuthPrompt._send_oauth_card(): get_oauth_sign_in_link() not supported by the current adapter"
@@ -365,26 +363,25 @@ class OAuthPrompt(Dialog):
                                     type=ActionTypes.signin,
                                 )
                             ],
-                        )))
+                        )
+                    )
+                )
 
         # Send prompt
         await context.send_activity(prompt)
 
-    async def _recognize_token(
-            self, dialog_context: DialogContext) -> PromptRecognizerResult:
+    async def _recognize_token(self, dialog_context: DialogContext) -> PromptRecognizerResult:
         context = dialog_context.context
         token = None
         if OAuthPrompt._is_token_response_event(context):
             token = context.activity.value
 
             # fixup the turnContext's state context if this was received from a skill host caller
-            state: CallerInfo = dialog_context.active_dialog.state[
-                OAuthPrompt.PERSISTED_CALLER]
+            state: CallerInfo = dialog_context.active_dialog.state[OAuthPrompt.PERSISTED_CALLER]
             if state:
                 # set the ServiceUrl to the skill host's Url
                 dialog_context.context.activity.service_url = state.caller_service_url
-                claims_identity = context.turn_state.get(
-                    BotAdapter.BOT_IDENTITY_KEY)
+                claims_identity = context.turn_state.get(BotAdapter.BOT_IDENTITY_KEY)
                 connector_client = await _UserTokenAccess.create_connector_client(
                     context,
                     dialog_context.context.activity.service_url,
@@ -392,49 +389,51 @@ class OAuthPrompt(Dialog):
                     state.scope,
                 )
 
-                context.turn_state[
-                    BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = connector_client
+                context.turn_state[BotAdapter.BOT_CONNECTOR_CLIENT_KEY] = connector_client
 
         elif OAuthPrompt._is_teams_verification_invoke(context):
             code = context.activity.value["state"]
             try:
-                token = await _UserTokenAccess.get_user_token(
-                    context, self._settings, code)
+                token = await _UserTokenAccess.get_user_token(context, self._settings, code)
                 if token is not None:
                     await context.send_activity(
                         Activity(
                             type="invokeResponse",
                             value=InvokeResponse(status=HTTPStatus.OK),
-                        ))
+                        )
+                    )
                 else:
                     await context.send_activity(
                         Activity(
                             type="invokeResponse",
                             value=InvokeResponse(status=HTTPStatus.NOT_FOUND),
-                        ))
+                        )
+                    )
             except Exception:
                 await context.send_activity(
                     Activity(
                         type="invokeResponse",
-                        value=InvokeResponse(
-                            status=HTTPStatus.INTERNAL_SERVER_ERROR),
-                    ))
+                        value=InvokeResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR),
+                    )
+                )
         elif self._is_token_exchange_request_invoke(context):
             if isinstance(context.activity.value, dict):
-                context.activity.value = TokenExchangeInvokeRequest(
-                ).from_dict(context.activity.value)
+                context.activity.value = TokenExchangeInvokeRequest().from_dict(
+                    context.activity.value
+                )
 
-            if not (context.activity.value and self._is_token_exchange_request(
-                    context.activity.value)):
+            if not (
+                context.activity.value and self._is_token_exchange_request(context.activity.value)
+            ):
                 # Received activity is not a token exchange request.
                 await context.send_activity(
                     self._get_token_exchange_invoke_response(
                         int(HTTPStatus.BAD_REQUEST),
                         "The bot received an InvokeActivity that is missing a TokenExchangeInvokeRequest value."
                         " This is required to be sent with the InvokeActivity.",
-                    ))
-            elif (context.activity.value.connection_name
-                  != self._settings.connection_name):
+                    )
+                )
+            elif context.activity.value.connection_name != self._settings.connection_name:
                 # Connection name on activity does not match that of setting.
                 await context.send_activity(
                     self._get_token_exchange_invoke_response(
@@ -443,7 +442,8 @@ class OAuthPrompt(Dialog):
                         " ConnectionName that does not match the ConnectionName expected by the bots active"
                         " OAuthPrompt. Ensure these names match when sending the InvokeActivityInvalid"
                         " ConnectionName in the TokenExchangeInvokeRequest",
-                    ))
+                    )
+                )
             elif not getattr(context.adapter, "exchange_token"):
                 # Token Exchange not supported in the adapter.
                 await context.send_activity(
@@ -451,7 +451,8 @@ class OAuthPrompt(Dialog):
                         int(HTTPStatus.BAD_GATEWAY),
                         "The bot's BotAdapter does not support token exchange operations."
                         " Ensure the bot's Adapter supports the ExtendedUserTokenProvider interface.",
-                    ))
+                    )
+                )
 
                 raise AttributeError(
                     "OAuthPrompt._recognize_token(): not supported by the current adapter."
@@ -463,8 +464,7 @@ class OAuthPrompt(Dialog):
                     token_exchange_response = await _UserTokenAccess.exchange_token(
                         context,
                         self._settings,
-                        TokenExchangeRequest(
-                            token=context.activity.value.token),
+                        TokenExchangeRequest(token=context.activity.value.token),
                     )
                 except:
                     # Ignore Exceptions
@@ -477,33 +477,32 @@ class OAuthPrompt(Dialog):
                         self._get_token_exchange_invoke_response(
                             int(HTTPStatus.PRECONDITION_FAILED),
                             "The bot is unable to exchange token. Proceed with regular login.",
-                        ))
+                        )
+                    )
                 else:
                     await context.send_activity(
                         self._get_token_exchange_invoke_response(
-                            int(HTTPStatus.OK), None,
-                            context.activity.value.id))
+                            int(HTTPStatus.OK), None, context.activity.value.id
+                        )
+                    )
                     token = TokenResponse(
                         channel_id=token_exchange_response.channel_id,
-                        connection_name=token_exchange_response.
-                        connection_name,
+                        connection_name=token_exchange_response.connection_name,
                         token=token_exchange_response.token,
                         expiration=None,
                     )
         elif context.activity.type == ActivityTypes.message and context.activity.text:
             match = re.match(r"(?<!\d)\d{6}(?!\d)", context.activity.text)
             if match:
-                token = await _UserTokenAccess.get_user_token(
-                    context, self._settings, match[0])
+                token = await _UserTokenAccess.get_user_token(context, self._settings, match[0])
 
-        return (PromptRecognizerResult(True, token)
-                if token is not None else PromptRecognizerResult())
+        return (
+            PromptRecognizerResult(True, token) if token is not None else PromptRecognizerResult()
+        )
 
     def _get_token_exchange_invoke_response(
-            self,
-            status: int,
-            failure_detail: str,
-            identifier: str = None) -> Activity:
+        self, status: int, failure_detail: str, identifier: str = None
+    ) -> Activity:
         return Activity(
             type=ActivityTypes.invoke_response,
             value=InvokeResponse(
@@ -520,22 +519,26 @@ class OAuthPrompt(Dialog):
     def _is_token_response_event(context: TurnContext) -> bool:
         activity = context.activity
 
-        return (activity.type == ActivityTypes.event
-                and activity.name == SignInConstants.token_response_event_name)
+        return (
+            activity.type == ActivityTypes.event
+            and activity.name == SignInConstants.token_response_event_name
+        )
 
     @staticmethod
     def _is_teams_verification_invoke(context: TurnContext) -> bool:
         activity = context.activity
 
-        return (activity.type == ActivityTypes.invoke and activity.name
-                == SignInConstants.verify_state_operation_name)
+        return (
+            activity.type == ActivityTypes.invoke
+            and activity.name == SignInConstants.verify_state_operation_name
+        )
 
     @staticmethod
     def _channel_suppports_oauth_card(channel_id: str) -> bool:
         if channel_id in [
-                Channels.cortana,
-                Channels.skype,
-                Channels.skype_for_business,
+            Channels.cortana,
+            Channels.skype,
+            Channels.skype_for_business,
         ]:
             return False
 
@@ -552,8 +555,10 @@ class OAuthPrompt(Dialog):
     def _is_token_exchange_request_invoke(context: TurnContext) -> bool:
         activity = context.activity
 
-        return (activity.type == ActivityTypes.invoke and activity.name
-                == SignInConstants.token_exchange_operation_name)
+        return (
+            activity.type == ActivityTypes.invoke
+            and activity.name == SignInConstants.token_exchange_operation_name
+        )
 
     @staticmethod
     def _is_token_exchange_request(obj: TokenExchangeInvokeRequest) -> bool:

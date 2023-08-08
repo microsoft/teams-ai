@@ -12,11 +12,7 @@ from teams.streaming.payloads.models import Serializable
 
 
 class StreamingResponse:
-
-    def __init__(self,
-                 *,
-                 status_code: int = 0,
-                 streams: List[ResponseMessageStream] = None):
+    def __init__(self, *, status_code: int = 0, streams: List[ResponseMessageStream] = None):
         self.status_code = status_code
         self.streams = streams
 
@@ -27,8 +23,7 @@ class StreamingResponse:
         if self.streams is None:
             self.streams: List[ResponseMessageStream] = []
 
-        self.streams.append(
-            ResponseMessageStream(id=identifier or uuid4(), content=content))
+        self.streams.append(ResponseMessageStream(id=identifier or uuid4(), content=content))
 
     def set_body(self, body: Union[str, Serializable, Model]):
         # TODO: verify if msrest.serialization.Model is necessary
@@ -66,5 +61,4 @@ class StreamingResponse:
 
     @staticmethod
     def internal_server_error(body: object = None) -> "StreamingResponse":
-        return StreamingResponse.create_response(
-            HTTPStatus.INTERNAL_SERVER_ERROR, body)
+        return StreamingResponse.create_response(HTTPStatus.INTERNAL_SERVER_ERROR, body)

@@ -10,7 +10,6 @@ from teams.connector.auth import AppCredentials
 
 
 class UserTokenProvider(ABC):
-
     @abstractmethod
     async def get_user_token(
         self,

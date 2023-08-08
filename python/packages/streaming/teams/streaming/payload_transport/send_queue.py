@@ -8,10 +8,7 @@ from typing import Awaitable, Callable
 
 
 class SendQueue:
-
-    def __init__(self,
-                 action: Callable[[object], Awaitable],
-                 timeout: int = 30):
+    def __init__(self, action: Callable[[object], Awaitable], timeout: int = 30):
         self._action = action
 
         self._queue = Queue()

@@ -46,7 +46,6 @@ class CredentialProvider:
 
 
 class SimpleCredentialProvider(CredentialProvider):
-
     def __init__(self, app_id: str, password: str):
         self.app_id = app_id
         self.password = password
@@ -62,7 +61,6 @@ class SimpleCredentialProvider(CredentialProvider):
 
 
 class _DelegatingCredentialProvider(CredentialProvider):
-
     def __init__(self, credentials_factory: "teams.connector.auth"):
         self._credentials_factory = credentials_factory
 

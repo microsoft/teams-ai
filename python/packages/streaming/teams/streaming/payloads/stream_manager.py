@@ -9,17 +9,14 @@ from teams.streaming.payloads.models import Header
 
 
 class StreamManager:
-
-    def __init__(self,
-                 on_cancel_stream: Callable[[PayloadStreamAssembler],
-                                            None] = None):
+    def __init__(self, on_cancel_stream: Callable[[PayloadStreamAssembler], None] = None):
         self._on_cancel_stream = on_cancel_stream or (lambda ocs: None)
         self._active_assemblers: Dict[UUID, PayloadStreamAssembler] = {}
 
-    def get_payload_assembler(self,
-                              identifier: UUID) -> PayloadStreamAssembler:
+    def get_payload_assembler(self, identifier: UUID) -> PayloadStreamAssembler:
         self._active_assemblers[identifier] = self._active_assemblers.get(
-            identifier, PayloadStreamAssembler(self, identifier))
+            identifier, PayloadStreamAssembler(self, identifier)
+        )
 
         return self._active_assemblers[identifier]
 
@@ -28,8 +25,7 @@ class StreamManager:
 
         return assembler.get_payload_as_stream()
 
-    def on_receive(self, header: Header, content_stream: List[int],
-                   content_length: int):
+    def on_receive(self, header: Header, content_stream: List[int], content_length: int):
         assembler = self._active_assemblers.get(header.id)
 
         if assembler:
@@ -41,7 +37,9 @@ class StreamManager:
         if assembler:
             del self._active_assemblers[identifier]
             stream = assembler.get_payload_as_stream()
-            if (assembler.content_length
-                    and len(stream) < assembler.content_length
-                    or not assembler.end):
+            if (
+                assembler.content_length
+                and len(stream) < assembler.content_length
+                or not assembler.end
+            ):
                 self._on_cancel_stream(assembler)

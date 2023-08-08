@@ -3,18 +3,13 @@
 
 
 class Claim:
-
     def __init__(self, claim_type: str, value):
         self.type = claim_type
         self.value = value
 
 
 class ClaimsIdentity:
-
-    def __init__(self,
-                 claims: dict,
-                 is_authenticated: bool,
-                 authentication_type: str = None):
+    def __init__(self, claims: dict, is_authenticated: bool, authentication_type: str = None):
         self.claims = claims
         self.is_authenticated = is_authenticated
         self.authentication_type = authentication_type

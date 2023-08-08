@@ -3,7 +3,6 @@
 
 
 class ChoiceFactoryOptions:
-
     def __init__(
         self,
         inline_separator: str = None,

@@ -22,7 +22,7 @@ class ChannelValidation:
     #
     TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS = VerifyOptions(
         issuer=[AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER],
-    # Audience validation takes place manually in code.
+        # Audience validation takes place manually in code.
         audience=None,
         clock_tolerance=5 * 60,
         ignore_expiration=False,
@@ -52,14 +52,13 @@ class ChannelValidation:
         :raises Exception:
         """
         identity = await ChannelValidation.authenticate_channel_token(
-            auth_header, credentials, channel_id, auth_configuration)
+            auth_header, credentials, channel_id, auth_configuration
+        )
 
-        service_url_claim = identity.get_claim_value(
-            ChannelValidation.SERVICE_URL_CLAIM)
+        service_url_claim = identity.get_claim_value(ChannelValidation.SERVICE_URL_CLAIM)
         if service_url_claim != service_url:
             # Claim must match. Not Authorized.
-            raise PermissionError(
-                "Unauthorized. service_url claim do not match.")
+            raise PermissionError("Unauthorized. service_url claim do not match.")
 
         return identity
 
@@ -83,12 +82,12 @@ class ChannelValidation:
         :return: A valid ClaimsIdentity.
         :raises Exception:
         """
-        auth_configuration = auth_configuration or AuthenticationConfiguration(
-        )
+        auth_configuration = auth_configuration or AuthenticationConfiguration()
         metadata_endpoint = (
             ChannelValidation.open_id_metadata_endpoint
-            if ChannelValidation.open_id_metadata_endpoint else
-            AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL)
+            if ChannelValidation.open_id_metadata_endpoint
+            else AuthenticationConstants.TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL
+        )
 
         token_extractor = JwtTokenExtractor(
             ChannelValidation.TO_BOT_FROM_CHANNEL_TOKEN_VALIDATION_PARAMETERS,
@@ -97,14 +96,15 @@ class ChannelValidation:
         )
 
         identity = await token_extractor.get_identity_from_auth_header(
-            auth_header, channel_id, auth_configuration.required_endorsements)
+            auth_header, channel_id, auth_configuration.required_endorsements
+        )
 
         return await ChannelValidation.validate_identity(identity, credentials)
 
     @staticmethod
     async def validate_identity(
-            identity: ClaimsIdentity,
-            credentials: CredentialProvider) -> ClaimsIdentity:
+        identity: ClaimsIdentity, credentials: CredentialProvider
+    ) -> ClaimsIdentity:
         if not identity:
             # No valid identity. Not Authorized.
             raise PermissionError("Unauthorized. No valid identity.")
@@ -119,21 +119,19 @@ class ChannelValidation:
         # Async validation.
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        if (identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM)
-                != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER):
+        if (
+            identity.get_claim_value(AuthenticationConstants.ISSUER_CLAIM)
+            != AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER
+        ):
             # The relevant Audience Claim MUST be present. Not Authorized.
-            raise PermissionError(
-                "Unauthorized. Audience Claim MUST be present.")
+            raise PermissionError("Unauthorized. Audience Claim MUST be present.")
 
         # The AppId from the claim in the token must match the AppId specified by the developer.
         # Note that the Bot Framework uses the Audience claim ("aud") to pass the AppID.
-        aud_claim = identity.get_claim_value(
-            AuthenticationConstants.AUDIENCE_CLAIM)
-        is_valid_app_id = await asyncio.ensure_future(
-            credentials.is_valid_appid(aud_claim or ""))
+        aud_claim = identity.get_claim_value(AuthenticationConstants.AUDIENCE_CLAIM)
+        is_valid_app_id = await asyncio.ensure_future(credentials.is_valid_appid(aud_claim or ""))
         if not is_valid_app_id:
             # The AppId is not valid or not present. Not Authorized.
-            raise PermissionError(
-                "Unauthorized. Invalid AppId passed on token: ", aud_claim)
+            raise PermissionError("Unauthorized. Invalid AppId passed on token: ", aud_claim)
 
         return identity

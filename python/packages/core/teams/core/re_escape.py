@@ -6,10 +6,7 @@
 # '-' (a range in character set)
 # '&', '~', (extended character set operations)
 # '#' (comment) and WHITESPACE (ignored) in verbose mode
-SPECIAL_CHARS_MAP = {
-    i: "\\" + chr(i)
-    for i in b"()[]{}?*+-|^$\\.&~# \t\n\r\v\f"
-}
+SPECIAL_CHARS_MAP = {i: "\\" + chr(i) for i in b"()[]{}?*+-|^$\\.&~# \t\n\r\v\f"}
 
 
 def escape(pattern):

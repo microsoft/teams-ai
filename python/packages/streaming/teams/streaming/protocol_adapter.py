@@ -19,7 +19,6 @@ from .streaming_request import StreamingRequest
 
 
 class ProtocolAdapter:
-
     def __init__(
         self,
         request_handler: RequestHandler,
@@ -38,8 +37,8 @@ class ProtocolAdapter:
         # TODO: might be able to remove
         self._stream_manager = StreamManager(self._on_cancel_stream)
         self._assembler_manager = PayloadAssemblerManager(
-            self._stream_manager, self._on_receive_request,
-            self._on_receive_response)
+            self._stream_manager, self._on_receive_request, self._on_receive_response
+        )
 
         self._payload_receiver.subscribe(
             self._assembler_manager.get_payload_stream,
@@ -48,9 +47,7 @@ class ProtocolAdapter:
 
     async def send_request(self, request: StreamingRequest) -> ReceiveResponse:
         if not request:
-            raise TypeError(
-                f"'request: {request.__class__.__name__}' argument can't be None"
-            )
+            raise TypeError(f"'request: {request.__class__.__name__}' argument can't be None")
 
         request_id = uuid4()
         response_task = self._request_manager.get_response(request_id)
@@ -60,24 +57,22 @@ class ProtocolAdapter:
 
         return response
 
-    async def _on_receive_request(self, identifier: UUID,
-                                  request: ReceiveRequest):
+    async def _on_receive_request(self, identifier: UUID, request: ReceiveRequest):
         # request is done, we can handle it
         if self._request_handler:
             response = await self._request_handler.process_request(
-                request, None, self._handler_context)
+                request, None, self._handler_context
+            )
 
             if response:
                 await self._send_operations.send_response(identifier, response)
 
-    async def _on_receive_response(self, identifier: UUID,
-                                   response: ReceiveResponse):
+    async def _on_receive_response(self, identifier: UUID, response: ReceiveResponse):
         # we received the response to something, signal it
         await self._request_manager.signal_response(identifier, response)
 
-    def _on_cancel_stream(self,
-                          content_stream_assembler: PayloadStreamAssembler):
+    def _on_cancel_stream(self, content_stream_assembler: PayloadStreamAssembler):
         # TODO: on original C# code content_stream_assembler is typed as IAssembler
         asyncio.create_task(
-            self._send_operations.send_cancel_stream(
-                content_stream_assembler.identifier))
+            self._send_operations.send_cancel_stream(content_stream_assembler.identifier)
+        )

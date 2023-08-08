@@ -9,7 +9,6 @@ from .memory_scope import MemoryScope
 
 
 class ClassMemoryScope(MemoryScope):
-
     def __init__(self):
         super().__init__(scope_path.SETTINGS, include_in_snapshot=False)
 
@@ -19,21 +18,17 @@ class ClassMemoryScope(MemoryScope):
 
         # if active dialog is a container dialog then "dialogclass" binds to it.
         if dialog_context.active_dialog:
-            dialog = dialog_context.find_dialog_sync(
-                dialog_context.active_dialog.id)
+            dialog = dialog_context.find_dialog_sync(dialog_context.active_dialog.id)
             if dialog:
-                return ClassMemoryScope._bind_to_dialog_context(
-                    dialog, dialog_context)
+                return ClassMemoryScope._bind_to_dialog_context(dialog, dialog_context)
 
         return None
 
     def set_memory(self, dialog_context: "DialogContext", memory: object):
-        raise Exception(
-            f"{self.__class__.__name__}.set_memory not supported (read only)")
+        raise Exception(f"{self.__class__.__name__}.set_memory not supported (read only)")
 
     @staticmethod
-    def _bind_to_dialog_context(obj,
-                                dialog_context: "DialogContext") -> object:
+    def _bind_to_dialog_context(obj, dialog_context: "DialogContext") -> object:
         clone = {}
         for prop in dir(obj):
             # don't process double underscore attributes
@@ -42,17 +37,15 @@ class ClassMemoryScope(MemoryScope):
                 if not callable(prop_value):
                     # the only objects
                     if hasattr(prop_value, "try_get_value"):
-                        clone[prop] = prop_value.try_get_value(
-                            dialog_context.state)
-                    elif hasattr(prop_value, "__dict__") and not isinstance(
-                            prop_value, type):
+                        clone[prop] = prop_value.try_get_value(dialog_context.state)
+                    elif hasattr(prop_value, "__dict__") and not isinstance(prop_value, type):
                         clone[prop] = ClassMemoryScope._bind_to_dialog_context(
-                            prop_value, dialog_context)
+                            prop_value, dialog_context
+                        )
                     else:
                         clone[prop] = prop_value
         if clone:
-            ReadOnlyObject = namedtuple(    # pylint: disable=invalid-name
-                "ReadOnlyObject", clone)
+            ReadOnlyObject = namedtuple("ReadOnlyObject", clone)  # pylint: disable=invalid-name
             return ReadOnlyObject(**clone)
 
         return None

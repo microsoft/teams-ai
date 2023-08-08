@@ -10,7 +10,6 @@ from .prompt_recognizer_result import PromptRecognizerResult
 
 
 class TextPrompt(Prompt):
-
     async def on_prompt(
         self,
         turn_context: TurnContext,
@@ -19,8 +18,7 @@ class TextPrompt(Prompt):
         is_retry: bool,
     ):
         if not turn_context:
-            raise TypeError(
-                "TextPrompt.on_prompt(): turn_context cannot be None.")
+            raise TypeError("TextPrompt.on_prompt(): turn_context cannot be None.")
         if not options:
             raise TypeError("TextPrompt.on_prompt(): options cannot be None.")
 
@@ -37,8 +35,7 @@ class TextPrompt(Prompt):
         options: PromptOptions,
     ) -> PromptRecognizerResult:
         if not turn_context:
-            raise TypeError(
-                "DateTimePrompt.on_recognize(): turn_context cannot be None.")
+            raise TypeError("DateTimePrompt.on_recognize(): turn_context cannot be None.")
 
         result = PromptRecognizerResult()
         if turn_context.activity.type == ActivityTypes.message:

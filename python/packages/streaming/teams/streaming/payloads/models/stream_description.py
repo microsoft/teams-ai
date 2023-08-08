@@ -8,11 +8,7 @@ from .serializable import Serializable
 
 class StreamDescription(Serializable):
     # pylint: disable=invalid-name
-    def __init__(self,
-                 *,
-                 id: str = None,
-                 content_type: str = None,
-                 length: int = None):
+    def __init__(self, *, id: str = None, content_type: str = None, length: int = None):
         self.id = id
         self.content_type = content_type
         self.length = length

@@ -10,7 +10,6 @@ from .persisted_state import PersistedState
 
 
 class DialogManagerResult:
-
     def __init__(
         self,
         turn_result: DialogTurnResult = None,

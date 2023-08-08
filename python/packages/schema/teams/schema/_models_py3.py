@@ -40,46 +40,27 @@ class ConversationReference(Model):
     """
 
     _attribute_map = {
-        "activity_id": {
-            "key": "activityId",
-            "type": "str"
-        },
-        "user": {
-            "key": "user",
-            "type": "ChannelAccount"
-        },
-        "bot": {
-            "key": "bot",
-            "type": "ChannelAccount"
-        },
-        "conversation": {
-            "key": "conversation",
-            "type": "ConversationAccount"
-        },
-        "channel_id": {
-            "key": "channelId",
-            "type": "str"
-        },
-        "locale": {
-            "key": "locale",
-            "type": "str"
-        },
-        "service_url": {
-            "key": "serviceUrl",
-            "type": "str"
-        },
+        "activity_id": {"key": "activityId", "type": "str"},
+        "user": {"key": "user", "type": "ChannelAccount"},
+        "bot": {"key": "bot", "type": "ChannelAccount"},
+        "conversation": {"key": "conversation", "type": "ConversationAccount"},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "locale": {"key": "locale", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 activity_id: str = None,
-                 user=None,
-                 bot=None,
-                 conversation=None,
-                 channel_id: str = None,
-                 locale: str = None,
-                 service_url: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        activity_id: str = None,
+        user=None,
+        bot=None,
+        conversation=None,
+        channel_id: str = None,
+        locale: str = None,
+        service_url: str = None,
+        **kwargs,
+    ) -> None:
         super(ConversationReference, self).__init__(**kwargs)
         self.activity_id = activity_id
         self.user = user
@@ -102,26 +83,12 @@ class Mention(Model):
     """
 
     _attribute_map = {
-        "mentioned": {
-            "key": "mentioned",
-            "type": "ChannelAccount"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
+        "mentioned": {"key": "mentioned", "type": "ChannelAccount"},
+        "text": {"key": "text", "type": "str"},
+        "type": {"key": "type", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 mentioned=None,
-                 text: str = None,
-                 type: str = None,
-                 **kwargs) -> None:
+    def __init__(self, *, mentioned=None, text: str = None, type: str = None, **kwargs) -> None:
         super(Mention, self).__init__(**kwargs)
         self.mentioned = mentioned
         self.text = text
@@ -281,221 +248,97 @@ class Activity(Model):
     """
 
     _attribute_map = {
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "timestamp": {
-            "key": "timestamp",
-            "type": "iso-8601"
-        },
-        "local_timestamp": {
-            "key": "localTimestamp",
-            "type": "iso-8601"
-        },
-        "local_timezone": {
-            "key": "localTimezone",
-            "type": "str"
-        },
-        "service_url": {
-            "key": "serviceUrl",
-            "type": "str"
-        },
-        "channel_id": {
-            "key": "channelId",
-            "type": "str"
-        },
-        "from_property": {
-            "key": "from",
-            "type": "ChannelAccount"
-        },
-        "conversation": {
-            "key": "conversation",
-            "type": "ConversationAccount"
-        },
-        "recipient": {
-            "key": "recipient",
-            "type": "ChannelAccount"
-        },
-        "text_format": {
-            "key": "textFormat",
-            "type": "str"
-        },
-        "attachment_layout": {
-            "key": "attachmentLayout",
-            "type": "str"
-        },
-        "members_added": {
-            "key": "membersAdded",
-            "type": "[ChannelAccount]"
-        },
-        "members_removed": {
-            "key": "membersRemoved",
-            "type": "[ChannelAccount]"
-        },
-        "reactions_added": {
-            "key": "reactionsAdded",
-            "type": "[MessageReaction]"
-        },
-        "reactions_removed": {
-            "key": "reactionsRemoved",
-            "type": "[MessageReaction]"
-        },
-        "topic_name": {
-            "key": "topicName",
-            "type": "str"
-        },
-        "history_disclosed": {
-            "key": "historyDisclosed",
-            "type": "bool"
-        },
-        "locale": {
-            "key": "locale",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "speak": {
-            "key": "speak",
-            "type": "str"
-        },
-        "input_hint": {
-            "key": "inputHint",
-            "type": "str"
-        },
-        "summary": {
-            "key": "summary",
-            "type": "str"
-        },
-        "suggested_actions": {
-            "key": "suggestedActions",
-            "type": "SuggestedActions"
-        },
-        "attachments": {
-            "key": "attachments",
-            "type": "[Attachment]"
-        },
-        "entities": {
-            "key": "entities",
-            "type": "[Entity]"
-        },
-        "channel_data": {
-            "key": "channelData",
-            "type": "object"
-        },
-        "action": {
-            "key": "action",
-            "type": "str"
-        },
-        "reply_to_id": {
-            "key": "replyToId",
-            "type": "str"
-        },
-        "label": {
-            "key": "label",
-            "type": "str"
-        },
-        "value_type": {
-            "key": "valueType",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "object"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
-        "relates_to": {
-            "key": "relatesTo",
-            "type": "ConversationReference"
-        },
-        "code": {
-            "key": "code",
-            "type": "str"
-        },
-        "expiration": {
-            "key": "expiration",
-            "type": "iso-8601"
-        },
-        "importance": {
-            "key": "importance",
-            "type": "str"
-        },
-        "delivery_mode": {
-            "key": "deliveryMode",
-            "type": "str"
-        },
-        "listen_for": {
-            "key": "listenFor",
-            "type": "[str]"
-        },
-        "text_highlights": {
-            "key": "textHighlights",
-            "type": "[TextHighlight]"
-        },
-        "semantic_action": {
-            "key": "semanticAction",
-            "type": "SemanticAction"
-        },
-        "caller_id": {
-            "key": "callerId",
-            "type": "str"
-        },
+        "type": {"key": "type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "timestamp": {"key": "timestamp", "type": "iso-8601"},
+        "local_timestamp": {"key": "localTimestamp", "type": "iso-8601"},
+        "local_timezone": {"key": "localTimezone", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
+        "channel_id": {"key": "channelId", "type": "str"},
+        "from_property": {"key": "from", "type": "ChannelAccount"},
+        "conversation": {"key": "conversation", "type": "ConversationAccount"},
+        "recipient": {"key": "recipient", "type": "ChannelAccount"},
+        "text_format": {"key": "textFormat", "type": "str"},
+        "attachment_layout": {"key": "attachmentLayout", "type": "str"},
+        "members_added": {"key": "membersAdded", "type": "[ChannelAccount]"},
+        "members_removed": {"key": "membersRemoved", "type": "[ChannelAccount]"},
+        "reactions_added": {"key": "reactionsAdded", "type": "[MessageReaction]"},
+        "reactions_removed": {"key": "reactionsRemoved", "type": "[MessageReaction]"},
+        "topic_name": {"key": "topicName", "type": "str"},
+        "history_disclosed": {"key": "historyDisclosed", "type": "bool"},
+        "locale": {"key": "locale", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "speak": {"key": "speak", "type": "str"},
+        "input_hint": {"key": "inputHint", "type": "str"},
+        "summary": {"key": "summary", "type": "str"},
+        "suggested_actions": {"key": "suggestedActions", "type": "SuggestedActions"},
+        "attachments": {"key": "attachments", "type": "[Attachment]"},
+        "entities": {"key": "entities", "type": "[Entity]"},
+        "channel_data": {"key": "channelData", "type": "object"},
+        "action": {"key": "action", "type": "str"},
+        "reply_to_id": {"key": "replyToId", "type": "str"},
+        "label": {"key": "label", "type": "str"},
+        "value_type": {"key": "valueType", "type": "str"},
+        "value": {"key": "value", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "relates_to": {"key": "relatesTo", "type": "ConversationReference"},
+        "code": {"key": "code", "type": "str"},
+        "expiration": {"key": "expiration", "type": "iso-8601"},
+        "importance": {"key": "importance", "type": "str"},
+        "delivery_mode": {"key": "deliveryMode", "type": "str"},
+        "listen_for": {"key": "listenFor", "type": "[str]"},
+        "text_highlights": {"key": "textHighlights", "type": "[TextHighlight]"},
+        "semantic_action": {"key": "semanticAction", "type": "SemanticAction"},
+        "caller_id": {"key": "callerId", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 type=None,
-                 id: str = None,
-                 timestamp=None,
-                 local_timestamp=None,
-                 local_timezone: str = None,
-                 service_url: str = None,
-                 channel_id: str = None,
-                 from_property=None,
-                 conversation=None,
-                 recipient=None,
-                 text_format=None,
-                 attachment_layout=None,
-                 members_added=None,
-                 members_removed=None,
-                 reactions_added=None,
-                 reactions_removed=None,
-                 topic_name: str = None,
-                 history_disclosed: bool = None,
-                 locale: str = None,
-                 text: str = None,
-                 speak: str = None,
-                 input_hint=None,
-                 summary: str = None,
-                 suggested_actions=None,
-                 attachments=None,
-                 entities=None,
-                 channel_data=None,
-                 action: str = None,
-                 reply_to_id: str = None,
-                 label: str = None,
-                 value_type: str = None,
-                 value=None,
-                 name: str = None,
-                 relates_to=None,
-                 code=None,
-                 expiration=None,
-                 importance=None,
-                 delivery_mode=None,
-                 listen_for=None,
-                 text_highlights=None,
-                 semantic_action=None,
-                 caller_id: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        type=None,
+        id: str = None,
+        timestamp=None,
+        local_timestamp=None,
+        local_timezone: str = None,
+        service_url: str = None,
+        channel_id: str = None,
+        from_property=None,
+        conversation=None,
+        recipient=None,
+        text_format=None,
+        attachment_layout=None,
+        members_added=None,
+        members_removed=None,
+        reactions_added=None,
+        reactions_removed=None,
+        topic_name: str = None,
+        history_disclosed: bool = None,
+        locale: str = None,
+        text: str = None,
+        speak: str = None,
+        input_hint=None,
+        summary: str = None,
+        suggested_actions=None,
+        attachments=None,
+        entities=None,
+        channel_data=None,
+        action: str = None,
+        reply_to_id: str = None,
+        label: str = None,
+        value_type: str = None,
+        value=None,
+        name: str = None,
+        relates_to=None,
+        code=None,
+        expiration=None,
+        importance=None,
+        delivery_mode=None,
+        listen_for=None,
+        text_highlights=None,
+        semantic_action=None,
+        caller_id: str = None,
+        **kwargs,
+    ) -> None:
         super(Activity, self).__init__(**kwargs)
         self.type = type
         self.id = id
@@ -540,9 +383,9 @@ class Activity(Model):
         self.semantic_action = semantic_action
         self.caller_id = caller_id
 
-    def apply_conversation_reference(self,
-                                     reference: ConversationReference,
-                                     is_incoming: bool = False):
+    def apply_conversation_reference(
+        self, reference: ConversationReference, is_incoming: bool = False
+    ):
         """
         Updates this activity with the delivery information from an existing ConversationReference
 
@@ -587,8 +430,7 @@ class Activity(Model):
 
         :returns: This activity as a message activity; or None.
         """
-        return (self if self.__is_activity(
-            ActivityTypes.contact_relation_update) else None)
+        return self if self.__is_activity(ActivityTypes.contact_relation_update) else None
 
     def as_conversation_update_activity(self):
         """
@@ -597,8 +439,7 @@ class Activity(Model):
 
         :returns: This activity as a conversation update activity; or None.
         """
-        return self if self.__is_activity(
-            ActivityTypes.conversation_update) else None
+        return self if self.__is_activity(ActivityTypes.conversation_update) else None
 
     def as_end_of_conversation_activity(self):
         """
@@ -607,8 +448,7 @@ class Activity(Model):
 
         :returns: This activity as an end of conversation activity; or None.
         """
-        return self if self.__is_activity(
-            ActivityTypes.end_of_conversation) else None
+        return self if self.__is_activity(ActivityTypes.end_of_conversation) else None
 
     def as_event_activity(self):
         """
@@ -635,8 +475,7 @@ class Activity(Model):
 
         :returns: This activity as an installation update activity; or None.
         """
-        return self if self.__is_activity(
-            ActivityTypes.installation_update) else None
+        return self if self.__is_activity(ActivityTypes.installation_update) else None
 
     def as_invoke_activity(self):
         """
@@ -663,8 +502,7 @@ class Activity(Model):
 
         :returns: This activity as a message delete request; or None.
         """
-        return self if self.__is_activity(
-            ActivityTypes.message_delete) else None
+        return self if self.__is_activity(ActivityTypes.message_delete) else None
 
     def as_message_reaction_activity(self):
         """
@@ -673,8 +511,7 @@ class Activity(Model):
 
         :return: This activity as a message reaction activity; or None.
         """
-        return self if self.__is_activity(
-            ActivityTypes.message_reaction) else None
+        return self if self.__is_activity(ActivityTypes.message_reaction) else None
 
     def as_message_update_activity(self):
         """
@@ -683,8 +520,7 @@ class Activity(Model):
 
         :returns: This activity as a message update request; or None.
         """
-        return self if self.__is_activity(
-            ActivityTypes.message_update) else None
+        return self if self.__is_activity(ActivityTypes.message_update) else None
 
     def as_suggestion_activity(self):
         """
@@ -813,11 +649,9 @@ class Activity(Model):
             entities=[],
         )
 
-    def create_trace(self,
-                     name: str,
-                     value: object = None,
-                     value_type: str = None,
-                     label: str = None):
+    def create_trace(
+        self, name: str, value: object = None, value_type: str = None, label: str = None
+    ):
         """
         Creates a new trace activity based on this activity.
 
@@ -858,10 +692,9 @@ class Activity(Model):
         ).as_trace_activity()
 
     @staticmethod
-    def create_trace_activity(name: str,
-                              value: object = None,
-                              value_type: str = None,
-                              label: str = None):
+    def create_trace_activity(
+        name: str, value: object = None, value_type: str = None, label: str = None
+    ):
         """
         Creates an instance of the :class:`Activity` class as a TraceActivity object.
 
@@ -923,8 +756,7 @@ class Activity(Model):
         _list = self.entities
         return [x for x in _list if str(x.type).lower() == "mention"]
 
-    def get_reply_conversation_reference(
-            self, reply: ResourceResponse) -> ConversationReference:
+    def get_reply_conversation_reference(self, reply: ResourceResponse) -> ConversationReference:
         """
         Create a ConversationReference based on this Activity's Conversation info
         and the ResourceResponse from sending an activity.
@@ -994,8 +826,10 @@ class Activity(Model):
             result = len(type_attribute) == len(activity_type)
 
             if not result:
-                result = (len(type_attribute) > len(activity_type)
-                          and type_attribute[len(activity_type)] == "/")
+                result = (
+                    len(type_attribute) > len(activity_type)
+                    and type_attribute[len(activity_type)] == "/"
+                )
 
         return result
 
@@ -1036,71 +870,37 @@ class AnimationCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "image": {
-            "key": "image",
-            "type": "ThumbnailUrl"
-        },
-        "media": {
-            "key": "media",
-            "type": "[MediaUrl]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "shareable": {
-            "key": "shareable",
-            "type": "bool"
-        },
-        "autoloop": {
-            "key": "autoloop",
-            "type": "bool"
-        },
-        "autostart": {
-            "key": "autostart",
-            "type": "bool"
-        },
-        "aspect": {
-            "key": "aspect",
-            "type": "str"
-        },
-        "duration": {
-            "key": "duration",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "object"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 image=None,
-                 media=None,
-                 buttons=None,
-                 shareable: bool = None,
-                 autoloop: bool = None,
-                 autostart: bool = None,
-                 aspect: str = None,
-                 duration: str = None,
-                 value=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        image=None,
+        media=None,
+        buttons=None,
+        shareable: bool = None,
+        autoloop: bool = None,
+        autostart: bool = None,
+        aspect: str = None,
+        duration: str = None,
+        value=None,
+        **kwargs,
+    ) -> None:
         super(AnimationCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -1132,36 +932,23 @@ class Attachment(Model):
     """
 
     _attribute_map = {
-        "content_type": {
-            "key": "contentType",
-            "type": "str"
-        },
-        "content_url": {
-            "key": "contentUrl",
-            "type": "str"
-        },
-        "content": {
-            "key": "content",
-            "type": "object"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
-        "thumbnail_url": {
-            "key": "thumbnailUrl",
-            "type": "str"
-        },
+        "content_type": {"key": "contentType", "type": "str"},
+        "content_url": {"key": "contentUrl", "type": "str"},
+        "content": {"key": "content", "type": "object"},
+        "name": {"key": "name", "type": "str"},
+        "thumbnail_url": {"key": "thumbnailUrl", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 content_type: str = None,
-                 content_url: str = None,
-                 content=None,
-                 name: str = None,
-                 thumbnail_url: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        content_type: str = None,
+        content_url: str = None,
+        content=None,
+        name: str = None,
+        thumbnail_url: str = None,
+        **kwargs,
+    ) -> None:
         super(Attachment, self).__init__(**kwargs)
         self.content_type = content_type
         self.content_url = content_url
@@ -1184,31 +971,21 @@ class AttachmentData(Model):
     """
 
     _attribute_map = {
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
-        "original_base64": {
-            "key": "originalBase64",
-            "type": "bytearray"
-        },
-        "thumbnail_base64": {
-            "key": "thumbnailBase64",
-            "type": "bytearray"
-        },
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "original_base64": {"key": "originalBase64", "type": "bytearray"},
+        "thumbnail_base64": {"key": "thumbnailBase64", "type": "bytearray"},
     }
 
-    def __init__(self,
-                 *,
-                 type: str = None,
-                 name: str = None,
-                 original_base64: bytearray = None,
-                 thumbnail_base64: bytearray = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        type: str = None,
+        name: str = None,
+        original_base64: bytearray = None,
+        thumbnail_base64: bytearray = None,
+        **kwargs,
+    ) -> None:
         super(AttachmentData, self).__init__(**kwargs)
         self.type = type
         self.name = name
@@ -1228,26 +1005,12 @@ class AttachmentInfo(Model):
     """
 
     _attribute_map = {
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "views": {
-            "key": "views",
-            "type": "[AttachmentView]"
-        },
+        "name": {"key": "name", "type": "str"},
+        "type": {"key": "type", "type": "str"},
+        "views": {"key": "views", "type": "[AttachmentView]"},
     }
 
-    def __init__(self,
-                 *,
-                 name: str = None,
-                 type: str = None,
-                 views=None,
-                 **kwargs) -> None:
+    def __init__(self, *, name: str = None, type: str = None, views=None, **kwargs) -> None:
         super(AttachmentInfo, self).__init__(**kwargs)
         self.name = name
         self.type = type
@@ -1264,21 +1027,11 @@ class AttachmentView(Model):
     """
 
     _attribute_map = {
-        "view_id": {
-            "key": "viewId",
-            "type": "str"
-        },
-        "size": {
-            "key": "size",
-            "type": "int"
-        },
+        "view_id": {"key": "viewId", "type": "str"},
+        "size": {"key": "size", "type": "int"},
     }
 
-    def __init__(self,
-                 *,
-                 view_id: str = None,
-                 size: int = None,
-                 **kwargs) -> None:
+    def __init__(self, *, view_id: str = None, size: int = None, **kwargs) -> None:
         super(AttachmentView, self).__init__(**kwargs)
         self.view_id = view_id
         self.size = size
@@ -1320,71 +1073,37 @@ class AudioCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "image": {
-            "key": "image",
-            "type": "ThumbnailUrl"
-        },
-        "media": {
-            "key": "media",
-            "type": "[MediaUrl]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "shareable": {
-            "key": "shareable",
-            "type": "bool"
-        },
-        "autoloop": {
-            "key": "autoloop",
-            "type": "bool"
-        },
-        "autostart": {
-            "key": "autostart",
-            "type": "bool"
-        },
-        "aspect": {
-            "key": "aspect",
-            "type": "str"
-        },
-        "duration": {
-            "key": "duration",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "object"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 image=None,
-                 media=None,
-                 buttons=None,
-                 shareable: bool = None,
-                 autoloop: bool = None,
-                 autostart: bool = None,
-                 aspect: str = None,
-                 duration: str = None,
-                 value=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        image=None,
+        media=None,
+        buttons=None,
+        shareable: bool = None,
+        autoloop: bool = None,
+        autostart: bool = None,
+        aspect: str = None,
+        duration: str = None,
+        value=None,
+        **kwargs,
+    ) -> None:
         super(AudioCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -1419,41 +1138,25 @@ class BasicCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "images": {
-            "key": "images",
-            "type": "[CardImage]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "tap": {
-            "key": "tap",
-            "type": "CardAction"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "images": {"key": "images", "type": "[CardImage]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 images=None,
-                 buttons=None,
-                 tap=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        images=None,
+        buttons=None,
+        tap=None,
+        **kwargs,
+    ) -> None:
         super(BasicCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -1490,51 +1193,29 @@ class CardAction(Model):
     """
 
     _attribute_map = {
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "image": {
-            "key": "image",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "display_text": {
-            "key": "displayText",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "object"
-        },
-        "channel_data": {
-            "key": "channelData",
-            "type": "object"
-        },
-        "image_alt_text": {
-            "key": "imageAltText",
-            "type": "str"
-        },
+        "type": {"key": "type", "type": "str"},
+        "title": {"key": "title", "type": "str"},
+        "image": {"key": "image", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "display_text": {"key": "displayText", "type": "str"},
+        "value": {"key": "value", "type": "object"},
+        "channel_data": {"key": "channelData", "type": "object"},
+        "image_alt_text": {"key": "imageAltText", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 type=None,
-                 title: str = None,
-                 image: str = None,
-                 text: str = None,
-                 display_text: str = None,
-                 value=None,
-                 channel_data=None,
-                 image_alt_text: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        type=None,
+        title: str = None,
+        image: str = None,
+        text: str = None,
+        display_text: str = None,
+        value=None,
+        channel_data=None,
+        image_alt_text: str = None,
+        **kwargs,
+    ) -> None:
         super(CardAction, self).__init__(**kwargs)
         self.type = type
         self.title = title
@@ -1558,26 +1239,12 @@ class CardImage(Model):
     """
 
     _attribute_map = {
-        "url": {
-            "key": "url",
-            "type": "str"
-        },
-        "alt": {
-            "key": "alt",
-            "type": "str"
-        },
-        "tap": {
-            "key": "tap",
-            "type": "CardAction"
-        },
+        "url": {"key": "url", "type": "str"},
+        "alt": {"key": "alt", "type": "str"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
-    def __init__(self,
-                 *,
-                 url: str = None,
-                 alt: str = None,
-                 tap=None,
-                 **kwargs) -> None:
+    def __init__(self, *, url: str = None, alt: str = None, tap=None, **kwargs) -> None:
         super(CardImage, self).__init__(**kwargs)
         self.url = url
         self.alt = alt
@@ -1601,31 +1268,15 @@ class ChannelAccount(Model):
     """
 
     _attribute_map = {
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
-        "aad_object_id": {
-            "key": "aadObjectId",
-            "type": "str"
-        },
-        "role": {
-            "key": "role",
-            "type": "str"
-        },
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "aad_object_id": {"key": "aadObjectId", "type": "str"},
+        "role": {"key": "role", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 id: str = None,
-                 name: str = None,
-                 aad_object_id: str = None,
-                 role=None,
-                 **kwargs) -> None:
+    def __init__(
+        self, *, id: str = None, name: str = None, aad_object_id: str = None, role=None, **kwargs
+    ) -> None:
         super(ChannelAccount, self).__init__(**kwargs)
         self.id = id
         self.name = name
@@ -1660,51 +1311,29 @@ class ConversationAccount(Model):
     """
 
     _attribute_map = {
-        "is_group": {
-            "key": "isGroup",
-            "type": "bool"
-        },
-        "conversation_type": {
-            "key": "conversationType",
-            "type": "str"
-        },
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
-        "aad_object_id": {
-            "key": "aadObjectId",
-            "type": "str"
-        },
-        "role": {
-            "key": "role",
-            "type": "str"
-        },
-        "tenant_id": {
-            "key": "tenantID",
-            "type": "str"
-        },
-        "properties": {
-            "key": "properties",
-            "type": "object"
-        },
+        "is_group": {"key": "isGroup", "type": "bool"},
+        "conversation_type": {"key": "conversationType", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "name": {"key": "name", "type": "str"},
+        "aad_object_id": {"key": "aadObjectId", "type": "str"},
+        "role": {"key": "role", "type": "str"},
+        "tenant_id": {"key": "tenantID", "type": "str"},
+        "properties": {"key": "properties", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 is_group: bool = None,
-                 conversation_type: str = None,
-                 id: str = None,
-                 name: str = None,
-                 aad_object_id: str = None,
-                 role=None,
-                 tenant_id=None,
-                 properties=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        is_group: bool = None,
+        conversation_type: str = None,
+        id: str = None,
+        name: str = None,
+        aad_object_id: str = None,
+        role=None,
+        tenant_id=None,
+        properties=None,
+        **kwargs,
+    ) -> None:
         super(ConversationAccount, self).__init__(**kwargs)
         self.is_group = is_group
         self.conversation_type = conversation_type
@@ -1726,14 +1355,8 @@ class ConversationMembers(Model):
     """
 
     _attribute_map = {
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "members": {
-            "key": "members",
-            "type": "[ChannelAccount]"
-        },
+        "id": {"key": "id", "type": "str"},
+        "members": {"key": "members", "type": "[ChannelAccount]"},
     }
 
     def __init__(self, *, id: str = None, members=None, **kwargs) -> None:
@@ -1765,46 +1388,27 @@ class ConversationParameters(Model):
     """
 
     _attribute_map = {
-        "is_group": {
-            "key": "isGroup",
-            "type": "bool"
-        },
-        "bot": {
-            "key": "bot",
-            "type": "ChannelAccount"
-        },
-        "members": {
-            "key": "members",
-            "type": "[ChannelAccount]"
-        },
-        "topic_name": {
-            "key": "topicName",
-            "type": "str"
-        },
-        "activity": {
-            "key": "activity",
-            "type": "Activity"
-        },
-        "channel_data": {
-            "key": "channelData",
-            "type": "object"
-        },
-        "tenant_id": {
-            "key": "tenantID",
-            "type": "str"
-        },
+        "is_group": {"key": "isGroup", "type": "bool"},
+        "bot": {"key": "bot", "type": "ChannelAccount"},
+        "members": {"key": "members", "type": "[ChannelAccount]"},
+        "topic_name": {"key": "topicName", "type": "str"},
+        "activity": {"key": "activity", "type": "Activity"},
+        "channel_data": {"key": "channelData", "type": "object"},
+        "tenant_id": {"key": "tenantID", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 is_group: bool = None,
-                 bot=None,
-                 members=None,
-                 topic_name: str = None,
-                 activity=None,
-                 channel_data=None,
-                 tenant_id=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        is_group: bool = None,
+        bot=None,
+        members=None,
+        topic_name: str = None,
+        activity=None,
+        channel_data=None,
+        tenant_id=None,
+        **kwargs,
+    ) -> None:
         super(ConversationParameters, self).__init__(**kwargs)
         self.is_group = is_group
         self.bot = bot
@@ -1828,26 +1432,14 @@ class ConversationResourceResponse(Model):
     """
 
     _attribute_map = {
-        "activity_id": {
-            "key": "activityId",
-            "type": "str"
-        },
-        "service_url": {
-            "key": "serviceUrl",
-            "type": "str"
-        },
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
+        "activity_id": {"key": "activityId", "type": "str"},
+        "service_url": {"key": "serviceUrl", "type": "str"},
+        "id": {"key": "id", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 activity_id: str = None,
-                 service_url: str = None,
-                 id: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self, *, activity_id: str = None, service_url: str = None, id: str = None, **kwargs
+    ) -> None:
         super(ConversationResourceResponse, self).__init__(**kwargs)
         self.activity_id = activity_id
         self.service_url = service_url
@@ -1865,21 +1457,11 @@ class ConversationsResult(Model):
     """
 
     _attribute_map = {
-        "continuation_token": {
-            "key": "continuationToken",
-            "type": "str"
-        },
-        "conversations": {
-            "key": "conversations",
-            "type": "[ConversationMembers]"
-        },
+        "continuation_token": {"key": "continuationToken", "type": "str"},
+        "conversations": {"key": "conversations", "type": "[ConversationMembers]"},
     }
 
-    def __init__(self,
-                 *,
-                 continuation_token: str = None,
-                 conversations=None,
-                 **kwargs) -> None:
+    def __init__(self, *, continuation_token: str = None, conversations=None, **kwargs) -> None:
         super(ConversationsResult, self).__init__(**kwargs)
         self.continuation_token = continuation_token
         self.conversations = conversations
@@ -1893,12 +1475,7 @@ class ExpectedReplies(Model):
     :type activities: list[~teams.connector.models.Activity]
     """
 
-    _attribute_map = {
-        "activities": {
-            "key": "activities",
-            "type": "[Activity]"
-        }
-    }
+    _attribute_map = {"activities": {"key": "activities", "type": "[Activity]"}}
 
     def __init__(self, *, activities=None, **kwargs) -> None:
         super(ExpectedReplies, self).__init__(**kwargs)
@@ -1931,26 +1508,14 @@ class Error(Model):
     """
 
     _attribute_map = {
-        "code": {
-            "key": "code",
-            "type": "str"
-        },
-        "message": {
-            "key": "message",
-            "type": "str"
-        },
-        "inner_http_error": {
-            "key": "innerHttpError",
-            "type": "InnerHttpError"
-        },
+        "code": {"key": "code", "type": "str"},
+        "message": {"key": "message", "type": "str"},
+        "inner_http_error": {"key": "innerHttpError", "type": "InnerHttpError"},
     }
 
-    def __init__(self,
-                 *,
-                 code: str = None,
-                 message: str = None,
-                 inner_http_error=None,
-                 **kwargs) -> None:
+    def __init__(
+        self, *, code: str = None, message: str = None, inner_http_error=None, **kwargs
+    ) -> None:
         super(Error, self).__init__(**kwargs)
         self.code = code
         self.message = message
@@ -1979,9 +1544,7 @@ class ErrorResponseException(HttpOperationError):
     """
 
     def __init__(self, deserialize, response, *args):
-
-        super(ErrorResponseException, self).__init__(deserialize, response,
-                                                     "ErrorResponse", *args)
+        super(ErrorResponseException, self).__init__(deserialize, response, "ErrorResponse", *args)
 
 
 class Fact(Model):
@@ -1997,21 +1560,11 @@ class Fact(Model):
     """
 
     _attribute_map = {
-        "key": {
-            "key": "key",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "str"
-        },
+        "key": {"key": "key", "type": "str"},
+        "value": {"key": "value", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 key: str = None,
-                 value: str = None,
-                 **kwargs) -> None:
+    def __init__(self, *, key: str = None, value: str = None, **kwargs) -> None:
         super(Fact, self).__init__(**kwargs)
         self.key = key
         self.value = value
@@ -2036,36 +1589,23 @@ class GeoCoordinates(Model):
     """
 
     _attribute_map = {
-        "elevation": {
-            "key": "elevation",
-            "type": "float"
-        },
-        "latitude": {
-            "key": "latitude",
-            "type": "float"
-        },
-        "longitude": {
-            "key": "longitude",
-            "type": "float"
-        },
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
+        "elevation": {"key": "elevation", "type": "float"},
+        "latitude": {"key": "latitude", "type": "float"},
+        "longitude": {"key": "longitude", "type": "float"},
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 elevation: float = None,
-                 latitude: float = None,
-                 longitude: float = None,
-                 type: str = None,
-                 name: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        elevation: float = None,
+        latitude: float = None,
+        longitude: float = None,
+        type: str = None,
+        name: str = None,
+        **kwargs,
+    ) -> None:
         super(GeoCoordinates, self).__init__(**kwargs)
         self.elevation = elevation
         self.latitude = latitude
@@ -2093,41 +1633,25 @@ class HeroCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "images": {
-            "key": "images",
-            "type": "[CardImage]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "tap": {
-            "key": "tap",
-            "type": "CardAction"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "images": {"key": "images", "type": "[CardImage]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 images=None,
-                 buttons=None,
-                 tap=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        images=None,
+        buttons=None,
+        tap=None,
+        **kwargs,
+    ) -> None:
         super(HeroCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -2147,21 +1671,11 @@ class InnerHttpError(Model):
     """
 
     _attribute_map = {
-        "status_code": {
-            "key": "statusCode",
-            "type": "int"
-        },
-        "body": {
-            "key": "body",
-            "type": "object"
-        },
+        "status_code": {"key": "statusCode", "type": "int"},
+        "body": {"key": "body", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 status_code: int = None,
-                 body=None,
-                 **kwargs) -> None:
+    def __init__(self, *, status_code: int = None, body=None, **kwargs) -> None:
         super(InnerHttpError, self).__init__(**kwargs)
         self.status_code = status_code
         self.body = body
@@ -2179,14 +1693,8 @@ class InvokeResponse(Model):
     """
 
     _attribute_map = {
-        "status": {
-            "key": "status",
-            "type": "int"
-        },
-        "body": {
-            "key": "body",
-            "type": "object"
-        },
+        "status": {"key": "status", "type": "int"},
+        "body": {"key": "body", "type": "object"},
     }
 
     def __init__(self, *, status: int = None, body: object = None, **kwargs):
@@ -2247,71 +1755,37 @@ class MediaCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "image": {
-            "key": "image",
-            "type": "ThumbnailUrl"
-        },
-        "media": {
-            "key": "media",
-            "type": "[MediaUrl]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "shareable": {
-            "key": "shareable",
-            "type": "bool"
-        },
-        "autoloop": {
-            "key": "autoloop",
-            "type": "bool"
-        },
-        "autostart": {
-            "key": "autostart",
-            "type": "bool"
-        },
-        "aspect": {
-            "key": "aspect",
-            "type": "str"
-        },
-        "duration": {
-            "key": "duration",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "object"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 image=None,
-                 media=None,
-                 buttons=None,
-                 shareable: bool = None,
-                 autoloop: bool = None,
-                 autostart: bool = None,
-                 aspect: str = None,
-                 duration: str = None,
-                 value=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        image=None,
+        media=None,
+        buttons=None,
+        shareable: bool = None,
+        autoloop: bool = None,
+        autostart: bool = None,
+        aspect: str = None,
+        duration: str = None,
+        value=None,
+        **kwargs,
+    ) -> None:
         super(MediaCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -2353,21 +1827,11 @@ class MediaUrl(Model):
     """
 
     _attribute_map = {
-        "url": {
-            "key": "url",
-            "type": "str"
-        },
-        "profile": {
-            "key": "profile",
-            "type": "str"
-        },
+        "url": {"key": "url", "type": "str"},
+        "profile": {"key": "profile", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 url: str = None,
-                 profile: str = None,
-                 **kwargs) -> None:
+    def __init__(self, *, url: str = None, profile: str = None, **kwargs) -> None:
         super(MediaUrl, self).__init__(**kwargs)
         self.url = url
         self.profile = profile
@@ -2400,31 +1864,21 @@ class OAuthCard(Model):
     """
 
     _attribute_map = {
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "token_exchange_resource": {
-            "key": "tokenExchangeResource",
-            "type": "object"
-        },
+        "text": {"key": "text", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "token_exchange_resource": {"key": "tokenExchangeResource", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 text: str = None,
-                 connection_name: str = None,
-                 buttons=None,
-                 token_exchange_resource=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        text: str = None,
+        connection_name: str = None,
+        buttons=None,
+        token_exchange_resource=None,
+        **kwargs,
+    ) -> None:
         super(OAuthCard, self).__init__(**kwargs)
         self.text = text
         self.connection_name = connection_name
@@ -2442,21 +1896,11 @@ class PagedMembersResult(Model):
     """
 
     _attribute_map = {
-        "continuation_token": {
-            "key": "continuationToken",
-            "type": "str"
-        },
-        "members": {
-            "key": "members",
-            "type": "[ChannelAccount]"
-        },
+        "continuation_token": {"key": "continuationToken", "type": "str"},
+        "members": {"key": "members", "type": "[ChannelAccount]"},
     }
 
-    def __init__(self,
-                 *,
-                 continuation_token: str = None,
-                 members=None,
-                 **kwargs) -> None:
+    def __init__(self, *, continuation_token: str = None, members=None, **kwargs) -> None:
         super(PagedMembersResult, self).__init__(**kwargs)
         self.continuation_token = continuation_token
         self.members = members
@@ -2481,36 +1925,16 @@ class Place(Model):
     """
 
     _attribute_map = {
-        "address": {
-            "key": "address",
-            "type": "object"
-        },
-        "geo": {
-            "key": "geo",
-            "type": "object"
-        },
-        "has_map": {
-            "key": "hasMap",
-            "type": "object"
-        },
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
+        "address": {"key": "address", "type": "object"},
+        "geo": {"key": "geo", "type": "object"},
+        "has_map": {"key": "hasMap", "type": "object"},
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 address=None,
-                 geo=None,
-                 has_map=None,
-                 type: str = None,
-                 name: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self, *, address=None, geo=None, has_map=None, type: str = None, name: str = None, **kwargs
+    ) -> None:
         super(Place, self).__init__(**kwargs)
         self.address = address
         self.geo = geo
@@ -2541,51 +1965,29 @@ class ReceiptCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "facts": {
-            "key": "facts",
-            "type": "[Fact]"
-        },
-        "items": {
-            "key": "items",
-            "type": "[ReceiptItem]"
-        },
-        "tap": {
-            "key": "tap",
-            "type": "CardAction"
-        },
-        "total": {
-            "key": "total",
-            "type": "str"
-        },
-        "tax": {
-            "key": "tax",
-            "type": "str"
-        },
-        "vat": {
-            "key": "vat",
-            "type": "str"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
+        "title": {"key": "title", "type": "str"},
+        "facts": {"key": "facts", "type": "[Fact]"},
+        "items": {"key": "items", "type": "[ReceiptItem]"},
+        "tap": {"key": "tap", "type": "CardAction"},
+        "total": {"key": "total", "type": "str"},
+        "tax": {"key": "tax", "type": "str"},
+        "vat": {"key": "vat", "type": "str"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 facts=None,
-                 items=None,
-                 tap=None,
-                 total: str = None,
-                 tax: str = None,
-                 vat: str = None,
-                 buttons=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        facts=None,
+        items=None,
+        tap=None,
+        total: str = None,
+        tax: str = None,
+        vat: str = None,
+        buttons=None,
+        **kwargs,
+    ) -> None:
         super(ReceiptCard, self).__init__(**kwargs)
         self.title = title
         self.facts = facts
@@ -2620,46 +2022,27 @@ class ReceiptItem(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "image": {
-            "key": "image",
-            "type": "CardImage"
-        },
-        "price": {
-            "key": "price",
-            "type": "str"
-        },
-        "quantity": {
-            "key": "quantity",
-            "type": "str"
-        },
-        "tap": {
-            "key": "tap",
-            "type": "CardAction"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "CardImage"},
+        "price": {"key": "price", "type": "str"},
+        "quantity": {"key": "quantity", "type": "str"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 image=None,
-                 price: str = None,
-                 quantity: str = None,
-                 tap=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        image=None,
+        price: str = None,
+        quantity: str = None,
+        tap=None,
+        **kwargs,
+    ) -> None:
         super(ReceiptItem, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -2682,26 +2065,12 @@ class SemanticAction(Model):
     """
 
     _attribute_map = {
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "entities": {
-            "key": "entities",
-            "type": "{Entity}"
-        },
-        "state": {
-            "key": "state",
-            "type": "str"
-        },
+        "id": {"key": "id", "type": "str"},
+        "entities": {"key": "entities", "type": "{Entity}"},
+        "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 id: str = None,
-                 entities=None,
-                 state=None,
-                 **kwargs) -> None:
+    def __init__(self, *, id: str = None, entities=None, state=None, **kwargs) -> None:
         super(SemanticAction, self).__init__(**kwargs)
         self.id = id
         self.entities = entities
@@ -2718,14 +2087,8 @@ class SigninCard(Model):
     """
 
     _attribute_map = {
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
+        "text": {"key": "text", "type": "str"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
     }
 
     def __init__(self, *, text: str = None, buttons=None, **kwargs) -> None:
@@ -2746,14 +2109,8 @@ class SuggestedActions(Model):
     """
 
     _attribute_map = {
-        "to": {
-            "key": "to",
-            "type": "[str]"
-        },
-        "actions": {
-            "key": "actions",
-            "type": "[CardAction]"
-        },
+        "to": {"key": "to", "type": "[str]"},
+        "actions": {"key": "actions", "type": "[CardAction]"},
     }
 
     def __init__(self, *, to=None, actions=None, **kwargs) -> None:
@@ -2773,21 +2130,11 @@ class TextHighlight(Model):
     """
 
     _attribute_map = {
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "occurrence": {
-            "key": "occurrence",
-            "type": "int"
-        },
+        "text": {"key": "text", "type": "str"},
+        "occurrence": {"key": "occurrence", "type": "int"},
     }
 
-    def __init__(self,
-                 *,
-                 text: str = None,
-                 occurrence: int = None,
-                 **kwargs) -> None:
+    def __init__(self, *, text: str = None, occurrence: int = None, **kwargs) -> None:
         super(TextHighlight, self).__init__(**kwargs)
         self.text = text
         self.occurrence = occurrence
@@ -2803,21 +2150,11 @@ class Thing(Model):
     """
 
     _attribute_map = {
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "name": {
-            "key": "name",
-            "type": "str"
-        },
+        "type": {"key": "type", "type": "str"},
+        "name": {"key": "name", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 type: str = None,
-                 name: str = None,
-                 **kwargs) -> None:
+    def __init__(self, *, type: str = None, name: str = None, **kwargs) -> None:
         super(Thing, self).__init__(**kwargs)
         self.type = type
         self.name = name
@@ -2842,41 +2179,25 @@ class ThumbnailCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "images": {
-            "key": "images",
-            "type": "[CardImage]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "tap": {
-            "key": "tap",
-            "type": "CardAction"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "images": {"key": "images", "type": "[CardImage]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "tap": {"key": "tap", "type": "CardAction"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 images=None,
-                 buttons=None,
-                 tap=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        images=None,
+        buttons=None,
+        tap=None,
+        **kwargs,
+    ) -> None:
         super(ThumbnailCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -2896,14 +2217,8 @@ class ThumbnailUrl(Model):
     """
 
     _attribute_map = {
-        "url": {
-            "key": "url",
-            "type": "str"
-        },
-        "alt": {
-            "key": "alt",
-            "type": "str"
-        },
+        "url": {"key": "url", "type": "str"},
+        "alt": {"key": "alt", "type": "str"},
     }
 
     def __init__(self, *, url: str = None, alt: str = None, **kwargs) -> None:
@@ -2926,31 +2241,21 @@ class TokenExchangeInvokeRequest(Model):
     """
 
     _attribute_map = {
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "token": {
-            "key": "token",
-            "type": "str"
-        },
-        "properties": {
-            "key": "properties",
-            "type": "{object}"
-        },
+        "id": {"key": "id", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+        "properties": {"key": "properties", "type": "{object}"},
     }
 
-    def __init__(self,
-                 *,
-                 id: str = None,
-                 connection_name: str = None,
-                 token: str = None,
-                 properties=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        id: str = None,
+        connection_name: str = None,
+        token: str = None,
+        properties=None,
+        **kwargs,
+    ) -> None:
         super(TokenExchangeInvokeRequest, self).__init__(**kwargs)
         self.id = id
         self.connection_name = connection_name
@@ -2972,31 +2277,21 @@ class TokenExchangeInvokeResponse(Model):
     """
 
     _attribute_map = {
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "failure_detail": {
-            "key": "failureDetail",
-            "type": "str"
-        },
-        "properties": {
-            "key": "properties",
-            "type": "{object}"
-        },
+        "id": {"key": "id", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "failure_detail": {"key": "failureDetail", "type": "str"},
+        "properties": {"key": "properties", "type": "{object}"},
     }
 
-    def __init__(self,
-                 *,
-                 id: str = None,
-                 connection_name: str = None,
-                 failure_detail: str = None,
-                 properties=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        id: str = None,
+        connection_name: str = None,
+        failure_detail: str = None,
+        properties=None,
+        **kwargs,
+    ) -> None:
         super(TokenExchangeInvokeResponse, self).__init__(**kwargs)
         self.id = id
         self.connection_name = connection_name
@@ -3020,36 +2315,23 @@ class TokenExchangeState(Model):
     """
 
     _attribute_map = {
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "conversation": {
-            "key": "conversation",
-            "type": "ConversationReference"
-        },
-        "relates_to": {
-            "key": "relatesTo",
-            "type": "ConversationReference"
-        },
-        "bot_url": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "ms_app_id": {
-            "key": "msAppId",
-            "type": "str"
-        },
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "conversation": {"key": "conversation", "type": "ConversationReference"},
+        "relates_to": {"key": "relatesTo", "type": "ConversationReference"},
+        "bot_url": {"key": "connectionName", "type": "str"},
+        "ms_app_id": {"key": "msAppId", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 connection_name: str = None,
-                 conversation=None,
-                 relates_to=None,
-                 bot_url: str = None,
-                 ms_app_id: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        connection_name: str = None,
+        conversation=None,
+        relates_to=None,
+        bot_url: str = None,
+        ms_app_id: str = None,
+        **kwargs,
+    ) -> None:
         super(TokenExchangeState, self).__init__(**kwargs)
         self.connection_name = connection_name
         self.conversation = conversation
@@ -3069,21 +2351,11 @@ class TokenRequest(Model):
     """
 
     _attribute_map = {
-        "provider": {
-            "key": "provider",
-            "type": "str"
-        },
-        "settings": {
-            "key": "settings",
-            "type": "{object}"
-        },
+        "provider": {"key": "provider", "type": "str"},
+        "settings": {"key": "settings", "type": "{object}"},
     }
 
-    def __init__(self,
-                 *,
-                 provider: str = None,
-                 settings=None,
-                 **kwargs) -> None:
+    def __init__(self, *, provider: str = None, settings=None, **kwargs) -> None:
         super(TokenRequest, self).__init__(**kwargs)
         self.provider = provider
         self.settings = settings
@@ -3104,31 +2376,21 @@ class TokenResponse(Model):
     """
 
     _attribute_map = {
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "token": {
-            "key": "token",
-            "type": "str"
-        },
-        "expiration": {
-            "key": "expiration",
-            "type": "str"
-        },
-        "channel_id": {
-            "key": "channelId",
-            "type": "str"
-        },
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+        "expiration": {"key": "expiration", "type": "str"},
+        "channel_id": {"key": "channelId", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 connection_name: str = None,
-                 token: str = None,
-                 expiration: str = None,
-                 channel_id: str = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        connection_name: str = None,
+        token: str = None,
+        expiration: str = None,
+        channel_id: str = None,
+        **kwargs,
+    ) -> None:
         super(TokenResponse, self).__init__(**kwargs)
         self.connection_name = connection_name
         self.token = token
@@ -3144,12 +2406,7 @@ class Transcript(Model):
     :type activities: list[~teams.connector.models.Activity]
     """
 
-    _attribute_map = {
-        "activities": {
-            "key": "activities",
-            "type": "[Activity]"
-        }
-    }
+    _attribute_map = {"activities": {"key": "activities", "type": "[Activity]"}}
 
     def __init__(self, *, activities=None, **kwargs) -> None:
         super(Transcript, self).__init__(**kwargs)
@@ -3192,71 +2449,37 @@ class VideoCard(Model):
     """
 
     _attribute_map = {
-        "title": {
-            "key": "title",
-            "type": "str"
-        },
-        "subtitle": {
-            "key": "subtitle",
-            "type": "str"
-        },
-        "text": {
-            "key": "text",
-            "type": "str"
-        },
-        "image": {
-            "key": "image",
-            "type": "ThumbnailUrl"
-        },
-        "media": {
-            "key": "media",
-            "type": "[MediaUrl]"
-        },
-        "buttons": {
-            "key": "buttons",
-            "type": "[CardAction]"
-        },
-        "shareable": {
-            "key": "shareable",
-            "type": "bool"
-        },
-        "autoloop": {
-            "key": "autoloop",
-            "type": "bool"
-        },
-        "autostart": {
-            "key": "autostart",
-            "type": "bool"
-        },
-        "aspect": {
-            "key": "aspect",
-            "type": "str"
-        },
-        "duration": {
-            "key": "duration",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "object"
-        },
+        "title": {"key": "title", "type": "str"},
+        "subtitle": {"key": "subtitle", "type": "str"},
+        "text": {"key": "text", "type": "str"},
+        "image": {"key": "image", "type": "ThumbnailUrl"},
+        "media": {"key": "media", "type": "[MediaUrl]"},
+        "buttons": {"key": "buttons", "type": "[CardAction]"},
+        "shareable": {"key": "shareable", "type": "bool"},
+        "autoloop": {"key": "autoloop", "type": "bool"},
+        "autostart": {"key": "autostart", "type": "bool"},
+        "aspect": {"key": "aspect", "type": "str"},
+        "duration": {"key": "duration", "type": "str"},
+        "value": {"key": "value", "type": "object"},
     }
 
-    def __init__(self,
-                 *,
-                 title: str = None,
-                 subtitle: str = None,
-                 text: str = None,
-                 image=None,
-                 media=None,
-                 buttons=None,
-                 shareable: bool = None,
-                 autoloop: bool = None,
-                 autostart: bool = None,
-                 aspect: str = None,
-                 duration: str = None,
-                 value=None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        title: str = None,
+        subtitle: str = None,
+        text: str = None,
+        image=None,
+        media=None,
+        buttons=None,
+        shareable: bool = None,
+        autoloop: bool = None,
+        autostart: bool = None,
+        aspect: str = None,
+        duration: str = None,
+        value=None,
+        **kwargs,
+    ) -> None:
         super(VideoCard, self).__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
@@ -3289,31 +2512,15 @@ class AdaptiveCardInvokeAction(Model):
     """
 
     _attribute_map = {
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "verb": {
-            "key": "verb",
-            "type": "str"
-        },
-        "data": {
-            "key": "data",
-            "type": "{object}"
-        },
+        "type": {"key": "type", "type": "str"},
+        "id": {"key": "id", "type": "str"},
+        "verb": {"key": "verb", "type": "str"},
+        "data": {"key": "data", "type": "{object}"},
     }
 
-    def __init__(self,
-                 *,
-                 type: str = None,
-                 id: str = None,
-                 verb: str = None,
-                 data=None,
-                 **kwargs) -> None:
+    def __init__(
+        self, *, type: str = None, id: str = None, verb: str = None, data=None, **kwargs
+    ) -> None:
         super(AdaptiveCardInvokeAction, self).__init__(**kwargs)
         self.type = type
         self.id = id
@@ -3335,26 +2542,12 @@ class AdaptiveCardInvokeResponse(Model):
     """
 
     _attribute_map = {
-        "status_code": {
-            "key": "statusCode",
-            "type": "int"
-        },
-        "type": {
-            "key": "type",
-            "type": "str"
-        },
-        "value": {
-            "key": "value",
-            "type": "{object}"
-        },
+        "status_code": {"key": "statusCode", "type": "int"},
+        "type": {"key": "type", "type": "str"},
+        "value": {"key": "value", "type": "{object}"},
     }
 
-    def __init__(self,
-                 *,
-                 status_code: int = None,
-                 type: str = None,
-                 value=None,
-                 **kwargs) -> None:
+    def __init__(self, *, status_code: int = None, type: str = None, value=None, **kwargs) -> None:
         super(AdaptiveCardInvokeResponse, self).__init__(**kwargs)
         self.status_code = status_code
         self.type = type
@@ -3375,26 +2568,12 @@ class AdaptiveCardInvokeValue(Model):
     """
 
     _attribute_map = {
-        "action": {
-            "key": "action",
-            "type": "{object}"
-        },
-        "authentication": {
-            "key": "authentication",
-            "type": "{object}"
-        },
-        "state": {
-            "key": "state",
-            "type": "str"
-        },
+        "action": {"key": "action", "type": "{object}"},
+        "authentication": {"key": "authentication", "type": "{object}"},
+        "state": {"key": "state", "type": "str"},
     }
 
-    def __init__(self,
-                 *,
-                 action=None,
-                 authentication=None,
-                 state: str = None,
-                 **kwargs) -> None:
+    def __init__(self, *, action=None, authentication=None, state: str = None, **kwargs) -> None:
         super(AdaptiveCardInvokeValue, self).__init__(**kwargs)
         self.action = action
         self.authentication = authentication

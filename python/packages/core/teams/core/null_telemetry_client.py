@@ -7,7 +7,6 @@ from .bot_telemetry_client import BotTelemetryClient, TelemetryDataPointType, Se
 
 
 class NullTelemetryClient(BotTelemetryClient):
-
     def __init__(self):
         return
 

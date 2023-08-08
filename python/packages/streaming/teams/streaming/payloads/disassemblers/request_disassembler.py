@@ -11,7 +11,6 @@ from .payload_disassembler import PayloadDisassembler
 
 
 class RequestDisassembler(PayloadDisassembler):
-
     def __init__(
         self,
         sender: PayloadSender,
@@ -27,8 +26,7 @@ class RequestDisassembler(PayloadDisassembler):
         return PayloadTypes.REQUEST
 
     async def get_stream(self) -> List[int]:
-        payload = RequestPayload(verb=self.request.verb,
-                                 path=self.request.path)
+        payload = RequestPayload(verb=self.request.verb, path=self.request.path)
 
         if self.request.streams:
             payload.streams = [

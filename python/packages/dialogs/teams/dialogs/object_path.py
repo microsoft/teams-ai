@@ -11,9 +11,7 @@ class ObjectPath:
     """
 
     @staticmethod
-    def assign(start_object,
-               overlay_object,
-               default: Union[Callable, object] = None):
+    def assign(start_object, overlay_object, default: Union[Callable, object] = None):
         """
         Creates a new object by overlaying values in start_object with non-null values from overlay_object.
 
@@ -51,10 +49,10 @@ class ObjectPath:
                             # recursive class copy
                             merge(target_value.__dict__, source_value.__dict__)
 
-            target_dict = merged if isinstance(merged,
-                                               dict) else merged.__dict__
-            overlay_dict = (overlay_object if isinstance(overlay_object, dict)
-                            else overlay_object.__dict__)
+            target_dict = merged if isinstance(merged, dict) else merged.__dict__
+            overlay_dict = (
+                overlay_object if isinstance(overlay_object, dict) else overlay_object.__dict__
+            )
             merge(target_dict, overlay_dict)
 
             return merged
@@ -98,8 +96,7 @@ class ObjectPath:
                     else:
                         ObjectPath.__set_object_segment(current, segment, [])
 
-                    next_obj = ObjectPath.__get_object_property(
-                        current, segment)
+                    next_obj = ObjectPath.__get_object_property(current, segment)
 
             current = next_obj
 
@@ -107,9 +104,7 @@ class ObjectPath:
         ObjectPath.__set_object_segment(current, last_segment, value)
 
     @staticmethod
-    def get_path_value(obj,
-                       path: str,
-                       default: Union[Callable, object] = None) -> object:
+    def get_path_value(obj, path: str, default: Union[Callable, object] = None) -> object:
         """
         Get the value for a path relative to an object.
         """
@@ -200,16 +195,14 @@ class ObjectPath:
         return value
 
     @staticmethod
-    def try_resolve_path(obj,
-                         property_path: str,
-                         evaluate: bool = False) -> []:
+    def try_resolve_path(obj, property_path: str, evaluate: bool = False) -> []:
         so_far = []
         first = property_path[0] if property_path else " "
         if first in ("'", '"'):
             if not property_path.endswith(first):
                 return None
 
-            so_far.append(property_path[1:len(property_path) - 2])
+            so_far.append(property_path[1 : len(property_path) - 2])
         elif ObjectPath.is_int(property_path):
             so_far.append(int(property_path))
         else:
@@ -304,9 +297,7 @@ class ObjectPath:
     def __get_object_property(obj, property_name: str):
         # doing a case insensitive search
         property_name_lower = property_name.lower()
-        matching = [
-            obj[key] for key in obj if key.lower() == property_name_lower
-        ]
+        matching = [obj[key] for key in obj if key.lower() == property_name_lower]
         return matching[0] if matching else None
 
     @staticmethod

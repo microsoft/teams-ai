@@ -47,8 +47,7 @@ class BotTelemetryMiddleware:
         """Process the incoming Django request."""
         # Bot Service doesn't handle anything over 256k
         # TODO: Add length check
-        body_unicode = (request.body.decode("utf-8")
-                        if request.method == "POST" else None)
+        body_unicode = request.body.decode("utf-8") if request.method == "POST" else None
         # Sanity check JSON
         if body_unicode is not None:
             # Integration layer expecting just the json text.

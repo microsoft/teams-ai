@@ -18,8 +18,9 @@ from .user_token_provider import UserTokenProvider
 class ExtendedUserTokenProvider(UserTokenProvider, ABC):
     # pylint: disable=unused-argument
 
-    async def get_sign_in_resource(self, turn_context: TurnContext,
-                                   connection_name: str) -> SignInUrlResponse:
+    async def get_sign_in_resource(
+        self, turn_context: TurnContext, connection_name: str
+    ) -> SignInUrlResponse:
         """
         Get the raw signin link to be sent to the user for signin for a connection name.
 

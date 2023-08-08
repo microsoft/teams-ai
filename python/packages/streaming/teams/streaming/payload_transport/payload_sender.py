@@ -18,22 +18,16 @@ from .send_packet import SendPacket
 
 # TODO: consider interface this class
 class PayloadSender:
-
     def __init__(self):
         self._connected_event = Event()
         self._sender: TransportSenderBase = None
         self._is_disconnecting: bool = False
-        self._send_header_buffer: List[int] = [
-            None
-        ] * TransportConstants.MAX_HEADER_LENGTH
-        self._send_content_buffer: List[int] = [
-            None
-        ] * TransportConstants.MAX_PAYLOAD_LENGTH
+        self._send_header_buffer: List[int] = [None] * TransportConstants.MAX_HEADER_LENGTH
+        self._send_content_buffer: List[int] = [None] * TransportConstants.MAX_PAYLOAD_LENGTH
 
         self._send_queue = SendQueue(action=self._write_packet)
 
-        self.disconnected: Callable[[object, DisconnectedEventArgs],
-                                    None] = None
+        self.disconnected: Callable[[object, DisconnectedEventArgs], None] = None
 
     @property
     def is_connected(self) -> bool:
@@ -41,8 +35,7 @@ class PayloadSender:
 
     def connect(self, sender: TransportSenderBase):
         if self._sender:
-            raise RuntimeError(
-                f"{self.__class__.__name__} instance already connected.")
+            raise RuntimeError(f"{self.__class__.__name__} instance already connected.")
 
         self._sender = sender
         self._connected_event.set()
@@ -84,15 +77,10 @@ class PayloadSender:
                     self._connected_event.clear()
                     if callable(self.disconnected):
                         # pylint: disable=not-callable
-                        if iscoroutinefunction(self.disconnected) or isfuture(
-                                self.disconnected):
-                            await self.disconnected(
-                                self, event_args
-                                or DisconnectedEventArgs.empty)
+                        if iscoroutinefunction(self.disconnected) or isfuture(self.disconnected):
+                            await self.disconnected(self, event_args or DisconnectedEventArgs.empty)
                         else:
-                            self.disconnected(
-                                self, event_args
-                                or DisconnectedEventArgs.empty)
+                            self.disconnected(self, event_args or DisconnectedEventArgs.empty)
             finally:
                 self._is_disconnecting = False
 
@@ -105,12 +93,10 @@ class PayloadSender:
                 count = packet.header.payload_length
                 packet.header.end = count == 0
 
-            header_length = HeaderSerializer.serialize(
-                packet.header, self._send_header_buffer, 0)
+            header_length = HeaderSerializer.serialize(packet.header, self._send_header_buffer, 0)
 
             # Send: Packet Header
-            length = await self._sender.send(self._send_header_buffer, 0,
-                                             header_length)
+            length = await self._sender.send(self._send_header_buffer, 0, header_length)
             if not length:
                 # TODO: make custom exception
                 raise Exception("TransportDisconnectedException")
@@ -124,8 +110,8 @@ class PayloadSender:
                 if not packet.is_length_known:
                     # Send: Packet content
                     length = await self._sender.send(
-                        self._send_content_buffer, 0,
-                        packet.header.payload_length)
+                        self._send_content_buffer, 0, packet.header.payload_length
+                    )
                     if length == 0:
                         # TODO: make custom exception
                         raise Exception("TransportDisconnectedException")
@@ -139,12 +125,10 @@ class PayloadSender:
                         # copy the stream to the buffer
                         # TODO: this has to be improved in custom buffer class (validate buffer ended)
                         for index in range(count):
-                            self._send_content_buffer[index] = packet.payload[
-                                index]
+                            self._send_content_buffer[index] = packet.payload[index]
 
                         # Send: Packet content
-                        length = await self._sender.send(
-                            self._send_content_buffer, 0, count)
+                        length = await self._sender.send(self._send_content_buffer, 0, count)
                         if length == 0:
                             # TODO: make custom exception
                             raise Exception("TransportDisconnectedException")

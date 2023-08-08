@@ -25,7 +25,7 @@ from .dialog_path import DialogPath
 from .dialog_state_manager_configuration import DialogStateManagerConfiguration
 
 # Declare type variable
-T = TypeVar("T")    # pylint: disable=invalid-name
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 BUILTIN_TYPES = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 
@@ -36,7 +36,6 @@ BUILTIN_TYPES = list(filter(lambda x: not x.startswith("_"), dir(builtins)))
 # PathResolvers allow for shortcut behavior for mapping things like $foo -> dialog.foo.
 # </summary>
 class DialogStateManager:
-
     SEPARATORS = [",", "["]
 
     def __init__(
@@ -71,15 +70,16 @@ class DialogStateManager:
             raise TypeError(f"Expecting: DialogContext, but received None")
 
         self._configuration = configuration or dialog_context.context.turn_state.get(
-            DialogStateManagerConfiguration.__name__, None)
+            DialogStateManagerConfiguration.__name__, None
+        )
         if not self._configuration:
             self._configuration = DialogStateManagerConfiguration()
 
             # get all of the component memory scopes
             memory_component: ComponentMemoryScopesBase
             for memory_component in filter(
-                    lambda comp: isinstance(comp, ComponentMemoryScopesBase),
-                    ComponentRegistration.get_components(),
+                lambda comp: isinstance(comp, ComponentMemoryScopesBase),
+                ComponentRegistration.get_components(),
             ):
                 for memory_scope in memory_component.get_memory_scopes():
                     self._configuration.memory_scopes.append(memory_scope)
@@ -87,15 +87,16 @@ class DialogStateManager:
             # get all of the component path resolvers
             path_component: ComponentPathResolversBase
             for path_component in filter(
-                    lambda comp: isinstance(comp, ComponentPathResolversBase),
-                    ComponentRegistration.get_components(),
+                lambda comp: isinstance(comp, ComponentPathResolversBase),
+                ComponentRegistration.get_components(),
             ):
                 for path_resolver in path_component.get_path_resolvers():
                     self._configuration.path_resolvers.append(path_resolver)
 
         # cache for any other new dialog_state_manager instances in this turn.
         dialog_context.context.turn_state[
-            self._configuration.__class__.__name__] = self._configuration
+            self._configuration.__class__.__name__
+        ] = self._configuration
 
     def __len__(self) -> int:
         """
@@ -118,10 +119,7 @@ class DialogStateManager:
         Gets a Iterable containing the keys of the memory scopes
         :return: Keys of the memory scopes.
         """
-        return [
-            memory_scope.name
-            for memory_scope in self.configuration.memory_scopes
-        ]
+        return [memory_scope.name for memory_scope in self.configuration.memory_scopes]
 
     @property
     def values(self) -> Iterable[object]:
@@ -194,8 +192,11 @@ class DialogStateManager:
             raise TypeError(f"Expecting: {str.__name__}, but received None")
 
         return next(
-            (memory_scope for memory_scope in self.configuration.memory_scopes
-             if memory_scope.name.lower() == name.lower()),
+            (
+                memory_scope
+                for memory_scope in self.configuration.memory_scopes
+                if memory_scope.name.lower() == name.lower()
+            ),
             None,
         )
 
@@ -230,7 +231,7 @@ class DialogStateManager:
             scope = path[0:sep_index]
             memory_scope = self.get_memory_scope(scope)
             if memory_scope:
-                remaining_path = path[sep_index + 1:]
+                remaining_path = path[sep_index + 1 :]
                 return memory_scope, remaining_path
 
         memory_scope = self.get_memory_scope(scope)
@@ -253,9 +254,7 @@ class DialogStateManager:
     def _is_primitive(type_to_check: Type) -> bool:
         return type_to_check.__name__ in BUILTIN_TYPES
 
-    def try_get_value(self,
-                      path: str,
-                      class_type: Type = object) -> Tuple[bool, object]:
+    def try_get_value(self, path: str, class_type: Type = object) -> Tuple[bool, object]:
         """
         Get the value from memory using path expression (NOTE: This always returns clone of value).
         :param class_type: The value type to return.
@@ -264,8 +263,7 @@ class DialogStateManager:
         """
         if not path:
             raise TypeError(f"Expecting: {str.__name__}, but received None")
-        return_value = (class_type() if
-                        DialogStateManager._is_primitive(class_type) else None)
+        return_value = class_type() if DialogStateManager._is_primitive(class_type) else None
         path = self.transform_path(path)
 
         try:
@@ -292,15 +290,14 @@ class DialogStateManager:
         except ValueError:
             i_first = -1
         if i_first >= 0:
-            remaining_path = path[i_first + len(first):]
+            remaining_path = path[i_first + len(first) :]
             path = path[0:i_first]
             success, first_value = self._try_get_first_nested_value(path, self)
             if success:
                 if not remaining_path:
                     return True, first_value
 
-                path_value = self._object_path_cls.try_get_path_value(
-                    first_value, remaining_path)
+                path_value = self._object_path_cls.try_get_path_value(first_value, remaining_path)
                 return bool(path_value), path_value
 
             return False, return_value
@@ -330,9 +327,7 @@ class DialogStateManager:
 
         return default_value() if default_value else None
 
-    def get_int_value(self,
-                      path_expression: str,
-                      default_value: int = 0) -> int:
+    def get_int_value(self, path_expression: str, default_value: int = 0) -> int:
         """
         Get an int value from memory using a path expression.
         :param path_expression: Path expression to use.
@@ -347,9 +342,7 @@ class DialogStateManager:
 
         return default_value
 
-    def get_bool_value(self,
-                       path_expression: str,
-                       default_value: bool = False) -> bool:
+    def get_bool_value(self, path_expression: str, default_value: bool = False) -> bool:
         """
         Get a bool value from memory using a path expression.
         :param path_expression: Path expression to use.
@@ -364,9 +357,7 @@ class DialogStateManager:
 
         return default_value
 
-    def get_string_value(self,
-                         path_expression: str,
-                         default_value: str = "") -> str:
+    def get_string_value(self, path_expression: str, default_value: str = "") -> str:
         """
         Get a string value from memory using a path expression.
         :param path_expression: Path expression to use.
@@ -389,8 +380,7 @@ class DialogStateManager:
         :return:
         """
         if isawaitable(value):
-            raise Exception(
-                f"{path} = You can't pass an awaitable to set_value")
+            raise Exception(f"{path} = You can't pass an awaitable to set_value")
 
         if not path:
             raise TypeError(f"Expecting: {str.__name__}, but received None")
@@ -423,10 +413,7 @@ class DialogStateManager:
         """
         result = {}
 
-        for scope in [
-                ms for ms in self.configuration.memory_scopes
-                if ms.include_in_snapshot
-        ]:
+        for scope in [ms for ms in self.configuration.memory_scopes if ms.include_in_snapshot]:
             memory = scope.get_memory(self._dialog_context)
             if memory:
                 result[scope.name] = memory
@@ -456,13 +443,9 @@ class DialogStateManager:
         :return:
         """
         name = name.upper()
-        scope_list = [
-            ms for ms in self.configuration.memory_scopes
-            if ms.name.upper == name
-        ]
+        scope_list = [ms for ms in self.configuration.memory_scopes if ms.name.upper == name]
         if len(scope_list) > 1:
-            raise RuntimeError(
-                f"More than 1 scopes found with the name '{name}'")
+            raise RuntimeError(f"More than 1 scopes found with the name '{name}'")
         scope = scope_list[0] if scope_list else None
         if scope:
             await scope.delete(self._dialog_context)
@@ -483,8 +466,7 @@ class DialogStateManager:
         :return: True if the dialog state manager contains an element with the key otherwise, False.
         """
         scopes_with_key = [
-            ms for ms in self.configuration.memory_scopes
-            if ms.name.upper == key.upper()
+            ms for ms in self.configuration.memory_scopes if ms.name.upper == key.upper()
         ]
         return bool(scopes_with_key)
 
@@ -557,8 +539,7 @@ class DialogStateManager:
         :return: An enumerator that can be used to iterate through the collection.
         """
         for memory_scope in self.configuration.memory_scopes:
-            yield (memory_scope.name,
-                   memory_scope.get_memory(self._dialog_context))
+            yield (memory_scope.name, memory_scope.get_memory(self._dialog_context))
 
     def track_paths(self, paths: Iterable[str]) -> List[str]:
         """
@@ -589,8 +570,7 @@ class DialogStateManager:
         found = False
         if paths:
             for path in paths:
-                if self.get_value(int,
-                                  self.path_tracker + "." + path) > counter:
+                if self.get_value(int, self.path_tracker + "." + path) > counter:
                     found = True
                     break
 
@@ -598,12 +578,10 @@ class DialogStateManager:
 
     def __iter__(self):
         for memory_scope in self.configuration.memory_scopes:
-            yield (memory_scope.name,
-                   memory_scope.get_memory(self._dialog_context))
+            yield (memory_scope.name, memory_scope.get_memory(self._dialog_context))
 
     @staticmethod
-    def _try_get_first_nested_value(remaining_path: str,
-                                    memory: object) -> Tuple[bool, object]:
+    def _try_get_first_nested_value(remaining_path: str, memory: object) -> Tuple[bool, object]:
         # These modules are imported at static level to avoid circular dependency problems
         # pylint: disable=import-outside-toplevel
 
@@ -641,8 +619,7 @@ class DialogStateManager:
                     last_changed = self.try_get_value(tracked_path, int)
                     if last_changed:
                         if counter is not None:
-                            counter = self.get_value(int,
-                                                     DialogPath.EVENT_COUNTER)
+                            counter = self.get_value(int, DialogPath.EVENT_COUNTER)
 
                         self.set_value(tracked_path, counter)
 
@@ -655,15 +632,12 @@ class DialogStateManager:
                         tracked_path += "_" + property.lower()
                         update()
                         if not self._is_primitive(type(instance)):
-                            self._object_path_cls.for_each_property(
-                                property, check_children)
+                            self._object_path_cls.for_each_property(property, check_children)
 
                         # Remove added child segment
-                        tracked_path = tracked_path.Substring(
-                            0, tracked_path.LastIndexOf("_"))
+                        tracked_path = tracked_path.Substring(0, tracked_path.LastIndexOf("_"))
 
-                    self._object_path_cls.for_each_property(
-                        value, check_children)
+                    self._object_path_cls.for_each_property(value, check_children)
 
             has_path = True
 

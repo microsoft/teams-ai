@@ -5,12 +5,12 @@ from abc import ABC
 
 
 class AuthenticationConstants(ABC):
-
     # TO CHANNEL FROM BOT: Login URL
     #
     # DEPRECATED: DO NOT USE
     TO_CHANNEL_FROM_BOT_LOGIN_URL = (
-        "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token")
+        "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
+    )
 
     # TO CHANNEL FROM BOT: Login URL prefix
     TO_CHANNEL_FROM_BOT_LOGIN_URL_PREFIX = "https://login.microsoftonline.com/"
@@ -45,12 +45,14 @@ class AuthenticationConstants(ABC):
 
     # TO BOT FROM CHANNEL: OpenID metadata document for tokens coming from MSA
     TO_BOT_FROM_CHANNEL_OPEN_ID_METADATA_URL = (
-        "https://login.botframework.com/v1/.well-known/openidconfiguration")
+        "https://login.botframework.com/v1/.well-known/openidconfiguration"
+    )
 
     # TO BOT FROM ENTERPRISE CHANNEL: OpenID metadata document for tokens coming from MSA
     TO_BOT_FROM_ENTERPRISE_CHANNEL_OPEN_ID_METADATA_URL_FORMAT = (
         "https://{channelService}.enterprisechannel.botframework.com"
-        "/v1/.well-known/openidconfiguration")
+        "/v1/.well-known/openidconfiguration"
+    )
 
     # TO BOT FROM EMULATOR: OpenID metadata document for tokens coming from MSA
     TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL = (

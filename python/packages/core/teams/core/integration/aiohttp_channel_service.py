@@ -16,8 +16,7 @@ from teams.schema import (
 from teams.core import ChannelServiceHandler
 
 
-async def deserialize_from_body(request: Request,
-                                target_model: Type[Model]) -> Activity:
+async def deserialize_from_body(request: Request, target_model: Type[Model]) -> Activity:
     if "application/json" in request.headers["Content-Type"]:
         body = await request.json()
     else:
@@ -26,8 +25,7 @@ async def deserialize_from_body(request: Request,
     return target_model().deserialize(body)
 
 
-def get_serialized_response(
-        model_or_list: Union[Model, List[Model]]) -> Response:
+def get_serialized_response(model_or_list: Union[Model, List[Model]]) -> Response:
     if isinstance(model_or_list, Model):
         json_obj = model_or_list.serialize()
     else:
@@ -36,8 +34,9 @@ def get_serialized_response(
     return Response(body=json.dumps(json_obj), content_type="application/json")
 
 
-def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
-                                   base_url: str = "") -> RouteTableDef:
+def aiohttp_channel_service_routes(
+    handler: ChannelServiceHandler, base_url: str = ""
+) -> RouteTableDef:
     # pylint: disable=unused-variable
     routes = RouteTableDef()
 
@@ -52,9 +51,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return get_serialized_response(result)
 
-    @routes.post(
-        base_url +
-        "/v3/conversations/{conversation_id}/activities/{activity_id}")
+    @routes.post(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
     async def reply_to_activity(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_reply_to_activity(
@@ -66,8 +63,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return get_serialized_response(result)
 
-    @routes.put(base_url +
-                "/v3/conversations/{conversation_id}/activities/{activity_id}")
+    @routes.put(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
     async def update_activity(request: Request):
         activity = await deserialize_from_body(request, Activity)
         result = await handler.handle_update_activity(
@@ -79,9 +75,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return get_serialized_response(result)
 
-    @routes.delete(
-        base_url +
-        "/v3/conversations/{conversation_id}/activities/{activity_id}")
+    @routes.delete(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}")
     async def delete_activity(request: Request):
         await handler.handle_delete_activity(
             request.headers.get("Authorization"),
@@ -91,9 +85,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return Response()
 
-    @routes.get(
-        base_url +
-        "/v3/conversations/{conversation_id}/activities/{activity_id}/members")
+    @routes.get(base_url + "/v3/conversations/{conversation_id}/activities/{activity_id}/members")
     async def get_activity_members(request: Request):
         result = await handler.handle_get_activity_members(
             request.headers.get("Authorization"),
@@ -105,18 +97,17 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
     @routes.post(base_url + "/")
     async def create_conversation(request: Request):
-        conversation_parameters = deserialize_from_body(
-            request, ConversationParameters)
+        conversation_parameters = deserialize_from_body(request, ConversationParameters)
         result = await handler.handle_create_conversation(
-            request.headers.get("Authorization"), conversation_parameters)
+            request.headers.get("Authorization"), conversation_parameters
+        )
 
         return get_serialized_response(result)
 
     @routes.get(base_url + "/")
     async def get_conversation(request: Request):
         # TODO: continuation token?
-        result = await handler.handle_get_conversations(
-            request.headers.get("Authorization"))
+        result = await handler.handle_get_conversations(request.headers.get("Authorization"))
 
         return get_serialized_response(result)
 
@@ -129,8 +120,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return get_serialized_response(result)
 
-    @routes.get(base_url +
-                "/v3/conversations/{conversation_id}/members/{member_id}")
+    @routes.get(base_url + "/v3/conversations/{conversation_id}/members/{member_id}")
     async def get_conversation_member(request: Request):
         result = await handler.handle_get_conversation_member(
             request.headers.get("Authorization"),
@@ -149,8 +139,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return get_serialized_response(result)
 
-    @routes.delete(base_url +
-                   "/v3/conversations/{conversation_id}/members/{member_id}")
+    @routes.delete(base_url + "/v3/conversations/{conversation_id}/members/{member_id}")
     async def delete_conversation_member(request: Request):
         result = await handler.handle_delete_conversation_member(
             request.headers.get("Authorization"),
@@ -160,8 +149,7 @@ def aiohttp_channel_service_routes(handler: ChannelServiceHandler,
 
         return get_serialized_response(result)
 
-    @routes.post(base_url +
-                 "/v3/conversations/{conversation_id}/activities/history")
+    @routes.post(base_url + "/v3/conversations/{conversation_id}/activities/history")
     async def send_conversation_history(request: Request):
         transcript = deserialize_from_body(request, Transcript)
         result = await handler.handle_send_conversation_history(

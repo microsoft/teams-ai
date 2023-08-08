@@ -7,9 +7,7 @@ from .channel_service_handler import ChannelServiceHandler
 
 
 class CloudChannelServiceHandler(ChannelServiceHandler):
-
-    def __init__(    # pylint: disable=super-init-not-called
-            self, auth: BotFrameworkAuthentication):
+    def __init__(self, auth: BotFrameworkAuthentication):  # pylint: disable=super-init-not-called
         if not auth:
             raise TypeError("Auth can't be None")
         self._auth = auth

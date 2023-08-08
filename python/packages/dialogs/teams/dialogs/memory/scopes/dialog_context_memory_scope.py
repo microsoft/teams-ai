@@ -7,7 +7,6 @@ from .memory_scope import MemoryScope
 
 
 class DialogContextMemoryScope(MemoryScope):
-
     def __init__(self):
         # pylint: disable=invalid-name
 
@@ -50,13 +49,15 @@ class DialogContextMemoryScope(MemoryScope):
 
         # top of stack is stack[0].
         memory[self.STACK] = stack
-        memory[self.ACTIVE_DIALOG] = (dialog_context.active_dialog.id if
-                                      dialog_context.active_dialog else None)
+        memory[self.ACTIVE_DIALOG] = (
+            dialog_context.active_dialog.id if dialog_context.active_dialog else None
+        )
         memory[self.PARENT] = (
-            dialog_context.parent.active_dialog.id if dialog_context.parent
-            and dialog_context.parent.active_dialog else None)
+            dialog_context.parent.active_dialog.id
+            if dialog_context.parent and dialog_context.parent.active_dialog
+            else None
+        )
         return memory
 
     def set_memory(self, dialog_context: "DialogContext", memory: object):
-        raise Exception(
-            f"{self.__class__.__name__}.set_memory not supported (read only)")
+        raise Exception(f"{self.__class__.__name__}.set_memory not supported (read only)")

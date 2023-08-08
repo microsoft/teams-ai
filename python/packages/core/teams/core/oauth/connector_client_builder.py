@@ -12,10 +12,9 @@ class ConnectorClientBuilder(ABC):
     """
 
     @abstractmethod
-    async def create_connector_client(self,
-                                      service_url: str,
-                                      identity: ClaimsIdentity = None,
-                                      audience: str = None) -> ConnectorClient:
+    async def create_connector_client(
+        self, service_url: str, identity: ClaimsIdentity = None, audience: str = None
+    ) -> ConnectorClient:
         """
         Creates the connector client asynchronous.
 

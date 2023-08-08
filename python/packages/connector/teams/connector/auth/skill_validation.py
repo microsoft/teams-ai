@@ -25,14 +25,14 @@ class SkillValidation:
 
     _token_validation_parameters = VerifyOptions(
         issuer=[
-            "https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/",    # Auth v3.1, 1.0 token
-            "https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0",    # Auth v3.1, 2.0 token
-            "https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",    # Auth v3.2, 1.0 token
-            "https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",    # Auth v3.2, 2.0 token
-            "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",    # Auth for US Gov, 1.0 token
-            "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",    # Auth for US Gov, 2.0 token
-            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",    # Auth for US Gov, 1.0 token
-            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",    # Auth for US Gov, 2.0 token
+            "https://sts.windows.net/d6d49420-f39b-4df7-a1dc-d59a935871db/",  # Auth v3.1, 1.0 token
+            "https://login.microsoftonline.com/d6d49420-f39b-4df7-a1dc-d59a935871db/v2.0",  # Auth v3.1, 2.0 token
+            "https://sts.windows.net/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth v3.2, 1.0 token
+            "https://login.microsoftonline.com/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth v3.2, 2.0 token
+            "https://sts.windows.net/cab8a31a-1906-4287-a0d8-4eef66b95f6e/",  # Auth for US Gov, 1.0 token
+            "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0",  # Auth for US Gov, 2.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/",  # Auth for US Gov, 1.0 token
+            "https://login.microsoftonline.us/f8cdef31-a31e-4b4a-93e4-5f571e91255a/v2.0",  # Auth for US Gov, 2.0 token
         ],
         audience=None,
         clock_tolerance=timedelta(minutes=5),
@@ -64,9 +64,10 @@ class SkillValidation:
         :param claims: A dict of claims.
         :return bool:
         """
-        if (claims.get(
-                AuthenticationConstants.APP_ID_CLAIM,
-                None) == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID):
+        if (
+            claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
+            == AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
+        ):
             return True
 
         if AuthenticationConstants.VERSION_CLAIM not in claims:
@@ -75,8 +76,7 @@ class SkillValidation:
         audience = claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
 
         # The audience is https://api.botframework.com and not an appId.
-        if (not audience or audience
-                == AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER):
+        if not audience or audience == AuthenticationConstants.TO_BOT_FROM_CHANNEL_TOKEN_ISSUER:
             return False
 
         from .jwt_token_validation import JwtTokenValidation
@@ -107,13 +107,13 @@ class SkillValidation:
         if isinstance(channel_service_or_provider, ChannelProvider):
             is_gov = channel_service_or_provider.is_government()
         else:
-            is_gov = JwtTokenValidation.is_government(
-                channel_service_or_provider)
+            is_gov = JwtTokenValidation.is_government(channel_service_or_provider)
 
         open_id_metadata_url = (
             GovernmentConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
-            if is_gov else
-            AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL)
+            if is_gov
+            else AuthenticationConstants.TO_BOT_FROM_EMULATOR_OPEN_ID_METADATA_URL
+        )
 
         token_extractor = JwtTokenExtractor(
             SkillValidation._token_validation_parameters,
@@ -122,7 +122,8 @@ class SkillValidation:
         )
 
         identity = await token_extractor.get_identity_from_auth_header(
-            auth_header, channel_id, auth_configuration.required_endorsements)
+            auth_header, channel_id, auth_configuration.required_endorsements
+        )
         await SkillValidation._validate_identity(identity, credentials)
 
         return identity
@@ -134,17 +135,13 @@ class SkillValidation:
         :return ClaimsIdentity:
         """
         return ClaimsIdentity(
-            {
-                AuthenticationConstants.APP_ID_CLAIM:
-                AuthenticationConstants.ANONYMOUS_SKILL_APP_ID
-            },
+            {AuthenticationConstants.APP_ID_CLAIM: AuthenticationConstants.ANONYMOUS_SKILL_APP_ID},
             True,
             AuthenticationConstants.ANONYMOUS_AUTH_TYPE,
         )
 
     @staticmethod
-    async def _validate_identity(identity: ClaimsIdentity,
-                                 credentials: CredentialProvider):
+    async def _validate_identity(identity: ClaimsIdentity, credentials: CredentialProvider):
         if not identity:
             # No valid identity. Not Authorized.
             raise PermissionError("Invalid Identity")
@@ -153,8 +150,7 @@ class SkillValidation:
             # The token is in some way invalid. Not Authorized.
             raise PermissionError("Token Not Authenticated")
 
-        version_claim = identity.claims.get(
-            AuthenticationConstants.VERSION_CLAIM)
+        version_claim = identity.claims.get(AuthenticationConstants.VERSION_CLAIM)
         if not version_claim:
             # No version claim
             raise PermissionError(
@@ -162,8 +158,7 @@ class SkillValidation:
             )
 
         # Look for the "aud" claim, but only if issued from the Bot Framework
-        audience_claim = identity.claims.get(
-            AuthenticationConstants.AUDIENCE_CLAIM)
+        audience_claim = identity.claims.get(AuthenticationConstants.AUDIENCE_CLAIM)
         if not audience_claim:
             # Claim is not present or doesn't have a value. Not Authorized.
             raise PermissionError(

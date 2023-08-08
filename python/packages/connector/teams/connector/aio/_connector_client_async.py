@@ -61,8 +61,7 @@ class ConnectorClient(BotFrameworkSDKClientAsync):
         pipeline_type: Optional[Type[AsyncPipeline]] = None,
         sender: Optional[AsyncHTTPSender] = None,
         driver: Optional[AsyncHttpDriver] = None,
-        custom_configuration: Optional[
-            BotFrameworkConnectorConfiguration] = None,
+        custom_configuration: Optional[BotFrameworkConnectorConfiguration] = None,
     ):
         if custom_configuration:
             self.config = custom_configuration
@@ -76,17 +75,14 @@ class ConnectorClient(BotFrameworkSDKClientAsync):
             )
         super(ConnectorClient, self).__init__(self.config)
 
-        client_models = {
-            k: v
-            for k, v in models.__dict__.items() if isinstance(v, type)
-        }
+        client_models = {k: v for k, v in models.__dict__.items() if isinstance(v, type)}
         self.api_version = "v3"
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 
-        self.attachments = AttachmentsOperations(self._client, self.config,
-                                                 self._serialize,
-                                                 self._deserialize)
-        self.conversations = ConversationsOperations(self._client, self.config,
-                                                     self._serialize,
-                                                     self._deserialize)
+        self.attachments = AttachmentsOperations(
+            self._client, self.config, self._serialize, self._deserialize
+        )
+        self.conversations = ConversationsOperations(
+            self._client, self.config, self._serialize, self._deserialize
+        )

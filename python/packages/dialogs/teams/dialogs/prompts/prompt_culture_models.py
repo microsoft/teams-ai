@@ -79,7 +79,7 @@ class PromptCultureModels:
     )
 
     German = PromptCultureModel(
-    # TODO: Replace with Culture.German after Recognizers-Text package updates.
+        # TODO: Replace with Culture.German after Recognizers-Text package updates.
         locale="de-de",
         inline_or=" oder ",
         inline_or_more=", oder ",

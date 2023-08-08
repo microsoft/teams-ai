@@ -14,8 +14,7 @@ class RegisterClassMiddleware(Middleware):
         self.service = service
         self._key = key
 
-    async def on_turn(self, context: TurnContext,
-                      logic: Callable[[TurnContext], Awaitable]):
+    async def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         # C# has TurnStateCollection with has overrides for adding items
         # to TurnState.  Python does not.  In C#'s case, there is an 'Add'
         # to handle adding object, and that uses the fully qualified class name.
@@ -27,5 +26,5 @@ class RegisterClassMiddleware(Middleware):
     def fullname(obj):
         module = obj.__class__.__module__
         if module is None or module == str.__class__.__module__:
-            return obj.__class__.__name__    # Avoid reporting __builtin__
+            return obj.__class__.__name__  # Avoid reporting __builtin__
         return module + "." + obj.__class__.__name__

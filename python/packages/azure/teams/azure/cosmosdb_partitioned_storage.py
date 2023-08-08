@@ -10,8 +10,8 @@ import json
 from azure.cosmos import documents, http_constants
 from jsonpickle.pickler import Pickler
 from jsonpickle.unpickler import Unpickler
-import azure.cosmos.cosmos_client as cosmos_client    # pylint: disable=no-name-in-module,import-error
-import azure.cosmos.errors as cosmos_errors    # pylint: disable=no-name-in-module,import-error
+import azure.cosmos.cosmos_client as cosmos_client  # pylint: disable=no-name-in-module,import-error
+import azure.cosmos.errors as cosmos_errors  # pylint: disable=no-name-in-module,import-error
 from teams.core.storage import Storage
 from teams.azure import CosmosDbKeyEscape
 
@@ -49,18 +49,16 @@ class CosmosDbPartitionedConfig:
         self.__config_file = kwargs.get("filename")
         if self.__config_file:
             kwargs = json.load(open(self.__config_file))
-        self.cosmos_db_endpoint = cosmos_db_endpoint or kwargs.get(
-            "cosmos_db_endpoint")
+        self.cosmos_db_endpoint = cosmos_db_endpoint or kwargs.get("cosmos_db_endpoint")
         self.auth_key = auth_key or kwargs.get("auth_key")
         self.database_id = database_id or kwargs.get("database_id")
         self.container_id = container_id or kwargs.get("container_id")
         self.cosmos_client_options = cosmos_client_options or kwargs.get(
-            "cosmos_client_options", {})
-        self.container_throughput = container_throughput or kwargs.get(
-            "container_throughput")
+            "cosmos_client_options", {}
+        )
+        self.container_throughput = container_throughput or kwargs.get("container_throughput")
         self.key_suffix = key_suffix or kwargs.get("key_suffix")
-        self.compatibility_mode = compatibility_mode or kwargs.get(
-            "compatibility_mode")
+        self.compatibility_mode = compatibility_mode or kwargs.get("compatibility_mode")
 
 
 class CosmosDbPartitionedStorage(Storage):
@@ -83,9 +81,7 @@ class CosmosDbPartitionedStorage(Storage):
             config.key_suffix = ""
         if not config.key_suffix.__eq__(""):
             if config.compatibility_mode:
-                raise Exception(
-                    "compatibilityMode cannot be true while using a keySuffix."
-                )
+                raise Exception("compatibilityMode cannot be true while using a keySuffix.")
             suffix_escaped = CosmosDbKeyEscape.sanitize_key(config.key_suffix)
             if not suffix_escaped.__eq__(config.key_suffix):
                 raise Exception(
@@ -108,22 +104,22 @@ class CosmosDbPartitionedStorage(Storage):
         for key in keys:
             try:
                 escaped_key = CosmosDbKeyEscape.sanitize_key(
-                    key, self.config.key_suffix,
-                    self.config.compatibility_mode)
+                    key, self.config.key_suffix, self.config.compatibility_mode
+                )
 
                 read_item_response = self.client.ReadItem(
-                    self.__item_link(escaped_key),
-                    self.__get_partition_key(escaped_key))
+                    self.__item_link(escaped_key), self.__get_partition_key(escaped_key)
+                )
                 document_store_item = read_item_response
                 if document_store_item:
-                    store_items[document_store_item[
-                        "realId"]] = self.__create_si(document_store_item)
+                    store_items[document_store_item["realId"]] = self.__create_si(
+                        document_store_item
+                    )
             # When an item is not found a CosmosException is thrown, but we want to
             # return an empty collection so in this instance we catch and do not rethrow.
             # Throw for any other exception.
             except cosmos_errors.HTTPFailure as err:
-                if (err.status_code ==
-                        cosmos_errors.http_constants.StatusCodes.NOT_FOUND):
+                if err.status_code == cosmos_errors.http_constants.StatusCodes.NOT_FOUND:
                     continue
                 raise err
             except Exception as err:
@@ -143,32 +139,24 @@ class CosmosDbPartitionedStorage(Storage):
 
         await self.initialize()
 
-        for (key, change) in changes.items():
+        for key, change in changes.items():
             e_tag = None
             if isinstance(change, dict):
                 e_tag = change.get("e_tag", None)
             elif hasattr(change, "e_tag"):
                 e_tag = change.e_tag
             doc = {
-                "id":
-                CosmosDbKeyEscape.sanitize_key(key, self.config.key_suffix,
-                                               self.config.compatibility_mode),
-                "realId":
-                key,
-                "document":
-                self.__create_dict(change),
+                "id": CosmosDbKeyEscape.sanitize_key(
+                    key, self.config.key_suffix, self.config.compatibility_mode
+                ),
+                "realId": key,
+                "document": self.__create_dict(change),
             }
             if e_tag == "":
                 raise Exception("cosmosdb_storage.write(): etag missing")
 
-            access_condition = {
-                "accessCondition": {
-                    "type": "IfMatch",
-                    "condition": e_tag
-                }
-            }
-            options = (access_condition
-                       if e_tag != "*" and e_tag and e_tag != "" else None)
+            access_condition = {"accessCondition": {"type": "IfMatch", "condition": e_tag}}
+            options = access_condition if e_tag != "*" and e_tag and e_tag != "" else None
             try:
                 self.client.UpsertItem(
                     database_or_Container_link=self.__container_link,
@@ -190,15 +178,15 @@ class CosmosDbPartitionedStorage(Storage):
 
         for key in keys:
             escaped_key = CosmosDbKeyEscape.sanitize_key(
-                key, self.config.key_suffix, self.config.compatibility_mode)
+                key, self.config.key_suffix, self.config.compatibility_mode
+            )
             try:
                 self.client.DeleteItem(
                     document_link=self.__item_link(escaped_key),
                     options=self.__get_partition_key(escaped_key),
                 )
             except cosmos_errors.HTTPFailure as err:
-                if (err.status_code ==
-                        cosmos_errors.http_constants.StatusCodes.NOT_FOUND):
+                if err.status_code == cosmos_errors.http_constants.StatusCodes.NOT_FOUND:
                     continue
                 raise err
             except Exception as err:
@@ -210,10 +198,8 @@ class CosmosDbPartitionedStorage(Storage):
                 self.client = cosmos_client.CosmosClient(
                     self.config.cosmos_db_endpoint,
                     {"masterKey": self.config.auth_key},
-                    self.config.cosmos_client_options.get(
-                        "connection_policy", None),
-                    self.config.cosmos_client_options.get(
-                        "consistency_level", None),
+                    self.config.cosmos_client_options.get("connection_policy", None),
+                    self.config.cosmos_client_options.get("consistency_level", None),
                 )
 
             if not self.database:
@@ -221,10 +207,10 @@ class CosmosDbPartitionedStorage(Storage):
                     try:
                         if not self.database:
                             self.database = self.client.CreateDatabase(
-                                {"id": self.config.database_id})
+                                {"id": self.config.database_id}
+                            )
                     except cosmos_errors.HTTPFailure:
-                        self.database = self.client.ReadDatabase(
-                            "dbs/" + self.config.database_id)
+                        self.database = self.client.ReadDatabase("dbs/" + self.config.database_id)
 
             self.__get_or_create_container()
 
@@ -247,8 +233,8 @@ class CosmosDbPartitionedStorage(Storage):
             except cosmos_errors.HTTPFailure as err:
                 if err.status_code == http_constants.StatusCodes.CONFLICT:
                     self.container = self.client.ReadContainer(
-                        "dbs/" + self.database["id"] + "/colls/" +
-                        container_def["id"])
+                        "dbs/" + self.database["id"] + "/colls/" + container_def["id"]
+                    )
                     if "partitionKey" not in self.container:
                         self.compatability_mode_partition_key = True
                     else:
@@ -265,9 +251,7 @@ class CosmosDbPartitionedStorage(Storage):
                     raise err
 
     def __get_partition_key(self, key: str) -> str:
-        return None if self.compatability_mode_partition_key else {
-            "partitionKey": key
-        }
+        return None if self.compatability_mode_partition_key else {"partitionKey": key}
 
     @staticmethod
     def __create_si(result) -> object:

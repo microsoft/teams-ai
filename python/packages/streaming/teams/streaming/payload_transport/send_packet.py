@@ -7,10 +7,14 @@ from teams.streaming.payloads.models import Header
 
 
 class SendPacket:
-
-    def __init__(self, *, header: Header, payload: object,
-                 is_length_known: bool, sent_callback: Callable[[Header],
-                                                                Awaitable]):
+    def __init__(
+        self,
+        *,
+        header: Header,
+        payload: object,
+        is_length_known: bool,
+        sent_callback: Callable[[Header], Awaitable],
+    ):
         self.header = header
         self.payload = payload
         self.is_length_known = is_length_known

@@ -7,7 +7,4 @@ import subprocess
 
 
 def fmt():
-    subprocess.run([
-        "poetry", "run", "yapf", "./teams", "--recursive", "--in-place",
-        "--parallel", "--print-modified"
-    ]).check_returncode()
+    subprocess.run(["poetry", "run", "black", "./teams"]).check_returncode()

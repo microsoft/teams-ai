@@ -8,7 +8,6 @@ from teams.schema import Activity
 
 
 class BotFrameworkClient(ABC):
-
     @abstractmethod
     async def post_activity(
         self,

@@ -18,7 +18,6 @@ from teams.streaming.payloads.models import (
 
 
 class PayloadDisassembler(ABC):
-
     def __init__(self, sender: PayloadSender, identifier: UUID):
         self.sender = sender
         self.identifier = identifier
@@ -46,8 +45,7 @@ class PayloadDisassembler(ABC):
         await self._send()
 
     @staticmethod
-    def get_stream_description(
-            stream: ResponseMessageStream) -> StreamDescription:
+    def get_stream_description(stream: ResponseMessageStream) -> StreamDescription:
         description = StreamDescription(id=str(stream.id))
 
         # TODO: This content type is hardcoded for POC, investigate how to proceed
@@ -95,12 +93,10 @@ class PayloadDisassembler(ABC):
                 self._stream_length - self._send_offset,
                 TransportConstants.MAX_PAYLOAD_LENGTH,
             )
-            header.end = (self._send_offset + header.payload_length
-                          >= self._stream_length)
+            header.end = self._send_offset + header.payload_length >= self._stream_length
             is_length_known = True
 
-        self.sender.send_payload(header, self._stream, is_length_known,
-                                 self._on_send)
+        self.sender.send_payload(header, self._stream, is_length_known, self._on_send)
 
     async def _on_send(self, header: Header):
         self._send_offset += header.payload_length

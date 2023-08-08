@@ -5,7 +5,6 @@ from teams.schema import Activity
 
 
 class BeginSkillDialogOptions:
-
     def __init__(self, activity: Activity):
         self.activity = activity
 

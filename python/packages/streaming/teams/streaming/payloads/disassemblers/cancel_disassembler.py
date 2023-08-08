@@ -8,7 +8,6 @@ from teams.streaming.payloads.models import Header
 
 
 class CancelDisassembler:
-
     def __init__(self, *, sender: PayloadSender, identifier: UUID, type: str):
         self._sender = sender
         self._identifier = identifier

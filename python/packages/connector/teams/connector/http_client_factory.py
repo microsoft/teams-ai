@@ -5,6 +5,5 @@ from .http_client_base import HttpClientBase
 
 
 class HttpClientFactory:
-
     def create_client(self) -> HttpClientBase:
         pass

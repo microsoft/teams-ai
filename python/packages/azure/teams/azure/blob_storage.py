@@ -49,15 +49,15 @@ class BlobStorageSettings:
 
 # New Azure Blob SDK only allows connection strings, but our SDK allows key+name.
 # This is here for backwards compatibility.
-def convert_account_name_and_key_to_connection_string(
-        settings: BlobStorageSettings):
+def convert_account_name_and_key_to_connection_string(settings: BlobStorageSettings):
     if not settings.account_name or not settings.account_key:
         raise Exception(
             "account_name and account_key are both required for BlobStorageSettings if not using a connections string."
         )
     return (
         f"DefaultEndpointsProtocol=https;AccountName={settings.account_name};"
-        f"AccountKey={settings.account_key};EndpointSuffix=core.windows.net")
+        f"AccountKey={settings.account_key};EndpointSuffix=core.windows.net"
+    )
 
 
 class BlobStorage(Storage):
@@ -80,13 +80,14 @@ class BlobStorage(Storage):
 
         if settings.connection_string:
             blob_service_client = BlobServiceClient.from_connection_string(
-                settings.connection_string)
+                settings.connection_string
+            )
         else:
             blob_service_client = BlobServiceClient.from_connection_string(
-                convert_account_name_and_key_to_connection_string(settings))
+                convert_account_name_and_key_to_connection_string(settings)
+            )
 
-        self.__container_client = blob_service_client.get_container_client(
-            settings.container_name)
+        self.__container_client = blob_service_client.get_container_client(settings.container_name)
 
         self.__initialized = False
 
@@ -140,7 +141,7 @@ class BlobStorage(Storage):
 
         await self._initialize()
 
-        for (name, item) in changes.items():
+        for name, item in changes.items():
             blob_reference = self.__container_client.get_blob_client(name)
 
             e_tag = None
@@ -156,9 +157,8 @@ class BlobStorage(Storage):
 
             if e_tag:
                 await blob_reference.upload_blob(
-                    item_str,
-                    match_condition=MatchConditions.IfNotModified,
-                    etag=e_tag)
+                    item_str, match_condition=MatchConditions.IfNotModified, etag=e_tag
+                )
             else:
                 await blob_reference.upload_blob(item_str, overwrite=True)
 

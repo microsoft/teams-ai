@@ -21,7 +21,6 @@ from .channel_provider import ChannelProvider
 
 
 class JwtTokenValidation:
-
     # TODO remove the default value on channel_service
     @staticmethod
     async def authenticate_request(
@@ -48,14 +47,15 @@ class JwtTokenValidation:
             auth_is_disabled = await credentials.is_authentication_disabled()
             if not auth_is_disabled:
                 # No Auth Header. Auth is required. Request is not authorized.
-                raise PermissionError(
-                    "Unauthorized Access. Request is not authorized")
+                raise PermissionError("Unauthorized Access. Request is not authorized")
 
             # Check if the activity is for a skill call and is coming from the Emulator.
             try:
-                if (activity.channel_id == Channels.emulator
-                        and activity.recipient.role == RoleTypes.skill
-                        and activity.relates_to is not None):
+                if (
+                    activity.channel_id == Channels.emulator
+                    and activity.recipient.role == RoleTypes.skill
+                    and activity.relates_to is not None
+                ):
                     # Return an anonymous claim with an anonymous skill AppId
                     return SkillValidation.create_anonymous_skill_claim()
             except AttributeError:
@@ -64,8 +64,7 @@ class JwtTokenValidation:
             # In the scenario where Auth is disabled, we still want to have the
             # IsAuthenticated flag set in the ClaimsIdentity. To do this requires
             # adding in an empty claim.
-            return ClaimsIdentity({}, True,
-                                  AuthenticationConstants.ANONYMOUS_AUTH_TYPE)
+            return ClaimsIdentity({}, True, AuthenticationConstants.ANONYMOUS_AUTH_TYPE)
 
         # Validate the header and extract claims.
         claims_identity = await JwtTokenValidation.validate_auth_header(
@@ -106,18 +105,20 @@ class JwtTokenValidation:
 
             if EmulatorValidation.is_token_from_emulator(auth_header):
                 return await EmulatorValidation.authenticate_emulator_token(
-                    auth_header, credentials, channel_service_or_provider,
-                    channel_id)
+                    auth_header, credentials, channel_service_or_provider, channel_id
+                )
 
             is_public = (
                 not channel_service_or_provider
                 or isinstance(channel_service_or_provider, ChannelProvider)
-                and channel_service_or_provider.is_public_azure())
+                and channel_service_or_provider.is_public_azure()
+            )
             is_gov = (
                 isinstance(channel_service_or_provider, ChannelProvider)
                 and channel_service_or_provider.is_public_azure()
-                or isinstance(channel_service_or_provider, str) and
-                JwtTokenValidation.is_government(channel_service_or_provider))
+                or isinstance(channel_service_or_provider, str)
+                and JwtTokenValidation.is_government(channel_service_or_provider)
+            )
 
             # If the channel is Public Azure
             if is_public:
@@ -131,7 +132,8 @@ class JwtTokenValidation:
                     )
 
                 return await ChannelValidation.authenticate_channel_token(
-                    auth_header, credentials, channel_id, auth_configuration)
+                    auth_header, credentials, channel_id, auth_configuration
+                )
 
             if is_gov:
                 if service_url:
@@ -144,17 +146,20 @@ class JwtTokenValidation:
                     )
 
                 return await GovernmentChannelValidation.authenticate_channel_token(
-                    auth_header, credentials, channel_id, auth_configuration)
+                    auth_header, credentials, channel_id, auth_configuration
+                )
 
             # Otherwise use Enterprise Channel Validation
             if service_url:
-                return await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
-                    auth_header,
-                    credentials,
-                    service_url,
-                    channel_id,
-                    channel_service_or_provider,
-                    auth_configuration,
+                return (
+                    await EnterpriseChannelValidation.authenticate_channel_token_with_service_url(
+                        auth_header,
+                        credentials,
+                        service_url,
+                        channel_id,
+                        channel_service_or_provider,
+                        auth_configuration,
+                    )
                 )
 
             return await EnterpriseChannelValidation.authenticate_channel_token(
@@ -168,14 +173,12 @@ class JwtTokenValidation:
         claims = await get_claims()
 
         if claims:
-            await JwtTokenValidation.validate_claims(auth_configuration,
-                                                     claims.claims)
+            await JwtTokenValidation.validate_claims(auth_configuration, claims.claims)
 
         return claims
 
     @staticmethod
-    async def validate_claims(auth_config: AuthenticationConfiguration,
-                              claims: List[Dict]):
+    async def validate_claims(auth_config: AuthenticationConfiguration, claims: List[Dict]):
         if auth_config and auth_config.claims_validator:
             await auth_config.claims_validator(claims)
         elif SkillValidation.is_skill_claim(claims):
@@ -186,8 +189,7 @@ class JwtTokenValidation:
 
     @staticmethod
     def is_government(channel_service: str) -> bool:
-        return (channel_service and channel_service.lower()
-                == GovernmentConstants.CHANNEL_SERVICE)
+        return channel_service and channel_service.lower() == GovernmentConstants.CHANNEL_SERVICE
 
     @staticmethod
     def get_app_id_from_claims(claims: Dict[str, object]) -> str:

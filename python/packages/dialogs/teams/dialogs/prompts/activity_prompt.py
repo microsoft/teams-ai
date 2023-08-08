@@ -37,8 +37,7 @@ class ActivityPrompt(Dialog):
     persisted_options = "options"
     persisted_state = "state"
 
-    def __init__(self, dialog_id: str,
-                 validator: Callable[[PromptValidatorContext], bool]):
+    def __init__(self, dialog_id: str, validator: Callable[[PromptValidatorContext], bool]):
         """
         Initializes a new instance of the :class:`ActivityPrompt` class.
 
@@ -53,9 +52,9 @@ class ActivityPrompt(Dialog):
             raise TypeError("validator was expected but received None")
         self._validator = validator
 
-    async def begin_dialog(self,
-                           dialog_context: DialogContext,
-                           options: PromptOptions = None) -> DialogTurnResult:
+    async def begin_dialog(
+        self, dialog_context: DialogContext, options: PromptOptions = None
+    ) -> DialogTurnResult:
         """
         Called when a prompt dialog is pushed onto the dialog stack and is being activated.
 
@@ -67,8 +66,7 @@ class ActivityPrompt(Dialog):
         :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
         """
         if not dialog_context:
-            raise TypeError(
-                "ActivityPrompt.begin_dialog(): dc cannot be None.")
+            raise TypeError("ActivityPrompt.begin_dialog(): dc cannot be None.")
         if not isinstance(options, PromptOptions):
             raise TypeError(
                 "ActivityPrompt.begin_dialog(): Prompt options are required for ActivityPrompts."
@@ -96,8 +94,7 @@ class ActivityPrompt(Dialog):
 
         return Dialog.end_of_turn
 
-    async def continue_dialog(
-            self, dialog_context: DialogContext) -> DialogTurnResult:
+    async def continue_dialog(self, dialog_context: DialogContext) -> DialogTurnResult:
         """
         Called when a prompt dialog is the active dialog and the user replied with a new activity.
 
@@ -107,16 +104,15 @@ class ActivityPrompt(Dialog):
         :rtype Dialog.end_of_turn: :class:`Dialog.DialogTurnResult`
         """
         if not dialog_context:
-            raise TypeError(
-                "ActivityPrompt.continue_dialog(): DialogContext cannot be None."
-            )
+            raise TypeError("ActivityPrompt.continue_dialog(): DialogContext cannot be None.")
 
         # Perform base recognition
         instance = dialog_context.active_dialog
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: Dict[str, object] = instance.state[self.persisted_options]
         recognized: PromptRecognizerResult = await self.on_recognize(
-            dialog_context.context, state, options)
+            dialog_context.context, state, options
+        )
 
         # Increment attempt count
         state[Prompt.ATTEMPT_COUNT_KEY] += 1
@@ -124,8 +120,9 @@ class ActivityPrompt(Dialog):
         # Validate the return value
         is_valid = False
         if self._validator is not None:
-            prompt_context = PromptValidatorContext(dialog_context.context,
-                                                    recognized, state, options)
+            prompt_context = PromptValidatorContext(
+                dialog_context.context, recognized, state, options
+            )
             is_valid = await self._validator(prompt_context)
 
             if options is None:
@@ -139,17 +136,17 @@ class ActivityPrompt(Dialog):
         if is_valid:
             return await dialog_context.end_dialog(recognized.value)
 
-        if (dialog_context.context.activity.type == ActivityTypes.message
-                and not dialog_context.context.responded):
+        if (
+            dialog_context.context.activity.type == ActivityTypes.message
+            and not dialog_context.context.responded
+        ):
             await self.on_prompt(dialog_context.context, state, options, True)
 
         return Dialog.end_of_turn
 
-    async def resume_dialog(    # pylint: disable=unused-argument
-            self,
-            dialog_context: DialogContext,
-            reason: DialogReason,
-            result: object = None):
+    async def resume_dialog(  # pylint: disable=unused-argument
+        self, dialog_context: DialogContext, reason: DialogReason, result: object = None
+    ):
         """
         Called when a prompt dialog resumes being the active dialog on the dialog stack, such
         as when the previous active dialog on the stack completes.
@@ -168,13 +165,11 @@ class ActivityPrompt(Dialog):
         :param result: Optional, value returned from the previous dialog on the stack.
         :type result: object
         """
-        await self.reprompt_dialog(dialog_context.context,
-                                   dialog_context.active_dialog)
+        await self.reprompt_dialog(dialog_context.context, dialog_context.active_dialog)
 
         return Dialog.end_of_turn
 
-    async def reprompt_dialog(self, context: TurnContext,
-                              instance: DialogInstance):
+    async def reprompt_dialog(self, context: TurnContext, instance: DialogInstance):
         state: Dict[str, object] = instance.state[self.persisted_state]
         options: PromptOptions = instance.state[self.persisted_options]
         await self.on_prompt(context, state, options, False)
@@ -182,7 +177,7 @@ class ActivityPrompt(Dialog):
     async def on_prompt(
         self,
         context: TurnContext,
-        state: Dict[str, dict],    # pylint: disable=unused-argument
+        state: Dict[str, dict],  # pylint: disable=unused-argument
         options: PromptOptions,
         is_retry: bool = False,
     ):
@@ -205,9 +200,9 @@ class ActivityPrompt(Dialog):
             options.prompt.input_hint = InputHints.expecting_input
             await context.send_activity(options.prompt)
 
-    async def on_recognize(    # pylint: disable=unused-argument
-            self, context: TurnContext, state: Dict[str, object],
-            options: PromptOptions) -> PromptRecognizerResult:
+    async def on_recognize(  # pylint: disable=unused-argument
+        self, context: TurnContext, state: Dict[str, object], options: PromptOptions
+    ) -> PromptRecognizerResult:
         """
         When overridden in a derived class, attempts to recognize the incoming activity.
 
@@ -221,7 +216,7 @@ class ActivityPrompt(Dialog):
         :rtype result: :class:`PromptRecognizerResult`
         """
         result = PromptRecognizerResult()
-        result.succeeded = (True, )
+        result.succeeded = (True,)
         result.value = context.activity
 
         return result

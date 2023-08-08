@@ -10,7 +10,6 @@ from teams.connector.auth import MicrosoftAppCredentials
 
 
 class InspectionSession:
-
     def __init__(
         self,
         conversation_reference: ConversationReference,
@@ -18,15 +17,16 @@ class InspectionSession:
     ):
         self._conversation_reference = conversation_reference
         self._connector_client = ConnectorClient(
-            credentials, base_url=conversation_reference.service_url)
+            credentials, base_url=conversation_reference.service_url
+        )
 
     async def send(self, activity: Activity) -> Any:
-        TurnContext.apply_conversation_reference(activity,
-                                                 self._conversation_reference)
+        TurnContext.apply_conversation_reference(activity, self._conversation_reference)
 
         try:
             await self._connector_client.conversations.send_to_conversation(
-                activity.conversation.id, activity)
+                activity.conversation.id, activity
+            )
         except Exception:
             return False
 

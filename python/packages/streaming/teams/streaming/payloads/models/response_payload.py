@@ -9,11 +9,7 @@ from .stream_description import StreamDescription
 
 
 class ResponsePayload(Serializable):
-
-    def __init__(self,
-                 *,
-                 status_code: int = None,
-                 streams: List[StreamDescription] = None):
+    def __init__(self, *, status_code: int = None, streams: List[StreamDescription] = None):
         self.status_code = status_code
         self.streams = streams
 
@@ -33,8 +29,7 @@ class ResponsePayload(Serializable):
 
         if stream_list:
             self.streams = [
-                StreamDescription().from_dict(stream_dict)
-                for stream_dict in stream_list
+                StreamDescription().from_dict(stream_dict) for stream_dict in stream_list
             ]
 
         return self

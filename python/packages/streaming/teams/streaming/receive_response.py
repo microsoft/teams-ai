@@ -9,16 +9,13 @@ from teams.streaming.payloads.models import Serializable
 
 
 class ReceiveResponse:
-
-    def __init__(self,
-                 status_code: int = 0,
-                 streams: List[ContentStream] = None):
+    def __init__(self, status_code: int = 0, streams: List[ContentStream] = None):
         self.status_code = status_code
         self.streams = streams or []
 
     def read_body_as_json(
-        self, cls: Union[Type[Model],
-                         Type[Serializable]]) -> Union[Model, Serializable]:
+        self, cls: Union[Type[Model], Type[Serializable]]
+    ) -> Union[Model, Serializable]:
         try:
             body_str = self.read_body_as_str()
             body = None

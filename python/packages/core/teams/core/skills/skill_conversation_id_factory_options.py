@@ -6,7 +6,6 @@ from .bot_framework_skill import BotFrameworkSkill
 
 
 class SkillConversationIdFactoryOptions:
-
     def __init__(
         self,
         from_bot_oauth_scope: str,

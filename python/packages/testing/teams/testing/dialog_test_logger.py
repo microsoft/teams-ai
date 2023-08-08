@@ -35,21 +35,18 @@ class DialogTestLogger(Middleware):
         :param time_func: A time function to record time spans, default to `time.monotonic`.
         :type time_func: Callable[[], float]
         """
-        self._log = logging.getLogger(
-            __name__).info if log_func is None else log_func
+        self._log = logging.getLogger(__name__).info if log_func is None else log_func
         self._stopwatch_state_key = f"stopwatch.{uuid.uuid4()}"
         self._json_indent = json_indent
         self._time_func = time.monotonic if time_func is None else time_func
 
-    async def on_turn(self, context: TurnContext,
-                      logic: Callable[[TurnContext], Awaitable]):
+    async def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         context.turn_state[self._stopwatch_state_key] = self._time_func()
         await self._log_incoming_activity(context, context.activity)
         context.on_send_activities(self._send_activities_handler)
         await logic()
 
-    async def _log_incoming_activity(self, context: TurnContext,
-                                     activity: Activity) -> None:
+    async def _log_incoming_activity(self, context: TurnContext, activity: Activity) -> None:
         self._log("")
         if context.activity.type == ActivityTypes.message:
             self._log("User: Text = %s", context.activity.text)
@@ -70,14 +67,15 @@ class DialogTestLogger(Middleware):
         responses = await next_send()
         return responses
 
-    async def _log_outgoing_activity(self, context: TurnContext,
-                                     activity: Activity) -> None:
+    async def _log_outgoing_activity(self, context: TurnContext, activity: Activity) -> None:
         self._log("")
         start_time = context.turn_state[self._stopwatch_state_key]
         if activity.type == ActivityTypes.message:
-            message = (f"Bot: Text      = {activity.text}\r\n"
-                       f"     Speak     = {activity.speak}\r\n"
-                       f"     InputHint = {activity.input_hint}")
+            message = (
+                f"Bot: Text      = {activity.text}\r\n"
+                f"     Speak     = {activity.speak}\r\n"
+                f"     InputHint = {activity.input_hint}"
+            )
             self._log(message)
         else:
             self._log_activity_as_json(actor="Bot", activity=activity)

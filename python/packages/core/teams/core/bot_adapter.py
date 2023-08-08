@@ -19,16 +19,14 @@ class BotAdapter(ABC):
     BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
-    def __init__(self,
-                 on_turn_error: Callable[[TurnContext, Exception],
-                                         Awaitable] = None):
+    def __init__(self, on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None):
         self._middleware = MiddlewareSet()
         self.on_turn_error = on_turn_error
 
     @abstractmethod
     async def send_activities(
-            self, context: TurnContext,
-            activities: List[Activity]) -> List[ResourceResponse]:
+        self, context: TurnContext, activities: List[Activity]
+    ) -> List[ResourceResponse]:
         """
         Sends a set of activities to the user. An array of responses from the server will be returned.
 
@@ -54,8 +52,7 @@ class BotAdapter(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def delete_activity(self, context: TurnContext,
-                              reference: ConversationReference):
+    async def delete_activity(self, context: TurnContext, reference: ConversationReference):
         """
         Deletes an existing activity.
 
@@ -78,12 +75,12 @@ class BotAdapter(ABC):
         return self
 
     async def continue_conversation(
-            self,
-            reference: ConversationReference,
-            callback: Callable,
-            bot_id: str = None,    # pylint: disable=unused-argument
-            claims_identity: ClaimsIdentity = None,    # pylint: disable=unused-argument
-            audience: str = None,    # pylint: disable=unused-argument
+        self,
+        reference: ConversationReference,
+        callback: Callable,
+        bot_id: str = None,  # pylint: disable=unused-argument
+        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
+        audience: str = None,  # pylint: disable=unused-argument
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
@@ -103,15 +100,13 @@ class BotAdapter(ABC):
         :type audience: str
         """
         context = TurnContext(
-            self,
-            conversation_reference_extension.get_continuation_activity(
-                reference))
+            self, conversation_reference_extension.get_continuation_activity(reference)
+        )
         return await self.run_pipeline(context, callback)
 
-    async def run_pipeline(self,
-                           context: TurnContext,
-                           callback: Callable[[TurnContext],
-                                              Awaitable] = None):
+    async def run_pipeline(
+        self, context: TurnContext, callback: Callable[[TurnContext], Awaitable] = None
+    ):
         """
         Called by the parent class to run the adapters middleware set and calls the passed in `callback()` handler at
         the end of the chain.
@@ -126,8 +121,7 @@ class BotAdapter(ABC):
 
         if context.activity is not None:
             try:
-                return await self._middleware.receive_activity_with_status(
-                    context, callback)
+                return await self._middleware.receive_activity_with_status(context, callback)
             except Exception as error:
                 if self.on_turn_error is not None:
                     await self.on_turn_error(context, error)

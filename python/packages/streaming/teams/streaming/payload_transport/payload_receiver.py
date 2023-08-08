@@ -17,22 +17,16 @@ from teams.streaming.transport import (
 
 
 class PayloadReceiver:
-
     def __init__(self):
         self._get_stream: Callable[[Header], List[int]] = None
         self._receive_action: Callable[[Header, List[int], int], None] = None
         self._receiver: TransportReceiverBase = None
         self._is_disconnecting = False
 
-        self._receive_header_buffer: List[int] = [
-            None
-        ] * TransportConstants.MAX_HEADER_LENGTH
-        self._receive_content_buffer: List[int] = [
-            None
-        ] * TransportConstants.MAX_PAYLOAD_LENGTH
+        self._receive_header_buffer: List[int] = [None] * TransportConstants.MAX_HEADER_LENGTH
+        self._receive_content_buffer: List[int] = [None] * TransportConstants.MAX_PAYLOAD_LENGTH
 
-        self.disconnected: Callable[[object, DisconnectedEventArgs],
-                                    None] = None
+        self.disconnected: Callable[[object, DisconnectedEventArgs], None] = None
 
     @property
     def is_connected(self) -> bool:
@@ -40,8 +34,7 @@ class PayloadReceiver:
 
     async def connect(self, receiver: TransportReceiverBase):
         if self._receiver:
-            raise RuntimeError(
-                f"{self.__class__.__name__} instance already connected.")
+            raise RuntimeError(f"{self.__class__.__name__} instance already connected.")
 
         self._receiver = receiver
         await self._run_receive()
@@ -76,15 +69,10 @@ class PayloadReceiver:
                 if did_disconnect:
                     if callable(self.disconnected):
                         # pylint: disable=not-callable
-                        if iscoroutinefunction(self.disconnected) or isfuture(
-                                self.disconnected):
-                            await self.disconnected(
-                                self, event_args
-                                or DisconnectedEventArgs.empty)
+                        if iscoroutinefunction(self.disconnected) or isfuture(self.disconnected):
+                            await self.disconnected(self, event_args or DisconnectedEventArgs.empty)
                         else:
-                            self.disconnected(
-                                self, event_args
-                                or DisconnectedEventArgs.empty)
+                            self.disconnected(self, event_args or DisconnectedEventArgs.empty)
             finally:
                 self._is_disconnecting = False
 
@@ -115,15 +103,17 @@ class PayloadReceiver:
 
                 # deserialize the bytes into a header
                 header = HeaderSerializer.deserialize(
-                    self._receive_header_buffer, 0,
-                    TransportConstants.MAX_HEADER_LENGTH)
+                    self._receive_header_buffer, 0, TransportConstants.MAX_HEADER_LENGTH
+                )
 
                 # read the payload
                 content_stream = self._get_stream(header)
 
-                buffer = ([None] * header.payload_length
-                          if PayloadTypes.is_stream(header) else
-                          self._receive_content_buffer)
+                buffer = (
+                    [None] * header.payload_length
+                    if PayloadTypes.is_stream(header)
+                    else self._receive_content_buffer
+                )
                 offset = 0
 
                 if header.payload_length:
@@ -134,8 +124,7 @@ class PayloadReceiver:
                         )
 
                         # Send: Packet content
-                        length = await self._receiver.receive(
-                            buffer, offset, count)
+                        length = await self._receiver.receive(buffer, offset, count)
                         if length == 0:
                             # TODO: make custom exception
                             raise Exception(
@@ -153,7 +142,8 @@ class PayloadReceiver:
 
                     # give the full payload buffer to the contentStream if it's a stream
                     if PayloadTypes.is_stream(header) and isinstance(
-                            content_stream, streaming.PayloadStream):
+                        content_stream, streaming.PayloadStream
+                    ):
                         content_stream.give_buffer(buffer)
 
                     self._receive_action(header, content_stream, offset)

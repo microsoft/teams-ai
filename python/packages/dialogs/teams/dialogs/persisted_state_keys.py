@@ -3,7 +3,6 @@
 
 
 class PersistedStateKeys:
-
     def __init__(self):
         self.user_state: str = None
         self.conversation_state: str = None

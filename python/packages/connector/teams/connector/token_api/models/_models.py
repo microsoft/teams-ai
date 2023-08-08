@@ -18,12 +18,7 @@ class AadResourceUrls(Model):
     :type resource_urls: list[str]
     """
 
-    _attribute_map = {
-        "resource_urls": {
-            "key": "resourceUrls",
-            "type": "[str]"
-        }
-    }
+    _attribute_map = {"resource_urls": {"key": "resourceUrls", "type": "[str]"}}
 
     def __init__(self, **kwargs):
         super(AadResourceUrls, self).__init__(**kwargs)
@@ -42,18 +37,9 @@ class Error(Model):
     """
 
     _attribute_map = {
-        "code": {
-            "key": "code",
-            "type": "str"
-        },
-        "message": {
-            "key": "message",
-            "type": "str"
-        },
-        "inner_http_error": {
-            "key": "innerHttpError",
-            "type": "InnerHttpError"
-        },
+        "code": {"key": "code", "type": "str"},
+        "message": {"key": "message", "type": "str"},
+        "inner_http_error": {"key": "innerHttpError", "type": "InnerHttpError"},
     }
 
     def __init__(self, **kwargs):
@@ -85,9 +71,7 @@ class ErrorResponseException(HttpOperationError):
     """
 
     def __init__(self, deserialize, response, *args):
-
-        super(ErrorResponseException, self).__init__(deserialize, response,
-                                                     "ErrorResponse", *args)
+        super(ErrorResponseException, self).__init__(deserialize, response, "ErrorResponse", *args)
 
 
 class InnerHttpError(Model):
@@ -100,14 +84,8 @@ class InnerHttpError(Model):
     """
 
     _attribute_map = {
-        "status_code": {
-            "key": "statusCode",
-            "type": "int"
-        },
-        "body": {
-            "key": "body",
-            "type": "object"
-        },
+        "status_code": {"key": "statusCode", "type": "int"},
+        "body": {"key": "body", "type": "object"},
     }
 
     def __init__(self, **kwargs):
@@ -127,10 +105,7 @@ class SignInUrlResponse(Model):
     """
 
     _attribute_map = {
-        "sign_in_link": {
-            "key": "signInLink",
-            "type": "str"
-        },
+        "sign_in_link": {"key": "signInLink", "type": "str"},
         "token_exchange_resource": {
             "key": "tokenExchangeResource",
             "type": "TokenExchangeResource",
@@ -140,8 +115,7 @@ class SignInUrlResponse(Model):
     def __init__(self, **kwargs):
         super(SignInUrlResponse, self).__init__(**kwargs)
         self.sign_in_link = kwargs.get("sign_in_link", None)
-        self.token_exchange_resource = kwargs.get("token_exchange_resource",
-                                                  None)
+        self.token_exchange_resource = kwargs.get("token_exchange_resource", None)
 
 
 class TokenExchangeRequest(Model):
@@ -154,14 +128,8 @@ class TokenExchangeRequest(Model):
     """
 
     _attribute_map = {
-        "uri": {
-            "key": "uri",
-            "type": "str"
-        },
-        "token": {
-            "key": "token",
-            "type": "str"
-        },
+        "uri": {"key": "uri", "type": "str"},
+        "token": {"key": "token", "type": "str"},
     }
 
     def __init__(self, **kwargs):
@@ -182,18 +150,9 @@ class TokenExchangeResource(Model):
     """
 
     _attribute_map = {
-        "id": {
-            "key": "id",
-            "type": "str"
-        },
-        "uri": {
-            "key": "uri",
-            "type": "str"
-        },
-        "provider_id": {
-            "key": "providerId",
-            "type": "str"
-        },
+        "id": {"key": "id", "type": "str"},
+        "uri": {"key": "uri", "type": "str"},
+        "provider_id": {"key": "providerId", "type": "str"},
     }
 
     def __init__(self, **kwargs):
@@ -217,22 +176,10 @@ class TokenResponse(Model):
     """
 
     _attribute_map = {
-        "channel_id": {
-            "key": "channelId",
-            "type": "str"
-        },
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "token": {
-            "key": "token",
-            "type": "str"
-        },
-        "expiration": {
-            "key": "expiration",
-            "type": "str"
-        },
+        "channel_id": {"key": "channelId", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "token": {"key": "token", "type": "str"},
+        "expiration": {"key": "expiration", "type": "str"},
     }
 
     def __init__(self, **kwargs):
@@ -259,18 +206,9 @@ class TokenStatus(Model):
     """
 
     _attribute_map = {
-        "channel_id": {
-            "key": "channelId",
-            "type": "str"
-        },
-        "connection_name": {
-            "key": "connectionName",
-            "type": "str"
-        },
-        "has_token": {
-            "key": "hasToken",
-            "type": "bool"
-        },
+        "channel_id": {"key": "channelId", "type": "str"},
+        "connection_name": {"key": "connectionName", "type": "str"},
+        "has_token": {"key": "hasToken", "type": "bool"},
         "service_provider_display_name": {
             "key": "serviceProviderDisplayName",
             "type": "str",
@@ -282,5 +220,4 @@ class TokenStatus(Model):
         self.channel_id = kwargs.get("channel_id", None)
         self.connection_name = kwargs.get("connection_name", None)
         self.has_token = kwargs.get("has_token", None)
-        self.service_provider_display_name = kwargs.get(
-            "service_provider_display_name", None)
+        self.service_provider_display_name = kwargs.get("service_provider_display_name", None)

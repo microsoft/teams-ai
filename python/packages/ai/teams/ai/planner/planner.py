@@ -14,10 +14,14 @@ class Planner(ABC):
     """
 
     @abstractclassmethod
-    async def generate_plan(self, turn_context: TurnContext, state: TurnState,
-                            prompt_name_or_template: Union[str,
-                                                           PromptTemplate], *,
-                            history_options: AIHistoryOptions) -> Plan:
+    async def generate_plan(
+        self,
+        turn_context: TurnContext,
+        state: TurnState,
+        prompt_name_or_template: Union[str, PromptTemplate],
+        *,
+        history_options: AIHistoryOptions,
+    ) -> Plan:
         """
         Generates a plan based on the given turn state and prompt name or template.
 
@@ -32,11 +36,9 @@ class Planner(ABC):
         """
 
     @abstractclassmethod
-    async def add_function(self,
-                           name: str,
-                           handler: Callable[[TurnContext, TurnState], Any],
-                           *,
-                           allow_overrides=False) -> None:
+    async def add_function(
+        self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False
+    ) -> None:
         """
         Adds a custom function to be used when rendering prompt templates.
 

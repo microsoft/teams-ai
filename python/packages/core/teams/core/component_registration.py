@@ -5,7 +5,6 @@ from typing import Dict, Iterable, Type
 
 
 class ComponentRegistration:
-
     @staticmethod
     def get_components() -> Iterable["ComponentRegistration"]:
         return _components.values()

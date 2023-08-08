@@ -10,16 +10,15 @@ from teams.schema import Activity
 
 
 class AzureQueueStorage(QueueStorage):
-
     def __init__(self, queues_storage_connection_string: str, queue_name: str):
         if not queues_storage_connection_string:
-            raise Exception(
-                "queues_storage_connection_string cannot be empty.")
+            raise Exception("queues_storage_connection_string cannot be empty.")
         if not queue_name:
             raise Exception("queue_name cannot be empty.")
 
         self.__queue_client = QueueClient.from_connection_string(
-            queues_storage_connection_string, queue_name)
+            queues_storage_connection_string, queue_name
+        )
 
         self.__initialized = False
 
@@ -61,9 +60,8 @@ class AzureQueueStorage(QueueStorage):
         message = encode(activity)
 
         receipt = await self.__queue_client.send_message(
-            message,
-            visibility_timeout=visibility_timeout,
-            time_to_live=time_to_live)
+            message, visibility_timeout=visibility_timeout, time_to_live=time_to_live
+        )
 
         # Encode the QueueMessage receipt as a JSON string.
         return encode(receipt)

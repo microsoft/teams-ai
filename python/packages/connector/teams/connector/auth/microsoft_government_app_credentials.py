@@ -18,9 +18,7 @@ class MicrosoftGovernmentAppCredentials(MicrosoftAppCredentials):
     ):
         super().__init__(app_id, app_password, channel_auth_tenant, scope)
         self.oauth_endpoint = GovernmentConstants.TO_CHANNEL_FROM_BOT_LOGIN_URL
-        self.oauth_scope = (
-            scope
-            if scope else GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE)
+        self.oauth_scope = scope if scope else GovernmentConstants.TO_CHANNEL_FROM_BOT_OAUTH_SCOPE
 
     @staticmethod
     def empty():

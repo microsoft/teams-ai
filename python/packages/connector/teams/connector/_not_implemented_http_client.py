@@ -7,12 +7,7 @@ from .http_response_base import HttpResponseBase
 
 
 class _NotImplementedHttpClient(HttpClientBase):
-
     async def post(
-        self,
-        *,
-        request: HttpRequest    # pylint: disable=unused-argument
+        self, *, request: HttpRequest  # pylint: disable=unused-argument
     ) -> HttpResponseBase:
-        raise RuntimeError(
-            "Please provide an http implementation for the skill BotFrameworkClient"
-        )
+        raise RuntimeError("Please provide an http implementation for the skill BotFrameworkClient")

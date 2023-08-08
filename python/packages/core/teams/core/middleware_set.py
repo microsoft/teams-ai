@@ -9,15 +9,12 @@ from .turn_context import TurnContext
 
 
 class Middleware(ABC):
-
     @abstractmethod
-    async def on_turn(self, context: TurnContext,
-                      logic: Callable[[TurnContext], Awaitable]):
+    async def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         pass
 
 
 class AnonymousReceiveMiddleware(Middleware):
-
     def __init__(self, anonymous_handler):
         if not iscoroutinefunction(anonymous_handler):
             raise TypeError(
@@ -25,8 +22,7 @@ class AnonymousReceiveMiddleware(Middleware):
             )
         self._to_call = anonymous_handler
 
-    def on_turn(self, context: TurnContext, logic: Callable[[TurnContext],
-                                                            Awaitable]):
+    def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         return self._to_call(context, logic)
 
 
@@ -47,25 +43,24 @@ class MiddlewareSet(Middleware):
         :param middleware :
         :return:
         """
-        for (idx, mid) in enumerate(middleware):
+        for idx, mid in enumerate(middleware):
             if hasattr(mid, "on_turn") and callable(mid.on_turn):
                 self._middleware.append(mid)
                 return self
             raise TypeError(
-                'MiddlewareSet.use(): invalid middleware at index "%s" being added.'
-                % idx)
+                'MiddlewareSet.use(): invalid middleware at index "%s" being added.' % idx
+            )
 
     async def receive_activity(self, context: TurnContext):
         await self.receive_activity_internal(context, None)
 
-    async def on_turn(self, context: TurnContext,
-                      logic: Callable[[TurnContext], Awaitable]):
+    async def on_turn(self, context: TurnContext, logic: Callable[[TurnContext], Awaitable]):
         await self.receive_activity_internal(context, None)
         await logic()
 
-    async def receive_activity_with_status(self, context: TurnContext,
-                                           callback: Callable[[TurnContext],
-                                                              Awaitable]):
+    async def receive_activity_with_status(
+        self, context: TurnContext, callback: Callable[[TurnContext], Awaitable]
+    ):
         return await self.receive_activity_internal(context, callback)
 
     async def receive_activity_internal(
@@ -82,7 +77,8 @@ class MiddlewareSet(Middleware):
 
         async def call_next_middleware():
             return await self.receive_activity_internal(
-                context, callback, next_middleware_index + 1)
+                context, callback, next_middleware_index + 1
+            )
 
         try:
             return await next_middleware.on_turn(context, call_next_middleware)

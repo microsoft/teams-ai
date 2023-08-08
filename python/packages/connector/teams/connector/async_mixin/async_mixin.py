@@ -42,12 +42,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class AsyncServiceClientMixin:
-
-    async def async_send_formdata(self,
-                                  request,
-                                  headers=None,
-                                  content=None,
-                                  **config):
+    async def async_send_formdata(self, request, headers=None, content=None, **config):
         """Send data as a multipart form-data request.
         We only deal with file-like objects or strings at this point.
         The requests is not yet streamed.
@@ -71,7 +66,7 @@ class AsyncServiceClientMixin:
             self._session = requests.Session()
         try:
             session = self.creds.signed_session(self._session)
-        except TypeError:    # Credentials does not support session injection
+        except TypeError:  # Credentials does not support session injection
             session = self.creds.signed_session()
             if self._session is not None:
                 _LOGGER.warning(
@@ -90,18 +85,16 @@ class AsyncServiceClientMixin:
 
         response = None
         try:
-
             try:
                 future = loop.run_in_executor(
                     None,
-                    functools.partial(session.request, request.method,
-                                      request.url, **kwargs),
+                    functools.partial(session.request, request.method, request.url, **kwargs),
                 )
                 return await future
 
             except (
-                    oauth2.rfc6749.errors.InvalidGrantError,
-                    oauth2.rfc6749.errors.TokenExpiredError,
+                oauth2.rfc6749.errors.InvalidGrantError,
+                oauth2.rfc6749.errors.TokenExpiredError,
             ) as err:
                 error = "Token expired or is invalid. Attempting to refresh."
                 _LOGGER.warning(error)
@@ -115,24 +108,21 @@ class AsyncServiceClientMixin:
 
                 future = loop.run_in_executor(
                     None,
-                    functools.partial(session.request, request.method,
-                                      request.url, **kwargs),
+                    functools.partial(session.request, request.method, request.url, **kwargs),
                 )
                 return await future
             except (
-                    oauth2.rfc6749.errors.InvalidGrantError,
-                    oauth2.rfc6749.errors.TokenExpiredError,
+                oauth2.rfc6749.errors.InvalidGrantError,
+                oauth2.rfc6749.errors.TokenExpiredError,
             ) as err:
                 msg = "Token expired or is invalid."
                 raise_with_traceback(TokenExpiredError, msg, err)
 
-        except (requests.RequestException,
-                oauth2.rfc6749.errors.OAuth2Error) as err:
+        except (requests.RequestException, oauth2.rfc6749.errors.OAuth2Error) as err:
             msg = "Error occurred in request."
             raise_with_traceback(ClientRequestError, msg, err)
         finally:
-            self._close_local_session_if_necessary(response, session,
-                                                   kwargs["stream"])
+            self._close_local_session_if_necessary(response, session, kwargs["stream"])
 
     def stream_download_async(self, response, user_callback):
         """Async Generator for streaming request body data.
@@ -158,7 +148,6 @@ def _msrest_next(iterator):
 
 
 class StreamDownloadGenerator(AsyncIterator):
-
     def __init__(self, response, user_callback, block):
         self.response = response
         self.block = block
@@ -168,8 +157,7 @@ class StreamDownloadGenerator(AsyncIterator):
     async def __anext__(self):
         loop = asyncio.get_event_loop()
         try:
-            chunk = await loop.run_in_executor(None, _msrest_next,
-                                               self.iter_content_func)
+            chunk = await loop.run_in_executor(None, _msrest_next, self.iter_content_func)
             if not chunk:
                 raise _MsrestStopIteration()
             if self.user_callback and callable(self.user_callback):

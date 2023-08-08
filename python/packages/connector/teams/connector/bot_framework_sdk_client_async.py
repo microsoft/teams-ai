@@ -12,14 +12,15 @@ from ._configuration import ConnectorClientConfiguration
 
 
 class BotFrameworkConnectorConfiguration(ConnectorClientConfiguration):
-
-    def __init__(self,
-                 credentials,
-                 base_url: str,
-                 *,
-                 pipeline_type: Optional[Type[AsyncPipeline]] = None,
-                 sender: Optional[AsyncHTTPSender] = None,
-                 driver: Optional[AsyncHttpDriver] = None):
+    def __init__(
+        self,
+        credentials,
+        base_url: str,
+        *,
+        pipeline_type: Optional[Type[AsyncPipeline]] = None,
+        sender: Optional[AsyncHTTPSender] = None,
+        driver: Optional[AsyncHttpDriver] = None,
+    ):
         super().__init__(credentials, base_url)
 
         # The overwrite hierarchy should be well documented
@@ -30,9 +31,7 @@ class BotFrameworkConnectorConfiguration(ConnectorClientConfiguration):
 
 
 class BotFrameworkSDKClientAsync(SDKClientAsync):
-
     def __init__(self, config: BotFrameworkConnectorConfiguration) -> None:
         super().__init__(config)
 
-        self._client.config.pipeline = (config.custom_pipeline
-                                        or self._client.config.pipeline)
+        self._client.config.pipeline = config.custom_pipeline or self._client.config.pipeline

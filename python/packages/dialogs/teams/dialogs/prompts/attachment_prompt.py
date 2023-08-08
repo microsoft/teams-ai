@@ -18,9 +18,7 @@ class AttachmentPrompt(Prompt):
     By default the prompt will return to the calling dialog an `[Attachment]`
     """
 
-    def __init__(self,
-                 dialog_id: str,
-                 validator: Callable[[PromptValidatorContext], bool] = None):
+    def __init__(self, dialog_id: str, validator: Callable[[PromptValidatorContext], bool] = None):
         super().__init__(dialog_id, validator)
 
     async def on_prompt(
@@ -31,8 +29,7 @@ class AttachmentPrompt(Prompt):
         is_retry: bool,
     ):
         if not turn_context:
-            raise TypeError(
-                "AttachmentPrompt.on_prompt(): TurnContext cannot be None.")
+            raise TypeError("AttachmentPrompt.on_prompt(): TurnContext cannot be None.")
 
         if not isinstance(options, PromptOptions):
             raise TypeError(
@@ -51,8 +48,7 @@ class AttachmentPrompt(Prompt):
         options: PromptOptions,
     ) -> PromptRecognizerResult:
         if not turn_context:
-            raise TypeError(
-                "AttachmentPrompt.on_recognize(): context cannot be None.")
+            raise TypeError("AttachmentPrompt.on_recognize(): context cannot be None.")
 
         result = PromptRecognizerResult()
 
