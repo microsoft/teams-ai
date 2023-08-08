@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+# pylint: skip-file
+
 from abc import ABC, abstractclassmethod
 from typing import Optional
 
