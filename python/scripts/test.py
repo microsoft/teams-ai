@@ -4,7 +4,11 @@ Licensed under the MIT License.
 """
 
 import subprocess
+from pathlib import Path
 
 
 def test():
-    subprocess.run(["poetry", "run", "pytest"])
+    for e in Path("./packages").glob("*"):
+        if e.is_dir():
+            print("------ " + e.name + " ------")
+            subprocess.run(["poetry", "run", "test"], cwd=e.absolute())

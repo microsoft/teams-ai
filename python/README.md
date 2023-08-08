@@ -1,6 +1,6 @@
-# Teams AI
+# Teams SDK
 
-SDK focused on building AI based applications for Microsoft Teams.
+A set of libraries that make it easy to build bots for Microsoft Teams.
 
 ## Development
 

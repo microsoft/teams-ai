@@ -1,8 +1,14 @@
+"""
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT License.
+"""
+
 import subprocess
+from pathlib import Path
 
 
 def ci():
-    subprocess.run(["poetry", "check"])
-    subprocess.run(["poetry", "run", "lint"])
-    subprocess.run(["poetry", "run", "test"])
-    subprocess.run(["poetry", "build"])
+    for e in Path("./packages").glob("*"):
+        if e.is_dir():
+            print("------ " + e.name + " ------")
+            subprocess.run(["poetry", "run", "ci"], cwd=e.absolute())

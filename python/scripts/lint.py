@@ -4,7 +4,11 @@ Licensed under the MIT License.
 """
 
 import subprocess
+from pathlib import Path
 
 
 def lint():
-    subprocess.run(["poetry", "run", "pylint", "./teams_ai"])
+    for e in Path("./packages").glob("*"):
+        if e.is_dir():
+            print("------ " + e.name + " ------")
+            subprocess.run(["poetry", "run", "lint"], cwd=e.absolute())

@@ -1,14 +1,15 @@
 [tool.poetry]
-name = "teams-ai"
+name = "teams"
 version = "0.0.0"
-description = "SDK focused on building AI based applications for Microsoft Teams."
-authors = ["Microsoft Corp."]
+description = "Teams SDK"
+authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
+packages = [
+    { include = "packages" }
+]
 
 [tool.poetry.dependencies]
-python = ">=3.7.2,<4.0"
-botbuilder-core = "^4.14.4"
-aiohttp = "^3.8.5"
+python = ">=3.8.3,<4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -18,11 +19,14 @@ pytest-cov = "^4.1.0"
 pytest-asyncio = "^0.21.1"
 
 [tool.poetry.scripts]
-lint = "scripts:lint"
-fmt = "scripts:fmt"
-test = "scripts:test"
-clean = "scripts:clean"
+build = "scripts:build"
+check = "scripts:check"
 ci = "scripts:ci"
+clean = "scripts:clean"
+fmt = "scripts:fmt"
+install = "scripts:install"
+lint = "scripts:lint"
+test = "scripts:test"
 
 [build-system]
 requires = ["poetry-core"]
@@ -34,4 +38,4 @@ spaces_before_comment = 4
 split_before_logical_operator = true
 
 [tool.pytest.ini_options]
-addopts = "--cov-report html:coverage --cov=teams_ai"
+addopts = "--cov-report html:coverage --cov=teams"

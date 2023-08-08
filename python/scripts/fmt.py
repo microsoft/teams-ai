@@ -4,10 +4,11 @@ Licensed under the MIT License.
 """
 
 import subprocess
+from pathlib import Path
 
 
 def fmt():
-    subprocess.run([
-        "poetry", "run", "yapf", ".", "--recursive", "--in-place",
-        "--parallel", "--print-modified"
-    ])
+    for e in Path("./packages").glob("*"):
+        if e.is_dir():
+            print("------ " + e.name + " ------")
+            subprocess.run(["poetry", "run", "fmt"], cwd=e.absolute())
