@@ -7,3 +7,5 @@ from .completion_config import *
 from .prompt_manager import *
 from .prompt_template import *
 from .prompt_template_config import *
+from .prompt_manager import *
+from .default_prompt_manager import *

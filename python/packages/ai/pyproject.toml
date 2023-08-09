@@ -12,6 +12,7 @@ packages = [
 python = ">=3.8"
 botbuilder-core = "^4.14.4"
 aiohttp = "^3.8.5"
+semantic-kernel = "^0.3.7.dev0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
