@@ -7,7 +7,7 @@ import subprocess
 
 
 def ci():
-    subprocess.run(["poetry", "check"]).check_returncode()
-    subprocess.run(["poetry", "run", "lint"]).check_returncode()
-    subprocess.run(["poetry", "run", "test"]).check_returncode()
-    subprocess.run(["poetry", "build"]).check_returncode()
+    subprocess.run(["poetry", "check"], check=True)
+    subprocess.run(["poetry", "run", "lint"], check=True)
+    subprocess.run(["poetry", "run", "test"], check=True)
+    subprocess.run(["poetry", "build"], check=True)

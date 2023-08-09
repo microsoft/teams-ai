@@ -4,9 +4,12 @@ Licensed under the MIT License.
 """
 
 import abc
-from typing import TypeVar, Generic, Any, Awaitable, Union
+from typing import Any, Awaitable, Generic, TypeVar, Union
+
 from botbuilder.core import TurnContext
-from ..turn_state import TurnState
+
+from teams.ai.turn_state import TurnState
+
 from .prompt_template import PromptTemplate
 
 T = TypeVar("T", bound=TurnState)

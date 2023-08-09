@@ -5,6 +5,7 @@ Licensed under the MIT License.
 
 from dataclasses import dataclass
 from typing import List, Union
+
 from .completion_config import CompletionConfig
 
 
