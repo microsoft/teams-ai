@@ -2,13 +2,18 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
+
+# pylint: disable=W0640
+
 import os
-from typing import Callable
+from typing import Callable, Dict, Union
 
 from botbuilder.core import TurnContext
-from teams.ai.turn_state import TurnState
-from semantic_kernel import Kernel, PromptTemplateConfig, PromptTemplate
+from semantic_kernel import Kernel, PromptTemplate, PromptTemplateConfig
 from semantic_kernel.skill_definition import sk_function
+
+from teams.ai.exceptions import AIException
+from teams.ai.turn_state import TurnState
 
 SK_CONFIG_FILE_NAME = "config.json"
 SK_PROMPT_FILE_NAME = "skprompt.txt"
@@ -20,8 +25,8 @@ class DefaultPromptManager:
     """
 
     _prompts_folder: str
-    _templates: dict[str, PromptTemplate]
-    _functions: dict[str, Callable[[TurnContext, TurnState], str]]
+    _templates: Dict[str, PromptTemplate] = {}
+    _functions: Dict[str, Callable[[TurnContext, TurnState], str]] = {}
 
     def __init__(self, prompts_folder: str) -> None:
         """
@@ -44,13 +49,13 @@ class DefaultPromptManager:
         :param allow_overrides: Whether to allow overriding an existing function with the same name.
         """
         if not allow_overrides and self._functions.get(name):
-            raise Exception(f"Function {name} already exists")
+            raise AIException(f"Function {name} already exists")
 
         self._functions[name] = handler
         return self
 
     async def render_prompt(
-        self, context: TurnContext, state: TurnState, name_or_template: str | PromptTemplate
+        self, context: TurnContext, state: TurnState, name_or_template: Union[str, PromptTemplate]
     ) -> str:
         """
         Renders the given prompt template.
@@ -78,8 +83,8 @@ class DefaultPromptManager:
 
     def _read_file(self, file_path: str) -> str:
         if not os.path.exists(file_path):
-            raise Exception(f"Missing prompt config or text file: {file_path} does not exist")
-        with open(file_path, "r") as file:
+            raise AIException(f"Missing prompt config or text file: {file_path} does not exist")
+        with open(file_path, "r", encoding="utf8") as file:
             return file.read()
 
     def _create_kernel_context(

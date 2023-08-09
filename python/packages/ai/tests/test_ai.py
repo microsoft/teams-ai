@@ -3,8 +3,6 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-# pylint: disable=W0212
-
 from unittest import TestCase
 
 from teams.ai import AI, ActionEntry, AIException

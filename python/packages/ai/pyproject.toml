@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.8,<4.0"
 botbuilder-core = "^4.14.4"
 aiohttp = "^3.8.5"
 semantic-kernel = "^0.3.7.dev0"
