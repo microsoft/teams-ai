@@ -12,7 +12,7 @@ from semantic_kernel import Kernel, PromptTemplate, PromptTemplateConfig
 from teams.ai.prompts import DefaultPromptManager
 from teams.ai.turn_state import TurnState
 
-TEST_ASSERTS_FOLDER = "tests\\prompts\\test_assets"
+TEST_ASSERTS_FOLDER = "tests/prompts/test_assets"
 
 
 class TestDefaultPromptManager(IsolatedAsyncioTestCase):
