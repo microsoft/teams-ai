@@ -56,7 +56,7 @@ namespace Microsoft.TeamsAI.AI.Planner
 
         private protected virtual ITextCompletion _CreateTextCompletionService(TOptions options)
         {
-            Verify.ParamNotNull(options, nameof(options));
+            Verify.ParamNotNull(options);
 
             return new OpenAITextCompletion(
                 options.DefaultModel,
@@ -68,7 +68,7 @@ namespace Microsoft.TeamsAI.AI.Planner
 
         private protected virtual IChatCompletion _CreateChatCompletionService(TOptions options)
         {
-            Verify.ParamNotNull(options, nameof(options));
+            Verify.ParamNotNull(options);
 
             return new OpenAIChatCompletion(
                 options.DefaultModel,
@@ -80,9 +80,9 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <inheritdoc/>
         public virtual async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
-            Verify.ParamNotNull(turnContext, nameof(turnContext));
-            Verify.ParamNotNull(turnState, nameof(turnState));
-            Verify.ParamNotNull(options, nameof(options));
+            Verify.ParamNotNull(turnContext);
+            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(options);
 
             string model = _GetModel(promptTemplate);
             string result;
@@ -137,9 +137,9 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <inheritdoc/>
         public async Task<Plan> GeneratePlanAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken = default)
         {
-            Verify.ParamNotNull(turnContext, nameof(turnContext));
-            Verify.ParamNotNull(turnState, nameof(turnState));
-            Verify.ParamNotNull(options, nameof(options));
+            Verify.ParamNotNull(turnContext);
+            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(options);
 
             string result;
             try
@@ -187,7 +187,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                 try
                 {
                     plan = ResponseParser.ParseResponse(result.Trim());
-                    Verify.ParamNotNull(plan, nameof(plan));
+                    Verify.ParamNotNull(plan);
                 }
                 catch (Exception ex)
                 {
@@ -222,7 +222,7 @@ namespace Microsoft.TeamsAI.AI.Planner
 
         private async Task<ITextResult> _CreateTextCompletion(PromptTemplate promptTemplate, CancellationToken cancellationToken)
         {
-            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
+            Verify.ParamNotNull(promptTemplate);
 
             PromptTemplateConfig skPromptTemplate = promptTemplate.Configuration.GetPromptTemplateConfig();
 
@@ -234,9 +234,9 @@ namespace Microsoft.TeamsAI.AI.Planner
 
         private async Task<IChatResult> _CreateChatCompletion(TState turnState, AIOptions<TState> aiOptions, PromptTemplate promptTemplate, string? userMessage, CancellationToken cancellationToken)
         {
-            Verify.ParamNotNull(turnState, nameof(turnState));
-            Verify.ParamNotNull(aiOptions, nameof(aiOptions));
-            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
+            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(aiOptions);
+            Verify.ParamNotNull(promptTemplate);
 
             PromptTemplateConfig templateConfig = promptTemplate.Configuration.GetPromptTemplateConfig();
             ChatRequestSettings chatRequestSettings = new()

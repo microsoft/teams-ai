@@ -28,7 +28,7 @@ namespace Microsoft.TeamsAI.State
             }
             set
             {
-                Verify.ParamNotNull(value, nameof(value));
+                Verify.ParamNotNull(value);
 
                 Set(ConversationStateKey, value!);
             }
@@ -45,7 +45,7 @@ namespace Microsoft.TeamsAI.State
             }
             set
             {
-                Verify.ParamNotNull(value, nameof(value));
+                Verify.ParamNotNull(value);
 
                 Set(UserStateKey, value!);
             }
@@ -62,7 +62,7 @@ namespace Microsoft.TeamsAI.State
             }
             set
             {
-                Verify.ParamNotNull(value, nameof(value));
+                Verify.ParamNotNull(value);
 
                 Set(TempStateKey, value!);
             }
