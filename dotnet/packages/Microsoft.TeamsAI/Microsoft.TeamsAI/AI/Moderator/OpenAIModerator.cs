@@ -62,22 +62,22 @@ namespace Microsoft.TeamsAI.AI.Moderator
             {
                 case ModerationType.Output:
                 case ModerationType.Both:
+                {
+                    foreach (IPredictedCommand command in plan.Commands)
                     {
-                        foreach (IPredictedCommand command in plan.Commands)
+                        if (command is PredictedSayCommand sayCommand)
                         {
-                            if (command is PredictedSayCommand sayCommand)
-                            {
-                                string output = sayCommand.Response;
+                            string output = sayCommand.Response;
 
-                                // If plan is flagged it will be replaced
-                                Plan? newPlan = await _HandleTextModeration(output, false);
+                            // If plan is flagged it will be replaced
+                            Plan? newPlan = await _HandleTextModeration(output, false);
 
-                                return newPlan ?? plan;
-                            }
+                            return newPlan ?? plan;
                         }
-
-                        break;
                     }
+
+                    break;
+                }
                 default:
                     break;
             }
@@ -91,7 +91,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
             {
                 ModerationResponse response = await _client.ExecuteTextModeration(text, _options.Model);
                 ModerationResult? result = response.Results.Count > 0 ? response.Results[0] : null;
-                
+
                 if (result != null)
                 {
                     if (result.Flagged)
@@ -114,7 +114,8 @@ namespace Microsoft.TeamsAI.AI.Moderator
 
                 return null;
 
-            } catch (OpenAIClientException e)
+            }
+            catch (OpenAIClientException e)
             {
                 // Rate limited
                 if (e.statusCode != null && (int)e.statusCode == 429)
