@@ -35,8 +35,6 @@ class DefaultPromptManager:
         :param prompts_folder: The base folder path where the prompt files are located.
         """
         self._prompts_folder = prompts_folder
-        self._templates = {}
-        self._functions = {}
 
     def add_function(
         self, name: str, handler: Callable[[TurnContext, TurnState], str], allow_overrides=False
