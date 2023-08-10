@@ -7,10 +7,10 @@ from enum import Enum
 
 
 class DefaultActionTypes(str, Enum):
-    UNKNOWN_ACTION = "__UnknownAction__"
-    FLAGGED_INPUT = "__FlaggedInput__"
-    FLAGGED_OUTPUT = "__FlaggedOutput__"
-    RATE_LIMITED = "__RateLimited__"
-    PLAN_READY = "__PlanReady__"
-    DO_COMMAND = "__DO__"
-    SAY_COMMAND = "__SAY__"
+    UNKNOWN_ACTION = "___UnknownAction___"
+    FLAGGED_INPUT = "___FlaggedInput___"
+    FLAGGED_OUTPUT = "___FlaggedOutput___"
+    RATE_LIMITED = "___RateLimited___"
+    PLAN_READY = "___PlanReady___"
+    DO_COMMAND = "___DO___"
+    SAY_COMMAND = "___SAY___"
