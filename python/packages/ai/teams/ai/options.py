@@ -16,7 +16,7 @@ StateT = TypeVar("StateT", bound=TurnState)
 
 @dataclass
 class AIOptions(Generic[StateT]):
-    prompt_manager: PromptManager[StateT] = DefaultPromptManager
+    prompt_manager: PromptManager[StateT] = DefaultPromptManager()
     "The prompt manager to use for generating prompts."
 
     prompt: Optional[str] = None
