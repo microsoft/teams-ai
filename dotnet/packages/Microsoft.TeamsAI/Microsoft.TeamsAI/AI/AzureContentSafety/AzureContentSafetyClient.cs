@@ -22,7 +22,7 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
 
         public AzureContentSafetyClient(AzureContentSafetyClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
-            _httpClient = httpClient ?? new HttpClient();
+            _httpClient = httpClient ?? DefaultHttpClient.Instance;
             _logger = logger;
             _options = options;
         }
@@ -48,7 +48,7 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
 
                 string apiVersion = _options.ApiVersion ?? "2023-04-30-preview";
                 string url = $"{_options.Endpoint}/contentsafety/text:analyze?api-version={apiVersion}";
-                HttpResponseMessage httpResponse = await _ExecutePostRequest(url, content);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequest(url, content);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 AzureContentSafetyTextAnalysisResponse result = JsonSerializer.Deserialize<AzureContentSafetyTextAnalysisResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
@@ -67,11 +67,10 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
 
         private async Task<HttpResponseMessage> _ExecutePostRequest(string url, HttpContent? content, CancellationToken cancellationToken = default)
         {
+            HttpResponseMessage? response = null;
             try
             {
-                HttpResponseMessage? response;
-
-                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url))
+                using (HttpRequestMessage request = new(HttpMethod.Post, url))
                 {
                     request.Headers.Add("Accept", "application/json");
                     request.Headers.Add("User-Agent", HttpUserAgent);
@@ -101,6 +100,7 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
             }
             catch (Exception e)
             {
+                response?.Dispose();
                 throw new AzureContentSafetyClientException($"Something went wrong {e.Message}");
             }
 
