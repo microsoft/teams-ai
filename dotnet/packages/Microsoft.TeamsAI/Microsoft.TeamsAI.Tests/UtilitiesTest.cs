@@ -11,7 +11,7 @@ namespace Microsoft.TeamsAI.Tests
             object? argument = null;
 
             // Act
-            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => Verify.ParamNotNull(argument, nameof(argument)));
+            ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => Verify.ParamNotNull(argument));
 
             // Assert
             Assert.Equal("Value cannot be null. (Parameter 'argument')", ex.Message);
@@ -24,7 +24,7 @@ namespace Microsoft.TeamsAI.Tests
             object? argument = new();
 
             // Act
-            Verify.ParamNotNull(argument, nameof(argument));
+            Verify.ParamNotNull(argument);
 
             // Assert
             // Nothing to assert, test passes 
