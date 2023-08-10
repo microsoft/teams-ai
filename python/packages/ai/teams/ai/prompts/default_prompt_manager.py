@@ -135,11 +135,13 @@ class DefaultPromptManager(PromptManager):
         self, context: TurnContext, state: TurnState, name_or_template: Union[str, PromptTemplate]
     ) -> PromptTemplate:
         """
-        Renders the given prompt template.
+        Renders a prompt template by name
 
-        :param context: The turn context for current turn of conversation.
-        :param state: The current turn state.
-        :param name_or_template: The name of the prompt template or the prompt template itself.
+        Parameters
+        ----------
+        `context`: current application turn context\n
+        `state`: current turn state\n
+        `name_or_template`: name of the prompt template to render or a prompt template to render
         """
         sk = Kernel()
         ctx = self._create_kernel_context(sk, context, state)
