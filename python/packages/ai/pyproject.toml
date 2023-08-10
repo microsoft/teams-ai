@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.3,<4.0"
+python = ">=3.8,<4.0"
 botbuilder-core = "^4.14.4"
 aiohttp = "^3.8.5"
 semantic-kernel = "^0.3.7.dev0"
@@ -20,6 +20,7 @@ pylint = "^2.17.4"
 pytest-cov = "^4.1.0"
 pytest-asyncio = "^0.21.1"
 black = "^23.7.0"
+isort = "^5.12.0"
 
 [tool.poetry.scripts]
 lint = "scripts:lint"
@@ -35,6 +36,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 target-version = ['py38']
+
+[tool.isort]
+profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--cov-report html:coverage --cov=teams"

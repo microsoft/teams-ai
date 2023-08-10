@@ -185,8 +185,13 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i,
+good-names=ai,
+           ci,
+           sk,
+           i,
            j,
+           e,
+           o,
            k,
            ex,
            Run,
@@ -428,7 +433,11 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead
+        use-symbolic-message-instead,
+        C0116,
+        C0115,
+        R0903,
+        W0212
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

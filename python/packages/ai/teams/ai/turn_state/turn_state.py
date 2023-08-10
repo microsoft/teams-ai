@@ -4,11 +4,11 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
-from .turn_state_entry import TurnStateEntry
 from .conversation_state import ConversationState
 from .temp_state import TempState
+from .turn_state_entry import TurnStateEntry
 from .user_state import UserState
 
 ConversationT = TypeVar("ConversationT", bound=ConversationState)

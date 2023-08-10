@@ -3,11 +3,12 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import TypeVar, Generic, Optional, List
-from botbuilder.core import TurnContext, Storage
+from typing import Generic, List, Optional, TypeVar
 
-from .turn_state_entry import TurnStateEntry
+from botbuilder.core import Storage, TurnContext
+
 from .turn_state import TurnState
+from .turn_state_entry import TurnStateEntry
 
 TurnStateT = TypeVar("TurnStateT", bound=TurnState)
 
