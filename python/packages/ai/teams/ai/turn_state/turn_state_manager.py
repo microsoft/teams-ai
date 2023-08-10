@@ -10,13 +10,13 @@ from botbuilder.core import Storage, TurnContext
 from .turn_state import TurnState
 from .turn_state_entry import TurnStateEntry
 
-TurnStateT = TypeVar("TurnStateT", bound=TurnState)
+StateT = TypeVar("StateT", bound=TurnState)
 
 
-class TurnStateManager(Generic[TurnStateT]):
+class TurnStateManager(Generic[StateT]):
     "responsible for loading and saving an application turn state"
 
-    async def load_state(self, storage: Optional[Storage], context: TurnContext) -> TurnStateT:
+    async def load_state(self, storage: Optional[Storage], context: TurnContext) -> StateT:
         """
         loads all of the state scopes for the current turn\n
         `storage`: storage provider to load state scopes from\n
@@ -61,7 +61,7 @@ class TurnStateManager(Generic[TurnStateT]):
             temp=TurnStateEntry(),
         )
 
-    async def save_state(self, storage: Optional[Storage], state: TurnStateT):
+    async def save_state(self, storage: Optional[Storage], state: StateT):
         "saves all of the state scopes for the current turn"
 
         if storage is None:

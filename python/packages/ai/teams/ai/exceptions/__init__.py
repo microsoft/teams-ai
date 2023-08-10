@@ -4,3 +4,4 @@ Licensed under the MIT License.
 """
 
 from .ai import *
+from .prompt_manager import *

@@ -4,13 +4,18 @@ Licensed under the MIT License.
 """
 
 from logging import Logger
-from typing import Dict, Optional
+from typing import Dict, Generic, Optional, TypeVar
 
 from teams.ai.action import ActionEntry, ActionFunction, DefaultActionTypes
 from teams.ai.exceptions import AIException
+from teams.ai.turn_state import TurnState
+
+from .options import AIOptions
+
+StateT = TypeVar("StateT", bound=TurnState)
 
 
-class AI:
+class AI(Generic[StateT]):
     """
     ### AI System
 
@@ -18,10 +23,12 @@ class AI:
     generating prompts. It can be used free standing or routed to by the Application object.
     """
 
+    _options: AIOptions[StateT]
     _log: Logger
     _actions: Dict[str, ActionEntry] = {}
 
-    def __init__(self, log=Logger("default")) -> None:
+    def __init__(self, options=AIOptions[StateT](), log=Logger("default")) -> None:
+        self._options = options
         self._log = log
         self._actions = {}
         self.action(DefaultActionTypes.UNKNOWN_ACTION)(self.__unknown_action__)

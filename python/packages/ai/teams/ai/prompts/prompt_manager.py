@@ -3,25 +3,26 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 import abc
 from typing import Any, Awaitable, Generic, TypeVar, Union
 
 from botbuilder.core import TurnContext
+from semantic_kernel import PromptTemplate
 
 from teams.ai.turn_state import TurnState
 
-from .prompt_template import PromptTemplate
-
-T = TypeVar("T", bound=TurnState)
+StateT = TypeVar("StateT", bound=TurnState)
 
 
-class PromptManager(abc.ABC, Generic[T]):
+class PromptManager(abc.ABC, Generic[StateT]):
     "interface implemented by all prompt managers"
 
     @abc.abstractmethod
-    def add_function(self, name: str, handler: Awaitable, allow_overrides=False):
+    def add_function(self, name: str, handler: Awaitable, allow_overrides=False) -> PromptManager:
         """
-        adds a custom function <name> to the prompt manager
+        Adds a custom function <name> to the prompt manager
 
         Parameters
         ----------
@@ -31,9 +32,9 @@ class PromptManager(abc.ABC, Generic[T]):
         """
 
     @abc.abstractmethod
-    def add_prompt_template(self, name: str, template: PromptTemplate):
+    def add_prompt_template(self, name: str, template: PromptTemplate) -> PromptManager:
         """
-        adds a prompt template to the prompt manager
+        Adds a prompt template to the prompt manager
 
         Parameters
         ----------
@@ -42,9 +43,9 @@ class PromptManager(abc.ABC, Generic[T]):
         """
 
     @abc.abstractmethod
-    async def invoke_function(self, context: TurnContext, state: T, name: str) -> Any:
+    async def invoke_function(self, context: TurnContext, state: StateT, name: str) -> Any:
         """
-        invoke a function by name
+        Invoke a function by name
 
         Parameters
         ----------
@@ -54,11 +55,21 @@ class PromptManager(abc.ABC, Generic[T]):
         """
 
     @abc.abstractmethod
+    def load_prompt_template(self, name: str) -> PromptTemplate:
+        """
+        Loads a named prompt template from the filesystem.
+
+        Parameters
+        ----------
+        `name`: name of the template to load
+        """
+
+    @abc.abstractmethod
     async def render_prompt(
-        self, context: TurnContext, state: T, name_or_template: Union[str, PromptTemplate]
+        self, context: TurnContext, state: StateT, name_or_template: Union[str, PromptTemplate]
     ) -> PromptTemplate:
         """
-        renders a prompt template by name
+        Renders a prompt template by name
 
         Parameters
         ----------
