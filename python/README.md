@@ -6,6 +6,10 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 
 - [AI](./packages/ai/)
 
+## Samples
+
+- [Echo](./samples/echo/)
+
 ## Development
 
 ### Prerequisites

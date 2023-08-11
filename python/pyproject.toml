@@ -5,7 +5,8 @@ description = "Teams SDK"
 authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
 packages = [
-    { include = "packages" }
+    { include = "packages" },
+    { include = "samples" }
 ]
 
 [tool.poetry.dependencies]
