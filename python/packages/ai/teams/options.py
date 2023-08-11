@@ -12,11 +12,10 @@ from botbuilder.core import BotAdapter, Storage
 from teams.ai import AIOptions, TurnState, TurnStateManager
 
 StateT = TypeVar("StateT", bound=TurnState)
-StateManagerT = TypeVar("StateManagerT", bound=TurnStateManager)
 
 
 @dataclass
-class ApplicationOptions(Generic[StateT, StateManagerT]):
+class ApplicationOptions(Generic[StateT]):
     adapter: Optional[BotAdapter] = None
     """
     Optional. Bot adapter being used.
@@ -39,9 +38,9 @@ class ApplicationOptions(Generic[StateT, StateManagerT]):
     Optional. AI options to use. When provided, a new instance of the AI system will be created.
     """
 
-    turn_state_manager: Optional[StateManagerT] = None
+    turn_state_manager = TurnStateManager[StateT]()
     """
-    Optional. Turn state manager to use. If omitted, an instance of `StateManagerT` will
+    Optional. Turn state manager to use. If omitted, an instance of `TurnStateManager` will
     be created using the parameterless constructor.
     """
 

@@ -62,7 +62,7 @@ class TestTurnStateManager(IsolatedAsyncioTestCase):
 
         # Mutate the conversation state to so that the changes are saved.
         value["test"] = "b"
-        await manager.save_state(storage=storage, state=state)
+        await manager.save_state(storage, TurnContext(SimpleAdapter(), ACTIVITY), state)
         value = await storage.read([key])
 
         self.assertEqual(value[key], {"test": "b"})

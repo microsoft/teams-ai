@@ -4,11 +4,11 @@ Licensed under the MIT License.
 """
 
 from logging import Logger
-from typing import Any, Dict, Generic, Optional, TypeVar
+from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar
 
 from botbuilder.core import TurnContext
 
-from teams.ai.action import ActionEntry, ActionFunction, DefaultActionTypes
+from teams.ai.action import ActionEntry
 from teams.ai.exceptions import AIException
 from teams.ai.state import TurnState
 
@@ -27,16 +27,12 @@ class AI(Generic[StateT]):
 
     _options: AIOptions[StateT]
     _log: Logger
-    _actions: Dict[str, ActionEntry] = {}
+    _actions: Dict[str, ActionEntry[StateT]] = {}
 
     def __init__(self, options=AIOptions[StateT](), log=Logger("default")) -> None:
         self._options = options
         self._log = log
         self._actions = {}
-        self.action(DefaultActionTypes.UNKNOWN_ACTION)(self.__unknown_action__)
-        self.action(DefaultActionTypes.FLAGGED_INPUT)(self.__flagged_input__)
-        self.action(DefaultActionTypes.FLAGGED_OUTPUT)(self.__flagged_output__)
-        self.action(DefaultActionTypes.RATE_LIMITED)(self.__rate_limited__)
 
     def action(self, name: Optional[str] = None, allow_overrides=False):
         """
@@ -46,8 +42,9 @@ class AI(Generic[StateT]):
         ```python
         # Use this method as a decorator
         @app.ai.action()
-        def hello_world():
+        async def hello_world(context: TurnContext, state: TurnState, entities: Any, name: str):
             print("hello world!")
+            return True
 
         # Pass a function to this method
         app.ai.action()(hello_world)
@@ -59,7 +56,7 @@ class AI(Generic[StateT]):
         are found `Default: False`
         """
 
-        def __call__(func: ActionFunction):
+        def __call__(func: Callable[[TurnContext, StateT, Any, str], Awaitable[bool]]):
             action_name = name
 
             if action_name is None:
@@ -79,42 +76,3 @@ class AI(Generic[StateT]):
             return func
 
         return __call__
-
-    def __unknown_action__(
-        self, _context: TurnContext, _state: StateT, _entities: Any, name: str
-    ) -> bool:
-        self._log.error(
-            """
-            An AI action named "%s" was 
-            predicted but no handler was registered.
-            """,
-            name,
-        )
-        return True
-
-    def __flagged_input__(
-        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
-    ) -> bool:
-        self._log.error(
-            """
-            The users input has been moderated but no handler 
-            was registered for 'AI.FlaggedInputActionName'.
-            """
-        )
-        return True
-
-    def __flagged_output__(
-        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
-    ) -> bool:
-        self._log.error(
-            """
-            The bots output has been moderated but no 
-            handler was registered for 'AI.FlaggedOutputActionName'.
-            """
-        )
-        return True
-
-    def __rate_limited__(
-        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
-    ) -> bool:
-        raise AIException("An AI request failed because it was rate limited")

@@ -64,7 +64,7 @@ class TurnStateManager(Generic[StateT]):
 
         return state
 
-    async def save_state(self, storage: Optional[Storage], state: StateT):
+    async def save_state(self, storage: Optional[Storage], _context: TurnContext, state: StateT):
         "saves all of the state scopes for the current turn"
 
         if storage is None:
