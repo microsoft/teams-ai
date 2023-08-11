@@ -3,11 +3,11 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, Optional, TypeVar
 
 from botbuilder.core import Storage, TurnContext
 
-from .turn_state import TurnState
+from .turn_state import ConversationState, TempState, TurnState, UserState
 from .turn_state_entry import TurnStateEntry
 
 StateT = TypeVar("StateT", bound=TurnState)
@@ -46,20 +46,23 @@ class TurnStateManager(Generic[StateT]):
         user_id = context.activity.from_property.id
         conversation_key = f"{channel_id}/{bot_id}/conversations/{conversation_id}"
         user_key = f"{channel_id}/{bot_id}/users/{user_id}"
-
         items = {}
 
         if storage:
-            items = await storage.read([conversation_key, user_key])
+            items: Any = await storage.read([conversation_key, user_key])
 
-        conversation = items[conversation_key] if conversation_key in items else None
-        user = items[user_key] if user_key in items else None
-
-        return TurnState(
-            conversation=TurnStateEntry(value=conversation, storage_key=conversation_key),
-            user=TurnStateEntry(value=user, storage_key=user_key),
-            temp=TurnStateEntry(),
+        conversation: ConversationState = (
+            items[conversation_key] if conversation_key in items else ConversationState()
         )
+        user: UserState = items[user_key] if user_key in items else UserState()
+
+        state: Any = TurnState(
+            conversation=TurnStateEntry(conversation, storage_key=conversation_key),
+            user=TurnStateEntry(user, storage_key=user_key),
+            temp=TurnStateEntry(TempState(history="", input="", output="")),
+        )
+
+        return state
 
     async def save_state(self, storage: Optional[Storage], state: StateT):
         "saves all of the state scopes for the current turn"
@@ -70,12 +73,23 @@ class TurnStateManager(Generic[StateT]):
         to_delete: List[str] = []
         changes = {}
 
-        for key in state:
-            if state[key].storage_key:
-                if state[key].is_deleted:
-                    to_delete.append(state[key].storage_key)
-                elif state[key].has_changed:
-                    changes[state[key].storage_key] = state[key].value
+        if state.conversation.storage_key:
+            if state.conversation.is_deleted:
+                to_delete.append(state.conversation.storage_key)
+            elif state.conversation.has_changed:
+                changes[state.conversation.storage_key] = state.conversation.value
+
+        if state.user.storage_key:
+            if state.user.is_deleted:
+                to_delete.append(state.user.storage_key)
+            elif state.user.has_changed:
+                changes[state.user.storage_key] = state.user.value
+
+        if state.temp.storage_key:
+            if state.temp.is_deleted:
+                to_delete.append(state.temp.storage_key)
+            elif state.temp.has_changed:
+                changes[state.temp.storage_key] = state.temp.value
 
         if len(changes) > 0:
             await storage.write(changes)

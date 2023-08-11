@@ -24,7 +24,7 @@ class ApplicationOptions(Generic[StateT, StateManagerT]):
     method, this property is required.
     """
 
-    bot_app_id: Optional[str] = None
+    bot_app_id = ""
     """
     Optional. `Application` ID of the bot.
     """

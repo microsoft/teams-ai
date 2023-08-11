@@ -4,11 +4,13 @@ Licensed under the MIT License.
 """
 
 from logging import Logger
-from typing import Dict, Generic, Optional, TypeVar
+from typing import Any, Dict, Generic, Optional, TypeVar
+
+from botbuilder.core import TurnContext
 
 from teams.ai.action import ActionEntry, ActionFunction, DefaultActionTypes
 from teams.ai.exceptions import AIException
-from teams.ai.turn_state import TurnState
+from teams.ai.state import TurnState
 
 from .options import AIOptions
 
@@ -73,12 +75,14 @@ class AI(Generic[StateT]):
                     """
                 )
 
-            self._actions[action_name] = ActionEntry(name, allow_overrides, func)
+            self._actions[action_name] = ActionEntry(action_name, allow_overrides, func)
             return func
 
         return __call__
 
-    def __unknown_action__(self, name: str) -> bool:
+    def __unknown_action__(
+        self, _context: TurnContext, _state: StateT, _entities: Any, name: str
+    ) -> bool:
         self._log.error(
             """
             An AI action named "%s" was 
@@ -88,7 +92,9 @@ class AI(Generic[StateT]):
         )
         return True
 
-    def __flagged_input__(self) -> bool:
+    def __flagged_input__(
+        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
+    ) -> bool:
         self._log.error(
             """
             The users input has been moderated but no handler 
@@ -97,7 +103,9 @@ class AI(Generic[StateT]):
         )
         return True
 
-    def __flagged_output__(self) -> bool:
+    def __flagged_output__(
+        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
+    ) -> bool:
         self._log.error(
             """
             The bots output has been moderated but no 
@@ -106,5 +114,7 @@ class AI(Generic[StateT]):
         )
         return True
 
-    def __rate_limited__(self) -> bool:
+    def __rate_limited__(
+        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
+    ) -> bool:
         raise AIException("An AI request failed because it was rate limited")

@@ -3,9 +3,9 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Hashable, Optional, TypeVar
 
-ValueT = TypeVar("ValueT")
+ValueT = TypeVar("ValueT", bound=Hashable)
 
 
 class TurnStateEntry(Generic[ValueT]):
@@ -16,7 +16,7 @@ class TurnStateEntry(Generic[ValueT]):
     _hash: str
     _deleted = False
 
-    def __init__(self, value: Optional[ValueT] = None, storage_key: Optional[str] = None) -> None:
+    def __init__(self, value: ValueT, storage_key: Optional[str] = None) -> None:
         self._value = value
         self._storage_key = storage_key
         self._hash = str(self._value)
@@ -44,7 +44,6 @@ class TurnStateEntry(Generic[ValueT]):
         "gets the value of the state scope"
 
         if self.is_deleted:
-            self._value = None
             self._deleted = False
 
         return self._value
