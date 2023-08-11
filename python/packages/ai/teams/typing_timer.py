@@ -32,6 +32,7 @@ class TypingTimer:
     def stop(self) -> None:
         if self._timer:
             self._timer.cancel()
+            self._timer = None
 
     def _on_timer(self, context: TurnContext):
         async def __call__():
