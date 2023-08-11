@@ -13,6 +13,7 @@ from teams.ai import AI, TurnState
 from .activity_type import ActivityType
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
+from .typing_timer import TypingTimer
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -147,7 +148,11 @@ class Application(Bot, Generic[StateT]):
         self._start_long_running_call(context, self._on_turn)
 
     async def _on_turn(self, context: TurnContext):
+        typing = TypingTimer()
+
         try:
+            await typing.start(context)
+
             state = await self._options.turn_state_manager.load_state(
                 self._options.storage, context
             )
@@ -180,9 +185,7 @@ class Application(Bot, Generic[StateT]):
 
                     return
         finally:
-            """
-            stop timer
-            """
+            typing.stop()
 
     async def _on_activity(self, context: TurnContext, state: StateT) -> bool:
         func = self._activities.get(str(context.activity.type))
