@@ -9,10 +9,10 @@ from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar
 from botbuilder.core import TurnContext
 
 from teams.ai.action import ActionEntry
-from teams.ai.exceptions import AIException
 from teams.ai.state import TurnState
 
-from .options import AIOptions
+from .ai_error import AIError
+from .ai_options import AIOptions
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -65,7 +65,7 @@ class AI(Generic[StateT]):
             existing = self._actions.get(action_name)
 
             if existing is not None and not existing.allow_overrides:
-                raise AIException(
+                raise AIError(
                     f"""
                     The AI.action() method was called with a previously 
                     registered action named \"{action_name}\".

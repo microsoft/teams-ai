@@ -11,8 +11,8 @@ from botbuilder.core.activity_handler import ActivityTypes
 from teams.ai import AI, TurnState
 
 from .activity_type import ActivityType
-from .exception import ApplicationException
-from .options import ApplicationOptions
+from .app_error import ApplicationError
+from .app_options import ApplicationOptions
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -45,7 +45,7 @@ class Application(Bot, Generic[StateT]):
         self._options = options
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):
-            raise ApplicationException(
+            raise ApplicationError(
                 """
                 The `ApplicationOptions.long_running_messages` property is unavailable because 
                 no adapter or `bot_app_id` was configured.
@@ -60,7 +60,7 @@ class Application(Bot, Generic[StateT]):
         """
 
         if not self._ai:
-            raise ApplicationException(
+            raise ApplicationError(
                 """
                 The `Application.ai` property is unavailable because no AI options were configured.
                 """
@@ -185,12 +185,12 @@ class Application(Bot, Generic[StateT]):
             """
 
     async def _on_activity(self, context: TurnContext, state: StateT) -> bool:
-        func = self._activities[str(context.activity.type)]
+        func = self._activities.get(str(context.activity.type))
 
         if func:
             return await func(context, state)
 
-        return False
+        return True
 
     def _start_long_running_call(
         self, context: TurnContext, func: Callable[[TurnContext], Awaitable]

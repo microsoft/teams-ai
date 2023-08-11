@@ -15,14 +15,14 @@ from semantic_kernel import Kernel, PromptTemplate, PromptTemplateConfig
 from semantic_kernel.skill_definition import sk_function
 from semantic_kernel.template_engine.prompt_template_engine import PromptTemplateEngine
 
-from teams.ai.exceptions import PromptManagerException
 from teams.ai.state import TurnState
+
+from .prompt_manager_error import PromptManagerError
 
 SK_CONFIG_FILE_NAME = "config.json"
 SK_PROMPT_FILE_NAME = "skprompt.txt"
 
 StateT = TypeVar("StateT", bound=TurnState)
-PromptFunction = Callable[[TurnContext, StateT], Awaitable[Any]]
 
 
 class PromptManager(Generic[StateT]):
@@ -32,7 +32,7 @@ class PromptManager(Generic[StateT]):
 
     _prompts_folder: str
     _templates: Dict[str, PromptTemplate] = {}
-    _functions: Dict[str, PromptFunction] = {}
+    _functions: Dict[str, Callable[[TurnContext, StateT], Awaitable[Any]]] = {}
     _variables: Dict[str, str] = {}
 
     def __init__(self, prompts_folder="") -> None:
@@ -44,7 +44,10 @@ class PromptManager(Generic[StateT]):
         self._prompts_folder = prompts_folder
 
     def add_function(
-        self, name: str, handler: PromptFunction, allow_overrides=False
+        self,
+        name: str,
+        handler: Callable[[TurnContext, StateT], Awaitable[Any]],
+        allow_overrides=False,
     ) -> PromptManager:
         """
         Adds a custom function <name> to the prompt manager
@@ -56,7 +59,7 @@ class PromptManager(Generic[StateT]):
         `allow_overrides`: whether to allow overriding an existing function
         """
         if not allow_overrides and self._functions.get(name):
-            raise PromptManagerException(f"Function {name} already exists")
+            raise PromptManagerError(f"Function {name} already exists")
 
         self._functions[name] = handler
         return self
@@ -71,7 +74,7 @@ class PromptManager(Generic[StateT]):
         `template`: prompt template to add\n
         """
         if self._templates.get(name):
-            raise PromptManagerException(f"Text template `{name}` already exists")
+            raise PromptManagerError(f"Text template `{name}` already exists")
 
         self._templates[name] = template
         return self
@@ -89,9 +92,7 @@ class PromptManager(Generic[StateT]):
         func = self._functions.get(name)
 
         if not func:
-            raise PromptManagerException(
-                f"Attempting to invoke an unregistered function name {name}"
-            )
+            raise PromptManagerError(f"Attempting to invoke an unregistered function name {name}")
 
         return await func(context, state)
 
@@ -113,13 +114,13 @@ class PromptManager(Generic[StateT]):
         config_path = os.path.join(folder_path, SK_CONFIG_FILE_NAME)
 
         if not os.path.isdir(folder_path):
-            raise PromptManagerException(f"Directory `{folder_path}` doesn't exist")
+            raise PromptManagerError(f"Directory `{folder_path}` doesn't exist")
 
         if not os.path.isfile(prompt_path):
-            raise PromptManagerException(f"File `{prompt_path}` doesn't exist")
+            raise PromptManagerError(f"File `{prompt_path}` doesn't exist")
 
         if not os.path.isfile(config_path):
-            raise PromptManagerException(f"File `{config_path}` doesn't exist")
+            raise PromptManagerError(f"File `{config_path}` doesn't exist")
 
         with open(prompt_path, "r", encoding="utf8") as file:
             prompt = file.read()
@@ -132,7 +133,7 @@ class PromptManager(Generic[StateT]):
                 template=prompt, template_engine=PromptTemplateEngine(), prompt_config=config
             )
         except Exception as e:
-            raise PromptManagerException(f"Error while loading prompt. {e}") from e
+            raise PromptManagerError(f"Error while loading prompt. {e}") from e
 
     async def render_prompt(
         self, context: TurnContext, state: StateT, name_or_template: Union[str, PromptTemplate]

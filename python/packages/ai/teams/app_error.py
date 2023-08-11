@@ -4,6 +4,6 @@ Licensed under the MIT License.
 """
 
 
-class PromptManagerException(Exception):
+class ApplicationError(Exception):
     def __init__(self, message: str) -> None:
         super().__init__(message)

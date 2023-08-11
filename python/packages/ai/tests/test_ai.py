@@ -8,15 +8,16 @@ from unittest import TestCase
 
 from botbuilder.core import TurnContext
 
-from teams.ai import AI, ActionEntry, AIException, TurnState
+from teams.ai import AI, ActionEntry, AIError, TurnState
 
 
 class TestAI(TestCase):
     def test_action_method(self):
         ai = AI()
 
-        def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
             print("test")
+            return True
 
         ai.action("hello_world")(hello_world)
 
@@ -27,8 +28,9 @@ class TestAI(TestCase):
         ai = AI()
 
         @ai.action("hello_world")
-        def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
             print("test")
+            return True
 
         self.assertIsNotNone(ai._actions["hello_world"])
         self.assertIsInstance(ai._actions["hello_world"], ActionEntry)
@@ -37,8 +39,9 @@ class TestAI(TestCase):
         ai = AI()
 
         @ai.action()
-        def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
             print("test")
+            return True
 
         self.assertIsNotNone(ai._actions["hello_world"])
         self.assertIsInstance(ai._actions["hello_world"], ActionEntry)
@@ -47,10 +50,11 @@ class TestAI(TestCase):
         ai = AI()
 
         @ai.action()
-        def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
             print("test")
+            return True
 
         def wrapper():
             ai.action()(hello_world)
 
-        self.assertRaises(AIException, wrapper)
+        self.assertRaises(AIError, wrapper)
