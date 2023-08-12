@@ -2,6 +2,8 @@
 
 A Teams bot that echos back what the user said
 
+![Screenshot](./assets/screenshot_0.png)
+
 ## Development
 
 ### Prerequisites

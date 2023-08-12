@@ -1,6 +1,8 @@
 """
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
+
+Description: initialize the app and listen for `message` activitys
 """
 
 from botbuilder.core import (

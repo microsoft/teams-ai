@@ -1,6 +1,9 @@
 """
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
+
+Description: initialize the api and route incoming messages
+to our app
 """
 
 import uvicorn
