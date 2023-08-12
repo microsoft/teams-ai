@@ -26,7 +26,7 @@ $: pip install poetry
 $: poetry install
 ```
 
-## Run Scripts On All Packages
+## Run Scripts On All Packages/Samples
 
 > The following scripts will run against all sub packages, if you need to run scripts against
 a specific package instead you should run the script from that packages directory.
