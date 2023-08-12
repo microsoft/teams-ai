@@ -3,7 +3,6 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
 from unittest import IsolatedAsyncioTestCase
 
 import pytest
@@ -46,7 +45,6 @@ class TestTurnStateManager(IsolatedAsyncioTestCase):
 
     @pytest.mark.asyncio
     async def test_save_state(self):
-        @dataclass
         class CustomConversationState(ConversationState):
             test: str
 
