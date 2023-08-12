@@ -7,5 +7,5 @@ from .ci import *
 from .clean import *
 from .fmt import *
 from .lint import *
-from .test import *
 from .start import *
+from .test import *

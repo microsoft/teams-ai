@@ -23,7 +23,7 @@ class ApplicationOptions(Generic[StateT]):
     method, this property is required.
     """
 
-    bot_app_id = ""
+    bot_app_id: str = ""
     """
     Optional. `Application` ID of the bot.
     """
@@ -49,20 +49,20 @@ class ApplicationOptions(Generic[StateT]):
     Optional. `Logger` that will be used in this application.
     """
 
-    remove_recipient_mention = True
+    remove_recipient_mention: bool = True
     """
     Optional. If true, the bot will automatically remove mentions of the bot's name from incoming
     messages. Defaults to true.
     """
 
-    start_typing_timer = True
+    start_typing_timer: bool = True
     """
     Optional. If true, the bot will automatically start a typing timer when messages are received.
     This allows the bot to automatically indicate that it's received the message and is processing
     the request. Defaults to true.
     """
 
-    long_running_messages = False
+    long_running_messages: bool = False
     """
     Optional. If true, the bot supports long running messages that can take longer then the 10 - 15
     second timeout imposed by most channels. Defaults to false.

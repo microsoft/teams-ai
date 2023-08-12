@@ -2067,7 +2067,7 @@ description = "SDK focused on building AI based applications for Microsoft Teams
 optional = false
 python-versions = ">=3.8,<4.0"
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
 aiohttp = "^3.8.5"
@@ -2372,4 +2372,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "9bc81ff7a4f20a189b85d927af1e40fbb99b4eaf48a576ca67548349d7226c20"
+content-hash = "a6247f2d9f2e0a68b5c571a386b5a293ed94696e4a0a8305b0f449dcee2d2cbc"

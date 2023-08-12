@@ -9,7 +9,7 @@ readme = "README.md"
 python = ">=3.8,<4.0"
 fastapi = "^0.101.0"
 uvicorn = "^0.23.2"
-teams-ai = { path = "../../packages/ai" }
+teams-ai = { path = "../../packages/ai", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

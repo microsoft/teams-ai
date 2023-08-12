@@ -145,7 +145,7 @@ class Application(Bot, Generic[StateT]):
         return func
 
     async def on_turn(self, context: TurnContext):
-        self._start_long_running_call(context, self._on_turn)
+        await self._start_long_running_call(context, self._on_turn)
 
     async def _on_turn(self, context: TurnContext):
         typing = TypingTimer()
@@ -195,7 +195,7 @@ class Application(Bot, Generic[StateT]):
 
         return True
 
-    def _start_long_running_call(
+    async def _start_long_running_call(
         self, context: TurnContext, func: Callable[[TurnContext], Awaitable]
     ):
         if (
@@ -203,10 +203,10 @@ class Application(Bot, Generic[StateT]):
             and ActivityTypes.message == context.activity.type
             and self._options.long_running_messages
         ):
-            return self._options.adapter.continue_conversation(
+            return await self._options.adapter.continue_conversation(
                 bot_id=self._options.bot_app_id,
                 reference=context.get_conversation_reference(context.activity),
                 callback=func,
             )
 
-        return func(context)
+        return await func(context)

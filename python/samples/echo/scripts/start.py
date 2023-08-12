@@ -7,4 +7,4 @@ import subprocess
 
 
 def start():
-    subprocess.run(["poetry", "run", "python", "echo/main.py"])
+    subprocess.run(["poetry", "run", "python", "echo/main.py"], check=False)
