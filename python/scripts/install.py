@@ -10,5 +10,10 @@ from pathlib import Path
 def install():
     for e in Path("./packages").glob("*"):
         if e.is_dir():
-            print("------ " + e.name + " ------")
-            subprocess.run(["poetry", "install"], cwd=e.absolute()).check_returncode()
+            print("------ Package[" + e.name + "] ------")
+            subprocess.run(["poetry", "install"], cwd=e.absolute(), check=True)
+
+    for e in Path("./samples").glob("*"):
+        if e.is_dir():
+            print("------ Sample[" + e.name + "] ------")
+            subprocess.run(["poetry", "install"], cwd=e.absolute(), check=True)
