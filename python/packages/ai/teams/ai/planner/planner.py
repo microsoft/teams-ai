@@ -8,6 +8,11 @@ Licensed under the MIT License.
 from abc import ABC, abstractclassmethod
 from typing import Any, Callable, Union
 
+from botbuilder.core import TurnContext
+
+from teams.ai.planner.ai_history_options import AIHistoryOptions
+from teams.ai.planner.plan import Plan
+from teams.ai.prompts import PromptTemplate
 from teams.ai.turn_state import TurnState
 
 

@@ -4,14 +4,14 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from typing import List, Union
+from typing import List, Optional
 
 
 @dataclass
 class CompletionConfig:
     "interface for the completion configuration portion of a prompt template"
 
-    tempurature: float
+    temperature: float
     "the models temperature as a number between 0 and 1"
 
     top_p: float
@@ -26,5 +26,18 @@ class CompletionConfig:
     max_tokens: int
     "the models maximum number of tokens to generate"
 
-    stop_sequences: Union[List[str], None]
+    stop_sequences: Optional[List[str]]
     "optional: array of stop sequences that when hit will stop generation"
+
+    @staticmethod
+    def from_dict(data: dict) -> "CompletionConfig":
+        "creates a CompletionConfig from a dictionary"
+        # TODO: should we have default values for the properties?
+        return CompletionConfig(
+            temperature=data["temperature"],
+            top_p=data["top_p"],
+            presence_penalty=data["presence_penalty"],
+            frequency_penalty=data["frequency_penalty"],
+            max_tokens=data["max_tokens"],
+            stop_sequences=data.get("stop_sequences", None),
+        )

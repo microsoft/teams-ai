@@ -4,11 +4,10 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from typing import TypedDict
 
 
 @dataclass
-class TempState(TypedDict):
+class TempState:
     """
     inherit a new interface from this base interface to strongly type
     the applications temp state

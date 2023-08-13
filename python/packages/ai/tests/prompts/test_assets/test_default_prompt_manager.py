@@ -3,14 +3,21 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+import json
+import os
 from unittest import IsolatedAsyncioTestCase
 
 import pytest
 from botbuilder.core import TurnContext
-from semantic_kernel import Kernel, PromptTemplate, PromptTemplateConfig
 
-from teams.ai.prompts import DefaultPromptManager
-from teams.ai.turn_state import TurnState
+from teams.ai.prompts import DefaultPromptManager, PromptTemplate, PromptTemplateConfig
+from teams.ai.turn_state import (
+    ConversationState,
+    TempState,
+    TurnState,
+    TurnStateEntry,
+    UserState,
+)
 
 TEST_ASSERTS_FOLDER = "tests/prompts/test_assets"
 
@@ -37,20 +44,22 @@ class TestDefaultPromptManager(IsolatedAsyncioTestCase):
         mocked_turn_state = self._mock_turn_state()
 
         # render prompt success when template is passed
-        prompt_text = await prompt_manager.render_prompt(
+        prompt = await prompt_manager.render_prompt(
             mocked_turn_context, mocked_turn_state, "happy_path"
         )
-        self.assertEqual(prompt_text, "test prompt")
+        self.assertEqual(prompt.text, "test prompt")
 
         # render prompt success when template is passed
-        sk = Kernel()
-        prompt_template = PromptTemplate(
-            "test prompt", sk.prompt_template_engine, PromptTemplateConfig()
-        )
-        prompt_text = await prompt_manager.render_prompt(
-            mocked_turn_context, mocked_turn_state, prompt_template
-        )
-        self.assertEqual(prompt_text, "test prompt")
+        with open(
+            os.path.join(TEST_ASSERTS_FOLDER, "happy_path", "config.json"), "r", encoding="utf8"
+        ) as file:
+            prompt_template = PromptTemplate(
+                "test prompt", PromptTemplateConfig.from_dict(json.loads(file.read()))
+            )
+            prompt = await prompt_manager.render_prompt(
+                mocked_turn_context, mocked_turn_state, prompt_template
+            )
+            self.assertEqual(prompt.text, "test prompt")
 
         # render prompt fail when config file is missing
         with pytest.raises(Exception):
@@ -68,4 +77,12 @@ class TestDefaultPromptManager(IsolatedAsyncioTestCase):
         return {}
 
     def _mock_turn_state(self) -> TurnState:
-        return {}
+        conversation_state = ConversationState()
+        user_state = UserState()
+        temp_state = TempState("input", "history", "output")
+        turn_state = TurnState[ConversationState, UserState, TempState](
+            conversation=TurnStateEntry(conversation_state),
+            user=TurnStateEntry(user_state),
+            temp=TurnStateEntry(temp_state),
+        )
+        return turn_state
