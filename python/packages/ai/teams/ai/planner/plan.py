@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 from teams.ai.planner.plan_type import PlanType
@@ -16,7 +16,7 @@ from .predicted_say_command import PredictedSayCommand
 @dataclass
 class Plan:
     type: PlanType = PlanType.PLAN
-    commands: List[PredictedCommand] = []
+    commands: List[PredictedCommand] = field(default_factory=list)
 
     @staticmethod
     def from_dict(data: dict) -> "Plan":

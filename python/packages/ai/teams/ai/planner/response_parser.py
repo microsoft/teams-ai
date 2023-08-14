@@ -99,7 +99,7 @@ def parse_response(text: str) -> Plan:
                 result = _parse_say_command(tokens)
 
             # Did we get a command back?
-            if len(result) > 0:
+            if result.length > 0:
                 # Add command to list if generated
                 # - In the case of `DO DO command` the first DO command wouldn't generate
                 if result.command:
@@ -239,8 +239,8 @@ def _parse_say_command(tokens: List[str]):
 
         # Parse command (skips initial DO token)
         response = ""
+        length += 1
         while length < len(tokens):
-            length += 1
             # Check for ignored tokens
             token = tokens[length]
             if token in IGNORED_TOKENS:
@@ -252,6 +252,8 @@ def _parse_say_command(tokens: List[str]):
 
             # Append token to output response
             response += token
+
+            length += 1
 
         # Create command
         if len(response) > 0:
