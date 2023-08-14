@@ -20,7 +20,7 @@ namespace Microsoft.TeamsAI.AI.Action
         }
 
         [Action(DefaultActionTypes.UnknownActionName)]
-        public Task<bool> UnknownAction([ActionName] string action)
+        public Task<bool> UnkownAction([ActionName] string action)
         {
             _logger?.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
             return Task.FromResult(true);
@@ -49,7 +49,7 @@ namespace Microsoft.TeamsAI.AI.Action
         [Action(DefaultActionTypes.PlanReadyActionName)]
         public Task<bool> PlanReadyAction([ActionEntities] Plan plan)
         {
-            Verify.ParamNotNull(plan);
+            Verify.ParamNotNull(plan, nameof(plan));
 
             return Task.FromResult(plan.Commands.Count > 0);
         }
@@ -57,7 +57,7 @@ namespace Microsoft.TeamsAI.AI.Action
         [Action(DefaultActionTypes.DoCommandActionName)]
         public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData, [ActionName] string action)
         {
-            Verify.ParamNotNull(doCommandActionData);
+            Verify.ParamNotNull(doCommandActionData, nameof(doCommandActionData));
 
             if (doCommandActionData.Handler == null)
             {
@@ -77,8 +77,7 @@ namespace Microsoft.TeamsAI.AI.Action
         [Action(DefaultActionTypes.SayCommandActionName)]
         public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
         {
-            Verify.ParamNotNull(command);
-
+            Verify.ParamNotNull(command, nameof(command));
             string response = command.Response;
             AdaptiveCardParseResult? card = ResponseParser.ParseAdaptiveCard(response);
 

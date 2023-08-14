@@ -6,10 +6,6 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 
 - [AI](./packages/ai/)
 
-## Samples
-
-- [Echo](./samples/echo/)
-
 ## Development
 
 ### Prerequisites
@@ -20,7 +16,13 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 $: pip install poetry
 ```
 
-## Run Scripts On All Packages/Samples
+### Install Monorepo Dependencies
+
+```bash
+$: poetry install
+```
+
+## Run Scripts On All Packages
 
 > The following scripts will run against all sub packages, if you need to run scripts against
 a specific package instead you should run the script from that packages directory.
@@ -28,35 +30,35 @@ a specific package instead you should run the script from that packages director
 ### Install Dependencies
 
 ```bash
-$: python scripts/install.py
+$: poetry run install
 ```
 
 ### Build
 
 ```bash
-$: python scripts/build.py
+$: poetry run build
 ```
 
 ### Test
 
 ```bash
-$: python scripts/test.py
+$: poetry run test
 ```
 
 ### Lint
 
 ```bash
-$: python scripts/lint.py
+$: poetry run lint
 ```
 
 ## Format
 
 ```bash
-$: python scripts/fmt.py
+$: poetry run fmt
 ```
 
 ## Clean
 
 ```bash
-$: python scripts/clean.py
+$: poetry run clean
 ```

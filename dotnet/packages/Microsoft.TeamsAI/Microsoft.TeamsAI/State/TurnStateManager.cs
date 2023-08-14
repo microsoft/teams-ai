@@ -88,8 +88,8 @@ namespace Microsoft.TeamsAI.State
         {
             try
             {
-                Verify.ParamNotNull(turnContext);
-                Verify.ParamNotNull(turnState);
+                Verify.ParamNotNull(turnContext, nameof(turnContext));
+                Verify.ParamNotNull(turnState, nameof(turnState));
 
                 Dictionary<string, object> changes = new();
                 List<string> deletions = new();

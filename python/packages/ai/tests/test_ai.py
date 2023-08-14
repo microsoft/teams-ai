@@ -3,21 +3,17 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Any
 from unittest import TestCase
 
-from botbuilder.core import TurnContext
-
-from teams.ai import AI, ActionEntry, AIError, TurnState
+from teams.ai import AI, ActionEntry, AIException
 
 
 class TestAI(TestCase):
     def test_action_method(self):
         ai = AI()
 
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        def hello_world():
             print("test")
-            return True
 
         ai.action("hello_world")(hello_world)
 
@@ -28,9 +24,8 @@ class TestAI(TestCase):
         ai = AI()
 
         @ai.action("hello_world")
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        def hello_world():
             print("test")
-            return True
 
         self.assertIsNotNone(ai._actions["hello_world"])
         self.assertIsInstance(ai._actions["hello_world"], ActionEntry)
@@ -39,9 +34,8 @@ class TestAI(TestCase):
         ai = AI()
 
         @ai.action()
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        def hello_world():
             print("test")
-            return True
 
         self.assertIsNotNone(ai._actions["hello_world"])
         self.assertIsInstance(ai._actions["hello_world"], ActionEntry)
@@ -50,11 +44,10 @@ class TestAI(TestCase):
         ai = AI()
 
         @ai.action()
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        def hello_world():
             print("test")
-            return True
 
         def wrapper():
             ai.action()(hello_world)
 
-        self.assertRaises(AIError, wrapper)
+        self.assertRaises(AIException, wrapper)

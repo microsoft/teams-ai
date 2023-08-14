@@ -86,7 +86,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
 
         private async Task<Plan?> _HandleTextModeration(string text, bool isModelInput)
         {
-            AzureContentSafetyTextAnalysisRequest request = new(text)
+            AzureContentSafetyTextAnalysisRequest request = new AzureContentSafetyTextAnalysisRequest(text)
             {
                 BlocklistNames = _options.BlocklistNames,
                 Categories = _options.Categories,

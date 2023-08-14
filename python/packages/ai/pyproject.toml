@@ -5,8 +5,7 @@ description = "SDK focused on building AI based applications for Microsoft Teams
 authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
 packages = [
-    { include = "teams" },
-    { include = "tests" }
+    { include = "teams" }
 ]
 
 [tool.poetry.dependencies]

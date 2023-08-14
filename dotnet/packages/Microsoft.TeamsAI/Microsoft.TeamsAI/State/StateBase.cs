@@ -17,7 +17,7 @@ namespace Microsoft.TeamsAI.State
         /// <exception cref="InvalidCastException"></exception>
         public bool TryGetValue<T>(string key, out T value)
         {
-            Verify.ParamNotNull(key);
+            Verify.ParamNotNull(key, nameof(key));
 
             if (base.TryGetValue(key, out object entry))
             {
@@ -43,7 +43,7 @@ namespace Microsoft.TeamsAI.State
         /// <returns>The value associated with the key</returns>
         public T? Get<T>(string key)
         {
-            Verify.ParamNotNull(key);
+            Verify.ParamNotNull(key, nameof(key));
 
             if (TryGetValue(key, out T value))
             {
@@ -63,8 +63,8 @@ namespace Microsoft.TeamsAI.State
         /// <param name="value">value associated with key</param>
         public void Set<T>(string key, T value)
         {
-            Verify.ParamNotNull(key);
-            Verify.ParamNotNull(value);
+            Verify.ParamNotNull(key, nameof(key));
+            Verify.ParamNotNull(value, nameof(value));
 
             this[key] = value;
         }

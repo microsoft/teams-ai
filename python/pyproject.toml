@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "teams"
+version = "0.0.0"
+description = "Teams SDK"
+authors = ["Microsoft <teams@microsoft.com>"]
+readme = "README.md"
+packages = [
+    { include = "packages" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8.3,<4.0"
+
+[tool.poetry.scripts]
+build = "scripts:build"
+check = "scripts:check"
+ci = "scripts:ci"
+clean = "scripts:clean"
+fmt = "scripts:fmt"
+install = "scripts:install"
+lint = "scripts:lint"
+test = "scripts:test"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

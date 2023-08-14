@@ -7,12 +7,8 @@ import subprocess
 from pathlib import Path
 
 
-for e in Path("./packages").glob("*"):
-    if e.is_dir():
-        print("------ Package[" + e.name + "] ------")
-        subprocess.run(["poetry", "run", "test"], cwd=e.absolute(), check=True)
-
-for e in Path("./samples").glob("*"):
-    if e.is_dir():
-        print("------ Sample[" + e.name + "] ------")
-        subprocess.run(["poetry", "run", "test"], cwd=e.absolute(), check=True)
+def test():
+    for e in Path("./packages").glob("*"):
+        if e.is_dir():
+            print("------ " + e.name + " ------")
+            subprocess.run(["poetry", "run", "test"], cwd=e.absolute()).check_returncode()

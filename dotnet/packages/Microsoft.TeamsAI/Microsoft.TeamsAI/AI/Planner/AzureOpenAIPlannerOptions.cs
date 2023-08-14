@@ -22,7 +22,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <param name="defaultModel">The default model to use.</param>
         public AzureOpenAIPlannerOptions(string apiKey, string defaultModel, string endpoint) : base(apiKey, defaultModel)
         {
-            Verify.ParamNotNull(endpoint);
+            Verify.ParamNotNull(endpoint, nameof(endpoint));
 
             Endpoint = endpoint;
         }

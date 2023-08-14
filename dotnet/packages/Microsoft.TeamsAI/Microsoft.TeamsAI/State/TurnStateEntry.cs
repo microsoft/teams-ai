@@ -15,7 +15,7 @@ namespace Microsoft.TeamsAI.State
         /// <param name="storageKey">The storage key used to store object entry</param>
         public TurnStateEntry(TValue value, string? storageKey = null)
         {
-            Verify.ParamNotNull(value);
+            Verify.ParamNotNull(value, nameof(value));
 
             _value = value;
             StorageKey = storageKey;
@@ -62,7 +62,7 @@ namespace Microsoft.TeamsAI.State
         /// <param name="value">The entry value.</param>
         public void Replace(TValue value)
         {
-            Verify.ParamNotNull(value);
+            Verify.ParamNotNull(value, nameof(value));
 
             _value = value;
         }

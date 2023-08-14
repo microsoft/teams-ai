@@ -53,8 +53,8 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="history">Optional. The history options to use for the AI system.</param>
         public AIOptions(IPlanner<TState> planner, IPromptManager<TState> promptManager, IModerator<TState>? moderator = null, string? prompt = null, AIHistoryOptions? history = null)
         {
-            Verify.ParamNotNull(planner);
-            Verify.ParamNotNull(promptManager);
+            Verify.ParamNotNull(planner, nameof(planner));
+            Verify.ParamNotNull(promptManager, nameof(promptManager));
 
             Planner = planner;
             PromptManager = promptManager;

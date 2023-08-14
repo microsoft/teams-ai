@@ -26,7 +26,7 @@ namespace Microsoft.TeamsAI.AI
 
         public AI(AIOptions<TState> options, ILogger? logger = null)
         {
-            Verify.ParamNotNull(options);
+            Verify.ParamNotNull(options, nameof(options));
 
             _options = options;
             _actions = new ActionCollection<TState>();
@@ -87,8 +87,8 @@ namespace Microsoft.TeamsAI.AI
         /// <exception cref="Exception"></exception>
         public AI<TState> RegisterAction(string name, IActionHandler<TState> handler, bool allowOverrides = false)
         {
-            Verify.ParamNotNull(name);
-            Verify.ParamNotNull(handler);
+            Verify.ParamNotNull(name, nameof(name));
+            Verify.ParamNotNull(handler, nameof(handler));
 
             if (!_actions.HasAction(name) || allowOverrides)
             {
@@ -117,7 +117,7 @@ namespace Microsoft.TeamsAI.AI
         /// <returns>The current instance object.</returns>
         public AI<TState> RegisterAction(ActionEntry<TState> action)
         {
-            Verify.ParamNotNull(action);
+            Verify.ParamNotNull(action, nameof(action));
 
             return RegisterAction(action.Name, action.Handler, action.AllowOverrides);
         }
@@ -130,7 +130,7 @@ namespace Microsoft.TeamsAI.AI
         /// <returns>The current instance object.</returns>
         public AI<TState> ImportActions(object instance)
         {
-            Verify.ParamNotNull(instance);
+            Verify.ParamNotNull(instance, nameof(instance));
 
             MethodInfo[] methods = instance.GetType()
                 .GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod);
@@ -171,8 +171,8 @@ namespace Microsoft.TeamsAI.AI
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
 
             AIOptions<TState> aIOptions = _ConfigureOptions(options);
 
@@ -216,9 +216,9 @@ namespace Microsoft.TeamsAI.AI
         /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, PromptTemplate prompt, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
-            Verify.ParamNotNull(prompt);
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(prompt, nameof(prompt));
 
             AIOptions<TState> opts = _ConfigureOptions(options);
 
@@ -330,9 +330,9 @@ namespace Microsoft.TeamsAI.AI
         /// or threads to receive notice of cancellation.</param>
         public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
-            Verify.ParamNotNull(promptTemplate);
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
 
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
@@ -355,9 +355,9 @@ namespace Microsoft.TeamsAI.AI
         /// or threads to receive notice of cancellation.</param>
         public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
         {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
-            Verify.ParamNotNull(name);
+            Verify.ParamNotNull(turnContext, nameof(turnContext));
+            Verify.ParamNotNull(turnState, nameof(turnState));
+            Verify.ParamNotNull(name, nameof(name));
 
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
@@ -390,7 +390,7 @@ namespace Microsoft.TeamsAI.AI
         /// <returns>A prompt function.</returns>
         public PromptFunction<TState> CreateSemanticFunction(string name, PromptTemplate? template, AIOptions<TState>? options)
         {
-            Verify.ParamNotNull(name);
+            Verify.ParamNotNull(name, nameof(name));
 
             if (template != null)
             {

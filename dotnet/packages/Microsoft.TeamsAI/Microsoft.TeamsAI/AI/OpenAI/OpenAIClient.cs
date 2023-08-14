@@ -1,12 +1,11 @@
-﻿using System.Net;
+﻿using Microsoft.TeamsAI.AI.Moderator;
+using Microsoft.TeamsAI.Exceptions;
+using Microsoft.Extensions.Logging;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Utilities;
 
 namespace Microsoft.TeamsAI.OpenAI
 {
@@ -24,9 +23,10 @@ namespace Microsoft.TeamsAI.OpenAI
 
         public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
-            _httpClient = httpClient ?? DefaultHttpClient.Instance;
+            _httpClient = httpClient ?? new HttpClient();
             _logger = logger;
             _options = options;
+
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Microsoft.TeamsAI.OpenAI
                     JsonSerializer.Serialize(new
                     {
                         model = model,
-                        input = text
+                        input = text 
                     }, new JsonSerializerOptions()
                     {
                         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -53,11 +53,11 @@ namespace Microsoft.TeamsAI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIModerationEndpoint, content);
+                HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIModerationEndpoint, content);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 ModerationResponse result = JsonSerializer.Deserialize<ModerationResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
-
+                
                 return result;
             }
             catch (OpenAIClientException)
@@ -72,13 +72,14 @@ namespace Microsoft.TeamsAI.OpenAI
 
         private async Task<HttpResponseMessage> _ExecutePostRequest(string url, HttpContent? content, CancellationToken cancellationToken = default)
         {
-            HttpResponseMessage? response = null;
             try
             {
-                using (HttpRequestMessage request = new(HttpMethod.Post, url))
+                HttpResponseMessage? response;
+
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url))
                 {
                     request.Headers.Add("Accept", "application/json");
-                    request.Headers.Add("User-Agent", HttpUserAgent);
+                    request.Headers.Add("User-Agent", HttpUserAgent);      
                     request.Headers.Add("Authorization", $"Bearer {_options.ApiKey}");
 
                     if (_options.Organization != null)
@@ -110,7 +111,6 @@ namespace Microsoft.TeamsAI.OpenAI
             }
             catch (Exception e)
             {
-                response?.Dispose();
                 throw new OpenAIClientException($"Something went wrong {e.Message}");
             }
 
