@@ -105,9 +105,10 @@ class DefaultPromptManager:
 
         sk_context = kernel.create_new_context()
         # Set built-in variables
-        sk_context.variables.set("input", turn_state.temp.value["input"])
-        sk_context.variables.set("history", turn_state.temp.value["history"])
-        sk_context.variables.set("output", turn_state.temp.value["output"])
+        sk_context.variables.set("input", turn_state.temp.value.input)
+        sk_context.variables.set("history", turn_state.temp.value.history)
+        sk_context.variables.set("output", turn_state.temp.value.output)
+        turn_state.temp.value
 
         sk_template = sk.PromptTemplate(
             prompt_template.text,
