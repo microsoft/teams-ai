@@ -10,8 +10,8 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
         public PromptTemplate(string text, PromptTemplateConfiguration configuration)
         {
-            Verify.ParamNotNull(text, nameof(text));
-            Verify.ParamNotNull(configuration, nameof(configuration));
+            Verify.ParamNotNull(text);
+            Verify.ParamNotNull(configuration);
 
             Text = text;
             Configuration = configuration;
