@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
+from typing import Dict
 
 from teams.ai.planner.command_type import CommandType
 from teams.ai.planner.predicted_command import PredictedCommand
@@ -13,7 +14,7 @@ from teams.ai.planner.predicted_command import PredictedCommand
 class PredictedDoCommand(PredictedCommand):
     type: CommandType.DO
     action: str
-    entities: dict[str, any]
+    entities: Dict[str, any]
 
     @staticmethod
     def from_dict(data: dict) -> "PredictedDoCommand":

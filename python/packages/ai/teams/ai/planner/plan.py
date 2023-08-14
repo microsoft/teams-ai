@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
+from typing import List
 
 from teams.ai.planner.plan_type import PlanType
 from teams.ai.planner.predicted_command import PredictedCommand
@@ -15,7 +16,7 @@ from .predicted_say_command import PredictedSayCommand
 @dataclass
 class Plan:
     type: PlanType = PlanType.PLAN
-    commands: list[PredictedCommand] = []
+    commands: List[PredictedCommand] = []
 
     @staticmethod
     def from_dict(data: dict) -> "Plan":

@@ -5,7 +5,7 @@ Licensed under the MIT License.
 import json
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 from teams.ai.exceptions import AIException
 
@@ -43,7 +43,7 @@ COMMANDS = ["DO", "SAY"]
 
 DEFAULT_COMMAND = "SAY"
 
-IGNORED_TOKENS: list[str] = ["THEN"]
+IGNORED_TOKENS: List[str] = ["THEN"]
 
 
 def parse_json(text: str) -> dict:
@@ -118,7 +118,7 @@ def parse_response(text: str) -> Plan:
     return plan
 
 
-def _parse_do_command(tokens: list[str]):
+def _parse_do_command(tokens: List[str]):
     length = 0
     command: PredictedDoCommand = None
     if len(tokens) > 1:
@@ -230,7 +230,7 @@ def _parse_do_command(tokens: list[str]):
     return ParsedCommandResult(length, command)
 
 
-def _parse_say_command(tokens: list[str]):
+def _parse_say_command(tokens: List[str]):
     length = 0
     command = None
     if len(tokens) > 1:
@@ -260,8 +260,8 @@ def _parse_say_command(tokens: list[str]):
     return ParsedCommandResult(length, command)
 
 
-def _tokenize_text(text: str) -> list[str]:
-    tokens: list[str] = []
+def _tokenize_text(text: str) -> List[str]:
+    tokens: List[str] = []
     if text:
         token = ""
         length = len(text)
