@@ -31,7 +31,7 @@ class Application(Bot, Generic[StateT]):
     and other AI capabilities.
     """
 
-    _ai: AI
+    _ai: AI[StateT]
     _options: ApplicationOptions[StateT]
     _typing_delay = 1000
     _activities: Dict[str, Callable[[TurnContext, StateT], Awaitable[bool]]] = {}
