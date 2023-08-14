@@ -22,6 +22,7 @@ pytest-cov = "^4.1.0"
 pytest-asyncio = "^0.21.1"
 black = "^23.7.0"
 isort = "^5.12.0"
+mypy = "^1.5.0"
 
 [tool.poetry.scripts]
 lint = "scripts:lint"
@@ -43,3 +44,11 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--cov-report html:coverage --cov=teams"
+
+[tool.mypy]
+python_version = "3.8"
+ignore_missing_imports = true
+show_error_codes = true
+no_implicit_optional = true
+warn_unused_ignores = true
+disable_error_code = ["no-redef"]

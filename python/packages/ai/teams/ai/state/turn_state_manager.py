@@ -46,10 +46,11 @@ class TurnStateManager(Generic[StateT]):
         user_id = context.activity.from_property.id
         conversation_key = f"{channel_id}/{bot_id}/conversations/{conversation_id}"
         user_key = f"{channel_id}/{bot_id}/users/{user_id}"
-        items = {}
 
         if storage:
             items: Any = await storage.read([conversation_key, user_key])
+        else:
+            items = {}
 
         conversation: ConversationState = (
             items[conversation_key] if conversation_key in items else ConversationState()
