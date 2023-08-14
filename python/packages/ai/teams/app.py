@@ -54,7 +54,7 @@ class Application(Bot, Generic[StateT]):
             )
 
     @property
-    def ai(self) -> AI:
+    def ai(self) -> AI[StateT]:
         """
         This property is only available if the Application was configured with 'ai' options.
         An exception will be thrown if you attempt to access it otherwise.
