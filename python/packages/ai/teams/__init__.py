@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from .ai import *
-from .app import *
-from .app_error import *
-from .app_options import *
+from .app import Application
+from .app_error import ApplicationError
+from .app_options import ApplicationOptions
+from .activity_type import ActivityType

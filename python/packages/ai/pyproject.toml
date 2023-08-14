@@ -51,4 +51,4 @@ ignore_missing_imports = true
 show_error_codes = true
 no_implicit_optional = true
 warn_unused_ignores = true
-disable_error_code = ["no-redef"]
+
