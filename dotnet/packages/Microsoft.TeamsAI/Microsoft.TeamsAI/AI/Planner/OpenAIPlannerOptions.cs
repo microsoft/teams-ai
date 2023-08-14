@@ -63,8 +63,8 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <param name="defaultModel">The default model to use.</param>
         public OpenAIPlannerOptions(string apiKey, string defaultModel)
         {
-            Verify.ParamNotNull(apiKey, nameof(apiKey));
-            Verify.ParamNotNull(defaultModel, nameof(defaultModel));
+            Verify.ParamNotNull(apiKey);
+            Verify.ParamNotNull(defaultModel);
 
             ApiKey = apiKey;
             DefaultModel = defaultModel;

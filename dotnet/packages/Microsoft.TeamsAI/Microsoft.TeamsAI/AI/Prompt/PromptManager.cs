@@ -35,8 +35,8 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <inheritdoc />
         public IPromptManager<TState> AddFunction(string name, PromptFunction<TState> promptFunction, bool allowOverrides = false)
         {
-            Verify.ParamNotNull(name, nameof(name));
-            Verify.ParamNotNull(promptFunction, nameof(promptFunction));
+            Verify.ParamNotNull(name);
+            Verify.ParamNotNull(promptFunction);
 
             if (!_functions.ContainsKey(name) || allowOverrides)
             {
@@ -61,8 +61,8 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <inheritdoc />
         public IPromptManager<TState> AddPromptTemplate(string name, PromptTemplate promptTemplate)
         {
-            Verify.ParamNotNull(name, nameof(name));
-            Verify.ParamNotNull(promptTemplate, nameof(promptTemplate));
+            Verify.ParamNotNull(name);
+            Verify.ParamNotNull(promptTemplate);
 
             if (_templates.ContainsKey(name))
             {
@@ -77,9 +77,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <inheritdoc />
         public Task<string> InvokeFunction(ITurnContext turnContext, TState turnState, string name)
         {
-            Verify.ParamNotNull(turnContext, nameof(turnContext));
-            Verify.ParamNotNull(turnState, nameof(turnState));
-            Verify.ParamNotNull(name, nameof(name));
+            Verify.ParamNotNull(turnContext);
+            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(name);
 
             if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> value))
             {
@@ -94,7 +94,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <inheritdoc />
         public PromptTemplate LoadPromptTemplate(string name)
         {
-            Verify.ParamNotNull(name, nameof(name));
+            Verify.ParamNotNull(name);
 
             if (_templates.TryGetValue(name, out PromptTemplate template))
             {
