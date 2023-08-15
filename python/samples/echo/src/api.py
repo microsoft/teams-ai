@@ -9,7 +9,7 @@ to our app
 from botbuilder.schema import Activity
 from fastapi import FastAPI, Request, Response
 
-from .bot import adapter, app
+from src.bot import adapter, app
 
 api = FastAPI()
 

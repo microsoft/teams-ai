@@ -67,7 +67,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/app.py",
+            "program": "${workspaceFolder}/src/app.py",
             "console": "integratedTerminal",
         }
     ],

@@ -5,8 +5,8 @@ Licensed under the MIT License.
 
 import uvicorn
 
-from echo.bot import config
-from echo.api import api
+from src.api import api
+from src.bot import config
 
 if __name__ == "__main__":
     uvicorn.run(api, port=config.port)

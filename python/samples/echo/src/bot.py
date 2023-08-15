@@ -15,7 +15,7 @@ from botbuilder.core import (
 )
 from teams import Application, ApplicationOptions, TurnState
 
-from .config import Config
+from src.config import Config
 
 config = Config()
 settings = BotFrameworkAdapterSettings(config.app_id, config.app_password)
