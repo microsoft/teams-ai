@@ -8,7 +8,7 @@ from typing import Generic, Optional, TypeVar
 
 from teams.ai.state import TurnState
 
-from .history_options import AIHistoryOptions
+from .ai_history_options import AIHistoryOptions
 
 StateT = TypeVar("StateT", bound=TurnState)
 
