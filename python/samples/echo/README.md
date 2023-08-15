@@ -1,4 +1,4 @@
-# Echo Bot
+# <img src="../../../assets/icon.png" height="10%" width="10%" /> Echo Bot
 
 A Teams bot that echos back what the user said
 
