@@ -7,5 +7,5 @@ import subprocess
 
 
 def fmt():
-    subprocess.run(["poetry", "run", "black", "echo", "scripts", "tests"], check=True)
-    subprocess.run(["poetry", "run", "isort", "echo", "scripts", "tests"], check=True)
+    subprocess.run(["poetry", "run", "black", "src", "scripts"], check=True)
+    subprocess.run(["poetry", "run", "isort", "src", "scripts"], check=True)

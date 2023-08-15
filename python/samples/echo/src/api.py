@@ -6,10 +6,10 @@ Description: initialize the api and route incoming messages
 to our app
 """
 
-import uvicorn
-from app import adapter, app, config
 from botbuilder.schema import Activity
 from fastapi import FastAPI, Request, Response
+
+from src.bot import adapter, app
 
 api = FastAPI()
 
@@ -26,7 +26,3 @@ async def on_message(req: Request, res: Response):
         return response.body
 
     return None
-
-
-if __name__ == "__main__":
-    uvicorn.run("echo.main:api", port=config.port)
