@@ -15,6 +15,7 @@ from semantic_kernel.connectors.ai.open_ai import (
 from semantic_kernel.connectors.ai.text_completion_client_base import (
     TextCompletionClientBase,
 )
+from semantic_kernel.utils.null_logger import NullLogger
 
 from teams.ai.prompts import PromptManager
 from teams.ai.prompts.prompt_template import PromptTemplate
@@ -159,8 +160,13 @@ class OpenAIPlanner(Planner):
         )
 
         text_completion_client = self._sk.get_ai_service(TextCompletionClientBase)(self)
-        result = await text_completion_client.complete_async(prompt_template.text, request_settings)
-        return result
+        result = await text_completion_client.complete_async(
+            prompt_template.text, request_settings, NullLogger()
+        )
+        if isinstance(result, str):
+            return result
+        else:
+            return "\n".join(result)
 
     def _get_model(self, prompt_template: PromptTemplate) -> str:
         default_backends = prompt_template.config.default_backends
