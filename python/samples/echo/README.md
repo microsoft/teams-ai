@@ -1,6 +1,12 @@
 # <img src="../../../assets/icon.png" height="10%" width="10%" /> Echo Bot
 
-A Teams bot that echos back what the user said
+A bot that echos back what the user said.  
+
+### In This Sample We Will...
+
+- Listen for Message Activities
+- Handle Errors
+- Sending Response Activities
 
 ![Screenshot](./assets/screenshot_0.png)
 
@@ -9,6 +15,12 @@ A Teams bot that echos back what the user said
 > To run samples we encourage the use of the [Teams Toolkit VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension), to run the project using `Teams Toolkit` click the `Debug` button and select a profile.
 ![Teams Toolkit VSCode](./assets/screenshot_1.png)  
 ![Teams Toolkit VSCode](./assets/screenshot_2.png)
+
+### Add Your App
+
+When prompted, add your app in teams and start chatting!  
+
+![Teams Toolkit VSCode](./assets/screenshot_3.png)
 
 ## Development
 
