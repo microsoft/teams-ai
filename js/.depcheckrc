@@ -1,0 +1,2 @@
+ignores: ["mocha", "rimraf", "sinon", "uuid"]
+ignorePatterns: [".eslintrc.json", "lib"]
