@@ -6,7 +6,6 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import Generic, Optional, TypeVar
 
-from teams.ai.prompts import PromptManager
 from teams.ai.state import TurnState
 
 from .history_options import AIHistoryOptions
@@ -16,9 +15,6 @@ StateT = TypeVar("StateT", bound=TurnState)
 
 @dataclass
 class AIOptions(Generic[StateT]):
-    prompt_manager = PromptManager[StateT]()
-    "The prompt manager to use for generating prompts."
-
     prompt: Optional[str] = None
     """
     Optional. The prompt to use for the current turn.

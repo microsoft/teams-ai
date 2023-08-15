@@ -3,6 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from dataclasses import dataclass
 from unittest import IsolatedAsyncioTestCase
 
 import pytest
@@ -45,13 +46,14 @@ class TestTurnStateManager(IsolatedAsyncioTestCase):
 
     @pytest.mark.asyncio
     async def test_save_state(self):
+        @dataclass
         class CustomConversationState(ConversationState):
             test: str
 
         manager = TurnStateManager[TurnState[CustomConversationState, UserState, TempState]]()
         storage = MemoryStorage()
         key = "UnitTest/bot/conversations/convo"
-        value = CustomConversationState(test="a")
+        value = CustomConversationState("a")
         state = TurnState[CustomConversationState, UserState, TempState](
             conversation=TurnStateEntry(value, storage_key=key),
             user=TurnStateEntry(UserState()),
@@ -59,8 +61,9 @@ class TestTurnStateManager(IsolatedAsyncioTestCase):
         )
 
         # Mutate the conversation state to so that the changes are saved.
-        value["test"] = "b"
+        value.test = "b"
         await manager.save_state(storage, TurnContext(SimpleAdapter(), ACTIVITY), state)
         value = await storage.read([key])
+        print(value)
 
-        self.assertEqual(value[key], {"test": "b"})
+        self.assertEqual(value[key].test, "b")
