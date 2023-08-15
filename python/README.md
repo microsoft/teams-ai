@@ -1,4 +1,4 @@
-# <img src="../../../assets/icon.png" height="10%" width="10%" /> Teams SDK
+# <img src="../assets/icon.png" height="10%" width="10%" /> Teams SDK
 
 A set of packages that make it easy to build bots for Microsoft Teams.
 
