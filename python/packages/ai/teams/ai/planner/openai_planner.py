@@ -17,11 +17,11 @@ from semantic_kernel.connectors.ai.text_completion_client_base import (
 )
 from semantic_kernel.utils.null_logger import NullLogger
 
+from teams.ai import AIHistoryOptions
 from teams.ai.prompts import PromptManager
 from teams.ai.prompts.prompt_template import PromptTemplate
 from teams.ai.prompts.utils import generate_sk_prompt_template_config
 from teams.ai.state import TurnState
-from teams.ai import AIHistoryOptions
 
 from .command_type import CommandType
 from .openai_planner_options import OpenAIPlannerOptions
