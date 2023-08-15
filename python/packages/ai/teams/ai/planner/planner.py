@@ -5,10 +5,16 @@ Licensed under the MIT License.
 
 # pylint: skip-file
 
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 from typing import Any, Callable, Union
 
-from teams.ai.turn_state import TurnState
+from botbuilder.core import TurnContext
+
+from teams.ai.prompts import PromptTemplate
+from teams.ai.state import TurnState
+
+from .ai_history_options import AIHistoryOptions
+from .plan import Plan
 
 
 class Planner(ABC):
@@ -16,7 +22,7 @@ class Planner(ABC):
     interface implemented by all planners
     """
 
-    @abstractclassmethod
+    @abstractmethod
     async def generate_plan(
         self,
         turn_context: TurnContext,
@@ -38,7 +44,7 @@ class Planner(ABC):
             Plan: The generated plan.
         """
 
-    @abstractclassmethod
+    @abstractmethod
     async def add_function(
         self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False
     ) -> None:
