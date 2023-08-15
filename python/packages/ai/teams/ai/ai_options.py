@@ -8,7 +8,7 @@ from typing import Generic, Optional, TypeVar
 
 from teams.ai.state import TurnState
 
-from .planner import AIHistoryOptions
+from .history_options import AIHistoryOptions
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -22,7 +22,7 @@ class AIOptions(Generic[StateT]):
     thrown if the AI system is routed to by the Application object and a prompt has not been
     """
 
-    history: AIHistoryOptions = AIHistoryOptions()
+    history = AIHistoryOptions()
     """
     Optional. The history options to use for the AI system
     `Default: tracking history with a maximum of 3 turns and 1000 tokens per turn.`
