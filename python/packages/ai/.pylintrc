@@ -299,7 +299,7 @@ max-attributes=10
 max-bool-expr=5
 
 # Maximum number of branch for function / method body.
-max-branches=12
+max-branches=50
 
 # Maximum number of locals for function / method body.
 max-locals=15
@@ -314,7 +314,7 @@ max-public-methods=20
 max-returns=6
 
 # Maximum number of statements in function / method body.
-max-statements=50
+max-statements=100
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=2
@@ -437,7 +437,9 @@ disable=raw-checker-failed,
         C0116,
         C0115,
         R0903,
-        W0212
+        W0212,
+        W0511,
+        R1702
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

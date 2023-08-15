@@ -165,8 +165,8 @@ class OpenAIPlanner(Planner):
         )
         if isinstance(result, str):
             return result
-        else:
-            return "\n".join(result)
+
+        return "\n".join(result)
 
     def _get_model(self, prompt_template: PromptTemplate) -> str:
         default_backends = prompt_template.config.default_backends
