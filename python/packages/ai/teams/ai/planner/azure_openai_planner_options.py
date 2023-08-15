@@ -23,12 +23,12 @@ class AzureOpenAIPlannerOptions(OpenAIPlannerOptions):
         use_system_message: bool = False,
         log_requests: bool = False,
     ):
-        self.endpoint = endpoint
         super().__init__(
             api_key,
             default_model,
             prompt_folder,
             organization=organization,
+            endpoint=endpoint,
             one_say_per_turn=one_say_per_turn,
             use_system_message=use_system_message,
             log_requests=log_requests,
