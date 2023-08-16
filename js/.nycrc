@@ -1,8 +1,8 @@
 {
-    "extension": [".js"],
-    "include": ["lib/**/*.js"],
+    "extension": [".ts"],
+    "include": ["packages/**/src/**/*.ts", "lib/**/*.js"],
     "exclude": ["**/node_modules/**", "**/tests/**", "**/coverage/**", "**/*.d.ts", "**/*.spec.ts"],
-    "reporter": ["html"],
+    "reporter": ["html", "text"],
     "all": true,
     "cache": true
 }
