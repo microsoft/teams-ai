@@ -16,14 +16,14 @@ There are two paths to get the package. Please do one of the following, not both
 <details>
     <summary><h4>Option 1: Install package via GitHub package manager</h4></summary>
 
-The development versions of the library might not be available on NuGet's public registry. Follow the instructions below to generate the `.nukpg` NuGet package file of the library to locally consume within the sample:
+Follow the instructions below to generate the `.nukpg` NuGet package file of the library to locally consume within the sample:
 
 1. Clone the repository and verify you are on `main` branch:
 
 `git clone https://github.com/Microsoft/teams-ai.git`
 
 1. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the `package:read` permission.
-1. Update the `Nuget.Config` file with your Github username and your new access token as the password.
+1. Update the `Nuget.Config` file of the sample you are testing with your Github username and your new access token as the password.
    ![Nuget.Config](./assets/screenshot-1.png)
 1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
 
@@ -31,9 +31,7 @@ The development versions of the library might not be available on NuGet's public
 
 ❕❕ If you followed the above directions, you do not need to do Option 2 below. [Skip to building your sample](#setting-up-a-sample)
 
-</details>
-
-<details>
+</details><details> <!-- done to minimize whitespace between blocks -->
     <summary><h4>Option 2: Install Package via local build</h4></summary>
 
 1. Clone the repository and verify you are on `main` branch:
