@@ -13,10 +13,8 @@ In this folder you will find various examples showcasing the different capabilit
 
 There are two paths to get the package. Please do one of the following, not both.
 
-1. [Download via GitHub package manager](#option-1-install-package-via-github-package-manager)
-2. [Build the package locally](#option-2-install-package-via-local-build)
-
-#### Option 1: Install package via GitHub package manager
+<details>
+    <summary><h4>Option 1: Install package via GitHub package manager</h4></summary>
 
 The development versions of the library might not be available on NuGet's public registry. Follow the instructions below to generate the `.nukpg` NuGet package file of the library to locally consume within the sample:
 
@@ -33,7 +31,10 @@ The development versions of the library might not be available on NuGet's public
 
 ❕❕ If you followed the above directions, you do not need to do Option 2 below. [Skip to building your sample](#setting-up-a-sample)
 
-#### Option 2: Install Package via local build
+</details>
+
+<details>
+    <summary><h4>Option 2: Install Package via local build</h4></summary>
 
 1. Clone the repository and verify you are on `main` branch:
 
@@ -50,8 +51,9 @@ Successfully created package "C:...\teams-ai\dotnet\packages\Microsoft.TeamsAI\M
 1. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the `LocalPkg/` folder within the sample folder you are testing.
 1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
    > Alternatively, you can run `dotnet add package Microsoft.TeamsAI`.
+   </details>
 
-Now can you proceed to setting up the sample.
+Now you may proceed with setting up the sample.
 
 ## Setting up a sample
 
