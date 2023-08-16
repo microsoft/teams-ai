@@ -58,9 +58,9 @@ describe('ConversationHistory', () => {
             ConversationHistory.clear(state);
         });
 
-        // TODO: Should it actually throw an error if there is no "conversation" member?
+        // TODO: (Discussion) Should it actually throw an error if there is no "conversation" member?
         // It seems unnecessarily strict for an operation that clears the state...
-        it.skip('should throw an Error if state has no "conversation" member', () => {
+        it('should throw an Error if state has no "conversation" member', () => {
             const state: TurnState = {};
 
             assert.throws(() => ConversationHistory.clear(state));
@@ -245,7 +245,7 @@ describe('ConversationHistory', () => {
             assert.equal(lastLine, expectedLastLine);
         });
 
-        // TODO: When history exists, but no SAY or DO exist in the last line, replacing the entire line with `${assistantPrefix}${newResponse}` doesn't ensure that SAY is included in newResponse.
+        // TODO: (Discussion) When history exists, but no SAY or DO exist in the last line, replacing the entire line with `${assistantPrefix}${newResponse}` doesn't ensure that SAY is included in newResponse.
         // This behavior doesn't follow the same behavior as when a SAY or DO is already found in the last line.
         // We need to decide if the newResponse should always have `SAY ` prefixed or not.
         it.skip('should replace entire last line if no SAY or DO found', () => {
