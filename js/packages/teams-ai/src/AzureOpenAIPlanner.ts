@@ -16,6 +16,10 @@ import { TurnState } from './TurnState';
  */
 export interface AzureOpenAIPlannerOptions extends OpenAIPlannerOptions {
     /**
+     * The default model to use. This should be the model deployment name, not the model
+     */
+    defaultModel: string;
+    /**
      * Endpoint for your Azure OpenAI deployment.
      */
     endpoint: string;

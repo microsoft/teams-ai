@@ -19,7 +19,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Create an instance of the OpenAIPlannerOptions class.
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="defaultModel">The default model to use.</param>
+        /// <param name="defaultModel">The default model to use. This should be the model deployment name, not the model</param>
         public AzureOpenAIPlannerOptions(string apiKey, string defaultModel, string endpoint) : base(apiKey, defaultModel)
         {
             Verify.ParamNotNull(endpoint);
