@@ -16,29 +16,35 @@ namespace Microsoft.TeamsAI.Tests.AITests
             bool allowOverrides = true;
 
             // Act
-            actionCollection.SetAction(name, handler, allowOverrides);
-            ActionEntry<TestTurnState> entry = actionCollection.GetAction(name);
+            actionCollection.AddAction(name, handler, allowOverrides);
+            ActionEntry<TestTurnState> entry = actionCollection[name];
+            bool tryGet = actionCollection.TryGetAction(name, out ActionEntry<TestTurnState> tryGetEntry);
 
             // Assert
-            Assert.True(actionCollection.HasAction(name));
+            Assert.True(actionCollection.ContainsAction(name));
             Assert.NotNull(entry);
             Assert.Equal(name, entry.Name);
             Assert.Equal(handler, entry.Handler);
             Assert.Equal(allowOverrides, entry.AllowOverrides);
+            Assert.True(tryGet);
+            Assert.NotNull(tryGetEntry);
+            Assert.Equal(name, tryGetEntry.Name);
+            Assert.Equal(handler, tryGetEntry.Handler);
+            Assert.Equal(allowOverrides, tryGetEntry.AllowOverrides);
         }
 
         [Fact]
-        public void Test_Set_NonOverridable_Action_Throws_Exception()
+        public void Test_Add_NonOverridable_Action_Throws_Exception()
         {
             // Arrange
             IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             string name = "action";
             IActionHandler<TestTurnState> handler = new TestActionHandler();
             bool allowOverrides = false;
-            actionCollection.SetAction(name, handler, allowOverrides);
+            actionCollection.AddAction(name, handler, allowOverrides);
 
             // Act
-            var func = () => actionCollection.SetAction(name, handler, allowOverrides);
+            var func = () => actionCollection.AddAction(name, handler, allowOverrides);
 
             // Assert
             Exception ex = Assert.Throws<ArgumentException>(() => func());
@@ -53,7 +59,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var nonExistentAction = "non existent action";
 
             // Act
-            var func = () => actionCollection.GetAction(nonExistentAction);
+            var func = () => actionCollection[nonExistentAction];
 
             // Assert
             Exception ex = Assert.Throws<ArgumentException>(() => func());
@@ -61,21 +67,36 @@ namespace Microsoft.TeamsAI.Tests.AITests
         }
 
         [Fact]
-        public void Test_HasAction_False()
+        public void Test_TryGet_NonExistent_Action()
         {
             // Arrange
             IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
             var nonExistentAction = "non existent action";
 
             // Act
-            bool hasAction = actionCollection.HasAction(nonExistentAction);
+            var result = actionCollection.TryGetAction(nonExistentAction, out ActionEntry<TestTurnState> actionEntry);
 
             // Assert
-            Assert.False(hasAction);
+            Assert.False(result);
+            Assert.Null(actionEntry);
         }
 
         [Fact]
-        public void Test_HasAction_True()
+        public void Test_ContainsAction_False()
+        {
+            // Arrange
+            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            var nonExistentAction = "non existent action";
+
+            // Act
+            bool containsAction = actionCollection.ContainsAction(nonExistentAction);
+
+            // Assert
+            Assert.False(containsAction);
+        }
+
+        [Fact]
+        public void Test_ContainsAction_True()
         {
             // Arrange
             IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
@@ -83,11 +104,11 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var name = "actionName";
 
             // Act
-            actionCollection.SetAction(name, handler, true);
-            bool hasAction = actionCollection.HasAction(name);
+            actionCollection.AddAction(name, handler, true);
+            bool containsAction = actionCollection.ContainsAction(name);
 
             // Assert
-            Assert.True(hasAction);
+            Assert.True(containsAction);
         }
 
         private class TestActionHandler : IActionHandler<TestTurnState>

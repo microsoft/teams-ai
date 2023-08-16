@@ -23,13 +23,13 @@ namespace Microsoft.TeamsAI.Tests.AI
             IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
 
             // Assert
-            Assert.True(actions.HasAction(DefaultActionTypes.UnknownActionName));
-            Assert.True(actions.HasAction(DefaultActionTypes.FlaggedInputActionName));
-            Assert.True(actions.HasAction(DefaultActionTypes.FlaggedOutputActionName));
-            Assert.True(actions.HasAction(DefaultActionTypes.RateLimitedActionName));
-            Assert.True(actions.HasAction(DefaultActionTypes.PlanReadyActionName));
-            Assert.True(actions.HasAction(DefaultActionTypes.DoCommandActionName));
-            Assert.True(actions.HasAction(DefaultActionTypes.SayCommandActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.UnknownActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.FlaggedInputActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.FlaggedOutputActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.RateLimitedActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.PlanReadyActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.DoCommandActionName));
+            Assert.True(actions.ContainsAction(DefaultActionTypes.SayCommandActionName));
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             var turnState = new TestTurnState();
 
             // Act
-            var unknownAction = actions.GetAction(DefaultActionTypes.UnknownActionName);
+            var unknownAction = actions[DefaultActionTypes.UnknownActionName];
             var result = await unknownAction.Handler.PerformAction(turnContext, turnState, null, "test-action");
 
             // Assert
@@ -63,7 +63,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             var turnState = new TestTurnState();
 
             // Act
-            var flaggedInputAction = actions.GetAction(DefaultActionTypes.FlaggedInputActionName);
+            var flaggedInputAction = actions[DefaultActionTypes.FlaggedInputActionName];
             var result = await flaggedInputAction.Handler.PerformAction(turnContext, turnState, null, null);
 
             // Assert
@@ -83,7 +83,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             var turnState = new TestTurnState();
 
             // Act
-            var flaggedOutputAction = actions.GetAction(DefaultActionTypes.FlaggedOutputActionName);
+            var flaggedOutputAction = actions[DefaultActionTypes.FlaggedOutputActionName];
             var result = await flaggedOutputAction.Handler.PerformAction(turnContext, turnState, null, null);
 
             // Assert
@@ -102,7 +102,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             var turnState = new TestTurnState();
 
             // Act
-            var rateLimitedAction = actions.GetAction(DefaultActionTypes.RateLimitedActionName);
+            var rateLimitedAction = actions[DefaultActionTypes.RateLimitedActionName];
             var exception = await Assert.ThrowsAsync<AIException>(async () => await rateLimitedAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
@@ -125,7 +125,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             });
 
             // Act
-            var planReadyAction = actions.GetAction(DefaultActionTypes.PlanReadyActionName);
+            var planReadyAction = actions[DefaultActionTypes.PlanReadyActionName];
             var result0 = await planReadyAction.Handler.PerformAction(turnContext, turnState, plan0, null);
             var result1 = await planReadyAction.Handler.PerformAction(turnContext, turnState, plan1, null);
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await planReadyAction.Handler.PerformAction(turnContext, turnState, null, null));
@@ -153,7 +153,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             };
 
             // Act
-            var doCommandAction = actions.GetAction(DefaultActionTypes.DoCommandActionName);
+            var doCommandAction = actions[DefaultActionTypes.DoCommandActionName];
             var result = await doCommandAction.Handler.PerformAction(turnContext, turnState, data, null);
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await doCommandAction.Handler.PerformAction(turnContext, turnState, null, null));
 
@@ -176,7 +176,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             var command = new PredictedSayCommand("hello");
 
             // Act
-            var sayCommandAction = actions.GetAction(DefaultActionTypes.SayCommandActionName);
+            var sayCommandAction = actions[DefaultActionTypes.SayCommandActionName];
             var result = await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, command, null);
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, null, null));
 
