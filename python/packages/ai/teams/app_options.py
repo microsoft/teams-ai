@@ -33,7 +33,7 @@ class ApplicationOptions(Generic[StateT]):
     Optional. `Storage` provider to use for the application.
     """
 
-    ai: Optional[AIOptions] = None
+    ai: Optional[AIOptions[StateT]] = None
     """
     Optional. AI options to use. When provided, a new instance of the AI system will be created.
     """
@@ -44,7 +44,7 @@ class ApplicationOptions(Generic[StateT]):
     be created using the parameterless constructor.
     """
 
-    logger: Optional[Logger] = None
+    logger: Logger = Logger("teams.ai")
     """
     Optional. `Logger` that will be used in this application.
     """

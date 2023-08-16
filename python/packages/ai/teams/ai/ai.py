@@ -29,7 +29,7 @@ class AI(Generic[StateT]):
     _log: Logger
     _actions: Dict[str, ActionEntry[StateT]] = {}
 
-    def __init__(self, options=AIOptions[StateT](), log=Logger("default")) -> None:
+    def __init__(self, options: AIOptions[StateT], log=Logger("teams.ai")) -> None:
         self._options = options
         self._log = log
         self._actions = {}

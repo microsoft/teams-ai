@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 import json
 import os
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Generic, TypeVar, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -20,18 +20,19 @@ from .utils import generate_sk_prompt_template_config
 
 SK_CONFIG_FILE_NAME = "config.json"
 SK_PROMPT_FILE_NAME = "skprompt.txt"
+StateT = TypeVar("StateT", bound=TurnState)
 
 
-class PromptManager:
+class PromptManager(Generic[StateT]):
     """
     Prompt manager used by action planner internally
     """
 
     _prompts_folder: str
     _templates: Dict[str, PromptTemplate] = {}
-    _functions: Dict[str, Callable[[TurnContext, TurnState], str]] = {}
+    _functions: Dict[str, Callable[[TurnContext, StateT], str]] = {}
 
-    def __init__(self, prompts_folder: str) -> None:
+    def __init__(self, prompts_folder: str = "prompts") -> None:
         """
         Initializes a new instance of the DefaultPromptManager class.
 
@@ -40,7 +41,7 @@ class PromptManager:
         self._prompts_folder = prompts_folder
 
     def add_function(
-        self, name: str, handler: Callable[[TurnContext, TurnState], str], allow_overrides=False
+        self, name: str, handler: Callable[[TurnContext, StateT], str], allow_overrides=False
     ):
         """
         Adds a new function to the prompt manager.
@@ -56,7 +57,7 @@ class PromptManager:
         return self
 
     async def render_prompt(
-        self, context: TurnContext, state: TurnState, name_or_template: Union[str, PromptTemplate]
+        self, context: TurnContext, state: StateT, name_or_template: Union[str, PromptTemplate]
     ) -> PromptTemplate:
         """
         Renders the given prompt template.
@@ -89,7 +90,7 @@ class PromptManager:
             return file.read()
 
     async def _render_prompt_with_sk(
-        self, prompt_template: PromptTemplate, turn_context: TurnContext, turn_state: TurnState
+        self, prompt_template: PromptTemplate, turn_context: TurnContext, turn_state: StateT
     ) -> PromptTemplate:
         kernel = sk.Kernel()
         for function_name, function in self._functions.items():

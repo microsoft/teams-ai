@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Awaitable, Callable, Dict, Generic, List, TypeVar
+from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
 
 from botbuilder.core import Bot, TurnContext
 from botbuilder.core.activity_handler import ActivityTypes
@@ -31,7 +31,7 @@ class Application(Bot, Generic[StateT]):
     and other AI capabilities.
     """
 
-    _ai: AI[StateT]
+    _ai: Optional[AI[StateT]]
     _options: ApplicationOptions[StateT]
     _typing_delay = 1000
     _activities: Dict[str, Callable[[TurnContext, StateT], Awaitable[bool]]] = {}
@@ -42,7 +42,7 @@ class Application(Bot, Generic[StateT]):
         """
         Creates a new Application instance.
         """
-        self._ai = AI(options.ai) if options.ai else AI()
+        self._ai = AI(options.ai, options.logger) if options.ai else None
         self._options = options
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):

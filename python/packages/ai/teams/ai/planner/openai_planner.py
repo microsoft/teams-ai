@@ -17,7 +17,7 @@ from semantic_kernel.connectors.ai.text_completion_client_base import (
 )
 from semantic_kernel.utils.null_logger import NullLogger
 
-from teams.ai import AIHistoryOptions
+from teams.ai.ai_history_options import AIHistoryOptions
 from teams.ai.prompts import PromptManager
 from teams.ai.prompts.prompt_template import PromptTemplate
 from teams.ai.prompts.utils import generate_sk_prompt_template_config
