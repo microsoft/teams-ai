@@ -90,13 +90,13 @@ namespace Microsoft.TeamsAI.AI
             Verify.ParamNotNull(name);
             Verify.ParamNotNull(handler);
 
-            if (!_actions.HasAction(name) || allowOverrides)
+            if (!_actions.ContainsAction(name) || allowOverrides)
             {
-                _actions.SetAction(name, handler, allowOverrides);
+                _actions.AddAction(name, handler, allowOverrides);
             }
             else
             {
-                ActionEntry<TState> entry = _actions.GetAction(name);
+                ActionEntry<TState> entry = _actions[name];
                 if (entry.AllowOverrides)
                 {
                     entry.Handler = handler;
@@ -238,7 +238,7 @@ namespace Microsoft.TeamsAI.AI
             }
 
             // Process generated plan
-            bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler.PerformAction(turnContext, turnState, plan);
+            bool continueChain = await _actions[DefaultActionTypes.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
             if (continueChain)
             {
                 // Update conversation history
@@ -280,33 +280,30 @@ namespace Microsoft.TeamsAI.AI
 
                 if (command is PredictedDoCommand doCommand)
                 {
-                    if (_actions.HasAction(doCommand.Action))
+                    if (_actions.ContainsAction(doCommand.Action))
                     {
                         DoCommandActionData<TState> data = new()
                         {
                             PredictedDoCommand = doCommand,
-                            Handler = _actions.GetAction(doCommand.Action).Handler
+                            Handler = _actions[doCommand.Action].Handler
                         };
 
                         // Call action handler
-                        continueChain = await _actions
-                            .GetAction(DefaultActionTypes.DoCommandActionName)!
+                        continueChain = await _actions[DefaultActionTypes.DoCommandActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, data, doCommand.Action);
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
-                        continueChain = await _actions
-                            .GetAction(DefaultActionTypes.UnknownActionName)
+                        continueChain = await _actions[DefaultActionTypes.UnknownActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
-                    continueChain = await _actions
-                        .GetAction(DefaultActionTypes.SayCommandActionName)
+                    continueChain = await _actions[DefaultActionTypes.SayCommandActionName]
                         .Handler
                         .PerformAction(turnContext, turnState!, sayCommand, DefaultActionTypes.SayCommandActionName);
                 }

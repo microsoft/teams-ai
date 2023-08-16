@@ -27,13 +27,13 @@ namespace Microsoft.TeamsAI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions.GetAction(actionName)?.Handler.PerformAction(turnContext, turnState);
+                actions[actionName].Handler.PerformAction(turnContext, turnState);
             }
 
             // Assert
             foreach (var actionName in actionNames)
             {
-                Assert.True(actions.HasAction(actionName));
+                Assert.True(actions.ContainsAction(actionName));
             }
             Assert.Equal(actionNames, instance.Calls.ToArray());
         }
@@ -52,13 +52,13 @@ namespace Microsoft.TeamsAI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions.GetAction(actionName)?.Handler.PerformAction(turnContext, turnState, entities, actionName);
+                actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName);
             }
 
             // Assert
             foreach (var actionName in actionNames)
             {
-                Assert.True(actions.HasAction(actionName));
+                Assert.True(actions.ContainsAction(actionName));
             }
             var expectedCalls = new[]
             {
@@ -84,7 +84,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
-            var exception = await Assert.ThrowsAsync<Exception>(async () => await actions.GetAction(actionName).Handler.PerformAction(turnContext, turnState, entities, actionName));
+            var exception = await Assert.ThrowsAsync<Exception>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
 
             // Assert
             Assert.NotNull(exception);
