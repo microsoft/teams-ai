@@ -3,8 +3,6 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-# pylint: skip-file
-
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -17,17 +15,20 @@ class Moderator(ABC):
     """
 
     @abstractmethod
-    async def review_prompt(self, input: str) -> Optional[Plan]:
+    async def review_prompt(self, content: str) -> Optional[Plan]:
         """
         Reviews user input before it's sent to the planner.
 
         Args:
-            input (str): The content to review.
+            content (str): The content to review.
 
         Returns:
-            Optional[Plan]: Returns None if the moderator approves the input, otherwise returns a new plan to bypass the planner and redirects to a new set of actions. Typically the moderator will return a new plan with a single DO command that calls `AI.FlaggedInputActionName` to flag the input for review.
+            Optional[Plan]: Returns None if the moderator approves the input,
+            otherwise returns a new plan to bypass the planner and redirects to
+            a new set of actions. Typically the moderator will return a new plan
+            with a single DO command that calls `AI.FlaggedInputActionName`
+            to flag the input for review.
         """
-        pass
 
     @abstractmethod
     async def review_plan(self, plan: Plan) -> Plan:
@@ -38,6 +39,8 @@ class Moderator(ABC):
             plan (Plan): The plan to review.
 
         Returns:
-            Plan: Returns the same plan if the moderator approves the plan, otherwise returns a new plan that redirects to a new set of actions. Typically the moderator will return a new plan with a single DO command that calls `AI.FlaggedOutputActionName` to flag the output for review.
+            Plan: Returns the same plan if the moderator approves the plan,
+            otherwise returns a new plan that redirects to a new set of actions.
+            Typically the moderator will return a new plan with a single DO command
+            that calls `AI.FlaggedOutputActionName` to flag the output for review.
         """
-        pass
