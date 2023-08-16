@@ -13,8 +13,8 @@ In this folder you will find various examples showcasing the different capabilit
 
 There are two paths to get the package. Please do one of the following, not both.
 
-<details>
-    <summary><h4>Option 1: Install package via GitHub package manager</h4></summary>
+<ul><li><details>
+<summary><h4>Option 1: Install package via GitHub package manager</h4></summary>
 
 Follow the instructions below to generate the `.nukpg` NuGet package file of the library to locally consume within the sample:
 
@@ -31,7 +31,8 @@ Follow the instructions below to generate the `.nukpg` NuGet package file of the
 
 ❕❕ If you followed the above directions, you do not need to do Option 2 below. [Skip to building your sample](#setting-up-a-sample)
 
-</details><details> <!-- done to minimize whitespace between blocks -->
+</details></li>
+<li><details> <!-- done to minimize whitespace between blocks -->
     <summary><h4>Option 2: Install Package via local build</h4></summary>
 
 1. Clone the repository and verify you are on `main` branch:
@@ -50,6 +51,8 @@ Successfully created package "C:...\teams-ai\dotnet\packages\Microsoft.TeamsAI\M
 1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
    > Alternatively, you can run `dotnet add package Microsoft.TeamsAI`.
    </details>
+   </li>
+   </ul>
 
 Now you may proceed with setting up the sample.
 
