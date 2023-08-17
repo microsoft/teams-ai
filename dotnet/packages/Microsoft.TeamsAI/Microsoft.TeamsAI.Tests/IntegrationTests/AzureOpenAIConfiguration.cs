@@ -1,12 +1,11 @@
-﻿
-namespace Microsoft.TeamsAI.Tests.Integration
+﻿namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     internal class AzureOpenAIConfiguration
     {
-        public string ModelId { get; set; }
-        public string ApiKey { get; set; }
+        public string ModelId { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
         public string? ChatModelId { get; set; }
-        public string Endpoint { get; set; }
+        public string Endpoint { get; set; } = string.Empty;
 
         public AzureOpenAIConfiguration(string modelId, string? chatModelId, string apiKey, string endpoint)
         {

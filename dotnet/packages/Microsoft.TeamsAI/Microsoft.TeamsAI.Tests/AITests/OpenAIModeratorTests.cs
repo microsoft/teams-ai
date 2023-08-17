@@ -9,7 +9,6 @@ using Microsoft.TeamsAI.OpenAI;
 using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
-using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 
@@ -49,7 +48,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
             var moderator = new OpenAIModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await Assert.ThrowsAsync<OpenAIClientException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate));
@@ -125,7 +124,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
             var moderator = new OpenAIModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate);
@@ -137,8 +136,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
                 Assert.Equal(DefaultActionTypes.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
-                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities.ContainsKey("Result"));
-                Assert.StrictEqual(response.Results[0], ((PredictedDoCommand)result.Commands[0]).Entities.GetValueOrDefault("Result"));
+                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
+                Assert.StrictEqual(response.Results[0], ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -166,7 +165,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
             var moderator = new OpenAIModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await Assert.ThrowsAsync<OpenAIClientException>(async () => await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan));
@@ -229,7 +228,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
             var moderator = new OpenAIModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan);
@@ -241,8 +240,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
                 Assert.Equal(DefaultActionTypes.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
-                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities.ContainsKey("Result"));
-                Assert.StrictEqual(response.Results[0], ((PredictedDoCommand)result.Commands[0]).Entities.GetValueOrDefault("Result"));
+                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
+                Assert.StrictEqual(response.Results[0], ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
             }
             else
             {

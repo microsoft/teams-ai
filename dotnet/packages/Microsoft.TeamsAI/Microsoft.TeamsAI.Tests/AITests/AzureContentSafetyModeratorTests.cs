@@ -49,7 +49,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
             var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await Assert.ThrowsAsync<AzureContentSafetyClientException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate));
@@ -102,7 +102,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
             var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate);
@@ -114,8 +114,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
                 Assert.Equal(DefaultActionTypes.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
-                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities.ContainsKey("Result"));
-                Assert.StrictEqual(response, ((PredictedDoCommand)result.Commands[0]).Entities.GetValueOrDefault("Result"));
+                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
+                Assert.StrictEqual(response, ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -167,7 +167,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
             var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate);
@@ -197,7 +197,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
             var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await Assert.ThrowsAsync<AzureContentSafetyClientException>(async () => await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan));
@@ -237,7 +237,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
             var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan);
@@ -249,8 +249,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
                 Assert.Equal(DefaultActionTypes.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
-                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities.ContainsKey("Result"));
-                Assert.StrictEqual(response, ((PredictedDoCommand)result.Commands[0]).Entities.GetValueOrDefault("Result"));
+                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
+                Assert.StrictEqual(response, ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -289,7 +289,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
             var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
-            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(moderator, clientMock.Object);
+            moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
             var result = await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan);

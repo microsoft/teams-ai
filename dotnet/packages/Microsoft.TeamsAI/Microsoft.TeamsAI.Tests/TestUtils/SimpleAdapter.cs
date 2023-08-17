@@ -1,22 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Xunit;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
     public class SimpleAdapter : BotAdapter
     {
-        private readonly Action<Activity[]> _callOnSend = null;
-        private readonly Action<Activity> _callOnUpdate = null;
-        private readonly Action<ConversationReference> _callOnDelete = null;
+        private readonly Action<Activity[]>? _callOnSend;
+        private readonly Action<Activity>? _callOnUpdate;
+        private readonly Action<ConversationReference>? _callOnDelete;
 
         public SimpleAdapter()
         {
@@ -50,13 +44,8 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
             Assert.True(activities.Count() > 0, "SimpleAdapter.sendActivities: empty activities array.");
 
             _callOnSend?.Invoke(activities);
-            List<ResourceResponse> responses = new List<ResourceResponse>();
-
-            foreach (var activity in activities)
-            {
-                responses.Add(new ResourceResponse(activity.Id));
-            }
-
+            List<ResourceResponse> responses = new();
+            responses.AddRange(activities.Select(activity => new ResourceResponse(activity.Id)));
             return Task.FromResult(responses.ToArray());
         }
 
@@ -64,7 +53,9 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
         {
             Assert.NotNull(activity); //SimpleAdapter.updateActivity: missing activity
             _callOnUpdate?.Invoke(activity);
+#pragma warning disable CA1062 // Validate arguments of public methods
             return Task.FromResult(new ResourceResponse(activity.Id)); // echo back the Id
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
 
         public async Task ProcessRequest(Activity activity, BotCallbackHandler callback, CancellationToken cancellationToken)

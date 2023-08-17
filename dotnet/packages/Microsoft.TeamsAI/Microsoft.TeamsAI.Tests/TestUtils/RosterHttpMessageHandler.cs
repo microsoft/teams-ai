@@ -1,10 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
@@ -15,7 +10,7 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
             var response = new HttpResponseMessage(HttpStatusCode.OK);
 
             // GetMembers (Team)
-            if (request.RequestUri.PathAndQuery.EndsWith("team-id/members"))
+            if (request.RequestUri!.PathAndQuery.EndsWith("team-id/members"))
             {
                 var content = new JArray
                     {

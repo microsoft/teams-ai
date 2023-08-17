@@ -10,6 +10,7 @@ using Microsoft.TeamsAI.AI.Action;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
+using Microsoft.TeamsAI.Tests.IntegrationTests;
 
 namespace Microsoft.TeamsAI.Tests.Integration
 {

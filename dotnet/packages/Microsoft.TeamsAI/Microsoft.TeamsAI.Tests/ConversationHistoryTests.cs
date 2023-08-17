@@ -67,10 +67,12 @@ namespace Microsoft.TeamsAI.Tests
         public void Clear_ThrowsArgumentNullException_WhenTurnStateIsNull()
         {
             // Arrange
-            TurnState turnState = null;
+            TurnState? turnState = null;
 
             // Act and Assert
+#pragma warning disable CS8604 // Possible null reference argument.
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.Clear(turnState));
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         [Fact]
@@ -133,10 +135,12 @@ namespace Microsoft.TeamsAI.Tests
         public void HasMoreLines_ThrowsArgumentNullExceptionIfTurnStateIsNull()
         {
             // Arrange
-            TurnState turnState = null;
+            TurnState? turnState = null;
 
             // Act and Assert
+#pragma warning disable CS8604 // Possible null reference argument.
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.HasMoreLines(turnState));
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         [Fact]
@@ -173,10 +177,12 @@ namespace Microsoft.TeamsAI.Tests
         public void GetLastLine_ThrowsArgumentNullExceptionIfTurnStateIsNull()
         {
             // Arrange
-            TurnState turnState = null;
+            TurnState? turnState = null;
 
             // Act and Assert
+#pragma warning disable CS8604 // Possible null reference argument.
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.GetLastLine(turnState));
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         [Fact]
@@ -297,7 +303,9 @@ namespace Microsoft.TeamsAI.Tests
             TurnState? turnState = null;
 
             // Act and Assert
+#pragma warning disable CS8604 // Possible null reference argument.
             Assert.Throws<ArgumentNullException>(() => ConversationHistory.RemoveLastLine(turnState));
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         [Fact]

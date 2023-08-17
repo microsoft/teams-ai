@@ -18,7 +18,7 @@ namespace Microsoft.TeamsAI.Tests.StateTests
             // Arrange
             var turnStateManager = new TurnStateManager<ApplicationTurnState, ConversationState, UserState, TempState>();
             var turnContext = _createConfiguredTurnContext();
-            IStorage storage = null;
+            IStorage? storage = null;
 
             // Act
             ApplicationTurnState state = await turnStateManager.LoadStateAsync(storage, turnContext);
@@ -169,11 +169,11 @@ namespace Microsoft.TeamsAI.Tests.StateTests
             Assert.Empty(storedItems.Keys);
         }
 
-        private TurnContext _createConfiguredTurnContext()
+        private static TurnContext _createConfiguredTurnContext()
         {
             return new TurnContext(new NotImplementedAdapter(), new Activity(
                 channelId: "channelId",
-                recipient: new(){ Id = "recipientId" },
+                recipient: new() { Id = "recipientId" },
                 conversation: new() { Id = "conversationId" },
                 from: new() { Id = "fromId" }
             ));

@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 using Azure.AI.OpenAI;
 using Microsoft.Bot.Builder;

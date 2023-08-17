@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.AI
+namespace Microsoft.TeamsAI.Tests.AITests
 {
     public class DefaultActionsTests
     {
