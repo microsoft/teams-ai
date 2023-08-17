@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Generic, Optional, TypeVar
 
 from teams.ai.planner import Planner
@@ -36,7 +36,7 @@ class AIOptions(Generic[StateT]):
     thrown if the AI system is routed to by the Application object and a prompt has not been
     """
 
-    history: AIHistoryOptions = AIHistoryOptions()
+    history: AIHistoryOptions = field(default_factory=AIHistoryOptions)
     """
     Optional. The history options to use for the AI system
     `Default: tracking history with a maximum of 3 turns and 1000 tokens per turn.`
