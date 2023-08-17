@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 import json
 import os
-from typing import Callable, Dict, Generic, TypeVar, Union
+from typing import Awaitable, Callable, Dict, Generic, TypeVar, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -30,7 +30,7 @@ class PromptManager(Generic[StateT]):
 
     _prompts_folder: str
     _templates: Dict[str, PromptTemplate] = {}
-    _functions: Dict[str, Callable[[TurnContext, StateT], str]] = {}
+    _functions: Dict[str, Callable[[TurnContext, StateT], Awaitable[str]]] = {}
 
     def __init__(self, prompts_folder: str = "prompts") -> None:
         """
@@ -41,7 +41,10 @@ class PromptManager(Generic[StateT]):
         self._prompts_folder = prompts_folder
 
     def add_function(
-        self, name: str, handler: Callable[[TurnContext, StateT], str], allow_overrides=False
+        self,
+        name: str,
+        handler: Callable[[TurnContext, StateT], Awaitable[str]],
+        allow_overrides=False,
     ):
         """
         Adds a new function to the prompt manager.

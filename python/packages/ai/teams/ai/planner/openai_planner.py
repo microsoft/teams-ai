@@ -12,10 +12,6 @@ from semantic_kernel.connectors.ai.open_ai import (
     OpenAIChatCompletion,
     OpenAITextCompletion,
 )
-from semantic_kernel.connectors.ai.text_completion_client_base import (
-    TextCompletionClientBase,
-)
-from semantic_kernel.utils.null_logger import NullLogger
 
 from teams.ai.ai_history_options import AIHistoryOptions
 from teams.ai.prompts import PromptManager
@@ -88,7 +84,11 @@ class OpenAIPlanner(Planner):
             if assistant_prefix:
                 # The model sometimes predicts additional text
                 # for the human side of things so skip that.
-                position = result.lower().index(assistant_prefix.lower())
+                try:
+                    position = result.lower().index(assistant_prefix.lower())
+                except ValueError:
+                    position = -1
+
                 if position >= 0:
                     result = result[position + len(assistant_prefix) :]
 
@@ -159,9 +159,11 @@ class OpenAIPlanner(Planner):
             prompt_template_config.completion
         )
 
-        text_completion_client = self._sk.get_ai_service(TextCompletionClientBase)(self)
+        text_completion_client = OpenAITextCompletion(
+            self._options.default_model, self._options.api_key, self._options.organization
+        )
         result = await text_completion_client.complete_async(
-            prompt_template.text, request_settings, NullLogger()
+            prompt=prompt_template.text, request_settings=request_settings
         )
         if isinstance(result, str):
             return result

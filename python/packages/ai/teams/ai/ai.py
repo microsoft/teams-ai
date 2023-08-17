@@ -3,7 +3,6 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-import json
 from logging import Logger
 from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
 
@@ -163,6 +162,41 @@ class AI(Generic[StateT]):
         self._review_plan = func
         return func
 
+    def function(self, name: Optional[str] = None, allow_overrides=False):
+        """
+        Registers a new prompt function event listener. This method can be used as either
+        a decorator or a method.
+
+        ```python
+        # Use this method as a decorator
+        @app.ai.function()
+        async def hello_world(context: TurnContext, state: TurnState, entities: Any, name: str):
+            print("hello world!")
+            return True
+
+        # Pass a function to this method
+        app.ai.function()(hello_world)
+        ```
+
+        #### Args:
+        - `name`: The name of the action `Default: Function Name`
+        - `allow_overrides`: If it should throw an error when duplicates
+        are found `Default: False`
+        """
+
+        def __call__(func: Callable[[TurnContext, StateT], Awaitable[str]]):
+            func_name = name
+
+            if not func_name:
+                func_name = func.__name__
+
+            self._options.prompt_manager.add_function(
+                name=func_name, handler=func, allow_overrides=allow_overrides
+            )
+            return func
+
+        return __call__
+
     async def chain(
         self, context: TurnContext, state: StateT, prompt: Union[str, PromptTemplate]
     ) -> bool:
@@ -214,7 +248,7 @@ class AI(Generic[StateT]):
 
                 state.conversation.value.history.add("assistant", text)
             else:
-                state.conversation.value.history.add("assistant", json.dumps(plan))
+                state.conversation.value.history.add("assistant", plan.json())
 
         for cmd in plan.commands:
             if cmd.type == "DO":
