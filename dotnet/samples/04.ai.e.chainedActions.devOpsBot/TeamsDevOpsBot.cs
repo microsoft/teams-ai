@@ -25,8 +25,8 @@ namespace DevOpsBot
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, DevOpsState turnState, CancellationToken cancellationToken)
         {
-            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
             if (!turnState.Conversation!.Greeted)
             {
@@ -37,8 +37,8 @@ namespace DevOpsBot
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, DevOpsState turnState, CancellationToken cancellationToken)
         {
-            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
             string? input = turnContext.Activity.Text?.Trim();
             if (string.Equals("/reset", input, StringComparison.OrdinalIgnoreCase))

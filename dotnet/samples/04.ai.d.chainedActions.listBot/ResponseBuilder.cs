@@ -2,8 +2,6 @@
 {
     public static class ResponseBuilder
     {
-        private static readonly Random RANDOM = new();
-
         private static readonly string[] GREET_MESSAGES =
         {
             "Welcome to List Bot! Type /reset to delete all existing lists.",
@@ -40,7 +38,7 @@
             "A {0} appears to be in your {1} list."
         };
 
-        private readonly static string[] NO_LISTS_FOUND_MESSAGES =
+        private static readonly string[] NO_LISTS_FOUND_MESSAGES =
         {
             "You don't have any lists yet.",
             "You haven't made any lists yet.",
@@ -49,7 +47,7 @@
             "You don't have any lists set up yet."
         };
 
-        private readonly static string[] UNKNOWN_ACTION_MESSAGES =
+        private static readonly string[] UNKNOWN_ACTION_MESSAGES =
         {
             "I'm sorry, I'm not sure how to {0}.",
             "I don't know the first thing about {0}.",
@@ -58,7 +56,7 @@
             "I'm afraid I'm not experienced enough with {0}."
         };
 
-        private readonly static string[] OFF_TOPIC_MESSAGES =
+        private static readonly string[] OFF_TOPIC_MESSAGES =
         {
             "I'm sorry, I'm not sure I can help you with that.",
             "I'm sorry, I'm afraid I'm not allowed to talk about such things.",
@@ -81,10 +79,6 @@
 
         public static string OffTopic() => GetRandomResponse(OFF_TOPIC_MESSAGES);
 
-        private static string GetRandomResponse(string[] responses)
-        {
-            int index = RANDOM.Next(responses.Length);
-            return responses[index];
-        }
+        private static string GetRandomResponse(string[] responses) => responses[Random.Shared.Next(responses.Length)];
     }
 }
