@@ -188,6 +188,8 @@ function-naming-style=snake_case
 good-names=ai,
            ci,
            sk,
+           id,
+           n,
            i,
            j,
            e,
@@ -439,7 +441,8 @@ disable=raw-checker-failed,
         R0903,
         W0212,
         W0511,
-        R1702
+        R1702,
+        W0622
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
