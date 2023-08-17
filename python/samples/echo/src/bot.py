@@ -9,7 +9,6 @@ import sys
 import traceback
 
 from botbuilder.core import (
-    BotFrameworkAdapter,
     BotFrameworkAdapterSettings,
     TurnContext,
 )
@@ -18,9 +17,10 @@ from teams import Application, ApplicationOptions, TurnState
 from src.config import Config
 
 config = Config()
-settings = BotFrameworkAdapterSettings(config.app_id, config.app_password)
-adapter = BotFrameworkAdapter(settings)
-app = Application(ApplicationOptions(adapter=adapter, bot_app_id=config.app_id))
+app = Application(ApplicationOptions(
+    bot_app_id=config.app_id,
+    adapter=BotFrameworkAdapterSettings(config.app_id, config.app_password)
+))
 
 
 @app.activity("message")
@@ -29,7 +29,7 @@ async def on_message(context: TurnContext, _state: TurnState):
     return True
 
 
-# Catch-all for errors.
+@app.error
 async def on_error(context: TurnContext, error: Exception):
     # This check writes out errors to console log .vs. app insights.
     # NOTE: In production environment, you should consider logging this to Azure
@@ -39,6 +39,3 @@ async def on_error(context: TurnContext, error: Exception):
 
     # Send a message to the user
     await context.send_activity("The bot encountered an error or bug.")
-
-
-adapter.on_turn_error = on_error

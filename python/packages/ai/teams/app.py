@@ -5,8 +5,8 @@ Licensed under the MIT License.
 
 from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
 
-from botbuilder.core import Bot, TurnContext
-from botbuilder.core.activity_handler import ActivityTypes
+from botbuilder.core import Bot, BotFrameworkAdapter, TurnContext
+from botbuilder.schema import Activity, ActivityTypes, InvokeResponse
 
 from teams.ai import AI, TurnState
 
@@ -33,10 +33,12 @@ class Application(Bot, Generic[StateT]):
 
     _ai: Optional[AI[StateT]]
     _options: ApplicationOptions[StateT]
+    _adapter: Optional[BotFrameworkAdapter] = None
     _typing_delay = 1000
     _activities: Dict[str, Callable[[TurnContext, StateT], Awaitable[bool]]] = {}
     _before_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
     _after_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
+    _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
 
     def __init__(self, options=ApplicationOptions[StateT]()) -> None:
         """
@@ -52,6 +54,9 @@ class Application(Bot, Generic[StateT]):
                 no adapter or `bot_app_id` was configured.
                 """
             )
+
+        if options.adapter:
+            self._adapter = BotFrameworkAdapter(options.adapter)
 
     @property
     def ai(self) -> AI[StateT]:
@@ -144,6 +149,58 @@ class Application(Bot, Generic[StateT]):
         self._after_turn.append(func)
         return func
 
+    def error(self, func: Callable[[TurnContext, Exception], Awaitable[None]]):
+        """
+        Registers an error handler that will be called anytime
+        the app throws an Exception
+
+        ```python
+        # Use this method as a decorator
+        @app.error
+        async def on_error(context: TurnContext, err: Exception):
+            print(err.message)
+
+        # Pass a function to this method
+        app.error(on_error)
+        ```
+        """
+
+        self._error = func
+
+        if self._adapter:
+            self._adapter.on_turn_error = func
+
+        return func
+
+    async def process_activity(
+        self, activity: Activity, auth_header: str
+    ) -> Optional[InvokeResponse]:
+        """
+        Creates a turn context and runs the middleware pipeline for an incoming activity.
+
+        :param activity: The incoming activity
+        :type activity: :class:`Activity`
+        :param auth_header: The HTTP authentication header of the request
+        :type auth_header: :class:`typing.str`
+
+        :return: A task that represents the work queued to execute.
+
+        .. remarks::
+            This class processes an activity received by the bots web server. This includes any
+            messages sent from a user and is the method that drives what's often referred to as the
+            bots *reactive messaging* flow.
+            Call this method to reactively send a message to a conversation.
+            If the task completes successfully, then an :class:`InvokeResponse` is returned;
+            otherwise. `null` is returned.
+        """
+
+        if not self._adapter:
+            raise ApplicationError(
+                "cannot call `app.process_activity` when `ApplicationOptions.adapter` not provided"
+            )
+
+        return await self._adapter.process_activity(activity, auth_header, self.on_turn)
+
     async def on_turn(self, context: TurnContext):
         await self._start_long_running_call(context, self._on_turn)
 
@@ -199,11 +256,11 @@ class Application(Bot, Generic[StateT]):
         self, context: TurnContext, func: Callable[[TurnContext], Awaitable]
     ):
         if (
-            self._options.adapter
+            self._adapter
             and ActivityTypes.message == context.activity.type
             and self._options.long_running_messages
         ):
-            return await self._options.adapter.continue_conversation(
+            return await self._adapter.continue_conversation(
                 bot_id=self._options.bot_app_id,
                 reference=context.get_conversation_reference(context.activity),
                 callback=func,
