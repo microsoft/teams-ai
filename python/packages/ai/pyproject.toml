@@ -44,6 +44,8 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--cov-report html:coverage --cov=teams"
+log_cli = true
+log_cli_level = "INFO"
 
 [tool.mypy]
 python_version = "3.8"

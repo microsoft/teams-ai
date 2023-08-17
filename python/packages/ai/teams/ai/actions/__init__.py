@@ -4,4 +4,4 @@ Licensed under the MIT License.
 """
 
 from .action_entry import ActionEntry
-from .default_action_types import DefaultActionTypes
+from .action_types import ActionTypes

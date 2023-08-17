@@ -4,12 +4,9 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from enum import Enum
+from typing import Literal
 
-
-class AssistantHistoryType(str, Enum):
-    TEXT = "__TEXT__"
-    PLAN_OBJECT = "__PLAN_OBJECT__"
+AssistantHistoryType = Literal["text", "planObject"]
 
 
 @dataclass
@@ -32,9 +29,9 @@ class AIHistoryOptions:
     assistant_prefix: str = "Assistant:"
     'The prefix to use for assistant history. `Default: "Assistant:"`'
 
-    assistant_history_type: AssistantHistoryType = AssistantHistoryType.PLAN_OBJECT
+    assistant_history_type: AssistantHistoryType = "planObject"
     """
     Whether the conversation history should include the plan object returned by the model or
     just the text of any SAY commands.
-    `Default: AssistantHistoryType.PLAN_OBJECT`
+    `Default: "planObject"`
     """

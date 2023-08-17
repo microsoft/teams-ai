@@ -6,7 +6,6 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import Generic, Optional, TypeVar
 
-from teams.ai.moderator import Moderator
 from teams.ai.planner import Planner
 from teams.ai.prompts import PromptManager
 from teams.ai.state import TurnState
@@ -28,12 +27,6 @@ class AIOptions(Generic[StateT]):
     prompt_manager: PromptManager[StateT] = PromptManager[StateT]()
     """
     Optional. The prompt manager to use for generating prompts.
-    """
-
-    moderator: Moderator[StateT] = Moderator[StateT]()
-    """
-    Optional. The moderator to use for moderating input passed to the model and the output
-    returned by the model.
     """
 
     prompt: Optional[str] = None
