@@ -103,7 +103,7 @@ namespace Microsoft.TeamsAI.AI
                 }
                 else
                 {
-                    throw new Exception($"Attempting to register an already existing action `{name}` that does not allow overrides.");
+                    throw new AIException($"Attempting to register an already existing action `{name}` that does not allow overrides.");
                 }
             }
 
@@ -143,7 +143,7 @@ namespace Microsoft.TeamsAI.AI
             HashSet<string> uniquenessCheck = new(from x in result select x.Name, StringComparer.OrdinalIgnoreCase);
             if (result.Count > uniquenessCheck.Count)
             {
-                throw new Exception("Function overloads are not supported, please differentiate function names");
+                throw new AIException("Function overloads are not supported, please differentiate function names");
             }
 
             // Register the actions
