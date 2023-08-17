@@ -8,7 +8,9 @@ using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 
+#pragma warning disable IDE0130 // Namespace does not match folder structure
 namespace Microsoft.TeamsAI.OpenAI
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 {
     /// <summary>
     /// The client to make calls to OpenAI's API

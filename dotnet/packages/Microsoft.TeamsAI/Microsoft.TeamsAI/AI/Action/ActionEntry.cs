@@ -54,7 +54,7 @@ namespace Microsoft.TeamsAI.AI.Action
                 .Cast<ActionAttribute>()
                 .FirstOrDefault();
 
-            if (actionAttribute == null) 
+            if (actionAttribute == null)
             {
                 return null;
             }
