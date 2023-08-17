@@ -220,7 +220,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             return (IActionCollection<TState>)actionsField!.GetValue(ai)!;
         }
 
-        private class TestActionHandler : IActionHandler<TestTurnState>
+        private sealed class TestActionHandler : IActionHandler<TestTurnState>
         {
             public string? ActionName { get; set; }
 

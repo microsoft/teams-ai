@@ -7,12 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
-using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.Tests.IntegrationTests;
 
-namespace Microsoft.TeamsAI.Tests.Integration
+namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     public sealed class OpenAICompletionTests
     {

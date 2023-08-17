@@ -3,7 +3,7 @@ using Microsoft.Bot.Schema;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
-    internal class TestInvokeAdapter : NotImplementedAdapter
+    internal sealed class TestInvokeAdapter : NotImplementedAdapter
     {
         public IActivity? Activity { get; private set; }
 

@@ -3,7 +3,7 @@ using System.Net;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
-    internal class RosterHttpMessageHandler : HttpMessageHandler
+    internal sealed class RosterHttpMessageHandler : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

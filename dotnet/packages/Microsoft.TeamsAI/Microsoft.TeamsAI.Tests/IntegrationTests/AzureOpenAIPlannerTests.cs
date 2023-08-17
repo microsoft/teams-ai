@@ -7,12 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
-using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.Tests.IntegrationTests;
 
-namespace Microsoft.TeamsAI.Tests.Integration
+namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     public sealed class AzureOpenAICompletionTests
     {
@@ -126,7 +124,7 @@ namespace Microsoft.TeamsAI.Tests.Integration
             var invalidApiKey = "invalidApiKey";
 
             var options = new AzureOpenAIPlannerOptions(invalidApiKey, config.ChatModelId, config.Endpoint);
-            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _output); 
+            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _output);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);

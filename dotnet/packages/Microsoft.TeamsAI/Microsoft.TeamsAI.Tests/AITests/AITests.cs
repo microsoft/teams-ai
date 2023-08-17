@@ -218,7 +218,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
         /// <summary>
         /// Override default DO and SAY actions for test
         /// </summary>
-        private class TestActions
+        private sealed class TestActions
         {
             public IList<string> DoActionRecord { get; } = new List<string>();
 

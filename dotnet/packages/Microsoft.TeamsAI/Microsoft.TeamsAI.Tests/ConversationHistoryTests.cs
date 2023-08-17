@@ -527,7 +527,7 @@ namespace Microsoft.TeamsAI.Tests
             Assert.Equal(shortLine, array[0]);
         }
 
-        private class ConversationState : StateBase { }
+        private sealed class ConversationState : StateBase { }
 
     }
 }

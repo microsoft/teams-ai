@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
-    internal class OpenAIConfiguration
+    internal sealed class OpenAIConfiguration
     {
         public string ModelId { get; set; } = string.Empty;
         public string ApiKey { get; set; } = string.Empty;

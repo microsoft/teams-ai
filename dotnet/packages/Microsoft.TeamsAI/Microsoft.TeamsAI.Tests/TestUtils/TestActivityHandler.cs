@@ -6,7 +6,7 @@ using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
-    internal class TestActivityHandler : TestApplication
+    internal sealed class TestActivityHandler : TestApplication
     {
         public TestActivityHandler(TestApplicationOptions options) : base(options)
         {

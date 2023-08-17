@@ -727,7 +727,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             }
         }
 
-        private class TestActivityHandlerFileConsent : TestApplication
+        private sealed class TestActivityHandlerFileConsent : TestApplication
         {
             public TestActivityHandlerFileConsent(TestApplicationOptions options) : base(options)
             {
@@ -744,7 +744,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             }
         }
 
-        private class TestActivityHandlerMessagePreview : TestApplication
+        private sealed class TestActivityHandlerMessagePreview : TestApplication
         {
             public TestActivityHandlerMessagePreview(TestApplicationOptions options) : base(options)
             {

@@ -179,9 +179,9 @@ namespace Microsoft.TeamsAI.Tests.StateTests
             ));
         }
 
-        private class ConversationState : StateBase { }
-        private class UserState : StateBase { }
+        private sealed class ConversationState : StateBase { }
+        private sealed class UserState : StateBase { }
 
-        private class ApplicationTurnState : TurnState<ConversationState, UserState, TempState> { }
+        private sealed class ApplicationTurnState : TurnState<ConversationState, UserState, TempState> { }
     }
 }

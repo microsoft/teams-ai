@@ -10,9 +10,8 @@ using Microsoft.TeamsAI.AI.Action;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.Tests.IntegrationTests;
 
-namespace Microsoft.TeamsAI.Tests.Integration
+namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     public sealed class AzureContentSafetyModeratorTests
     {
@@ -60,11 +59,11 @@ namespace Microsoft.TeamsAI.Tests.Integration
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
             var turnStateMock = new Mock<TurnState>();
-            var promptTemplateMock = new Mock<PromptTemplate>(String.Empty, new PromptTemplateConfiguration());
+            var promptTemplateMock = new Mock<PromptTemplate>(string.Empty, new PromptTemplateConfiguration());
 
             // Act
             var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplateMock.Object);
-            
+
             // Assert
             if (flagged)
             {

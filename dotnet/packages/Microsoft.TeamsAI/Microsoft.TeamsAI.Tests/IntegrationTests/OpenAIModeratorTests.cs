@@ -3,7 +3,6 @@ using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.Tests.Integration;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
