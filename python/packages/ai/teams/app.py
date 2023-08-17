@@ -8,7 +8,7 @@ from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
 from botbuilder.core import Bot, BotFrameworkAdapter, TurnContext
 from botbuilder.schema import Activity, ActivityTypes, InvokeResponse
 
-from teams.ai import AI, TurnState
+from teams.ai import AI, AIError, TurnState
 
 from .activity_type import ActivityType
 from .app_error import ApplicationError
@@ -223,15 +223,27 @@ class Application(Bot, Generic[StateT]):
 
                     return
 
-            # run turn
-            res = await self._on_activity(context, state)
+            # run activity handler
+            is_ok = await self._on_activity(context, state)
 
-            if not res:
+            if not is_ok:
                 await self._options.turn_state_manager.save_state(
                     self._options.storage, context, state
                 )
 
                 return
+
+            if (
+                self._ai
+                and self._options.ai
+                and self._options.ai.prompt
+                and context.activity.type == ActivityTypes.message
+                and context.activity.text
+            ):
+                try:
+                    await self._ai.chain(context, state, self._options.ai.prompt)
+                except AIError as err:
+                    await self._on_error(context, err)
 
             # run after turn middleware
             for after_turn in self._after_turn:
@@ -244,7 +256,7 @@ class Application(Bot, Generic[StateT]):
         finally:
             typing.stop()
 
-    async def _on_activity(self, context: TurnContext, state: StateT) -> bool:
+    async def _on_activity(self, context: TurnContext, state: StateT):
         func = self._activities.get(str(context.activity.type))
 
         if func:
@@ -267,3 +279,9 @@ class Application(Bot, Generic[StateT]):
             )
 
         return await func(context)
+
+    async def _on_error(self, context: TurnContext, err: ApplicationError) -> None:
+        if self._error:
+            return await self._error(context, err)
+
+        raise err

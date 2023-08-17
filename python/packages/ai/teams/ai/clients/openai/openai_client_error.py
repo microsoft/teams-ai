@@ -7,8 +7,14 @@ from typing import Optional
 
 from aiohttp.typedefs import LooseHeaders
 
+from teams.ai.ai_error import AIError
 
-class OpenAIClientError(Exception):
+
+class OpenAIClientError(AIError):
+    """
+    OpenAI Module Error
+    """
+
     status: int
     message: str
     headers: Optional[LooseHeaders]
