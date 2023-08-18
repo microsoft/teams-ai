@@ -11,7 +11,11 @@ import time
 import traceback
 from typing import Any
 
-from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
+from botbuilder.core import MemoryStorage, TurnContext
+from botframework.connector.auth import (
+    BotFrameworkAuthenticationFactory,
+    PasswordServiceClientCredentialFactory,
+)
 from teams import (
     AIOptions,
     Application,
@@ -32,8 +36,12 @@ storage = MemoryStorage()
 app = Application[TurnState[AppConversationState, UserState, TempState]](
     ApplicationOptions[TurnState[AppConversationState, UserState, TempState]](
         bot_app_id=config.app_id,
-        adapter=BotFrameworkAdapterSettings(config.app_id, config.app_password),
         storage=storage,
+        auth=BotFrameworkAuthenticationFactory.create(
+            credential_factory=PasswordServiceClientCredentialFactory(
+                app_id=config.app_id, password=config.app_password
+            )
+        ),
         ai=AIOptions(
             prompt="chatGPT",
             prompt_manager=PromptManager[TurnState[AppConversationState, UserState, TempState]](

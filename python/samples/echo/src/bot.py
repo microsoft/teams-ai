@@ -8,7 +8,11 @@ Description: initialize the app and listen for `message` activitys
 import sys
 import traceback
 
-from botbuilder.core import BotFrameworkAdapterSettings, TurnContext
+from botbuilder.core import TurnContext
+from botframework.connector.auth import (
+    BotFrameworkAuthenticationFactory,
+    PasswordServiceClientCredentialFactory,
+)
 from teams import Application, ApplicationOptions, TurnState
 
 from src.config import Config
@@ -17,7 +21,11 @@ config = Config()
 app = Application(
     ApplicationOptions(
         bot_app_id=config.app_id,
-        adapter=BotFrameworkAdapterSettings(config.app_id, config.app_password),
+        auth=BotFrameworkAuthenticationFactory.create(
+            credential_factory=PasswordServiceClientCredentialFactory(
+                app_id=config.app_id, password=config.app_password
+            )
+        ),
     )
 )
 
