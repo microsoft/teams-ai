@@ -2,7 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace ListBot
 {
@@ -12,13 +12,13 @@ namespace ListBot
         {
             AI.Prompts.AddFunction("getListNames", (turnContext, turnState) =>
             {
-                string listNames = JsonConvert.SerializeObject(turnState.Conversation!.ListNames);
+                string listNames = JsonSerializer.Serialize(turnState.Conversation!.ListNames);
                 return Task.FromResult(listNames);
             });
 
             AI.Prompts.AddFunction("getLists", (turnContext, turnState) =>
             {
-                string lists = JsonConvert.SerializeObject(turnState.Conversation!.Lists);
+                string lists = JsonSerializer.Serialize(turnState.Conversation!.Lists);
                 return Task.FromResult(lists);
             });
 
@@ -27,18 +27,10 @@ namespace ListBot
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, ListState turnState, CancellationToken cancellationToken)
         {
-            if (turnContext == null)
-            {
-                throw new ArgumentNullException(nameof(turnContext));
-            }
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
-
-            bool greeted = turnState.Conversation!.Greeted;
-            if (!greeted)
+            if (!turnState.Conversation!.Greeted)
             {
                 turnState.Conversation.Greeted = true;
                 await turnContext.SendActivityAsync(MessageFactory.Text(ResponseBuilder.Greeting()), cancellationToken).ConfigureAwait(false);
@@ -47,21 +39,13 @@ namespace ListBot
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, ListState turnState, CancellationToken cancellationToken)
         {
-            if (turnContext == null)
-            {
-                throw new ArgumentNullException(nameof(turnContext));
-            }
-
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
             if (turnContext.Activity.Text.Equals("/reset", StringComparison.OrdinalIgnoreCase))
             {
                 turnState.ConversationStateEntry?.Delete();
                 await turnContext.SendActivityAsync(MessageFactory.Text(ResponseBuilder.Reset()), cancellationToken).ConfigureAwait(false);
-                return;
             }
             else
             {
