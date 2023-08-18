@@ -11,7 +11,7 @@ from teams.ai.state import ConversationT, TempT, TurnState, UserT
 
 
 def state_to_history_array(
-    state: TurnState[ConversationT, UserT, TempT], maxTokens: int = 1000
+    state: TurnState[ConversationT, UserT, TempT], max_tokens: int = 1000
 ) -> List[str]:
     if state.conversation:
         # Get history array if it exists
@@ -21,20 +21,20 @@ def state_to_history_array(
         encoding = tiktoken.get_encoding("cl100k_base")
 
         # Populate up to max chars
-        textTokens: int = 0
+        text_tokens: int = 0
         lines: List[str] = []
         for i in range(len(history) - 1, -1, -1):
             # Ensure that adding line won't go over the max character length
             line = history[i]
-            lineTokens = len(encoding.encode(line))
-            newTextTokens = textTokens + lineTokens
-            if newTextTokens > maxTokens:
+            line_tokens = len(encoding.encode(line))
+            new_text_tokens = text_tokens + line_tokens
+            if new_text_tokens > max_tokens:
                 break
 
             # Prepend line to output
-            textTokens = newTextTokens
+            text_tokens = new_text_tokens
             lines.insert(0, line)
 
         return lines
-    else:
-        raise ValueError("The state object does not contain conversation state.")
+
+    raise ValueError("The state object does not contain conversation state.")

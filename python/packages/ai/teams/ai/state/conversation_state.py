@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List
 
 
@@ -14,4 +14,4 @@ class ConversationState:
     the applications conversation state
     """
 
-    __history__: List[str] = field(default_factory=list)
+    __history__: List[str]

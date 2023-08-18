@@ -53,7 +53,7 @@ class TurnStateManager(Generic[StateT]):
             items = {}
 
         conversation: ConversationState = (
-            items[conversation_key] if conversation_key in items else ConversationState()
+            items[conversation_key] if conversation_key in items else ConversationState([])
         )
         user: UserState = items[user_key] if user_key in items else UserState()
 

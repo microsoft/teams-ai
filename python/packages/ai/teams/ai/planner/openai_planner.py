@@ -17,7 +17,6 @@ from semantic_kernel.connectors.ai.open_ai import (
     OpenAIChatCompletion,
     OpenAITextCompletion,
 )
-from semantic_kernel.utils.null_logger import NullLogger
 
 from teams.ai import AIHistoryOptions
 from teams.ai.prompts import PromptManager
@@ -96,7 +95,7 @@ class OpenAIPlanner(Planner):
             if assistant_prefix:
                 # The model sometimes predicts additional text
                 # for the human side of things so skip that.
-                position = result.lower().index(assistant_prefix.lower())
+                position = result.lower().find(assistant_prefix.lower())
                 if position >= 0:
                     result = result[position + len(assistant_prefix) :]
 
@@ -186,7 +185,7 @@ class OpenAIPlanner(Planner):
         if self._options.use_system_message:
             chat_history.append((SYSTEM_ROLE_NAME, prompt_template.text))
         else:
-            chat_history.append((USER_ROLE_NAME, user_message))
+            chat_history.append((USER_ROLE_NAME, prompt_template.text))
 
         # Populate conversation history
         if options.track_history:
@@ -205,9 +204,7 @@ class OpenAIPlanner(Planner):
         if user_message:
             chat_history.append((USER_ROLE_NAME, user_message))
 
-        result = await chat_completion_client.complete_chat_async(
-            chat_history, request_settings, NullLogger()
-        )
+        result = await chat_completion_client.complete_chat_async(chat_history, request_settings)
         if isinstance(result, str):
             return result
 
@@ -220,9 +217,7 @@ class OpenAIPlanner(Planner):
         )
 
         text_completion_client = self._sk.get_ai_service(TextCompletionClientBase)(self._sk)
-        result = await text_completion_client.complete_async(
-            prompt_template.text, request_settings, NullLogger()
-        )
+        result = await text_completion_client.complete_async(prompt_template.text, request_settings)
         if isinstance(result, str):
             return result
 
