@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0130 // Namespace does not match folder structure
-namespace Microsoft.TeamsAI.OpenAI
-#pragma warning restore IDE0130 // Namespace does not match folder structure
+﻿namespace Microsoft.TeamsAI.AI.OpenAI
 {
     public class OpenAIClientOptions
     {

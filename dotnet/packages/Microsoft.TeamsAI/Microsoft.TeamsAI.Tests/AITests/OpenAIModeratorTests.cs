@@ -5,12 +5,12 @@ using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.OpenAI;
 using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
+using Microsoft.TeamsAI.AI.OpenAI;
 
 namespace Microsoft.TeamsAI.Tests.AITests
 {

@@ -1,6 +1,6 @@
 ﻿using System.Net;
+using Microsoft.TeamsAI.AI.OpenAI;
 using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.OpenAI;
 using Microsoft.TeamsAI.Utilities;
 
 namespace Microsoft.TeamsAI.Tests.AITests
