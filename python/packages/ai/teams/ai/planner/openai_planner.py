@@ -84,11 +84,7 @@ class OpenAIPlanner(Planner):
             if assistant_prefix:
                 # The model sometimes predicts additional text
                 # for the human side of things so skip that.
-                try:
-                    position = result.lower().index(assistant_prefix.lower())
-                except ValueError:
-                    position = -1
-
+                position = result.lower().find(assistant_prefix.lower())
                 if position >= 0:
                     result = result[position + len(assistant_prefix) :]
 
