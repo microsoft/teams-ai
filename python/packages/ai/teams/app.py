@@ -5,8 +5,9 @@ Licensed under the MIT License.
 
 from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
 
-from botbuilder.core import Bot, BotFrameworkAdapter, TurnContext
-from botbuilder.schema import Activity, ActivityTypes, InvokeResponse
+from botbuilder.core import Bot, CloudAdapterBase, TurnContext
+from botbuilder.core.invoke_response import InvokeResponse
+from botbuilder.schema import Activity, ActivityTypes
 
 from teams.ai import AI, AIError, TurnState
 
@@ -33,7 +34,7 @@ class Application(Bot, Generic[StateT]):
 
     _ai: Optional[AI[StateT]]
     _options: ApplicationOptions[StateT]
-    _adapter: Optional[BotFrameworkAdapter] = None
+    _adapter: Optional[CloudAdapterBase] = None
     _typing_delay = 1000
     _activities: Dict[str, Callable[[TurnContext, StateT], Awaitable[bool]]] = {}
     _before_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
@@ -47,7 +48,7 @@ class Application(Bot, Generic[StateT]):
         self._ai = AI(options.ai, options.logger) if options.ai else None
         self._options = options
 
-        if options.long_running_messages and (not options.adapter or not options.bot_app_id):
+        if options.long_running_messages and (not options.auth or not options.bot_app_id):
             raise ApplicationError(
                 """
                 The `ApplicationOptions.long_running_messages` property is unavailable because 
@@ -55,8 +56,8 @@ class Application(Bot, Generic[StateT]):
                 """
             )
 
-        if options.adapter:
-            self._adapter = BotFrameworkAdapter(options.adapter)
+        if options.auth:
+            self._adapter = CloudAdapterBase(options.auth)
 
     @property
     def ai(self) -> AI[StateT]:
@@ -172,9 +173,7 @@ class Application(Bot, Generic[StateT]):
 
         return func
 
-    async def process_activity(
-        self, activity: Activity, auth_header: str
-    ) -> Optional[InvokeResponse]:
+    async def process_activity(self, activity: Activity, auth_header: str) -> InvokeResponse:
         """
         Creates a turn context and runs the middleware pipeline for an incoming activity.
 
@@ -199,7 +198,7 @@ class Application(Bot, Generic[StateT]):
                 "cannot call `app.process_activity` when `ApplicationOptions.adapter` not provided"
             )
 
-        return await self._adapter.process_activity(activity, auth_header, self.on_turn)
+        return await self._adapter.process_activity(auth_header, activity, self.on_turn)
 
     async def on_turn(self, context: TurnContext):
         await self._start_long_running_call(context, self._on_turn)
@@ -273,7 +272,6 @@ class Application(Bot, Generic[StateT]):
             and self._options.long_running_messages
         ):
             return await self._adapter.continue_conversation(
-                bot_id=self._options.bot_app_id,
                 reference=context.get_conversation_reference(context.activity),
                 callback=func,
             )

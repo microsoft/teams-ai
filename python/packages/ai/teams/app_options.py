@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from logging import Logger
 from typing import Generic, Optional, TypeVar
 
-from botbuilder.core import BotFrameworkAdapterSettings, Storage
+from botbuilder.core import Storage
+from botframework.connector.auth import BotFrameworkAuthentication
 
 from teams.ai import AIOptions, TurnState, TurnStateManager
 
@@ -16,9 +17,9 @@ StateT = TypeVar("StateT", bound=TurnState)
 
 @dataclass
 class ApplicationOptions(Generic[StateT]):
-    adapter: Optional[BotFrameworkAdapterSettings] = None
+    auth: Optional[BotFrameworkAuthentication] = None
     """
-    Optional. Bot adapter being used.
+    Optional. Bot auth settings.
     If using the `long_running_messages` option or calling the `continue_conversation_async` 
     method, this property is required.
     """
