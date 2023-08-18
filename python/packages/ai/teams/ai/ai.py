@@ -251,18 +251,16 @@ class AI(Generic[StateT]):
                 state.conversation.value.history.add("assistant", plan.json())
 
         for cmd in plan.commands:
-            if cmd.type == "DO":
-                do_cmd = PredictedDoCommand.from_dict(cmd.__dict__)
+            if isinstance(cmd, PredictedDoCommand):
                 action = self._actions.get(ActionTypes.DO_COMMAND)
 
                 if action:
-                    is_ok = await action.invoke(context, state, do_cmd)
-            elif cmd.type == "SAY":
-                say_cmd = PredictedSayCommand.from_dict(cmd.__dict__)
+                    is_ok = await action.invoke(context, state, cmd)
+            elif isinstance(cmd, PredictedSayCommand):
                 action = self._actions.get(ActionTypes.SAY_COMMAND)
 
                 if action:
-                    is_ok = await action.invoke(context, state, say_cmd)
+                    is_ok = await action.invoke(context, state, cmd)
             else:
                 raise AIError(f'unknown command type "{cmd.type}"')
 

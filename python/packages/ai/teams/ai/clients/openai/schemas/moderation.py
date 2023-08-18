@@ -16,29 +16,23 @@ class CreateModerationResponse:
         category_scores: Dict[str, int]
 
         @classmethod
-        def from_json(cls, data: Dict[str, Any]) -> "CreateModerationResponse.Result":
+        def from_dict(cls, data: Dict[str, Any]) -> "CreateModerationResponse.Result":
             return CreateModerationResponse.Result(
                 flagged=data["flagged"],
                 categories=data["categories"],
                 category_scores=data["category_scores"],
             )
 
-        def to_dict(self) -> Dict[str, Any]:
-            return self.__dict__
-
     id: str
     model: str
     results: List[Result]
 
     @classmethod
-    def from_json(cls, data: Dict[str, Any]) -> "CreateModerationResponse":
+    def from_dict(cls, data: Dict[str, Any]) -> "CreateModerationResponse":
         results: List[Any] = data["results"]
 
         return CreateModerationResponse(
             id=data["id"],
             model=data["model"],
-            results=list(map(CreateModerationResponse.Result.from_json, results)),
+            results=list(map(CreateModerationResponse.Result.from_dict, results)),
         )
-
-    def to_dict(self) -> Dict[str, Any]:
-        return self.__dict__

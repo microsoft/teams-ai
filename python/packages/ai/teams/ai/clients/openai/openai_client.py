@@ -40,9 +40,12 @@ class OpenAIClient(ClientSession):
     ) -> OpenAIClientResponse[CreateModerationResponse]:
         try:
             res = await self.post("/v1/moderations", data={"input": input, "model": model})
+            data = await res.json()
 
             return OpenAIClientResponse[CreateModerationResponse](
-                status=res.status, headers=res.headers, data=await res.json()
+                status=res.status,
+                headers=res.headers,
+                data=CreateModerationResponse.from_dict(data),
             )
         except ClientResponseError as err:
             raise OpenAIClientError(
