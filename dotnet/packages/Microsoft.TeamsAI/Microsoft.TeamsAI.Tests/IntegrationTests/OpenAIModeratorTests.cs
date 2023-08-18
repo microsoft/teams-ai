@@ -10,6 +10,7 @@ using Xunit.Abstractions;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
+using Microsoft.TeamsAI.Tests.TestUtils;
 
 namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
