@@ -2,8 +2,6 @@
 {
     public static class ResponseBuilder
     {
-        private static readonly Random RANDOM = new();
-
         private static readonly string[] SECRET_WORDS =
         {
             "Apple", " banana", "airplane", "coffee", "book", "ocean", "bird",
@@ -141,10 +139,7 @@
 
         public static string YouLose(string secretWord) => string.Format(GetRandomResponse(LOSE_MESSAGES), secretWord);
 
-        private static string GetRandomResponse(string[] responses)
-        {
-            int index = RANDOM.Next(responses.Length);
-            return responses[index];
-        }
+        private static string GetRandomResponse(string[] responses) =>
+            responses[Random.Shared.Next(responses.Length)];
     }
 }
