@@ -96,7 +96,7 @@ namespace Microsoft.TeamsAI
 
         private async void SendTypingActivity(object state)
         {
-            ITurnContext turnContext = state as ITurnContext ?? throw new Exception("Unexpected failure of casting object TurnContext");
+            ITurnContext turnContext = state as ITurnContext ?? throw new ArgumentException("Unexpected failure of casting object TurnContext");
 
             try
             {

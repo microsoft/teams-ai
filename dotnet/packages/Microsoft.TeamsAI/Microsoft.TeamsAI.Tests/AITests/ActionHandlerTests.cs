@@ -84,7 +84,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
-            var exception = await Assert.ThrowsAsync<Exception>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
 
             // Assert
             Assert.NotNull(exception);

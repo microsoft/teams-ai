@@ -61,12 +61,12 @@ namespace Microsoft.TeamsAI.AI.Action
 
             if (doCommandActionData.Handler == null)
             {
-                throw new Exception("Unexpected `data` object: Handler does not exist");
+                throw new ArgumentException("Unexpected `data` object: Handler does not exist");
             }
 
             if (doCommandActionData.PredictedDoCommand == null)
             {
-                throw new Exception("Unexpected `data` object: PredictedDoCommand does not exist");
+                throw new ArgumentException("Unexpected `data` object: PredictedDoCommand does not exist");
             }
 
             IActionHandler<TState> handler = doCommandActionData.Handler;
