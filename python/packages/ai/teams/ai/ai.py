@@ -190,9 +190,7 @@ class AI(Generic[StateT]):
             if not func_name:
                 func_name = func.__name__
 
-            self._options.prompt_manager.add_function(
-                name=func_name, handler=func, allow_overrides=allow_overrides
-            )
+            self._options.planner.add_function(func_name, func, allow_overrides=allow_overrides)
             return func
 
         return __call__
@@ -209,16 +207,11 @@ class AI(Generic[StateT]):
         the outer plan should continue executing.
         """
 
-        rendered = await self._options.prompt_manager.render_prompt(context, state, prompt)
-        plan = None
+        # TODO: call review_plan
 
-        if self._review_prompt:
-            plan = await self._review_prompt(context, state, rendered)
-
-        if not plan:
-            plan = await self._options.planner.generate_plan(
-                context, state, rendered, history_options=self._options.history
-            )
+        plan = await self._options.planner.generate_plan(
+            context, state, prompt, history_options=self._options.history
+        )
 
         if self._review_plan:
             plan = await self._review_plan(context, state, plan)

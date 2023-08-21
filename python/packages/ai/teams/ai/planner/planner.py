@@ -4,18 +4,20 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Union
+from typing import Any, Callable, Generic, TypeVar, Union
 
 from botbuilder.core import TurnContext
 
 from teams.ai.ai_history_options import AIHistoryOptions
 from teams.ai.prompts import PromptTemplate
-from teams.ai.state import TurnState
+from teams.ai.state import ConversationState, TempState, TurnState, UserState
 
 from .plan import Plan
 
+StateT = TypeVar("StateT", bound=TurnState[ConversationState, UserState, TempState])
 
-class Planner(ABC):
+
+class Planner(ABC, Generic[StateT]):
     """
     interface implemented by all planners
     """
@@ -24,7 +26,7 @@ class Planner(ABC):
     async def generate_plan(
         self,
         turn_context: TurnContext,
-        state: TurnState,
+        state: StateT,
         prompt_name_or_template: Union[str, PromptTemplate],
         *,
         history_options: AIHistoryOptions,
@@ -44,8 +46,8 @@ class Planner(ABC):
         """
 
     @abstractmethod
-    async def add_function(
-        self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False
+    def add_function(
+        self, name: str, handler: Callable[[TurnContext, StateT], Any], *, allow_overrides=False
     ) -> None:
         """
         Adds a custom function to be used when rendering prompt templates.

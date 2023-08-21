@@ -7,7 +7,6 @@ from dataclasses import dataclass, field
 from typing import Generic, Optional, TypeVar
 
 from teams.ai.planner import Planner
-from teams.ai.prompts import PromptManager
 from teams.ai.state import TurnState
 
 from .ai_history_options import AIHistoryOptions
@@ -17,16 +16,11 @@ StateT = TypeVar("StateT", bound=TurnState)
 
 @dataclass
 class AIOptions(Generic[StateT]):
-    planner: Planner
+    planner: Planner[StateT]
     """
     The planner to use for generating plans. For example,
     you could set this as an instance of `OpenAIPlanner` or
     `AzureOpenAIPlanner`.
-    """
-
-    prompt_manager: PromptManager[StateT] = PromptManager[StateT]()
-    """
-    Optional. The prompt manager to use for generating prompts.
     """
 
     prompt: Optional[str] = None

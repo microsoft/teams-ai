@@ -18,7 +18,6 @@ from teams import (
     ApplicationOptions,
     OpenAIPlanner,
     OpenAIPlannerOptions,
-    PromptManager,
     TempState,
     TurnState,
     UserState,
@@ -39,14 +38,12 @@ app = Application[TurnState[AppConversationState, UserState, TempState]](
         ),
         ai=AIOptions(
             prompt="chatGPT",
-            prompt_manager=PromptManager[TurnState[AppConversationState, UserState, TempState]](
-                prompts_folder=f"{os.getcwd()}/src/prompts",
-            ),
             planner=OpenAIPlanner(
                 OpenAIPlannerOptions(
                     api_key="",
                     default_model="gpt-3.5-turbo",
                     log_requests=True,
+                    prompt_folder=f"{os.getcwd()}/src/prompts",
                 )
             ),
         ),
@@ -81,6 +78,7 @@ async def on_lights_off(
     _name: str,
 ):
     state.conversation.value.lights_on = False
+    print(state.conversation.value)
     await context.send_activity("[lights off]")
     return True
 

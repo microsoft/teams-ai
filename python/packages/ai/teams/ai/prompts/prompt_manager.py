@@ -107,8 +107,8 @@ class PromptManager(Generic[StateT]):
             # So no need to spend extra time on this warning.
             class Wrapper:
                 @sk_function(name=function_name)
-                def run(self):
-                    return function(turn_context, turn_state)
+                async def run(self):
+                    return await function(turn_context, turn_state)
 
             kernel.import_skill(Wrapper())
 
