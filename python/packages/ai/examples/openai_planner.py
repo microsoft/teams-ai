@@ -34,7 +34,7 @@ async def generate_plan(turn_context: TurnContext):
     options = OpenAIPlannerOptions("api_key", "gpt-3.5-turbo", "tests/planner/test_assets")
     planner = OpenAIPlanner(options)
     state = TurnState(
-        TurnStateEntry(ConversationState([])),
+        TurnStateEntry(ConversationState()),
         TurnStateEntry(UserState()),
         TurnStateEntry(TempState("", "", "")),
     )

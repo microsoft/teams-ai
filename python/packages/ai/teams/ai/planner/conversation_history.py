@@ -15,7 +15,7 @@ def state_to_history_array(
 ) -> List[str]:
     if state.conversation:
         # Get history array if it exists
-        history = state.conversation.value.__history__
+        history = state.conversation.value.history
 
         # Get encoding for gpt-4 and gpt-3.5-turbo models
         encoding = tiktoken.get_encoding("cl100k_base")
@@ -25,15 +25,15 @@ def state_to_history_array(
         lines: List[str] = []
         for i in range(len(history) - 1, -1, -1):
             # Ensure that adding line won't go over the max character length
-            line = history[i]
-            line_tokens = len(encoding.encode(line))
+            message = history[i]
+            line_tokens = len(encoding.encode(message.content))
             new_text_tokens = text_tokens + line_tokens
             if new_text_tokens > max_tokens:
                 break
 
             # Prepend line to output
             text_tokens = new_text_tokens
-            lines.insert(0, line)
+            lines.insert(0, message.content)
 
         return lines
 
