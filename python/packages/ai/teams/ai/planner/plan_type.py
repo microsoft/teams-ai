@@ -5,5 +5,5 @@ Licensed under the MIT License.
 from enum import Enum
 
 
-class PlanType(Enum):
+class PlanType(str, Enum):
     PLAN = "plan"

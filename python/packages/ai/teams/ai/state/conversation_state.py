@@ -3,8 +3,9 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+
+from .conversation_history import ConversationHistory
 
 
 @dataclass
@@ -14,4 +15,4 @@ class ConversationState:
     the applications conversation state
     """
 
-    __history__: List[str]
+    history: ConversationHistory = field(default_factory=ConversationHistory)

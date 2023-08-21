@@ -22,21 +22,20 @@ namespace Microsoft.TeamsAI.AI
     public class AI<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly IActionCollection<TState> _actions;
-        private readonly AIOptions<TState> _options;
 
         public AI(AIOptions<TState> options, ILogger? logger = null)
         {
             Verify.ParamNotNull(options);
 
-            _options = options;
+            Options = options;
             _actions = new ActionCollection<TState>();
 
-            if (_options.Moderator == null)
+            if (Options.Moderator == null)
             {
-                _options.Moderator = new DefaultModerator<TState>();
+                Options.Moderator = new DefaultModerator<TState>();
             }
 
-            _options.History ??= new AIHistoryOptions();
+            Options.History ??= new AIHistoryOptions();
 
 
             // Import default actions
@@ -49,19 +48,19 @@ namespace Microsoft.TeamsAI.AI
         /// <remarks>
         /// The default moderator simply allows all messages and plans through without intercepting them.
         /// </remarks>
-        public IModerator<TState> Moderator => _options.Moderator!;
+        public IModerator<TState> Moderator => Options.Moderator!;
 
         /// <summary>
         /// Returns the options for the AI system.
         /// </summary>
-        public AIOptions<TState> Options => _options;
+        public AIOptions<TState> Options { get; }
 
         /// <summary>
         /// Returns the planner being used by the AI system.
         /// </summary>
-        public IPlanner<TState> Planner => _options.Planner;
+        public IPlanner<TState> Planner => Options.Planner;
 
-        public IPromptManager<TState> Prompts => _options.PromptManager;
+        public IPromptManager<TState> Prompts => Options.PromptManager;
 
         /// <summary>
         /// Registers a handler for a named action.
@@ -90,20 +89,20 @@ namespace Microsoft.TeamsAI.AI
             Verify.ParamNotNull(name);
             Verify.ParamNotNull(handler);
 
-            if (!_actions.HasAction(name) || allowOverrides)
+            if (!_actions.ContainsAction(name) || allowOverrides)
             {
-                _actions.SetAction(name, handler, allowOverrides);
+                _actions.AddAction(name, handler, allowOverrides);
             }
             else
             {
-                ActionEntry<TState> entry = _actions.GetAction(name);
+                ActionEntry<TState> entry = _actions[name];
                 if (entry.AllowOverrides)
                 {
                     entry.Handler = handler;
                 }
                 else
                 {
-                    throw new Exception($"Attempting to register an already existing action `{name}` that does not allow overrides.");
+                    throw new AIException($"Attempting to register an already existing action `{name}` that does not allow overrides.");
                 }
             }
 
@@ -143,7 +142,7 @@ namespace Microsoft.TeamsAI.AI
             HashSet<string> uniquenessCheck = new(from x in result select x.Name, StringComparer.OrdinalIgnoreCase);
             if (result.Count > uniquenessCheck.Count)
             {
-                throw new Exception("Function overloads are not supported, please differentiate function names");
+                throw new AIException("Function overloads are not supported, please differentiate function names");
             }
 
             // Register the actions
@@ -238,7 +237,7 @@ namespace Microsoft.TeamsAI.AI
             }
 
             // Process generated plan
-            bool continueChain = await _actions.GetAction(DefaultActionTypes.PlanReadyActionName)!.Handler.PerformAction(turnContext, turnState, plan);
+            bool continueChain = await _actions[DefaultActionTypes.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
             if (continueChain)
             {
                 // Update conversation history
@@ -280,33 +279,30 @@ namespace Microsoft.TeamsAI.AI
 
                 if (command is PredictedDoCommand doCommand)
                 {
-                    if (_actions.HasAction(doCommand.Action))
+                    if (_actions.ContainsAction(doCommand.Action))
                     {
                         DoCommandActionData<TState> data = new()
                         {
                             PredictedDoCommand = doCommand,
-                            Handler = _actions.GetAction(doCommand.Action).Handler
+                            Handler = _actions[doCommand.Action].Handler
                         };
 
                         // Call action handler
-                        continueChain = await _actions
-                            .GetAction(DefaultActionTypes.DoCommandActionName)!
+                        continueChain = await _actions[DefaultActionTypes.DoCommandActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, data, doCommand.Action);
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
-                        continueChain = await _actions
-                            .GetAction(DefaultActionTypes.UnknownActionName)
+                        continueChain = await _actions[DefaultActionTypes.UnknownActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
-                    continueChain = await _actions
-                        .GetAction(DefaultActionTypes.SayCommandActionName)
+                    continueChain = await _actions[DefaultActionTypes.SayCommandActionName]
                         .Handler
                         .PerformAction(turnContext, turnState!, sayCommand, DefaultActionTypes.SayCommandActionName);
                 }
@@ -394,7 +390,7 @@ namespace Microsoft.TeamsAI.AI
 
             if (template != null)
             {
-                _options.PromptManager.AddPromptTemplate(name, template);
+                Options.PromptManager.AddPromptTemplate(name, template);
             }
 
             return (ITurnContext turnContext, TState turnState) => CompletePromptAsync(turnContext, turnState, name, options, default);
@@ -413,7 +409,7 @@ namespace Microsoft.TeamsAI.AI
             }
             else
             {
-                configuredOptions = _options;
+                configuredOptions = Options;
             }
 
             return configuredOptions;

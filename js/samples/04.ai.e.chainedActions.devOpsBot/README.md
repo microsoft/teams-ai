@@ -110,7 +110,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/04.ai.e.chainedActions.devOpsBot/
     teamsfx provision --env local
 
     ```

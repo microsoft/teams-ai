@@ -12,33 +12,40 @@ namespace Microsoft.TeamsAI.AI.Action
         }
 
         /// <inheritdoc />
-        public void SetAction(string name, IActionHandler<TState> handler, bool allowOverrides = false)
+        public ActionEntry<TState> this[string actionName]
         {
-            if (_actions.ContainsKey(name))
+            get
             {
-                if (!_actions[name].AllowOverrides)
+                if (!_actions.ContainsKey(actionName))
                 {
-                    throw new ArgumentException($"Action {name} already exists and does not allow overrides");
+                    throw new ArgumentException($"`{actionName}` action does not exist");
+                }
+                return _actions[actionName];
+            }
+        }
+
+        /// <inheritdoc />
+        public void AddAction(string actionName, IActionHandler<TState> handler, bool allowOverrides = false)
+        {
+            if (_actions.ContainsKey(actionName))
+            {
+                if (!_actions[actionName].AllowOverrides)
+                {
+                    throw new ArgumentException($"Action {actionName} already exists and does not allow overrides");
                 }
             }
-            _actions[name] = new ActionEntry<TState>(name, handler, allowOverrides);
+            _actions[actionName] = new ActionEntry<TState>(actionName, handler, allowOverrides);
         }
 
         /// <inheritdoc />
-        public ActionEntry<TState> GetAction(string name)
-        {
-            if (!_actions.ContainsKey(name))
-            {
-                throw new ArgumentException($"`{name}` action does not exist");
-            }
-            return _actions[name];
-        }
-
-        /// <inheritdoc />
-        public bool HasAction(string actionName)
+        public bool ContainsAction(string actionName)
         {
             return _actions.ContainsKey(actionName);
         }
 
+        public bool TryGetAction(string actionName, out ActionEntry<TState> actionEntry)
+        {
+            return _actions.TryGetValue(actionName, out actionEntry);
+        }
     }
 }

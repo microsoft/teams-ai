@@ -41,19 +41,19 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
         /// The name of matched blocklist.
         /// </summary>
         [JsonPropertyName("blocklistName")]
-        public string BlocklistName { get; set; }
+        public string BlocklistName { get; set; } = string.Empty;
 
         /// <summary>
         /// The id of matched item.
         /// </summary>
         [JsonPropertyName("blockItemId")]
-        public string BlockItemId { get; set; }
+        public string BlockItemId { get; set; } = string.Empty;
 
         /// <summary>
         /// The content of matched item.
         /// </summary>
         [JsonPropertyName("blockItemText")]
-        public string BlockItemText { get; set; }
+        public string BlockItemText { get; set; } = string.Empty;
 
         /// <summary>
         /// The character offset of matched text in original input.

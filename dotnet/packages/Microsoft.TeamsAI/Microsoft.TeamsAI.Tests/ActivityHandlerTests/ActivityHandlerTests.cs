@@ -738,7 +738,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
 
             // Act
-            var exception = Assert.Throws<Exception>(() => new TestActivityHandler(new TestApplicationOptions
+            var exception = Assert.Throws<ArgumentException>(() => new TestActivityHandler(new TestApplicationOptions
             {
                 LongRunningMessages = true,
                 StartTypingTimer = false,

@@ -9,6 +9,7 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 ## Samples
 
 - [Echo](./samples/echo/)
+- [List](./samples/list/)
 
 ## Development
 

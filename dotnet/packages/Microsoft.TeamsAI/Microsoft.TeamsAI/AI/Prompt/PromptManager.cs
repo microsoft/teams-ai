@@ -41,14 +41,16 @@ namespace Microsoft.TeamsAI.AI.Prompt
             if (!_functions.ContainsKey(name) || allowOverrides)
             {
                 _functions[name] = new TemplateFunctionEntry<TState>(promptFunction, allowOverrides);
-            } else
+            }
+            else
             {
-                if (_functions.TryGetValue(name, out var entry))
+                if (_functions.TryGetValue(name, out TemplateFunctionEntry<TState> entry))
                 {
                     if (entry.AllowOverrides)
                     {
                         entry.Handler = promptFunction;
-                    } else
+                    }
+                    else
                     {
                         throw new PromptManagerException($"Attempting to update a previously registered function `{name}`");
                     }
@@ -85,7 +87,8 @@ namespace Microsoft.TeamsAI.AI.Prompt
             {
                 PromptFunction<TState> handler = value.Handler;
                 return handler(turnContext, turnState);
-            } else
+            }
+            else
             {
                 throw new PromptManagerException($"Attempting to invoke an unregistered function name {name}");
             }
@@ -105,7 +108,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             {
                 throw new PromptManagerException($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
             }
-            
+
             return _LoadPromptTemplateFromFile(name);
         }
 
@@ -139,7 +142,8 @@ namespace Microsoft.TeamsAI.AI.Prompt
             try
             {
                 renderedPrompt = await promptRenderer.RenderAsync(promptTemplate.Text, context);
-            } catch (TemplateException ex)
+            }
+            catch (TemplateException ex)
             {
                 throw new PromptManagerException($"Failed to render prompt: ${ex.Message}", ex);
             }
@@ -149,7 +153,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         }
 
         /// <summary>
-        /// Registers all the functions into the <seealso cref="SemanticKernel.IKernel"/> default skill collection.
+        /// Registers all the functions into the <seealso cref="IKernel"/> default skill collection.
         /// </summary>
         /// <param name="kernel">The semantic kernel</param>
         /// <param name="turnContext">The context object for this turn.</param>
@@ -157,10 +161,10 @@ namespace Microsoft.TeamsAI.AI.Prompt
         internal void RegisterFunctionsIntoKernel(IKernel kernel, ITurnContext turnContext, TState turnState)
         {
             // TODO: Optimize
-            foreach (var templateEntry in _functions)
+            foreach (KeyValuePair<string, TemplateFunctionEntry<TState>> templateEntry in _functions)
             {
                 // Wrap the function into an SKFunction
-                SKFunctionWrapper<TState> sKFunction = new (turnContext, turnState, templateEntry.Key, this);
+                SKFunctionWrapper<TState> sKFunction = new(turnContext, turnState, templateEntry.Key, this);
                 kernel.RegisterCustomFunction(sKFunction);
             }
         }
@@ -189,19 +193,19 @@ namespace Microsoft.TeamsAI.AI.Prompt
             const string CONFIG_FILE = "config.json";
             const string PROMPT_FILE = "skprompt.txt";
 
-            var promptFolder = Path.Combine(_promptsFolder, name);
+            string promptFolder = Path.Combine(_promptsFolder, name);
             _VerifyDirectoryExists(promptFolder);
 
             // Continue only if prompt template exists
-            var promptPath = Path.Combine(promptFolder, PROMPT_FILE);
+            string promptPath = Path.Combine(promptFolder, PROMPT_FILE);
             if (!File.Exists(promptPath)) { throw new PromptManagerException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
 
             // Load prompt template
-            var text = File.ReadAllText(promptPath);
+            string text = File.ReadAllText(promptPath);
 
             // Load prompt configuration. Note: the configuration is optional.
             PromptTemplateConfiguration? config;
-            var configPath = Path.Combine(promptFolder, CONFIG_FILE);
+            string configPath = Path.Combine(promptFolder, CONFIG_FILE);
             if (!File.Exists(configPath)) { throw new PromptManagerException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
 
             try
@@ -219,7 +223,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         private void _VerifyDirectoryExists(string directoryPath)
         {
             if (Directory.Exists(directoryPath)) { return; }
-            
+
             throw new PromptManagerException($"Directory doesn't exist `{directoryPath}`");
         }
     }

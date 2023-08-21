@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Microsoft.TeamsAI.AI.Planner
+﻿namespace Microsoft.TeamsAI.AI.Planner
 {
     internal class ParsedCommandResult
     {

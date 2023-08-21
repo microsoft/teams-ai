@@ -27,13 +27,13 @@ namespace Microsoft.TeamsAI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions.GetAction(actionName)?.Handler.PerformAction(turnContext, turnState);
+                actions[actionName].Handler.PerformAction(turnContext, turnState);
             }
 
             // Assert
             foreach (var actionName in actionNames)
             {
-                Assert.True(actions.HasAction(actionName));
+                Assert.True(actions.ContainsAction(actionName));
             }
             Assert.Equal(actionNames, instance.Calls.ToArray());
         }
@@ -52,13 +52,13 @@ namespace Microsoft.TeamsAI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions.GetAction(actionName)?.Handler.PerformAction(turnContext, turnState, entities, actionName);
+                actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName);
             }
 
             // Assert
             foreach (var actionName in actionNames)
             {
-                Assert.True(actions.HasAction(actionName));
+                Assert.True(actions.ContainsAction(actionName));
             }
             var expectedCalls = new[]
             {
@@ -84,7 +84,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
-            var exception = await Assert.ThrowsAsync<Exception>(async () => await actions.GetAction(actionName).Handler.PerformAction(turnContext, turnState, entities, actionName));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
 
             // Assert
             Assert.NotNull(exception);
@@ -132,7 +132,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             };
         }
 
-        private class DifferentReturnTypesActions
+        private sealed class DifferentReturnTypesActions
         {
             public List<string> Calls { get; set; } = new List<string>();
 
@@ -178,7 +178,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             }
         }
 
-        private class DifferentParameterAttributesActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+        private sealed class DifferentParameterAttributesActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
         {
             public List<object?[]> Calls { get; set; } = new List<object?[]>();
 
@@ -219,7 +219,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             }
         }
 
-        private class TestActions<TContext, TState, TEntities, TName>
+        private sealed class TestActions<TContext, TState, TEntities, TName>
         {
             [Action("action")]
             public static void Action([ActionTurnContext] TContext _0, [ActionTurnState] TState _1, [ActionEntities] TEntities _2, [ActionName] TName _3) { }
