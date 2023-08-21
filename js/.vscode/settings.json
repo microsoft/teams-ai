@@ -1,0 +1,7 @@
+{
+    "editor.tabSize": 4,
+    "editor.wordWrap": "on",
+    "eslint.enable": true,
+    "eslint.workingDirectories": ["./packages", "./samples"],
+    "hints.no-inline-styles": "off" // Removes warnings for coverage report files
+}

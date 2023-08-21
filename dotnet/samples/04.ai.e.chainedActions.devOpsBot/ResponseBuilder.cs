@@ -2,8 +2,6 @@
 {
     public static class ResponseBuilder
     {
-        private static readonly Random RANDOM = new();
-
         private static readonly string[] GREETING_MESSAGES =
         {
             "Welcome to DevOps Bot! Type /reset to delete all existing work items.",
@@ -101,10 +99,7 @@
         /// </summary>
         public static string OffTopic() => GetRandomResponse(OFF_TOPIC_MESSAGES);
 
-        private static string GetRandomResponse(string[] responses)
-        {
-            int index = RANDOM.Next(responses.Length);
-            return responses[index];
-        }
+        private static string GetRandomResponse(string[] responses) =>
+            responses[Random.Shared.Next(responses.Length)];
     }
 }

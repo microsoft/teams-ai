@@ -41,12 +41,12 @@ namespace Microsoft.TeamsAI.AI.Action
         {
             if (methodSignature == null)
             {
-                throw new Exception("Method is null");
+                throw new ArgumentNullException(nameof(methodSignature), "Method is null");
             }
 
             if (methodContainerInstance == null)
             {
-                throw new Exception("Method container instance is null");
+                throw new ArgumentNullException(nameof(methodContainerInstance), "Method container instance is null");
             }
 
             ActionAttribute? actionAttribute = methodSignature
@@ -54,7 +54,7 @@ namespace Microsoft.TeamsAI.AI.Action
                 .Cast<ActionAttribute>()
                 .FirstOrDefault();
 
-            if (actionAttribute == null) 
+            if (actionAttribute == null)
             {
                 return null;
             }

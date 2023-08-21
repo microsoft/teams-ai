@@ -17,7 +17,7 @@
         "package": "wsrun -e -t -l --if is-not-private --bin yarn pack",
         "test": "yarn tsc -b packages/teams-ai && npx mocha -r ts-node/register packages/teams-ai/src/**/*.spec.ts",
         "test:mocha": "nyc --silent mocha --require ts-node/register \"./packages/teams-ai/src/*.spec.ts\" --exit --check-leaks",
-        "test:nyc:report": "nyc report"
+        "test:nyc:report": "npx rimraf coverage && nyc report"
     },
     "devDependencies": {
         "@azure/logger": "^1.0.2",
@@ -63,8 +63,5 @@
         "typedoc-plugin-markdown": "^3.15.4",
         "typescript": "^5.1.6",
         "wsrun": "^5.2.4"
-    },
-    "nyc": {
-        "exclude": []
     }
 }

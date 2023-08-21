@@ -3,7 +3,7 @@ using Microsoft.Bot.Schema;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
-    internal class TestDelegatingTurnContext : TestApplication
+    internal sealed class TestDelegatingTurnContext : TestApplication
     {
         public TestDelegatingTurnContext(TestApplicationOptions options) : base(options)
         {
