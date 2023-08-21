@@ -3,11 +3,16 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 from datetime import datetime
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, List, Tuple, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
-from semantic_kernel.connectors.ai import CompleteRequestSettings
+from semantic_kernel.connectors.ai import (
+    ChatCompletionClientBase,
+    ChatRequestSettings,
+    CompleteRequestSettings,
+    TextCompletionClientBase,
+)
 from semantic_kernel.connectors.ai.open_ai import (
     OpenAIChatCompletion,
     OpenAITextCompletion,
@@ -17,13 +22,19 @@ from teams.ai.ai_history_options import AIHistoryOptions
 from teams.ai.prompts import PromptManager
 from teams.ai.prompts.prompt_template import PromptTemplate
 from teams.ai.prompts.utils import generate_sk_prompt_template_config
-from teams.ai.state import TurnState
+from teams.ai.state import ConversationT, TempT, TurnState, UserT
 
 from .command_type import CommandType
+from .conversation_history import state_to_history_array
 from .openai_planner_options import OpenAIPlannerOptions
 from .plan import Plan
 from .planner import Planner
 from .response_parser import parse_response
+
+# Define role names used by OpenAI API
+SYSTEM_ROLE_NAME: str = "system"
+USER_ROLE_NAME: str = "user"
+ASSISTANT_ROLE_NAME: str = "assistant"
 
 
 class OpenAIPlanner(Planner):
@@ -53,7 +64,7 @@ class OpenAIPlanner(Planner):
         state: TurnState,
         prompt_name_or_template: Union[str, PromptTemplate],
         *,
-        history_options: Optional[AIHistoryOptions] = None,
+        history_options: AIHistoryOptions = AIHistoryOptions(),
     ) -> Plan:
         """
         Generates a plan based on the given turn state and prompt name or template.
@@ -69,7 +80,7 @@ class OpenAIPlanner(Planner):
         prompt_template = await self._prompt_manager.render_prompt(
             turn_context, state, prompt_name_or_template
         )
-        result = await self._complete_prompt(prompt_template)
+        result = await self._complete_prompt(state, prompt_template, history_options)
 
         if len(result) > 0:
             # Patch the occasional "Then DO" which gets predicted
@@ -129,7 +140,9 @@ class OpenAIPlanner(Planner):
 
     async def _complete_prompt(
         self,
+        turn_state: TurnState[ConversationT, UserT, TempT],
         prompt_template: PromptTemplate,
+        history_options: AIHistoryOptions,
     ) -> str:
         model: str = self._get_model(prompt_template)
         is_chat_completion: bool = model.lower().startswith("gpt-")
@@ -138,10 +151,13 @@ class OpenAIPlanner(Planner):
 
         self._log_request(f"\n{log_prefix} REQUEST: \n'''\n{prompt_template.text}\n'''")
 
-        result: str
-
-        # TODO: implement chat completion
-        result = await self._complete_text(prompt_template)
+        if is_chat_completion:
+            user_message = turn_state.temp.value.input
+            result = await self._complete_chat(
+                prompt_template, turn_state, user_message, history_options
+            )
+        else:
+            result = await self._complete_text(prompt_template)
 
         duration = datetime.now() - start_time
         # TODO: investigate how to get prompt/completion tokens
@@ -149,18 +165,57 @@ class OpenAIPlanner(Planner):
 
         return result
 
+    async def _complete_chat(
+        self,
+        prompt_template: PromptTemplate,
+        state: TurnState,
+        user_message: str,
+        options: AIHistoryOptions,
+    ):
+        prompt_template_config = generate_sk_prompt_template_config(prompt_template)
+        request_settings = ChatRequestSettings.from_completion_config(
+            prompt_template_config.completion
+        )
+
+        chat_completion_client = self._sk.get_ai_service(ChatCompletionClientBase)(self._sk)
+
+        chat_history: List[Tuple[str, str]] = []
+        if self._options.use_system_message:
+            chat_history.append((SYSTEM_ROLE_NAME, prompt_template.text))
+        else:
+            chat_history.append((USER_ROLE_NAME, prompt_template.text))
+
+        # Populate conversation history
+        if options.track_history:
+            user_prefix = options.user_prefix
+            assistant_prefix = options.assistant_prefix
+            history: List[str] = state_to_history_array(state, options.max_tokens)
+
+            for line in history:
+                if line.lower().startswith(user_prefix.lower()):
+                    chat_history.append((USER_ROLE_NAME, line[len(user_prefix) :].strip()))
+                elif line.lower().startswith(assistant_prefix.lower()):
+                    chat_history.append(
+                        (ASSISTANT_ROLE_NAME, line[len(assistant_prefix) :].strip())
+                    )
+
+        if user_message:
+            chat_history.append((USER_ROLE_NAME, user_message))
+
+        result = await chat_completion_client.complete_chat_async(chat_history, request_settings)
+        if isinstance(result, str):
+            return result
+
+        return "\n".join(result)
+
     async def _complete_text(self, prompt_template: PromptTemplate):
         prompt_template_config = generate_sk_prompt_template_config(prompt_template)
         request_settings = CompleteRequestSettings.from_completion_config(
             prompt_template_config.completion
         )
 
-        text_completion_client = OpenAITextCompletion(
-            self._options.default_model, self._options.api_key, self._options.organization
-        )
-        result = await text_completion_client.complete_async(
-            prompt=prompt_template.text, request_settings=request_settings
-        )
+        text_completion_client = self._sk.get_ai_service(TextCompletionClientBase)(self._sk)
+        result = await text_completion_client.complete_async(prompt_template.text, request_settings)
         if isinstance(result, str):
             return result
 

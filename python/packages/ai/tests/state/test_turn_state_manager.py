@@ -29,7 +29,7 @@ class TestTurnStateManager(IsolatedAsyncioTestCase):
         state = await self.manager.load_state(
             storage=storage, context=TurnContext(SimpleAdapter(), ACTIVITY)
         )
-        self.assertEqual(state.conversation.value, ConversationState())
+        self.assertEqual(state.conversation.value, ConversationState([]))
         self.assertEqual(state.user.value, UserState())
         self.assertEqual(state.temp.value, TempState(history="", input="", output=""))
 

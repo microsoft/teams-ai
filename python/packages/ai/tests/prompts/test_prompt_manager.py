@@ -84,7 +84,7 @@ class TestDefaultPromptManager(IsolatedAsyncioTestCase):
         return cast(TurnContext, {})
 
     def _mock_turn_state(self) -> TurnState:
-        conversation_state = ConversationState()
+        conversation_state = ConversationState([])
         user_state = UserState()
         temp_state = TempState("input", "history", "output")
         turn_state = TurnState[ConversationState, UserState, TempState](
