@@ -25,9 +25,10 @@ class TypingTimer:
         if self._timer is not None:
             return
 
-        self._timer = Timer(self._interval, self._on_timer)
+        func = self._on_timer(context)
+        self._timer = Timer(self._interval, func)
         self._timer.start()
-        await self._on_timer(context)()
+        await func()
 
     def stop(self) -> None:
         if self._timer:

@@ -5,8 +5,7 @@ Licensed under the MIT License.
 
 from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
 
-from botbuilder.core import Bot, CloudAdapterBase, TurnContext
-from botbuilder.core.invoke_response import InvokeResponse
+from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
 from botbuilder.schema import Activity, ActivityTypes
 
 from teams.ai import AI, AIError, TurnState
@@ -34,7 +33,7 @@ class Application(Bot, Generic[StateT]):
 
     _ai: Optional[AI[StateT]]
     _options: ApplicationOptions[StateT]
-    _adapter: Optional[CloudAdapterBase] = None
+    _adapter: Optional[BotFrameworkAdapter] = None
     _typing_delay = 1000
     _activities: Dict[str, Callable[[TurnContext, StateT], Awaitable[bool]]] = {}
     _before_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
@@ -57,7 +56,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         if options.auth:
-            self._adapter = CloudAdapterBase(options.auth)
+            self._adapter = BotFrameworkAdapter(options.auth)
 
     @property
     def ai(self) -> AI[StateT]:
@@ -173,7 +172,9 @@ class Application(Bot, Generic[StateT]):
 
         return func
 
-    async def process_activity(self, activity: Activity, auth_header: str) -> InvokeResponse:
+    async def process_activity(
+        self, activity: Activity, auth_header: str
+    ) -> Optional[InvokeResponse]:
         """
         Creates a turn context and runs the middleware pipeline for an incoming activity.
 
@@ -198,7 +199,7 @@ class Application(Bot, Generic[StateT]):
                 "cannot call `app.process_activity` when `ApplicationOptions.adapter` not provided"
             )
 
-        return await self._adapter.process_activity(auth_header, activity, self.on_turn)
+        return await self._adapter.process_activity(activity, auth_header, self.on_turn)
 
     async def on_turn(self, context: TurnContext):
         await self._start_long_running_call(context, self._on_turn)
