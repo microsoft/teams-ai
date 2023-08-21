@@ -3,15 +3,20 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from typing import Any, Callable, Generic, TypeVar
+
 from botbuilder.core import TurnContext
 
 from teams.ai.planner import OpenAIPlanner, OpenAIPlannerOptions
 from teams.ai.state import (
     ConversationState,
+    ConversationT,
     TempState,
+    TempT,
     TurnState,
     TurnStateEntry,
     UserState,
+    UserT,
 )
 
 
@@ -35,3 +40,22 @@ async def generate_plan(turn_context: TurnContext):
     )
 
     await planner.generate_plan(turn_context, state, "test")
+
+
+class Application(Generic[ConversationT, UserT, TempT]):
+    planner: OpenAIPlanner
+
+    async def add_function(
+        self,
+        name: str,
+        handler: Callable[[TurnContext, TurnState[ConversationT, UserT, TempT]], Any],
+    ):
+        await self.planner.add_function(name, handler)
+
+    async def generate_plan(
+        self,
+        turn_context: TurnContext,
+        state: TurnState[ConversationT, UserT, TempT],
+        prompt_name_or_template: str,
+    ):
+        await self.planner.generate_plan(turn_context, state, prompt_name_or_template)
