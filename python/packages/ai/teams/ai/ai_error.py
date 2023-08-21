@@ -3,7 +3,10 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from teams.app_error import ApplicationError
 
-class AIError(Exception):
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
+
+class AIError(ApplicationError):
+    """
+    AI Module Error
+    """

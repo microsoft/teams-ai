@@ -3,9 +3,9 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Generic, Hashable, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
-ValueT = TypeVar("ValueT", bound=Hashable)
+ValueT = TypeVar("ValueT")
 
 
 class TurnStateEntry(Generic[ValueT]):

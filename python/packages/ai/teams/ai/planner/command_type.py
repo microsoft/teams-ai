@@ -5,6 +5,6 @@ Licensed under the MIT License.
 from enum import Enum
 
 
-class CommandType(Enum):
+class CommandType(str, Enum):
     DO = "DO"
     SAY = "SAY"

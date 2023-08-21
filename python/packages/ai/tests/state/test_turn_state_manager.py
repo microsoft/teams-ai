@@ -48,12 +48,12 @@ class TestTurnStateManager(IsolatedAsyncioTestCase):
     async def test_save_state(self):
         @dataclass
         class CustomConversationState(ConversationState):
-            test: str
+            test: str = ""
 
         manager = TurnStateManager[TurnState[CustomConversationState, UserState, TempState]]()
         storage = MemoryStorage()
         key = "UnitTest/bot/conversations/convo"
-        value = CustomConversationState("a")
+        value = CustomConversationState(test="a")
         state = TurnState[CustomConversationState, UserState, TempState](
             conversation=TurnStateEntry(value, storage_key=key),
             user=TurnStateEntry(UserState()),

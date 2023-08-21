@@ -188,6 +188,7 @@ function-naming-style=snake_case
 good-names=ai,
            ci,
            sk,
+           id,
            i,
            j,
            e,
@@ -434,12 +435,14 @@ disable=raw-checker-failed,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
-        C0116,
-        C0115,
-        R0903,
-        W0212,
-        W0511,
-        R1702
+        missing-function-docstring,
+        missing-class-docstring,
+        too-few-public-methods,
+        protected-access,
+        fixme,
+        too-many-nested-blocks,
+        redefined-builtin,
+        too-many-public-methods
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

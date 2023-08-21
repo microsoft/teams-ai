@@ -12,8 +12,8 @@ from .predicted_command import PredictedCommand
 
 @dataclass
 class PredictedSayCommand(PredictedCommand):
-    type: Literal[CommandType.SAY]
-    response: str
+    type: Literal[CommandType.SAY] = CommandType.SAY
+    response: str = ""
 
     @staticmethod
     def from_dict(data: dict) -> "PredictedSayCommand":

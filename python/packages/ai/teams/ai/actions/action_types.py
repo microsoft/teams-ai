@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from enum import Enum
 
 
-class DefaultActionTypes(str, Enum):
+class ActionTypes(str, Enum):
     UNKNOWN_ACTION = "___UnknownAction___"
     FLAGGED_INPUT = "___FlaggedInput___"
     FLAGGED_OUTPUT = "___FlaggedOutput___"

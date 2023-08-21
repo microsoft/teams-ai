@@ -20,7 +20,7 @@ from teams.ai.state import (
     UserState,
 )
 
-TEST_ASSERTS_FOLDER = "tests/prompts/test_assets"
+TEST_ASSERTS_FOLDER: str = "tests/prompts/test_assets"
 
 
 class TestDefaultPromptManager(IsolatedAsyncioTestCase):

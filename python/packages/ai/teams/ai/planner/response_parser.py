@@ -7,10 +7,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
-from teams.ai.ai_error import AIError
-
 from .command_type import CommandType
 from .plan import Plan
+from .planner_error import PlannerError
 from .predicted_command import PredictedCommand
 from .predicted_do_command import PredictedDoCommand
 from .predicted_say_command import PredictedSayCommand
@@ -118,10 +117,11 @@ def _parse_do_command(tokens: List[str]):
     length = 0
     # Only used to bypass the possibly unbound error.
     # The command instance will be initialized again during parsing.
-    command: PredictedDoCommand = PredictedDoCommand(CommandType.DO, "", {})
+    command: PredictedDoCommand = PredictedDoCommand()
+
     if len(tokens) > 1:
         if tokens[0] != "DO":
-            raise AIError("Token list passed in doesn't start with 'DO' token.")
+            raise PlannerError("Token list passed in doesn't start with 'DO' token.")
 
         action_name = ""
         entity_name = ""
@@ -153,7 +153,7 @@ def _parse_do_command(tokens: List[str]):
                 # - Underscores and dashes are allowed
                 if token in NAME_BREAKING_CHARACTERS:
                     # Initialize command object and enter new state
-                    command = PredictedDoCommand(CommandType.DO, action_name, {})
+                    command = PredictedDoCommand(action=action_name)
                     parse_state = DoCommandParseState.FIND_ENTITY_NAME
                 else:
                     action_name += token
@@ -219,7 +219,7 @@ def _parse_do_command(tokens: List[str]):
         # Create command if not created
         # - This happens when a DO command without any entities is at the end of the response.
         if not command and action_name:
-            command = PredictedDoCommand(CommandType.DO, action_name, {})
+            command = PredictedDoCommand(action=action_name)
 
         # Append final entity
         if command and entity_name:
@@ -233,7 +233,7 @@ def _parse_say_command(tokens: List[str]):
     command = None
     if len(tokens) > 1:
         if tokens[0] != "SAY":
-            raise AIError("Token list passed in doesn't start with 'SAY' token.")
+            raise PlannerError("Token list passed in doesn't start with 'SAY' token.")
 
         # Parse command (skips initial DO token)
         response = ""
@@ -255,7 +255,7 @@ def _parse_say_command(tokens: List[str]):
 
         # Create command
         if len(response) > 0:
-            command = PredictedSayCommand(CommandType.SAY, response)
+            command = PredictedSayCommand(response=response)
 
     return ParsedCommandResult(length, command)
 

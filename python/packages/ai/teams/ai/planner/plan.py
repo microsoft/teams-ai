@@ -3,6 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+import json
 from dataclasses import dataclass, field
 from typing import List
 
@@ -27,3 +28,6 @@ class Plan:
             if command["type"] == "SAY":
                 commands.append(PredictedSayCommand.from_dict(command))
         return Plan(plan_type, commands)
+
+    def json(self):
+        return json.dumps(self.__dict__, default=lambda value: value.__dict__)
