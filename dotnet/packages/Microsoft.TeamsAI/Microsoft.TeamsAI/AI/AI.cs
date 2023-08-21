@@ -22,21 +22,20 @@ namespace Microsoft.TeamsAI.AI
     public class AI<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly IActionCollection<TState> _actions;
-        private readonly AIOptions<TState> _options;
 
         public AI(AIOptions<TState> options, ILogger? logger = null)
         {
             Verify.ParamNotNull(options);
 
-            _options = options;
+            Options = options;
             _actions = new ActionCollection<TState>();
 
-            if (_options.Moderator == null)
+            if (Options.Moderator == null)
             {
-                _options.Moderator = new DefaultModerator<TState>();
+                Options.Moderator = new DefaultModerator<TState>();
             }
 
-            _options.History ??= new AIHistoryOptions();
+            Options.History ??= new AIHistoryOptions();
 
 
             // Import default actions
@@ -49,19 +48,19 @@ namespace Microsoft.TeamsAI.AI
         /// <remarks>
         /// The default moderator simply allows all messages and plans through without intercepting them.
         /// </remarks>
-        public IModerator<TState> Moderator => _options.Moderator!;
+        public IModerator<TState> Moderator => Options.Moderator!;
 
         /// <summary>
         /// Returns the options for the AI system.
         /// </summary>
-        public AIOptions<TState> Options => _options;
+        public AIOptions<TState> Options { get; }
 
         /// <summary>
         /// Returns the planner being used by the AI system.
         /// </summary>
-        public IPlanner<TState> Planner => _options.Planner;
+        public IPlanner<TState> Planner => Options.Planner;
 
-        public IPromptManager<TState> Prompts => _options.PromptManager;
+        public IPromptManager<TState> Prompts => Options.PromptManager;
 
         /// <summary>
         /// Registers a handler for a named action.
@@ -391,7 +390,7 @@ namespace Microsoft.TeamsAI.AI
 
             if (template != null)
             {
-                _options.PromptManager.AddPromptTemplate(name, template);
+                Options.PromptManager.AddPromptTemplate(name, template);
             }
 
             return (ITurnContext turnContext, TState turnState) => CompletePromptAsync(turnContext, turnState, name, options, default);
@@ -410,7 +409,7 @@ namespace Microsoft.TeamsAI.AI
             }
             else
             {
-                configuredOptions = _options;
+                configuredOptions = Options;
             }
 
             return configuredOptions;

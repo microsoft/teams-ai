@@ -3,7 +3,6 @@ using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
 using Microsoft.Bot.Connector;
-using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
@@ -32,7 +31,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             Assert.True(isHandlerImplemented);
             Assert.Single(bot.Record);
             Assert.Equal("OnInvokeActivityAsync", bot.Record[0]);
-            Assert.Equal(200, ((InvokeResponse)((Activity)adapter.Activity).Value).Status);
+            Assert.Equal(200, ((InvokeResponse)((Activity)adapter.Activity!).Value).Status);
         }
 
         [Fact]
@@ -81,7 +80,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             Assert.True(isHandlerImplemented);
             Assert.Single(bot.Record);
             Assert.Equal("OnInvokeActivityAsync", bot.Record[0]);
-            Assert.Equal(501, ((InvokeResponse)((Activity)adapter.Activity).Value).Status);
+            Assert.Equal(501, ((InvokeResponse)((Activity)adapter.Activity!).Value).Status);
         }
 
         [Fact]
@@ -104,7 +103,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -148,7 +147,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -184,7 +183,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new O365ConnectorCardActionQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -219,7 +218,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new AppBasedLinkQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -254,7 +253,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new AppBasedLinkQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -289,7 +288,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new MessagingExtensionQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -324,7 +323,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = new JObject(),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -359,7 +358,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new MessagingExtensionQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -398,7 +397,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -437,7 +436,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -473,7 +472,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""commandId"":""testCommand""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -508,7 +507,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""commandId"":""testCommand""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -543,7 +542,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""commandId"":""testCommand""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -578,7 +577,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""data"":{""key"":""value"",""type"":""task / fetch""},""context"":{""theme"":""default""}}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -613,7 +612,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""data"":{""key"":""value"",""type"":""task / fetch""},""context"":{""theme"":""default""}}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -648,7 +647,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""data"":{""key"":""value"",""type"":""tab / fetch""},""context"":{""theme"":""default""}}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -683,7 +682,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""data"":{""key"":""value"",""type"":""tab / submit""},""context"":{""theme"":""default""}}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -717,7 +716,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Name = "signin/verifyState",
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -813,7 +812,9 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
         [Fact]
         public async Task TestGetSearchInvokeValue_NullValueThrows()
         {
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             var activity = GetSearchActivity(null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             await AssertErrorThroughInvokeAdapter(activity, "Missing value property for search");
         }
 
@@ -838,7 +839,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             await AssertErrorThroughInvokeAdapter(activity, "Missing queryText property for search");
         }
 
-        private Activity GetSearchActivity(object value)
+        private static Activity GetSearchActivity(object value)
         {
             return new Activity
             {
@@ -848,7 +849,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             };
         }
 
-        private async Task AssertErrorThroughInvokeAdapter(Activity activity, string errorMessage)
+        private static async Task AssertErrorThroughInvokeAdapter(Activity activity, string errorMessage)
         {
             // Arrange
             var adapter = new TestInvokeAdapter();
@@ -857,24 +858,24 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
 
             // Act
             var bot = new TestActivityHandler(new TestApplicationOptions());
-            var isHandlerImplemented = await bot.RunActivityHandlerAsync(turnContext, turnState, default);
+            await bot.RunActivityHandlerAsync(turnContext, turnState, default);
 
             // Assert
             var sent = adapter.Activity as Activity;
-            Assert.Equal(ActivityTypesEx.InvokeResponse, sent.Type);
+            Assert.Equal(ActivityTypesEx.InvokeResponse, sent!.Type);
 
             Assert.IsType<InvokeResponse>(sent.Value);
             var value = sent.Value as InvokeResponse;
-            Assert.Equal(400, value.Status);
+            Assert.Equal(400, value!.Status);
 
             Assert.IsType<AdaptiveCardInvokeResponse>(value.Body);
             var body = value.Body as AdaptiveCardInvokeResponse;
-            Assert.Equal("application/vnd.microsoft.error", body.Type);
+            Assert.Equal("application/vnd.microsoft.error", body!.Type);
             Assert.Equal(400, body.StatusCode);
 
             Assert.IsType<Error>(body.Value);
             var error = body.Value as Error;
-            Assert.Equal("BadRequest", error.Code);
+            Assert.Equal("BadRequest", error!.Code);
             Assert.Equal(errorMessage, error.Message);
         }
     }

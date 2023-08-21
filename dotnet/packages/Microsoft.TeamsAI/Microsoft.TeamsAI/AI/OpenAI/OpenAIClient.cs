@@ -8,7 +8,7 @@ using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 
-namespace Microsoft.TeamsAI.OpenAI
+namespace Microsoft.TeamsAI.AI.OpenAI
 {
     /// <summary>
     /// The client to make calls to OpenAI's API
@@ -43,7 +43,7 @@ namespace Microsoft.TeamsAI.OpenAI
                 using HttpContent content = new StringContent(
                     JsonSerializer.Serialize(new
                     {
-                        model = model,
+                        model,
                         input = text
                     }, new JsonSerializerOptions()
                     {

@@ -1,6 +1,6 @@
 ﻿using System.Net;
+using Microsoft.TeamsAI.AI.OpenAI;
 using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.OpenAI;
 using Microsoft.TeamsAI.Utilities;
 
 namespace Microsoft.TeamsAI.Tests.AITests
@@ -52,7 +52,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             Assert.True(response.Disposed);
         }
 
-        private class TestHttpResponseMessage : HttpResponseMessage
+        private sealed class TestHttpResponseMessage : HttpResponseMessage
         {
             public bool Disposed { get; set; }
 
@@ -67,7 +67,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             }
         }
 
-        private class TestHttpMessageHandler : HttpMessageHandler
+        private sealed class TestHttpMessageHandler : HttpMessageHandler
         {
             public HttpResponseMessage Response { get; set; } = new TestHttpResponseMessage(HttpStatusCode.OK);
 

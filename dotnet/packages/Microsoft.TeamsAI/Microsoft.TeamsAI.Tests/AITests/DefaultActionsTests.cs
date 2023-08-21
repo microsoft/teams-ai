@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.AI
+namespace Microsoft.TeamsAI.Tests.AITests
 {
     public class DefaultActionsTests
     {
@@ -220,7 +220,7 @@ namespace Microsoft.TeamsAI.Tests.AI
             return (IActionCollection<TState>)actionsField!.GetValue(ai)!;
         }
 
-        private class TestActionHandler : IActionHandler<TestTurnState>
+        private sealed class TestActionHandler : IActionHandler<TestTurnState>
         {
             public string? ActionName { get; set; }
 

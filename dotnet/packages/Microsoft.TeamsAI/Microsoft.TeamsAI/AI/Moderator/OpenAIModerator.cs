@@ -2,10 +2,10 @@
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.OpenAI;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
+using Microsoft.TeamsAI.AI.OpenAI;
 
 namespace Microsoft.TeamsAI.AI.Moderator
 {

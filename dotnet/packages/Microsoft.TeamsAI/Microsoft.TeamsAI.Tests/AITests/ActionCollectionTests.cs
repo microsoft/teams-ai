@@ -111,7 +111,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             Assert.True(containsAction);
         }
 
-        private class TestActionHandler : IActionHandler<TestTurnState>
+        private sealed class TestActionHandler : IActionHandler<TestTurnState>
         {
             public Task<bool> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
             {

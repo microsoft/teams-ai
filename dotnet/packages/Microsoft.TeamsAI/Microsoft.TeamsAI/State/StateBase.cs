@@ -30,7 +30,9 @@ namespace Microsoft.TeamsAI.State
                 throw new InvalidCastException($"Failed to cast generic object to type '{typeof(T)}'");
             }
 
+#pragma warning disable CS8601 // Possible null reference assignment.
             value = default;
+#pragma warning restore CS8601 // Possible null reference assignment.
 
             return false;
         }
@@ -66,7 +68,9 @@ namespace Microsoft.TeamsAI.State
             Verify.ParamNotNull(key);
             Verify.ParamNotNull(value);
 
+#pragma warning disable CS8601 // Possible null reference assignment.
             this[key] = value;
+#pragma warning restore CS8601 // Possible null reference assignment.
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Microsoft.TeamsAI.Tests
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Type = ActivityTypes.Message });
 
             int timerDelay = 1000;
-            TypingTimer typingTimer = new TypingTimer(timerDelay);
+            TypingTimer typingTimer = new(timerDelay);
 
             // Act
             typingTimer.Start(turnContextMock.Object);
@@ -32,7 +32,7 @@ namespace Microsoft.TeamsAI.Tests
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Type = ActivityTypes.Message });
 
             int timerDelay = 1000;
-            TypingTimer typingTimer = new TypingTimer(timerDelay);
+            TypingTimer typingTimer = new(timerDelay);
 
             // Act
             typingTimer.Start(turnContextMock.Object);
@@ -50,7 +50,7 @@ namespace Microsoft.TeamsAI.Tests
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Type = notMessageActivityType });
 
             int timerDelay = 1000;
-            TypingTimer typingTimer = new TypingTimer(timerDelay);
+            TypingTimer typingTimer = new(timerDelay);
 
             // Act
             typingTimer.Start(turnContextMock.Object);
@@ -69,7 +69,7 @@ namespace Microsoft.TeamsAI.Tests
             turnContextMock.Setup(tc => tc.OnSendActivities(It.IsAny<SendActivitiesHandler>()));
 
             int timerDelay = 1000;
-            TypingTimer typingTimer = new TypingTimer(timerDelay);
+            TypingTimer typingTimer = new(timerDelay);
 
             // Act
             typingTimer.Start(turnContextMock.Object);
@@ -95,7 +95,7 @@ namespace Microsoft.TeamsAI.Tests
 
             // Sending typing activity 10 times per second
             int timerDelay = 100;
-            TypingTimer typingTimer = new TypingTimer(timerDelay);
+            TypingTimer typingTimer = new(timerDelay);
 
             // Act
             typingTimer.Start(turnContextMock.Object);
@@ -145,7 +145,7 @@ namespace Microsoft.TeamsAI.Tests
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Type = ActivityTypes.Message });
 
             int timerDelay = 1000;
-            TypingTimer typingTimer = new TypingTimer(timerDelay);
+            TypingTimer typingTimer = new(timerDelay);
 
             // Act
             typingTimer.Start(turnContextMock.Object);
