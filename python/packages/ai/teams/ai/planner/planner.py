@@ -10,7 +10,7 @@ from typing import Any, Callable, Union
 
 from botbuilder.core import TurnContext
 
-from teams import AIHistoryOptions
+from teams.ai import AIHistoryOptions
 from teams.ai.prompts import PromptTemplate
 from teams.ai.state import TurnState
 

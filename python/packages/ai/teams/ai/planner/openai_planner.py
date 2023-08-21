@@ -151,8 +151,6 @@ class OpenAIPlanner(Planner):
 
         self._log_request(f"\n{log_prefix} REQUEST: \n'''\n{prompt_template.text}\n'''")
 
-        result: str
-
         if is_chat_completion:
             user_message = turn_state.temp.value.input
             result = await self._complete_chat(
