@@ -1,15 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.TeamsAI.Tests;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Newtonsoft.Json.Linq;
-using Xunit;
 using Microsoft.TeamsAI.Tests.TestUtils;
-using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
@@ -26,7 +21,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Name = "gibberish",
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -66,7 +61,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -106,7 +101,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -137,7 +132,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new O365ConnectorCardActionQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -168,7 +163,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new AppBasedLinkQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -199,7 +194,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new MessagingExtensionQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -230,7 +225,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = new JObject(),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -261,7 +256,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.FromObject(new MessagingExtensionQuery()),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -295,7 +290,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -329,7 +324,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -360,7 +355,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""commandId"":""testCommand""}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -390,7 +385,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Name = "composeExtension/querySettingsUrl",
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -420,7 +415,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Name = "composeExtension/setting",
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -451,7 +446,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""data"":{""key"":""value"",""type"":""task / fetch""},""context"":{""theme"":""default""}}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -482,7 +477,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 Value = JObject.Parse(@"{""data"":{""key"":""value"",""type"":""task / fetch""},""context"":{""theme"":""default""}}"),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -522,7 +517,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -562,7 +557,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -596,7 +591,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -630,7 +625,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -671,7 +666,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -705,7 +700,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
                 }),
             };
 
-            Activity[] activitiesToSend = null;
+            Activity[]? activitiesToSend = null;
             void CaptureSend(Activity[] arg)
             {
                 activitiesToSend = arg;
@@ -725,14 +720,14 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             Assert.Equal(400, ((InvokeResponse)activitiesToSend[0].Value).Status);
         }
 
-        private class TestActivityHandler : TestApplication
+        private sealed class TestActivityHandler : TestApplication
         {
             public TestActivityHandler(TestApplicationOptions options) : base(options)
             {
             }
         }
 
-        private class TestActivityHandlerFileConsent : TestApplication
+        private sealed class TestActivityHandlerFileConsent : TestApplication
         {
             public TestActivityHandlerFileConsent(TestApplicationOptions options) : base(options)
             {
@@ -749,7 +744,7 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             }
         }
 
-        private class TestActivityHandlerMessagePreview : TestApplication
+        private sealed class TestActivityHandlerMessagePreview : TestApplication
         {
             public TestActivityHandlerMessagePreview(TestApplicationOptions options) : base(options)
             {

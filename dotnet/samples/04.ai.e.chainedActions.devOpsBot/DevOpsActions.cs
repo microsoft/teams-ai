@@ -19,8 +19,8 @@ namespace DevOpsBot
         [Action("CreateWI")]
         public async Task<bool> CreateWI([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
             EntityData workItem = GetEntityData(entities);
             int id = CreateNewWorkItem(turnState, workItem);
@@ -31,7 +31,7 @@ namespace DevOpsBot
         [Action("AssignWI")]
         public bool AssignWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnState);
 
             AssignWorkItem(turnState, GetEntityData(entities));
             return true;
@@ -40,7 +40,7 @@ namespace DevOpsBot
         [Action("UpdateWI")]
         public bool UpdateWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnState);
 
             UpdateWorkItem(turnState, GetEntityData(entities));
             return true;
@@ -49,7 +49,7 @@ namespace DevOpsBot
         [Action("TriageWI")]
         public bool TriageWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnState);
 
             TriageWorkItem(turnState, GetEntityData(entities));
             return true;
@@ -58,8 +58,8 @@ namespace DevOpsBot
         [Action("Summarize")]
         public async Task<bool> Summarize([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] DevOpsState turnState)
         {
-            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
-            _ = turnState ?? throw new ArgumentNullException(nameof(turnState));
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
             EntityData[] workItems = turnState.Conversation!.WorkItems;
             if (workItems.Length > 0)
@@ -79,7 +79,7 @@ namespace DevOpsBot
         [Action(DefaultActionTypes.UnknownActionName)]
         public async Task<bool> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
         {
-            _ = turnContext ?? throw new ArgumentNullException(nameof(turnContext));
+            ArgumentNullException.ThrowIfNull(turnContext);
 
             await turnContext.SendActivityAsync(ResponseBuilder.UnknownAction(action)).ConfigureAwait(false);
             return false;
@@ -87,7 +87,7 @@ namespace DevOpsBot
 
         private static EntityData GetEntityData(Dictionary<string, object> entities)
         {
-            _ = entities ?? throw new ArgumentNullException(nameof(entities));
+            ArgumentNullException.ThrowIfNull(entities);
 
             EntityData workItem =
                 JsonConvert.DeserializeObject<EntityData>(JsonConvert.SerializeObject(entities))

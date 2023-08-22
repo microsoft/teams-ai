@@ -6,12 +6,6 @@ using Microsoft.Bot.Schema;
 using Microsoft.Rest.Serialization;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests

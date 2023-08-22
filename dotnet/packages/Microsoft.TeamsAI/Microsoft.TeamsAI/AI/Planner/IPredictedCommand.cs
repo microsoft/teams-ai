@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Microsoft.TeamsAI.AI.Planner
+﻿namespace Microsoft.TeamsAI.AI.Planner
 {
     /// <summary>
     /// A predicted command is a command that the AI system should execute.

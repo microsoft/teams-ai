@@ -2,45 +2,50 @@
 using System.Text;
 using Xunit.Abstractions;
 
-public class RedirectOutput : TextWriter, ILogger
+namespace Microsoft.TeamsAI.Tests.TestUtils
 {
-    private readonly StringBuilder _log;
-    private readonly ITestOutputHelper _output;
-
-    public override Encoding Encoding => Encoding.UTF8;
-
-    public RedirectOutput(ITestOutputHelper output)
+    public class RedirectOutput : TextWriter, ILogger
     {
-        _output = output;
-        _log = new StringBuilder();
-    }
+        private readonly StringBuilder _log;
+        private readonly ITestOutputHelper _output;
 
-    public override void WriteLine(string? message)
-    {
-        _output.WriteLine(message);
-        _log.AppendLine(message);
-    }
+        public override Encoding Encoding => Encoding.UTF8;
 
-    public string GetLogs()
-    {
-        return _log.ToString();
-    }
+        public RedirectOutput(ITestOutputHelper output)
+        {
+            _output = output;
+            _log = new StringBuilder();
+        }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-    {
-        var message = formatter(state, exception);
+        public override void WriteLine(string? message)
+        {
+            _output.WriteLine(message);
+            _log.AppendLine(message);
+        }
 
-        _output?.WriteLine(message);
-        _log.AppendLine(message);
-    }
+        public string GetLogs()
+        {
+            return _log.ToString();
+        }
 
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        return true;
-    }
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+#pragma warning disable CA1062 // Validate arguments of public methods
+            var message = formatter(state, exception);
+#pragma warning restore CA1062 // Validate arguments of public methods
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-    {
-        return null;
+            _output?.WriteLine(message);
+            _log.AppendLine(message);
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+        {
+            return null;
+        }
     }
 }
