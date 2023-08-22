@@ -7,6 +7,7 @@ namespace Microsoft.TeamsAI.State
     {
         private TValue _value;
         private string _hash;
+        private static readonly JsonSerializerOptions s_options = new() { MaxDepth = 64 };
 
         /// <summary>
         /// Constructs the turn state entry.
@@ -77,7 +78,7 @@ namespace Microsoft.TeamsAI.State
         {
             Verify.ParamNotNull(obj);
 
-            return JsonSerializer.Serialize(obj, new JsonSerializerOptions() { MaxDepth = 64 });
+            return JsonSerializer.Serialize(obj, s_options);
         }
     }
 }

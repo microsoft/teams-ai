@@ -21,6 +21,10 @@ namespace Microsoft.TeamsAI.OpenAI
         private HttpClient _httpClient;
         private ILogger? _logger;
         private OpenAIClientOptions _options;
+        private static readonly JsonSerializerOptions s_options = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
 
         public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
@@ -45,10 +49,7 @@ namespace Microsoft.TeamsAI.OpenAI
                     {
                         model = model,
                         input = text
-                    }, new JsonSerializerOptions()
-                    {
-                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    }),
+                    }, s_options),
                     Encoding.UTF8,
                     "application/json"
                 );
