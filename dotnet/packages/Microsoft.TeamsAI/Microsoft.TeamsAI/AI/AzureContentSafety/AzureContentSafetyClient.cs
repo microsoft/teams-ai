@@ -19,7 +19,7 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
         private readonly HttpClient _httpClient;
         private readonly ILogger? _logger;
         private readonly AzureContentSafetyClientOptions _options;
-        private static readonly JsonSerializerOptions s_options = new()
+        private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
@@ -42,7 +42,7 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
             try
             {
                 using HttpContent content = new StringContent(
-                    JsonSerializer.Serialize(request, s_options),
+                    JsonSerializer.Serialize(request, _serializerOptions),
                     Encoding.UTF8,
                     "application/json"
                 );
