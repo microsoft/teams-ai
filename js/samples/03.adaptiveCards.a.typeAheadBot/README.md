@@ -23,6 +23,10 @@
 
 This sample shows how to incorporate Adaptive Cards into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Type-Ahead bot gives an enhanced search experience with Adaptive Cards to search and select data.
 
+## How to use
+
+Once the sample is running, you can interact by sending 'dynamic' or 'static' to the app. The app will respond with an Adaptive Card. Typing into the search box will filter the list of options. Selecting an option and submitting will send a message to the bot with the selected option(s).
+
 ## Setting up the sample
 
 1. Clone the repository
