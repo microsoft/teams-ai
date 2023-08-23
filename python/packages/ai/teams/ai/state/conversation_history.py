@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import List, Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 import tiktoken
 
@@ -91,13 +91,17 @@ class ConversationHistory(List[Message]):
 
         return value.strip()
 
-    def to_tuples(self, max_tokens: int, token_encoding: str) -> List[Tuple[str, str]]:
+    def to_tuples(
+        self, max_tokens: int, token_encoding: Literal["cl100k_base", "p50k_base"]
+    ) -> List[Tuple[str, str]]:
         """
         Returns a list of tuples containing the role and content of each message in the history.
 
         Args:
             max_tokens (int): The maximum number of tokens for returned history.
-            token_encoding (str): The encoding to use for tokenization.
+            token_encoding (str): The encoding to use for tokenization. Available values are:
+                                  "cl100k_base" for gpt-4 and gpt-3.5-turbo,
+                                  "p50k_base" for text-davinci-002 and text-davinci-003.
 
         Returns:
             List[Tuple[str,str]]: A list of tuples containing the role and content
