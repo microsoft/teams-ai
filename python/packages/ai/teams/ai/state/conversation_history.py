@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 import tiktoken
 
@@ -78,7 +78,24 @@ class ConversationHistory(List[Message]):
 
         return -1
 
-    def to_str(self, max_tokens: int, token_encoding: str, delim="\n") -> str:
+    def to_str(
+        self, max_tokens: int, token_encoding: Literal["cl100k_base", "p50k_base"], delim="\n"
+    ) -> str:
+        """
+        Returns a string representation of the conversation history.
+        The string is limited to the specified number of tokens.
+
+        Args:
+            max_tokens (int): The maximum number of tokens to return.
+            token_encoding (str): The token encoding to use. Available values are:
+                                  "cl100k_base" for gpt-4 and gpt-3.5-turbo,
+                                  "p50k_base" for text-davinci-002 and text-davinci-003.
+            delim (str): The delimiter to use between lines. Defaults to "\n".
+
+        Returns:
+            str: The string representation of the conversation history.
+        """
+
         value = ""
         encoding = tiktoken.get_encoding(token_encoding)
 
