@@ -5,6 +5,8 @@ Licensed under the MIT License.
 
 from typing import List, Optional
 
+import tiktoken
+
 from .message import Message, MessageRole
 from .state_error import StateError
 
@@ -76,13 +78,17 @@ class ConversationHistory(List[Message]):
 
         return -1
 
-    def to_str(self, max_tokens: int, delim="\n") -> str:
+    def to_str(self, max_tokens: int, token_encoding: str, delim="\n") -> str:
         value = ""
+        encoding = tiktoken.get_encoding(token_encoding)
 
+        text_tokens = 0
         for item in self:
             line = f"[{item.role}]: {item.content}{delim}"
 
-            if len(value) + len(line) > max_tokens:
+            line_tokens = len(encoding.encode(line))
+            text_tokens = text_tokens + line_tokens
+            if text_tokens > max_tokens:
                 break
 
             value += line
