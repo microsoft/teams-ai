@@ -25,7 +25,6 @@ from teams.ai.prompts.utils import generate_sk_prompt_template_config
 from teams.ai.state import ConversationT, TempT, TurnState, UserT
 
 from .command_type import CommandType
-from .conversation_history import state_to_history_array
 from .openai_planner_options import OpenAIPlannerOptions
 from .plan import Plan
 from .planner import Planner
@@ -168,7 +167,7 @@ class OpenAIPlanner(Planner):
     async def _complete_chat(
         self,
         prompt_template: PromptTemplate,
-        state: TurnState,
+        state: TurnState[ConversationT, UserT, TempT],
         user_message: str,
         options: AIHistoryOptions,
     ):
@@ -187,17 +186,11 @@ class OpenAIPlanner(Planner):
 
         # Populate conversation history
         if options.track_history:
-            user_prefix = options.user_prefix
-            assistant_prefix = options.assistant_prefix
-            history: List[str] = state_to_history_array(state, options.max_tokens)
-
-            for line in history:
-                if line.lower().startswith(user_prefix.lower()):
-                    chat_history.append((USER_ROLE_NAME, line[len(user_prefix) :].strip()))
-                elif line.lower().startswith(assistant_prefix.lower()):
-                    chat_history.append(
-                        (ASSISTANT_ROLE_NAME, line[len(assistant_prefix) :].strip())
-                    )
+            history: List[Tuple[str, str]] = state.conversation.value.history.to_tuples(
+                options.max_tokens,
+                "cl100k_base",  # This function is only called for gpt-4 and gpt-3.5-turbo model
+            )
+            chat_history.extend(history)
 
         if user_message:
             chat_history.append((USER_ROLE_NAME, user_message))
