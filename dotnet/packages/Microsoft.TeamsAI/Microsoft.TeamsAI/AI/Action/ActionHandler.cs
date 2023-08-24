@@ -32,7 +32,7 @@ namespace Microsoft.TeamsAI.AI.Action
                 && _returnType != typeof(ValueTask)
                 && _returnType != typeof(ValueTask<bool>))
             {
-                throw new Exception($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
+                throw new InvalidOperationException($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
             }
 
             ParameterInfo[] parameters = _method.GetParameters();
@@ -47,7 +47,7 @@ namespace Microsoft.TeamsAI.AI.Action
                 }
                 else if (parameterAttributes.Count() > 1)
                 {
-                    throw new Exception($"Action method parameter should have no more than one parameter attribute. Method name: {_method.Name}. Parameter name: {parameter.Name}.");
+                    throw new InvalidOperationException($"Action method parameter should have no more than one parameter attribute. Method name: {_method.Name}. Parameter name: {parameter.Name}.");
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace Microsoft.TeamsAI.AI.Action
                 }
                 else
                 {
-                    throw new Exception($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
+                    throw new InvalidOperationException($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
                 }
             }
             catch (TargetInvocationException ex)
@@ -144,7 +144,7 @@ namespace Microsoft.TeamsAI.AI.Action
         {
             if (!to.IsAssignableFrom(from))
             {
-                throw new Exception($"Cannot assign {from} to {to} of action method {method.Name}");
+                throw new InvalidOperationException($"Cannot assign {from} to {to} of action method {method.Name}");
             }
         }
     }

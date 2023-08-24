@@ -53,7 +53,7 @@ namespace Microsoft.TeamsAI
             // Validate long running messages configuration
             if (Options.LongRunningMessages == true && (Options.Adapter == null || Options.BotAppId == null))
             {
-                throw new Exception("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
+                throw new ArgumentException("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
             }
 
         }
@@ -71,7 +71,7 @@ namespace Microsoft.TeamsAI
             {
                 if (_ai == null)
                 {
-                    throw new Exception("The Application.AI property is unavailable because no AI options were configured.");
+                    throw new ArgumentException("The Application.AI property is unavailable because no AI options were configured.");
                 }
 
                 return _ai;
@@ -1325,7 +1325,7 @@ namespace Microsoft.TeamsAI
                 invokeValue = obj.ToObject<SearchInvokeValue>();
                 if (invokeValue == null)
                 {
-                    throw new Exception();
+                    throw new InvalidOperationException("Value property is not valid for search.");
                 }
             }
             catch (Exception ex)
@@ -1389,7 +1389,7 @@ namespace Microsoft.TeamsAI
                 invokeValue = obj.ToObject<AdaptiveCardInvokeValue>();
                 if (invokeValue == null)
                 {
-                    throw new Exception();
+                    throw new InvalidOperationException("Value property is not properly formed.");
                 }
             }
             catch (Exception ex)

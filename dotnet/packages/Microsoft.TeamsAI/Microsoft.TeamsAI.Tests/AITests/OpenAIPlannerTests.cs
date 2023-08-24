@@ -272,7 +272,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             Assert.Equal("chat-completion", result);
         }
 
-        private class CustomCompletePromptOpenAIPlanner<TState> : OpenAIPlanner<TState>
+        private sealed class CustomCompletePromptOpenAIPlanner<TState> : OpenAIPlanner<TState>
             where TState : TestTurnState
         {
             private Func<string> customFunction;
@@ -289,7 +289,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
         }
 
-        private class CustomCompletionOpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions>
+        private sealed class CustomCompletionOpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions>
             where TState : TestTurnState
         {
             public Mock<ITextCompletion> TextCompletionMock { get; } = new Mock<ITextCompletion>();

@@ -8,7 +8,7 @@ namespace Microsoft.TeamsAI.Tests
     {
         [Theory]
         [MemberData(nameof(ParseJsonTestData))]
-        public void Test_ParseJson_Simple(string text, List<string> expectedJSONs)
+        public void Test_ParseJson_Simple(string text, IList<string> expectedJSONs)
         {
             // Arrange - done through parameters
 
@@ -70,7 +70,7 @@ namespace Microsoft.TeamsAI.Tests
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
-            Assert.Empty(predictedDoCommand.Entities);
+            Assert.Empty(predictedDoCommand.Entities!);
             Assert.Equal("actionValue", predictedDoCommand.Action);
         }
 
@@ -108,8 +108,8 @@ namespace Microsoft.TeamsAI.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Single(predictedDoCommand.Entities);
-            Assert.Equal("entityValue", predictedDoCommand.Entities["entityName"]);
+            Assert.Single(predictedDoCommand.Entities!);
+            Assert.Equal("entityValue", predictedDoCommand.Entities!["entityName"]);
         }
 
         [Fact]
@@ -127,7 +127,7 @@ namespace Microsoft.TeamsAI.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Equal(2, predictedDoCommand.Entities.Count);
+            Assert.Equal(2, predictedDoCommand.Entities!.Count);
             Assert.Equal("entityValueA", predictedDoCommand.Entities["entityNameA"]);
             Assert.Equal("entityValueB", predictedDoCommand.Entities["entityNameB"]);
         }

@@ -2,9 +2,6 @@
 {
     public static class ResponseGenerator
     {
-        // A random number generator for selecting responses
-        private static readonly Random rng = new();
-
         // Returns a friendly response for the light status
         public static string LightStatus(bool status)
         {
@@ -43,10 +40,7 @@
         }
 
         // Returns a random response from an array of responses
-        private static string GetRandomResponse(string[] responses)
-        {
-            var i = rng.Next(responses.Length);
-            return responses[i];
-        }
+        private static string GetRandomResponse(string[] responses) =>
+            responses[Random.Shared.Next(responses.Length)];
     }
 }

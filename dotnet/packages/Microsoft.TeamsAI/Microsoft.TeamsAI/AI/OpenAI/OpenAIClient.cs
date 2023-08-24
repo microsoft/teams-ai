@@ -8,7 +8,7 @@ using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 
-namespace Microsoft.TeamsAI.OpenAI
+namespace Microsoft.TeamsAI.AI.OpenAI
 {
     /// <summary>
     /// The client to make calls to OpenAI's API
@@ -21,6 +21,10 @@ namespace Microsoft.TeamsAI.OpenAI
         private HttpClient _httpClient;
         private ILogger? _logger;
         private OpenAIClientOptions _options;
+        private static readonly JsonSerializerOptions _serializerOptions = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
 
         public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
@@ -43,12 +47,9 @@ namespace Microsoft.TeamsAI.OpenAI
                 using HttpContent content = new StringContent(
                     JsonSerializer.Serialize(new
                     {
-                        model = model,
+                        model,
                         input = text
-                    }, new JsonSerializerOptions()
-                    {
-                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    }),
+                    }, _serializerOptions),
                     Encoding.UTF8,
                     "application/json"
                 );

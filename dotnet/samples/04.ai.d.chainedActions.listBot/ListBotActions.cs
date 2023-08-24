@@ -17,13 +17,10 @@ namespace ListBot
         [Action("CreateList")]
         public bool CreateList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
+            ArgumentNullException.ThrowIfNull(turnState);
+            ArgumentNullException.ThrowIfNull(entities);
 
-            VerifyEntities(entities, "list");
-            string listName = (string)entities["list"];
+            string listName = GetEntityString(entities, "list");
 
             EnsureListExists(turnState, listName);
 
@@ -33,13 +30,10 @@ namespace ListBot
         [Action("DeleteList")]
         public bool DeleteList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
+            ArgumentNullException.ThrowIfNull(turnState);
+            ArgumentNullException.ThrowIfNull(entities);
 
-            VerifyEntities(entities, "list");
-            string listName = (string)entities["list"];
+            string listName = GetEntityString(entities, "list");
 
             DeleteList(turnState, listName);
 
@@ -49,14 +43,11 @@ namespace ListBot
         [Action("AddItem")]
         public bool AddItem([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
+            ArgumentNullException.ThrowIfNull(turnState);
+            ArgumentNullException.ThrowIfNull(entities);
 
-            VerifyEntities(entities, "list", "item");
-            string listName = (string)entities["list"];
-            string item = (string)entities["item"];
+            string listName = GetEntityString(entities, "list");
+            string item = GetEntityString(entities, "item");
 
             IList<string> items = GetItems(turnState, listName);
             items.Add(item);
@@ -68,19 +59,12 @@ namespace ListBot
         [Action("RemoveItem")]
         public async Task<bool> RemoveItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            if (turnContext == null)
-            {
-                throw new ArgumentNullException(nameof(turnContext));
-            }
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
+            ArgumentNullException.ThrowIfNull(entities);
 
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
-
-            VerifyEntities(entities, "list", "item");
-            string listName = (string)entities["list"];
-            string item = (string)entities["item"];
+            string listName = GetEntityString(entities, "list");
+            string item = GetEntityString(entities, "item");
 
             IList<string> items = GetItems(turnState, listName);
             if (!items.Contains(listName))
@@ -102,29 +86,17 @@ namespace ListBot
         [Action("FindItem")]
         public async Task<bool> FindItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
         {
-            if (turnContext == null)
-            {
-                throw new ArgumentNullException(nameof(turnContext));
-            }
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
+            ArgumentNullException.ThrowIfNull(entities);
 
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
-
-            VerifyEntities(entities, "list", "item");
-            string listName = (string)entities["list"];
-            string item = (string)entities["item"];
+            string listName = GetEntityString(entities, "list");
+            string item = GetEntityString(entities, "item");
 
             IList<string> items = GetItems(turnState, listName);
-            if (!items.Contains(item))
-            {
-                await turnContext.SendActivityAsync(ResponseBuilder.ItemNotFound(listName, item)).ConfigureAwait(false);
-            }
-            else
-            {
-                await turnContext.SendActivityAsync(ResponseBuilder.ItemFound(listName, item)).ConfigureAwait(false);
-            }
+            await turnContext.SendActivityAsync(items.Contains(item) ?
+                ResponseBuilder.ItemFound(listName, item) :
+                ResponseBuilder.ItemNotFound(listName, item)).ConfigureAwait(false);
 
             // End the current chain
             return false;
@@ -133,18 +105,11 @@ namespace ListBot
         [Action("SummarizeLists")]
         public async Task<bool> SummarizeLists([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState)
         {
-            if (turnContext == null)
-            {
-                throw new ArgumentNullException(nameof(turnContext));
-            }
-
-            if (turnState == null)
-            {
-                throw new ArgumentNullException(nameof(turnState));
-            }
+            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(turnState);
 
             Dictionary<string, IList<string>>? lists = turnState.Conversation!.Lists;
-            if (lists != null)
+            if (lists is not null)
             {
                 await _application.AI.ChainAsync(turnContext, turnState, "Summarize").ConfigureAwait(false);
             }
@@ -160,10 +125,7 @@ namespace ListBot
         [Action(DefaultActionTypes.UnknownActionName)]
         public async Task<bool> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
         {
-            if (turnContext == null)
-            {
-                throw new ArgumentNullException(nameof(turnContext));
-            }
+            ArgumentNullException.ThrowIfNull(turnContext);
 
             await turnContext.SendActivityAsync(ResponseBuilder.UnknownAction(action)).ConfigureAwait(false);
 
@@ -180,12 +142,13 @@ namespace ListBot
         private static void SetItems(ListState turnState, string listName, IList<string> items)
         {
             EnsureListExists(turnState, listName);
+
             turnState.Conversation!.Lists![listName] = items;
         }
 
         private static void EnsureListExists(ListState turnState, string listName)
         {
-            if (turnState.Conversation!.Lists == null)
+            if (turnState.Conversation!.Lists is null)
             {
                 turnState.Conversation.Lists = new Dictionary<string, IList<string>>();
                 turnState.Conversation.ListNames = new List<string>();
@@ -200,31 +163,25 @@ namespace ListBot
 
         private static void DeleteList(ListState turnState, string listName)
         {
-            if (turnState.Conversation!.Lists != null && turnState.Conversation.Lists.ContainsKey(listName))
+            if (turnState.Conversation!.Lists?.Remove(listName) == true)
             {
-                turnState.Conversation.Lists.Remove(listName);
                 turnState.Conversation.ListNames!.Remove(listName);
             }
         }
 
-        private static void VerifyEntities(Dictionary<string, object> entities, params string[] keys)
+        private static string GetEntityString(Dictionary<string, object> entities, string key)
         {
-            if (entities == null)
+            if (!entities.TryGetValue(key, out object? value))
             {
-                throw new ArgumentNullException(nameof(entities));
+                throw new ArgumentException($"No {key} in entities.", nameof(entities));
             }
 
-            foreach (string key in keys)
+            if (value is not string castValue)
             {
-                if (!entities.ContainsKey(key))
-                {
-                    throw new ArgumentException($"No {key} in entities.");
-                }
-                if (entities[key] is not string)
-                {
-                    throw new ArgumentException($"{key} is not string.");
-                }
+                throw new ArgumentException($"{key} is not of type string.", nameof(entities));
             }
+
+            return castValue;
         }
     }
 }
