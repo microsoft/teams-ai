@@ -1,5 +1,7 @@
 # Consuming daily builds of the SDK
 
+Daily builds are not yet available.
+
 <!-- ## Using npm
 Daily packages for the Bot Framework SDK for JS are published to [`npm`](https://www.npmjs.com/) and can be installed by using the `next` tag.
 
