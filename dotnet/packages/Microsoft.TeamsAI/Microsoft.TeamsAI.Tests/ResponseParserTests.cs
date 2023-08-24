@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using AdaptiveCards;
+﻿using AdaptiveCards;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Planner;
 
@@ -11,7 +10,7 @@ namespace Microsoft.TeamsAI.Tests
         [MemberData(nameof(ParseJsonTestData))]
         public void Test_ParseJson_Simple(string text, List<string> expectedJSONs)
         {
-            // Arange - done through parameters
+            // Arrange - done through parameters
 
             // Act
             var actualObjects = ResponseParser.ParseJSON(text);
@@ -47,7 +46,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_No_Commands()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -61,7 +60,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_One_DoCommand_Empty_Entities_Property()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'DO','action':'actionValue','entities':{}}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"entities\":{}}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -79,7 +78,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_One_DoCommand_No_Entities_Property()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'DO','action':'actionValue'}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\"}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -89,7 +88,7 @@ namespace Microsoft.TeamsAI.Tests
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
-            Assert.Null(predictedDoCommand.Entities);
+            Assert.NotNull(predictedDoCommand.Entities);
             Assert.Equal("actionValue", predictedDoCommand.Action);
         }
 
@@ -97,7 +96,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_One_DoCommand_One_Entity()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'DO','action':'actionValue','entities':{ 'entityName': 'entityValue' }}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"entities\":{ \"entityName\": \"entityValue\" }}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -117,7 +116,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_One_DoCommand_Multiple_Entities()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'DO','action':'actionValue','entities':{ 'entityNameA': 'entityValueA', 'entityNameB': 'entityValueB' }}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"entities\":{ \"entityNameA\": \"entityValueA\", \"entityNameB\": \"entityValueB\" }}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -137,7 +136,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_Multiple_DoCommands_No_Entities()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'DO','action':'actionValueA'}, {'type': 'DO', 'action':'actionValueB'}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValueA\"}, {\"type\": \"DO\", \"action\":\"actionValueB\"}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -157,7 +156,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_One_SayCommand()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValue'}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValue\"}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -174,7 +173,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_Multiple_SayCommands()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValueA'}, {'type':'SAY','response':'responseValueB'}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValueA\"}, {\"type\":\"SAY\",\"response\":\"responseValueB\"}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -193,7 +192,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_Multiple_Commands_One_SayCommand_And_One_DoCommand()
         {
             // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValue'}, {'type':'Do','action':'actionValue'}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValue\"}, {\"type\":\"Do\",\"action\":\"actionValue\"}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -208,42 +207,28 @@ namespace Microsoft.TeamsAI.Tests
             Assert.Equal("actionValue", secondCommand.Action);
         }
 
-        [Fact]
-        public void Test_ParsePlan_Not_Plan_Type_Default_Command()
+        [Theory]
+        [MemberData(nameof(InvalidPlanObjectData))]
+        public void Test_ParsePlan_Not_Plan_Type_Default_Command(string invalidPlanJson)
         {
-            // Arrange 
-            var notPlanJSON = @"{ 'type':'notPlan','commands':[] }";
+            // Arrange - done through test set up
 
             // Act
-            Plan responsePlan = ResponseParser.ParseResponse(notPlanJSON);
+            Plan responsePlan = ResponseParser.ParseResponse(invalidPlanJson);
 
             // Assert - returns plan with default (say) command
             Assert.Equal(AITypes.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
-            Assert.Equal(notPlanJSON, predictedSayCommand.Response);
-        }
-
-        [Fact]
-        public void Test_ParsePlan_Invalid_Format_NonExistentCommand()
-        {
-            // Arrange 
-            var planJSON = @"{ 'type':'plan','commands':[{ type: 'newCommand' }] }";
-
-            // Act
-            Action action = () => ResponseParser.ParseResponse(planJSON);
-
-            // Act & Assert
-            JsonSerializationException ex = Assert.Throws<JsonSerializationException>(action);
-            Assert.Equal("Unknown command type `newCommand`", ex.Message);
+            Assert.Equal(invalidPlanJson, predictedSayCommand.Response);
         }
 
         [Fact]
         public void Test_ParsePlan_NonSpecificJSONText()
         {
             // Arrange 
-            var planJSON = @"Here's your plan: { 'type':'plan','commands':[] }, you're welcome.";
+            var planJSON = "Here\"s your plan: { \"type\":\"plan\",\"commands\":[] }, you\"re welcome.";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -257,7 +242,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_AnyJSON_Response_Say_Command()
         {
             // Arrange 
-            var anyJSON = @"{ 'foo':'bar' }";
+            var anyJSON = "{ \"foo\":\"bar\" }";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(anyJSON);
@@ -275,11 +260,11 @@ namespace Microsoft.TeamsAI.Tests
         {
             // Arrange 
             var adaptiveCardJSON =
-@"{
-  ""type"": ""AdaptiveCard"",
-  ""version"": ""1.4"",
-  ""body"": []
-}";
+            @"{
+              ""type"": ""AdaptiveCard"",
+              ""version"": ""1.4"",
+              ""body"": []
+            }";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(adaptiveCardJSON);
@@ -296,7 +281,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_NonJSON_Response_No_Commands()
         {
             // Arrange 
-            var responseText = @"I'm sorry we could not generate a plan";
+            var responseText = "I\"m sorry we could not generate a plan";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
@@ -313,7 +298,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_NonJSON_Response_DO_Command()
         {
             // Arrange 
-            var responseText = @"DO 'actionValue'";
+            var responseText = "DO \"actionValue\"";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
@@ -330,7 +315,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_NonJSON_Response_SAY_Command()
         {
             // Arrange 
-            var responseText = @"SAY this is a say command response";
+            var responseText = "SAY this is a say command response";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
@@ -347,7 +332,7 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_ParsePlan_NonJSON_Response_DO_then_SAY_Commands()
         {
             // Arrange 
-            var responseText = @"DO actionName THEN SAY responseValue";
+            var responseText = "DO actionName THEN SAY responseValue";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
@@ -366,8 +351,8 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_TokenizeText_Simple_DoCommand()
         {
             // Arrange 
-            var planText = @"DO action='actionValue'";
-            List<string> actualTokens = new() { "DO", " ", "action", "=", "'", "actionValue", "'" };
+            var planText = "DO action=\"actionValue\"";
+            List<string> actualTokens = new() { "DO", " ", "action", "=", "\"", "actionValue", "\"" };
 
             // Act
             List<string> expectedTokens = ResponseParser.TokenizeText(planText);
@@ -381,8 +366,8 @@ namespace Microsoft.TeamsAI.Tests
         public void Test_TokenizeText_Simple_SayCommand()
         {
             // Arrange 
-            var planText = @"SAY response='responseValue'";
-            List<string> actualTokens = new() { "SAY", " ", "response", "=", "'", "responseValue", "'" };
+            var planText = "SAY response=\"responseValue\"";
+            List<string> actualTokens = new() { "SAY", " ", "response", "=", "\"", "responseValue", "\"" };
 
             // Act
             List<string> expectedTokens = ResponseParser.TokenizeText(planText);
@@ -396,23 +381,30 @@ namespace Microsoft.TeamsAI.Tests
             yield return new object[] { "{}", new List<string> { "{}" } };
             yield return new object[] { "{}{}", new List<string> { "{}", "{}" } };
 
-            yield return new object[] { "{'Name': 'Jose'}", new List<string> {
-                    "{'Name': 'Jose'}"
+            yield return new object[] { "{\"Name\": \"Jose\"}", new List<string> {
+                    "{\"Name\": \"Jose\"}"
                 }
             };
 
-            yield return new object[] { "{'Name': 'Jose'} {'Name': 'Carlos'}", new List<string> {
-                    "{'Name': 'Jose'}",
-                    "{'Name': 'Carlos'}"
+            yield return new object[] { "{\"Name\": \"Jose\"} {\"Name\": \"Carlos\"}", new List<string> {
+                    "{\"Name\": \"Jose\"}",
+                    "{\"Name\": \"Carlos\"}"
                 },
             };
 
-            string planObjectJSON = "{ 'type':'plan','commands':[{ 'type':'DO','action':'<name>','entities':{ '<name>': '<value>' } },{ 'type':'SAY','response':'<response>'}]}";
+            string planObjectJSON = "{ \"type\":\"plan\",\"commands\":[{ \"type\":\"DO\",\"action\":\"<name>\",\"entities\":{ \"<name>\": \"<value>\" } },{ \"type\":\"SAY\",\"response\":\"<response>\"}]}";
             yield return new object[] { planObjectJSON, new List<string> { planObjectJSON } };
 
             string twoPlanObjectsJSON = "prefix string " + planObjectJSON + "other string" + planObjectJSON + "suffix string";
             yield return new object[] { twoPlanObjectsJSON, new List<string> { planObjectJSON, planObjectJSON } };
 
+        }
+
+        public static IEnumerable<object[]> InvalidPlanObjectData()
+        {
+            yield return new object[] { "{ \"type\":\"notPlan\",\"commands\":[] }" };
+
+            yield return new object[] { "{ \"type\":\"plan\",\"commands\":[{ \"type\": \"newCommand\" }] }" };
         }
     }
 }

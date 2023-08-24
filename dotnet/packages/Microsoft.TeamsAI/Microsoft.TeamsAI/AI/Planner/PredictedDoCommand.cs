@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text.Json.Serialization;
+using Microsoft.TeamsAI.Utilities.JsonConverters;
 
 namespace Microsoft.TeamsAI.AI.Planner
 {
@@ -18,23 +16,25 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <summary>
         /// The named action that the AI system should perform.
         /// </summary>
-        [JsonProperty("action")]
+        [JsonPropertyName("action")]
         [JsonRequired]
-        public string Action { get; }
+        [JsonInclude]
+        public string Action { get; private set; }
 
         /// <summary>
         /// Any entities that the AI system should use to perform the action.
         /// </summary>
-        [JsonProperty("entities")]
-        public Dictionary<string, object>? Entities { get; }
+        [JsonPropertyName("entities")]
+        [JsonConverter(typeof(DictionaryJsonConverter))]
+        public Dictionary<string, object>? Entities { get; set; }
 
-        [JsonConstructor]
         public PredictedDoCommand(string action, Dictionary<string, object> entities)
         {
             Action = action;
             Entities = entities;
         }
 
+        [JsonConstructor]
         public PredictedDoCommand(string action)
         {
             Action = action;
