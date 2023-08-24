@@ -41,6 +41,8 @@
     },
     "devDependencies": {
         "@types/globalize": "^1.5.0",
+        "botbuilder-dialogs": "^4.20.0",
+        "botbuilder-core": "^4.20.0",
         "line-reader": "^0.4.0"
     },
     "scripts": {
