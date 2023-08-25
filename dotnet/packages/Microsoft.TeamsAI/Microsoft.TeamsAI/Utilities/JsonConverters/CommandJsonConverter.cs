@@ -19,32 +19,30 @@ namespace Microsoft.TeamsAI.Utilities.JsonConverters
 
         public override IPredictedCommand Read(ref Utf8JsonReader reader, Type objectType, JsonSerializerOptions options)
         {
-            Utf8JsonReader readerClone = reader;
-
-            if (readerClone.TokenType != JsonTokenType.StartObject)
+            if (reader.TokenType != JsonTokenType.StartObject)
             {
                 throw new JsonException();
             };
 
-            readerClone.Read();
-            if (readerClone.TokenType != JsonTokenType.PropertyName)
+            reader.Read();
+            if (reader.TokenType != JsonTokenType.PropertyName)
             {
                 throw new JsonException();
             }
 
-            string? propertyName = readerClone.GetString();
+            string? propertyName = reader.GetString();
             if (propertyName != "type")
             {
                 throw new JsonException("The missing `type` property should be the first property in the Json object.");
             }
 
-            readerClone.Read();
-            if (readerClone.TokenType != JsonTokenType.String)
+            reader.Read();
+            if (reader.TokenType != JsonTokenType.String)
             {
                 throw new JsonException("Invalid value for the `type` property. String expected.");
             }
 
-            string? commandType = readerClone.GetString();
+            string? commandType = reader.GetString();
 
             IPredictedCommand predictedCommand = (commandType?.ToUpperInvariant()) switch
             {
