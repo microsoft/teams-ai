@@ -18,11 +18,11 @@ namespace QuestBot
                 logger.LogError(exception, "[OnTurnError] unhandled error : {message}", exception.Message);
 
                 // Send a message to the user
-                await turnContext.SendActivityAsync($"The bot encountered an unhandled error: {exception.Message}");
-                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.");
+                await turnContext.SendActivityAsync($"The bot encountered an unhandled error: {exception.Message}").ConfigureAwait(false);
+                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.").ConfigureAwait(false);
 
                 // Send a trace activity
-                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");
+                await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError").ConfigureAwait(false);
             };
         }
     }
