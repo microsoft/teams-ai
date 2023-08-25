@@ -1,12 +1,12 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
-using Microsoft.Bot.Schema;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Specialized;
 using System.Web;
 using TypeAheadBot.Model;
-using Newtonsoft.Json;
 
 namespace TypeAheadBot
 {
