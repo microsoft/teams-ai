@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Planner;
