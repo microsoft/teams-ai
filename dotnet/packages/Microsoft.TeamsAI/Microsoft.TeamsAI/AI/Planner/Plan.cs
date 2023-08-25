@@ -10,21 +10,18 @@ namespace Microsoft.TeamsAI.AI.Planner
     [JsonConverter(typeof(PlanJsonConverter))]
     public class Plan
     {
-        private static readonly JsonSerializerOptions _serializerOptions = new()
-        {
-            WriteIndented = true
-        };
-
         /// <summary>
         /// A list of predicted commands that the AI system should execute.
         /// </summary>
         [JsonPropertyName("commands")]
+        [JsonIgnore]
         public List<IPredictedCommand> Commands { get; set; }
 
         /// <summary>
         /// Type to indicate that a plan is being returned.
         /// </summary>
         [JsonPropertyName("type")]
+        [JsonIgnore]
         public string Type { get; } = AITypes.Plan;
 
         public Plan()
@@ -43,7 +40,10 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// </summary>
         public string ToJsonString()
         {
-            return JsonSerializer.Serialize(this, typeof(Plan), _serializerOptions);
+            return JsonSerializer.Serialize(this, typeof(Plan), new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            });
         }
 
     }
