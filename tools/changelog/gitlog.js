@@ -20,32 +20,21 @@ if (!existsSync(join(__dirname, gitLogFromRepo))) {
   throw new ReferenceError(`The provided file "${gitLogFromRepo}" was not found in ${__dirname}`);
 }
 
-// Determine the changelogFile (which contains the formatted merges to main)
-// and the repository URL.
+// Determine the changelogFile
 let changelogFile;
-let repository;
 if (gitLogFromRepo.startsWith("dotnet")) {
   changelogFile = optionalOutputName || "dotnet.md";
-  repository = "botbuilder-dotnet";
 } else if (gitLogFromRepo.startsWith("js")) {
   changelogFile = optionalOutputName || "js.md";
-  repository = "botbuilder-js";
 } else if (gitLogFromRepo.startsWith("python")) {
   changelogFile = optionalOutputName || "python.md";
-  repository = "botbuilder-python";
-} else if (gitLogFromRepo.startsWith("java")) {
-  changelogFile = optionalOutputName || "java.md";
-  repository = "botbuilder-java";
-} else if (gitLogFromRepo.startsWith("bf-cli")) {
-  changelogFile = optionalOutputName || "bf-cli.md";
-  repository = "botframework-cli";
 }
 
-// git log --show-pulls --pretty=tformat:"%s" --since=2020-08-13 > dotnet.txt
-// git log --show-pulls --pretty=tformat:"%s" --since=2020-08-07 > js.txt
-// git log --show-pulls --pretty=tformat:"%s" --since=2020-08-10 > python.txt
-// git log --show-pulls --pretty=tformat:"%s" --since=2020-08-17 > java.txt
-// git log --show-pulls --pretty=tformat:"%s" --since=2020-08-10 > bf-cli.txt
+// Run the following per file
+// git log --show-pulls --pretty=tformat:"%s" --since=2023-08-13 > dotnet.txt
+// git log --show-pulls --pretty=tformat:"%s" --since=2023-08-07 > js.txt
+// git log --show-pulls --pretty=tformat:"%s" --since=2023-08-10 > python.txt
+// then run node gitlog.js dotnet.txt
 
 const preparedStream = createWriteStream(changelogFile);
 (async function processLineByLine() {
@@ -63,14 +52,14 @@ const preparedStream = createWriteStream(changelogFile);
       const matches = /(?<message>.*)\s\(#(?<num>\d*)\)$/gim.exec(line);
       if (matches) {
         const { message, num } = matches.groups;
-        preparedStream.write(`- ${message} [[PR ${num}]](https://github.com/microsoft/${repository}/pull/${num})\n`);
+        preparedStream.write(`- ${message} [[PR ${num}]](https://github.com/microsoft/teams-ai/pull/${num})\n`);
       } else {
         // This second check is for PRs that were not squashed and merged.
         // E.g. "Merge pull request #1411 from <fork/branch>"
         const otherFormatMatches = /^(?<message>Merge pull request #(?<num>\d*) from.*)/gim.exec(line);
         if (otherFormatMatches) {
           const { message, num } = otherFormatMatches.groups;
-          preparedStream.write(`- ${message} [[PR ${num}]](https://github.com/microsoft/${repository}/pull/${num})\n`);
+          preparedStream.write(`- ${message} [[PR ${num}]](https://github.com/microsoft/teams-ai/pull/${num})\n`);
         }
       }
     });
