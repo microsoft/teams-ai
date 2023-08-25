@@ -17,7 +17,7 @@ namespace TypeAheadBot
 
         private readonly HttpClient _httpClient;
 
-        public TypeAheadBotApplication(ApplicationOptions<TurnState, TurnStateManager> options, IHttpClientFactory httpClientFactory) : base(options) 
+        public TypeAheadBotApplication(ApplicationOptions<TurnState, TurnStateManager> options, IHttpClientFactory httpClientFactory) : base(options)
         {
             _httpClient = httpClientFactory.CreateClient("WebClient");
         }
@@ -35,34 +35,35 @@ namespace TypeAheadBot
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
-            if (turnContext.Activity.Type == ActivityTypes.Message)
+            if (turnContext.Activity.Text != null)
             {
-                if (turnContext.Activity.Text != null)
+                if (turnContext.Activity.Text.Equals("static", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (turnContext.Activity.Text.Equals("static", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Attachment attachment = CreateAdaptiveCardAttachment(_staticSearchCardFilePath);
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken);
-                    }
-                    else if (turnContext.Activity.Text.Equals("dynamic", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Attachment attachment = CreateAdaptiveCardAttachment(_dynamicSearchCardFilePath);
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken);
-                    }
-                    else
-                    {
-                        await turnContext.SendActivityAsync(MessageFactory.Text("Try saying \"static\" or \"dynamic\"."), cancellationToken);
-                    }
+                    Attachment attachment = CreateAdaptiveCardAttachment(_staticSearchCardFilePath);
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken);
                 }
-                else if (turnContext.Activity.Value != null)
+                else if (turnContext.Activity.Text.Equals("dynamic", StringComparison.OrdinalIgnoreCase))
                 {
-                    // handling Adaptive Card Action.Submit events
-                    AdaptiveCardSubmitResult submitResult = (turnContext.Activity.Value! as JObject).ToObject<AdaptiveCardSubmitResult>();
-                    if (submitResult.Verb.Equals("StaticSubmit"))
+                    Attachment attachment = CreateAdaptiveCardAttachment(_dynamicSearchCardFilePath);
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken);
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Try saying \"static\" or \"dynamic\"."), cancellationToken);
+                }
+            }
+            else if (turnContext.Activity.Value != null)
+            {
+                // handling Adaptive Card Action.Submit events
+                AdaptiveCardSubmitResult? submitResult = (turnContext.Activity.Value! as JObject)?.ToObject<AdaptiveCardSubmitResult>();
+
+                if (submitResult != null)
+                {
+                    if (submitResult.Verb!.Equals("StaticSubmit"))
                     {
                         await turnContext.SendActivityAsync(MessageFactory.Text($"Statically selected option is: {submitResult.ChoiceSelect}"), cancellationToken);
                     }
-                    else if (submitResult.Verb.Equals("DynamicSubmit"))
+                    else if (submitResult.Verb!.Equals("DynamicSubmit"))
                     {
                         await turnContext.SendActivityAsync(MessageFactory.Text($"Dynamically selected option is: {submitResult.ChoiceSelect}"), cancellationToken);
                     }
@@ -76,13 +77,13 @@ namespace TypeAheadBot
             int count = invokeValue.QueryOptions.Top;
 
             Package[] packages = await SearchPackages(queryText, count, cancellationToken);
-            
+
             IList<AdaptiveCardSearchResult> searchResults = packages.Select(package => new AdaptiveCardSearchResult()
             {
                 Title = package.Id,
                 Value = $"{package.Id} - {package.Description}"
             }).ToList();
-            SearchInvokeResponse response = new SearchInvokeResponse()
+            SearchInvokeResponse response = new()
             {
                 StatusCode = 200,
                 Type = "application/vnd.microsoft.search.searchResponse",
