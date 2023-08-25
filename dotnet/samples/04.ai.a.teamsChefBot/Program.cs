@@ -1,13 +1,13 @@
-using TeamsChefBot;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Moderator;
+using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.TeamsAI.AI.Prompt;
+using Microsoft.TeamsAI.State;
+using TeamsChefBot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +52,7 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
     IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
     IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory.CreateLogger<OpenAIModerator<TurnState>>());
 
-    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
+    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
     {
         AI = new AIOptions<TurnState>(planner, promptManager)
         {
