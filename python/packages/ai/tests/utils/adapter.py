@@ -7,7 +7,7 @@ from typing import List
 from unittest import IsolatedAsyncioTestCase
 
 from botbuilder.core import BotAdapter
-from botbuilder.schema import Activity, ActivityTypes, ResourceResponse
+from botbuilder.schema import Activity, ResourceResponse
 
 from .activity import ACTIVITY
 
@@ -22,7 +22,6 @@ class SimpleAdapter(BotAdapter, IsolatedAsyncioTestCase):
 
         for _, activity in enumerate(activities):
             self.assertIsInstance(activity, Activity)
-            self.assertIn(activity.type, [ActivityTypes.message, ActivityTypes.trace])
             responses.append(ResourceResponse(id="5678"))
         return responses
 

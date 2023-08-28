@@ -48,6 +48,7 @@ class Application(Bot, Generic[StateT]):
         """
         self._ai = AI(options.ai, options.logger) if options.ai else None
         self._options = options
+        self._routes = []
 
         if options.long_running_messages and (not options.auth or not options.bot_app_id):
             raise ApplicationError(
