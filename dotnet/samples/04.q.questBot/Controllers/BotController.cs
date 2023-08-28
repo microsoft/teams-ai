@@ -26,7 +26,7 @@ namespace QuestBot.Controllers
                 Response,
                 _bot,
                 cancellationToken
-            ).ConfigureAwait(false);
+            );
         }
     }
 }
