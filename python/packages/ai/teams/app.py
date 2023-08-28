@@ -8,7 +8,7 @@ from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
 from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
 from botbuilder.schema import Activity, ActivityTypes
 
-from teams.ai import AI, AIError, TurnState
+from teams.ai import AI, TurnState
 
 from .activity_type import ActivityType
 from .app_error import ApplicationError
@@ -242,7 +242,7 @@ class Application(Bot, Generic[StateT]):
             ):
                 try:
                     await self._ai.chain(context, state, self._options.ai.prompt)
-                except AIError as err:
+                except ApplicationError as err:
                     await self._on_error(context, err)
 
             # run after turn middleware

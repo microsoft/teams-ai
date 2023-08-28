@@ -7,9 +7,10 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
+from teams.app_error import ApplicationError
+
 from .command_type import CommandType
 from .plan import Plan
-from .planner_error import PlannerError
 from .predicted_command import PredictedCommand
 from .predicted_do_command import PredictedDoCommand
 from .predicted_say_command import PredictedSayCommand
@@ -121,7 +122,7 @@ def _parse_do_command(tokens: List[str]):
 
     if len(tokens) > 1:
         if tokens[0] != "DO":
-            raise PlannerError("Token list passed in doesn't start with 'DO' token.")
+            raise ApplicationError("Token list passed in doesn't start with 'DO' token.")
 
         action_name = ""
         entity_name = ""
@@ -233,7 +234,7 @@ def _parse_say_command(tokens: List[str]):
     command = None
     if len(tokens) > 1:
         if tokens[0] != "SAY":
-            raise PlannerError("Token list passed in doesn't start with 'SAY' token.")
+            raise ApplicationError("Token list passed in doesn't start with 'SAY' token.")
 
         # Parse command (skips initial DO token)
         response = ""
