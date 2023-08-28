@@ -25,3 +25,17 @@ ActivityType = Literal[
     "command",
     "commandResult",
 ]
+
+ConversationUpdateType = Literal[
+    "channelCreated",
+    "channelRenamed",
+    "channelDeleted",
+    "channelRestored",
+    "membersAdded",
+    "membersRemoved",
+    "teamRenamed",
+    "teamDeleted",
+    "teamArchived",
+    "teamUnarchived",
+    "teamRestored",
+]
