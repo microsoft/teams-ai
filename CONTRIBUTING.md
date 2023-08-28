@@ -16,9 +16,11 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 Microsoft Teams is currently accepting contributions in the form of bug fixes and new
 features. Any submission must have an issue tracking it in the issue tracker that has
-been approved by the Teams Collaboration team. Your pull request should include a link to
+been approved by the Teams AI team. Your pull request should include a link to
 the bug that you are fixing. If you've submitted a PR for a bug, please post a
 comment in the bug to avoid duplication of effort.
+
+Please note that as of August 2023, signed commits are required for all contributions to this project. For more information on how to set up, see the [GitHub Authentication verify commit signature](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification) documentation.
 
 ## Legal
 
