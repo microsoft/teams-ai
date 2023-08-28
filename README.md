@@ -1,4 +1,5 @@
 # <image src="https://github.com/microsoft/teams-ai/assets/14900841/972a9a1b-679a-4725-bfc0-a1e76151a78a" height="10%" width="10%" /> Teams AI Library
+
 Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 
 <p>
@@ -11,8 +12,8 @@ The SDK is currently available for JavaScript/TypeScript applications in the <a 
 
 ## Getting Started
 
-
-> ### 🖇️ Jump right in❗️ 📎 
+> ### 🖇️ Jump right in❗️ 📎
+>
 > If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.teamsChefBot) sample. This sample is a simple bot that uses the OpenAI GPT model to build a Teams app. Just load it up in Visual Code and hit F5! 🎉
 
 ### Start with our getting started guides
@@ -85,3 +86,7 @@ trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
+
+## Accessing daily builds
+
+Please see [Daily Builds](docs/DAILYBUILDS.md) for instructions on how to access daily builds.
