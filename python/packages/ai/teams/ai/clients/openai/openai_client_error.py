@@ -7,10 +7,10 @@ from typing import Optional
 
 from aiohttp.typedefs import LooseHeaders
 
-from teams.ai.ai_error import AIError
+from teams.app_error import ApplicationError
 
 
-class OpenAIClientError(AIError):
+class OpenAIClientError(ApplicationError):
     """
     OpenAI Module Error
     """

@@ -9,7 +9,6 @@ from .openai_planner import OpenAIPlanner
 from .openai_planner_options import OpenAIPlannerOptions
 from .plan import Plan, PlanType
 from .planner import Planner
-from .planner_error import PlannerError
 from .predicted_command import PredictedCommand
 from .predicted_do_command import PredictedDoCommand
 from .predicted_say_command import PredictedSayCommand

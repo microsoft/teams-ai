@@ -12,8 +12,8 @@ from botbuilder.core import TurnContext
 from semantic_kernel.skill_definition import sk_function
 
 from teams.ai.state import TurnState
+from teams.app_error import ApplicationError
 
-from .prompt_manager_error import PromptManagerError
 from .prompt_template import PromptTemplate
 from .prompt_template_config import PromptTemplateConfig
 from .utils import generate_sk_prompt_template_config
@@ -54,7 +54,7 @@ class PromptManager(Generic[StateT]):
         :param allow_overrides: Whether to allow overriding an existing function with the same name.
         """
         if not allow_overrides and self._functions.get(name):
-            raise PromptManagerError(f"Function {name} already exists")
+            raise ApplicationError(f"Function {name} already exists")
 
         self._functions[name] = handler
         return self
@@ -86,7 +86,7 @@ class PromptManager(Generic[StateT]):
 
     def _read_file(self, file_path: str) -> str:
         if not os.path.exists(file_path):
-            raise PromptManagerError(
+            raise ApplicationError(
                 f"Missing prompt config or text file: {file_path} does not exist"
             )
         with open(file_path, "r", encoding="utf8") as file:

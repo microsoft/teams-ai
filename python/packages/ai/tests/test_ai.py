@@ -9,11 +9,11 @@ from unittest import TestCase
 import pytest
 from botbuilder.core import TurnContext
 
-from teams.ai import (
+from teams import (
     AI,
     ActionEntry,
-    AIError,
     AIOptions,
+    ApplicationError,
     OpenAIPlanner,
     OpenAIPlannerOptions,
     TurnState,
@@ -72,4 +72,4 @@ class TestAI(TestCase):
         def wrapper():
             self.ai.action()(hello_world)
 
-        self.assertRaises(AIError, wrapper)
+        self.assertRaises(ApplicationError, wrapper)

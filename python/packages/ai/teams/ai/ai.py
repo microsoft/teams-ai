@@ -12,8 +12,8 @@ from teams.ai.actions import ActionEntry, ActionTypes
 from teams.ai.planner import Plan, PredictedDoCommand, PredictedSayCommand
 from teams.ai.prompts import PromptTemplate
 from teams.ai.state import ConversationState, TempState, TurnState, UserState
+from teams.app_error import ApplicationError
 
-from .ai_error import AIError
 from .ai_options import AIOptions
 
 StateT = TypeVar("StateT", bound=TurnState[ConversationState, UserState, TempState])
@@ -89,7 +89,7 @@ class AI(Generic[StateT]):
             existing = self._actions.get(action_name)
 
             if existing and not existing.allow_overrides:
-                raise AIError(
+                raise ApplicationError(
                     f"""
                     The AI.action() method was called with a previously 
                     registered action named \"{action_name}\".
@@ -255,7 +255,7 @@ class AI(Generic[StateT]):
                 if action:
                     is_ok = await action.invoke(context, state, cmd)
             else:
-                raise AIError(f'unknown command type "{cmd.type}"')
+                raise ApplicationError(f'unknown command type "{cmd.type}"')
 
             if not is_ok:
                 return False
@@ -287,7 +287,7 @@ class AI(Generic[StateT]):
     async def _on_rate_limited(
         self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
     ) -> bool:
-        raise AIError("An AI request failed because it was rate limited")
+        raise ApplicationError("An AI request failed because it was rate limited")
 
     async def _on_plan_ready(
         self, _context: TurnContext, _state: StateT, plan: Plan, _name: str
