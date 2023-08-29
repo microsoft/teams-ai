@@ -23,7 +23,7 @@
       <!-- Include SemanticKernel contentFiles (Tokenizers/) -->
       <PrivateAssets>analyzers;build</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>
