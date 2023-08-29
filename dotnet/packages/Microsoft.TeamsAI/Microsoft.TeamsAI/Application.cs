@@ -11,6 +11,7 @@ using Microsoft.TeamsAI.Utilities;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
+// TODO: As part of unifying the BF SDK, we should update it's classes to use System.Text.Json instead of Newtonsoft.Json
 namespace Microsoft.TeamsAI
 {
     /// <summary>
