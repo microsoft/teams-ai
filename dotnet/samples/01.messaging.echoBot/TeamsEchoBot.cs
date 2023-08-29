@@ -24,7 +24,8 @@ namespace EchoBot
             {
                 turnState.ConversationStateEntry.Delete();
                 await turnContext.SendActivityAsync("Ok I've deleted the current conversation state");
-            } else
+            }
+            else
             {
                 int count = turnState.Conversation.MessageCount;
 
