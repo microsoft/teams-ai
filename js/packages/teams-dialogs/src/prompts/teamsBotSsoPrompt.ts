@@ -100,7 +100,7 @@ class TokenExchangeInvokeResponse {
  * Creates a new prompt that leverage Teams Single Sign On (SSO) support for bot to automatically sign in user and
  * help receive oauth token, asks the user to consent if needed.
  * 
- * @remarks
+ * @summary
  * The prompt will attempt to retrieve the users current token of the desired scopes and store it in
  * the token store.
  * 
@@ -172,7 +172,7 @@ export class TeamsBotSsoPrompt extends Dialog {
 
   /**
    * Called when a prompt dialog is pushed onto the dialog stack and is being activated.
-   * @remarks
+   * @summary
    * If the task is successful, the result indicates whether the prompt is still
    * active after the turn has been processed by the prompt.
    *
@@ -212,7 +212,7 @@ export class TeamsBotSsoPrompt extends Dialog {
   /**
    * Called when a prompt dialog is the active dialog and the user replied with a new activity.
    *
-   * @remarks
+   * @summary
    * If the task is successful, the result indicates whether the dialog is still
    * active after the turn has been processed by the dialog.
    * The prompt generally continues to receive the user's replies until it accepts the
