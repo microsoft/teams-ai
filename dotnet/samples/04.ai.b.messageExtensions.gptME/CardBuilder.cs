@@ -15,7 +15,8 @@ namespace GPT
         {
             string cardTemplate = await File.ReadAllTextAsync(EDIT_VIEW_FILE, cancellationToken)!;
             string cardContent = new AdaptiveCardTemplate(cardTemplate).Expand(
-                new {
+                new
+                {
                     post,
                     previewMode
                 });

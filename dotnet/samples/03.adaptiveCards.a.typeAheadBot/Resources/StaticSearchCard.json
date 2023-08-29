@@ -73,9 +73,9 @@
                   "value": "visual_studio_code"
                 }
               ],
-              "style": "filtered",
-              "placeholder": "Search for a IDE",
               "id": "choiceSelect",
+              "placeholder": "Search for a IDE",
+              "style": "filtered",
               "type": "Input.ChoiceSet"
             }
           ],

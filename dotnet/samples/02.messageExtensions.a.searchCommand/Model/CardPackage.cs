@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SearchCommand.Card
+namespace SearchCommand.Model
 {
     /// <summary>
     /// The strongly typed NuGet package model for Adaptive Card
