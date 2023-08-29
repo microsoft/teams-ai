@@ -3,16 +3,18 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Awaitable, Callable, Dict, Generic, List, Optional, TypeVar
+import re
+from typing import Awaitable, Callable, Generic, List, Optional, Pattern, TypeVar, Union
 
 from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
 from botbuilder.schema import Activity, ActivityTypes
 
 from teams.ai import AI, TurnState
 
-from .activity_type import ActivityType
+from .activity_type import ActivityType, ConversationUpdateType
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
+from .route import Route
 from .typing_timer import TypingTimer
 
 StateT = TypeVar("StateT", bound=TurnState)
@@ -35,10 +37,10 @@ class Application(Bot, Generic[StateT]):
     _options: ApplicationOptions[StateT]
     _adapter: Optional[BotFrameworkAdapter] = None
     _typing_delay = 1000
-    _activities: Dict[str, Callable[[TurnContext, StateT], Awaitable[bool]]] = {}
     _before_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
     _after_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
     _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
+    _routes: List[Route[StateT]] = []
 
     def __init__(self, options=ApplicationOptions[StateT]()) -> None:
         """
@@ -46,6 +48,7 @@ class Application(Bot, Generic[StateT]):
         """
         self._ai = AI(options.ai, options.logger) if options.ai else None
         self._options = options
+        self._routes = []
 
         if options.long_running_messages and (not options.auth or not options.bot_app_id):
             raise ApplicationError(
@@ -81,7 +84,7 @@ class Application(Bot, Generic[StateT]):
         """
         return self._options
 
-    def activity(self, activity_type: ActivityType):
+    def activity(self, type: ActivityType):
         """
         Registers a new activity event listener. This method can be used as either
         a decorator or a method.
@@ -101,8 +104,94 @@ class Application(Bot, Generic[StateT]):
         - `activity_type`: The type of the activity
         """
 
+        def __selector__(context: TurnContext):
+            return type == str(context.activity.type)
+
         def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
-            self._activities[activity_type] = func
+            self._routes.append(Route[StateT](__selector__, func))
+            return func
+
+        return __call__
+
+    def message(self, select: Union[str, Pattern[str]]):
+        """
+        Registers a new message activity event listener. This method can be used as either
+        a decorator or a method.
+
+        ```python
+        # Use this method as a decorator
+        @app.message("hi")
+        async def on_hi_message(context: TurnContext, state: TurnState):
+            print("hello!")
+            return True
+
+        # Pass a function to this method
+        app.message("hi")(on_hi_message)
+        ```
+
+        #### Args:
+        - `select`: a string or regex pattern
+        """
+
+        def __selector__(context: TurnContext):
+            if context.activity.type != ActivityTypes.message:
+                return False
+
+            if isinstance(select, Pattern):
+                hits = re.match(select, context.activity.text)
+                return hits is not None
+
+            i = context.activity.text.find(select)
+            return i > -1
+
+        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+            self._routes.append(Route[StateT](__selector__, func))
+            return func
+
+        return __call__
+
+    def conversation_update(self, type: ConversationUpdateType):
+        """
+        Registers a new message activity event listener. This method can be used as either
+        a decorator or a method.
+
+        ```python
+        # Use this method as a decorator
+        @app.conversation_update("channelCreated")
+        async def on_channel_created(context: TurnContext, state: TurnState):
+            print("a new channel was created!")
+            return True
+
+        # Pass a function to this method
+        app.conversation_update("channelCreated")(on_channel_created)
+        ```
+
+        #### Args:
+        - `type`: a string or regex pattern
+        """
+
+        def __selector__(context: TurnContext):
+            if context.activity.type != ActivityTypes.conversation_update:
+                return False
+
+            if type == "membersAdded":
+                if isinstance(context.activity.members_added, List):
+                    return len(context.activity.members_added) > 0
+                return False
+
+            if type == "membersRemoved":
+                if isinstance(context.activity.members_removed, List):
+                    return len(context.activity.members_removed) > 0
+                return False
+
+            if isinstance(context.activity.channel_data, object):
+                data = vars(context.activity.channel_data)
+                return data["event_type"] == type
+
+            return False
+
+        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+            self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
@@ -223,7 +312,7 @@ class Application(Bot, Generic[StateT]):
 
                     return
 
-            # run activity handler
+            # run activity handlers
             is_ok = await self._on_activity(context, state)
 
             if not is_ok:
@@ -240,10 +329,7 @@ class Application(Bot, Generic[StateT]):
                 and context.activity.type == ActivityTypes.message
                 and context.activity.text
             ):
-                try:
-                    await self._ai.chain(context, state, self._options.ai.prompt)
-                except ApplicationError as err:
-                    await self._on_error(context, err)
+                await self._ai.chain(context, state, self._options.ai.prompt)
 
             # run after turn middleware
             for after_turn in self._after_turn:
@@ -253,14 +339,16 @@ class Application(Bot, Generic[StateT]):
                     )
 
                     return
+        except ApplicationError as err:
+            await self._on_error(context, err)
         finally:
             typing.stop()
 
     async def _on_activity(self, context: TurnContext, state: StateT):
-        func = self._activities.get(str(context.activity.type))
-
-        if func:
-            return await func(context, state)
+        for route in self._routes:
+            if route.selector(context):
+                if not await route.handler(context, state):
+                    return False
 
         return True
 
