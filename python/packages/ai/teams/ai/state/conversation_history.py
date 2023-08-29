@@ -7,8 +7,9 @@ from typing import List, Literal, Optional, Tuple
 
 import tiktoken
 
+from teams.app_error import ApplicationError
+
 from .message import Message, MessageRole
-from .state_error import StateError
 
 
 class ConversationHistory(List[Message]):
@@ -30,7 +31,7 @@ class ConversationHistory(List[Message]):
 
     def replace_last(self, role: MessageRole, content: str) -> None:
         if self.empty():
-            raise StateError("conversation history is empty")
+            raise ApplicationError("conversation history is empty")
 
         self[len(self) - 1] = Message(role, content)
 
@@ -38,7 +39,7 @@ class ConversationHistory(List[Message]):
         i = self.last_index_of_role(of_role)
 
         if i == -1:
-            raise StateError("conversation history is empty")
+            raise ApplicationError("conversation history is empty")
 
         self[i] = Message(role, content)
 
@@ -53,13 +54,13 @@ class ConversationHistory(List[Message]):
 
     def first(self) -> Message:
         if self.empty():
-            raise StateError("conversation history is empty")
+            raise ApplicationError("conversation history is empty")
 
         return self[0]
 
     def last(self) -> Message:
         if self.empty():
-            raise StateError("conversation history is empty")
+            raise ApplicationError("conversation history is empty")
 
         return self[len(self) - 1]
 
