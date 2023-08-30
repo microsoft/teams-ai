@@ -103,9 +103,9 @@
             switch (name)
             {
                 case "coin":
-                case "coins":
                 case "gold coins":
                 case "wealth": return new KeyValuePair<string, int>("gold", count);
+                case "coins":
                 case "nuggets": return new KeyValuePair<string, int>("gold", count * 10);
                 case "<item>":
                 case "item":

@@ -2,32 +2,32 @@
 {
     public static class Conditions
     {
-        private static readonly string SEASON_SPRING = "spring";
-        private static readonly string SEASON_SUMMER = "summer";
-        private static readonly string SEASON_FALL = "fall";
-        private static readonly string SEASON_WINTER = "winter";
+        public static readonly string SEASON_SPRING = "spring";
+        public static readonly string SEASON_SUMMER = "summer";
+        public static readonly string SEASON_FALL = "fall";
+        public static readonly string SEASON_WINTER = "winter";
 
-        private static readonly string WEATHER_SUNNY = "sunny";
-        private static readonly string WEATHER_CLOUDY = "cloudy";
-        private static readonly string WEATHER_RAINY = "rainy";
-        private static readonly string WEATHER_SNOWY = "snowy";
-        private static readonly string WEATHER_FOGGY = "foggy";
-        private static readonly string WEATHER_THUNDERSTORMS = "thunderstorms";
-        private static readonly string WEATHER_WINDY = "windy";
+        public static readonly string WEATHER_SUNNY = "sunny";
+        public static readonly string WEATHER_CLOUDY = "cloudy";
+        public static readonly string WEATHER_RAINY = "rainy";
+        public static readonly string WEATHER_SNOWY = "snowy";
+        public static readonly string WEATHER_FOGGY = "foggy";
+        public static readonly string WEATHER_THUNDERSTORMS = "thunderstorms";
+        public static readonly string WEATHER_WINDY = "windy";
 
-        private static readonly string TIME_DAWN = "dawn";
-        private static readonly string TIME_MORNING = "morning";
-        private static readonly string TIME_NOON = "noon";
-        private static readonly string TIME_AFTERNOON = "afternoon";
-        private static readonly string TIME_EVENING = "evening";
-        private static readonly string TIME_NIGHT = "night";
+        public static readonly string TIME_DAWN = "dawn";
+        public static readonly string TIME_MORNING = "morning";
+        public static readonly string TIME_NOON = "noon";
+        public static readonly string TIME_AFTERNOON = "afternoon";
+        public static readonly string TIME_EVENING = "evening";
+        public static readonly string TIME_NIGHT = "night";
 
-        private static readonly string TEMPERATURE_FREEZING = "freezing";
-        private static readonly string TEMPERATURE_COLD = "cold";
-        private static readonly string TEMPERATURE_COMFORTABLE = "comfortable";
-        private static readonly string TEMPERATURE_WARM = "warm";
-        private static readonly string TEMPERATURE_HOT = "hot";
-        private static readonly string TEMPERATURE_VERYHOT = "very hot";
+        public static readonly string TEMPERATURE_FREEZING = "freezing";
+        public static readonly string TEMPERATURE_COLD = "cold";
+        public static readonly string TEMPERATURE_COMFORTABLE = "comfortable";
+        public static readonly string TEMPERATURE_WARM = "warm";
+        public static readonly string TEMPERATURE_HOT = "hot";
+        public static readonly string TEMPERATURE_VERYHOT = "very hot";
 
         public static string DescribeConditions(double time, int day, string temperature, string weather)
             => $"It's a ${DescribeSeason(day)} ${DescribeTimeOfDay(time)} and the weather is ${temperature} and ${weather}.";
