@@ -44,7 +44,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             var clientMock = new Mock<AzureContentSafetyClient>(It.IsAny<AzureContentSafetyClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
-            var exception = new AzureContentSafetyClientException("Exception Message");
+            var exception = new TeamsAIException("Exception Message");
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
@@ -52,7 +52,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<AzureContentSafetyClientException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -192,7 +192,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             });
 
             var clientMock = new Mock<AzureContentSafetyClient>(It.IsAny<AzureContentSafetyClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
-            var exception = new AzureContentSafetyClientException("Exception Message");
+            var exception = new TeamsAIException("Exception Message");
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<AzureContentSafetyTextAnalysisRequest>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
@@ -200,7 +200,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<AzureContentSafetyClientException>(async () => await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);

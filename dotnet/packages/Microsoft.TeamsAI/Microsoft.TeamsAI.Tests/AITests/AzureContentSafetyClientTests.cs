@@ -35,10 +35,10 @@ namespace Microsoft.TeamsAI.Tests.AITests
         }
 
         [Theory]
-        [InlineData(HttpStatusCode.OK)]
         [InlineData(HttpStatusCode.BadRequest)]
         [InlineData(HttpStatusCode.InternalServerError)]
-        public async Task Test_ExecuteTextModeration_HttpResponseMessage_IsDisposed(HttpStatusCode statusCode)
+        [InlineData(HttpStatusCode.TooManyRequests)]
+        public async Task Test_ExecuteTextModeration_HttpResponseMessage_FailureStatusCode_IsDisposed(HttpStatusCode statusCode)
         {
             // Arrange
             var response = new TestHttpResponseMessage(statusCode);
@@ -49,10 +49,11 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var azureContentSafetyClient = new AzureContentSafetyClient(new AzureContentSafetyClientOptions("test-key", "https://test-endpoint"), null, httpClient);
 
             // Action
-            var exception = await Assert.ThrowsAsync<AzureContentSafetyClientException>(async () => await azureContentSafetyClient.ExecuteTextModeration(new AzureContentSafetyTextAnalysisRequest("test-text")));
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await azureContentSafetyClient.ExecuteTextModeration(new AzureContentSafetyTextAnalysisRequest("test-text")));
 
             // Assert
             Assert.NotNull(exception);
+            Assert.Equal(statusCode, exception.StatusCode);
             Assert.True(response.Disposed);
         }
 

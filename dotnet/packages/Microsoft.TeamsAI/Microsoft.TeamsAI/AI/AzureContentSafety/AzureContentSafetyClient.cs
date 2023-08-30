@@ -36,7 +36,7 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
         /// </summary>
         /// <param name="request">The <see cref="AzureContentSafetyTextAnalysisRequest">.</param>
         /// <returns>The <see cref="AzureContentSafetyTextAnalysisResponse"></returns>
-        /// <exception cref="AzureContentSafetyClientException" />
+        /// <exception cref="HttpOperationException" />
         public virtual async Task<AzureContentSafetyTextAnalysisResponse> ExecuteTextModeration(AzureContentSafetyTextAnalysisRequest request)
         {
             try
@@ -56,55 +56,47 @@ namespace Microsoft.TeamsAI.AI.AzureContentSafety
 
                 return result;
             }
-            catch (AzureContentSafetyClientException)
+            catch (HttpOperationException)
             {
                 throw;
             }
             catch (Exception e)
             {
-                throw new AzureContentSafetyClientException($"Something went wrong: {e.Message}");
+                throw new TeamsAIException($"Something went wrong: {e.Message}", e);
             }
         }
 
         private async Task<HttpResponseMessage> _ExecutePostRequest(string url, HttpContent? content, CancellationToken cancellationToken = default)
         {
             HttpResponseMessage? response = null;
-            try
+
+            using (HttpRequestMessage request = new(HttpMethod.Post, url))
             {
-                using (HttpRequestMessage request = new(HttpMethod.Post, url))
+                request.Headers.Add("Accept", "application/json");
+                request.Headers.Add("User-Agent", HttpUserAgent);
+                request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey);
+
+                if (content != null)
                 {
-                    request.Headers.Add("Accept", "application/json");
-                    request.Headers.Add("User-Agent", HttpUserAgent);
-                    request.Headers.Add("Ocp-Apim-Subscription-Key", _options.ApiKey);
-
-                    if (content != null)
-                    {
-                        request.Content = content;
-                    }
-
-                    response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                    request.Content = content;
                 }
 
-                _logger?.LogTrace($"HTTP response: {(int)response.StatusCode} {response.StatusCode:G}");
-
-                // Throw an exception if not a success status code
-                if (response.IsSuccessStatusCode)
-                {
-                    return response;
-                }
-
-                HttpStatusCode statusCode = response.StatusCode;
-                string failureReason = response.ReasonPhrase;
-
-                throw new AzureContentSafetyClientException($"HTTP response failure status code: ${statusCode} ({failureReason})", statusCode);
-
+                response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e)
+
+            _logger?.LogTrace($"HTTP response: {(int)response.StatusCode} {response.StatusCode:G}");
+
+            // Throw an exception if not a success status code
+            if (response.IsSuccessStatusCode)
             {
-                response?.Dispose();
-                throw new AzureContentSafetyClientException($"Something went wrong {e.Message}");
+                return response;
             }
 
+            HttpStatusCode statusCode = response.StatusCode;
+            string failureReason = response.ReasonPhrase;
+            response?.Dispose();
+
+            throw new HttpOperationException($"HTTP response failure status code: ${statusCode} ({failureReason})", statusCode, failureReason);
         }
     }
 }

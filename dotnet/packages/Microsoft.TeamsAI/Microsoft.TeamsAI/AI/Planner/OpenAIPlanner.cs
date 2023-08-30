@@ -148,6 +148,7 @@ namespace Microsoft.TeamsAI.AI.Planner
             }
             catch (TeamsAIException ex)
             {
+                // TODO: SK recently updated AIException to HttpOperationException, update this when we update SK dependency
                 // Ensure we weren't rate limited
                 if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
                 {
