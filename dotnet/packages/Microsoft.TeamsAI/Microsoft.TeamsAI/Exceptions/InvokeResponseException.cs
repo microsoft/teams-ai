@@ -28,31 +28,5 @@ namespace Microsoft.TeamsAI.Exceptions
             StatusCode = statusCode;
             Body = body;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvokeResponseException"/> class.
-        /// </summary>
-        public InvokeResponseException()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvokeResponseException"/> class.
-        /// </summary>
-        /// <param name="message">The message that explains the reason for the exception, or an empty string.</param>
-        public InvokeResponseException(string message)
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvokeResponseException"/> class.
-        /// </summary>
-        /// <param name="message">The message that explains the reason for the exception, or an empty string.</param>
-        /// <param name="innerException">Gets the System.Exception instance that caused the current exception.</param>
-        public InvokeResponseException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
     }
 }
