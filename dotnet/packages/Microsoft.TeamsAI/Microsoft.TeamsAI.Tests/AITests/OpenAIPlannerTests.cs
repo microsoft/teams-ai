@@ -45,7 +45,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            static string rateLimitedFunc() => throw new PlannerException("", new AIException(AIException.ErrorCodes.Throttling));
+            static string rateLimitedFunc() => throw new TeamsAIException("", new AIException(AIException.ErrorCodes.Throttling));
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, rateLimitedFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
@@ -87,12 +87,12 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            static string throwsExceptionFunc() => throw new PlannerException("Exception Message");
+            static string throwsExceptionFunc() => throw new TeamsAIException("Exception Message");
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, throwsExceptionFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
             // Act
-            var exception = await Assert.ThrowsAsync<PlannerException>(async () => await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
             Assert.Equal("Exception Message", exception.Message);

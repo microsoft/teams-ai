@@ -79,7 +79,7 @@ namespace Microsoft.TeamsAI.State
             }
             catch (Exception ex)
             {
-                throw new TurnStateManagerException($"Something went wrong when loading state: {ex.Message}", ex);
+                throw new TeamsAIException($"Something went wrong when loading state: {ex.Message}", ex);
             }
         }
 
@@ -137,7 +137,7 @@ namespace Microsoft.TeamsAI.State
             }
             catch (Exception ex)
             {
-                throw new TurnStateManagerException($"Something went wrong when saving state: {ex.Message}", ex);
+                throw new TeamsAIException($"Something went wrong when saving state: {ex.Message}", ex);
             }
         }
     }

@@ -189,11 +189,11 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <returns>Prompt template configuration.</returns>
         internal static PromptTemplateConfiguration FromJson(string json)
         {
-            var result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
+            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
 
             if (result == null)
             {
-                throw new PromptManagerException("Failed to deserialize prompt configuration JSON string");
+                throw new TeamsAIException("Failed to deserialize prompt configuration JSON string");
             }
 
             return result;

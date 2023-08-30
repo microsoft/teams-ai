@@ -2,7 +2,7 @@
 
 namespace Microsoft.TeamsAI.Exceptions
 {
-    public class AzureContentSafetyClientException: Exception
+    public class AzureContentSafetyClientException : Exception
     {
         public readonly HttpStatusCode? statusCode;
 
