@@ -16,8 +16,10 @@ namespace Microsoft.TeamsAI.Tests.AITests
   ""commands"": []
 }";
 
+            expectedPlanJson = expectedPlanJson.ReplaceLineEndings();
+
             // Act
-            string planJson = plan.ToJsonString();
+            string planJson = plan.ToJsonString().ReplaceLineEndings();
 
             // Assert
             Assert.Equal(expectedPlanJson, planJson);
@@ -47,9 +49,10 @@ namespace Microsoft.TeamsAI.Tests.AITests
     }
   ]
 }";
+            expectedPlanJson = expectedPlanJson.ReplaceLineEndings();
 
             // Act
-            string planJson = plan.ToJsonString();
+            string planJson = plan.ToJsonString().ReplaceLineEndings();
 
             // Assert
             Assert.Equal(expectedPlanJson, planJson);
