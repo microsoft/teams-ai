@@ -1,6 +1,4 @@
-using TwentyQuestions;
-
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
@@ -8,6 +6,7 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
+using TwentyQuestions;
 
 var builder = WebApplication.CreateBuilder(args);
 

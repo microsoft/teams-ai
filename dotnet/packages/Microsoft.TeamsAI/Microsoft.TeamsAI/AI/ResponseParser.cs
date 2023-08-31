@@ -1,8 +1,7 @@
 ﻿using AdaptiveCards;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.Exceptions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.TeamsAI.AI
 {
@@ -48,9 +47,9 @@ namespace Microsoft.TeamsAI.AI
                     // Validate string to be a valid JSON
                     try
                     {
-                        JToken.Parse(possibleJSON);
+                        JsonDocument.Parse(possibleJSON);
                     }
-                    catch (JsonReaderException)
+                    catch (JsonException)
                     {
                         continue;
                     }
@@ -437,13 +436,25 @@ namespace Microsoft.TeamsAI.AI
         private static Plan? GetFirstPlanObject(string text)
         {
             string? firstJSON = GetFirstJsonString(text);
-            if (firstJSON == null) return null;
-
-            JsonSerializerSettings settings = new()
+            if (firstJSON == null)
             {
-                Converters = new List<JsonConverter> { new PlanJsonConverter(), new PredictedCommandJsonConverter() }
+                return null;
+            }
+
+            JsonSerializerOptions options = new();
+            Plan? plan;
+
+            try
+            {
+                plan = JsonSerializer.Deserialize<Plan>(firstJSON, options);
+            }
+            catch (JsonException)
+            {
+                // Json string is not a plan object
+                return null;
             };
-            return JsonConvert.DeserializeObject<Plan>(firstJSON, settings);
+
+            return plan;
         }
     }
 

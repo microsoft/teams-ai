@@ -78,6 +78,7 @@ dotnet_style_prefer_simplified_boolean_expressions = true:warning
 dotnet_style_prefer_compound_assignment = true:warning
 # Code quality rules
 dotnet_code_quality_unused_parameters = all:warning
+dotnet_style_namespace_match_folder = true:suggestion
 
 [*.cs]
 # Explicitly define rules and ignore others
@@ -140,7 +141,7 @@ dotnet_diagnostic.CA1031.severity = warning # Do not catch general exception typ
 dotnet_diagnostic.CA1032.severity = warning # We're using RCS1194 which seems to cover more ctors
 dotnet_diagnostic.CA1034.severity = warning # Do not nest type. Alternatively, change its accessibility so that it is not externally visible
 dotnet_diagnostic.CA1050.severity = warning # Declare types in namespaces
-dotnet_diagnostic.CA1062.severity = warning # Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none # Validate arguments of public methods
 dotnet_diagnostic.CA1063.severity = warning # Implement IDisposable correctly
 dotnet_diagnostic.CA1064.severity = warning # Exceptions should be public
 dotnet_diagnostic.CA1303.severity = warning # Do not pass literals as localized parameters
@@ -148,13 +149,13 @@ dotnet_diagnostic.CA1416.severity = warning # Validate platform compatibility
 dotnet_diagnostic.CA1508.severity = warning # Avoid dead conditional code
 dotnet_diagnostic.CA1805.severity = warning # Member is explicitly initialized to its default value
 dotnet_diagnostic.CA1822.severity = warning # Member does not access instance data and can be marked as static
-dotnet_diagnostic.CA1848.severity = warning # For improved performance, use the LoggerMessage delegates
+dotnet_diagnostic.CA1848.severity = none # For improved performance, use the LoggerMessage delegates
 dotnet_diagnostic.CA1852.severity = warning # Sealed classes
 dotnet_diagnostic.CA1859.severity = warning # Use concrete types when possible for improved performance
 dotnet_diagnostic.CA1860.severity = warning # Prefer comparing 'Count' to 0 rather than using 'Any()', both for clarity and for performance
 dotnet_diagnostic.CA2000.severity = warning # Call System.IDisposable.Dispose on object before all references to it are out of scope
-dotnet_diagnostic.CA2007.severity = warning # Do not directly await a Task
-dotnet_diagnostic.CA2201.severity = warning # Exception type System.Exception is not sufficiently specific
+dotnet_diagnostic.CA2007.severity = none # Do not directly await a Task
+dotnet_diagnostic.CA2201.severity = none # Exception type System.Exception is not sufficiently specific
 dotnet_diagnostic.CA2225.severity = warning # Operator overloads have named alternates
 dotnet_diagnostic.CA2227.severity = warning # Change to be read-only by removing the property setter
 dotnet_diagnostic.CA2253.severity = warning # Named placeholders in the logging message template should not be comprised of only numeric characters
@@ -166,7 +167,7 @@ dotnet_diagnostic.IDE0002.severity = warning # Simplify member access
 dotnet_diagnostic.IDE0003.severity = warning # Remove this or Me qualification
 dotnet_diagnostic.IDE0004.severity = warning # Remove unnecessary cast
 dotnet_diagnostic.IDE0005.severity = warning # Remove unnecessary using directives
-dotnet_diagnostic.IDE0008.severity = warning # Use explicit type instead of var
+dotnet_diagnostic.IDE0008.severity = none # Use explicit type instead of var
 dotnet_diagnostic.IDE0011.severity = warning # Add braces
 dotnet_diagnostic.IDE0018.severity = warning # Inline variable declaration
 dotnet_diagnostic.IDE0032.severity = warning # Use auto-implemented property
@@ -331,3 +332,4 @@ csharp_style_prefer_method_group_conversion = true:warning
 csharp_style_prefer_top_level_statements = true:warning
 csharp_style_expression_bodied_lambdas = true:warning
 csharp_style_expression_bodied_local_functions = false:warning
+csharp_style_prefer_primary_constructors = true:suggestion

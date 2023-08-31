@@ -1,12 +1,12 @@
-using LightBot;
+﻿using LightBot;
+using LightBot.Model;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.Bot.Builder;
+using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI;
-using LightBot.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,19 +50,19 @@ builder.Services.AddTransient<IBot>(sp =>
     IPlanner<AppState> planner = new OpenAIPlanner<AppState>(
         sp.GetService<OpenAIPlannerOptions>()!,
         loggerFactory.CreateLogger<OpenAIPlanner<AppState>>());
-    
+
     // Create Application
     AIHistoryOptions aiHistoryOptions = new()
     {
         AssistantHistoryType = AssistantHistoryType.Text
     };
-    
+
     AIOptions<AppState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<AppState>("./Prompts"),
         prompt: "chatGPT",
         history: aiHistoryOptions);
-    
+
     ApplicationOptions<AppState, AppStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new AppStateManager(),

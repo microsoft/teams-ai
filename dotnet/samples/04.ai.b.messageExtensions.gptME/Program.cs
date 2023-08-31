@@ -1,4 +1,4 @@
-using GPT;
+﻿using GPT;
 
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
@@ -80,7 +80,7 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions
     };
-    return new GPtMessageExtension(ApplicationOptions, PREVIEW_MODE);
+    return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });
 #endregion
 
@@ -128,7 +128,7 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
     };
-    return new GPtMessageExtension(ApplicationOptions, PREVIEW_MODE);
+    return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });
 **/
 #endregion
