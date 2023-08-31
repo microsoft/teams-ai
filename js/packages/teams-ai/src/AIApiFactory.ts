@@ -13,14 +13,6 @@ import { ConfiguredAIOptions } from './AI';
 import { TurnContext } from 'botbuilder';
 import { Plan } from './Planner';
 import { ResponseParser } from './ResponseParser';
-
-export interface LLMs {
-    readonly openai: {
-        readonly DefaultCompletionEndpoint: 'https://api.openai.com/v1/chat/completions';
-        readonly DefaultChatCompletionEndpoint: 'https://api.openai.com/v1/chat/completions';
-        readonly DefaultEmbeddingEndpoint: 'https://api.openai.com/v1/embeddings';
-        readonly DefaultModerationEndpoint: 'https://api.openai.com/v1/moderations';
-    };
 }
 
 export interface AIApiFactoryOptions {
