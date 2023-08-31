@@ -13,7 +13,6 @@ import { ConfiguredAIOptions } from './AI';
 import { TurnContext } from 'botbuilder';
 import { Plan } from './Planner';
 import { ResponseParser } from './ResponseParser';
-}
 
 export interface AIApiFactoryOptions {
     /**
