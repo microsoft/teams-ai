@@ -9,6 +9,9 @@ namespace QuestBot.State
         private const string _equippedKey = "equippedKey";
         private const string _inventoryKey = "inventoryKey";
 
+        public static readonly string DEFAULT_BACKSTORY = "Lives in Shadow Falls.";
+        public static readonly string DEFAULT_EQUIPPED = "Wearing clothes.";
+
         public string? Name
         {
             get => Get<string>(_nameKey);

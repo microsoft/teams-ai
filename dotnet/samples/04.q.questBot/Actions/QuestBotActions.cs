@@ -20,7 +20,7 @@ namespace QuestBot.Actions
         {
             ArgumentNullException.ThrowIfNull(entities);
             DataEntities data = JsonSerializer.Deserialize<DataEntities>(JsonSerializer.Serialize(entities))
-                ?? throw new ArgumentException("Action data is not work item.");
+                ?? throw new ArgumentException("Action data is not data entities.");
             return data;
         }
 

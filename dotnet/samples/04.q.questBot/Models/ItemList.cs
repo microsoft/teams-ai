@@ -3,6 +3,7 @@
     public class ItemList : Dictionary<string, int>
     {
         public ItemList() : base(StringComparer.OrdinalIgnoreCase) { }
+        public ItemList(IEnumerable<KeyValuePair<string, int>> collection) : base(collection, StringComparer.OrdinalIgnoreCase) { }
 
         public void AddItem(string key, int value)
         {
@@ -97,7 +98,7 @@
             return itemList;
         }
 
-        private static KeyValuePair<string, int> MapTo(string name, int count)
+        public static KeyValuePair<string, int> MapTo(string name, int count)
         {
             name = name.Trim().ToLowerInvariant();
             switch (name)
