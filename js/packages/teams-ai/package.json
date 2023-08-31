@@ -26,23 +26,24 @@
         "botbuilder": "^4.20.0",
         "botbuilder-dialogs": "^4.20.0",
         "gpt-3-encoder": "^1.1.4",
+        "sinon": "^15.2.0",
         "yaml": "^2.2.2"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
+        "@types/assert": "^1.5.6",
         "@types/jsonwebtoken": "^9.0.2",
+        "@types/mocha": "^10.0.1",
         "@types/node": "^20.3.1",
         "eslint": "^8.42.0",
         "jsonwebtoken": "^9.0.0",
-        "typescript": "^5.1.6",
-        "@types/mocha": "^10.0.1",
-        "@types/assert": "^1.5.6",
         "mocha": "10.2.0",
         "nyc": "^15.1.0",
         "shx": "^0.3.4",
-        "ts-mocha": "10.0.0"
+        "ts-mocha": "10.0.0",
+        "typescript": "^5.1.6"
     },
     "scripts": {
         "build": "tsc -b",
