@@ -78,6 +78,8 @@ dotnet_style_prefer_simplified_boolean_expressions = true:warning
 dotnet_style_prefer_compound_assignment = true:warning
 # Code quality rules
 dotnet_code_quality_unused_parameters = all:warning
+dotnet_style_namespace_match_folder = true:suggestion
+dotnet_diagnostic.CA1848.severity = none
 
 [*.cs]
 # Explicitly define rules and ignore others
@@ -148,7 +150,7 @@ dotnet_diagnostic.CA1416.severity = warning # Validate platform compatibility
 dotnet_diagnostic.CA1508.severity = warning # Avoid dead conditional code
 dotnet_diagnostic.CA1805.severity = warning # Member is explicitly initialized to its default value
 dotnet_diagnostic.CA1822.severity = warning # Member does not access instance data and can be marked as static
-dotnet_diagnostic.CA1848.severity = warning # For improved performance, use the LoggerMessage delegates
+dotnet_diagnostic.CA1848.severity = none # For improved performance, use the LoggerMessage delegates
 dotnet_diagnostic.CA1852.severity = warning # Sealed classes
 dotnet_diagnostic.CA1859.severity = warning # Use concrete types when possible for improved performance
 dotnet_diagnostic.CA1860.severity = warning # Prefer comparing 'Count' to 0 rather than using 'Any()', both for clarity and for performance
@@ -331,3 +333,4 @@ csharp_style_prefer_method_group_conversion = true:warning
 csharp_style_prefer_top_level_statements = true:warning
 csharp_style_expression_bodied_lambdas = true:warning
 csharp_style_expression_bodied_local_functions = false:warning
+csharp_style_prefer_primary_constructors = true:suggestion

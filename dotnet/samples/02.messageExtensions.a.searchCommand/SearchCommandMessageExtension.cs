@@ -1,16 +1,15 @@
-﻿using System.Collections.Specialized;
-using System.Web;
-
-using AdaptiveCards;
+﻿using AdaptiveCards;
 using AdaptiveCards.Templating;
 using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SearchCommand.Card;
+using SearchCommand.Model;
+using System.Collections.Specialized;
+using System.Web;
 
 namespace SearchCommand
 {

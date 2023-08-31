@@ -163,7 +163,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            string multipleSayCommands = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValueA'}, {'type':'SAY','response':'responseValueB'}]}";
+            string multipleSayCommands = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValueA\"}, {\"type\":\"SAY\",\"response\":\"responseValueB\"}]}";
             string multipleSayCommandsFunc() => multipleSayCommands;
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, multipleSayCommandsFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -206,7 +206,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            string simplePlan = @"{ 'type':'plan','commands':[{'type':'SAY','response':'responseValueA'}, {'type':'DO', 'action': 'actionName'}]}";
+            string simplePlan = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValueA\"}, {\"type\":\"DO\", \"action\": \"actionName\"}]}";
             string multipleSayCommandsFunc() => simplePlan;
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, multipleSayCommandsFunc);
 
