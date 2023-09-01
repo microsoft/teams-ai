@@ -1,7 +1,7 @@
-using EchoBot;
+﻿using EchoBot;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.Bot.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
