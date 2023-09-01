@@ -308,4 +308,6 @@ class AI(Generic[StateT]):
         self, _context: TurnContext, _state: StateT, _command: PredictedSayCommand, _name: str
     ) -> bool:
         # TODO: Adaptive Card
+        response = _command.response
+        await _context.send_activity(response)
         return True
