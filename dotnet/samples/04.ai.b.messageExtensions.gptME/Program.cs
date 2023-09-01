@@ -112,10 +112,7 @@ builder.Services.AddTransient<IBot>(sp =>
         loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
 
     // Create AzureContentSafetyModerator
-    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(
-        sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>(),
-        moderatorHttpClient);
+    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
     // Create Application
     AIOptions<TurnState> aiOptions = new(

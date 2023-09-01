@@ -102,19 +102,13 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
     // Create AzureOpenAIPlanner
     IPlanner<GameState> planner = new AzureOpenAIPlanner<GameState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
         loggerFactory.CreateLogger<AzureOpenAIPlanner<GameState>>());
 
     // Create AzureContentSafetyModerator
-    IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(
-        sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<GameState>>(),
-        moderatorHttpClient);
+    IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
     // Create Application
     AIHistoryOptions aiHistoryOptions = new()
