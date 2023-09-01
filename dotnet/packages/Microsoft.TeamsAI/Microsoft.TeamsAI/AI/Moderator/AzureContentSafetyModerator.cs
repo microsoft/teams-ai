@@ -94,38 +94,31 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 }
             }
 
-            try
+            Response<AnalyzeTextResult> response = await _client.AnalyzeTextAsync(analyzeTextOptions);
+
+            bool flagged = response.Value.BlocklistsMatchResults.Count > 0
+            || _ShouldBeFlagged(response.Value.HateResult)
+            || _ShouldBeFlagged(response.Value.SelfHarmResult)
+            || _ShouldBeFlagged(response.Value.SexualResult)
+            || _ShouldBeFlagged(response.Value.ViolenceResult);
+            if (flagged)
             {
-                Response<AnalyzeTextResult> response = await _client.AnalyzeTextAsync(analyzeTextOptions);
+                string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
 
-                bool flagged = response.Value.BlocklistsMatchResults.Count > 0
-                || _ShouldBeFlagged(response.Value.HateResult)
-                || _ShouldBeFlagged(response.Value.SelfHarmResult)
-                || _ShouldBeFlagged(response.Value.SexualResult)
-                || _ShouldBeFlagged(response.Value.ViolenceResult);
-                if (flagged)
+                // Flagged
+                return new Plan()
                 {
-                    string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
-
-                    // Flagged
-                    return new Plan()
-                    {
-                        Commands = new List<IPredictedCommand>
+                    Commands = new List<IPredictedCommand>
                             {
                                 new PredictedDoCommand(actionName, new Dictionary<string, object>
                                 {
                                     { "Result", response.Value }
                                 })
                             }
-                    };
-                }
+                };
+            }
 
-                return null;
-            }
-            catch (RequestFailedException)
-            {
-                throw;
-            }
+            return null;
         }
 
         private bool _ShouldBeFlagged(TextAnalyzeSeverityResult result)
