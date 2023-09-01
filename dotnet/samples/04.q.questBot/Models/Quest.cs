@@ -9,5 +9,7 @@ namespace QuestBot.Models
 
         [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
+
+        public string ToMessage() => $"✨ <strong>{Title}</strong><br>{string.Join("<br>", Description.Split('\n'))}";
     }
 }
