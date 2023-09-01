@@ -26,8 +26,10 @@ jobs:
         configuration: [Release]
       fail-fast: false
     runs-on: ${{ matrix.os }}
-    env:
-      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    defaults:
+      run:
+        shell: bash
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -38,18 +40,15 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+
       - name: Pack
-        shell: bash
-        working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet pack --output . --configuration ${{ matrix.configuration }} Microsoft.TeamsAI/Microsoft.TeamsAI.csproj
 
       - name: Publish
-        shell: bash
-        working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json --skip-duplicate --no-symbols
 
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
           name: nupkg-dotnet-${{ matrix.dotnet-version }}
-          path: ${{ env.SOLUTION_DIR }}*.nupkg
+          path: dotnet/packages/Microsoft.TeamsAI/*.nupkg

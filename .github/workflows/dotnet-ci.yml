@@ -17,8 +17,10 @@ jobs:
         configuration: [Release]
       fail-fast: false
     runs-on: ${{ matrix.os }}
-    env:
-      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    defaults:
+      run:
+        shell: bash
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,13 +33,9 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore
-        shell: bash
-        working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet restore Microsoft.TeamsAI.sln
 
       - name: Build
-        shell: bash
-        working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet build Microsoft.TeamsAI.sln --no-restore --configuration ${{ matrix.configuration }}
 
   test:
@@ -49,6 +47,10 @@ jobs:
         configuration: [Release]
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
     env:
       SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
     steps:
@@ -63,13 +65,9 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore
-        shell: bash
-        working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet restore Microsoft.TeamsAI.sln
 
       - name: Test
-        shell: bash
-        working-directory: ${{ env.SOLUTION_DIR }}
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.TeamsAI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration ${{ matrix.configuration }}
 
       - name: Coverage
