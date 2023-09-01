@@ -103,9 +103,6 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
     // Create AzureOpenAIPlanner
     IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
