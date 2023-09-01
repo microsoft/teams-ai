@@ -1,6 +1,5 @@
 ﻿using AdaptiveCards;
 using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.Exceptions;
 using System.Text.Json;
 
 namespace Microsoft.TeamsAI.AI

@@ -163,8 +163,7 @@ namespace GPT
 
             try
             {
-                string post = await AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
-                return post;
+                return await AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
             }
             catch (HttpOperationException e) when (e.Response.StatusCode == HttpStatusCode.TooManyRequests)
             {

@@ -2,7 +2,6 @@
 using Microsoft.TeamsAI.AI.Planner;
 using System.Reflection;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Utilities;
