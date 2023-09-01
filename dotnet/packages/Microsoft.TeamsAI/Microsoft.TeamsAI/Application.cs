@@ -22,7 +22,7 @@ namespace Microsoft.TeamsAI
     /// a simpler fluent style of authoring bots versus the inheritance based approach used by the
     /// ActivityHandler class.
     ///
-    /// Additionally, it has built-in support for calling into the SDK's AI system and can be used to create
+    /// Additionally, it has built-in support for calling into the SDK's AI system and can be used to creates
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
