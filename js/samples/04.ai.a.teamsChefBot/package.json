@@ -26,7 +26,7 @@
         "dotenv": "^8.2.0",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.2.1"
+        "vectra": "^0.2.2"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
