@@ -2,9 +2,11 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
+using Microsoft.Rest;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace GPT
 {
@@ -159,8 +161,15 @@ namespace GPT
             AI.Prompts.Variables.Add("prompt", data.Prompt ?? string.Empty);
             AI.Prompts.Variables.Add("post", data.Post ?? string.Empty);
 
-            string post = await AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
-            return post ?? throw new Exception("The request to OpenAI was rate limited. Please try again later.");
+            try
+            {
+                string post = await AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
+                return post;
+            }
+            catch (HttpOperationException e) when (e.Response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                throw new Exception("The request to OpenAI was rate limited. Please try again later.", e);
+            }
         }
 
         private static TaskModuleResponseBase CreateTaskModule(Attachment attachment)

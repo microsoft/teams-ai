@@ -28,5 +28,15 @@ namespace Microsoft.TeamsAI.Exceptions
             StatusCode = httpStatusCode;
             ResponseContent = responseContent;
         }
+
+        /// <summary>
+        /// Checks status code is a rate limit status code.
+        /// </summary>
+        /// <returns>Returns true if the status code is a rate limit status code.</returns>
+        internal bool isRateLimitedStatusCode()
+        {
+            /// HttpStatusCode.TooManyRequests is not available in .NET Standard 2.0, this is a workaround.
+            return StatusCode == (HttpStatusCode)429;
+        }
     }
 }

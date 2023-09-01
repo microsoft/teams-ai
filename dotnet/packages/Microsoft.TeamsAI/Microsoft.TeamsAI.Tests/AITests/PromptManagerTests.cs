@@ -63,7 +63,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
-            var exception = Assert.Throws<TeamsAIException>(() => promptManager.AddFunction(name, promptFunctionOverride, false));
+            var exception = Assert.Throws<InvalidOperationException>(() => promptManager.AddFunction(name, promptFunctionOverride, false));
 
             // Assert
             Assert.Equal(exception.Message, $"Attempting to update a previously registered function `{name}`");
@@ -116,7 +116,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var exception = Assert.Throws<TeamsAIException>(() => promptManager.AddPromptTemplate(name, promptTemplate));
+            var exception = Assert.Throws<InvalidOperationException>(() => promptManager.AddPromptTemplate(name, promptTemplate));
 
             // Assert
             Assert.Equal(exception.Message, $"Text template `{name}` already exists.");
@@ -217,7 +217,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var name = "invalidPromptTemplateFolder";
 
             // Act
-            var exception = Assert.Throws<TeamsAIException>(() => promptManager.LoadPromptTemplate(name));
+            var exception = Assert.Throws<ArgumentException>(() => promptManager.LoadPromptTemplate(name));
 
             // Assert 
             Assert.Equal(exception.Message, $"Directory doesn't exist `{directoryPath}\\{name}`");
