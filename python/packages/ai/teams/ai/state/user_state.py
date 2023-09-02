@@ -31,7 +31,9 @@ class UserState(State):
             )
 
     @classmethod
-    async def from_activity(cls, activity: Activity, _storage: Optional[Storage] = None) -> "UserState":
+    async def from_activity(
+        cls, activity: Activity, _storage: Optional[Storage] = None
+    ) -> "UserState":
         if not activity.channel_id:
             raise ValueError("missing activity.channel_id")
         if not activity.from_property:
