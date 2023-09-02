@@ -19,7 +19,9 @@ class AppTurnState(TurnState):
     conversation: AppConversationState
 
     @classmethod
-    async def from_activity(cls, activity: Activity, storage: Optional[Storage]) -> "AppTurnState":
+    async def from_activity(
+        cls, activity: Activity, storage: Optional[Storage] = None
+    ) -> "AppTurnState":
         return cls(
             conversation=await AppConversationState.from_activity(activity, storage),
             user=await UserState.from_activity(activity, storage),
