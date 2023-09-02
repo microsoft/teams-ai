@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 import json
 import os
-from typing import Awaitable, Callable, Dict, Generic, TypeVar, Union
+from typing import Awaitable, Callable, Dict, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -20,17 +20,16 @@ from .utils import generate_sk_prompt_template_config
 
 SK_CONFIG_FILE_NAME = "config.json"
 SK_PROMPT_FILE_NAME = "skprompt.txt"
-StateT = TypeVar("StateT", bound=TurnState)
 
 
-class PromptManager(Generic[StateT]):
+class PromptManager:
     """
     Prompt manager used by action planner internally
     """
 
     _prompts_folder: str
     _templates: Dict[str, PromptTemplate] = {}
-    _functions: Dict[str, Callable[[TurnContext, StateT], Awaitable[str]]] = {}
+    _functions: Dict[str, Callable[[TurnContext, TurnState], Awaitable[str]]] = {}
 
     def __init__(self, prompts_folder: str = "prompts") -> None:
         """
@@ -43,7 +42,7 @@ class PromptManager(Generic[StateT]):
     def add_function(
         self,
         name: str,
-        handler: Callable[[TurnContext, StateT], Awaitable[str]],
+        handler: Callable[[TurnContext, TurnState], Awaitable[str]],
         allow_overrides=False,
     ):
         """
@@ -60,7 +59,7 @@ class PromptManager(Generic[StateT]):
         return self
 
     async def render_prompt(
-        self, context: TurnContext, state: StateT, name_or_template: Union[str, PromptTemplate]
+        self, context: TurnContext, state: TurnState, name_or_template: Union[str, PromptTemplate]
     ) -> PromptTemplate:
         """
         Renders the given prompt template.
@@ -93,7 +92,7 @@ class PromptManager(Generic[StateT]):
             return file.read()
 
     async def _render_prompt_with_sk(
-        self, prompt_template: PromptTemplate, turn_context: TurnContext, turn_state: StateT
+        self, prompt_template: PromptTemplate, turn_context: TurnContext, turn_state: TurnState
     ) -> PromptTemplate:
         kernel = sk.Kernel()
         for function_name, function in self._functions.items():
@@ -114,9 +113,9 @@ class PromptManager(Generic[StateT]):
 
         sk_context = kernel.create_new_context()
         # Set built-in variables
-        sk_context.variables.set("input", turn_state.temp.value.input)
-        sk_context.variables.set("history", turn_state.temp.value.history)
-        sk_context.variables.set("output", turn_state.temp.value.output)
+        sk_context.variables.set("input", turn_state.temp.input)
+        sk_context.variables.set("history", turn_state.temp.history)
+        sk_context.variables.set("output", turn_state.temp.output)
 
         sk_template = sk.PromptTemplate(
             prompt_template.text,

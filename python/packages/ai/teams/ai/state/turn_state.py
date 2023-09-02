@@ -3,23 +3,33 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
-from typing import Generic, TypeVar
+from abc import ABC
+from dataclasses import dataclass, field
+from typing import Optional
+
+from botbuilder.core import Storage
+from botbuilder.schema import Activity
 
 from .conversation_state import ConversationState
 from .temp_state import TempState
-from .turn_state_entry import TurnStateEntry
 from .user_state import UserState
-
-ConversationT = TypeVar("ConversationT", bound=ConversationState)
-UserT = TypeVar("UserT", bound=UserState)
-TempT = TypeVar("TempT", bound=TempState)
 
 
 @dataclass
-class TurnState(Generic[ConversationT, UserT, TempT]):
-    "defines the default state scopes persisted by the `TurnStateManager`"
+class TurnState(ABC):
+    "defines the default state application state"
 
-    conversation: TurnStateEntry[ConversationT]
-    user: TurnStateEntry[UserT]
-    temp: TurnStateEntry[TempT]
+    conversation: ConversationState
+    user: UserState
+    temp: TempState = field(default_factory=TempState)
+
+    async def save(self, storage: Optional[Storage]) -> None:
+        await self.conversation.save(storage)
+        await self.user.save(storage)
+
+    @classmethod
+    async def from_activity(cls, activity: Activity, storage: Optional[Storage]) -> "TurnState":
+        return cls(
+            conversation=await ConversationState.from_activity(activity, storage),
+            user=await UserState.from_activity(activity, storage),
+        )
