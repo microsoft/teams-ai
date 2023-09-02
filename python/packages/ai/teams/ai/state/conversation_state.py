@@ -10,11 +10,10 @@ from botbuilder.core import Storage
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 
 from .conversation_history import ConversationHistory
-from .state import State
 
 
 @dataclass
-class ConversationState(State):
+class ConversationState:
     """
     inherit a new interface from this base interface to strongly type
     the applications conversation state

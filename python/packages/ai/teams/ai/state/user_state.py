@@ -9,11 +9,9 @@ from typing import Optional
 from botbuilder.core import Storage
 from botbuilder.schema import Activity, ChannelAccount
 
-from .state import State
-
 
 @dataclass
-class UserState(State):
+class UserState:
     """
     inherit a new interface from this base interface to strongly type
     the applications user state

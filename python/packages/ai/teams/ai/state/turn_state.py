@@ -17,7 +17,7 @@ from .user_state import UserState
 
 @dataclass
 class TurnState(ABC):
-    "defines the default state application state"
+    "defines the default application state"
 
     conversation: ConversationState
     user: UserState
