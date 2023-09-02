@@ -22,7 +22,7 @@ class UserState(State):
     __key__: str
     channel: ChannelAccount
 
-    async def save(self, storage: Optional[Storage]) -> None:
+    async def save(self, storage: Optional[Storage] = None) -> None:
         if storage:
             await storage.write(
                 {
@@ -31,7 +31,7 @@ class UserState(State):
             )
 
     @classmethod
-    async def from_activity(cls, activity: Activity, _storage: Optional[Storage]) -> "UserState":
+    async def from_activity(cls, activity: Activity, _storage: Optional[Storage] = None) -> "UserState":
         if not activity.channel_id:
             raise ValueError("missing activity.channel_id")
         if not activity.from_property:

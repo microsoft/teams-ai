@@ -25,7 +25,7 @@ class ConversationState(State):
     channel: ChannelAccount
     history: ConversationHistory = field(default_factory=ConversationHistory)
 
-    async def save(self, storage: Optional[Storage]) -> None:
+    async def save(self, storage: Optional[Storage] = None) -> None:
         if storage:
             await storage.write(
                 {
@@ -37,7 +37,7 @@ class ConversationState(State):
 
     @classmethod
     async def from_activity(
-        cls, activity: Activity, storage: Optional[Storage]
+        cls, activity: Activity, storage: Optional[Storage] = None
     ) -> "ConversationState":
         if not activity.channel_id:
             raise ValueError("missing activity.channel_id")

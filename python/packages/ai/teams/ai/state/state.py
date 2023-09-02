@@ -18,10 +18,10 @@ class State(ABC):
     """
 
     @abstractmethod
-    async def save(self, storage: Optional[Storage]) -> None:
+    async def save(self, storage: Optional[Storage] = None) -> None:
         pass
 
     @classmethod
     @abstractmethod
-    async def from_activity(cls, activity: Activity, storage: Optional[Storage]) -> "State":
+    async def from_activity(cls, activity: Activity, storage: Optional[Storage] = None) -> "State":
         pass
