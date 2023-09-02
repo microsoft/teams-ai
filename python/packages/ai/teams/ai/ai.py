@@ -209,6 +209,16 @@ class AI(Generic[StateT]):
 
         # TODO: call review_plan
 
+        if state.temp.value.input == "":
+            state.temp.value.input = context.activity.text
+
+        if state.temp.value.history == "":
+            state.temp.value.history = state.conversation.value.history.to_str(
+                self._options.history.max_tokens,
+                "cl100k_base",
+                self._options.history.line_separator,
+            )
+
         plan = await self._options.planner.generate_plan(
             context, state, prompt, history_options=self._options.history
         )
@@ -305,7 +315,7 @@ class AI(Generic[StateT]):
         return await action.func(context, state, command.entities, command.action)
 
     async def _on_say_command(
-        self, _context: TurnContext, _state: StateT, _command: PredictedSayCommand, _name: str
+        self, context: TurnContext, _state: StateT, command: PredictedSayCommand, _name: str
     ) -> bool:
-        # TODO: Adaptive Card
+        await context.send_activity(command.response)
         return True

@@ -305,21 +305,19 @@ class Application(Bot, Generic[StateT]):
 
             # run before turn middleware
             for before_turn in self._before_turn:
-                if not await before_turn(context, state):
-                    await self._options.turn_state_manager.save_state(
-                        self._options.storage, context, state
-                    )
-
-                    return
-
-            # run activity handlers
-            is_ok = await self._on_activity(context, state)
-
-            if not is_ok:
+                is_ok = await before_turn(context, state)
                 await self._options.turn_state_manager.save_state(
                     self._options.storage, context, state
                 )
 
+                if not is_ok:
+                    return
+
+            # run activity handlers
+            is_ok = await self._on_activity(context, state)
+            await self._options.turn_state_manager.save_state(self._options.storage, context, state)
+
+            if not is_ok:
                 return
 
             if (
@@ -330,15 +328,20 @@ class Application(Bot, Generic[StateT]):
                 and context.activity.text
             ):
                 await self._ai.chain(context, state, self._options.ai.prompt)
+                await self._options.turn_state_manager.save_state(
+                    self._options.storage, context, state
+                )
 
             # run after turn middleware
             for after_turn in self._after_turn:
-                if not await after_turn(context, state):
-                    await self._options.turn_state_manager.save_state(
-                        self._options.storage, context, state
-                    )
+                is_ok = await after_turn(context, state)
+                await self._options.turn_state_manager.save_state(
+                    self._options.storage, context, state
+                )
 
+                if not is_ok:
                     return
+
         except ApplicationError as err:
             await self._on_error(context, err)
         finally:

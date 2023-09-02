@@ -14,6 +14,7 @@ from typing import Any
 from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
 from teams import (
     AIOptions,
+    AIHistoryOptions,
     Application,
     ApplicationOptions,
     OpenAIPlanner,
@@ -28,6 +29,10 @@ from src.conversation import AppConversationState
 
 config = Config()
 storage = MemoryStorage()
+
+if config.open_ai_key == "":
+    raise RuntimeError("OpenAIKey is a required environment variable")
+
 app = Application[TurnState[AppConversationState, UserState, TempState]](
     ApplicationOptions[TurnState[AppConversationState, UserState, TempState]](
         bot_app_id=config.app_id,
@@ -40,23 +45,32 @@ app = Application[TurnState[AppConversationState, UserState, TempState]](
             prompt="chatGPT",
             planner=OpenAIPlanner(
                 OpenAIPlannerOptions(
-                    api_key="",
+                    api_key=config.open_ai_key,
                     default_model="gpt-3.5-turbo",
                     log_requests=True,
                     prompt_folder=f"{os.getcwd()}/src/prompts",
                 )
             ),
+            history=AIHistoryOptions(
+                assistant_history_type="text"
+            ),
         ),
     )
 )
+
+@app.message("/history")
+async def on_history(context: TurnContext, state: TurnState[AppConversationState, UserState, TempState]):
+    if state.conversation.value.history.len() > 0:
+        await context.send_activity(state.conversation.value.history.to_str(2000, "cl100k_base", "\n\n"))
+    return True
 
 
 @app.ai.function("getLightStatus")
 async def on_get_light_status(
     _context: TurnContext, state: TurnState[AppConversationState, UserState, TempState]
 ):
+    print(state.conversation.value)
     return "on" if state.conversation.value.lights_on else "off"
-
 
 @app.ai.action("LightsOn")
 async def on_lights_on(
@@ -78,7 +92,6 @@ async def on_lights_off(
     _name: str,
 ):
     state.conversation.value.lights_on = False
-    print(state.conversation.value)
     await context.send_activity("[lights off]")
     return True
 

@@ -21,7 +21,7 @@ class AIHistoryOptions:
     "The maximum number of tokens worth of history to add to the prompt. `Default: 1000`"
 
     line_separator: str = "\n"
-    "The line separator to use when concatenating history. `Default: '\n'`"
+    "The line separator to use when concatenating history. `Default: '\\n'`"
 
     user_prefix: str = "User:"
     'The prefix to use for user history. `Default: "User:"`'
