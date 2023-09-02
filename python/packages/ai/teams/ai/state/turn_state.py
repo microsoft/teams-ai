@@ -28,7 +28,9 @@ class TurnState(ABC):
         await self.user.save(storage)
 
     @classmethod
-    async def from_activity(cls, activity: Activity, storage: Optional[Storage]) -> "TurnState":
+    async def from_activity(
+        cls, activity: Activity, storage: Optional[Storage] = None
+    ) -> "TurnState":
         return cls(
             conversation=await ConversationState.from_activity(activity, storage),
             user=await UserState.from_activity(activity, storage),
