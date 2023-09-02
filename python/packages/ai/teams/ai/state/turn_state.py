@@ -23,7 +23,7 @@ class TurnState(ABC):
     user: UserState
     temp: TempState = field(default_factory=TempState)
 
-    async def save(self, storage: Optional[Storage]) -> None:
+    async def save(self, storage: Optional[Storage] = None) -> None:
         await self.conversation.save(storage)
         await self.user.save(storage)
 
