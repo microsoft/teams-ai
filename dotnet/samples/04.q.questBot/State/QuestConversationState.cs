@@ -5,6 +5,8 @@ namespace QuestBot.State
 {
     public class QuestConversationState : StateBase
     {
+        public static readonly int CONVERSATION_STATE_VERSION = 1;
+
         private const string _versionKey = "versionKey";
         private const string _greetedKey = "greetedKey";
         private const string _turnKey = "turnKey";

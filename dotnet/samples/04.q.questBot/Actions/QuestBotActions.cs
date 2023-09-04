@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.AI.Planner;
 using QuestBot.Models;
 using QuestBot.State;
@@ -14,6 +15,13 @@ namespace QuestBot.Actions
         public QuestBotActions(Application<QuestState, QuestStateManager> application)
         {
             _application = application;
+        }
+
+        [Action(DefaultActionTypes.UnknownActionName)]
+        public async Task<bool> UnknownAsync([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
+        {
+            await turnContext.SendActivityAsync($"<strong>{action}</strong> action missing");
+            return true;
         }
 
         private static DataEntities GetData(Dictionary<string, object> entities)

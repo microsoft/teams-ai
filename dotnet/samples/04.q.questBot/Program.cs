@@ -8,6 +8,7 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using QuestBot.State;
+using QuestBot.Store;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +33,7 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Clou
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 // Create singleton instances for bot application
-builder.Services.AddSingleton<IStorage, MemoryStorage>();
+builder.Services.AddSingleton<IStorage, LastWriterWinsMemoryStore>();
 
 #region Use OpenAI
 // Use OpenAI
@@ -40,7 +41,7 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new ArgumentException("Missing OpenAI configuration.");
 }
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "text-davinci-003"));
+builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -57,7 +58,15 @@ builder.Services.AddTransient<IBot>(sp =>
     AIOptions<QuestState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<QuestState>("./Prompts"),
-        prompt: "Chat");
+        prompt: "Intro",
+        history: new AIHistoryOptions
+        {
+            UserPrefix = "Player:",
+            AssistantPrefix = "DM:",
+            MaxTurns = 3,
+            MaxTokens = 600,
+            TrackHistory = true
+        });
     ApplicationOptions<QuestState, QuestStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new QuestStateManager(),
@@ -77,7 +86,7 @@ if (config.Azure == null
 {
     throw new ArgumentException("Missing Azure configuration.");
 }
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint));
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -94,7 +103,15 @@ builder.Services.AddTransient<IBot>(sp =>
     AIOptions<QuestState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<QuestState>("./Prompts"),
-        prompt: "Chat");
+        prompt: "Intro",
+        history: new AIHistoryOptions
+        {
+            UserPrefix = "Player:",
+            AssistantPrefix = "DM:",
+            MaxTurns = 3,
+            MaxTokens = 600,
+            TrackHistory = true
+        });
     ApplicationOptions<QuestState, QuestStateManager> ApplicationOptions = new()
     {
         TurnStateManager = new QuestStateManager(),

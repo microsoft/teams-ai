@@ -19,7 +19,7 @@
 
   <!-- Include prompt as content in build output -->
   <ItemGroup>
-    <Folder Include="Prompts/Chat/" />
+    <Folder Include="Prompts/*/" />
     <Content Include="Prompts/*/skprompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

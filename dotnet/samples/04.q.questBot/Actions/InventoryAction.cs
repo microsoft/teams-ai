@@ -37,7 +37,7 @@ namespace QuestBot.Actions
             {
                 state.Temp!.ListItems = items;
                 state.Temp!.ListType = "inventory";
-                var newResponse = await _application.AI.CompletePromptAsync(context, state, "listItems", null, default);
+                var newResponse = await _application.AI.CompletePromptAsync(context, state, "ListItems", null, default);
                 if (!string.IsNullOrEmpty(newResponse))
                 {
                     var card = ResponseParser.ParseAdaptiveCard(newResponse);

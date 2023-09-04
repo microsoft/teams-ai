@@ -53,7 +53,7 @@ namespace QuestBot.Actions
             };
 
             // Expand quest details
-            var details = await _application.AI.CompletePromptAsync(context, state, "questDetails", null, default);
+            var details = await _application.AI.CompletePromptAsync(context, state, "QuestDetails", null, default);
             if (!string.IsNullOrEmpty(details))
             {
                 quest.Description = details.Trim();
