@@ -11,6 +11,7 @@ from typing import (
     List,
     Optional,
     Pattern,
+    Tuple,
     TypeVar,
     Union,
     cast,
@@ -334,15 +335,17 @@ class Application(Bot, Generic[StateT]):
                     return
 
             # run activity handlers
-            is_ok = await self._on_activity(context, state)
+            is_ok, matches = await self._on_activity(context, state)
 
             if not is_ok:
                 if self._options.storage:
                     await state.save(self._options.storage)
                 return
 
+            # only run chain when no activity handlers matched
             if (
-                self._ai
+                matches == 0
+                and self._ai
                 and self._options.ai
                 and self._options.ai.prompt
                 and context.activity.type == ActivityTypes.message
@@ -372,13 +375,17 @@ class Application(Bot, Generic[StateT]):
         finally:
             typing.stop()
 
-    async def _on_activity(self, context: TurnContext, state: TurnState):
+    async def _on_activity(self, context: TurnContext, state: TurnState) -> Tuple[bool, int]:
+        matches = 0
+
         for route in self._routes:
             if route.selector(context):
-                if not await route.handler(context, cast(StateT, state)):
-                    return False
+                matches = matches + 1
 
-        return True
+                if not await route.handler(context, cast(StateT, state)):
+                    return False, matches
+
+        return True, matches
 
     async def _start_long_running_call(
         self, context: TurnContext, func: Callable[[TurnContext], Awaitable]
