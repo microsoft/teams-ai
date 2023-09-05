@@ -15,6 +15,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
   ""type"": ""plan"",
   ""commands"": []
 }";
+            expectedPlanJson = expectedPlanJson.ReplaceLineEndings();
 
             expectedPlanJson = expectedPlanJson.ReplaceLineEndings();
 
