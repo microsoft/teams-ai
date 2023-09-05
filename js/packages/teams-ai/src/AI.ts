@@ -481,10 +481,10 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         const renderedPrompt = await opts.promptManager.renderPrompt(context, state, prompt);
 
         // Generate plan
-        let plan = await opts.moderator.reviewPrompt(context, state, renderedPrompt, opts);
+        let plan = await opts.moderator.reviewInput(context, state);
         if (!plan) {
             plan = await opts.planner.generatePlan(context, state, renderedPrompt, opts);
-            plan = await opts.moderator.reviewPlan(context, state, plan);
+            plan = await opts.moderator.reviewOutput(context, state, plan);
         }
 
         // Process generated plan

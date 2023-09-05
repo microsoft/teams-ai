@@ -5,8 +5,6 @@ import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnStateEntry } from './TurnState';
 import { ConversationHistory } from './ConversationHistory';
 import { Plan, PredictedDoCommand } from './Planner';
-import { PromptTemplate } from './Prompts';
-import { ConfiguredAIOptions } from './AI';
 
 describe('DefaultModerator', () => {
     const adapter = new TestAdapter();
@@ -28,11 +26,9 @@ describe('DefaultModerator', () => {
 
             const moderator = new DefaultModerator();
 
-            const plan = await moderator.reviewPrompt(
+            const plan = await moderator.reviewInput(
                 mockTurnContext,
                 state,
-                {} as any as PromptTemplate,
-                {} as any as ConfiguredAIOptions<DefaultTurnState>
             );
             assert.equal(plan, undefined);
         });
@@ -49,7 +45,7 @@ describe('DefaultModerator', () => {
 
             const moderator = new DefaultModerator();
 
-            const plan = await moderator.reviewPlan(mockTurnContext, state, expectedPlan);
+            const plan = await moderator.reviewOutput(mockTurnContext, state, expectedPlan);
             assert.deepEqual(plan, expectedPlan);
         });
     });
