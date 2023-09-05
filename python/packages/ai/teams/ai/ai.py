@@ -6,10 +6,12 @@ Licensed under the MIT License.
 from logging import Logger
 from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
 
-from botbuilder.core import TurnContext
+from botbuilder.core import CardFactory, MessageFactory, TurnContext
+from botframework.connector import Channels
 
 from teams.ai.actions import ActionEntry, ActionTypes
 from teams.ai.planner import Plan, PredictedDoCommand, PredictedSayCommand
+from teams.ai.planner.response_parser import parse_adaptive_card
 from teams.ai.prompts import PromptTemplate
 from teams.ai.state import ConversationState, TempState, TurnState, UserState
 from teams.app_error import ApplicationError
@@ -307,5 +309,14 @@ class AI(Generic[StateT]):
     async def _on_say_command(
         self, _context: TurnContext, _state: StateT, _command: PredictedSayCommand, _name: str
     ) -> bool:
-        # TODO: Adaptive Card
+        response = _command.response
+        card = parse_adaptive_card(response)
+        if card:  # Find adaptive card in response
+            attachment = CardFactory.adaptive_card(card)
+            activity = MessageFactory.attachment(attachment)
+            await _context.send_activity(activity)
+        elif _context.activity.channel_id == Channels.ms_teams:
+            await _context.send_activity(response.replace("\n", "<br>"))
+        else:
+            await _context.send_activity(response)
         return True
