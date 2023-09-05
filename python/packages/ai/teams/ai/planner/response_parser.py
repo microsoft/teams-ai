@@ -67,6 +67,20 @@ def parse_json(text: str) -> dict:
     return obj
 
 
+def parse_adaptive_card(text: str) -> Optional[dict]:
+    """Attempts to find an Adaptive Card in a response
+    Args:
+        text (str): The response to parse.
+    Returns:
+        dict: The parsed Adaptive Card object.
+    """
+
+    obj = parse_json(text)
+    if obj and obj.get("type") == "AdaptiveCard":
+        return obj
+    return None
+
+
 def parse_response(text: str) -> Plan:
     """Parse a response into a Plan object.
     Args:
