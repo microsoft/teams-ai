@@ -5,17 +5,15 @@ Licensed under the MIT License.
 
 from dataclasses import dataclass
 from logging import Logger
-from typing import Generic, Optional, TypeVar
+from typing import Optional
 
 from botbuilder.core import BotFrameworkAdapterSettings, Storage
 
-from teams.ai import AIOptions, TurnState, TurnStateManager
-
-StateT = TypeVar("StateT", bound=TurnState)
+from teams.ai import AIOptions
 
 
 @dataclass
-class ApplicationOptions(Generic[StateT]):
+class ApplicationOptions:
     auth: Optional[BotFrameworkAdapterSettings] = None
     """
     Optional. Bot auth settings.
@@ -33,15 +31,9 @@ class ApplicationOptions(Generic[StateT]):
     Optional. `Storage` provider to use for the application.
     """
 
-    ai: Optional[AIOptions[StateT]] = None
+    ai: Optional[AIOptions] = None
     """
     Optional. AI options to use. When provided, a new instance of the AI system will be created.
-    """
-
-    turn_state_manager = TurnStateManager[StateT]()
-    """
-    Optional. Turn state manager to use. If omitted, an instance of `TurnStateManager` will
-    be created using the parameterless constructor.
     """
 
     logger: Logger = Logger("teams.ai")

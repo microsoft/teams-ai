@@ -4,7 +4,18 @@ Licensed under the MIT License.
 """
 
 import re
-from typing import Awaitable, Callable, Generic, List, Optional, Pattern, TypeVar, Union
+from typing import (
+    Awaitable,
+    Callable,
+    Generic,
+    List,
+    Optional,
+    Pattern,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
 from botbuilder.schema import Activity, ActivityTypes
@@ -34,15 +45,16 @@ class Application(Bot, Generic[StateT]):
     """
 
     _ai: Optional[AI[StateT]]
-    _options: ApplicationOptions[StateT]
+    _options: ApplicationOptions
     _adapter: Optional[BotFrameworkAdapter] = None
     _typing_delay = 1000
     _before_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
     _after_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
     _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
+    _turn_state_factory: Optional[Callable[[Activity], Awaitable[StateT]]] = None
     _routes: List[Route[StateT]] = []
 
-    def __init__(self, options=ApplicationOptions[StateT]()) -> None:
+    def __init__(self, options=ApplicationOptions()) -> None:
         """
         Creates a new Application instance.
         """
@@ -78,7 +90,7 @@ class Application(Bot, Generic[StateT]):
         return self._ai
 
     @property
-    def options(self) -> ApplicationOptions[StateT]:
+    def options(self) -> ApplicationOptions:
         """
         The application's configured options.
         """
@@ -261,6 +273,14 @@ class Application(Bot, Generic[StateT]):
 
         return func
 
+    def turn_state_factory(self, func: Callable[[Activity], Awaitable[StateT]]):
+        """
+        Custom Turn State Factory
+        """
+
+        self._turn_state_factory = func
+        return func
+
     async def process_activity(
         self, activity: Activity, auth_header: str
     ) -> Optional[InvokeResponse]:
@@ -298,59 +318,74 @@ class Application(Bot, Generic[StateT]):
 
         try:
             await typing.start(context)
+            state: TurnState
 
-            state = await self._options.turn_state_manager.load_state(
-                self._options.storage, context
-            )
+            if self._turn_state_factory:
+                state = await self._turn_state_factory(context.activity)
+            else:
+                state = await self._load_state(context.activity)
 
             # run before turn middleware
             for before_turn in self._before_turn:
-                if not await before_turn(context, state):
-                    await self._options.turn_state_manager.save_state(
-                        self._options.storage, context, state
-                    )
+                is_ok = await before_turn(context, cast(StateT, state))
 
+                if not is_ok:
+                    if self._options.storage:
+                        await state.save(self._options.storage)
                     return
 
             # run activity handlers
-            is_ok = await self._on_activity(context, state)
+            is_ok, matches = await self._on_activity(context, state)
 
             if not is_ok:
-                await self._options.turn_state_manager.save_state(
-                    self._options.storage, context, state
-                )
-
+                if self._options.storage:
+                    await state.save(self._options.storage)
                 return
 
+            # only run chain when no activity handlers matched
             if (
-                self._ai
+                matches == 0
+                and self._ai
                 and self._options.ai
                 and self._options.ai.prompt
                 and context.activity.type == ActivityTypes.message
                 and context.activity.text
             ):
-                await self._ai.chain(context, state, self._options.ai.prompt)
+                is_ok = await self._ai.chain(context, cast(StateT, state), self._options.ai.prompt)
+
+                if not is_ok:
+                    if self._options.storage:
+                        await state.save(self._options.storage)
+                    return
 
             # run after turn middleware
             for after_turn in self._after_turn:
-                if not await after_turn(context, state):
-                    await self._options.turn_state_manager.save_state(
-                        self._options.storage, context, state
-                    )
+                is_ok = await after_turn(context, cast(StateT, state))
 
+                if not is_ok:
+                    if self._options.storage:
+                        await state.save(self._options.storage)
                     return
+
+            if self._options.storage:
+                await state.save(self._options.storage)
+
         except ApplicationError as err:
             await self._on_error(context, err)
         finally:
             typing.stop()
 
-    async def _on_activity(self, context: TurnContext, state: StateT):
+    async def _on_activity(self, context: TurnContext, state: TurnState) -> Tuple[bool, int]:
+        matches = 0
+
         for route in self._routes:
             if route.selector(context):
-                if not await route.handler(context, state):
-                    return False
+                matches = matches + 1
 
-        return True
+                if not await route.handler(context, cast(StateT, state)):
+                    return False, matches
+
+        return True, matches
 
     async def _start_long_running_call(
         self, context: TurnContext, func: Callable[[TurnContext], Awaitable]
@@ -372,3 +407,6 @@ class Application(Bot, Generic[StateT]):
             return await self._error(context, err)
 
         raise err
+
+    async def _load_state(self, activity: Activity) -> TurnState:
+        return await TurnState.from_activity(activity, self._options.storage)
