@@ -327,16 +327,18 @@ class Application(Bot, Generic[StateT]):
             # run before turn middleware
             for before_turn in self._before_turn:
                 is_ok = await before_turn(context, cast(StateT, state))
-                await state.save(self._options.storage)
 
                 if not is_ok:
+                    if self._options.storage:
+                        await state.save(self._options.storage)
                     return
 
             # run activity handlers
             is_ok = await self._on_activity(context, state)
-            await state.save(self._options.storage)
 
             if not is_ok:
+                if self._options.storage:
+                    await state.save(self._options.storage)
                 return
 
             if (
@@ -346,17 +348,24 @@ class Application(Bot, Generic[StateT]):
                 and context.activity.type == ActivityTypes.message
                 and context.activity.text
             ):
-                await self._ai.chain(context, cast(StateT, state), self._options.ai.prompt)
+                is_ok = await self._ai.chain(context, cast(StateT, state), self._options.ai.prompt)
 
-            await state.save(self._options.storage)
+                if not is_ok:
+                    if self._options.storage:
+                        await state.save(self._options.storage)
+                    return
 
             # run after turn middleware
             for after_turn in self._after_turn:
                 is_ok = await after_turn(context, cast(StateT, state))
-                await state.save(self._options.storage)
 
                 if not is_ok:
+                    if self._options.storage:
+                        await state.save(self._options.storage)
                     return
+
+            if self._options.storage:
+                await state.save(self._options.storage)
 
         except ApplicationError as err:
             await self._on_error(context, err)

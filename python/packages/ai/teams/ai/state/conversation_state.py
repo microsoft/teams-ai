@@ -24,15 +24,14 @@ class ConversationState:
     channel: ChannelAccount
     history: ConversationHistory = field(default_factory=ConversationHistory)
 
-    async def save(self, storage: Optional[Storage] = None) -> None:
-        if storage:
-            await storage.write(
-                {
-                    self.__key__: {
-                        "history": self.history,
-                    },
-                }
-            )
+    async def save(self, storage: Storage) -> None:
+        await storage.write(
+            {
+                self.__key__: {
+                    "history": self.history,
+                },
+            }
+        )
 
     @classmethod
     async def from_activity(

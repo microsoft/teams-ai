@@ -20,13 +20,12 @@ class UserState:
     __key__: str
     channel: ChannelAccount
 
-    async def save(self, storage: Optional[Storage] = None) -> None:
-        if storage:
-            await storage.write(
-                {
-                    self.__key__: {},
-                }
-            )
+    async def save(self, storage: Storage) -> None:
+        await storage.write(
+            {
+                self.__key__: {},
+            }
+        )
 
     @classmethod
     async def from_activity(
