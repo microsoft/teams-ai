@@ -332,6 +332,7 @@ namespace Microsoft.TeamsAI.AI
 
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
+            _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, promptTemplate);
@@ -357,6 +358,7 @@ namespace Microsoft.TeamsAI.AI
 
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
+            _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, name);
