@@ -7,11 +7,11 @@ Here are a list of {{$listType}} items:
 Here's an Adaptive Card template:
 {"type":"AdaptiveCard","version":"1.4","body":[{"type":"FactSet","facts":[{"title":"Sword","value":"1"}]}]}
 
-Player name: {{$user.name}}
+Player name: {{$name}}
 Players query:
 
 ```
-{{$activity.text}}
+{{$input}}
 ``
 
 Using the players query for context, create an adaptive card showing the items. Add an appropriate title to the card:

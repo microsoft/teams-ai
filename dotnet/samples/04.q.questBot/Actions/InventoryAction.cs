@@ -5,6 +5,7 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Action;
 using QuestBot.Models;
 using QuestBot.State;
+using System.Text.Json;
 
 namespace QuestBot.Actions
 {
@@ -37,6 +38,9 @@ namespace QuestBot.Actions
             {
                 state.Temp!.ListItems = items;
                 state.Temp!.ListType = "inventory";
+                _application.AI.Prompts.Variables["listType"] = state.Temp!.ListType;
+                _application.AI.Prompts.Variables["listItems"] = JsonSerializer.Serialize(state.Temp!.ListItems);
+                _application.AI.Prompts.Variables["name"] = state.User!.Name ?? string.Empty;
                 var newResponse = await _application.AI.CompletePromptAsync(context, state, "ListItems", null, default);
                 if (!string.IsNullOrEmpty(newResponse))
                 {

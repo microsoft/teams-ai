@@ -63,6 +63,8 @@ namespace QuestBot.Actions
             {
                 state.Temp!.BackstoryChange = string.IsNullOrEmpty(backstoryChange) ? "no change" : backstoryChange;
                 state.Temp!.EquippedChange = string.IsNullOrEmpty(equippedChange) ? "no change" : equippedChange;
+                _application.AI.Prompts.Variables["backstoryChange"] = state.Temp!.BackstoryChange;
+                _application.AI.Prompts.Variables["equippedChange"] = state.Temp!.EquippedChange;
                 var update = await _application.AI.CompletePromptAsync(context, state, "UpdatePlayer", null, default);
                 if (update == null)
                 {

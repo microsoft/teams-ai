@@ -237,6 +237,7 @@ namespace QuestBot
             {
                 temp.Prompt = "NewObjective";
                 temp.ObjectiveTitle = nextObjective!.Title;
+                AI.Prompts.Variables["$objectiveTitle"] = temp.ObjectiveTitle;
             }
             else if (conversation.Turn >= conversation.NextEncounterTurn && location != null && Random.Shared.NextDouble() <= location.EncounterChance)
             {
@@ -244,6 +245,10 @@ namespace QuestBot
                 temp.PromptInstructions = "An encounter occurred! Describe to the player the encounter.";
                 conversation.NextEncounterTurn = conversation.Turn + (5 + (int)Math.Floor(Random.Shared.NextDouble() * 15));
             }
+
+            AI.Prompts.Variables["players"] = JsonSerializer.Serialize(conversation.Players ?? Array.Empty<string>());
+            AI.Prompts.Variables["story"] = conversation.Story ?? string.Empty;
+            AI.Prompts.Variables["promptInstructions"] = temp.PromptInstructions ?? string.Empty;
 
             return true;
         }

@@ -21,7 +21,7 @@ Current location:
 {{describeLocation}}
 
 All Players:
-{{$conversation.players}}
+{{$players}}
 
 Current Player Profile:
 {{describePlayerInfo}}
@@ -36,7 +36,7 @@ Conditions:
 {{describeConditions}}
 
 Story:
-{{$conversation.story}}
+{{$story}}
 
 Conversation History:
 ```
@@ -48,7 +48,7 @@ Conversation History:
 Players question:
 ```
 
-{{$activity.text}}
+{{$input}}
 
 ```
 
