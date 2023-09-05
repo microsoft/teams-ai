@@ -7,9 +7,9 @@ from typing import Awaitable, Callable, Generic, TypeVar
 
 from botbuilder.core import TurnContext
 
-from teams.ai.state import ConversationState, TempState, TurnState, UserState
+from teams.ai.state import TurnState
 
-StateT = TypeVar("StateT", bound=TurnState[ConversationState, UserState, TempState])
+StateT = TypeVar("StateT", bound=TurnState)
 
 
 class Route(Generic[StateT]):

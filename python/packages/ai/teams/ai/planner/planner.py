@@ -10,11 +10,11 @@ from botbuilder.core import TurnContext
 
 from teams.ai.ai_history_options import AIHistoryOptions
 from teams.ai.prompts import PromptTemplate
-from teams.ai.state import ConversationState, TempState, TurnState, UserState
+from teams.ai.state import TurnState
 
 from .plan import Plan
 
-StateT = TypeVar("StateT", bound=TurnState[ConversationState, UserState, TempState])
+StateT = TypeVar("StateT", bound=TurnState)
 
 
 class Planner(ABC, Generic[StateT]):

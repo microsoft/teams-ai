@@ -12,24 +12,27 @@ import traceback
 from typing import Any
 
 from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
+from botbuilder.schema import Activity
 from teams import (
+    AIHistoryOptions,
     AIOptions,
     Application,
     ApplicationOptions,
     OpenAIPlanner,
     OpenAIPlannerOptions,
-    TempState,
-    TurnState,
-    UserState,
 )
 
 from src.config import Config
-from src.conversation import AppConversationState
+from state import AppTurnState
 
 config = Config()
 storage = MemoryStorage()
-app = Application[TurnState[AppConversationState, UserState, TempState]](
-    ApplicationOptions[TurnState[AppConversationState, UserState, TempState]](
+
+if config.open_ai_key == "":
+    raise RuntimeError("OpenAIKey is a required environment variable")
+
+app = Application[AppTurnState](
+    ApplicationOptions(
         bot_app_id=config.app_id,
         storage=storage,
         auth=BotFrameworkAdapterSettings(
@@ -40,32 +43,44 @@ app = Application[TurnState[AppConversationState, UserState, TempState]](
             prompt="chatGPT",
             planner=OpenAIPlanner(
                 OpenAIPlannerOptions(
-                    api_key="",
+                    api_key=config.open_ai_key,
                     default_model="gpt-3.5-turbo",
                     log_requests=True,
                     prompt_folder=f"{os.getcwd()}/src/prompts",
                 )
             ),
+            history=AIHistoryOptions(assistant_history_type="text"),
         ),
     )
 )
 
 
+@app.turn_state_factory
+async def on_state_factory(activity: Activity):
+    return await AppTurnState.from_activity(activity, storage)
+
+
+@app.message("/history")
+async def on_history(context: TurnContext, state: AppTurnState):
+    if state.conversation.history.len() > 0:
+        await context.send_activity(state.conversation.history.to_str(2000, "cl100k_base", "\n\n"))
+    return True
+
+
 @app.ai.function("getLightStatus")
-async def on_get_light_status(
-    _context: TurnContext, state: TurnState[AppConversationState, UserState, TempState]
-):
-    return "on" if state.conversation.value.lights_on else "off"
+async def on_get_light_status(_context: TurnContext, state: AppTurnState):
+    print(state.conversation)
+    return "on" if state.conversation.lights_on else "off"
 
 
 @app.ai.action("LightsOn")
 async def on_lights_on(
     context: TurnContext,
-    state: TurnState[AppConversationState, UserState, TempState],
+    state: AppTurnState,
     _data: Any,
     _name: str,
 ):
-    state.conversation.value.lights_on = True
+    state.conversation.lights_on = True
     await context.send_activity("[lights on]")
     return True
 
@@ -73,12 +88,11 @@ async def on_lights_on(
 @app.ai.action("LightsOff")
 async def on_lights_off(
     context: TurnContext,
-    state: TurnState[AppConversationState, UserState, TempState],
+    state: AppTurnState,
     _data: Any,
     _name: str,
 ):
-    state.conversation.value.lights_on = False
-    print(state.conversation.value)
+    state.conversation.lights_on = False
     await context.send_activity("[lights off]")
     return True
 
@@ -86,7 +100,7 @@ async def on_lights_off(
 @app.ai.action("Pause")
 async def on_pause(
     context: TurnContext,
-    _state: TurnState[AppConversationState, UserState, TempState],
+    _state: AppTurnState,
     data: Any,
     _name: str,
 ):
