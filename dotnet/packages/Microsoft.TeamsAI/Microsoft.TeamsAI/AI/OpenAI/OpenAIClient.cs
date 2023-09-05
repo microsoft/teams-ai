@@ -26,6 +26,12 @@ namespace Microsoft.TeamsAI.AI.OpenAI
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="OpenAIClient"/> class.
+        /// </summary>
+        /// <param name="options">The OpenAI client options.</param>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="httpClient">The HTTP client instance.</param>
         public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
         {
             _httpClient = httpClient ?? DefaultHttpClient.Instance;

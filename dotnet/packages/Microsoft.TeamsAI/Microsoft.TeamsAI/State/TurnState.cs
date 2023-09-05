@@ -13,8 +13,19 @@ namespace Microsoft.TeamsAI.State
         where TUserState : StateBase
         where TTempState : TempState
     {
+        /// <summary>
+        /// Name of the conversation state entry.
+        /// </summary>
         public const string ConversationStateKey = "conversationState";
+
+        /// <summary>
+        /// Name of the user state entry.
+        /// </summary>
         public const string UserStateKey = "userState";
+
+        /// <summary>
+        /// Name of the temp state entry.
+        /// </summary>
         public const string TempStateKey = "tempState";
 
         /// <summary>

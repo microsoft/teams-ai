@@ -3,6 +3,13 @@ using Microsoft.TeamsAI.State;
 
 namespace Microsoft.TeamsAI.AI.Prompt
 {
+    /// <summary>
+    /// The prompt function delegate.
+    /// </summary>
+    /// <typeparam name="TState">The turn state class.</typeparam>
+    /// <param name="turnContext">The turn context.</param>
+    /// <param name="turnState">The turn state.</param>
+    /// <returns>A string that is injected in the prompt template.</returns>
     public delegate Task<string> PromptFunction<TState>(ITurnContext turnContext, TState turnState) where TState : ITurnState<StateBase, StateBase, TempState>;
 
     internal class TemplateFunctionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
