@@ -1,4 +1,4 @@
-# Teams AI
+# Teams AIs
 
 SDK focused on building AI based applications for Microsoft Teams.
 
