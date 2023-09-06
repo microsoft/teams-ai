@@ -247,7 +247,7 @@ class Application(Bot, Generic[StateT]):
 
     def message_preview(self, command_id: Union[str, Pattern[str]], action: MessagePreviewAction):
         """
-        Registers a handler to process the 'edit' action of a message that's being
+        Registers a handler to process an action of a message that's being
         previewed by the user prior to sending.
 
         ```python
