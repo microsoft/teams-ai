@@ -10,6 +10,7 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 
 - [Echo](./samples/echo/)
 - [List](./samples/list/)
+- [Teams Chef Bot](./samples/04.ai.a.teamsChefBot/)
 
 ## Development
 
