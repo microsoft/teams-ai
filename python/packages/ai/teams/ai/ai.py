@@ -331,5 +331,4 @@ class AI(Generic[StateT]):
         else:
             await context.send_activity(response)
 
-        await context.send_activity(command.response)
         return True
