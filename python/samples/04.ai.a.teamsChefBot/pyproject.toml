@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "teamschef-demo"
+name = "teamschef-sample"
 version = "0.1.0"
 description = "Sample bot that thinks it's a Chef to help you cook Teams apps"
 authors = ["Microsoft"]
@@ -44,7 +44,7 @@ target-version = ['py38']
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report html:coverage --cov=echo"
+addopts = "--cov-report html:coverage --cov=src"
 
 [tool.mypy]
 python_version = "3.8"

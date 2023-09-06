@@ -18,8 +18,6 @@ from teams import (AIHistoryOptions, AIOptions, Application,
 from src.config import Config
 
 # Initialize Teams AI application
-StateT = TypeVar("StateT", bound=TurnState[ConversationState, UserState, TempState])
-
 planner = AzureOpenAIPlanner(
     AzureOpenAIPlannerOptions(
         Config.AZURE_OPENAI_KEY,
@@ -28,7 +26,7 @@ planner = AzureOpenAIPlanner(
     )
 )
 storage = MemoryStorage()
-app = Application(
+app = Application[TurnState](
     ApplicationOptions(
         auth=BotFrameworkAdapterSettings(
             app_id=Config.BOT_ID,
@@ -45,8 +43,8 @@ app = Application(
 
 
 @app.message("/history")
-async def handle_history_command(context: TurnContext, state: StateT) -> bool:
-    history = state.conversation.value.history.to_str(2000, "cl100k_base", "\n\n")
+async def handle_history_command(context: TurnContext, state: TurnState) -> bool:
+    history = state.conversation.history.to_str(2000, "cl100k_base", "\n\n")
     await context.send_activity(history)
     return True
 
