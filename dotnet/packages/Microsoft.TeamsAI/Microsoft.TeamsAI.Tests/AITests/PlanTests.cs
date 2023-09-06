@@ -17,6 +17,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
 }";
             expectedPlanJson = expectedPlanJson.ReplaceLineEndings();
 
+            expectedPlanJson = expectedPlanJson.ReplaceLineEndings();
+
             // Act
             string planJson = plan.ToJsonString().ReplaceLineEndings();
 

@@ -1,6 +1,9 @@
 ﻿
 namespace Microsoft.TeamsAI.AI
 {
+    /// <summary>
+    /// Options for the AI system.
+    /// </summary>
     public class AIHistoryOptions
     {
         /// <summary>
@@ -61,9 +64,19 @@ namespace Microsoft.TeamsAI.AI
         public AssistantHistoryType AssistantHistoryType { get; set; } = AssistantHistoryType.PlanObject;
     }
 
+    /// <summary>
+    /// The type of assistant history to include in the conversation history.
+    /// </summary>
     public enum AssistantHistoryType
     {
+        /// <summary>
+        /// Text of any SAY commands.
+        /// </summary>
         Text,
+
+        /// <summary>
+        /// The plan object returned by the model.
+        /// </summary>
         PlanObject
     }
 }

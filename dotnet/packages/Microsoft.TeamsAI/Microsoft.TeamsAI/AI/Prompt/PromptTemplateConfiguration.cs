@@ -98,6 +98,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// </summary>
         public class InputConfig
         {
+            /// <summary>
+            /// List of all input parameters for a semantic function.
+            /// </summary>
             [JsonPropertyName("parameters")]
             [JsonPropertyOrder(1)]
             public List<InputParameterValues> Parameters { get; set; } = new();
@@ -189,7 +192,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <returns>Prompt template configuration.</returns>
         internal static PromptTemplateConfiguration FromJson(string json)
         {
-            var result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
+            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
 
             if (result == null)
             {
