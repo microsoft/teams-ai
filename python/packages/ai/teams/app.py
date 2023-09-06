@@ -114,7 +114,7 @@ class Application(Bot, Generic[StateT]):
         ```
 
         #### Args:
-        - `activity_type`: The type of the activity
+        - `type`: The type of the activity
         """
 
         def __selector__(context: TurnContext):
@@ -209,7 +209,7 @@ class Application(Bot, Generic[StateT]):
 
         return __call__
 
-    def anonymous_query_link(self, select: Union[str, Pattern[str]]):
+    def anonymous_query_link(self, command_id: Union[str, Pattern[str]]):
         """
         Registers a handler for a command that performs anonymous link unfurling.
 
@@ -225,7 +225,7 @@ class Application(Bot, Generic[StateT]):
         ```
 
         #### Args:
-        - `select`: a string or regex pattern that matches against the activities
+        - `command_id`: a string or regex pattern that matches against the activities
         `command_id`
         """
 
@@ -237,7 +237,7 @@ class Application(Bot, Generic[StateT]):
             ):
                 return False
 
-            return self._activity_with_command_id(context.activity, select)
+            return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
             self._routes.append(Route[StateT](__selector__, func))
