@@ -14,6 +14,11 @@ namespace Microsoft.TeamsAI.AI.Planner
     public class AzureOpenAIPlanner<TState> : OpenAIPlanner<TState, AzureOpenAIPlannerOptions>
         where TState : ITurnState<StateBase, StateBase, TempState>
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="AzureOpenAIPlanner{TState}"/> class.
+        /// </summary>
+        /// <param name="options">The options to configure the planner.</param>
+        /// <param name="logger">The logger instance.</param>
         public AzureOpenAIPlanner(AzureOpenAIPlannerOptions options, ILogger logger) : base(options, logger)
         {
         }

@@ -1,6 +1,9 @@
 ﻿
 namespace Microsoft.TeamsAI.AI.Moderator
 {
+    /// <summary>
+    /// Options for the OpenAI Moderator.
+    /// </summary>
     public class OpenAIModeratorOptions
     {
         /// <summary>
@@ -40,10 +43,24 @@ namespace Microsoft.TeamsAI.AI.Moderator
         }
     }
 
+    /// <summary>
+    /// Which parts of the conversation to moderate.
+    /// </summary>
     public enum ModerationType
     {
+        /// <summary>
+        /// Only moderate input.
+        /// </summary>
         Input,
+
+        /// <summary>
+        /// Only moderate output.
+        /// </summary>
         Output,
+
+        /// <summary>
+        /// Moderate both input and output.
+        /// </summary>
         Both
     };
 }
