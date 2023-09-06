@@ -6,17 +6,19 @@ Licensed under the MIT License.
 from logging import Logger
 from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
 
-from botbuilder.core import TurnContext
+from botbuilder.core import CardFactory, MessageFactory, TurnContext
+from botframework.connector import Channels
 
 from teams.ai.actions import ActionEntry, ActionTypes
 from teams.ai.planner import Plan, PredictedDoCommand, PredictedSayCommand
+from teams.ai.planner.response_parser import parse_adaptive_card
 from teams.ai.prompts import PromptTemplate
-from teams.ai.state import ConversationState, TempState, TurnState, UserState
+from teams.ai.state import TurnState
 from teams.app_error import ApplicationError
 
 from .ai_options import AIOptions
 
-StateT = TypeVar("StateT", bound=TurnState[ConversationState, UserState, TempState])
+StateT = TypeVar("StateT", bound=TurnState)
 
 
 class AI(Generic[StateT]):
@@ -27,7 +29,7 @@ class AI(Generic[StateT]):
     generating prompts. It can be used free standing or routed to by the Application object.
     """
 
-    _options: AIOptions[StateT]
+    _options: AIOptions
     _log: Logger
     _actions: Dict[str, ActionEntry[StateT]] = {}
     _review_prompt: Optional[
@@ -35,7 +37,7 @@ class AI(Generic[StateT]):
     ] = None
     _review_plan: Optional[Callable[[TurnContext, StateT, Plan], Awaitable[Plan]]] = None
 
-    def __init__(self, options: AIOptions[StateT], log=Logger("teams.ai")) -> None:
+    def __init__(self, options: AIOptions, log=Logger("teams.ai")) -> None:
         self._options = options
         self._log = log
         self._actions = {
@@ -209,6 +211,16 @@ class AI(Generic[StateT]):
 
         # TODO: call review_plan
 
+        if state.temp.input == "":
+            state.temp.input = context.activity.text
+
+        if state.temp.history == "":
+            state.temp.history = state.conversation.history.to_str(
+                self._options.history.max_tokens,
+                "cl100k_base",
+                self._options.history.line_separator,
+            )
+
         plan = await self._options.planner.generate_plan(
             context, state, prompt, history_options=self._options.history
         )
@@ -227,8 +239,8 @@ class AI(Generic[StateT]):
             return False
 
         if self._options.history.track_history:
-            state.conversation.value.history.add(
-                "user", state.temp.value.input.strip(), self._options.history.max_turns * 2
+            state.conversation.history.add(
+                "user", state.temp.input.strip(), self._options.history.max_turns * 2
             )
 
             if self._options.history.assistant_history_type == "text":
@@ -239,9 +251,9 @@ class AI(Generic[StateT]):
                     )
                 )
 
-                state.conversation.value.history.add("assistant", text)
+                state.conversation.history.add("assistant", text)
             else:
-                state.conversation.value.history.add("assistant", plan.json())
+                state.conversation.history.add("assistant", plan.json())
 
         for cmd in plan.commands:
             if isinstance(cmd, PredictedDoCommand):
@@ -305,9 +317,18 @@ class AI(Generic[StateT]):
         return await action.func(context, state, command.entities, command.action)
 
     async def _on_say_command(
-        self, _context: TurnContext, _state: StateT, _command: PredictedSayCommand, _name: str
+        self, context: TurnContext, _state: StateT, command: PredictedSayCommand, _name: str
     ) -> bool:
-        # TODO: Adaptive Card
-        response = _command.response
-        await _context.send_activity(response)
+        response = command.response
+        card = parse_adaptive_card(response)
+
+        if card:  # Find adaptive card in response
+            attachment = CardFactory.adaptive_card(card)
+            activity = MessageFactory.attachment(attachment)
+            await context.send_activity(activity)
+        elif context.activity.channel_id == Channels.ms_teams:
+            await context.send_activity(response.replace("\n", "<br>"))
+        else:
+            await context.send_activity(response)
+
         return True

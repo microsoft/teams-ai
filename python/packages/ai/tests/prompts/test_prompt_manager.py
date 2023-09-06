@@ -10,25 +10,20 @@ from unittest import IsolatedAsyncioTestCase
 
 import pytest
 from botbuilder.core import TurnContext
+from botbuilder.schema import ChannelAccount, ConversationAccount
 
 from teams.ai.prompts import PromptManager, PromptTemplate, PromptTemplateConfig
-from teams.ai.state import (
-    ConversationState,
-    TempState,
-    TurnState,
-    TurnStateEntry,
-    UserState,
-)
+from teams.ai.state import ConversationState, TurnState, UserState
 
 TEST_ASSERTS_FOLDER: str = "tests/prompts/test_assets"
 
 
 class TestDefaultPromptManager(IsolatedAsyncioTestCase):
     def test_add_function(self):
-        def function_to_add_1(turn_context: TurnContext, turn_state: TurnState) -> str:
+        async def function_to_add_1(turn_context: TurnContext, turn_state: TurnState) -> str:
             raise NotImplementedError()
 
-        def function_to_add_2(turn_context: TurnContext, turn_state: TurnState) -> str:
+        async def function_to_add_2(turn_context: TurnContext, turn_state: TurnState) -> str:
             raise NotImplementedError()
 
         prompt_manager = PromptManager(TEST_ASSERTS_FOLDER)
@@ -84,12 +79,14 @@ class TestDefaultPromptManager(IsolatedAsyncioTestCase):
         return cast(TurnContext, {})
 
     def _mock_turn_state(self) -> TurnState:
-        conversation_state = ConversationState([])
-        user_state = UserState()
-        temp_state = TempState("input", "history", "output")
-        turn_state = TurnState[ConversationState, UserState, TempState](
-            conversation=TurnStateEntry(conversation_state),
-            user=TurnStateEntry(user_state),
-            temp=TurnStateEntry(temp_state),
+        return TurnState(
+            conversation=ConversationState(
+                "",
+                ConversationAccount(id="convo", name="Convo Name"),
+                ChannelAccount(id="bot", name="Bot Name"),
+            ),
+            user=UserState(
+                "",
+                ChannelAccount(id="user", name="User Name"),
+            ),
         )
-        return turn_state

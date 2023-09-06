@@ -22,7 +22,7 @@ from teams.ai.ai_history_options import AIHistoryOptions
 from teams.ai.prompts import PromptManager
 from teams.ai.prompts.prompt_template import PromptTemplate
 from teams.ai.prompts.utils import generate_sk_prompt_template_config
-from teams.ai.state import ConversationT, TempT, TurnState, UserT
+from teams.ai.state import TurnState
 
 from .command_type import CommandType
 from .openai_planner_options import OpenAIPlannerOptions
@@ -139,7 +139,7 @@ class OpenAIPlanner(Planner):
 
     async def _complete_prompt(
         self,
-        turn_state: TurnState[ConversationT, UserT, TempT],
+        turn_state: TurnState,
         prompt_template: PromptTemplate,
         history_options: AIHistoryOptions,
     ) -> str:
@@ -151,7 +151,7 @@ class OpenAIPlanner(Planner):
         self._log_request(f"\n{log_prefix} REQUEST: \n'''\n{prompt_template.text}\n'''")
 
         if is_chat_completion:
-            user_message = turn_state.temp.value.input
+            user_message = turn_state.temp.input
             result = await self._complete_chat(
                 prompt_template, turn_state, user_message, history_options
             )
@@ -167,7 +167,7 @@ class OpenAIPlanner(Planner):
     async def _complete_chat(
         self,
         prompt_template: PromptTemplate,
-        state: TurnState[ConversationT, UserT, TempT],
+        state: TurnState,
         user_message: str,
         options: AIHistoryOptions,
     ):
@@ -186,7 +186,7 @@ class OpenAIPlanner(Planner):
 
         # Populate conversation history
         if options.track_history:
-            history: List[Tuple[str, str]] = state.conversation.value.history.to_tuples(
+            history: List[Tuple[str, str]] = state.conversation.history.to_tuples(
                 options.max_tokens,
                 "cl100k_base",  # This function is only called for gpt-4 and gpt-3.5-turbo model
             )

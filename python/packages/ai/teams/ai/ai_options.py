@@ -4,19 +4,16 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass, field
-from typing import Generic, Optional, TypeVar
+from typing import Optional
 
 from teams.ai.planner import Planner
-from teams.ai.state import TurnState
 
 from .ai_history_options import AIHistoryOptions
 
-StateT = TypeVar("StateT", bound=TurnState)
-
 
 @dataclass
-class AIOptions(Generic[StateT]):
-    planner: Planner[StateT]
+class AIOptions:
+    planner: Planner
     """
     The planner to use for generating plans. For example,
     you could set this as an instance of `OpenAIPlanner` or

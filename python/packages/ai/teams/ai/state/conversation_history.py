@@ -91,7 +91,7 @@ class ConversationHistory(List[Message]):
             token_encoding (str): The token encoding to use. Available values are:
                                   "cl100k_base" for gpt-4 and gpt-3.5-turbo,
                                   "p50k_base" for text-davinci-002 and text-davinci-003.
-            delim (str): The delimiter to use between lines. Defaults to "\n".
+            delim (str): The delimiter to use between lines. Defaults to "\\n".
 
         Returns:
             str: The string representation of the conversation history.
@@ -99,11 +99,10 @@ class ConversationHistory(List[Message]):
 
         value = ""
         encoding = tiktoken.get_encoding(token_encoding)
-
         text_tokens = 0
+
         for item in self:
             line = f"[{item.role}]: {item.content}{delim}"
-
             line_tokens = len(encoding.encode(line))
             text_tokens = text_tokens + line_tokens
             if text_tokens > max_tokens:
