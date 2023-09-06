@@ -3,17 +3,20 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import TypeVar
 
 import uvicorn
-from botbuilder.core import (BotFrameworkAdapterSettings, MemoryStorage,
-                             TurnContext)
+from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
 from botbuilder.schema import Activity
 from fastapi import FastAPI, Request, Response
-from teams import (AIHistoryOptions, AIOptions, Application,
-                   ApplicationOptions, AzureOpenAIPlanner,
-                   AzureOpenAIPlannerOptions, ConversationState, TempState,
-                   TurnState, UserState)
+from teams import (
+    AIHistoryOptions,
+    AIOptions,
+    Application,
+    ApplicationOptions,
+    AzureOpenAIPlanner,
+    AzureOpenAIPlannerOptions,
+    TurnState,
+)
 
 from src.config import Config
 
