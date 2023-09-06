@@ -2,20 +2,21 @@
 # This workflow will build, run tests, and pack for the Microsoft.TeamsAI Python SDK.
 #
 
-name: python-ci
+name: Python CI
 
 on:
-  workflow_dispatch:
-  push:
-    paths:
-      - 'python/**'
+  workflow_call:
 
 jobs:
-  python-build-test-lint:
+  check:
+    name: Check
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
+    defaults:
+      run:
+        working-directory: ./python
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python ${{ matrix.python-version }}
@@ -23,12 +24,82 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
-        working-directory: ./python
         run: |
           python -m pip install --upgrade pip
           pip install poetry
           python scripts/install.py
-      - name: Build Test Lint
-        working-directory: ./python
+      - name: Check
         run: |
-          python scripts/ci.py
+          python scripts/check.py
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    defaults:
+      run:
+        working-directory: ./python
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          python scripts/install.py
+      - name: Build
+        run: |
+          python scripts/build.py
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    defaults:
+      run:
+        working-directory: ./python
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          python scripts/install.py
+      - name: Test
+        run: |
+          python scripts/test.py
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    defaults:
+      run:
+        working-directory: ./python
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          python scripts/install.py
+      - name: Lint
+        run: |
+          python scripts/lint.py
