@@ -1,6 +1,9 @@
 ﻿
 namespace Microsoft.TeamsAI.AI
 {
+    /// <summary>
+    /// The constants used by the AI system.
+    /// </summary>
     public static class AIConstants
     {
         /// <summary>
