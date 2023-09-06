@@ -236,19 +236,54 @@ class Application(Bot, Generic[StateT]):
             ):
                 return False
 
-            command_id = None
+            return self._activity_with_command_id(context.activity, select)
 
-            if isinstance(context.activity.value, object):
-                command_id = getattr(context.activity.value, "command_id")
+        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+            self._routes.append(Route[StateT](__selector__, func))
+            return func
 
-            if not isinstance(command_id, str):
+        return __call__
+
+    def message_preview_edit(self, select: Union[str, Pattern[str]]):
+        """
+        Registers a handler to process the 'edit' action of a message that's being
+        previewed by the user prior to sending.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_preview_edit("test")
+        async def on_message_preview_edit(context: TurnContext, state: TurnState):
+            return True
+
+        # Pass a function to this method
+        app.message_preview_edit("test")(on_message_preview_edit)
+        ```
+
+        #### Args:
+        - `select`: a string or regex pattern that matches against the activities
+        `command_id`
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/submitAction"
+                or not context.activity.value
+                or not self._activity_with_command_id(context.activity, select)
+            ):
                 return False
 
-            if isinstance(select, Pattern):
-                hits = re.match(select, command_id)
-                return hits is not None
+            message_preview_action = None
 
-            return command_id == select
+            if isinstance(context.activity.value, object):
+                message_preview_action = getattr(
+                    context.activity.value, "bot_message_preview_action"
+                )
+
+            if not isinstance(message_preview_action, str) or message_preview_action != "edit":
+                return False
+
+            return True
 
         def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
             self._routes.append(Route[StateT](__selector__, func))
@@ -458,3 +493,20 @@ class Application(Bot, Generic[StateT]):
 
     async def _load_state(self, activity: Activity) -> TurnState:
         return await TurnState.from_activity(activity, self._options.storage)
+
+    def _activity_with_command_id(
+        self, activity: Activity, match: Union[str, Pattern[str]]
+    ) -> bool:
+        command_id = None
+
+        if isinstance(activity.value, object):
+            command_id = getattr(activity.value, "command_id")
+
+        if not isinstance(command_id, str):
+            return False
+
+        if isinstance(match, Pattern):
+            hits = re.match(match, command_id)
+            return hits is not None
+
+        return command_id == match

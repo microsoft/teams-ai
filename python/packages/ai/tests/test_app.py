@@ -199,3 +199,53 @@ class TestApp(IsolatedAsyncioTestCase):
         )
 
         handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_message_preview_edit(self):
+        handler = mock.AsyncMock()
+        self.app.message_preview_edit("256")(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        @dataclass
+        class Value:
+            command_id: str
+            bot_message_preview_action: str
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/submitAction",
+                    text="test",
+                    value=Value("256", "edit"),
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_called_once()
