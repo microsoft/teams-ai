@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="3.0.0" />
+    <PackageReference Include="Azure.AI.ContentSafety" Version="1.0.0-beta.1" />
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.19.3" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.19.3" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.16.230615.1-preview">

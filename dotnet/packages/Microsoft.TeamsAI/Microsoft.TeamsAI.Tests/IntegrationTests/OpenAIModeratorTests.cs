@@ -77,7 +77,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
 
         [Theory(Skip = "This test should only be run manually.")]
         [InlineData("I want to kill them.", true)]
-        public async Task AzureContentSafetyModerator_ReviewPlan(string response, bool flagged)
+        public async Task OpenAIModerator_ReviewPlan(string response, bool flagged)
         {
             // Arrange
             var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
