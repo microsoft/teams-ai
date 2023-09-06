@@ -208,6 +208,54 @@ class Application(Bot, Generic[StateT]):
 
         return __call__
 
+    def anonymous_query_link(self, select: Union[str, Pattern[str]]):
+        """
+        Registers a handler for a command that performs anonymous link unfurling.
+
+        ```python
+        # Use this method as a decorator
+        @app.anonymous_query_link("test")
+        async def on_anonymous_query_link(context: TurnContext, state: TurnState):
+            print(context.activity.value.url)
+            return True
+
+        # Pass a function to this method
+        app.anonymous_query_link("test")(on_anonymous_query_link)
+        ```
+
+        #### Args:
+        - `select`: a string or regex pattern that matches against the activities
+        `command_id`
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/anonymousQueryLink"
+                or not context.activity.value
+            ):
+                return False
+
+            command_id = None
+
+            if isinstance(context.activity.value, object):
+                command_id = getattr(context.activity.value, "command_id")
+
+            if not isinstance(command_id, str):
+                return False
+
+            if isinstance(select, Pattern):
+                hits = re.match(select, command_id)
+                return hits is not None
+
+            return command_id == select
+
+        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+            self._routes.append(Route[StateT](__selector__, func))
+            return func
+
+        return __call__
+
     def before_turn(self, func: Callable[[TurnContext, StateT], Awaitable[bool]]):
         """
         Registers a new event listener that will be executed before turns.

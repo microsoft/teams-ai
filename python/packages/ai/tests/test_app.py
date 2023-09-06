@@ -5,6 +5,7 @@ Licensed under the MIT License.
 
 # pylint:disable=duplicate-code
 
+from dataclasses import dataclass
 from unittest import IsolatedAsyncioTestCase, mock
 
 import pytest
@@ -149,3 +150,52 @@ class TestApp(IsolatedAsyncioTestCase):
         )
 
         on_member_added.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_anonymous_query_link(self):
+        handler = mock.AsyncMock()
+        self.app.anonymous_query_link("256")(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        @dataclass
+        class Value:
+            command_id: str
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/anonymousQueryLink",
+                    text="test",
+                    value=Value("256"),
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_called_once()
