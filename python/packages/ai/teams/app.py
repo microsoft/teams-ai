@@ -25,6 +25,7 @@ from teams.ai import AI, TurnState
 from .activity_type import ActivityType, ConversationUpdateType
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
+from .message_preview_action import MessagePreviewAction
 from .route import Route
 from .typing_timer import TypingTimer
 
@@ -244,24 +245,25 @@ class Application(Bot, Generic[StateT]):
 
         return __call__
 
-    def message_preview_edit(self, select: Union[str, Pattern[str]]):
+    def message_preview(self, command_id: Union[str, Pattern[str]], action: MessagePreviewAction):
         """
         Registers a handler to process the 'edit' action of a message that's being
         previewed by the user prior to sending.
 
         ```python
         # Use this method as a decorator
-        @app.message_preview_edit("test")
+        @app.message_preview("test", "edit")
         async def on_message_preview_edit(context: TurnContext, state: TurnState):
             return True
 
         # Pass a function to this method
-        app.message_preview_edit("test")(on_message_preview_edit)
+        app.message_preview("test", "edit")(on_message_preview_edit)
         ```
 
         #### Args:
-        - `select`: a string or regex pattern that matches against the activities
+        - `command_id`: a string or regex pattern that matches against the activities
         `command_id`
+        - `action`: the action to subscribe to
         """
 
         def __selector__(context: TurnContext):
@@ -269,7 +271,7 @@ class Application(Bot, Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/submitAction"
                 or not context.activity.value
-                or not self._activity_with_command_id(context.activity, select)
+                or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
 
@@ -280,7 +282,7 @@ class Application(Bot, Generic[StateT]):
                     context.activity.value, "bot_message_preview_action"
                 )
 
-            if not isinstance(message_preview_action, str) or message_preview_action != "edit":
+            if not isinstance(message_preview_action, str) or message_preview_action != action:
                 return False
 
             return True

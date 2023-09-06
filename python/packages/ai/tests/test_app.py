@@ -201,9 +201,9 @@ class TestApp(IsolatedAsyncioTestCase):
         handler.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_message_preview_edit(self):
+    async def test_message_preview(self):
         handler = mock.AsyncMock()
-        self.app.message_preview_edit("256")(handler)
+        self.app.message_preview("256", "edit")(handler)
         self.assertEqual(len(self.app._routes), 1)
 
         @dataclass
