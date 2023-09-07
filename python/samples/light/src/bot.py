@@ -48,7 +48,6 @@ app = Application[AppTurnState](
                 OpenAIPlannerOptions(
                     api_key=config.open_ai_key,
                     default_model="gpt-3.5-turbo",
-                    log_requests=True,
                     prompt_folder=f"{os.getcwd()}/src/prompts",
                 )
             ),

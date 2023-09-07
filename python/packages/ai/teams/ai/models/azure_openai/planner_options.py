@@ -22,7 +22,6 @@ class AzureOpenAIPlannerOptions(OpenAIPlannerOptions):
         organization: Optional[str] = None,
         one_say_per_turn: bool = False,
         use_system_message: bool = False,
-        log_requests: bool = False,
     ):
         super().__init__(
             api_key,
@@ -33,5 +32,4 @@ class AzureOpenAIPlannerOptions(OpenAIPlannerOptions):
             endpoint=endpoint,
             one_say_per_turn=one_say_per_turn,
             use_system_message=use_system_message,
-            log_requests=log_requests,
         )

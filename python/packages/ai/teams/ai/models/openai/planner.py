@@ -319,5 +319,5 @@ class OpenAIPlanner(Planner):
         return self._options.default_model
 
     def _log_request(self, request: str) -> None:
-        if self._options.log_requests and self.log:
-            self.log.info(request)
+        if self.log:
+            self.log.debug(request)

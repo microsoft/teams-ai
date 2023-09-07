@@ -15,7 +15,6 @@ class OpenAIPlannerOptions:
     endpoint: Optional[str]
     one_say_per_turn: bool
     use_system_message: bool
-    log_requests: bool
 
     def __init__(
         self,
@@ -28,7 +27,6 @@ class OpenAIPlannerOptions:
         endpoint: Optional[str] = None,
         one_say_per_turn: bool = False,
         use_system_message: bool = False,
-        log_requests: bool = False,
     ):
         self.api_key = api_key
         self.default_model = default_model
@@ -38,4 +36,3 @@ class OpenAIPlannerOptions:
         self.endpoint = endpoint
         self.one_say_per_turn = one_say_per_turn
         self.use_system_message = use_system_message
-        self.log_requests = log_requests
