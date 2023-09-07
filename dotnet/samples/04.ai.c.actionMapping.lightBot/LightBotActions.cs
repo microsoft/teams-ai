@@ -27,13 +27,13 @@ namespace LightBot
         {
             // Try to parse entities returned by the model.
             // Expecting "time" to be a number of milliseconds to pause.
-            if (entities.TryGetValue("time", out object time))
+            if (entities.TryGetValue("time", out object? time))
             {
-                if (time is string timeString)
+                if (time != null && time is string timeString)
                 {
                     if (int.TryParse(timeString, out int timeInt))
                     {
-                        await turnContext.SendActivityAsync(MessageFactory.Text($"[pausing for {timeInt/1000} seconds]"));
+                        await turnContext.SendActivityAsync(MessageFactory.Text($"[pausing for {timeInt / 1000} seconds]"));
                         await Task.Delay(timeInt);
                     }
                 }

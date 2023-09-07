@@ -1,4 +1,4 @@
-﻿using Microsoft.TeamsAI.AI.AzureContentSafety;
+﻿using Azure.AI.ContentSafety;
 
 namespace Microsoft.TeamsAI.AI.Moderator
 {
@@ -15,11 +15,6 @@ namespace Microsoft.TeamsAI.AI.Moderator
         public string Endpoint { get; set; }
 
         /// <summary>
-        /// Azure Content Safety API version.
-        /// </summary>
-        public string? ApiVersion { get; set; }
-
-        /// <summary>
         /// Which parts of the conversation to moderate
         /// </summary>
         public ModerationType Moderate { get; set; }
@@ -30,18 +25,17 @@ namespace Microsoft.TeamsAI.AI.Moderator
         public int SeverityLevel { get; set; } = 2;
 
         /// <summary>
-        /// The categories will be analyzed.
+        /// The categories will be analyzed. If not assigned, a default set of the categories' analysis results will be returned.
         /// </summary>
-        public List<AzureContentSafetyHarmCategory>? Categories { get; set; }
+        public IList<TextCategory>? Categories { get; set; }
 
         /// <summary>
         /// The names of blocklists.
         /// </summary>
-        public List<string>? BlocklistNames { get; set; }
+        public IList<string>? BlocklistNames { get; set; }
 
         /// <summary>
-        /// When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit.
-        /// When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
+        /// When set to true, further analyses of harmful content will not be performed in cases where blocklists are hit. When set to false, all analyses of harmful content will be performed, whether or not blocklists are hit.
         /// </summary>
         public bool? BreakByBlocklists { get; set; }
 

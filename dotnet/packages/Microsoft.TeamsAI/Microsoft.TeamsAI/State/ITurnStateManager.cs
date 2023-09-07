@@ -12,7 +12,7 @@ namespace Microsoft.TeamsAI.State
         /// Loads all of the state scopes for the current turn.
         /// </summary>
         /// <param name="storage">Storage provider to load state scopes from.</param>
-        /// <param name="context">Context for the current turn of conversation with the user.</param>
+        /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
         /// <returns>The loaded state scopes.</returns>
         Task<TState> LoadStateAsync(IStorage? storage, ITurnContext turnContext);
 
@@ -20,8 +20,8 @@ namespace Microsoft.TeamsAI.State
         /// Saves all of the state scopes for the current turn.
         /// </summary>
         /// <param name="storage">Storage provider to save state scopes to.</param>
-        /// <param name="context">Context for the current turn of conversation with the user.</param>
-        /// <param name="state">State scopes to save.</param>
+        /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
+        /// <param name="turnState">State scopes to save.</param>
         Task SaveStateAsync(IStorage? storage, ITurnContext turnContext, TState turnState);
     }
 

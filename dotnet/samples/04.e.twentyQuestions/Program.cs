@@ -1,6 +1,4 @@
-using TwentyQuestions;
-
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
@@ -8,6 +6,7 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
+using TwentyQuestions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,19 +102,13 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
     // Create AzureOpenAIPlanner
     IPlanner<GameState> planner = new AzureOpenAIPlanner<GameState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
         loggerFactory.CreateLogger<AzureOpenAIPlanner<GameState>>());
 
     // Create AzureContentSafetyModerator
-    IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(
-        sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<GameState>>(),
-        moderatorHttpClient);
+    IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
     // Create Application
     AIHistoryOptions aiHistoryOptions = new()
