@@ -1,5 +1,5 @@
 ﻿using Microsoft.SemanticKernel.SemanticFunctions;
-using Microsoft.TeamsAI.Exceptions;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static Microsoft.SemanticKernel.SemanticFunctions.PromptTemplateConfig;
@@ -196,7 +196,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             if (result == null)
             {
-                throw new PromptManagerException("Failed to deserialize prompt configuration JSON string");
+                throw new SerializationException("Failed to deserialize prompt configuration JSON string");
             }
 
             return result;

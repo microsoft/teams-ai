@@ -2,7 +2,6 @@
 using Microsoft.TeamsAI.AI.Planner;
 using System.Reflection;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Utilities;
@@ -110,7 +109,7 @@ namespace Microsoft.TeamsAI.AI
                 }
                 else
                 {
-                    throw new AIException($"Attempting to register an already existing action `{name}` that does not allow overrides.");
+                    throw new InvalidOperationException($"Attempting to register an already existing action `{name}` that does not allow overrides.");
                 }
             }
 
@@ -150,7 +149,7 @@ namespace Microsoft.TeamsAI.AI
             HashSet<string> uniquenessCheck = new(from x in result select x.Name, StringComparer.OrdinalIgnoreCase);
             if (result.Count > uniquenessCheck.Count)
             {
-                throw new AIException("Function overloads are not supported, please differentiate function names");
+                throw new InvalidOperationException("Function overloads are not supported, please differentiate function names");
             }
 
             // Register the actions
@@ -175,7 +174,7 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
+        /// <exception cref="InvalidOperationException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
@@ -188,7 +187,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (aIOptions.Prompt == null)
                 {
-                    throw new AIException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
+                    throw new InvalidOperationException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
                 }
                 else
                 {
@@ -220,7 +219,7 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
+        /// <exception cref="InvalidOperationException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, PromptTemplate prompt, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
@@ -316,7 +315,7 @@ namespace Microsoft.TeamsAI.AI
                 }
                 else
                 {
-                    throw new AIException($"Unknown command of {command.Type} predicted");
+                    throw new InvalidOperationException($"Unknown command of {command.Type} predicted");
                 }
             }
 
