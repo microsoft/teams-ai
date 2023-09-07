@@ -10,7 +10,8 @@ using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.AI.Action
 {
-    public class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+
+    internal class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly ILogger? _logger;
 
@@ -43,7 +44,7 @@ namespace Microsoft.TeamsAI.AI.Action
         [Action(DefaultActionTypes.RateLimitedActionName)]
         public Task<bool> RateLimitedAction()
         {
-            throw new AIException("An AI request failed because it was rate limited");
+            throw new TeamsAIException("An AI request failed because it was rate limited");
         }
 
         [Action(DefaultActionTypes.PlanReadyActionName)]
@@ -55,7 +56,7 @@ namespace Microsoft.TeamsAI.AI.Action
         }
 
         [Action(DefaultActionTypes.DoCommandActionName)]
-        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData, [ActionName] string action)
+        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData)
         {
             Verify.ParamNotNull(doCommandActionData);
 

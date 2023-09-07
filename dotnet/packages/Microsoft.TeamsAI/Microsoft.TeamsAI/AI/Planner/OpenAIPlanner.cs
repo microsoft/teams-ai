@@ -14,6 +14,7 @@ using PromptTemplate = Microsoft.TeamsAI.AI.Prompt.PromptTemplate;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 using System.Runtime.CompilerServices;
+using System.Net;
 
 // For Unit Test
 [assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
@@ -34,6 +35,13 @@ namespace Microsoft.TeamsAI.AI.Planner
         private TOptions _options { get; }
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="OpenAIPlanner{TState, TOptions}"/> class.
+        /// </summary>
+        /// <param name="options">The options to configure the planner.</param>
+        /// <param name="logger">The logger instance.</param>
+        /// <exception cref="ArgumentException"></exception>
         public OpenAIPlanner(TOptions options, ILogger? logger = null)
         {
             // TODO: Configure Retry Handler
@@ -128,9 +136,16 @@ namespace Microsoft.TeamsAI.AI.Planner
 
                 return result;
             }
+            catch (AIException ex) when (ex.ErrorCode == AIException.ErrorCodes.Throttling)
+            {
+                // TODO: SK recently updated AIException to HttpOperationException, update this when we update SK dependency
+
+                // rate limited
+                throw new HttpOperationException($"Error while executing AI prompt completion: {ex.Message}", (HttpStatusCode)429);
+            }
             catch (Exception ex)
             {
-                throw new PlannerException($"Failed to perform AI prompt completion: {ex.Message}", ex);
+                throw new TeamsAIException($"Error while executing AI prompt completion: {ex.Message}", ex);
             }
         }
 
@@ -146,10 +161,10 @@ namespace Microsoft.TeamsAI.AI.Planner
             {
                 result = await CompletePromptAsync(turnContext, turnState, promptTemplate, options, cancellationToken);
             }
-            catch (PlannerException ex)
+            catch (HttpOperationException ex)
             {
                 // Ensure we weren't rate limited
-                if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
+                if (ex.isRateLimitedStatusCode())
                 {
                     Plan plan = new();
                     plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
@@ -191,7 +206,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                 }
                 catch (Exception ex)
                 {
-                    throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
+                    throw new TeamsAIException($"Error while generating plan from model response: {ex.Message}. Model response: {result}", ex);
                 }
 
 
@@ -228,7 +243,7 @@ namespace Microsoft.TeamsAI.AI.Planner
 
             ITextCompletion textCompletion = _kernel.GetService<ITextCompletion>();
 
-            var completions = await textCompletion.GetCompletionsAsync(promptTemplate.Text, CompleteRequestSettings.FromCompletionConfig(skPromptTemplate.Completion), cancellationToken);
+            IReadOnlyList<ITextResult> completions = await textCompletion.GetCompletionsAsync(promptTemplate.Text, CompleteRequestSettings.FromCompletionConfig(skPromptTemplate.Completion), cancellationToken);
             return completions[0];
         }
 
@@ -293,7 +308,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                 chatHistory.AddUserMessage(userMessage);
             }
 
-            var completions = await chatCompletion.GetChatCompletionsAsync(chatHistory, chatRequestSettings, cancellationToken);
+            IReadOnlyList<IChatResult> completions = await chatCompletion.GetChatCompletionsAsync(chatHistory, chatRequestSettings, cancellationToken);
 
             return completions[0];
         }
@@ -315,6 +330,11 @@ namespace Microsoft.TeamsAI.AI.Planner
     /// <inheritdoc/>
     public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions> where TState : ITurnState<StateBase, StateBase, TempState>
     {
+        /// <summary>
+        /// Creates a new <see cref="OpenAIPlanner{TState}"/> instance.
+        /// </summary>
+        /// <param name="options">The options to configure the planner.</param>
+        /// <param name="logger">The logger instance.</param>
         public OpenAIPlanner(OpenAIPlannerOptions options, ILogger? logger = null) : base(options, logger)
         {
         }

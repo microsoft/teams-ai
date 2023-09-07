@@ -103,7 +103,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             var rateLimitedAction = actions[DefaultActionTypes.RateLimitedActionName];
-            var exception = await Assert.ThrowsAsync<AIException>(async () => await rateLimitedAction.Handler.PerformAction(turnContext, turnState, null, null));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await rateLimitedAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
             Assert.NotNull(exception);

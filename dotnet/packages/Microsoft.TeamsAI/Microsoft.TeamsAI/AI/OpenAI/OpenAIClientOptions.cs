@@ -1,5 +1,8 @@
 ﻿namespace Microsoft.TeamsAI.AI.OpenAI
 {
+    /// <summary>
+    /// Options for the OpenAI client.
+    /// </summary>
     public class OpenAIClientOptions
     {
         /// <summary>

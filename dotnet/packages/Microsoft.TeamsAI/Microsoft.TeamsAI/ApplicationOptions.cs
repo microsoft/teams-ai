@@ -6,9 +6,10 @@ using Microsoft.Bot.Builder;
 namespace Microsoft.TeamsAI
 {
     /// <summary>
-    /// Options for the <see cref="Application{TState, TTurnStateManager}"/> class
+    /// Options for the <see cref="Application{TState, TTurnStateManager}"/> class.
     /// </summary>
-    /// <typeparam name="TState">Type of the turn state</typeparam>
+    /// <typeparam name="TState">Type of the turn state.</typeparam>
+    /// <typeparam name="TTurnStateManager">Type of the turn state manager.</typeparam>
     public class ApplicationOptions<TState, TTurnStateManager>
         where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>
@@ -25,7 +26,7 @@ namespace Microsoft.TeamsAI
         /// Optional. Application ID of the bot.
         /// </summary>
         /// <remarks>
-        /// If using the <see cref="ApplicationOptions{TState}.LongRunningMessages"/> option or calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, Schema.Activity, BotCallbackHandler, CancellationToken)"/> method, this property is required.
+        /// If using the <see cref="ApplicationOptions{TState, TTurnStateManager}.LongRunningMessages"/> option or calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, Bot.Schema.Activity, BotCallbackHandler, CancellationToken)"/> method, this property is required.
         /// </remarks>
         public string? BotAppId { get; set; }
 
@@ -49,7 +50,7 @@ namespace Microsoft.TeamsAI
         /// Optional. Logger that will be used in this application.
         /// </summary>
         /// <remarks>
-        /// <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}"/> and <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}.AzureOpenAIPlanner"/> prompt completion data will is logged at the <see cref="LogLevel.Info"/> level.
+        /// <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}"/> and <see cref="AI.Planner.AzureOpenAIPlanner{TState}"/> prompt completion data will is logged at the <see cref="LogLevel.Information"/> level.
         /// </remarks>
         public ILogger? Logger { get; set; }
 
@@ -77,6 +78,4 @@ namespace Microsoft.TeamsAI
         /// </remarks>
         public bool? LongRunningMessages { get; set; } = false;
     }
-
-    public class ApplicationOptions<TurnState> { }
 }

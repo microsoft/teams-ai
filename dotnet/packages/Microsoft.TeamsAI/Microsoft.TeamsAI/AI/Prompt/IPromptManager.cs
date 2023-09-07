@@ -3,6 +3,10 @@ using Microsoft.TeamsAI.State;
 
 namespace Microsoft.TeamsAI.AI.Prompt
 {
+    /// <summary>
+    /// Interface for a prompt manager.
+    /// </summary>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public interface IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
@@ -22,7 +26,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// </remarks>
         /// <param name="name">The name of the function.</param>
         /// <param name="promptFunction">Delegate to return on name match.</param>
-        /// <param name="allowOverrides">Whether to allow overriding an existing fuction.</param>
+        /// <param name="allowOverrides">Whether to allow overriding an existing function.</param>
         /// <returns>The prompt manager for chaining.</returns>
         IPromptManager<TState> AddFunction(string name, PromptFunction<TState> promptFunction, bool allowOverrides = false);
 
@@ -53,17 +57,15 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <summary>
         /// Renders a prompt template by name.
         /// </summary>
-        /// <param name="kernel">The semantic kernel</param>
         /// <param name="turnContext">Current application turn context.</param>
         /// <param name="turnState">Current turn state.</param>
-        /// <param name="promptTemplate">Prompt template to render.</param>
+        /// <param name="name">Name of prompt template.</param>
         /// <returns>The rendered prompt template</returns>
         Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name);
 
         /// <summary>
         /// Renders a prompt template.
         /// </summary>
-        /// <param name="kernel">The semantic kernel</param>
         /// <param name="turnContext">Current application turn context.</param>
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>

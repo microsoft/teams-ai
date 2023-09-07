@@ -1,6 +1,6 @@
 ## Linked issues
 
-Resolves: # (issue number)
+closes: # (issue number)
 
 ## Details
 

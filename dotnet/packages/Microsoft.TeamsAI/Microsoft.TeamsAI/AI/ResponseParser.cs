@@ -1,11 +1,10 @@
 ﻿using AdaptiveCards;
 using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.Exceptions;
 using System.Text.Json;
 
 namespace Microsoft.TeamsAI.AI
 {
-    public class ResponseParser
+    internal class ResponseParser
     {
         private static readonly string BREAKING_CHARACTERS = "`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./ \r\n\t";
         private static readonly string NAME_BREAKING_CHARACTERS = "`~!@#$%^&*()+={}|[]\\:\";\'<>?,./ \r\n\t";
@@ -23,9 +22,12 @@ namespace Microsoft.TeamsAI.AI
         {
             int length = text.Length;
 
-            if (length < 2) return null;
+            if (length < 2)
+            {
+                return null;
+            }
 
-            var result = new List<string>();
+            List<string> result = new();
 
             int startIndex;
             int endIndex = -1;
@@ -33,14 +35,20 @@ namespace Microsoft.TeamsAI.AI
             {
                 // Find the first "{"
                 startIndex = text.IndexOf('{', endIndex + 1);
-                if (startIndex == -1) return result;
+                if (startIndex == -1)
+                {
+                    return result;
+                }
 
                 // Find the first "}" such that all the contents sandwiched between S & E is a valid JSON.
                 endIndex = startIndex;
                 while (endIndex < length)
                 {
                     endIndex = text.IndexOf('}', endIndex + 1);
-                if (endIndex == -1) return result;
+                    if (endIndex == -1)
+                    {
+                        return result;
+                    }
 
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
 
@@ -71,7 +79,10 @@ namespace Microsoft.TeamsAI.AI
         {
             string? firstJsonString = GetFirstJsonString(text);
 
-            if (firstJsonString == null) return null;
+            if (firstJsonString == null)
+            {
+                return null;
+            }
 
             return AdaptiveCard.FromJson(firstJsonString);
         }
@@ -170,7 +181,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (!AITypes.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
                 }
 
                 string actionName = "";
@@ -337,7 +348,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (!AITypes.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
                 }
 
                 // Parse command (skips initial SAY token)
@@ -372,7 +383,7 @@ namespace Microsoft.TeamsAI.AI
         }
 
         /// <summary>
-        /// Simple text tokensizer. Breaking characters are added to list as separate tokens.
+        /// Simple text tokenizer. Breaking characters are added to list as separate tokens.
         /// </summary>
         /// <param name="text">Any input string</param>
         /// <returns>A list of tokens</returns>
@@ -380,7 +391,10 @@ namespace Microsoft.TeamsAI.AI
         {
             List<string> tokens = new();
 
-            if (text.Length < 1) return tokens;
+            if (text.Length < 1)
+            {
+                return tokens;
+            }
 
             string token = "";
             int length = text.Length;
@@ -458,7 +472,7 @@ namespace Microsoft.TeamsAI.AI
         }
     }
 
-    enum DoCommandParseState
+    internal enum DoCommandParseState
     {
         FindActionName,
         InActionName,

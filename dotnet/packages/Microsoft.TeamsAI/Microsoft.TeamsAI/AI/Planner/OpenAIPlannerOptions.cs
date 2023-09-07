@@ -2,6 +2,9 @@
 
 namespace Microsoft.TeamsAI.AI.Planner
 {
+    /// <summary>
+    /// Options for the OpenAI planner.
+    /// </summary>
     public class OpenAIPlannerOptions
     {
         /// <summary>
