@@ -56,7 +56,7 @@ namespace Microsoft.TeamsAI.AI.Action
         }
 
         [Action(AIConstants.DoCommandActionName)]
-        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData, [ActionName] string action)
+        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData)
         {
             Verify.ParamNotNull(doCommandActionData);
 
