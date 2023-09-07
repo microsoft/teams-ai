@@ -18,7 +18,7 @@ from typing import (
 )
 
 from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
-from botbuilder.schema import Activity, ActivityTypes, ErrorResponseException
+from botbuilder.schema import Activity, ActivityTypes
 
 from teams.ai import AI, TurnState
 
@@ -404,7 +404,7 @@ class Application(Bot, Generic[StateT]):
         try:
             if self._options.start_typing_timer:
                 await self.typing.start(context)
-            
+
             state: TurnState
 
             if self._turn_state_factory:

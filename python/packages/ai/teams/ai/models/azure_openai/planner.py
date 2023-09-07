@@ -8,8 +8,9 @@ from semantic_kernel.connectors.ai.open_ai import (
     AzureTextCompletion,
 )
 
-from .azure_openai_planner_options import AzureOpenAIPlannerOptions
-from .openai_planner import OpenAIPlanner
+from teams.ai.models.openai import OpenAIPlanner
+
+from .planner_options import AzureOpenAIPlannerOptions
 
 
 class AzureOpenAIPlanner(OpenAIPlanner):
