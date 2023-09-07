@@ -10,7 +10,7 @@ from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ActivityTypes, ErrorResponseException
 
 
-class TypingTimer:
+class Typing:
     """
     Encapsulates the logic for sending "typing" activity to the user.
     """

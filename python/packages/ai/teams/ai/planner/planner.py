@@ -4,7 +4,8 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Awaitable, Callable, Generic, TypeVar, Union
+from logging import Logger
+from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar, Union
 
 from botbuilder.core import TurnContext
 
@@ -21,6 +22,8 @@ class Planner(ABC, Generic[StateT]):
     """
     interface implemented by all planners
     """
+
+    log: Optional[Logger] = None
 
     @abstractmethod
     async def generate_plan(

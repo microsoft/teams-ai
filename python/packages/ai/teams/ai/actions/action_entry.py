@@ -12,18 +12,19 @@ from teams.ai.state import TurnState
 from .action_turn_context import ActionTurnContext
 
 StateT = TypeVar("StateT", bound=TurnState)
+ActionHandler = Callable[[ActionTurnContext, StateT], Awaitable[bool]]
 
 
 class ActionEntry(Generic[StateT]):
     name: str
     allow_overrides: bool
-    func: Callable[[ActionTurnContext, StateT], Awaitable[bool]]
+    func: ActionHandler[StateT]
 
     def __init__(
         self,
         name: str,
         allow_overrides: bool,
-        func: Callable[[ActionTurnContext, StateT], Awaitable[bool]],
+        func: ActionHandler[StateT],
     ) -> None:
         self.name = name
         self.allow_overrides = allow_overrides

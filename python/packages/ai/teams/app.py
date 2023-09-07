@@ -18,7 +18,7 @@ from typing import (
 )
 
 from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
-from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes, ErrorResponseException
 
 from teams.ai import AI, TurnState
 
@@ -26,8 +26,8 @@ from .activity_type import ActivityType, ConversationUpdateType
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .message_preview_action import MessagePreviewAction
-from .route import Route
-from .typing_timer import TypingTimer
+from .route import Route, RouteHandler
+from .typing import Typing
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -45,21 +45,23 @@ class Application(Bot, Generic[StateT]):
     and other AI capabilities.
     """
 
+    typing: Typing
+
     _ai: Optional[AI[StateT]]
     _options: ApplicationOptions
     _adapter: Optional[BotFrameworkAdapter] = None
-    _typing_delay = 1000
-    _before_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
-    _after_turn: List[Callable[[TurnContext, StateT], Awaitable[bool]]] = []
+    _before_turn: List[RouteHandler[StateT]] = []
+    _after_turn: List[RouteHandler[StateT]] = []
+    _routes: List[Route[StateT]] = []
     _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
     _turn_state_factory: Optional[Callable[[Activity], Awaitable[StateT]]] = None
-    _routes: List[Route[StateT]] = []
 
     def __init__(self, options=ApplicationOptions()) -> None:
         """
         Creates a new Application instance.
         """
-        self._ai = AI(options.ai, options.logger) if options.ai else None
+        self.typing = Typing()
+        self._ai = AI(options.ai, log=options.logger) if options.ai else None
         self._options = options
         self._routes = []
 
@@ -120,7 +122,7 @@ class Application(Bot, Generic[StateT]):
         def __selector__(context: TurnContext):
             return type == str(context.activity.type)
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+        def __call__(func: RouteHandler[StateT]):
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
@@ -157,7 +159,7 @@ class Application(Bot, Generic[StateT]):
             i = context.activity.text.find(select)
             return i > -1
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+        def __call__(func: RouteHandler[StateT]):
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
@@ -203,7 +205,7 @@ class Application(Bot, Generic[StateT]):
 
             return False
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+        def __call__(func: RouteHandler[StateT]):
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
@@ -239,7 +241,7 @@ class Application(Bot, Generic[StateT]):
 
             return self._activity_with_command_id(context.activity, command_id)
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+        def __call__(func: RouteHandler[StateT]):
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
@@ -287,13 +289,13 @@ class Application(Bot, Generic[StateT]):
 
             return True
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+        def __call__(func: RouteHandler[StateT]):
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def before_turn(self, func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+    def before_turn(self, func: RouteHandler[StateT]):
         """
         Registers a new event listener that will be executed before turns.
         This method can be used as either a decorator or a method and
@@ -314,7 +316,7 @@ class Application(Bot, Generic[StateT]):
         self._before_turn.append(func)
         return func
 
-    def after_turn(self, func: Callable[[TurnContext, StateT], Awaitable[bool]]):
+    def after_turn(self, func: RouteHandler[StateT]):
         """
         Registers a new event listener that will be executed after turns.
         This method can be used as either a decorator or a method and
@@ -399,10 +401,10 @@ class Application(Bot, Generic[StateT]):
         await self._start_long_running_call(context, self._on_turn)
 
     async def _on_turn(self, context: TurnContext):
-        typing = TypingTimer()
-
         try:
-            await typing.start(context)
+            if self._options.start_typing_timer:
+                await self.typing.start(context)
+            
             state: TurnState
 
             if self._turn_state_factory:
@@ -458,7 +460,7 @@ class Application(Bot, Generic[StateT]):
         except ApplicationError as err:
             await self._on_error(context, err)
         finally:
-            typing.stop()
+            self.typing.stop()
 
     async def _on_activity(self, context: TurnContext, state: TurnState) -> Tuple[bool, int]:
         matches = 0
@@ -491,6 +493,7 @@ class Application(Bot, Generic[StateT]):
         if self._error:
             return await self._error(context, err)
 
+        self._options.logger.error(err)
         raise err
 
     async def _load_state(self, activity: Activity) -> TurnState:

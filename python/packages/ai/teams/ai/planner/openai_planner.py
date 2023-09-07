@@ -3,7 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 from datetime import datetime
-from typing import Any, Awaitable, Callable, List, Tuple, Union
+from logging import Logger
+from typing import Any, Awaitable, Callable, List, Optional, Tuple, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -41,11 +42,14 @@ class OpenAIPlanner(Planner):
     Planner that uses OpenAI's API to generate prompts
     """
 
+    log: Optional[Logger]
+
     _options: OpenAIPlannerOptions
     _sk: sk.Kernel
     _prompt_manager: PromptManager
 
     def __init__(self, options: OpenAIPlannerOptions) -> None:
+        self.log = None
         self._options = options
         self._prompt_manager = PromptManager(options.prompt_folder)
         self._sk = sk.Kernel()
@@ -226,5 +230,5 @@ class OpenAIPlanner(Planner):
         return self._options.default_model
 
     def _log_request(self, request: str) -> None:
-        if self._options.log_requests:
-            print(request)
+        if self._options.log_requests and self.log:
+            self.log.info(request)

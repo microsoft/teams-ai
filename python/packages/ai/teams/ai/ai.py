@@ -9,7 +9,7 @@ from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar, U
 from botbuilder.core import CardFactory, MessageFactory, TurnContext
 from botframework.connector import Channels
 
-from teams.ai.actions import ActionEntry, ActionTurnContext, ActionTypes
+from teams.ai.actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
 from teams.ai.planner import Plan, PredictedDoCommand, PredictedSayCommand
 from teams.ai.planner.response_parser import parse_adaptive_card
 from teams.ai.prompts import PromptTemplate
@@ -37,9 +37,10 @@ class AI(Generic[StateT]):
     ] = None
     _review_plan: Optional[Callable[[TurnContext, StateT, Plan], Awaitable[Plan]]] = None
 
-    def __init__(self, options: AIOptions, log=Logger("teams.ai")) -> None:
+    def __init__(self, options: AIOptions, *, log=Logger("teams.ai")) -> None:
         self._options = options
         self._log = log
+        self._options.planner.log = log
         self._actions = {
             ActionTypes.UNKNOWN_ACTION: ActionEntry(
                 ActionTypes.UNKNOWN_ACTION, True, self._on_unknown_action
@@ -82,7 +83,7 @@ class AI(Generic[StateT]):
         are found `Default: False`
         """
 
-        def __call__(func: Callable[[ActionTurnContext, StateT], Awaitable[bool]]):
+        def __call__(func: ActionHandler[StateT]):
             action_name = name
 
             if not action_name:
