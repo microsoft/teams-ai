@@ -1,9 +1,9 @@
 import { strict as assert } from "assert";
 import { Message, FunctionRegistry, GPT3Tokenizer, Prompt, PromptFunctions, PromptMemory, Tokenizer, VolatileMemory } from "promptrix";
-import { PromptResponse, PromptResponseValidator, Validation } from "./ai/types";
-import { DefaultResponseValidator } from "./DefaultResponseValidator";
-import { TestModel } from "./TestModel";
-import { AlphaWave } from "./LLMClient";
+import { PromptResponse, PromptResponseValidator, Validation } from "./types";
+import { DefaultResponseValidator } from "../DefaultResponseValidator";
+import { TestModel } from "../TestModel";
+import { AlphaWave } from "../LLMClient";
 
 class TestValidator implements PromptResponseValidator {
     public feedback: string = 'Something is wrong';

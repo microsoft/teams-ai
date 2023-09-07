@@ -1,16 +1,11 @@
 import { TurnContext } from 'botbuilder';
-import {
-    DefaultConversationState,
-    DefaultTempState,
-    DefaultTurnState,
-    DefaultUserState
-} from './DefaultTurnStateManager';
 import { Plan, Planner, PredictedSayCommand } from './Planner';
+import { TurnState } from '../TurnState';
 
 /**
  * A planner used for testing.
  */
-export class TestPlanner implements Planner<DefaultTurnState> {
+export class TestPlanner implements Planner<TurnState> {
     public constructor(plan?: Plan, promptResponse?: string) {
         this.plan = plan || {
             type: 'plan',
@@ -25,7 +20,7 @@ export class TestPlanner implements Planner<DefaultTurnState> {
 
     public generatePlan(
         context: TurnContext,
-        state: DefaultTurnState<DefaultConversationState, DefaultUserState, DefaultTempState>,
+        state: TurnState,
     ): Promise<Plan> {
         return Promise.resolve(this.plan);
     }

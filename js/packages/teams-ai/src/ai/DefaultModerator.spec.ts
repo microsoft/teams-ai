@@ -1,28 +1,24 @@
 import { strict as assert } from 'assert';
 import { DefaultModerator } from './DefaultModerator';
-import { ActivityTypes, TestAdapter, TurnContext } from 'botbuilder-core';
-import { DefaultTurnState } from './DefaultTurnStateManager';
-import { TurnStateEntry } from './TurnState';
-import { ConversationHistory } from './ConversationHistory';
+import { ActivityTypes, TestAdapter, TurnContext, MemoryStorage } from 'botbuilder-core';
+import { TurnState, TurnStateEntry } from '../TurnState';
+import { ConversationHistory } from '../ConversationHistory';
 import { Plan, PredictedDoCommand } from './Planner';
 
 describe('DefaultModerator', () => {
     const adapter = new TestAdapter();
 
-    const createTurnContextAndState = (): [TurnContext, DefaultTurnState] => {
+    const createTurnContextAndState = async (): Promise<[TurnContext, TurnState]> => {
         const mockTurnContext = new TurnContext(adapter, { text: 'test', type: ActivityTypes.Message });
-        const state: DefaultTurnState = {
-            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
-            user: new TurnStateEntry(),
-            dialog: new TurnStateEntry(),
-            temp: new TurnStateEntry()
-        };
+        const storage = new MemoryStorage();
+        const state = new TurnState();
+        await state.load(mockTurnContext, storage);
         return [mockTurnContext, state];
     };
 
     describe('reviewPrompt()', () => {
-        it('should return unddefined', async () => {
-            const [mockTurnContext, state] = createTurnContextAndState();
+        it('should return undefined', async () => {
+            const [mockTurnContext, state] = await createTurnContextAndState();
 
             const moderator = new DefaultModerator();
 
@@ -36,7 +32,7 @@ describe('DefaultModerator', () => {
 
     describe('reviewPrompt()', () => {
         it('should return the provided plan', async () => {
-            const [mockTurnContext, state] = createTurnContextAndState();
+            const [mockTurnContext, state] = await createTurnContextAndState();
 
             const expectedPlan: Plan = {
                 type: 'plan',

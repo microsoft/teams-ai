@@ -8,8 +8,7 @@
  */
 
 import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
-import { TurnState } from './TurnState';
-import { DefaultTurnState } from './DefaultTurnStateManager';
+import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
 import {
     OpenAIClient,
@@ -61,7 +60,7 @@ export interface OpenAIModeratorOptions {
  * This moderation can be configure to review the input from the user, output from the model, or both.
  * @template TState Optional. Type of the applications turn state.
  */
-export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implements Moderator<TState> {
+export class OpenAIModerator<TState extends TurnState = TurnState> implements Moderator<TState> {
     private readonly _options: OpenAIModeratorOptions;
     private readonly _client: OpenAIClient;
 
@@ -87,7 +86,7 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
         switch (this._options.moderate) {
             case 'input':
             case 'both': {
-                const input = state?.temp?.value.input ?? context.activity.text;
+                const input = state.temp.input ?? context.activity.text;
                 const result = await this.createModeration(input, this._options.model);
                 if (result) {
                     if (result.flagged) {

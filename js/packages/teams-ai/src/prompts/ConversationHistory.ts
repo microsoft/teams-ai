@@ -3,13 +3,12 @@ import { PromptSectionBase } from "./PromptSectionBase";
 import { Utilities } from "../Utilities";
 import { TurnContext } from 'botbuilder';
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 
 /**
  * A section that renders the conversation history.
  */
-export class ConversationHistory<TState extends TurnState = DefaultTurnState> extends PromptSectionBase<TState> {
+export class ConversationHistory<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     public readonly variable: string;
     public readonly userPrefix: string;
     public readonly assistantPrefix: string;
@@ -31,7 +30,7 @@ export class ConversationHistory<TState extends TurnState = DefaultTurnState> ex
 
     public async renderAsText(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
       // Get messages from memory
-      const history: Message[] = (Utilities.getStateValue<Message[], TState>(state, this.variable) ?? []).slice();
+      const history: Message[] = (state.getValue<Message[]>(this.variable) ?? []).slice();
 
       // Populate history and stay under the token budget
       let tokens = 0;
@@ -67,7 +66,7 @@ export class ConversationHistory<TState extends TurnState = DefaultTurnState> ex
 
     public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Get messages from memory
-        const history: Message[] = (Utilities.getStateValue<Message[], TState>(state, this.variable) ?? []).slice();
+        const history: Message[] = (state.getValue<Message[]>(this.variable) ?? []).slice();
 
         // Populate messages and stay under the token budget
         let tokens = 0;

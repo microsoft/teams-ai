@@ -1,14 +1,13 @@
 import { PromptSection } from "./types";
 import { LayoutEngine } from "./LayoutEngine";
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 
 /**
  * Top level prompt section.
  * @remarks
  * Prompts are compositional such that they can be nested to create complex prompt hierarchies.
  */
-export class Prompt<TState extends TurnState = DefaultTurnState> extends LayoutEngine<TState> {
+export class Prompt<TState extends TurnState = TurnState> extends LayoutEngine<TState> {
     /**
      * Creates a new 'Prompt' instance.
      * @param sections Sections to render.

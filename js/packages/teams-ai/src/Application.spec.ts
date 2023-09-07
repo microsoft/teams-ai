@@ -2,16 +2,16 @@ import { strict as assert } from 'assert';
 import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
 import { Application } from './Application';
 import { TestPlanner } from './TestPlanner';
-import { TestPromptManager } from './TestPromptManager';
+import { TestPromptManager } from './prompts/TestPromptManager';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './ai/AI';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { TaskModulesOptions } from './TaskModules';
+import { TurnState } from './TurnState';
 
 describe('Application', () => {
     const adapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
-    const ai: AIOptions<DefaultTurnState> = {
+    const ai: AIOptions<TurnState> = {
         planner: new TestPlanner(),
         promptManager: new TestPromptManager()
     };
@@ -21,7 +21,6 @@ describe('Application', () => {
     const startTypingTimer = false;
     const storage = new MemoryStorage();
     const taskModules: TaskModulesOptions = { taskDataFilter: 'taskFilter' };
-    const turnStateManager = new DefaultTurnStateManager();
 
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
@@ -36,7 +35,7 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, true);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.taskModules, undefined);
-            assert.notEqual(app.options.turnStateManager, undefined);
+            assert.notEqual(app.options.turnStateFactory, undefined);
         });
 
         it('should create an Application with custom options', () => {
@@ -49,8 +48,7 @@ describe('Application', () => {
                 removeRecipientMention,
                 startTypingTimer,
                 storage,
-                taskModules,
-                turnStateManager
+                taskModules
             });
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, adapter);
@@ -62,7 +60,6 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, startTypingTimer);
             assert.equal(app.options.storage, storage);
             assert.deepEqual(app.options.taskModules, taskModules);
-            assert.equal(app.options.turnStateManager, turnStateManager);
         });
     });
 

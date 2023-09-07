@@ -2,7 +2,6 @@ import { FunctionCall, Message, PromptFunctions, RenderedPromptSection } from ".
 import { PromptSectionBase } from "./PromptSectionBase";
 import { TurnContext } from "botbuilder";
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 
 /**
@@ -11,7 +10,7 @@ import { Tokenizer } from "../ai";
  * The function call information is returned by the model so we use an "assistant" message to
  * represent it in conversation history.
  */
-export class FunctionCallMessage<TState extends TurnState = DefaultTurnState> extends PromptSectionBase<TState> {
+export class FunctionCallMessage<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     private _length: number = -1;
 
     public readonly function_call: FunctionCall;

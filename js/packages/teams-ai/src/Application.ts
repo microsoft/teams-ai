@@ -15,8 +15,7 @@ import {
     Activity,
     ResourceResponse
 } from 'botbuilder';
-import { TurnState, TurnStateManager } from './TurnState';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
+import { TurnState } from './TurnState';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './ai/AI';
@@ -80,12 +79,6 @@ export interface ApplicationOptions<TState extends TurnState> {
     ai?: AIOptions<TState>;
 
     /**
-     * Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
-     * be created.
-     */
-    turnStateManager: TurnStateManager<TState>;
-
-    /**
      * Optional. Options used to customize the processing of Adaptive Card requests.
      */
     adaptiveCards?: AdaptiveCardsOptions;
@@ -117,6 +110,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
      */
     longRunningMessages: boolean;
+
+    /**
+     * Optional. Factory used to create a custom turn state instance.
+     */
+    turnStateFactory: () => TState;
 }
 
 /**
@@ -180,7 +178,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
  * bots that leverage Large Language Models (LLM) and other AI capabilities.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
-export class Application<TState extends TurnState = DefaultTurnState> {
+export class Application<TState extends TurnState = TurnState> {
     private readonly _options: ApplicationOptions<TState>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
@@ -206,9 +204,9 @@ export class Application<TState extends TurnState = DefaultTurnState> {
             options
         ) as ApplicationOptions<TState>;
 
-        // Create default turn state manager if needed
-        if (!this._options.turnStateManager) {
-            this._options.turnStateManager = new DefaultTurnStateManager() as any;
+        // Create turn state factory
+        if (!this._options.turnStateFactory) {
+            this._options.turnStateFactory = () => new TurnState() as TState;
         }
 
         // Create AI component if configured with a planner
@@ -459,15 +457,16 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 }
 
                 // Load turn state
-                const { storage, turnStateManager } = this._options;
-                const state = await turnStateManager!.loadState(storage, context);
+                const { storage, turnStateFactory } = this._options;
+                const state = turnStateFactory();
+                await state.load(context, storage);
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
                     // Save turn state
                     // - This lets the bot keep track of why it ended the previous turn. It also
                     //   allows the dialog system to be used before the AI system is called.
-                    await turnStateManager!.saveState(storage, context, state);
+                    await state.save(context, storage);
                     return false;
                 }
 
@@ -485,7 +484,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                             // Call afterTurn event handlers
                             if (await this.callEventHandlers(context, state, this._afterTurn)) {
                                 // Save turn state
-                                await turnStateManager!.saveState(storage, context, state);
+                                await state.save(context, storage);
                             }
 
                             // End dispatch
@@ -506,7 +505,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                         // Call afterTurn event handlers
                         if (await this.callEventHandlers(context, state, this._afterTurn)) {
                             // Save turn state
-                            await turnStateManager!.saveState(storage, context, state);
+                            await state.save(context, storage);
                         }
 
                         // End dispatch
@@ -522,7 +521,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     // Call afterTurn event handlers
                     if (await this.callEventHandlers(context, state, this._afterTurn)) {
                         // Save turn state
-                        await turnStateManager!.saveState(storage, context, state);
+                        await state.save(context, storage);
                     }
 
                     // End dispatch

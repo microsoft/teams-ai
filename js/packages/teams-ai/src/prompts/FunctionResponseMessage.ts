@@ -3,13 +3,12 @@ import { PromptSectionBase } from "./PromptSectionBase";
 import { Utilities } from "../Utilities";
 import { TurnContext } from "botbuilder";
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 
 /**
  * Message containing the response to a function call.
  */
-export class FunctionResponseMessage<TState extends TurnState = DefaultTurnState> extends PromptSectionBase<TState> {
+export class FunctionResponseMessage<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     private _text: string = '';
     private _length: number = -1;
 

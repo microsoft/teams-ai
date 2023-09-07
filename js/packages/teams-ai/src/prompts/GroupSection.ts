@@ -3,13 +3,12 @@ import { PromptSectionBase } from "./PromptSectionBase";
 import { LayoutEngine } from "./LayoutEngine";
 import { TurnContext } from "botbuilder";
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 
 /**
  * A group of sections that will rendered as a single message.
  */
-export class GroupSection<TState extends TurnState = DefaultTurnState> extends PromptSectionBase<TState> {
+export class GroupSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     private readonly _layoutEngine: LayoutEngine<TState>;
 
     public readonly sections: PromptSection<TState>[];

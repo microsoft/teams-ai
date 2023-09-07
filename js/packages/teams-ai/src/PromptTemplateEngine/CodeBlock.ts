@@ -7,7 +7,6 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { DefaultTempState, DefaultTurnState } from '../DefaultTurnStateManager';
 import { PromptManager } from '../Prompts';
 import { TurnState } from '../TurnState';
 import { Block, BlockTypes } from './Block';
@@ -96,7 +95,7 @@ export class CodeBlock extends Block {
         const output = VarBlock.formatValue(result);
 
         // Save output to $temp.output and then return
-        const temp = (state as DefaultTurnState)?.temp?.value ?? ({} as DefaultTempState);
+        const temp = state.temp.value ?? {};
         temp.output = output;
         return output;
     }

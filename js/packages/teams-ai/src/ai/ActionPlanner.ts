@@ -6,12 +6,11 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedDoCommand, Planner, Plan } from './Planner';
-import { TurnState } from './TurnState';
-import { DefaultTurnState } from './DefaultTurnStateManager';
+import { PredictedDoCommand, Planner, Plan } from '../Planner';
+import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
 
-export class ActionPlannerOpenAIPlanner<TState extends TurnState = DefaultTurnState> implements Planner<TState> {
+export class ActionPlannerOpenAIPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
     /**
      * Completes a prompt and generates a plan for the AI system to execute.
      * @param context Context for the current turn of conversation.

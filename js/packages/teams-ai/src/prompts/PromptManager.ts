@@ -1,6 +1,5 @@
 import { PromptFunctions, PromptFunction, PromptTemplate } from "./types";
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 import { TurnContext } from "botbuilder";
 import * as fs from 'fs/promises';
@@ -38,7 +37,7 @@ export interface PromptManagerOptions {
  * registered with the prompt manager.
  * @template TState Optional. Type of the applications turn state.
  */
-export class PromptManager<TState extends TurnState = DefaultTurnState> implements PromptFunctions<TState> {
+export class PromptManager<TState extends TurnState = TurnState> implements PromptFunctions<TState> {
     private readonly _options: PromptManagerOptions;
     private readonly _functions: Map<string, PromptFunction<TState>> = new Map();
     private readonly _prompts: Map<string, PromptTemplate<TState>> = new Map();

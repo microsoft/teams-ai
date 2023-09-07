@@ -8,8 +8,7 @@
  */
 
 import { PredictedDoCommand, Planner, Plan } from './Planner';
-import { TurnState } from './TurnState';
-import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
+import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
 import {
     OpenAIClient,
@@ -88,7 +87,7 @@ export interface OpenAIPlannerOptions {
  * @template TOptions Optional. Type of the planner options.
  */
 export class OpenAIPlanner<
-    TState extends TurnState = DefaultTurnState,
+    TState extends TurnState = TurnState,
     TOptions extends OpenAIPlannerOptions = OpenAIPlannerOptions
 > implements Planner<TState>
 {

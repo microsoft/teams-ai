@@ -9,7 +9,6 @@
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
 import { ConversationHistory } from '../ConversationHistory';
 import { DefaultModerator } from '../DefaultModerator';
-import { DefaultTempState, DefaultTurnState } from '../DefaultTurnStateManager';
 import { Moderator } from './Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from '../Planner';
 import { PromptManager, PromptTemplate } from '../Prompts';
@@ -175,7 +174,7 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
  * generating prompts. It can be used free standing or routed to by the Application object.
  * @template TState Optional. Type of the turn state.
  */
-export class AI<TState extends TurnState = DefaultTurnState> {
+export class AI<TState extends TurnState = TurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
 
@@ -466,15 +465,9 @@ export class AI<TState extends TurnState = DefaultTurnState> {
         }
 
         // Populate {{$temp.input}}
-        const temp = (state as any as DefaultTurnState)?.temp?.value ?? ({} as DefaultTempState);
-        if (typeof temp.input != 'string') {
+        if (typeof state.temp.input != 'string') {
             // Use the received activity text
-            temp.input = context.activity.text;
-        }
-
-        // Populate {{$temp.history}}
-        if (typeof temp.history != 'string' && opts.history.trackHistory) {
-            temp.history = ConversationHistory.toString(state, opts.history.maxTokens, opts.history.lineSeparator);
+            state.temp.input = context.activity.text;
         }
 
         // Render the prompt
@@ -494,7 +487,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
             if (opts.history.trackHistory) {
                 ConversationHistory.addLine(
                     state,
-                    `${opts.history.userPrefix.trim()} ${temp.input.trim()}`,
+                    `${opts.history.userPrefix.trim()} ${state.temp.input.trim()}`,
                     opts.history.maxTurns * 2
                 );
                 switch (opts.history.assistantHistoryType) {

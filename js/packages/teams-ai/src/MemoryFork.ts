@@ -1,4 +1,41 @@
-import { PromptMemory, VolatileMemory } from "promptrix";
+
+const TEMP_SCOPE = 'temp';
+
+/**
+ * Represents a memory.
+ * @remarks
+ * A memory is a key-value store that can be used to store and retrieve values.
+ */
+export interface Memory {
+    /**
+     * Deletes a value from the memory.
+     * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
+     * @returns True if the value was deleted, false otherwise.
+     * @throws Error if the path is invalid.
+     */
+    deleteValue(path: string): void;
+
+    /**
+     * Checks if a value exists in the memory.
+     * @param path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
+     * @returns True if the value exists, false otherwise.
+     */
+    hasValue(path: string): boolean;
+
+    /**
+     * Retrieves a value from the memory.
+     * @param path Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.
+     * @returns The value or undefined if not found.
+     */
+    getValue<TValue = unknown>(path: string): TValue;
+
+    /**
+     * Assigns a value to the memory.
+     * @param path Path to the value to assign in the form of `[scope].property`. If scope is omitted, the value is assigned to the temporary scope.
+     * @param value Value to assign.
+     */
+    setValue(path: string, value: unknown): void;
+}
 
 /**
  * Forks an existing memory.
@@ -6,63 +43,93 @@ import { PromptMemory, VolatileMemory } from "promptrix";
  * A memory fork is a memory that is a copy of another memory, but can be modified without
  * affecting the original memory.
  */
-export class MemoryFork implements PromptMemory {
-    private readonly _fork: VolatileMemory = new VolatileMemory();
-    private readonly _memory: PromptMemory;
+export class MemoryFork implements Memory {
+    private readonly _fork: Record<string, Record<string, unknown>> = {};
+    private readonly _memory: Memory;
 
     /**
      * Creates a new `MemoryFork` instance.
      * @param memory Memory to fork.
      */
-    public constructor(memory: PromptMemory) {
+    public constructor(memory: Memory) {
         this._memory = memory;
     }
 
     /**
-     * Returns whether the memory contains the specified key.
-     * @param key Name of the key to check.
-     * @returns True if the memory contains the specified key, false otherwise.
+     * Deletes a value from the memory.
+     * @remarks
+     * Only forked values will be deleted.
+     * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
      */
-    public has(key: string): boolean {
-        return this._fork.has(key) || this._memory.has(key);
+    public deleteValue(path: string): void {
+        const {scope, name} = this.getScopeAndName(path);
+        if (this._fork.hasOwnProperty(scope) && this._fork[scope].hasOwnProperty(name)) {
+            delete this._fork[scope][name];
+        }
     }
 
     /**
-     * Gets the value of the specified key.
-     * @param key Key to get the value of.
-     * @returns Value of the key or undefined if missing.
+     * Checks if a value exists in the memory.
+     * @remarks
+     * The forked memory is checked first, then the original memory.
+     * @param path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
+     * @returns True if the value exists, false otherwise.
      */
-    public get<TValue = any|undefined>(key: string): TValue {
-        if (this._fork.has(key)) {
-            return this._fork.get(key);
+    public hasValue(path: string): boolean {
+        const {scope, name} = this.getScopeAndName(path);
+        if (this._fork.hasOwnProperty(scope)) {
+            return this._fork[scope].hasOwnProperty(name);
         } else {
-            return this._memory.get(key);
+            return this._memory.hasValue(path);
         }
     }
 
     /**
-     * Sets the value of the specified key.
-     * @param key Key to set the value of.
-     * @param value Value to set.
+     * Retrieves a value from the memory.
+     * @remarks
+     * The forked memory is checked first, then the original memory.
+     * @param path Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.
+     * @returns The value or undefined if not found.
      */
-    public set<TValue = any>(key: string, value: TValue): void {
-        this._fork.set(key, value);
-    }
-
-    /**
-     * Deletes the specified key.
-     * @param key Key to delete.
-     */
-    public delete(key: string): void {
-        if (this._fork.has(key)) {
-            this._fork.delete(key);
+    public getValue<TValue = unknown>(path: string): TValue {
+        const {scope, name} = this.getScopeAndName(path);
+        if (this._fork.hasOwnProperty(scope)) {
+            if (this._fork[scope].hasOwnProperty(name)) {
+                return this._fork[scope][name] as TValue;
+            }
         }
+
+        return this._memory.getValue(path);
     }
 
     /**
-     * Clears the memory.
+     * Assigns a value to the memory.
+     * @remarks
+     * The value is assigned to the forked memory.
+     * @param path Path to the value to assign in the form of `[scope].property`. If scope is omitted, the value is assigned to the temporary scope.
+     * @param value Value to assign.
      */
-    public clear(): void {
-        this._fork.clear();
+    public setValue(path: string, value: unknown): void {
+        const {scope, name} = this.getScopeAndName(path);
+        if (!this._fork.hasOwnProperty(scope)) {
+            this._fork[scope] = {};
+        }
+
+        this._fork[scope][name] = value;
+    }
+
+    /**
+     * @private
+     */
+    private getScopeAndName(path: string): { scope: string; name: string } {
+        // Get variable scope and name
+        const parts = path.split('.');
+        if (parts.length > 2) {
+            throw new Error(`Invalid state path: ${path}`);
+        } else if (parts.length === 1) {
+            parts.unshift(TEMP_SCOPE);
+        }
+
+        return { scope: parts[0], name: parts[1] };
     }
 }

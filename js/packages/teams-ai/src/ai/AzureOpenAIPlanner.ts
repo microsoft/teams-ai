@@ -6,10 +6,9 @@
  * Licensed under the MIT License.
  */
 
-import { DefaultTurnState } from './DefaultTurnStateManager';
 import { OpenAIClient, AzureOpenAIClient } from './OpenAIClients';
 import { OpenAIPlanner, OpenAIPlannerOptions } from './OpenAIPlanner';
-import { TurnState } from './TurnState';
+import { TurnState } from '../TurnState';
 
 /**
  * Additional options needed to use the Azure OpenAI service.
@@ -34,7 +33,7 @@ export interface AzureOpenAIPlannerOptions extends OpenAIPlannerOptions {
  * Planner that uses the Azure OpenAI service.
  * @template TState Optional. Type of the applications turn state.
  */
-export class AzureOpenAIPlanner<TState extends TurnState = DefaultTurnState> extends OpenAIPlanner<
+export class AzureOpenAIPlanner<TState extends TurnState = TurnState> extends OpenAIPlanner<
     TState,
     AzureOpenAIPlannerOptions
 > {

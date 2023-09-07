@@ -1,9 +1,8 @@
 import { TurnContext } from 'botbuilder';
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { ChatCompletionFunction, Tokenizer } from '../ai';
 
-export interface PromptSection<TState extends TurnState = DefaultTurnState> {
+export interface PromptSection<TState extends TurnState = TurnState> {
     /**
      * If true the section is mandatory otherwise it can be safely dropped.
      */
@@ -81,13 +80,13 @@ export interface FunctionCall {
     arguments?: string;
 }
 
-export interface PromptFunctions<TState extends TurnState = DefaultTurnState> {
+export interface PromptFunctions<TState extends TurnState = TurnState> {
     hasFunction(name: string): boolean;
     getFunction(name: string): PromptFunction<TState>;
     invokeFunction(name: string, context: TurnContext, state: TState, tokenizer: Tokenizer, args: string[]): Promise<any>;
 }
 
-export type PromptFunction<TState extends TurnState = DefaultTurnState, TArgs = any> = (context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, args: TArgs) => Promise<any>;
+export type PromptFunction<TState extends TurnState = TurnState, TArgs = any> = (context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, args: TArgs) => Promise<any>;
 
 /**
  * Interface for the completion configuration portion of a prompt template.
@@ -159,7 +158,7 @@ export interface PromptTemplateConfig {
 /**
  * Prompt template cached by the prompt manager.
  */
-export interface PromptTemplate<TState extends TurnState = DefaultTurnState> {
+export interface PromptTemplate<TState extends TurnState = TurnState> {
     /**
      * Text of the prompt template.
      */

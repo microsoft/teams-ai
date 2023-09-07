@@ -2,13 +2,12 @@ import { Message, PromptFunctions, RenderedPromptSection } from "./types";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { TurnContext } from "botbuilder";
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 
 /**
  * A section of text that will be rendered as a message.
  */
-export class TextSection<TState extends TurnState = DefaultTurnState> extends PromptSectionBase<TState> {
+export class TextSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     private _length: number = -1;
 
     public readonly text: string;

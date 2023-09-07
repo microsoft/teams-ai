@@ -3,7 +3,6 @@ import { PromptSectionBase } from "./PromptSectionBase";
 import { Utilities } from "../Utilities";
 import { TurnContext } from 'botbuilder';
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Tokenizer } from "../ai";
 
 /**
@@ -20,7 +19,7 @@ import { Tokenizer } from "../ai";
  *
  * Function arguments are optional and separated by spaces. They can be quoted using `'`, `"`, or `\`` delimiters.
  */
-export class TemplateSection<TState extends TurnState = DefaultTurnState> extends PromptSectionBase<TState> {
+export class TemplateSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     private _parts: PartRenderer<TState>[] = [];
 
     public readonly template: string;
@@ -125,7 +124,7 @@ export class TemplateSection<TState extends TurnState = DefaultTurnState> extend
 
     private createVariableRenderer(name: string): PartRenderer<TState> {
         return (context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
-            const value = Utilities.getStateValue(state, name);
+            const value = state.getValue(name);
             return Promise.resolve(Utilities.toString(tokenizer, value));
         };
     }
