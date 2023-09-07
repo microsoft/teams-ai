@@ -9,11 +9,12 @@ import os
 import sys
 import time
 import traceback
-from typing import Any
+from typing import Any, Dict
 
 from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
 from botbuilder.schema import Activity
 from teams import (
+    ActionTurnContext,
     AIHistoryOptions,
     AIOptions,
     Application,
@@ -31,6 +32,7 @@ storage = MemoryStorage()
 if config.open_ai_key == "":
     raise RuntimeError("OpenAIKey is a required environment variable")
 
+ActionTurnContext = ActionTurnContext[Dict[str, Any]]
 app = Application[AppTurnState](
     ApplicationOptions(
         bot_app_id=config.app_id,
@@ -75,10 +77,8 @@ async def on_get_light_status(_context: TurnContext, state: AppTurnState):
 
 @app.ai.action("LightsOn")
 async def on_lights_on(
-    context: TurnContext,
+    context: ActionTurnContext,
     state: AppTurnState,
-    _data: Any,
-    _name: str,
 ):
     state.conversation.lights_on = True
     await context.send_activity("[lights on]")
@@ -87,10 +87,8 @@ async def on_lights_on(
 
 @app.ai.action("LightsOff")
 async def on_lights_off(
-    context: TurnContext,
+    context: ActionTurnContext,
     state: AppTurnState,
-    _data: Any,
-    _name: str,
 ):
     state.conversation.lights_on = False
     await context.send_activity("[lights off]")
@@ -99,12 +97,10 @@ async def on_lights_off(
 
 @app.ai.action("Pause")
 async def on_pause(
-    context: TurnContext,
+    context: ActionTurnContext,
     _state: AppTurnState,
-    data: Any,
-    _name: str,
 ):
-    time_ms = int(data.time) if data and data.time else 1000
+    time_ms = int(context.data["time"]) if context.data["time"] else 1000
     await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
     time.sleep(time_ms)
     return True

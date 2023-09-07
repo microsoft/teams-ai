@@ -9,25 +9,27 @@ from botbuilder.core import TurnContext
 
 from teams.ai.state import TurnState
 
+from .action_turn_context import ActionTurnContext
+
 StateT = TypeVar("StateT", bound=TurnState)
 
 
 class ActionEntry(Generic[StateT]):
     name: str
     allow_overrides: bool
-    func: Callable[[TurnContext, StateT, Any, str], Awaitable[bool]]
+    func: Callable[[ActionTurnContext, StateT], Awaitable[bool]]
 
     def __init__(
         self,
         name: str,
         allow_overrides: bool,
-        func: Callable[[TurnContext, StateT, Any, str], Awaitable[bool]],
+        func: Callable[[ActionTurnContext, StateT], Awaitable[bool]],
     ) -> None:
         self.name = name
         self.allow_overrides = allow_overrides
         self.func = func
 
     async def invoke(
-        self, context: TurnContext, state: StateT, entities: Any, name: Optional[str] = None
+        self, context: TurnContext, state: StateT, data: Any, name: Optional[str] = None
     ):
-        return await self.func(context, state, entities, name or self.name)
+        return await self.func(ActionTurnContext(name or self.name, data, context), state)

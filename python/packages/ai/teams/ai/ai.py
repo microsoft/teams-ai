@@ -4,12 +4,12 @@ Licensed under the MIT License.
 """
 
 from logging import Logger
-from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
+from typing import Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
 
 from botbuilder.core import CardFactory, MessageFactory, TurnContext
 from botframework.connector import Channels
 
-from teams.ai.actions import ActionEntry, ActionTypes
+from teams.ai.actions import ActionEntry, ActionTurnContext, ActionTypes
 from teams.ai.planner import Plan, PredictedDoCommand, PredictedSayCommand
 from teams.ai.planner.response_parser import parse_adaptive_card
 from teams.ai.prompts import PromptTemplate
@@ -82,7 +82,7 @@ class AI(Generic[StateT]):
         are found `Default: False`
         """
 
-        def __call__(func: Callable[[TurnContext, StateT, Any, str], Awaitable[bool]]):
+        def __call__(func: Callable[[ActionTurnContext, StateT], Awaitable[bool]]):
             action_name = name
 
             if not action_name:
@@ -275,51 +275,68 @@ class AI(Generic[StateT]):
         return True
 
     async def _on_unknown_action(
-        self, _context: TurnContext, _state: StateT, _entities: Any, name: str
+        self,
+        context: ActionTurnContext,
+        _state: StateT,
     ) -> bool:
-        self._log.error('An AI action named "%s" was predicted but no handler was registered', name)
+        self._log.error(
+            'An AI action named "%s" was predicted but no handler was registered', context.name
+        )
         return True
 
     async def _on_flagged_input(
-        self, _context: TurnContext, _state: StateT, _entities: Any, name: str
+        self,
+        context: ActionTurnContext,
+        _state: StateT,
     ) -> bool:
         self._log.error(
-            "The users input has been moderated but no handler was registered for %s", name
+            "The users input has been moderated but no handler was registered for %s", context.name
         )
         return True
 
     async def _on_flagged_output(
-        self, _context: TurnContext, _state: StateT, _entities: Any, name: str
+        self,
+        context: ActionTurnContext,
+        _state: StateT,
     ) -> bool:
         self._log.error(
-            "The apps output has been moderated but no handler was registered for %s", name
+            "The apps output has been moderated but no handler was registered for %s", context.name
         )
         return True
 
     async def _on_rate_limited(
-        self, _context: TurnContext, _state: StateT, _entities: Any, _name: str
+        self,
+        _context: ActionTurnContext,
+        _state: StateT,
     ) -> bool:
         raise ApplicationError("An AI request failed because it was rate limited")
 
     async def _on_plan_ready(
-        self, _context: TurnContext, _state: StateT, plan: Plan, _name: str
+        self,
+        context: ActionTurnContext[Plan],
+        _state: StateT,
     ) -> bool:
-        return len(plan.commands) > 0
+        return len(context.data.commands) > 0
 
     async def _on_do_command(
-        self, context: TurnContext, state: StateT, command: PredictedDoCommand, _name: str
+        self,
+        context: ActionTurnContext[PredictedDoCommand],
+        state: StateT,
     ) -> bool:
-        action = self._actions.get(command.action)
+        action = self._actions.get(context.data.action)
+        ctx = ActionTurnContext(context.data.action, context.data.entities, context)
 
         if not action:
-            return await self._on_unknown_action(context, state, command, command.action)
+            return await self._on_unknown_action(ctx, state)
 
-        return await action.func(context, state, command.entities, command.action)
+        return await action.func(ctx, state)
 
     async def _on_say_command(
-        self, context: TurnContext, _state: StateT, command: PredictedSayCommand, _name: str
+        self,
+        context: ActionTurnContext[PredictedSayCommand],
+        _state: StateT,
     ) -> bool:
-        response = command.response
+        response = context.data.response
         card = parse_adaptive_card(response)
 
         if card:  # Find adaptive card in response
