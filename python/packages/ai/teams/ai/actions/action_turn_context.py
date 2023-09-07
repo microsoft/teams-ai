@@ -23,5 +23,7 @@ class ActionTurnContext(TurnContext, Generic[DataT]):
 
     def __init__(self, name: str, data: DataT, context: TurnContext) -> None:
         super().__init__(context)
+        context.copy_to(self)
+        self._turn_state = context.turn_state
         self.name = name
         self.data = data

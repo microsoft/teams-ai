@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from aiohttp import ClientResponseError, ClientSession
 
@@ -22,19 +22,17 @@ class OpenAIClient:
     _base_url: str
 
     @property
-    async def _http(self) -> ClientSession:
-        async with ClientSession(
-            base_url=self._base_url,
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "Microsoft Teams Conversational AI SDK",
-                "Authorization": f"Bearer {self._api_key}",
-            },
-        ) as session:
-            if self._organization:
-                session.headers.add("OpenAI-Organization", self._organization)
+    def _headers(self) -> Dict[str, str]:
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": "Microsoft Teams Conversational AI SDK",
+            "Authorization": f"Bearer {self._api_key}",
+        }
 
-            return session
+        if self._organization:
+            headers["OpenAI-Organization"] = self._organization
+
+        return headers
 
     def __init__(
         self,
@@ -48,19 +46,27 @@ class OpenAIClient:
         self._base_url = base_url
 
     async def create_moderation(
-        self, input: Union[str, List[str]], model: Optional[str] = None
+        self,
+        input: Union[str, List[str]],
+        *,
+        model: Literal[
+            "text-moderation-stable", "text-moderation-latest"
+        ] = "text-moderation-stable",
     ) -> OpenAIClientResponse[CreateModerationResponse]:
-        try:
-            http = await self._http
-            res = await http.post("/v1/moderations", data={"input": input, "model": model})
-            data = await res.json()
+        async with ClientSession(
+            base_url=self._base_url,
+            headers=self._headers,
+        ) as session:
+            try:
+                res = await session.post("/v1/moderations", json={"input": input, "model": model})
+                data = await res.json()
 
-            return OpenAIClientResponse[CreateModerationResponse](
-                status=res.status,
-                headers=res.headers,
-                data=CreateModerationResponse.from_dict(data),
-            )
-        except ClientResponseError as err:
-            raise OpenAIClientError(
-                status=err.status, message=err.message, headers=err.headers
-            ) from err
+                return OpenAIClientResponse[CreateModerationResponse](
+                    status=res.status,
+                    headers=res.headers,
+                    data=CreateModerationResponse.from_dict(data),
+                )
+            except ClientResponseError as err:
+                raise OpenAIClientError(
+                    status=err.status, message=err.message, headers=err.headers
+                ) from err

@@ -138,7 +138,9 @@ class OpenAIPlanner(Planner):
                 plan.commands = new_commands
 
             return await self.review_plan(
-                turn_context, state, plan, self._get_model(prompt_template)
+                turn_context,
+                state,
+                plan,
             )
 
         return Plan()
@@ -147,7 +149,7 @@ class OpenAIPlanner(Planner):
         self,
         _context: TurnContext,
         state: TurnState,
-        prompt: PromptTemplate,
+        _prompt: PromptTemplate,
     ) -> Optional[Plan]:
         if self._options.moderate == "output":
             return None
@@ -155,7 +157,6 @@ class OpenAIPlanner(Planner):
         try:
             res = await self._client.create_moderation(
                 state.temp.input,
-                self._get_model(prompt),
             )
 
             if res.data.results[0].flagged:
@@ -182,7 +183,6 @@ class OpenAIPlanner(Planner):
         _context: TurnContext,
         _state: TurnState,
         plan: Plan,
-        model: str,
     ) -> Plan:
         if self._options.moderate == "input":
             return plan
@@ -194,7 +194,6 @@ class OpenAIPlanner(Planner):
                 try:
                     res = await self._client.create_moderation(
                         cmd.response,
-                        model,
                     )
 
                     if res.data.results[0].flagged:

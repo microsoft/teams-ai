@@ -21,6 +21,7 @@ from teams import (
     ApplicationOptions,
     OpenAIPlanner,
     OpenAIPlannerOptions,
+    ActionTypes,
 )
 
 from src.config import Config
@@ -72,6 +73,12 @@ async def on_history(context: TurnContext, state: AppTurnState):
 @app.ai.function("getLightStatus")
 async def on_get_light_status(_context: TurnContext, state: AppTurnState):
     return "on" if state.conversation.lights_on else "off"
+
+
+@app.ai.action(ActionTypes.FLAGGED_INPUT)
+async def on_flagged_input(context: TurnContext, _state: AppTurnState):
+    await context.send_activity("FLAGGED INPUT!!!")
+    return False
 
 
 @app.ai.action("LightsOn")
