@@ -239,7 +239,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 return true;
             }
 
-            [Action(DefaultActionTypes.SayCommandActionName)]
+            [Action(AIConstants.SayCommandActionName)]
             public bool SayCommand([ActionEntities] PredictedSayCommand command)
             {
                 SayActionRecord.Add(command.Response);

@@ -245,7 +245,7 @@ namespace Microsoft.TeamsAI.AI
             }
 
             // Process generated plan
-            bool continueChain = await _actions[DefaultActionTypes.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
+            bool continueChain = await this._actions[AIConstants.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
             if (continueChain)
             {
                 // Update conversation history
@@ -296,23 +296,23 @@ namespace Microsoft.TeamsAI.AI
                         };
 
                         // Call action handler
-                        continueChain = await _actions[DefaultActionTypes.DoCommandActionName]
+                        continueChain = await this._actions[AIConstants.DoCommandActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, data, doCommand.Action);
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
-                        continueChain = await _actions[DefaultActionTypes.UnknownActionName]
+                        continueChain = await this._actions[AIConstants.UnknownActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
-                    continueChain = await _actions[DefaultActionTypes.SayCommandActionName]
+                    continueChain = await this._actions[AIConstants.SayCommandActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState!, sayCommand, DefaultActionTypes.SayCommandActionName);
+                        .PerformAction(turnContext, turnState!, sayCommand, AIConstants.SayCommandActionName);
                 }
                 else
                 {

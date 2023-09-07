@@ -11,7 +11,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <summary>
         /// Type to indicate that a DO command is being returned.
         /// </summary>
-        public string Type { get; } = AITypes.DoCommand;
+        public string Type { get; } = AIConstants.DoCommand;
 
         /// <summary>
         /// The named action that the AI system should perform.

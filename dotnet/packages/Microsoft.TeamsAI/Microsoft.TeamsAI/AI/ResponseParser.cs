@@ -9,9 +9,9 @@ namespace Microsoft.TeamsAI.AI
     {
         private static readonly string BREAKING_CHARACTERS = "`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./ \r\n\t";
         private static readonly string NAME_BREAKING_CHARACTERS = "`~!@#$%^&*()+={}|[]\\:\";\'<>?,./ \r\n\t";
-        private static readonly string[] COMMANDS = { AITypes.DoCommand, AITypes.SayCommand };
+        private static readonly string[] COMMANDS = { AIConstants.DoCommand, AIConstants.SayCommand };
         private static readonly string SPACE_CHARACTERS = "\r\n\t";
-        private static readonly string DEFAULT_COMMAND = AITypes.SayCommand;
+        private static readonly string DEFAULT_COMMAND = AIConstants.SayCommand;
         private static readonly string[] IGNORED_TOKENS = { "THEN" };
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Microsoft.TeamsAI.AI
 
             if (plan != null)
             {
-                if (AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
+                if (AIConstants.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
                 {
                     return plan;
                 }
@@ -126,11 +126,11 @@ namespace Microsoft.TeamsAI.AI
                     ParsedCommandResult result;
                     switch (tokens[0])
                     {
-                        case AITypes.DoCommand:
+                        case AIConstants.DoCommand:
                             result = ParseDoCommand(tokens);
                             break;
 
-                        case AITypes.SayCommand:
+                        case AIConstants.SayCommand:
                         default:
                             result = ParseSayCommand(tokens);
                             break;
@@ -143,7 +143,7 @@ namespace Microsoft.TeamsAI.AI
                         // - In the case of `DO DO command` the first DO command wouldn't generate
                         if (result.Command != null)
                         {
-                            if (AITypes.SayCommand.Equals(result.Command.Type, StringComparison.OrdinalIgnoreCase))
+                            if (AIConstants.SayCommand.Equals(result.Command.Type, StringComparison.OrdinalIgnoreCase))
                             {
                                 // Check for duplicate SAY
                                 string response = ((PredictedSayCommand)result.Command).Response.Trim().ToLower();
@@ -180,9 +180,9 @@ namespace Microsoft.TeamsAI.AI
 
             if (tokens.Count > 1)
             {
-                if (!AITypes.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
+                if (!AIConstants.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
+                    throw new ResponseParserException($"Token list passed in doesn't start with {AIConstants.DoCommand} token");
                 }
 
                 string actionName = "";
@@ -347,9 +347,9 @@ namespace Microsoft.TeamsAI.AI
             IPredictedCommand? command = null;
             if (tokens.Count > 1)
             {
-                if (!AITypes.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
+                if (!AIConstants.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
+                    throw new ResponseParserException($"Token list passed in doesn't start with {AIConstants.SayCommand} token");
                 }
 
                 // Parse command (skips initial SAY token)

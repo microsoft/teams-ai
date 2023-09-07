@@ -1,5 +1,4 @@
 ﻿using Castle.Core.Logging;
-using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.AzureContentSafety;
 using Microsoft.TeamsAI.AI.Moderator;
@@ -111,8 +110,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
             {
                 Assert.NotNull(result);
-                Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
-                Assert.Equal(DefaultActionTypes.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
+                Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
                 Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
                 Assert.StrictEqual(response, ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
@@ -246,8 +245,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
             {
                 Assert.NotNull(result);
-                Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
-                Assert.Equal(DefaultActionTypes.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
+                Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
                 Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
                 Assert.StrictEqual(response, ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));

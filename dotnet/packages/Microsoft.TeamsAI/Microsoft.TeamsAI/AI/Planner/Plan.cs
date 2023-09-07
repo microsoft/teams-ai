@@ -25,7 +25,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Type to indicate that a plan is being returned.
         /// </summary>
         [JsonPropertyName("type")]
-        public string Type { get; } = AITypes.Plan;
+        public string Type { get; } = AIConstants.Plan;
 
         /// <summary>
         /// Creates a new instance of the <see cref="Plan"/> class.

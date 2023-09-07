@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI.AzureContentSafety;
+﻿using Microsoft.TeamsAI.AI.AzureContentSafety;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.State;
@@ -102,7 +101,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 || _ShouldBeFlagged(response.ViolenceResult);
             if (flagged)
             {
-                string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
+                string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
 
                 // Flagged
                 return new Plan()

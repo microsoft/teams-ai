@@ -1,11 +1,23 @@
 ﻿
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.TeamsAI.AI
 {
-    /// <summary>
-    /// Names of the default action types.
-    /// </summary>
-    public class DefaultActionTypes
+    public static class AIConstants
     {
+        /// <summary>
+        /// The type of command that will be used to plan an action.
+        /// </summary>
+        public const string Plan = "plan";
+
+        /// <summary>
+        /// The type of command that will be used to do an action.
+        /// </summary>
+        public const string DoCommand = "DO";
+
+        /// <summary>
+        /// The type of command that will be used to say something.
+        /// </summary>
+        public const string SayCommand = "SAY";
+
         /// <summary>
         /// An action that will be called anytime an unknown action is predicted by the planner.
         /// </summary>
