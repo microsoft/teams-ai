@@ -4,7 +4,7 @@ Licensed under the MIT License.
 """
 
 from logging import Logger
-from typing import Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
+from typing import Any, Awaitable, Callable, Dict, Generic, Optional, TypeVar, Union
 
 from botbuilder.core import CardFactory, MessageFactory, TurnContext
 from botframework.connector import Channels
@@ -60,7 +60,7 @@ class AI(Generic[StateT]):
             ),
         }
 
-    def action(self, name: Optional[str] = None, allow_overrides=False):
+    def action(self, name: Optional[str] = None, *, allow_overrides=False):
         """
         Registers a new action event listener. This method can be used as either
         a decorator or a method.
@@ -164,7 +164,7 @@ class AI(Generic[StateT]):
         self._review_plan = func
         return func
 
-    def function(self, name: Optional[str] = None, allow_overrides=False):
+    def function(self, name: Optional[str] = None, *, allow_overrides=False):
         """
         Registers a new prompt function event listener. This method can be used as either
         a decorator or a method.
@@ -186,7 +186,7 @@ class AI(Generic[StateT]):
         are found `Default: False`
         """
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[str]]):
+        def __call__(func: Callable[[TurnContext, StateT], Awaitable[Any]]):
             func_name = name
 
             if not func_name:

@@ -4,7 +4,7 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Generic, TypeVar, Union
+from typing import Any, Awaitable, Callable, Generic, TypeVar, Union
 
 from botbuilder.core import TurnContext
 
@@ -47,7 +47,11 @@ class Planner(ABC, Generic[StateT]):
 
     @abstractmethod
     def add_function(
-        self, name: str, handler: Callable[[TurnContext, StateT], Any], *, allow_overrides=False
+        self,
+        name: str,
+        handler: Callable[[TurnContext, StateT], Awaitable[Any]],
+        *,
+        allow_overrides=False,
     ) -> None:
         """
         Adds a custom function to be used when rendering prompt templates.

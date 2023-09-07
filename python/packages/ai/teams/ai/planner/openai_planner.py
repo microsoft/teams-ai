@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 from datetime import datetime
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Awaitable, Callable, List, Tuple, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -53,7 +53,11 @@ class OpenAIPlanner(Planner):
         self._add_chat_completion_service()
 
     def add_function(
-        self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False
+        self,
+        name: str,
+        handler: Callable[[TurnContext, TurnState], Awaitable[Any]],
+        *,
+        allow_overrides=False,
     ) -> None:
         self._prompt_manager.add_function(name, handler, allow_overrides=allow_overrides)
 
