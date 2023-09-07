@@ -42,7 +42,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             var clientMock = new Mock<OpenAIClient>(It.IsAny<OpenAIClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
-            var exception = new OpenAIClientException("Exception Message");
+            var exception = new TeamsAIException("Exception Message");
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
@@ -50,7 +50,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<OpenAIClientException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplate));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -159,7 +159,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             });
 
             var clientMock = new Mock<OpenAIClient>(It.IsAny<OpenAIClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
-            var exception = new OpenAIClientException("Exception Message");
+            var exception = new TeamsAIException("Exception Message");
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
@@ -167,7 +167,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<OpenAIClientException>(async () => await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);

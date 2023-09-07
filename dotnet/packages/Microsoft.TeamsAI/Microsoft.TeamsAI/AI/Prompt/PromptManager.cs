@@ -61,7 +61,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
                     }
                     else
                     {
-                        throw new PromptManagerException($"Attempting to update a previously registered function `{name}`");
+                        throw new InvalidOperationException($"Attempting to update a previously registered function `{name}`");
                     }
                 }
             }
@@ -77,7 +77,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             if (_templates.ContainsKey(name))
             {
-                throw new PromptManagerException($"Text template `{name}` already exists.");
+                throw new InvalidOperationException($"Text template `{name}` already exists.");
             }
 
             _templates.Add(name, promptTemplate);
@@ -99,7 +99,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
             else
             {
-                throw new PromptManagerException($"Attempting to invoke an unregistered function name {name}");
+                throw new InvalidOperationException($"Attempting to invoke an unregistered function name {name}");
             }
         }
 
@@ -115,7 +115,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             if (_promptsFolder == null)
             {
-                throw new PromptManagerException($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
+                throw new InvalidOperationException($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
             }
 
             return _LoadPromptTemplateFromFile(name);
@@ -146,7 +146,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
             catch (TemplateException ex)
             {
-                throw new PromptManagerException($"Failed to render prompt: ${ex.Message}", ex);
+                throw new TeamsAIException($"Failed to render prompt: ${ex.Message}", ex);
             }
 
 
@@ -200,7 +200,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             // Continue only if prompt template exists
             string promptPath = Path.Combine(promptFolder, PROMPT_FILE);
-            if (!File.Exists(promptPath)) { throw new PromptManagerException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
+            if (!File.Exists(promptPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
 
             // Load prompt template
             string text = File.ReadAllText(promptPath);
@@ -208,7 +208,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             // Load prompt configuration. Note: the configuration is optional.
             PromptTemplateConfiguration? config;
             string configPath = Path.Combine(promptFolder, CONFIG_FILE);
-            if (!File.Exists(configPath)) { throw new PromptManagerException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
+            if (!File.Exists(configPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
 
             try
             {
@@ -216,7 +216,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
             catch (Exception ex)
             {
-                throw new PromptManagerException($"Error while loading prompt. {ex.Message}");
+                throw new TeamsAIException($"Error while loading prompt. {ex.Message}");
             }
 
             return new PromptTemplate(text, config);
@@ -226,7 +226,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         {
             if (Directory.Exists(directoryPath)) { return; }
 
-            throw new PromptManagerException($"Directory doesn't exist `{directoryPath}`");
+            throw new ArgumentException($"Directory doesn't exist `{directoryPath}`");
         }
     }
 }

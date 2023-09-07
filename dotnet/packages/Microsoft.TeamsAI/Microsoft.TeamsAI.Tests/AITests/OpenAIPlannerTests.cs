@@ -14,6 +14,7 @@ using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Moq;
+using System.Net;
 
 namespace Microsoft.TeamsAI.Tests.AITests
 {
@@ -44,7 +45,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            static string rateLimitedFunc() => throw new PlannerException("", new AIException(AIException.ErrorCodes.Throttling));
+            static string rateLimitedFunc() => throw new HttpOperationException("", (HttpStatusCode)429);
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, rateLimitedFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
@@ -86,12 +87,12 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 }
             );
 
-            static string throwsExceptionFunc() => throw new PlannerException("Exception Message");
+            static string throwsExceptionFunc() => throw new TeamsAIException("Exception Message");
             var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, throwsExceptionFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
 
             // Act
-            var exception = await Assert.ThrowsAsync<PlannerException>(async () => await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
             Assert.Equal("Exception Message", exception.Message);
@@ -223,6 +224,90 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var doCommand = (PredictedDoCommand)result.Commands[1];
             Assert.Equal("actionName", doCommand.Action);
+        }
+
+        [Fact]
+        public async void Test_CompletePrompt_TextCompletion_PromptCompletionRateLimited_ShouldThrowHttpOperationException()
+        {
+            // Arrange
+            var apiKey = "randomApiKey";
+            var model = "text-model";
+
+            var optionsMock = new Mock<OpenAIPlannerOptions>(apiKey, model);
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnStateMock = new Mock<TestTurnState>();
+            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new PromptTemplateConfiguration
+                {
+                    Completion =
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
+                }
+            );
+
+            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(optionsMock.Object);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
+            var thrownException = new AIException(AIException.ErrorCodes.Throttling);
+
+            planner.TextCompletionMock.Setup(textCompletion => textCompletion.GetCompletionsAsync(It.IsAny<string>(), It.IsAny<CompleteRequestSettings>(), It.IsAny<CancellationToken>())).ThrowsAsync(thrownException);
+
+            // Act
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.True(exception.Message.Equals("Error while executing AI prompt completion: Throttling", StringComparison.OrdinalIgnoreCase));
+            Assert.Equal((HttpStatusCode)429, exception.StatusCode);
+        }
+
+        [Fact]
+        public async void Test_CompletePrompt_ChatCompletion_PromptCompletionRateLimited_ShouldThrowHttpOperationException()
+        {
+            // Arrange
+            var apiKey = "randomApiKey";
+            var model = "gpt-model";
+
+            var optionsMock = new Mock<OpenAIPlannerOptions>(apiKey, model);
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnStateMock = new Mock<TestTurnState>();
+            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new PromptTemplateConfiguration
+                {
+                    Completion =
+                    {
+                        MaxTokens = 2000,
+                        Temperature = 0.2,
+                        TopP = 0.5,
+                    }
+                }
+            );
+
+            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(optionsMock.Object);
+            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
+            var thrownException = new AIException(AIException.ErrorCodes.Throttling);
+
+            planner.ChatCompletionMock
+            .Setup(m => m.CreateNewChat(It.IsAny<string?>()))
+            .Returns(new ChatHistory());
+
+            planner.ChatCompletionMock.Setup(chatCompletion => chatCompletion.GetChatCompletionsAsync(It.IsAny<ChatHistory>(), It.IsAny<ChatRequestSettings>(), It.IsAny<CancellationToken>())).ThrowsAsync(thrownException);
+
+            // Act
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.True(exception.Message.Equals("Error while executing AI prompt completion: Throttling", StringComparison.OrdinalIgnoreCase));
+            Assert.Equal((HttpStatusCode)429, exception.StatusCode);
         }
 
         [Fact]

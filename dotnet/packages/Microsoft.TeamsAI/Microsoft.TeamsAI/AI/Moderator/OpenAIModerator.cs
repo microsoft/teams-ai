@@ -114,10 +114,10 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 return null;
 
             }
-            catch (OpenAIClientException e)
+            catch (HttpOperationException e)
             {
                 // Rate limited
-                if (e.statusCode != null && (int)e.statusCode == 429)
+                if (e.StatusCode != null && (int)e.StatusCode == 429)
                 {
                     return new Plan()
                     {

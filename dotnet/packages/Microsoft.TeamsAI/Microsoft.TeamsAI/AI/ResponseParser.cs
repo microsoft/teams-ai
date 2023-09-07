@@ -1,6 +1,5 @@
 ﻿using AdaptiveCards;
 using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.Exceptions;
 using System.Text.Json;
 
 namespace Microsoft.TeamsAI.AI
@@ -182,7 +181,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (!AIConstants.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AIConstants.DoCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
                 }
 
                 string actionName = "";
@@ -349,7 +348,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (!AIConstants.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AIConstants.SayCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
                 }
 
                 // Parse command (skips initial SAY token)

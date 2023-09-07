@@ -148,7 +148,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             );
 
             // Act
-            var exception = await Assert.ThrowsAsync<PlannerException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
             Assert.Equal("Failed to perform AI prompt completion: Access denied: The request is not authorized, HTTP status: 401", exception.Message);
@@ -183,7 +183,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             );
 
             // Act
-            var exception = await Assert.ThrowsAsync<PlannerException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
             Assert.Equal("Failed to perform AI prompt completion: Invalid request: The request is not valid, HTTP status: 404", exception.Message);

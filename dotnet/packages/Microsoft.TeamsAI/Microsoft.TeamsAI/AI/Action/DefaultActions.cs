@@ -44,7 +44,7 @@ namespace Microsoft.TeamsAI.AI.Action
         [Action(AIConstants.RateLimitedActionName)]
         public Task<bool> RateLimitedAction()
         {
-            throw new AIException("An AI request failed because it was rate limited");
+            throw new TeamsAIException("An AI request failed because it was rate limited");
         }
 
         [Action(AIConstants.PlanReadyActionName)]

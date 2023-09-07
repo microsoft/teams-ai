@@ -13,6 +13,7 @@ using PromptTemplate = Microsoft.TeamsAI.AI.Prompt.PromptTemplate;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 using System.Runtime.CompilerServices;
+using System.Net;
 
 // For Unit Test
 [assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
@@ -134,9 +135,16 @@ namespace Microsoft.TeamsAI.AI.Planner
 
                 return result;
             }
+            catch (AIException ex) when (ex.ErrorCode == AIException.ErrorCodes.Throttling)
+            {
+                // TODO: SK recently updated AIException to HttpOperationException, update this when we update SK dependency
+
+                // rate limited
+                throw new HttpOperationException($"Error while executing AI prompt completion: {ex.Message}", (HttpStatusCode)429);
+            }
             catch (Exception ex)
             {
-                throw new PlannerException($"Failed to perform AI prompt completion: {ex.Message}", ex);
+                throw new TeamsAIException($"Error while executing AI prompt completion: {ex.Message}", ex);
             }
         }
 
@@ -152,10 +160,10 @@ namespace Microsoft.TeamsAI.AI.Planner
             {
                 result = await CompletePromptAsync(turnContext, turnState, promptTemplate, options, cancellationToken);
             }
-            catch (PlannerException ex)
+            catch (HttpOperationException ex)
             {
                 // Ensure we weren't rate limited
-                if (ex.InnerException is AIException aiEx && aiEx.ErrorCode == AIException.ErrorCodes.Throttling)
+                if (ex.isRateLimitedStatusCode())
                 {
                     Plan plan = new();
                     plan.Commands.Add(new PredictedDoCommand(AIConstants.RateLimitedActionName));
@@ -197,7 +205,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                 }
                 catch (Exception ex)
                 {
-                    throw new PlannerException($"Failed to generate plan from model response: {ex.Message}", ex);
+                    throw new TeamsAIException($"Error while generating plan from model response: {ex.Message}. Model response: {result}", ex);
                 }
 
 
