@@ -8,7 +8,7 @@
 
 import { TurnContext } from 'botbuilder-core';
 import { Plan } from './Planner';
-import { TurnState } from './TurnState';
+import { TurnState } from '../TurnState';
 
 /**
  * A moderator is responsible for reviewing and approving AI prompts and plans.

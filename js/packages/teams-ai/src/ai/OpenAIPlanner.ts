@@ -22,7 +22,7 @@ import {
 } from './OpenAIClients';
 import { ResponseParser } from './ResponseParser';
 import { ConversationHistory } from './ConversationHistory';
-import { AI, ConfiguredAIOptions } from './AI';
+import { AI, ConfiguredAIOptions } from './ai/AI';
 import { PromptTemplate } from './Prompts';
 
 /**

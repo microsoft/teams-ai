@@ -7,16 +7,16 @@
  */
 
 export * from './AdaptiveCards';
-export * from './AI';
+export * from './ai/AI';
 export * from './Application';
 export * from './AzureOpenAIPlanner';
-export * from './AzureOpenAIModerator';
+export * from './ai/AzureOpenAIModerator';
 export * from './ConversationHistory';
 export * from './DefaultModerator';
 export * from './DefaultPromptManager';
 export * from './DefaultTurnStateManager';
 export * from './MessageExtensions';
-export * from './Moderator';
+export * from './ai/Moderator';
 export * from './OpenAIModerator';
 export * from './OpenAIPlanner';
 export * from './Planner';

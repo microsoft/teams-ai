@@ -7,14 +7,14 @@
  */
 
 import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
-import { ConversationHistory } from './ConversationHistory';
-import { DefaultModerator } from './DefaultModerator';
-import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
+import { ConversationHistory } from '../ConversationHistory';
+import { DefaultModerator } from '../DefaultModerator';
+import { DefaultTempState, DefaultTurnState } from '../DefaultTurnStateManager';
 import { Moderator } from './Moderator';
-import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
-import { PromptManager, PromptTemplate } from './Prompts';
-import { ResponseParser } from './ResponseParser';
-import { TurnState } from './TurnState';
+import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from '../Planner';
+import { PromptManager, PromptTemplate } from '../Prompts';
+import { ResponseParser } from '../ResponseParser';
+import { TurnState } from '../TurnState';
 
 /**
  * A function that can be used to select a prompt to use for the current turn.

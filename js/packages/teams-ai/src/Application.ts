@@ -19,7 +19,7 @@ import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
-import { AI, AIOptions } from './AI';
+import { AI, AIOptions } from './ai/AI';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 
 /**

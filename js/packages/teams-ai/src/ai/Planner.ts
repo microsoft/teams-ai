@@ -7,8 +7,6 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { ConfiguredAIOptions } from './AI';
-import { PromptTemplate } from './Prompts';
 import { TurnState } from './TurnState';
 
 /**
@@ -16,33 +14,14 @@ import { TurnState } from './TurnState';
  */
 export interface Planner<TState extends TurnState> {
     /**
-     * Completes a prompt without returning a plan.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param prompt Prompt to complete.
-     * @param options Configuration options for the AI system.
-     * @returns The response from the prompt. Can return undefined to indicate the prompt was rate limited.
-     */
-    completePrompt(
-        context: TurnContext,
-        state: TState,
-        prompt: PromptTemplate,
-        options: ConfiguredAIOptions<TState>
-    ): Promise<string | undefined>;
-
-    /**
      * Completes a prompt and generates a plan for the AI system to execute.
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
-     * @param prompt Prompt to complete.
-     * @param options Configuration options for the AI system.
      * @returns The plan that was generated.
      */
     generatePlan(
         context: TurnContext,
-        state: TState,
-        prompt: PromptTemplate,
-        options: ConfiguredAIOptions<TState>
+        state: TState
     ): Promise<Plan>;
 }
 

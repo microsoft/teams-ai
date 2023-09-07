@@ -4,7 +4,7 @@ import { Application } from './Application';
 import { TestPlanner } from './TestPlanner';
 import { TestPromptManager } from './TestPromptManager';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
-import { AIOptions } from './AI';
+import { AIOptions } from './ai/AI';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { TaskModulesOptions } from './TaskModules';
 

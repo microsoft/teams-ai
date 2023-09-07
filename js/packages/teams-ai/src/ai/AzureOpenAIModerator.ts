@@ -9,9 +9,9 @@
  * Licensed under the MIT License.
  */
 
-import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
-import { TurnState } from './TurnState';
-import { DefaultTurnState } from './DefaultTurnStateManager';
+import { Plan, PredictedDoCommand, PredictedSayCommand } from '../Planner';
+import { TurnState } from '../TurnState';
+import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { TurnContext } from 'botbuilder';
 import {
     CreateModerationResponseResultsInner,
@@ -24,10 +24,9 @@ import {
     ContentSafetyHarmCategory,
     ContentSafetyOptions,
     ModerationSeverity
-} from './OpenAIClients';
-import { PromptTemplate } from './Prompts';
-import { ConfiguredAIOptions, AI } from './AI';
-import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
+} from '../OpenAIClients';
+import { AI } from './AI';
+import { OpenAIModerator, OpenAIModeratorOptions } from '../OpenAIModerator';
 
 /**
  * Options for the OpenAI based moderator.

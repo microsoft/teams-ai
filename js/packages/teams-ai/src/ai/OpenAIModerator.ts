@@ -18,7 +18,7 @@ import {
     OpenAIClientResponse
 } from './OpenAIClients';
 import { Moderator } from './Moderator';
-import { AI } from './AI';
+import { AI } from './ai/AI';
 
 /**
  * Options for the OpenAI based moderator.

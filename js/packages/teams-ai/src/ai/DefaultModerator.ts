@@ -7,7 +7,7 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { AI, ConfiguredAIOptions } from './AI';
+import { AI, ConfiguredAIOptions } from './ai/AI';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { Moderator } from './Moderator';
 import { Plan } from './Planner';
