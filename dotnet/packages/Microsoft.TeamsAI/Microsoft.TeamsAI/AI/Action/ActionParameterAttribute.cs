@@ -1,5 +1,8 @@
 ﻿namespace Microsoft.TeamsAI.AI.Action
 {
+    /// <summary>
+    /// Attribute that marks a method parameter as an action parameter.
+    /// </summary>
     public class ActionParameterAttribute : Attribute
     {
         /// <summary>

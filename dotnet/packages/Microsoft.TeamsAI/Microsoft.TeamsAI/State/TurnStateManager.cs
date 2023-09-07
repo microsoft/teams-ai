@@ -18,7 +18,9 @@ namespace Microsoft.TeamsAI.State
         where TUserState : StateBase, new()
         where TTempState : TempState, new()
     {
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TurnStateManager{TState, TConversationState, TUserState, TTempState}"/> class.
+        /// </summary>
         public TurnStateManager() { }
 
         /// <inheritdoc />
@@ -142,6 +144,9 @@ namespace Microsoft.TeamsAI.State
         }
     }
 
+    /// <summary>
+    /// Default turn state manager.
+    /// </summary>
     public class TurnStateManager : TurnStateManager<TurnState, StateBase, StateBase, TempState>
     {
     }

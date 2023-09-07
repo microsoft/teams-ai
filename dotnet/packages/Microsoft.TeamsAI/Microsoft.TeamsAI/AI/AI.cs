@@ -22,6 +22,11 @@ namespace Microsoft.TeamsAI.AI
     {
         private readonly IActionCollection<TState> _actions;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="AI{TState}"/> class.
+        /// </summary>
+        /// <param name="options">The options to configure.</param>
+        /// <param name="logger">The logger instance.</param>
         public AI(AIOptions<TState> options, ILogger? logger = null)
         {
             Verify.ParamNotNull(options);
@@ -59,6 +64,9 @@ namespace Microsoft.TeamsAI.AI
         /// </summary>
         public IPlanner<TState> Planner => Options.Planner;
 
+        /// <summary>
+        /// Returns the prompt manager being used by the AI system.
+        /// </summary>
         public IPromptManager<TState> Prompts => Options.PromptManager;
 
         /// <summary>
@@ -331,6 +339,7 @@ namespace Microsoft.TeamsAI.AI
 
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
+            _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, promptTemplate);
@@ -356,6 +365,7 @@ namespace Microsoft.TeamsAI.AI
 
             // Configure options
             AIOptions<TState> aiOptions = _ConfigureOptions(options);
+            _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
             PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, name);

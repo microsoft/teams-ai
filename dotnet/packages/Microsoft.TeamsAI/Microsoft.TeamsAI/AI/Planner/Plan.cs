@@ -27,11 +27,18 @@ namespace Microsoft.TeamsAI.AI.Planner
         [JsonPropertyName("type")]
         public string Type { get; } = AITypes.Plan;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Plan"/> class.
+        /// </summary>
         public Plan()
         {
             Commands = new List<IPredictedCommand>();
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Plan"/> class.
+        /// </summary>
+        /// <param name="commands">A list of model predicted commands.</param>
         [JsonConstructor]
         public Plan(List<IPredictedCommand> commands)
         {

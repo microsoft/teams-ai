@@ -98,6 +98,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// </summary>
         public class InputConfig
         {
+            /// <summary>
+            /// List of all input parameters for a semantic function.
+            /// </summary>
             [JsonPropertyName("parameters")]
             [JsonPropertyOrder(1)]
             public List<InputParameterValues> Parameters { get; set; } = new();

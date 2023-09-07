@@ -6,6 +6,10 @@ using Microsoft.TeamsAI.Utilities;
 
 namespace Microsoft.TeamsAI.AI
 {
+    /// <summary>
+    /// Options for configuring the AI system.
+    /// </summary>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public sealed class AIOptions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>

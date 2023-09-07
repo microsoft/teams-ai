@@ -3,10 +3,14 @@ using System.Reflection;
 
 namespace Microsoft.TeamsAI.AI.Action
 {
+    /// <summary>
+    /// Represents an action.
+    /// </summary>
+    /// <typeparam name="TState"></typeparam>
     public class ActionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
-        /// The name of the action.
+        /// The action name.
         /// </summary>
         public string Name { get; set; }
 
@@ -20,6 +24,13 @@ namespace Microsoft.TeamsAI.AI.Action
         /// </summary>
         public bool AllowOverrides { get; set; }
 
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="ActionEntry{TState}"/> class.
+        /// </summary>
+        /// <param name="name">The action name.</param>
+        /// <param name="handler">The action handler function.</param>
+        /// <param name="allowOverrides">Whether to allow overrides of this action's properties.</param>
         public ActionEntry(string name, IActionHandler<TState> handler, bool allowOverrides = true)
         {
             Name = name;

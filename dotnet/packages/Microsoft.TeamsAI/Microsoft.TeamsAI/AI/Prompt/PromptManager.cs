@@ -8,6 +8,10 @@ using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.AI.Prompt
 {
+    /// <summary>
+    /// The prompt manager.
+    /// </summary>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public class PromptManager<TState> : IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private string? _promptsFolder;
@@ -15,6 +19,11 @@ namespace Microsoft.TeamsAI.AI.Prompt
         private readonly Dictionary<string, TemplateFunctionEntry<TState>> _functions;
         private readonly Dictionary<string, string> _promptVariables;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="PromptManager{TState}"/> class.
+        /// </summary>
+        /// <param name="promptsFolder">The prompt folder. This should be the absolute path, for example, "C:\prompts".</param>
+        /// <param name="promptVariables">Mapping to resolve prompt template variables.</param>
         public PromptManager(string? promptsFolder = null, Dictionary<string, string>? promptVariables = null)
         {
             if (promptsFolder != null)
@@ -172,6 +181,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <summary>
         /// Loads value from turn context and turn state into context variables.
         /// </summary>
+        /// <param name="context">The Semantic Kernel context</param>
         /// <param name="turnContext">The context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <returns>Variables that could be injected into the prompt template</returns>

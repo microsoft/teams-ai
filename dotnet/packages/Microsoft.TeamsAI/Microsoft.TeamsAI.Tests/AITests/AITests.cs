@@ -153,16 +153,20 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Prompt = "Test"
             };
             var ai = new AI<TestTurnState>(options);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnState = new TestTurnState();
+            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
+            var turnState = new TestTurnState
+            {
+                TempStateEntry = new TurnStateEntry<TempState>(new())
+            };
 
             // Act
-            var result = await ai.CompletePromptAsync(turnContextMock.Object, turnState, "Test", null, CancellationToken.None);
+            var result = await ai.CompletePromptAsync(turnContext, turnState, "Test", null, CancellationToken.None);
 
             // Assert
             Assert.Equal("Default", result);
             Assert.Equal(new string[] { "CompletePromptAsync" }, planner.Record.ToArray());
             Assert.Equal(new string[] { "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal("hello", turnState.Temp?.Input);
         }
 
         [Fact]
@@ -176,17 +180,21 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Prompt = "Test"
             };
             var ai = new AI<TestTurnState>(options);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnState = new TestTurnState();
+            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
+            var turnState = new TestTurnState
+            {
+                TempStateEntry = new TurnStateEntry<TempState>(new())
+            };
             var prompt = new PromptTemplate("Test", new());
 
             // Act
-            var result = await ai.CompletePromptAsync(turnContextMock.Object, turnState, prompt, null, CancellationToken.None);
+            var result = await ai.CompletePromptAsync(turnContext, turnState, prompt, null, CancellationToken.None);
 
             // Assert
             Assert.Equal("Default", result);
             Assert.Equal(new string[] { "CompletePromptAsync" }, planner.Record.ToArray());
             Assert.Equal(new string[] { "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal("hello", turnState.Temp?.Input);
         }
 
         [Fact]

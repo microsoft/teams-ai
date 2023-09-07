@@ -35,6 +35,13 @@ namespace Microsoft.TeamsAI.AI.Planner
         private TOptions _options { get; }
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="OpenAIPlanner{TState, TOptions}"/> class.
+        /// </summary>
+        /// <param name="options">The options to configure the planner.</param>
+        /// <param name="logger">The logger instance.</param>
+        /// <exception cref="ArgumentException"></exception>
         public OpenAIPlanner(TOptions options, ILogger? logger = null)
         {
             // TODO: Configure Retry Handler
@@ -323,6 +330,11 @@ namespace Microsoft.TeamsAI.AI.Planner
     /// <inheritdoc/>
     public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions> where TState : ITurnState<StateBase, StateBase, TempState>
     {
+        /// <summary>
+        /// Creates a new <see cref="OpenAIPlanner{TState}"/> instance.
+        /// </summary>
+        /// <param name="options">The options to configure the planner.</param>
+        /// <param name="logger">The logger instance.</param>
         public OpenAIPlanner(OpenAIPlannerOptions options, ILogger? logger = null) : base(options, logger)
         {
         }

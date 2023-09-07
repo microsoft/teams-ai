@@ -5,8 +5,14 @@ using System.Text;
 
 namespace Microsoft.TeamsAI.AI.Planner
 {
+    /// <summary>
+    /// Class that provides utility methods for working with conversation history.
+    /// </summary>
     public class ConversationHistory
     {
+        /// <summary>
+        /// The name of the conversation state property that stores the conversation history.
+        /// </summary>
         public static readonly string StatePropertyName = "__history__";
 
         /// <summary>
@@ -38,6 +44,11 @@ namespace Microsoft.TeamsAI.AI.Planner
             _SetHistory(turnState, history);
         }
 
+        /// <summary>
+        /// Appends text to the last line of conversation history.
+        /// </summary>
+        /// <param name="turnState">The turn state.</param>
+        /// <param name="text">The input text.</param>
         public static void AppendToLastLine(ITurnState<StateBase, StateBase, TempState> turnState, string text)
         {
             string line = GetLastLine(turnState);
@@ -313,7 +324,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Gets the conversation history from the turn state object.
         /// </summary>
         /// <param name="turnState">The application turn state</param>
-        /// <returns>The coversation history</returns>
+        /// <returns>The conversation history</returns>
         public static List<string> GetHistory(ITurnState<StateBase, StateBase, TempState> turnState)
         {
             if (turnState.Conversation != null && turnState.Conversation.TryGetValue(StatePropertyName, out object history))

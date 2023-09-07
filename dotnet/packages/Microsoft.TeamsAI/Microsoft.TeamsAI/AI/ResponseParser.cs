@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Microsoft.TeamsAI.AI
 {
-    public class ResponseParser
+    internal class ResponseParser
     {
         private static readonly string BREAKING_CHARACTERS = "`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./ \r\n\t";
         private static readonly string NAME_BREAKING_CHARACTERS = "`~!@#$%^&*()+={}|[]\\:\";\'<>?,./ \r\n\t";
@@ -383,7 +383,7 @@ namespace Microsoft.TeamsAI.AI
         }
 
         /// <summary>
-        /// Simple text tokensizer. Breaking characters are added to list as separate tokens.
+        /// Simple text tokenizer. Breaking characters are added to list as separate tokens.
         /// </summary>
         /// <param name="text">Any input string</param>
         /// <returns>A list of tokens</returns>
