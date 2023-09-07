@@ -1,37 +1,30 @@
-﻿using Microsoft.TeamsAI.AI.AzureContentSafety;
+﻿using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.State;
-using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
+using Azure.AI.ContentSafety;
+using Azure;
 
 namespace Microsoft.TeamsAI.AI.Moderator
 {
     /// <summary>
     /// An moderator that uses Azure Content Safety API.
     /// </summary>
-    /// <typeparam name="TState"></typeparam>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly AzureContentSafetyModeratorOptions _options;
-        private readonly AzureContentSafetyClient _client;
+        private readonly ContentSafetyClient _client;
 
         /// <summary>
         /// Constructs an instance of the moderator.
         /// </summary>
         /// <param name="options">Options to configure the moderator.</param>
-        /// <param name="logger">A logger instance.</param>
-        /// <param name="httpClient">HTTP client.</param>
-        public AzureContentSafetyModerator(AzureContentSafetyModeratorOptions options, ILogger? logger = null, HttpClient? httpClient = null)
+        public AzureContentSafetyModerator(AzureContentSafetyModeratorOptions options)
         {
             _options = options;
-
-            AzureContentSafetyClientOptions clientOptions = new(_options.ApiKey, _options.Endpoint)
-            {
-                ApiVersion = _options.ApiVersion,
-            };
-
-            _client = new AzureContentSafetyClient(clientOptions, logger, httpClient);
+            _client = new ContentSafetyClient(new Uri(options.Endpoint), new AzureKeyCredential(options.ApiKey));
         }
 
         /// <inheritdoc />
@@ -85,20 +78,29 @@ namespace Microsoft.TeamsAI.AI.Moderator
 
         private async Task<Plan?> _HandleTextModeration(string text, bool isModelInput)
         {
-            AzureContentSafetyTextAnalysisRequest request = new(text)
+            AnalyzeTextOptions analyzeTextOptions = new(text);
+            if (_options.Categories != null)
             {
-                BlocklistNames = _options.BlocklistNames,
-                Categories = _options.Categories,
-                BreakByBlocklists = _options.BreakByBlocklists,
-            };
+                foreach (TextCategory category in _options.Categories)
+                {
+                    analyzeTextOptions.Categories.Add(category);
+                }
+            }
+            if (_options.BlocklistNames != null)
+            {
+                foreach (string blocklistName in _options.BlocklistNames)
+                {
+                    analyzeTextOptions.BlocklistNames.Add(blocklistName);
+                }
+            }
 
-            AzureContentSafetyTextAnalysisResponse response = await _client.ExecuteTextModeration(request);
+            Response<AnalyzeTextResult> response = await _client.AnalyzeTextAsync(analyzeTextOptions);
 
-            bool flagged = response.BlocklistsMatchResults.Count > 0
-                || _ShouldBeFlagged(response.HateResult)
-                || _ShouldBeFlagged(response.SelfHarmResult)
-                || _ShouldBeFlagged(response.SexualResult)
-                || _ShouldBeFlagged(response.ViolenceResult);
+            bool flagged = response.Value.BlocklistsMatchResults.Count > 0
+            || _ShouldBeFlagged(response.Value.HateResult)
+            || _ShouldBeFlagged(response.Value.SelfHarmResult)
+            || _ShouldBeFlagged(response.Value.SexualResult)
+            || _ShouldBeFlagged(response.Value.ViolenceResult);
             if (flagged)
             {
                 string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
@@ -110,7 +112,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                             {
                                 new PredictedDoCommand(actionName, new Dictionary<string, object>
                                 {
-                                    { "Result", response }
+                                    { "Result", response.Value }
                                 })
                             }
                 };
@@ -119,7 +121,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
             return null;
         }
 
-        private bool _ShouldBeFlagged(AzureContentSafetyHarmCategoryResult? result)
+        private bool _ShouldBeFlagged(TextAnalyzeSeverityResult result)
         {
             return result != null && result.Severity >= _options.SeverityLevel;
         }

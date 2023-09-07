@@ -9,19 +9,15 @@ using Xunit.Abstractions;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.Tests.TestUtils;
 
 namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     public sealed class AzureContentSafetyModeratorTests
     {
         private readonly IConfigurationRoot _configuration;
-        private readonly RedirectOutput _output;
 
-        public AzureContentSafetyModeratorTests(ITestOutputHelper output)
+        public AzureContentSafetyModeratorTests()
         {
-            _output = new RedirectOutput(output);
-
             var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             if (string.IsNullOrWhiteSpace(currentAssemblyDirectory))
@@ -49,7 +45,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("AzureContentSafety").Get<AzureContentSafetyConfiguration>();
             var options = new AzureContentSafetyModeratorOptions(config.ApiKey, config.Endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options, _output);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
 
             var botAdapterMock = new Mock<BotAdapter>();
             // TODO: when TurnState is implemented, get the user input
@@ -85,7 +81,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("AzureContentSafety").Get<AzureContentSafetyConfiguration>();
             var options = new AzureContentSafetyModeratorOptions(config.ApiKey, config.Endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options, _output);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
 
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TurnState>();
