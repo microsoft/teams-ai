@@ -18,14 +18,14 @@ namespace QuestBot.Controllers
         }
 
         [HttpPost]
-        public async Task PostAsync(CancellationToken cancellationToken = default)
+        public async Task PostAsync()
         {
             await _adapter.ProcessAsync
             (
                 Request,
                 Response,
                 _bot,
-                cancellationToken
+                cancellationToken: default
             );
         }
     }

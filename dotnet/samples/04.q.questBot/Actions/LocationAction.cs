@@ -62,7 +62,7 @@ namespace QuestBot.Actions
             if (!string.Equals(newLocation.Title, currentLocation?.Title, StringComparison.OrdinalIgnoreCase))
             {
                 state.Conversation.LocationTurn += 1;
-                await context.SendActivityAsync($"🧭 <strong>${newLocation.Title}</strong><br>{string.Join("<br>", newLocation.Description.Split('\n'))}");
+                await context.SendActivityAsync($"🧭 <strong>{newLocation.Title}</strong><br>{string.Join("<br>", newLocation.Description.Split('\n'))}");
             }
 
             state.Temp!.PlayerAnswered = true;

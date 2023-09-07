@@ -37,7 +37,7 @@ namespace QuestBot.Actions
             );
 
             // Say the current conditions to the player
-            await UpdateDMResponseAsync(context, state, $"⏳ ${conditions}");
+            await UpdateDMResponseAsync(context, state, $"⏳ {conditions}");
             state.Temp!.PlayerAnswered = true;
             return false;
         }
@@ -133,7 +133,7 @@ namespace QuestBot.Actions
                 // Notify player
                 // - We don't consider this answering the players query. We want the story to be included
                 //   for added color.
-                await context.SendActivityAsync(notification ?? $"⏳ ${days} days later");
+                await context.SendActivityAsync(notification ?? $"⏳ {days} days later");
                 return true;
             }
             else

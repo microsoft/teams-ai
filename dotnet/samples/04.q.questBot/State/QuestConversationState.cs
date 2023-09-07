@@ -55,7 +55,17 @@ namespace QuestBot.State
         public Campaign? Campaign
         {
             get => Get<Campaign>(_campaignKey);
-            set => Set(_campaignKey, value);
+            set
+            {
+                if (value == null)
+                {
+                    Remove(_campaignKey);
+                }
+                else
+                {
+                    Set(_campaignKey, value);
+                }
+            }
         }
 
         public IReadOnlyDictionary<string, Quest>? Quests

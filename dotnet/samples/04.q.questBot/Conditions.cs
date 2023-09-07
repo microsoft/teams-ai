@@ -30,7 +30,7 @@
         public static readonly string TEMPERATURE_VERYHOT = "very hot";
 
         public static string DescribeConditions(double time, int day, string temperature, string weather)
-            => $"It's a ${DescribeSeason(day)} ${DescribeTimeOfDay(time)} and the weather is ${temperature} and ${weather}.";
+            => $"It's a {DescribeSeason(day)} {DescribeTimeOfDay(time)} and the weather is {temperature} and {weather}.";
 
         public static string DescribeTimeOfDay(double time)
         {

@@ -12,6 +12,8 @@ namespace QuestBot.Models
 
         [JsonInclude]
         [JsonPropertyName("objectives")]
-        public IList<CampaignObjective> Objectives { get; private set; } = Array.Empty<CampaignObjective>();
+#pragma warning disable CA2227
+        public IList<CampaignObjective> Objectives { get; set; } = Array.Empty<CampaignObjective>();
+#pragma warning restore CA2227
     }
 }

@@ -211,7 +211,7 @@ namespace QuestBot
                 // Notify user of new quest
                 objectiveAdded = true;
                 await turnContext.SendActivityAsync(
-                    $"✨ <strong>${nextObjective.Title}</strong><br>{string.Join("<br>", nextObjective.Description.Trim().Split('\n'))}",
+                    $"✨ <strong>{nextObjective.Title}</strong><br>{string.Join("<br>", nextObjective.Description.Trim().Split('\n'))}",
                     cancellationToken: cancellationToken);
             }
 
@@ -337,7 +337,7 @@ namespace QuestBot
             var conversation = state.Conversation!;
             return Task.FromResult(conversation.Campaign == null ?
                 string.Empty :
-                $"\"{conversation.Campaign.Title}\" - ${conversation.Campaign.PlayerIntro}");
+                $"\"{conversation.Campaign.Title}\" - {conversation.Campaign.PlayerIntro}");
         }
 
         private Task<string> DescribeQuests(ITurnContext _, QuestState state)
@@ -363,7 +363,7 @@ namespace QuestBot
             var conversation = state.Conversation!;
             return Task.FromResult(conversation.Location == null ?
                 string.Empty :
-                $"\"{conversation.Location.Title}\" - ${conversation.Location.Description}");
+                $"\"{conversation.Location.Title}\" - {conversation.Location.Description}");
         }
 
         private Task<string> DescribeConditions(ITurnContext _, QuestState state)
