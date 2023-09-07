@@ -181,7 +181,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (!AIConstants.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ArgumentException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AIConstants.DoCommand} token");
                 }
 
                 string actionName = "";
@@ -348,7 +348,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (!AIConstants.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ArgumentException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AIConstants.SayCommand} token");
                 }
 
                 // Parse command (skips initial SAY token)

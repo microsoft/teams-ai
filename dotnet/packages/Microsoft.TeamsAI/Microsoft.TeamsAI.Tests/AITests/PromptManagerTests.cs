@@ -327,7 +327,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var ex = await Assert.ThrowsAsync<TeamsAIException>(async () => await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate));
+            var ex = await Assert.ThrowsAsync<TeamsAIException>(async () => await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate));
 
             // Assert
             Assert.Equal("Failed to render prompt: $Function not found: Function `promptFunction` not found", ex.Message);
