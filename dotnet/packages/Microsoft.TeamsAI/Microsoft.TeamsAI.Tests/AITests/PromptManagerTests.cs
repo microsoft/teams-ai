@@ -2,11 +2,11 @@
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Bot.Schema;
-using Microsoft.SemanticKernel.TemplateEngine;
 using Moq;
 using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
+using Microsoft.SemanticKernel.Diagnostics;
 
 namespace Microsoft.TeamsAI.Tests.AITests
 {
@@ -330,8 +330,8 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var ex = await Assert.ThrowsAsync<TeamsAIException>(async () => await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate));
 
             // Assert
-            Assert.Equal("Failed to render prompt: $Function not found: Function `promptFunction` not found", ex.Message);
-            Assert.Equal(typeof(TemplateException), ex.InnerException?.GetType());
+            Assert.Equal("Failed to render prompt: $Function `promptFunction` not found", ex.Message);
+            Assert.Equal(typeof(SKException), ex.InnerException?.GetType());
         }
 
         [Fact]

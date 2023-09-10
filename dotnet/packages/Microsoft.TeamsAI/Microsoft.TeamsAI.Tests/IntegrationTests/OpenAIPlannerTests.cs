@@ -151,7 +151,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
-            Assert.Equal("Failed to perform AI prompt completion: Access denied: The request is not authorized, HTTP status: 401", exception.Message);
+            Assert.StartsWith("Error while executing AI prompt completion: Incorrect API key provided: invalidA*iKey. You can find your API key at https://platform.openai.com/account/api-keys.", exception.Message);
         }
 
         [Fact(Skip = "OpenAI will throttle requests. This test should only be run manually.")]
@@ -186,7 +186,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
-            Assert.Equal("Failed to perform AI prompt completion: Invalid request: The request is not valid, HTTP status: 404", exception.Message);
+            Assert.StartsWith("Error while executing AI prompt completion: The model `invalidModel` does not exist", exception.Message);
         }
     }
 }
