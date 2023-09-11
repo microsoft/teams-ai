@@ -1,6 +1,5 @@
 ﻿using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
@@ -22,7 +21,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
         ///
         /// To approve a prompt, simply return null. Returning a new plan bypasses the planner and
         /// redirects to a new set of actions. Typically the moderator will return a new plan with a
-        /// single DO command that calls <see cref="DefaultActionTypes.FlaggedInputActionName"/> to flag the input for review.
+        /// single DO command that calls <see cref="AIConstants.FlaggedInputActionName"/> to flag the input for review.
         ///
         /// The moderator can pass any entities that make sense to the redirected action.
         /// </remarks>
@@ -40,7 +39,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
         ///
         /// To approve a plan simply return the plan that was passed in. A new plan can be returned to
         /// redirect to a new set of actions. Typically the moderator will return a new plan with a
-        /// single DO command that calls <see cref="DefaultActionTypes.FlaggedOutputActionName"/> to flag the output for review.
+        /// single DO command that calls <see cref="AIConstants.FlaggedOutputActionName"/> to flag the output for review.
         ///
         /// The moderator can pass any entities that make sense to the redirected action.
         /// </remarks>

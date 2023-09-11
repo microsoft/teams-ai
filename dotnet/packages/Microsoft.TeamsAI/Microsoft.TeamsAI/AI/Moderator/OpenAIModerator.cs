@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI.Planner;
+﻿using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -96,7 +95,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 {
                     if (result.Flagged)
                     {
-                        string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
+                        string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
 
                         // Flagged
                         return new Plan()
@@ -124,7 +123,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                     {
                         Commands = new List<IPredictedCommand>
                         {
-                            new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName)
+                            new PredictedDoCommand(AIConstants.RateLimitedActionName)
                         }
                     };
 

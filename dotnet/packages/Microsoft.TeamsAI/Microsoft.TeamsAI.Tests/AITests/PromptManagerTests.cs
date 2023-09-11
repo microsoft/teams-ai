@@ -251,7 +251,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, promptString);
@@ -290,7 +290,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddFunction(promptFunctionName, promptFunction);
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -327,7 +327,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var ex = await Assert.ThrowsAsync<TeamsAIException>(async () => await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate));
+            var ex = await Assert.ThrowsAsync<TeamsAIException>(async () => await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate));
 
             // Assert
             Assert.Equal("Failed to render prompt: $Function not found: Function `promptFunction` not found", ex.Message);
@@ -338,7 +338,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
         public async void RenderPrompt_ResolveVariable()
         {
             // Arrange
-            IPromptManager<TestTurnState> promptManager = new PromptManager<TestTurnState>();
+            PromptManager<TestTurnState> promptManager = new();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
@@ -366,7 +366,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.Variables[variableKey] = variableValue;
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -411,7 +411,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnState, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnState, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -456,7 +456,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnState, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnState, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -490,7 +490,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal("", renderedPrompt.Text);

@@ -1,6 +1,7 @@
 ﻿using LightBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.TeamsAI.AI.Action;
+using Microsoft.TeamsAI.AI;
 
 namespace LightBot
 {
@@ -49,7 +50,7 @@ namespace LightBot
             return false;
         }
 
-        [Action(DefaultActionTypes.UnknownActionName)]
+        [Action(AIConstants.UnknownActionName)]
         public async Task<bool> UnknownAction([ActionTurnContext] TurnContext turnContext, [ActionName] string action)
         {
             await turnContext.SendActivityAsync(ResponseGenerator.UnknownAction(action ?? "Unknown"));

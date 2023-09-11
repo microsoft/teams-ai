@@ -14,6 +14,18 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
 
         public List<string> Record { get; } = new List<string>();
 
+        protected override Task<bool> OnBeforeTurnAsync(ITurnContext turnContext, TestTurnState turnState, CancellationToken cancellationToken)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return base.OnBeforeTurnAsync(turnContext, turnState, cancellationToken);
+        }
+
+        protected override Task<bool> OnAfterTurnAsync(ITurnContext turnContext, TestTurnState turnState, CancellationToken cancellationToken)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return base.OnAfterTurnAsync(turnContext, turnState, cancellationToken);
+        }
+
         protected override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, TestTurnState turnState, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);

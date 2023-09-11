@@ -1,5 +1,4 @@
 ﻿using Azure.AI.OpenAI;
-using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 using Microsoft.Extensions.Logging;
@@ -167,7 +166,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                 if (ex.isRateLimitedStatusCode())
                 {
                     Plan plan = new();
-                    plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
+                    plan.Commands.Add(new PredictedDoCommand(AIConstants.RateLimitedActionName));
                     return plan;
                 }
 
@@ -216,7 +215,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                     bool spoken = false;
                     plan.Commands = plan.Commands.FindAll((command) =>
                     {
-                        if (command.Type == AITypes.SayCommand)
+                        if (command.Type == AIConstants.SayCommand)
                         {
                             if (spoken) { return false; }
 

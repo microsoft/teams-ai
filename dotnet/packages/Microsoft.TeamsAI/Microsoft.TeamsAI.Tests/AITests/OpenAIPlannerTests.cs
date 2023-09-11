@@ -8,7 +8,6 @@ using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
@@ -55,10 +54,10 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Assert
             Assert.Single(result.Commands);
-            Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
+            Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
 
             var doCommand = (PredictedDoCommand)result.Commands[0];
-            Assert.Equal(DefaultActionTypes.RateLimitedActionName, doCommand.Action);
+            Assert.Equal(AIConstants.RateLimitedActionName, doCommand.Action);
             Assert.Empty(doCommand.Entities!);
 
         }
