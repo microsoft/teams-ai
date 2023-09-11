@@ -34,6 +34,7 @@ namespace Microsoft.TeamsAI
     {
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
+        private TypingTimer? _typingTimer;
 
         /// <summary>
         /// Creates a new Application instance.
@@ -78,6 +79,47 @@ namespace Microsoft.TeamsAI
 
                 return _ai;
             }
+        }
+
+        /// <summary>
+        /// Manually start a timer to periodically send "typing" activities.
+        /// </summary>
+        /// <remarks>
+        /// The timer waits 1000ms to send its initial "typing" activity and then send an additional
+        /// "typing" activity every 1000ms.The timer will automatically end once an outgoing activity
+        /// has been sent. If the timer is already running or the current activity is not a "message"
+        /// the call is ignored.
+        /// </remarks>
+        /// <param name="turnContext">The turn context.</param>
+        public void StartTypingTimer(ITurnContext turnContext)
+        {
+            if (turnContext.Activity.Type != ActivityTypes.Message)
+            {
+                return;
+            }
+
+            if (_typingTimer == null)
+            {
+                _typingTimer = new TypingTimer(_typingTimerDelay);
+            }
+
+            if (_typingTimer.IsRunning() == false)
+            {
+                _typingTimer.Start(turnContext);
+            }
+
+        }
+
+        /// <summary>
+        /// Manually stop the typing timer.
+        /// </summary>
+        /// <remarks>
+        /// If the timer isn't running nothing happens.
+        /// </remarks>
+        public void StopTypingTimer()
+        {
+            _typingTimer?.Dispose();
+            _typingTimer = null;
         }
 
         /// <summary>
@@ -152,15 +194,12 @@ namespace Microsoft.TeamsAI
         /// </summary>
         private async Task _OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            TypingTimer? timer = null;
-
             try
             {
                 // Start typing timer if configured
                 if (Options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(_typingTimerDelay);
-                    timer.Start(turnContext);
+                    StartTypingTimer(turnContext);
                 };
 
                 // Remove @mentions
@@ -202,8 +241,8 @@ namespace Microsoft.TeamsAI
             }
             finally
             {
-                // Dipose the timer if configured
-                timer?.Dispose();
+                // Stop the timer if configured
+                StopTypingTimer();
             }
         }
 

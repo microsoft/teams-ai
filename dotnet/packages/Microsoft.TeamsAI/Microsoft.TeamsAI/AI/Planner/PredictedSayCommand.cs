@@ -10,7 +10,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <summary>
         /// The type to indicate that a SAY command is being returned.
         /// </summary>
-        public string Type { get; } = AITypes.SayCommand;
+        public string Type { get; } = AIConstants.SayCommand;
 
         /// <summary>
         /// The response that the AI system should say.

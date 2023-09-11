@@ -1,15 +1,14 @@
 ﻿using Azure.AI.OpenAI;
-using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextCompletion;
 using Microsoft.SemanticKernel.SemanticFunctions;
-using AIException = Microsoft.SemanticKernel.AI.AIException;
 using PromptTemplate = Microsoft.TeamsAI.AI.Prompt.PromptTemplate;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
@@ -35,6 +34,8 @@ namespace Microsoft.TeamsAI.AI.Planner
         private TOptions _options { get; }
         private protected readonly IKernel _kernel;
         private readonly ILogger? _logger;
+        // TODO: update when refactoring logging
+        private readonly ILoggerFactory? _loggerFactory = NullLoggerFactory.Instance;
 
         /// <summary>
         /// Creates a new instance of the <see cref="OpenAIPlanner{TState, TOptions}"/> class.
@@ -55,7 +56,7 @@ namespace Microsoft.TeamsAI.AI.Planner
             }
             if (logger != null)
             {
-                builder.WithLogger(logger);
+                builder.WithLoggerFactory(_loggerFactory);
                 _logger = logger;
             }
 
@@ -112,7 +113,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                     // Request base chat completion
                     IChatResult response = await _CreateChatCompletion(turnState!, options, promptTemplate, userMessage, cancellationToken);
                     ChatMessageBase message = await response.GetChatMessageAsync(cancellationToken).ConfigureAwait(false);
-                    CompletionsUsage usage = ((ITextResult)response).ModelResult.GetOpenAIChatResult().Usage;
+                    CompletionsUsage usage = response.ModelResult.GetOpenAIChatResult().Usage;
 
                     completionTokens = usage.CompletionTokens;
                     promptTokens = usage.PromptTokens;
@@ -136,12 +137,10 @@ namespace Microsoft.TeamsAI.AI.Planner
 
                 return result;
             }
-            catch (AIException ex) when (ex.ErrorCode == AIException.ErrorCodes.Throttling)
+            catch (SemanticKernel.Diagnostics.HttpOperationException ex) when (ex.StatusCode == (HttpStatusCode)429)
             {
-                // TODO: SK recently updated AIException to HttpOperationException, update this when we update SK dependency
-
                 // rate limited
-                throw new HttpOperationException($"Error while executing AI prompt completion: {ex.Message}", (HttpStatusCode)429);
+                throw new HttpOperationException($"Error while executing AI prompt completion: {ex.Message}", ex.StatusCode);
             }
             catch (Exception ex)
             {
@@ -167,7 +166,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                 if (ex.isRateLimitedStatusCode())
                 {
                     Plan plan = new();
-                    plan.Commands.Add(new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName));
+                    plan.Commands.Add(new PredictedDoCommand(AIConstants.RateLimitedActionName));
                     return plan;
                 }
 
@@ -216,7 +215,7 @@ namespace Microsoft.TeamsAI.AI.Planner
                     bool spoken = false;
                     plan.Commands = plan.Commands.FindAll((command) =>
                     {
-                        if (command.Type == AITypes.SayCommand)
+                        if (command.Type == AIConstants.SayCommand)
                         {
                             if (spoken) { return false; }
 

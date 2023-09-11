@@ -48,8 +48,8 @@ namespace Microsoft.TeamsAI.Utilities.JsonConverters
 
             IPredictedCommand predictedCommand = (commandType?.ToUpperInvariant()) switch
             {
-                AITypes.DoCommand => JsonSerializer.Deserialize<PredictedDoCommand>(ref reader)!,
-                AITypes.SayCommand => JsonSerializer.Deserialize<PredictedSayCommand>(ref reader)!,
+                AIConstants.DoCommand => JsonSerializer.Deserialize<PredictedDoCommand>(ref reader)!,
+                AIConstants.SayCommand => JsonSerializer.Deserialize<PredictedSayCommand>(ref reader)!,
                 _ => throw new JsonException($"Unknown command type `{commandType}`")
             };
 
@@ -66,7 +66,7 @@ namespace Microsoft.TeamsAI.Utilities.JsonConverters
 
             if (command == typeof(PredictedDoCommand))
             {
-                writer.WriteStringValue(AITypes.DoCommand);
+                writer.WriteStringValue(AIConstants.DoCommand);
 
                 writer.WritePropertyName(_entitiesPropertyName);
 
@@ -74,7 +74,7 @@ namespace Microsoft.TeamsAI.Utilities.JsonConverters
             }
             else if (command == typeof(PredictedSayCommand))
             {
-                writer.WriteStringValue(AITypes.SayCommand);
+                writer.WriteStringValue(AIConstants.SayCommand);
 
                 writer.WritePropertyName(_responsePropertyName);
 
