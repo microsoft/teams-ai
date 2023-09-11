@@ -8,4 +8,4 @@ from .ai import *
 from .app import Application
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
-from .message_preview_action import MessagePreviewAction
+from .message_extensions import MessagePreviewAction

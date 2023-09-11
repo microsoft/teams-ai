@@ -155,7 +155,7 @@ class TestApp(IsolatedAsyncioTestCase):
     @pytest.mark.asyncio
     async def test_anonymous_query_link(self):
         handler = mock.AsyncMock()
-        self.app.anonymous_query_link("256")(handler)
+        self.app.message_extensions.anonymous_query_link("256")(handler)
         self.assertEqual(len(self.app._routes), 1)
 
         @dataclass
@@ -205,7 +205,7 @@ class TestApp(IsolatedAsyncioTestCase):
     @pytest.mark.asyncio
     async def test_message_preview(self):
         handler = mock.AsyncMock()
-        self.app.message_preview("256", "edit")(handler)
+        self.app.message_extensions.message_preview("256", "edit")(handler)
         self.assertEqual(len(self.app._routes), 1)
 
         @dataclass
