@@ -11,13 +11,11 @@ namespace Microsoft.TeamsAI.AI.Prompt
         // TODO: This is a hack around to get the default skill name from SK's internal implementation. We need to fix this.
         public const string DefaultSkill = "_GLOBAL_FUNCTIONS_";
 
-        private string _name;
         private PromptManager<TState> _promptManager;
         private TState _turnState;
         private ITurnContext _turnContext;
-        private IReadOnlySkillCollection? _skillCollection;
 
-        public string Name => _name;
+        public string Name { get; }
 
         public string SkillName => DefaultSkill;
 
@@ -31,7 +29,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
         public SKFunctionWrapper(ITurnContext turnContext, TState turnState, string name, PromptManager<TState> promptManager)
         {
-            _name = name;
+            Name = name;
             _promptManager = promptManager;
             _turnContext = turnContext;
             _turnState = turnState;
@@ -44,7 +42,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
         public async Task<SKContext> InvokeAsync(SKContext context, CompleteRequestSettings? settings = null, CancellationToken cancellationToken = default)
         {
-            string result = await _promptManager.InvokeFunction(_turnContext, _turnState, _name);
+            string result = await _promptManager.InvokeFunction(_turnContext, _turnState, Name);
             context.Variables.Update(result);
             return context;
         }
@@ -61,7 +59,6 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
         public ISKFunction SetDefaultSkillCollection(IReadOnlySkillCollection skills)
         {
-            _skillCollection = skills;
             return this;
         }
     }
