@@ -21,7 +21,9 @@ from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContex
 from botbuilder.schema import Activity, ActivityTypes
 from botbuilder.schema.teams import (
     MessagingExtensionActionResponse,
+    MessagingExtensionResponse,
     MessagingExtensionResult,
+    TaskModuleResponse,
     TaskModuleResponseBase,
     TaskModuleTaskInfo,
 )
@@ -328,7 +330,7 @@ class Application(Bot, Generic[StateT]):
                     return False
 
                 res = await func(context, state, value["bot_activity_preview"][0])
-                await self._invoke_response(context, res)
+                await self._invoke_action_response(context, res)
                 return True
 
             self._routes.append(Route[StateT](__selector__, __invoke__))
@@ -557,7 +559,19 @@ class Application(Bot, Generic[StateT]):
 
         return command_id == match
 
-    async def _invoke_response(
+    async def _invoke_response(self, context: TurnContext, body: MessagingExtensionResult):
+        if context._INVOKE_RESPONSE_KEY in context.turn_state:
+            return
+
+        response = MessagingExtensionResponse(compose_extension=body)
+
+        await context.send_activity(
+            Activity(
+                type=ActivityTypes.invoke_response, value=InvokeResponse(body=response, status=200)
+            )
+        )
+
+    async def _invoke_action_response(
         self,
         context: TurnContext,
         body: Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None] = None,
@@ -580,6 +594,23 @@ class Application(Bot, Generic[StateT]):
             )
         elif isinstance(body, MessagingExtensionResult):
             response = MessagingExtensionActionResponse(compose_extension=body)
+
+        await context.send_activity(
+            Activity(
+                type=ActivityTypes.invoke_response, value=InvokeResponse(body=response, status=200)
+            )
+        )
+
+    async def _invoke_task_response(
+        self, context: TurnContext, body: Union[TaskModuleTaskInfo, str]
+    ):
+        if context._INVOKE_RESPONSE_KEY in context.turn_state:
+            return
+
+        response = TaskModuleResponse(task=TaskModuleResponseBase(type="continue", value=body))
+
+        if isinstance(body, str):
+            response = TaskModuleResponse(task=TaskModuleResponseBase(type="message", value=body))
 
         await context.send_activity(
             Activity(
