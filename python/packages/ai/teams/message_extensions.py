@@ -37,13 +37,13 @@ class MessageExtensions(Generic[StateT]):
 
         ```python
         # Use this method as a decorator
-        @app.anonymous_query_link("test")
+        @app.message_extensions.anonymous_query_link("test")
         async def on_anonymous_query_link(context: TurnContext, state: TurnState, url: str):
             print(url)
-            return True
+            return MessageExtensionResult()
 
         # Pass a function to this method
-        app.anonymous_query_link("test")(on_anonymous_query_link)
+        app.message_extensions.anonymous_query_link("test")(on_anonymous_query_link)
         ```
 
         #### Args:
@@ -89,12 +89,16 @@ class MessageExtensions(Generic[StateT]):
 
         ```python
         # Use this method as a decorator
-        @app.message_preview("test", "edit")
-        async def on_message_preview_edit(context: TurnContext, state: TurnState):
-            return True
+        @app.message_extensions.message_preview("test", "edit")
+        async def on_message_preview_edit(
+            context: TurnContext,
+            state: TurnState,
+            activity: Activity,
+        ):
+            return
 
         # Pass a function to this method
-        app.message_preview("test", "edit")(on_message_preview_edit)
+        app.message_extensions.message_preview("test", "edit")(on_message_preview_edit)
         ```
 
         #### Args:
@@ -143,6 +147,53 @@ class MessageExtensions(Generic[StateT]):
 
                 res = await func(context, state, value["bot_activity_preview"][0])
                 await self._invoke_action_response(context, res)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__))
+            return func
+
+        return __call__
+
+    def fetch_task(self, command_id: Union[str, Pattern[str]]):
+        """
+        Registers a handler to process an action of a message that's being
+        previewed by the user prior to sending.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_extensions.fetch_task("test")
+        async def on_fetch_task(context: TurnContext, state: TurnState):
+            return TaskModuleTaskInfo()
+
+        # Pass a function to this method
+        app.message_extensions.fetch_task("test")(on_fetch_task)
+        ```
+
+        #### Args:
+        - `command_id`: a string or regex pattern that matches against the activities
+        `command_id`
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/fetchTask"
+                or not context.activity.value
+                or not self._activity_with_command_id(context.activity, command_id)
+            ):
+                return False
+
+            return True
+
+        def __call__(
+            func: Callable[
+                [TurnContext, StateT],
+                Awaitable[Union[TaskModuleTaskInfo, str]],
+            ]
+        ):
+            async def __invoke__(context: TurnContext, state: StateT):
+                res = await func(context, state)
+                await self._invoke_task_response(context, res)
                 return True
 
             self._routes.append(Route[StateT](__selector__, __invoke__))
