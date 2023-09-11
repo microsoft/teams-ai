@@ -27,15 +27,15 @@ export function createDynamicSearchCard(): Attachment {
                                 choices: [
                                     {
                                         title: '@microsoft/teams-ai',
-                                        value: 'static_option_1'
+                                        value: 'microsoft_teams_ai'
                                     },
                                     {
                                         title: '@microsoft/botframework-webchat',
-                                        value: 'static_option_2'
+                                        value: 'microsoft_botframework_webchat'
                                     },
                                     {
                                         title: '@microsoft/botframework-emulator',
-                                        value: 'static_option_3'
+                                        value: 'microsoft_botframework_emulator'
                                     }
                                 ],
                                 'choices.data': {
@@ -49,7 +49,7 @@ export function createDynamicSearchCard(): Attachment {
                                 isRequired: true,
                                 errorMessage: 'There was an error',
                                 isMultiSelect: true,
-                                style: 'expanded'
+                                style: 'filtered'
                             }
                         ],
                         type: 'Column'

@@ -31,9 +31,9 @@ namespace Microsoft.TeamsAI.Tests.AITests
         }
 
         [Theory]
-        [InlineData(HttpStatusCode.OK)]
         [InlineData(HttpStatusCode.BadRequest)]
         [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.TooManyRequests)]
         public async Task Test_ExecuteTextModeration_HttpResponseMessage_IsDisposed(HttpStatusCode statusCode)
         {
             // Arrange
@@ -45,10 +45,11 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"), null, httpClient);
 
             // Action
-            var exception = await Assert.ThrowsAsync<OpenAIClientException>(async () => await openAIClient.ExecuteTextModeration("test-text", "test-model"));
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await openAIClient.ExecuteTextModeration("test-text", "test-model"));
 
             // Assert
             Assert.NotNull(exception);
+            Assert.Equal(statusCode, exception.StatusCode);
             Assert.True(response.Disposed);
         }
 

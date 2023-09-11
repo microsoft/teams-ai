@@ -1,19 +1,20 @@
-﻿using Microsoft.Bot.Builder;
+﻿using GPT.Model;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
+using Microsoft.Rest;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using Newtonsoft.Json.Linq;
-
-using GPT.Model;
+using System.Net;
 
 namespace GPT
 {
-    public class GPtMessageExtension : Application<TurnState, TurnStateManager>
+    public class GPTMessageExtension : Application<TurnState, TurnStateManager>
     {
         private readonly bool _previewMode;
 
-        public GPtMessageExtension(ApplicationOptions<TurnState, TurnStateManager> options, bool previewMode = false) : base(options)
+        public GPTMessageExtension(ApplicationOptions<TurnState, TurnStateManager> options, bool previewMode = false) : base(options)
         {
             _previewMode = previewMode;
         }
@@ -45,55 +46,55 @@ namespace GPT
                 switch (data.Verb?.ToLowerInvariant())
                 {
                     case "generate":
+                    {
+                        // Call GPT and return response view
+                        string post = await GetGPTPost(turnContext, turnState, "Generate", data, cancellationToken);
+                        Attachment card = await CardBuilder.NewEditViewAttachment(post, _previewMode, cancellationToken);
+                        return new MessagingExtensionActionResponse
                         {
-                            // Call GPT and return response view
-                            string post = await GetGPtPost(turnContext, turnState, "Generate", data, cancellationToken);
-                            Attachment card = await CardBuilder.NewEditViewAttachment(post, _previewMode, cancellationToken);
-                            return new MessagingExtensionActionResponse
-                            {
-                                Task = CreateTaskModule(card)
-                            };
-                        }
+                            Task = CreateTaskModule(card)
+                        };
+                    }
                     case "update":
+                    {
+                        // Call GPT and return an updated response view
+                        string post = await GetGPTPost(turnContext, turnState, "Update", data, cancellationToken);
+                        Attachment card = await CardBuilder.NewEditViewAttachment(post, _previewMode, cancellationToken);
+                        return new MessagingExtensionActionResponse
                         {
-                            // Call GPT and return an updated response view
-                            string post = await GetGPtPost(turnContext, turnState, "Update", data, cancellationToken);
-                            Attachment card = await CardBuilder.NewEditViewAttachment(post, _previewMode, cancellationToken);
-                            return new MessagingExtensionActionResponse
-                            {
-                                Task = CreateTaskModule(card)
-                            };
-                        }
+                            Task = CreateTaskModule(card)
+                        };
+                    }
                     case "preview":
+                    {
+                        // Preview the post as an adaptive card
+                        Attachment card = await CardBuilder.NewPostCardAttachment(data.Post ?? string.Empty, cancellationToken);
+                        return new MessagingExtensionActionResponse
                         {
-                            // Preview the post as an adaptive card
-                            Attachment card = await CardBuilder.NewPostCardAttachment(data.Post ?? string.Empty, cancellationToken);
-                            return new MessagingExtensionActionResponse
+                            ComposeExtension = new MessagingExtensionResult
                             {
-                                ComposeExtension = new MessagingExtensionResult
-                                {
-                                    Type = "botMessagePreview",
-                                    ActivityPreview = MessageFactory.Attachment(card) as Activity,
-                                }
-                            };
-                        }
+                                Type = "botMessagePreview",
+                                ActivityPreview = MessageFactory.Attachment(card) as Activity,
+                            }
+                        };
+                    }
                     case "post":
+                    {
+                        // Drop the card into compose window
+                        Attachment card = await CardBuilder.NewPostCardAttachment(data.Post ?? string.Empty, cancellationToken);
+                        return new MessagingExtensionActionResponse
                         {
-                            // Drop the card into compose window
-                            Attachment card = await CardBuilder.NewPostCardAttachment(data.Post ?? string.Empty, cancellationToken);
-                            return new MessagingExtensionActionResponse
+                            ComposeExtension = new MessagingExtensionResult
                             {
-                                ComposeExtension = new MessagingExtensionResult
-                                {
-                                    Type = "result",
-                                    AttachmentLayout = "list",
-                                    Attachments = new List<MessagingExtensionAttachment>
+                                Type = "result",
+                                AttachmentLayout = "list",
+                                Attachments = new List<MessagingExtensionAttachment>
                                     {
                                         card.ToMessagingExtensionAttachment()
                                     }
-                                }
-                            };
-                        }
+                            }
+                        };
+                    }
                     default:
                         throw new Exception($"Unknown CreatePost verb: {data.Verb}");
                 }
@@ -107,7 +108,7 @@ namespace GPT
         protected override async Task<MessagingExtensionActionResponse> OnMessagingExtensionBotMessagePreviewEditAsync(MessagingExtensionAction action, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
         {
             // Get post text from previewed card
-            PreviewCard previewCard = 
+            PreviewCard previewCard =
                 (action.BotActivityPreview.FirstOrDefault()?.Attachments.FirstOrDefault()?.Content as JObject)?
                 .ToObject<PreviewCard>()
                 ?? throw new Exception("Incorrect preview card format");
@@ -154,14 +155,20 @@ namespace GPT
             return Task.CompletedTask;
         }
 
-        private async Task<string> GetGPtPost(ITurnContext turnContext, TurnState turnState, string prompt, SubmitData data, CancellationToken cancellationToken)
+        private async Task<string> GetGPTPost(ITurnContext turnContext, TurnState turnState, string prompt, SubmitData data, CancellationToken cancellationToken)
         {
             // Set prompt variables
             AI.Prompts.Variables.Add("prompt", data.Prompt ?? string.Empty);
             AI.Prompts.Variables.Add("post", data.Post ?? string.Empty);
 
-            string post = await AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
-            return post ?? throw new Exception("The request to OpenAI was rate limited. Please try again later.");
+            try
+            {
+                return await AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
+            }
+            catch (HttpOperationException e) when (e.Response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                throw new Exception("The request to OpenAI was rate limited. Please try again later.", e);
+            }
         }
 
         private static TaskModuleResponseBase CreateTaskModule(Attachment attachment)

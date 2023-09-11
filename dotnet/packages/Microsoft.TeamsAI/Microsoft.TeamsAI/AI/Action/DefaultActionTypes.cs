@@ -1,6 +1,9 @@
 ﻿
 namespace Microsoft.TeamsAI.AI.Action
 {
+    /// <summary>
+    /// Names of the default action types.
+    /// </summary>
     public class DefaultActionTypes
     {
         /// <summary>

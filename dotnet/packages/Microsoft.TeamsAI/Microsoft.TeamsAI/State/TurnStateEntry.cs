@@ -1,12 +1,19 @@
 ﻿using Microsoft.TeamsAI.Utilities;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
+[assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
 namespace Microsoft.TeamsAI.State
 {
+    /// <summary>
+    /// The turn state entry.
+    /// </summary>
+    /// <typeparam name="TValue">The type of value.</typeparam>
     public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue> where TValue : class
     {
         private TValue _value;
         private string _hash;
+        private static readonly JsonSerializerOptions _serializerOptions = new() { MaxDepth = 64 };
 
         /// <summary>
         /// Constructs the turn state entry.
@@ -77,7 +84,7 @@ namespace Microsoft.TeamsAI.State
         {
             Verify.ParamNotNull(obj);
 
-            return JsonSerializer.Serialize(obj, new JsonSerializerOptions() { MaxDepth = 64 });
+            return JsonSerializer.Serialize(obj, _serializerOptions);
         }
     }
 }

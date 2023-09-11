@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Microsoft.TeamsAI.AI.Planner
 {
@@ -15,10 +15,15 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <summary>
         /// The response that the AI system should say.
         /// </summary>
-        [JsonProperty("response")]
+        [JsonPropertyName("response")]
         [JsonRequired]
         public string Response { get; set; }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="PredictedSayCommand"/> class.
+        /// </summary>
+        /// <param name="response">The response that the AI system should say.</param>
+        [JsonConstructor]
         public PredictedSayCommand(string response)
         {
             Response = response;

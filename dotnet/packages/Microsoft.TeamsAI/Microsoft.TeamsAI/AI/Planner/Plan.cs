@@ -1,28 +1,45 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.TeamsAI.Utilities.JsonConverters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.TeamsAI.AI.Planner
 {
-    // TODO: Move from Newtonsoft.Json to System.Text.Json
+    /// <summary>
+    /// A plan is a list of commands that the AI system should execute.
+    /// </summary>
+    [JsonConverter(typeof(PlanJsonConverter))]
     public class Plan
     {
+        private static readonly JsonSerializerOptions _serializerOptions = new()
+        {
+            WriteIndented = true
+        };
+
         /// <summary>
         /// A list of predicted commands that the AI system should execute.
         /// </summary>
-        [JsonProperty("commands")]
+        [JsonPropertyName("commands")]
         public List<IPredictedCommand> Commands { get; set; }
 
         /// <summary>
         /// Type to indicate that a plan is being returned.
         /// </summary>
-        [JsonProperty("type")]
-        [JsonRequired]
+        [JsonPropertyName("type")]
         public string Type { get; } = AITypes.Plan;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Plan"/> class.
+        /// </summary>
         public Plan()
         {
             Commands = new List<IPredictedCommand>();
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="Plan"/> class.
+        /// </summary>
+        /// <param name="commands">A list of model predicted commands.</param>
+        [JsonConstructor]
         public Plan(List<IPredictedCommand> commands)
         {
             Commands = commands;
@@ -33,8 +50,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// </summary>
         public string ToJsonString()
         {
-            // TODO: Optimize
-            return JsonConvert.SerializeObject(this);
+            return JsonSerializer.Serialize(this, typeof(Plan), _serializerOptions);
         }
 
     }

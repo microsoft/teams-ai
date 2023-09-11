@@ -12,7 +12,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
     /// <summary>
     /// An moderator that uses OpenAI's moderation API.
     /// </summary>
-    /// <typeparam name="TState"></typeparam>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public class OpenAIModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly OpenAIModeratorOptions _options;
@@ -115,10 +115,10 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 return null;
 
             }
-            catch (OpenAIClientException e)
+            catch (HttpOperationException e)
             {
                 // Rate limited
-                if (e.statusCode != null && (int)e.statusCode == 429)
+                if (e.StatusCode != null && (int)e.StatusCode == 429)
                 {
                     return new Plan()
                     {

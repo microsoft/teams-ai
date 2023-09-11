@@ -1,10 +1,9 @@
-using SearchCommand;
-
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.State;
+using SearchCommand;
 
 var builder = WebApplication.CreateBuilder(args);
 

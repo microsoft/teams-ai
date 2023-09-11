@@ -11,6 +11,7 @@ using Microsoft.TeamsAI.Utilities;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
+// TODO: As part of unifying the BF SDK, we should update it's classes to use System.Text.Json instead of Newtonsoft.Json
 namespace Microsoft.TeamsAI
 {
     /// <summary>
@@ -25,6 +26,8 @@ namespace Microsoft.TeamsAI
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
+    /// <typeparam name="TTurnStateManager">Type of the turn state manager.</typeparam>
+
     public class Application<TState, TTurnStateManager> : IBot
         where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>, new()
@@ -877,9 +880,9 @@ namespace Microsoft.TeamsAI
         /// When the <see cref="RunActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message reaction activity, it calls this method.
         /// If the message reaction indicates that reactions were added to a message, it calls
-        /// <see cref="OnReactionsAddedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, CancellationToken)"/>.
+        /// <see cref="OnReactionsAddedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>.
         /// If the message reaction indicates that reactions were removed from a message, it calls
-        /// <see cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, CancellationToken)"/>.
+        /// <see cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>.
         ///
         /// In a derived class, override this method to add logic that applies to all message reaction activities.
         /// Add logic to apply before the reactions added or removed logic before the call to the base class
@@ -2005,7 +2008,6 @@ namespace Microsoft.TeamsAI
         {
             if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && Options.LongRunningMessages == true)
             {
-                /// <see cref="BotAdapter.ContinueConversationAsync"/> supports <see cref="Activity"/> as input
                 return Options.Adapter!.ContinueConversationAsync(Options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
             }
             else
