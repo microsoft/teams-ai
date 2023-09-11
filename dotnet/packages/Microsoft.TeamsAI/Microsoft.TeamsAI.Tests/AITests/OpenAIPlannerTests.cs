@@ -3,9 +3,9 @@
 using Azure.AI.OpenAI;
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
-using AIException = Microsoft.SemanticKernel.AI.AIException;
 using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.AI.OpenAI.AzureSdk;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Moderator;
@@ -253,7 +253,11 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(optionsMock.Object);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
-            var thrownException = new AIException(AIException.ErrorCodes.Throttling);
+            var exceptionMessage = "Exception Message";
+            var thrownException = new SemanticKernel.Diagnostics.HttpOperationException(exceptionMessage)
+            {
+                StatusCode = (HttpStatusCode)429
+            };
 
             planner.TextCompletionMock.Setup(textCompletion => textCompletion.GetCompletionsAsync(It.IsAny<string>(), It.IsAny<CompleteRequestSettings>(), It.IsAny<CancellationToken>())).ThrowsAsync(thrownException);
 
@@ -262,7 +266,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Assert
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Equals("Error while executing AI prompt completion: Throttling", StringComparison.OrdinalIgnoreCase));
+            Assert.True(exception.Message.Equals($"Error while executing AI prompt completion: {exceptionMessage}", StringComparison.OrdinalIgnoreCase));
             Assert.Equal((HttpStatusCode)429, exception.StatusCode);
         }
 
@@ -293,7 +297,11 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(optionsMock.Object);
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
-            var thrownException = new AIException(AIException.ErrorCodes.Throttling);
+            var exceptionMessage = "Exception Message";
+            var thrownException = new SemanticKernel.Diagnostics.HttpOperationException(exceptionMessage)
+            {
+                StatusCode = (HttpStatusCode)429
+            };
 
             planner.ChatCompletionMock
             .Setup(m => m.CreateNewChat(It.IsAny<string?>()))
@@ -306,7 +314,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Assert
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Equals("Error while executing AI prompt completion: Throttling", StringComparison.OrdinalIgnoreCase));
+            Assert.True(exception.Message.Equals($"Error while executing AI prompt completion: {exceptionMessage}", StringComparison.OrdinalIgnoreCase));
             Assert.Equal((HttpStatusCode)429, exception.StatusCode);
         }
 
@@ -400,17 +408,26 @@ namespace Microsoft.TeamsAI.Tests.AITests
         /// </summary>
         private static void MockTextCompletion(Mock<ITextCompletion> mock, string completionResult)
         {
-            // Create Completions and CompletionsUsage
+            // Create TextModelResult
             // Early version does not expose public constructor.
             var completionsUsage = (CompletionsUsage)typeof(CompletionsUsage)
                 .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(int), typeof(int), typeof(int) })!
                 .Invoke(new object[] { 1, 1, 1 })!;
+            var completionsLogProbabilityModel = (CompletionsLogProbabilityModel)typeof(CompletionsLogProbabilityModel)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(IEnumerable<string>), typeof(IEnumerable<float?>), typeof(IEnumerable<IDictionary<string, float?>>), typeof(IEnumerable<int>) })!
+                .Invoke(new object[] { Array.Empty<string>(), Array.Empty<float?>(), Array.Empty<IDictionary<string, float?>>(), Array.Empty<int>() });
+            var choice = (Choice)typeof(Choice)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(string), typeof(int), typeof(CompletionsLogProbabilityModel), typeof(CompletionsFinishReason) })!
+                .Invoke(new object[] { "", 1, completionsLogProbabilityModel, CompletionsFinishReason.Stopped });
             var completions = (Completions)typeof(Completions)
-                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(CompletionsUsage) })!
-                .Invoke(new[] { completionsUsage });
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(string), typeof(DateTimeOffset), typeof(IEnumerable<Choice>), typeof(CompletionsUsage) })!
+                .Invoke(new object[] { "", DateTimeOffset.Now, new List<Choice> { choice }, completionsUsage });
+            var textModelResult = (TextModelResult)typeof(TextModelResult)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(Completions), typeof(Choice) })!
+                .Invoke(new object[] { completions, choice });
 
             var textResultMock = new Mock<ITextResult>();
-            textResultMock.Setup(tr => tr.ModelResult).Returns(new ModelResult(completions));
+            textResultMock.Setup(tr => tr.ModelResult).Returns(new ModelResult(textModelResult));
             textResultMock.Setup(tr => tr.GetCompletionAsync(It.IsAny<CancellationToken>())).ReturnsAsync(completionResult);
             mock
                 .Setup(m => m.GetCompletionsAsync(It.IsAny<string>(), It.IsAny<CompleteRequestSettings>(), It.IsAny<CancellationToken>()))
@@ -422,23 +439,29 @@ namespace Microsoft.TeamsAI.Tests.AITests
         /// </summary>
         private static void MockChatCompletion(Mock<IChatCompletion> mock, string completionResult)
         {
-            // Create ChatCompletions and CompletionsUsage
+            // Create ChatModelResult
             // Early version does not expose public constructor.
             var completionsUsage = (CompletionsUsage)typeof(CompletionsUsage)
                 .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(int), typeof(int), typeof(int) })!
                 .Invoke(new object[] { 1, 1, 1 })!;
+            var chatChoice = (ChatChoice)typeof(ChatChoice)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(int), typeof(CompletionsFinishReason) })!
+                .Invoke(new object[] { 1, CompletionsFinishReason.Stopped });
             var completions = (ChatCompletions)typeof(ChatCompletions)
-                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(string), typeof(int?), typeof(IReadOnlyList<ChatChoice>), typeof(CompletionsUsage) })!
-                .Invoke(new object[] { "", 0, Array.Empty<ChatChoice>(), completionsUsage });
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(string), typeof(DateTimeOffset), typeof(IReadOnlyList<ChatChoice>), typeof(CompletionsUsage) })!
+                .Invoke(new object[] { "", DateTimeOffset.Now, new ChatChoice[] { chatChoice }, completionsUsage });
+            var chatModelResult = (ChatModelResult)typeof(ChatModelResult)
+                .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, new[] { typeof(ChatCompletions), typeof(ChatChoice) })!
+                .Invoke(new object[] { completions, chatChoice });
 
             var chatHistory = new ChatHistory();
             chatHistory.AddMessage(AuthorRole.User, completionResult);
+
             var chatResultMock = new Mock<IChatResult>();
             chatResultMock
                 .Setup(cr => cr.GetChatMessageAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(chatHistory[0]);
-            chatResultMock.As<ITextResult>().Setup(tr => tr.ModelResult).Returns(new ModelResult(completions));
-            chatResultMock.As<ITextResult>().Setup(tr => tr.GetCompletionAsync(It.IsAny<CancellationToken>())).ReturnsAsync(completionResult);
+            chatResultMock.As<IChatResult>().Setup(tr => tr.ModelResult).Returns(new ModelResult(chatModelResult));
             mock
                 .Setup(m => m.CreateNewChat(It.IsAny<string?>()))
                 .Returns(chatHistory);

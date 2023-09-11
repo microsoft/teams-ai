@@ -1,8 +1,9 @@
 ﻿using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Diagnostics;
 using Microsoft.SemanticKernel.Orchestration;
-using Microsoft.SemanticKernel.TemplateEngine;
+using Microsoft.SemanticKernel.TemplateEngine.Prompt;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
@@ -144,7 +145,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             {
                 renderedPrompt = await promptRenderer.RenderAsync(promptTemplate.Text, context);
             }
-            catch (TemplateException ex)
+            catch (SKException ex)
             {
                 throw new TeamsAIException($"Failed to render prompt: ${ex.Message}", ex);
             }
@@ -185,9 +186,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
 
             // Temp state values override the user configured variables
-            context[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
-            context[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
-            context[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
+            context.Variables[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
+            context.Variables[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
+            context.Variables[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)
