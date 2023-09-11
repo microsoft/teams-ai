@@ -32,6 +32,61 @@ class MessageExtensions(Generic[StateT]):
     def __init__(self, routes: List[Route[StateT]]) -> None:
         self._routes = routes
 
+    def query_link(self, command_id: Union[str, Pattern[str]]):
+        """
+        Registers a handler to process an action of a message that's being
+        previewed by the user prior to sending.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_extensions.query_link("test")
+        async def on_query_link(context: TurnContext, state: TurnState, url: str):
+            return MessagingExtensionResult()
+
+        # Pass a function to this method
+        app.message_extensions.query_link("test")(on_query_link)
+        ```
+
+        #### Args:
+        - `command_id`: a string or regex pattern that matches against the activities
+        `command_id`
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/queryLink"
+                or not context.activity.value
+                or not self._activity_with_command_id(context.activity, command_id)
+            ):
+                return False
+
+            return True
+
+        def __call__(
+            func: Callable[
+                [TurnContext, StateT, str],
+                Awaitable[MessagingExtensionResult],
+            ]
+        ):
+            async def __invoke__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+
+                value = vars(context.activity.value)
+
+                if not "url" in value or not isinstance(value["url"], str):
+                    return False
+
+                res = await func(context, state, value["url"])
+                await self._invoke_response(context, res)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__))
+            return func
+
+        return __call__
+
     def anonymous_query_link(self, command_id: Union[str, Pattern[str]]):
         """
         Registers a handler for a command that performs anonymous link unfurling.
