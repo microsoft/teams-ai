@@ -23,13 +23,13 @@ namespace Microsoft.TeamsAI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
 
             // Assert
-            Assert.True(actions.ContainsAction(DefaultActionTypes.UnknownActionName));
-            Assert.True(actions.ContainsAction(DefaultActionTypes.FlaggedInputActionName));
-            Assert.True(actions.ContainsAction(DefaultActionTypes.FlaggedOutputActionName));
-            Assert.True(actions.ContainsAction(DefaultActionTypes.RateLimitedActionName));
-            Assert.True(actions.ContainsAction(DefaultActionTypes.PlanReadyActionName));
-            Assert.True(actions.ContainsAction(DefaultActionTypes.DoCommandActionName));
-            Assert.True(actions.ContainsAction(DefaultActionTypes.SayCommandActionName));
+            Assert.True(actions.ContainsAction(AIConstants.UnknownActionName));
+            Assert.True(actions.ContainsAction(AIConstants.FlaggedInputActionName));
+            Assert.True(actions.ContainsAction(AIConstants.FlaggedOutputActionName));
+            Assert.True(actions.ContainsAction(AIConstants.RateLimitedActionName));
+            Assert.True(actions.ContainsAction(AIConstants.PlanReadyActionName));
+            Assert.True(actions.ContainsAction(AIConstants.DoCommandActionName));
+            Assert.True(actions.ContainsAction(AIConstants.SayCommandActionName));
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var turnState = new TestTurnState();
 
             // Act
-            var unknownAction = actions[DefaultActionTypes.UnknownActionName];
+            var unknownAction = actions[AIConstants.UnknownActionName];
             var result = await unknownAction.Handler.PerformAction(turnContext, turnState, null, "test-action");
 
             // Assert
@@ -63,7 +63,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var turnState = new TestTurnState();
 
             // Act
-            var flaggedInputAction = actions[DefaultActionTypes.FlaggedInputActionName];
+            var flaggedInputAction = actions[AIConstants.FlaggedInputActionName];
             var result = await flaggedInputAction.Handler.PerformAction(turnContext, turnState, null, null);
 
             // Assert
@@ -83,7 +83,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var turnState = new TestTurnState();
 
             // Act
-            var flaggedOutputAction = actions[DefaultActionTypes.FlaggedOutputActionName];
+            var flaggedOutputAction = actions[AIConstants.FlaggedOutputActionName];
             var result = await flaggedOutputAction.Handler.PerformAction(turnContext, turnState, null, null);
 
             // Assert
@@ -102,7 +102,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var turnState = new TestTurnState();
 
             // Act
-            var rateLimitedAction = actions[DefaultActionTypes.RateLimitedActionName];
+            var rateLimitedAction = actions[AIConstants.RateLimitedActionName];
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await rateLimitedAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
@@ -125,7 +125,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             });
 
             // Act
-            var planReadyAction = actions[DefaultActionTypes.PlanReadyActionName];
+            var planReadyAction = actions[AIConstants.PlanReadyActionName];
             var result0 = await planReadyAction.Handler.PerformAction(turnContext, turnState, plan0, null);
             var result1 = await planReadyAction.Handler.PerformAction(turnContext, turnState, plan1, null);
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await planReadyAction.Handler.PerformAction(turnContext, turnState, null, null));
@@ -153,7 +153,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             };
 
             // Act
-            var doCommandAction = actions[DefaultActionTypes.DoCommandActionName];
+            var doCommandAction = actions[AIConstants.DoCommandActionName];
             var result = await doCommandAction.Handler.PerformAction(turnContext, turnState, data, null);
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await doCommandAction.Handler.PerformAction(turnContext, turnState, null, null));
 
@@ -176,7 +176,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var command = new PredictedSayCommand("hello");
 
             // Act
-            var sayCommandAction = actions[DefaultActionTypes.SayCommandActionName];
+            var sayCommandAction = actions[AIConstants.SayCommandActionName];
             var result = await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, command, null);
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, null, null));
 
@@ -187,7 +187,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             Assert.Equal("Value cannot be null. (Parameter 'command')", exception.Message);
         }
 
-        private static IActionCollection<TState> ImportDefaultActions<TState>(IList<string>? logs = null) where TState : ITurnState<StateBase, StateBase, TempState>
+        private static IActionCollection<TState> ImportDefaultActions<TState>(List<string>? logs = null) where TState : ITurnState<StateBase, StateBase, TempState>
         {
             ILogger? logger = null;
             if (logs != null)

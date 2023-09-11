@@ -123,24 +123,16 @@ namespace Microsoft.TeamsAI.AI.Prompt
         }
 
         /// <inheritdoc/>
-        public async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name)
+        public async Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, string name)
         {
             PromptTemplate promptTemplate = LoadPromptTemplate(name);
 
-            return await RenderPrompt(turnContext, turnState, promptTemplate);
+            return await RenderPromptAsync(turnContext, turnState, promptTemplate);
         }
 
-        /// TODO: Ensure async methods have "Async" suffix
-        /// TODO: Ensure turnContext and turnState descriptions are same throughout the SDK
         /// <inheritdoc/>
-        public async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        public async Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
         {
-            // TODO: Review prompt template standards and make sure they align with SK's.
-            // Convert all the `.` in variable references to `_` to conform to SK template rules
-            // Ex. {{ $state.conversation.value }} to {{ $state_conversation_value }}
-            // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
-            // string updatedPrompt = "";
-
             IKernel kernel = Kernel.Builder.Build();
             RegisterFunctionsIntoKernel(kernel, turnContext, turnState);
             SKContext context = kernel.CreateNewContext();

@@ -103,7 +103,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
             || _ShouldBeFlagged(response.Value.ViolenceResult);
             if (flagged)
             {
-                string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
+                string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
 
                 // Flagged
                 return new Plan()

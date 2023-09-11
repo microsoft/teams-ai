@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.AI.Action;
+using Microsoft.TeamsAI.AI;
 
 namespace ListBot
 {
@@ -122,7 +123,7 @@ namespace ListBot
             return false;
         }
 
-        [Action(DefaultActionTypes.UnknownActionName)]
+        [Action(AIConstants.UnknownActionName)]
         public async Task<bool> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
         {
             ArgumentNullException.ThrowIfNull(turnContext);

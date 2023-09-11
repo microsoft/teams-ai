@@ -66,8 +66,8 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             if (flagged)
             {
                 Assert.NotNull(result);
-                Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
-                Assert.Equal(DefaultActionTypes.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
+                Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
             }
             else
             {
@@ -97,12 +97,12 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Assert
             if (flagged)
             {
-                Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
-                Assert.Equal(DefaultActionTypes.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
+                Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
             }
             else
             {
-                Assert.Equal(AITypes.SayCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.SayCommand, result.Commands[0].Type);
             }
         }
     }
