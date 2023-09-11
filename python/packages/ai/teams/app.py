@@ -19,6 +19,12 @@ from typing import (
 
 from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
 from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema.teams import (
+    MessagingExtensionActionResponse,
+    MessagingExtensionResult,
+    TaskModuleResponseBase,
+    TaskModuleTaskInfo,
+)
 
 from teams.ai import AI, TurnState
 
@@ -218,8 +224,8 @@ class Application(Bot, Generic[StateT]):
         ```python
         # Use this method as a decorator
         @app.anonymous_query_link("test")
-        async def on_anonymous_query_link(context: TurnContext, state: TurnState):
-            print(context.activity.value.url)
+        async def on_anonymous_query_link(context: TurnContext, state: TurnState, url: str):
+            print(url)
             return True
 
         # Pass a function to this method
@@ -241,8 +247,23 @@ class Application(Bot, Generic[StateT]):
 
             return self._activity_with_command_id(context.activity, command_id)
 
-        def __call__(func: RouteHandler[StateT]):
-            self._routes.append(Route[StateT](__selector__, func))
+        def __call__(
+            func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]
+        ):
+            async def __invoke__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+
+                value = vars(context.activity.value)
+
+                if not "url" in value or not isinstance(value["url"], str):
+                    return False
+
+                res = await func(context, state, value["url"])
+                await self._invoke_response(context, res)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__))
             return func
 
         return __call__
@@ -289,8 +310,28 @@ class Application(Bot, Generic[StateT]):
 
             return True
 
-        def __call__(func: RouteHandler[StateT]):
-            self._routes.append(Route[StateT](__selector__, func))
+        def __call__(
+            func: Callable[
+                [TurnContext, StateT, Activity],
+                Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+            ]
+        ):
+            async def __invoke__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+
+                value = vars(context.activity.value)
+
+                if not "bot_activity_preview" in value or not isinstance(
+                    value["bot_activity_preview"], list
+                ):
+                    return False
+
+                res = await func(context, state, value["bot_activity_preview"][0])
+                await self._invoke_response(context, res)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__))
             return func
 
         return __call__
@@ -515,3 +556,33 @@ class Application(Bot, Generic[StateT]):
             return hits is not None
 
         return command_id == match
+
+    async def _invoke_response(
+        self,
+        context: TurnContext,
+        body: Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None] = None,
+    ):
+        if context._INVOKE_RESPONSE_KEY in context.turn_state:
+            return
+
+        response = MessagingExtensionActionResponse()
+
+        if isinstance(body, str):
+            response = MessagingExtensionActionResponse(
+                task=TaskModuleResponseBase(
+                    type="message",
+                    value=body,
+                )
+            )
+        elif isinstance(body, TaskModuleTaskInfo):
+            response = MessagingExtensionActionResponse(
+                task=TaskModuleResponseBase(type="continue", value=body)
+            )
+        elif isinstance(body, MessagingExtensionResult):
+            response = MessagingExtensionActionResponse(compose_extension=body)
+
+        await context.send_activity(
+            Activity(
+                type=ActivityTypes.invoke_response, value=InvokeResponse(body=response, status=200)
+            )
+        )

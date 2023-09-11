@@ -6,6 +6,7 @@ Licensed under the MIT License.
 # pylint:disable=duplicate-code
 
 from dataclasses import dataclass
+from typing import List
 from unittest import IsolatedAsyncioTestCase, mock
 
 import pytest
@@ -160,6 +161,7 @@ class TestApp(IsolatedAsyncioTestCase):
         @dataclass
         class Value:
             command_id: str
+            url: str
 
         await self.app.on_turn(
             TurnContext(
@@ -187,7 +189,7 @@ class TestApp(IsolatedAsyncioTestCase):
                     type="invoke",
                     name="composeExtension/anonymousQueryLink",
                     text="test",
-                    value=Value("256"),
+                    value=Value("256", ""),
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
                     conversation=ConversationAccount(id="convo", name="Convo Name"),
@@ -210,6 +212,7 @@ class TestApp(IsolatedAsyncioTestCase):
         class Value:
             command_id: str
             bot_message_preview_action: str
+            bot_activity_preview: List[Activity]
 
         await self.app.on_turn(
             TurnContext(
@@ -237,7 +240,7 @@ class TestApp(IsolatedAsyncioTestCase):
                     type="invoke",
                     name="composeExtension/submitAction",
                     text="test",
-                    value=Value("256", "edit"),
+                    value=Value("256", "edit", [Activity()]),
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
                     conversation=ConversationAccount(id="convo", name="Convo Name"),
