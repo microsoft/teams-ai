@@ -103,9 +103,9 @@ namespace Microsoft.TeamsAI
                 _typingTimer = new TypingTimer(_typingTimerDelay);
             }
 
-            if (_typingTimer!.IsRunning() == false)
+            if (_typingTimer.IsRunning() == false)
             {
-                _typingTimer!.Start(turnContext);
+                _typingTimer.Start(turnContext);
             }
 
         }

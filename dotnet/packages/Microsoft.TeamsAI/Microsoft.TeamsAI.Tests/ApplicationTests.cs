@@ -12,7 +12,7 @@ namespace Microsoft.TeamsAI.Tests
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var turnContext = new TurnContext(new SimpleAdapter(), activity);
             var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
@@ -30,7 +30,7 @@ namespace Microsoft.TeamsAI.Tests
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var turnContext = new TurnContext(new SimpleAdapter(), activity);
             var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act 1
@@ -58,7 +58,7 @@ namespace Microsoft.TeamsAI.Tests
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var turnContext = new TurnContext(new SimpleAdapter(), activity);
             var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
@@ -89,7 +89,7 @@ namespace Microsoft.TeamsAI.Tests
         {
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var turnContext = new TurnContext(new SimpleAdapter(), activity);
             var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
