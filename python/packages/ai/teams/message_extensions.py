@@ -12,8 +12,9 @@ from botbuilder.schema.teams import (
     MessagingExtensionActionResponse,
     MessagingExtensionResponse,
     MessagingExtensionResult,
+    TaskModuleContinueResponse,
+    TaskModuleMessageResponse,
     TaskModuleResponse,
-    TaskModuleResponseBase,
     TaskModuleTaskInfo,
 )
 
@@ -242,15 +243,12 @@ class MessageExtensions(Generic[StateT]):
 
         if isinstance(body, str):
             response = MessagingExtensionActionResponse(
-                task=TaskModuleResponseBase(
-                    type="message",
+                task=TaskModuleMessageResponse(
                     value=body,
                 )
             )
         elif isinstance(body, TaskModuleTaskInfo):
-            response = MessagingExtensionActionResponse(
-                task=TaskModuleResponseBase(type="continue", value=body)
-            )
+            response = MessagingExtensionActionResponse(task=TaskModuleContinueResponse(value=body))
         elif isinstance(body, MessagingExtensionResult):
             response = MessagingExtensionActionResponse(compose_extension=body)
 
@@ -266,10 +264,10 @@ class MessageExtensions(Generic[StateT]):
         if context._INVOKE_RESPONSE_KEY in context.turn_state:
             return
 
-        response = TaskModuleResponse(task=TaskModuleResponseBase(type="continue", value=body))
+        response = TaskModuleResponse(task=TaskModuleContinueResponse(value=body))
 
         if isinstance(body, str):
-            response = TaskModuleResponse(task=TaskModuleResponseBase(type="message", value=body))
+            response = TaskModuleResponse(task=TaskModuleMessageResponse(value=body))
 
         await context.send_activity(
             Activity(
