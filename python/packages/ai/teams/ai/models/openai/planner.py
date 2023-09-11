@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from datetime import datetime
 from logging import Logger
-from typing import Any, Awaitable, Callable, List, Optional, Tuple, Union, cast
+from typing import Any, Awaitable, Callable, List, Optional, Tuple, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -164,7 +164,7 @@ class OpenAIPlanner(Planner):
                     commands=[
                         PredictedDoCommand(
                             action=ActionTypes.FLAGGED_INPUT,
-                            entities=res.data.results[0].__dict__,
+                            entities=vars(res.data.results[0]),
                         )
                     ]
                 )
@@ -188,9 +188,7 @@ class OpenAIPlanner(Planner):
             return plan
 
         for cmd in plan.commands:
-            if cmd.type == CommandType.SAY:
-                cmd = cast(PredictedSayCommand, cmd)
-
+            if isinstance(cmd, PredictedSayCommand):
                 try:
                     res = await self._client.create_moderation(
                         cmd.response,
@@ -201,7 +199,7 @@ class OpenAIPlanner(Planner):
                             commands=[
                                 PredictedDoCommand(
                                     action=ActionTypes.FLAGGED_INPUT,
-                                    entities=res.data.results[0].__dict__,
+                                    entities=vars(res.data.results[0]),
                                 )
                             ]
                         )
