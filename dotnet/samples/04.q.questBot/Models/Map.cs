@@ -227,6 +227,11 @@
             }
         };
 
+        /// <summary>
+        /// Finds a map location by name.
+        /// </summary>
+        /// <param name="name">The name of the map location.</param>
+        /// <returns>The map location, or null if not found.</returns>
         public static MapLocation? FindMapLocation(string name)
         {
             var key = name?.Trim()?.ToLowerInvariant();

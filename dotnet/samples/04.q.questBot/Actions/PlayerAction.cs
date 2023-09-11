@@ -26,6 +26,9 @@ namespace QuestBot.Actions
             }
         }
 
+        /// <summary>
+        /// Updates the player's information.
+        /// </summary>
         private async Task<bool> UpdatePlayerAsync(ITurnContext context, QuestState state, DataEntities data)
         {
             // Check for name change

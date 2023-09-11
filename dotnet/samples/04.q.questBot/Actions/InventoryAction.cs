@@ -31,6 +31,9 @@ namespace QuestBot.Actions
             }
         }
 
+        /// <summary>
+        /// Prints the user's inventory to the conversation.
+        /// </summary>
         private async Task<bool> PrintListAsync(ITurnContext context, QuestState state)
         {
             var items = state.User!.Inventory;
@@ -67,6 +70,9 @@ namespace QuestBot.Actions
             return false;
         }
 
+        /// <summary>
+        /// Updates the user's inventory based on the given data.
+        /// </summary>
         private static async Task UpdateListAsync(ITurnContext context, QuestState state, DataEntities data)
         {
             var newItems =

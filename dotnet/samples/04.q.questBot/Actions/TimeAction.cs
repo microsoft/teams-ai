@@ -26,6 +26,9 @@ namespace QuestBot.Actions
             }
         }
 
+        /// <summary>
+        /// Queries the current time and updates the conversation state accordingly.
+        /// </summary>
         private static async Task<bool> QueryTimeAsync(ITurnContext context, QuestState state)
         {
             // Render conditions
@@ -42,6 +45,9 @@ namespace QuestBot.Actions
             return false;
         }
 
+        /// <summary>
+        /// Wait for a specified time and update the conversation state accordingly.
+        /// </summary>
         private static async Task<bool> WaitForTimeAsync(ITurnContext context, QuestState state, DataEntities data)
         {
             var until = (data.Until ?? string.Empty).Trim();

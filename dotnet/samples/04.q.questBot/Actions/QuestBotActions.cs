@@ -32,12 +32,18 @@ namespace QuestBot.Actions
             return data;
         }
 
+        /// <summary>
+        /// Trims the prompt response by removing common junk that gets returned by the model.
+        /// </summary>
         private static string TrimPromptResponse(string response)
         {
             // Remove common junk that gets returned by the model.
             return response.Replace("DM: ", string.Empty).Replace("```", string.Empty);
         }
 
+        /// <summary>
+        /// Updates the conversation history with the new response and sends the response to the user.
+        /// </summary>
         private static async Task UpdateDMResponseAsync(ITurnContext context, QuestState state, string newResponse)
         {
             if (ConversationHistory.GetLastLine(state).StartsWith("DM:"))

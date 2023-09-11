@@ -26,6 +26,9 @@ namespace QuestBot.Actions
             }
         }
 
+        /// <summary>
+        /// Calculates the encounter chance for a given location title.
+        /// </summary>
         private static double GetEncounterChance(string title)
         {
             title = title.ToLowerInvariant();
@@ -44,6 +47,9 @@ namespace QuestBot.Actions
             }
         }
 
+        /// <summary>
+        /// Updates the location of the conversation and sends a message to the user if the location has changed.
+        /// </summary>
         private static async Task UpdateLocationAsync(ITurnContext context, QuestState state, DataEntities data)
         {
             var currentLocation = state.Conversation!.Location;

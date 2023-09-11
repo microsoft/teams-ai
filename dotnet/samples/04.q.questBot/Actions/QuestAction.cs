@@ -37,6 +37,9 @@ namespace QuestBot.Actions
             return true;
         }
 
+        /// <summary>
+        /// Updates a quest.
+        /// </summary>
         private async Task UpdateQuestAsync(ITurnContext context, QuestState state, DataEntities data)
         {
             var quests =
@@ -70,6 +73,9 @@ namespace QuestBot.Actions
             state.Temp!.PlayerAnswered = true;
         }
 
+        /// <summary>
+        /// Removes a quest.
+        /// </summary>
         private static bool RemoveQuestAsync(QuestState state, DataEntities data)
         {
             var quests =
@@ -88,6 +94,9 @@ namespace QuestBot.Actions
             return false;
         }
 
+        /// <summary>
+        /// Deletes a quest from the conversation and marks the corresponding campaign objective as completed if applicable.
+        /// </summary>
         private static void FinishQuestAsync(QuestState state, DataEntities data)
         {
             if (RemoveQuestAsync(state, data))
@@ -111,6 +120,9 @@ namespace QuestBot.Actions
             }
         }
 
+        /// <summary>
+        /// Lists all quests in the conversation and sends them to the user.
+        /// </summary>
         private static async Task ListQuestAsync(ITurnContext context, QuestState state)
         {
             if (state.Conversation!.Quests != null)

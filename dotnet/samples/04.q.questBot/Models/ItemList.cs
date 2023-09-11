@@ -17,6 +17,11 @@
             }
         }
 
+        /// <summary>
+        /// Searches for an item in an item list.
+        /// </summary>
+        /// <param name="item">The item to search for.</param>
+        /// <returns>The best match for the item in the item list.</returns>
         public string SearchItem(string item)
         {
             if (ContainsKey(item))
@@ -38,6 +43,10 @@
             return bestMatch;
         }
 
+        /// <summary>
+        /// Convert items to normalized types / units
+        /// </summary>
+        /// <returns>The normalized items.</returns>
         public ItemList NormalizeItems()
         {
             var normalized = new ItemList();
@@ -57,6 +66,11 @@
             return normalized;
         }
 
+        /// <summary>
+        /// Converts a string of text to an item list.
+        /// </summary>
+        /// <param name="text">The text to convert.</param>
+        /// <returns>The item list.</returns>
         public static ItemList FromText(string? text)
         {
             var itemList = new ItemList();
@@ -98,6 +112,12 @@
             return itemList;
         }
 
+        /// <summary>
+        /// Maps an item name and count to an object.
+        /// </summary>
+        /// <param name="name">The item name.</param>
+        /// <param name="count">The item count.</param>
+        /// <returns>The mapped item name and count.</returns>
         public static KeyValuePair<string, int> MapTo(string name, int count)
         {
             name = name.Trim().ToLowerInvariant();

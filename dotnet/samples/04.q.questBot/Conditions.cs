@@ -29,9 +29,22 @@
         public static readonly string TEMPERATURE_HOT = "hot";
         public static readonly string TEMPERATURE_VERYHOT = "very hot";
 
+        /// <summary>
+        /// Returns a string describing the current conditions.
+        /// </summary>
+        /// <param name="time">The current time.</param>
+        /// <param name="day">The current day.</param>
+        /// <param name="temperature">The current temperature.</param>
+        /// <param name="weather">The current weather.</param>
+        /// <returns>A string describing the current conditions.</returns>
         public static string DescribeConditions(double time, int day, string temperature, string weather)
             => $"It's a {DescribeSeason(day)} {DescribeTimeOfDay(time)} and the weather is {temperature} and {weather}.";
 
+        /// <summary>
+        /// Returns a string describing the time of day.
+        /// </summary>
+        /// <param name="time">The current time.</param>
+        /// <returns>A string describing the time of day.</returns>
         public static string DescribeTimeOfDay(double time)
         {
             if (time >= 4 && time < 6)
@@ -60,6 +73,11 @@
             }
         }
 
+        /// <summary>
+        /// Returns the current season based on the day of the year.
+        /// </summary>
+        /// <param name="day">The current day of the year.</param>
+        /// <returns>The current season.</returns>
         public static string DescribeSeason(int day)
         {
             if (day >= 79 && day <= 172)
@@ -80,6 +98,16 @@
             }
         }
 
+        /// <summary>
+        /// Generate random weather.
+        /// Weather Patterns:
+        /// Spring: Sunny - 40%, Cloudy - 30%, Rainy - 20%, Windy - 5%, Snowy - 2%, Foggy - 2%, Humid - 1%
+        /// Summer: Sunny - 60%, Cloudy - 20%, Rainy - 10%, Windy - 5%, Snowy - 2%, Foggy - 2%, Humid - 1%
+        /// Fall: Sunny - 40%, Cloudy - 30%, Rainy - 20%, Windy - 5%, Snowy - 5%, Foggy - 5%, Humid - 5%
+        /// Winter: Sunny - 20%, Cloudy - 40%, Rainy - 10%, Windy - 10%, Snowy - 10%, Foggy - 5%, Humid - 5%
+        /// </summary>
+        /// <param name="season">The season to generate weather for.</param>
+        /// <returns>A string representing the generated weather.</returns>
         public static string GenerateWeather(string season)
         {
             var weather = string.Empty;
@@ -189,6 +217,11 @@
             return randomNumber < 0.1 ? $"{weather}+{WEATHER_WINDY}" : weather;
         }
 
+        /// <summary>
+        /// Generates a temperature string based on the given season.
+        /// </summary>
+        /// <param name="season">The season to generate temperature for.</param>
+        /// <returns>A string representing the generated temperature.</returns>
         public static string GenerateTemperature(string season)
         {
             var temperature = string.Empty;
