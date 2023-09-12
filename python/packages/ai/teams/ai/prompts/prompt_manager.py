@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 import json
 import os
-from typing import Awaitable, Callable, Dict, Union
+from typing import Any, Awaitable, Callable, Dict, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -42,7 +42,7 @@ class PromptManager:
     def add_function(
         self,
         name: str,
-        handler: Callable[[TurnContext, TurnState], Awaitable[str]],
+        handler: Callable[[TurnContext, TurnState], Awaitable[Any]],
         allow_overrides=False,
     ):
         """

@@ -10,16 +10,17 @@ from botbuilder.core import TurnContext
 from teams.ai.state import TurnState
 
 StateT = TypeVar("StateT", bound=TurnState)
+RouteHandler = Callable[[TurnContext, StateT], Awaitable[bool]]
 
 
 class Route(Generic[StateT]):
     selector: Callable[[TurnContext], bool]
-    handler: Callable[[TurnContext, StateT], Awaitable[bool]]
+    handler: RouteHandler[StateT]
 
     def __init__(
         self,
         selector: Callable[[TurnContext], bool],
-        handler: Callable[[TurnContext, StateT], Awaitable[bool]],
+        handler: RouteHandler[StateT],
     ) -> None:
         self.selector = selector
         self.handler = handler

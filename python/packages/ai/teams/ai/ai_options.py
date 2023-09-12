@@ -4,7 +4,6 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from teams.ai.planner import Planner
 
@@ -20,11 +19,9 @@ class AIOptions:
     `AzureOpenAIPlanner`.
     """
 
-    prompt: Optional[str] = None
+    prompt: str = "default"
     """
-    Optional. The prompt to use for the current turn.
-    This allows for the use of the AI system in a free standing mode. An exception will be
-    thrown if the AI system is routed to by the Application object and a prompt has not been
+    The prompt to use for the current turn.
     """
 
     history: AIHistoryOptions = field(default_factory=AIHistoryOptions)

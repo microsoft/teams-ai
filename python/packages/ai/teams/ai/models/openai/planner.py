@@ -2,8 +2,10 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
+
 from datetime import datetime
-from typing import Any, Callable, List, Tuple, Union
+from logging import Logger
+from typing import Any, Awaitable, Callable, List, Optional, Tuple, Union
 
 import semantic_kernel as sk
 from botbuilder.core import TurnContext
@@ -18,17 +20,23 @@ from semantic_kernel.connectors.ai.open_ai import (
     OpenAITextCompletion,
 )
 
+from teams.ai.actions import ActionTypes
 from teams.ai.ai_history_options import AIHistoryOptions
+from teams.ai.planner import (
+    CommandType,
+    Plan,
+    Planner,
+    PredictedDoCommand,
+    PredictedSayCommand,
+)
+from teams.ai.planner.response_parser import parse_response
 from teams.ai.prompts import PromptManager
 from teams.ai.prompts.prompt_template import PromptTemplate
 from teams.ai.prompts.utils import generate_sk_prompt_template_config
 from teams.ai.state import TurnState
 
-from .command_type import CommandType
-from .openai_planner_options import OpenAIPlannerOptions
-from .plan import Plan
-from .planner import Planner
-from .response_parser import parse_response
+from .client import OpenAIClient, OpenAIClientError
+from .planner_options import OpenAIPlannerOptions
 
 # Define role names used by OpenAI API
 SYSTEM_ROLE_NAME: str = "system"
@@ -41,19 +49,28 @@ class OpenAIPlanner(Planner):
     Planner that uses OpenAI's API to generate prompts
     """
 
+    log: Optional[Logger]
+
     _options: OpenAIPlannerOptions
     _sk: sk.Kernel
     _prompt_manager: PromptManager
+    _client: OpenAIClient
 
     def __init__(self, options: OpenAIPlannerOptions) -> None:
+        self.log = None
         self._options = options
         self._prompt_manager = PromptManager(options.prompt_folder)
+        self._client = OpenAIClient(self._options.api_key, organization=self._options.organization)
         self._sk = sk.Kernel()
         self._add_text_completion_service()
         self._add_chat_completion_service()
 
     def add_function(
-        self, name: str, handler: Callable[[TurnContext, TurnState], Any], *, allow_overrides=False
+        self,
+        name: str,
+        handler: Callable[[TurnContext, TurnState], Awaitable[Any]],
+        *,
+        allow_overrides=False,
     ) -> None:
         self._prompt_manager.add_function(name, handler, allow_overrides=allow_overrides)
 
@@ -79,6 +96,11 @@ class OpenAIPlanner(Planner):
         prompt_template = await self._prompt_manager.render_prompt(
             turn_context, state, prompt_name_or_template
         )
+        plan = await self.review_prompt(turn_context, state, prompt_template)
+
+        if plan:
+            return plan
+
         result = await self._complete_prompt(state, prompt_template, history_options)
 
         if len(result) > 0:
@@ -98,7 +120,7 @@ class OpenAIPlanner(Planner):
                 if position >= 0:
                     result = result[position + len(assistant_prefix) :]
 
-            plan: Plan = parse_response(result)
+            plan = parse_response(result)
 
             # Filter to only a single SAY command
             if self._options.one_say_per_turn:
@@ -115,9 +137,82 @@ class OpenAIPlanner(Planner):
                         new_commands.append(command)
                 plan.commands = new_commands
 
-            return plan
+            return await self.review_plan(
+                turn_context,
+                state,
+                plan,
+            )
 
         return Plan()
+
+    async def review_prompt(
+        self,
+        _context: TurnContext,
+        state: TurnState,
+        _prompt: PromptTemplate,
+    ) -> Optional[Plan]:
+        if self._options.moderate == "output":
+            return None
+
+        try:
+            res = await self._client.create_moderation(
+                state.temp.input,
+            )
+
+            if res.data.results[0].flagged:
+                return Plan(
+                    commands=[
+                        PredictedDoCommand(
+                            action=ActionTypes.FLAGGED_INPUT,
+                            entities=vars(res.data.results[0]),
+                        )
+                    ]
+                )
+        except OpenAIClientError:
+            return Plan(
+                commands=[
+                    PredictedDoCommand(
+                        action=ActionTypes.RATE_LIMITED,
+                    )
+                ]
+            )
+        return None
+
+    async def review_plan(
+        self,
+        _context: TurnContext,
+        _state: TurnState,
+        plan: Plan,
+    ) -> Plan:
+        if self._options.moderate == "input":
+            return plan
+
+        for cmd in plan.commands:
+            if isinstance(cmd, PredictedSayCommand):
+                try:
+                    res = await self._client.create_moderation(
+                        cmd.response,
+                    )
+
+                    if res.data.results[0].flagged:
+                        return Plan(
+                            commands=[
+                                PredictedDoCommand(
+                                    action=ActionTypes.FLAGGED_INPUT,
+                                    entities=vars(res.data.results[0]),
+                                )
+                            ]
+                        )
+                except OpenAIClientError:
+                    return Plan(
+                        commands=[
+                            PredictedDoCommand(
+                                action=ActionTypes.RATE_LIMITED,
+                            )
+                        ]
+                    )
+
+        return plan
 
     def _add_text_completion_service(self) -> None:
         # TODO: default_model may not be text completion
@@ -222,5 +317,5 @@ class OpenAIPlanner(Planner):
         return self._options.default_model
 
     def _log_request(self, request: str) -> None:
-        if self._options.log_requests:
-            print(request)
+        if self.log:
+            self.log.debug(request)
