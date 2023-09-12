@@ -1,7 +1,7 @@
 import { Message, PromptFunctions, PromptSection, RenderedPromptSection } from "./types";
 import { TurnContext } from 'botbuilder';
 import { TurnState } from '../TurnState';
-import { Tokenizer } from "../ai";
+import { Tokenizer } from "../tokenizers";
 
 /**
  * Abstract Base class for most prompt sections.

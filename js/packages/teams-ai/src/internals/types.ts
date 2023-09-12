@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { ChatCompletionFunction } from "../ai/types";
+import { ChatCompletionFunction } from "../models/types";
 
 /**
  * @private

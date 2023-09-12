@@ -1,4 +1,4 @@
-import { Tokenizer } from "./ai/types";
+import { Tokenizer } from "./models/types";
 import { stringify } from "yaml";
 
 /**

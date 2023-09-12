@@ -1,5 +1,5 @@
 import { TurnContext } from 'botbuilder';
-import { Plan, Planner, PredictedSayCommand } from './Planner';
+import { Plan, Planner, PredictedSayCommand } from '../planners/Planner';
 import { TurnState } from '../TurnState';
 
 /**

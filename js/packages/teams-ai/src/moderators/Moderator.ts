@@ -7,7 +7,7 @@
  */
 
 import { TurnContext } from 'botbuilder-core';
-import { Plan } from './Planner';
+import { Plan } from '../planners';
 import { TurnState } from '../TurnState';
 
 /**

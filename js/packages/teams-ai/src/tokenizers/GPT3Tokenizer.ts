@@ -1,5 +1,13 @@
-import { Tokenizer } from "./types";
-import { encode, decode } from "gpt-3-encoder";
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+import { Tokenizer } from './Tokenizer';
+import { encode, decode } from 'gpt-3-encoder';
 
 /**
  * Tokenizer that uses GPT-3's encoder.

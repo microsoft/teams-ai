@@ -9,7 +9,7 @@
  * Licensed under the MIT License.
  */
 
-import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
+import { Plan, PredictedDoCommand, PredictedSayCommand } from '../planners';
 import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
 import {
@@ -24,7 +24,7 @@ import {
     ContentSafetyOptions,
     ModerationSeverity
 } from '../OpenAIClients';
-import { AI } from './AI';
+import { AI } from '../AI';
 import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
 
 /**

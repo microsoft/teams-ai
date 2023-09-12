@@ -26,6 +26,7 @@
         "botbuilder": "^4.20.0",
         "botbuilder-dialogs": "^4.20.0",
         "gpt-3-encoder": "^1.1.4",
+        "jsonschema": "1.4.1",
         "yaml": "^2.2.2"
     },
     "resolutions": {

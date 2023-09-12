@@ -18,7 +18,7 @@ import {
 import { TurnState } from './TurnState';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
-import { AI, AIOptions } from './ai/AI';
+import { AI, AIOptions } from './AI';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 
 /**

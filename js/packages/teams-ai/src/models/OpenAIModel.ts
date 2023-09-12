@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { PromptFunctions, PromptMemory, PromptSection, Tokenizer } from "promptrix";
 import { PromptCompletionModel, PromptResponse, ChatCompletionFunction } from "./ai/types";
 import { ChatCompletionRequestMessage, CreateChatCompletionRequest, CreateChatCompletionResponse, CreateCompletionRequest, CreateCompletionResponse, OpenAICreateChatCompletionRequest, OpenAICreateCompletionRequest } from "./internals";
-import { Colorize } from "./internals";
+import { Colorize } from "../internals";
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.

@@ -7,7 +7,7 @@
  * Licensed under the MIT License.
  */
 
-import { Plan, PredictedDoCommand, PredictedSayCommand } from './Planner';
+import { Plan, PredictedDoCommand, PredictedSayCommand } from '../planners';
 import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
 import {
@@ -17,7 +17,7 @@ import {
     OpenAIClientResponse
 } from './OpenAIClients';
 import { Moderator } from './Moderator';
-import { AI } from './ai/AI';
+import { AI } from '../ai';
 
 /**
  * Options for the OpenAI based moderator.

@@ -7,7 +7,7 @@
  * Licensed under the MIT License.
  */
 
-import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from './Planner';
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners/Planner';
 
 /**
  * @private

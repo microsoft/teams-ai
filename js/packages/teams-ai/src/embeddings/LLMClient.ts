@@ -3,7 +3,7 @@ import { PromptResponse, Validation, PromptResponseValidator, PromptCompletionMo
 import { DefaultResponseValidator } from "./DefaultResponseValidator";
 import { MemoryFork } from "./MemoryFork";
 import { Colorize } from "./internals";
-import { OpenAIModel } from "./OpenAIModel";
+import { OpenAIModel } from "../models/OpenAIModel";
 import { FunctionResponseValidator } from "./FunctionResponseValidator";
 
 /**

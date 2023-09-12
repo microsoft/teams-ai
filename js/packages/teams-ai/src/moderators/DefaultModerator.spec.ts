@@ -3,7 +3,7 @@ import { DefaultModerator } from './DefaultModerator';
 import { ActivityTypes, TestAdapter, TurnContext, MemoryStorage } from 'botbuilder-core';
 import { TurnState, TurnStateEntry } from '../TurnState';
 import { ConversationHistory } from '../ConversationHistory';
-import { Plan, PredictedDoCommand } from './Planner';
+import { Plan, PredictedDoCommand } from '../planners/Planner';
 
 describe('DefaultModerator', () => {
     const adapter = new TestAdapter();

@@ -7,7 +7,7 @@
  * Licensed under the MIT License.
  */
 
-import { PredictedDoCommand, Planner, Plan } from './Planner';
+import { PredictedDoCommand, Planner, Plan } from '../planners/Planner';
 import { TurnState } from '../TurnState';
 import { TurnContext } from 'botbuilder';
 import {

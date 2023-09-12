@@ -1,4 +1,4 @@
-import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "./types";
+import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "../models/types";
 
 /**
  * A test model that can be used to test the prompt completion system.

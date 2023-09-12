@@ -7,7 +7,8 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { TurnState } from './TurnState';
+import { TurnState } from '../TurnState';
+import { AI } from '../AI';
 
 /**
  * A planner is responsible for generating a plan that the AI system will execute.
@@ -17,11 +18,13 @@ export interface Planner<TState extends TurnState> {
      * Completes a prompt and generates a plan for the AI system to execute.
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
+     * @param ai The AI system that is generating the plan.
      * @returns The plan that was generated.
      */
     generatePlan(
         context: TurnContext,
-        state: TState
+        state: TState,
+        ai: AI<TState>
     ): Promise<Plan>;
 }
 
