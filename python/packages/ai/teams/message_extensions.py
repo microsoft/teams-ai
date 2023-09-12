@@ -231,14 +231,12 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/submitAction"
                 or not context.activity.value
+                or not isinstance(context.activity.value, MessagingExtensionAction)
                 or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
 
-            message_preview_action = None
-
-            if isinstance(context.activity.value, MessagingExtensionAction):
-                message_preview_action = context.activity.value.bot_message_preview_action
+            message_preview_action = context.activity.value.bot_message_preview_action
 
             if not isinstance(message_preview_action, str) or message_preview_action != action:
                 return False
@@ -255,14 +253,15 @@ class MessageExtensions(Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                value = vars(context.activity.value)
+                value: MessagingExtensionAction = context.activity.value
 
-                if not "bot_activity_preview" in value or not isinstance(
-                    value["bot_activity_preview"], list
+                if (
+                    not isinstance(value.bot_activity_preview, list)
+                    or len(value.bot_activity_preview) == 0
                 ):
                     return False
 
-                res = await func(context, state, value["bot_activity_preview"][0])
+                res = await func(context, state, value.bot_activity_preview[0])
                 await self._invoke_action_response(context, res)
                 return True
 
