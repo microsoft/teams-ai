@@ -42,7 +42,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
                 .Build();
         }
 
-        // TODO: There exists a race condition bug where this test fail when the entire test suite runs, but not when run individually.
+        // TODO: There exists a race condition bug where this test fails when running the entire test suite, but not when run in isolation.
         [Theory(Skip = "This test should only be run manually.")]
         [InlineData("I want to kill them.", true)]
         public async Task OpenAIModerator_ReviewPrompt(string input, bool flagged)
