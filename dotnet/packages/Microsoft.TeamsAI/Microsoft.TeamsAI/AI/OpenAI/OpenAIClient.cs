@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
@@ -8,12 +9,14 @@ using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 
+// For Unit Tests - so the Moq framework can mock internal classes
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Microsoft.TeamsAI.AI.OpenAI
 {
     /// <summary>
     /// The client to make calls to OpenAI's API
     /// </summary>
-    internal sealed class OpenAIClient
+    internal class OpenAIClient
     {
         private const string HttpUserAgent = "Microsoft Teams AI";
         private const string OpenAIModerationEndpoint = "https://api.openai.com/v1/moderations";
@@ -46,7 +49,7 @@ namespace Microsoft.TeamsAI.AI.OpenAI
         /// <param name="model">The moderation model to use.</param>
         /// <returns>The moderation result from the API call.</returns>
         /// <exception cref="HttpOperationException" />
-        public async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
+        public virtual async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
         {
             try
             {
