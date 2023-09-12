@@ -69,11 +69,11 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/query"
                 or not context.activity.value
-                or not self._activity_with_command_id(context.activity, command_id)
+                or not isinstance(context.activity.value, MessagingExtensionQuery)
             ):
                 return False
 
-            return True
+            return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(
             func: Callable[
@@ -82,12 +82,11 @@ class MessageExtensions(Generic[StateT]):
             ]
         ):
             async def __invoke__(context: TurnContext, state: StateT):
-                query = context.activity.value
-
-                if not query or not isinstance(query, MessagingExtensionQuery):
+                if not context.activity.value:
                     return False
 
-                res = await func(context, state, query)
+                value: MessagingExtensionQuery = context.activity.value
+                res = await func(context, state, value)
                 await self._invoke_response(context, res)
                 return True
 
@@ -120,11 +119,11 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/queryLink"
                 or not context.activity.value
-                or not self._activity_with_command_id(context.activity, command_id)
+                or not isinstance(context.activity.value, AppBasedLinkQuery)
             ):
                 return False
 
-            return True
+            return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(
             func: Callable[
@@ -133,15 +132,15 @@ class MessageExtensions(Generic[StateT]):
             ]
         ):
             async def __invoke__(context: TurnContext, state: StateT):
-                if not context.activity.value or not isinstance(
-                    context.activity.value, AppBasedLinkQuery
-                ):
+                if not context.activity.value:
                     return False
 
-                if not isinstance(context.activity.value.url, str):
+                value: AppBasedLinkQuery = context.activity.value
+
+                if not isinstance(value.url, str):
                     return False
 
-                res = await func(context, state, context.activity.value.url)
+                res = await func(context, state, value.url)
                 await self._invoke_response(context, res)
                 return True
 
@@ -175,6 +174,7 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/anonymousQueryLink"
                 or not context.activity.value
+                or not isinstance(context.activity.value, AppBasedLinkQuery)
             ):
                 return False
 
@@ -184,15 +184,15 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]
         ):
             async def __invoke__(context: TurnContext, state: StateT):
-                if not context.activity.value or not isinstance(
-                    context.activity.value, AppBasedLinkQuery
-                ):
+                if not context.activity.value:
                     return False
 
-                if not isinstance(context.activity.value.url, str):
+                value: AppBasedLinkQuery = context.activity.value
+
+                if not isinstance(value.url, str):
                     return False
 
-                res = await func(context, state, context.activity.value.url)
+                res = await func(context, state, value.url)
                 await self._invoke_response(context, res)
                 return True
 
@@ -295,6 +295,7 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/fetchTask"
                 or not context.activity.value
+                or not isinstance(context.activity.value, MessagingExtensionAction)
                 or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
@@ -366,7 +367,7 @@ class MessageExtensions(Generic[StateT]):
         ```python
         # Use this method as a decorator
         @app.message_extensions.submit_action("test")
-        async def on_submit_action(context: TurnContext, state: TurnState, value: Any):
+        async def on_submit_action(context: TurnContext, state: TurnState, data: Any):
             return TaskModuleTaskInfo()
 
         # Pass a function to this method
@@ -383,6 +384,7 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/submitAction"
                 or not context.activity.value
+                or not isinstance(context.activity.value, MessagingExtensionAction)
                 or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
@@ -396,7 +398,11 @@ class MessageExtensions(Generic[StateT]):
             ]
         ):
             async def __invoke__(context: TurnContext, state: StateT):
-                res = await func(context, state, context.activity.value)
+                if not context.activity.value:
+                    return False
+
+                value: MessagingExtensionAction = context.activity.value
+                res = await func(context, state, value.data)
                 await self._invoke_action_response(context, res)
                 return True
 
