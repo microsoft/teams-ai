@@ -198,7 +198,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, aIOptions);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
+            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
 
             return await ChainAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
         }
@@ -231,7 +231,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, opts);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await opts.PromptManager.RenderPrompt(turnContext, turnState, prompt);
+            PromptTemplate renderedPrompt = await opts.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
 
             // Review prompt
             Plan? plan = await opts.Moderator!.ReviewPrompt(turnContext, turnState, renderedPrompt);
@@ -244,7 +244,7 @@ namespace Microsoft.TeamsAI.AI
             }
 
             // Process generated plan
-            bool continueChain = await _actions[DefaultActionTypes.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
+            bool continueChain = await this._actions[AIConstants.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
             if (continueChain)
             {
                 // Update conversation history
@@ -295,23 +295,23 @@ namespace Microsoft.TeamsAI.AI
                         };
 
                         // Call action handler
-                        continueChain = await _actions[DefaultActionTypes.DoCommandActionName]
+                        continueChain = await this._actions[AIConstants.DoCommandActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, data, doCommand.Action);
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
-                        continueChain = await _actions[DefaultActionTypes.UnknownActionName]
+                        continueChain = await this._actions[AIConstants.UnknownActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
-                    continueChain = await _actions[DefaultActionTypes.SayCommandActionName]
+                    continueChain = await this._actions[AIConstants.SayCommandActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState!, sayCommand, DefaultActionTypes.SayCommandActionName);
+                        .PerformAction(turnContext, turnState!, sayCommand, AIConstants.SayCommandActionName);
                 }
                 else
                 {
@@ -342,7 +342,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, promptTemplate);
+            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPromptAsync(turnContext, turnState, promptTemplate);
 
             // Complete the prompt
             return await aiOptions.Planner.CompletePromptAsync(turnContext, turnState, renderedPrompt, aiOptions, cancellationToken);
@@ -368,7 +368,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, name);
+            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPromptAsync(turnContext, turnState, name);
 
             // Complete the prompt
             return await aiOptions.Planner.CompletePromptAsync(turnContext, turnState, renderedPrompt, aiOptions, cancellationToken);

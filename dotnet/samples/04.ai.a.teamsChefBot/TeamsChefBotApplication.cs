@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.State;
@@ -31,7 +32,7 @@ namespace TeamsChefBot
 
     internal class TeamsChefBotActions
     {
-        [Action(DefaultActionTypes.FlaggedInputActionName)]
+        [Action(AIConstants.FlaggedInputActionName)]
         public async Task<bool> FlaggedInputAction([ActionTurnContext] ITurnContext turnContext, [ActionEntities] Dictionary<string, object> entities)
         {
             string entitiesJsonString = JsonSerializer.Serialize(entities);
@@ -39,7 +40,7 @@ namespace TeamsChefBot
             return false;
         }
 
-        [Action(DefaultActionTypes.FlaggedOutputActionName)]
+        [Action(AIConstants.FlaggedOutputActionName)]
         public async Task<bool> FlaggedOutputAction([ActionTurnContext] ITurnContext turnContext)
         {
             await turnContext.SendActivityAsync("I'm not allowed to talk about such things.");

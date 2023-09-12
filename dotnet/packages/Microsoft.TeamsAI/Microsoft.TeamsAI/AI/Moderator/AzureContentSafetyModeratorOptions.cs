@@ -2,6 +2,9 @@
 
 namespace Microsoft.TeamsAI.AI.Moderator
 {
+    /// <summary>
+    /// Options for the Azure Content Safety moderator.
+    /// </summary>
     public class AzureContentSafetyModeratorOptions
     {
         /// <summary>

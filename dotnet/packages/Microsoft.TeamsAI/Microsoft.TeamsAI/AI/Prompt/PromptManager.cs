@@ -1,8 +1,9 @@
 ﻿using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Diagnostics;
 using Microsoft.SemanticKernel.Orchestration;
-using Microsoft.SemanticKernel.TemplateEngine;
+using Microsoft.SemanticKernel.TemplateEngine.Prompt;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
@@ -122,24 +123,16 @@ namespace Microsoft.TeamsAI.AI.Prompt
         }
 
         /// <inheritdoc/>
-        public async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name)
+        public async Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, string name)
         {
             PromptTemplate promptTemplate = LoadPromptTemplate(name);
 
-            return await RenderPrompt(turnContext, turnState, promptTemplate);
+            return await RenderPromptAsync(turnContext, turnState, promptTemplate);
         }
 
-        /// TODO: Ensure async methods have "Async" suffix
-        /// TODO: Ensure turnContext and turnState descriptions are same throughout the SDK
         /// <inheritdoc/>
-        public async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        public async Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
         {
-            // TODO: Review prompt template standards and make sure they align with SK's.
-            // Convert all the `.` in variable references to `_` to conform to SK template rules
-            // Ex. {{ $state.conversation.value }} to {{ $state_conversation_value }}
-            // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
-            // string updatedPrompt = "";
-
             IKernel kernel = Kernel.Builder.Build();
             RegisterFunctionsIntoKernel(kernel, turnContext, turnState);
             SKContext context = kernel.CreateNewContext();
@@ -152,7 +145,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             {
                 renderedPrompt = await promptRenderer.RenderAsync(promptTemplate.Text, context);
             }
-            catch (TemplateException ex)
+            catch (SKException ex)
             {
                 throw new TeamsAIException($"Failed to render prompt: ${ex.Message}", ex);
             }
@@ -193,9 +186,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
 
             // Temp state values override the user configured variables
-            context[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
-            context[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
-            context[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
+            context.Variables[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
+            context.Variables[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
+            context.Variables[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)

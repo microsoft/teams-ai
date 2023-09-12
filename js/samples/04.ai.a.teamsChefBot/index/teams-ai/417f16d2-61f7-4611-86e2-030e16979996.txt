@@ -1,0 +1,43 @@
+# Actions
+
+1. [Prompts](./00.PROMPTS.md)
+2. [Templates](./01.TEMPLATES.md)
+3. [**Actions**](./02.ACTIONS.md)
+4. [Plans](./03.PLANS.md)
+5. [Chaining](./04.CHAINING.md)
+6. [Storage](./05.STORAGE.md)
+7. [Turns](./06.TURNS.md)
+
+A function that can be called by a plan or template.
+
+## Template
+
+```Prompt
+human - remind me to buy milk
+ai - DO LightsOn SAY Ok I turned the lights on!
+```
+
+## C#
+
+```C#
+[Action("LightsOn")]
+public async Task<bool> LightsOn([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
+{
+    turnState.Conversation!.LightsOn = true;
+    await turnContext.SendActivityAsync(MessageFactory.Text("[lights on]"));
+    return true;
+}
+```
+
+## Javascript
+
+```typescript
+app.ai.action(
+    'LightsOn',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        state.conversation.value.lightsOn = true;
+        await context.sendActivity(`[lights on]`);
+        return true;
+    }
+);
+```

@@ -1,0 +1,116 @@
+# Turns
+
+1. [Prompts](./00.PROMPTS.md)
+2. [Templates](./01.TEMPLATES.md)
+3. [Actions](./02.ACTIONS.md)
+4. [Plans](./03.PLANS.md)
+5. [Chaining](./04.CHAINING.md)
+6. [Storage](./05.STORAGE.md)
+7. [**Turns**](./06.TURNS.md)
+
+A **Turn** occurs when someone (either a bot or a user) sends a message in the conversation. Each turn 
+has a `Context` and a `State` that are used to access and set conversational data.
+
+## Routing
+
+1. When a message is sent by the user it is routed to your bots endpoint `[POST] /api/messages`, which 
+starts the routing process.
+
+#### Javascript
+
+```typescript
+server.post('/api/messages', async (req, res) => {
+    // Route received a request to adapter for processing
+    await adapter.process(req, res as any, async (context) => {
+        // Dispatch to application for routing
+        await app.run(context);
+    });
+});
+```
+
+#### C#
+
+```C#
+[Route("api/messages")]
+[ApiController]
+public class BotController : ControllerBase
+{
+    private readonly IBotFrameworkHttpAdapter _adapter;
+    private readonly IBot _bot;
+
+    public BotController(IBotFrameworkHttpAdapter adapter, IBot bot)
+    {
+        _adapter = adapter;
+        _bot = bot;
+    }
+
+    [HttpPost]
+    public async Task PostAsync(CancellationToken cancellationToken = default)
+    {
+        await _adapter.ProcessAsync
+        (
+            Request,
+            Response,
+            _bot,
+            cancellationToken
+        );
+    }
+}
+```
+
+2. The message is then routed to whichever middleware necessary.
+
+### Action Example
+
+#### Javascript
+
+```typescript
+app.ai.action('helloWorld', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
+    await context.sendActivity(`hello world!`);
+    return false;
+});
+```
+
+#### C#
+
+```C#
+[Action("helloWorld")]
+public bool CreateList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
+{
+    await turnContext.SendActivityAsync(MessageFactory.Text("hello world!"));
+    return false;
+}
+```
+
+### Message Middleware Example
+
+This example illustrates how to format message text before it is sent to the user.
+
+#### Javascript
+
+```typescript
+context.onSendActivities((context, activities, next) => {
+    for (const activity of activities.filter(a => a.type === 'message')) {
+        activity.text = "changing the response";
+    }
+
+    return next();
+});
+```
+
+#### C#
+
+```C#
+context.OnSendActivities(delegate (ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+{
+    foreach (Activity activity in activities)
+    {
+        if (activity.Type == "message")
+        {
+            activity.Text = "changing the response";
+        }
+    }
+
+    return next();
+});
+```

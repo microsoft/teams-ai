@@ -52,7 +52,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Empty(responsePlan.Commands);
         }
 
@@ -66,7 +66,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
@@ -84,7 +84,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
@@ -103,7 +103,7 @@ namespace Microsoft.TeamsAI.Tests
 
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
@@ -122,7 +122,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
@@ -143,7 +143,7 @@ namespace Microsoft.TeamsAI.Tests
 
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Equal(2, responsePlan.Commands.Count);
 
             PredictedDoCommand firstDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
@@ -162,7 +162,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -179,7 +179,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Equal(2, responsePlan.Commands.Count);
 
             PredictedSayCommand firstSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -198,7 +198,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Equal(2, responsePlan.Commands.Count);
 
             PredictedSayCommand firstCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -217,7 +217,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(invalidPlanJson);
 
             // Assert - returns plan with default (say) command
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -234,7 +234,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Empty(responsePlan.Commands);
         }
 
@@ -248,7 +248,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(anyJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -270,7 +270,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(adaptiveCardJSON);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -287,7 +287,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -304,7 +304,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
@@ -321,7 +321,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Single(responsePlan.Commands);
 
             PredictedSayCommand predictedSayCommand = (PredictedSayCommand)responsePlan.Commands.First();
@@ -338,7 +338,7 @@ namespace Microsoft.TeamsAI.Tests
             Plan responsePlan = ResponseParser.ParseResponse(responseText);
 
             // Assert
-            Assert.Equal(AITypes.Plan, responsePlan.Type);
+            Assert.Equal(AIConstants.Plan, responsePlan.Type);
             Assert.Equal(2, responsePlan.Commands.Count);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();

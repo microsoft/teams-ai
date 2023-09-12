@@ -37,13 +37,13 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
             throw new NotImplementedException();
         }
 
-        public Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TestTurnState turnState, string name)
+        public Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TestTurnState turnState, string name)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(RenderPromptResult);
         }
 
-        public Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TestTurnState turnState, PromptTemplate promptTemplate)
+        public Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TestTurnState turnState, PromptTemplate promptTemplate)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(RenderPromptResult);

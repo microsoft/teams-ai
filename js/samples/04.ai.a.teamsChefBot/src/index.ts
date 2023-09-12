@@ -16,6 +16,10 @@ import {
     TurnContext
 } from 'botbuilder';
 
+// Read botFilePath and botFileSecret from .env file.
+const ENV_FILE = path.join(__dirname, '..', '.env');
+config({ path: ENV_FILE });
+
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     {},
     new ConfigurationServiceClientCredentialFactory({
@@ -72,6 +76,8 @@ import {
     OpenAIModerator,
     OpenAIPlanner
 } from '@microsoft/teams-ai';
+import { addSemanticSearch } from './semanticSearch';
+import { addResponseFormatter } from './responseFormatter';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
@@ -80,7 +86,7 @@ type ApplicationTurnState = DefaultTurnState<ConversationState>;
 // Create AI components
 const planner = new OpenAIPlanner({
     apiKey: process.env.OPENAI_API_KEY || '',
-    defaultModel: 'text-davinci-003',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
 // const planner = new AzureOpenAIPlanner({
@@ -111,6 +117,13 @@ const app = new Application<ApplicationTurnState>({
     }
 });
 
+// Add 'semanticSearch' prompt function
+addSemanticSearch(app, process.env.OPENAI_API_KEY || '');
+
+// Add a custom response formatter to convert markdown code blocks to <pre> tags
+addResponseFormatter(app);
+
+// Register other AI actions
 app.ai.action(
     AI.FlaggedInputActionName,
     async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>) => {

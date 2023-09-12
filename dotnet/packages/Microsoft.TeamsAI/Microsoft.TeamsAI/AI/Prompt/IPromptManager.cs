@@ -61,7 +61,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="name">Name of prompt template.</param>
         /// <returns>The rendered prompt template</returns>
-        Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name);
+        Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, string name);
 
         /// <summary>
         /// Renders a prompt template.
@@ -70,6 +70,6 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <param name="turnState">Current turn state.</param>
         /// <param name="promptTemplate">Prompt template to render.</param>
         /// <returns>The rendered prompt template</returns>
-        Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate);
+        Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate);
     }
 }
