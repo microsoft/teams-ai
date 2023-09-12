@@ -5,14 +5,12 @@ Licensed under the MIT License.
 
 # pylint:disable=duplicate-code
 
-from dataclasses import dataclass
 from unittest import IsolatedAsyncioTestCase, mock
 
 import pytest
 from botbuilder.core import TurnContext
 from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 from botbuilder.schema.teams import (
-    AppBasedLinkQuery,
     MessagingExtensionAction,
     MessagingExtensionResult,
     TaskModuleTaskInfo,
