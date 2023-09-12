@@ -6,7 +6,6 @@ Licensed under the MIT License.
 # pylint:disable=duplicate-code
 
 from dataclasses import dataclass
-from typing import List
 from unittest import IsolatedAsyncioTestCase, mock
 
 import pytest
