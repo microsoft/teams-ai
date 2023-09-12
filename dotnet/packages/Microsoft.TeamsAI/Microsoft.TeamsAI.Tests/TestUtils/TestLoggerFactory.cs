@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microsoft.TeamsAI.Tests.TestUtils
 {
-    internal class TestLoggerFactory : ILoggerFactory
+    internal sealed class TestLoggerFactory : ILoggerFactory
     {
         private readonly ILogger _loggerInstance;
 
