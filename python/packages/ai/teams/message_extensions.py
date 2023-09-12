@@ -19,6 +19,8 @@ from typing import (
 from botbuilder.core import InvokeResponse, TurnContext
 from botbuilder.schema import Activity, ActivityTypes
 from botbuilder.schema.teams import (
+    AppBasedLinkQuery,
+    MessagingExtensionAction,
     MessagingExtensionActionResponse,
     MessagingExtensionQuery,
     MessagingExtensionResponse,
@@ -131,15 +133,15 @@ class MessageExtensions(Generic[StateT]):
             ]
         ):
             async def __invoke__(context: TurnContext, state: StateT):
-                if not context.activity.value:
+                if not context.activity.value or not isinstance(
+                    context.activity.value, AppBasedLinkQuery
+                ):
                     return False
 
-                value = vars(context.activity.value)
-
-                if not "url" in value or not isinstance(value["url"], str):
+                if not isinstance(context.activity.value.url, str):
                     return False
 
-                res = await func(context, state, value["url"])
+                res = await func(context, state, context.activity.value.url)
                 await self._invoke_response(context, res)
                 return True
 
@@ -182,15 +184,15 @@ class MessageExtensions(Generic[StateT]):
             func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]
         ):
             async def __invoke__(context: TurnContext, state: StateT):
-                if not context.activity.value:
+                if not context.activity.value or not isinstance(
+                    context.activity.value, AppBasedLinkQuery
+                ):
                     return False
 
-                value = vars(context.activity.value)
-
-                if not "url" in value or not isinstance(value["url"], str):
+                if not isinstance(context.activity.value.url, str):
                     return False
 
-                res = await func(context, state, value["url"])
+                res = await func(context, state, context.activity.value.url)
                 await self._invoke_response(context, res)
                 return True
 
@@ -235,10 +237,8 @@ class MessageExtensions(Generic[StateT]):
 
             message_preview_action = None
 
-            if isinstance(context.activity.value, object):
-                message_preview_action = getattr(
-                    context.activity.value, "bot_message_preview_action"
-                )
+            if isinstance(context.activity.value, MessagingExtensionAction):
+                message_preview_action = context.activity.value.bot_message_preview_action
 
             if not isinstance(message_preview_action, str) or message_preview_action != action:
                 return False
