@@ -50,11 +50,11 @@ namespace Microsoft.TeamsAI
 
             if (Options.AI != null)
             {
-                _ai = new AI<TState>(Options.AI, Options.Logger);
+                _ai = new AI<TState>(Options.AI, Options.LoggerFactory);
             }
 
             // Validate long running messages configuration
-            if (Options.LongRunningMessages == true && (Options.Adapter == null || Options.BotAppId == null))
+            if (Options.LongRunningMessages && (Options.Adapter == null || Options.BotAppId == null))
             {
                 throw new ArgumentException("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
             }
@@ -2045,7 +2045,7 @@ namespace Microsoft.TeamsAI
         /// <returns>A task that represents the work queued to execute.</returns>
         private Task _StartLongRunningCall(ITurnContext turnContext, Func<ITurnContext, CancellationToken, Task> handler, CancellationToken cancellationToken = default)
         {
-            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && Options.LongRunningMessages == true)
+            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && Options.LongRunningMessages)
             {
                 return Options.Adapter!.ContinueConversationAsync(Options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
             }

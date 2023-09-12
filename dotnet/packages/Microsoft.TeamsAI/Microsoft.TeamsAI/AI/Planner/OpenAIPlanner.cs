@@ -33,32 +33,31 @@ namespace Microsoft.TeamsAI.AI.Planner
     {
         private TOptions _options { get; }
         private protected readonly IKernel _kernel;
-        private readonly ILogger? _logger;
-        // TODO: update when refactoring logging
-        private readonly ILoggerFactory? _loggerFactory = NullLoggerFactory.Instance;
+        private readonly ILogger _logger;
+
 
         /// <summary>
         /// Creates a new instance of the <see cref="OpenAIPlanner{TState, TOptions}"/> class.
         /// </summary>
         /// <param name="options">The options to configure the planner.</param>
-        /// <param name="logger">The logger instance.</param>
+        /// <param name="loggerFactory">The logger factory instance.</param>
         /// <exception cref="ArgumentException"></exception>
-        public OpenAIPlanner(TOptions options, ILogger? logger = null)
+        public OpenAIPlanner(TOptions options, ILoggerFactory? loggerFactory = null)
         {
             // TODO: Configure Retry Handler
             _options = options;
             KernelBuilder builder = Kernel.Builder
                 .WithDefaultAIService(_CreateTextCompletionService(options))
                 .WithDefaultAIService(_CreateChatCompletionService(options));
-            if (options.LogRequests && logger == null)
+
+            _logger = loggerFactory is null ? NullLogger.Instance : loggerFactory.CreateLogger(typeof(OpenAIPlanner<TState, TOptions>));
+
+            if (options.LogRequests && loggerFactory == null)
             {
-                throw new ArgumentException("Logger parameter cannot be null if `LogRequests` option is set to true");
+                throw new ArgumentException($"`{nameof(loggerFactory)}` parameter cannot be null if `LogRequests` option is set to true");
             }
-            if (logger != null)
-            {
-                builder.WithLoggerFactory(_loggerFactory);
-                _logger = logger;
-            }
+
+            builder.WithLoggerFactory(loggerFactory ?? NullLoggerFactory.Instance);
 
             _kernel = builder.Build();
         }
@@ -333,8 +332,8 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Creates a new <see cref="OpenAIPlanner{TState}"/> instance.
         /// </summary>
         /// <param name="options">The options to configure the planner.</param>
-        /// <param name="logger">The logger instance.</param>
-        public OpenAIPlanner(OpenAIPlannerOptions options, ILogger? logger = null) : base(options, logger)
+        /// <param name="loggerFactory">The logger factory instance.</param>
+        public OpenAIPlanner(OpenAIPlannerOptions options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
         {
         }
     }

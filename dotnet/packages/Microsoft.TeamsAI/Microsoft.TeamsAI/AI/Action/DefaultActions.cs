@@ -7,37 +7,38 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microsoft.TeamsAI.AI.Action
 {
 
     internal class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
-        private readonly ILogger? _logger;
+        private readonly ILogger _logger;
 
-        public DefaultActions(ILogger? logger)
+        public DefaultActions(ILoggerFactory? loggerFactory = null)
         {
-            _logger = logger;
+            _logger = loggerFactory is null ? NullLogger.Instance : loggerFactory.CreateLogger(typeof(DefaultActions<TState>));
         }
 
         [Action(AIConstants.UnknownActionName)]
         public Task<bool> UnknownAction([ActionName] string action)
         {
-            _logger?.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
+            _logger.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
             return Task.FromResult(true);
         }
 
         [Action(AIConstants.FlaggedInputActionName)]
         public Task<bool> FlaggedInputAction()
         {
-            _logger?.LogError($"The users input has been moderated but no handler was registered for {AIConstants.FlaggedInputActionName}");
+            _logger.LogError($"The users input has been moderated but no handler was registered for {AIConstants.FlaggedInputActionName}");
             return Task.FromResult(true);
         }
 
         [Action(AIConstants.FlaggedOutputActionName)]
         public Task<bool> FlaggedOutputAction()
         {
-            _logger?.LogError($"The bots output has been moderated but no handler was registered for {AIConstants.FlaggedOutputActionName}");
+            _logger.LogError($"The bots output has been moderated but no handler was registered for {AIConstants.FlaggedOutputActionName}");
             return Task.FromResult(true);
         }
 

@@ -26,8 +26,8 @@ namespace Microsoft.TeamsAI.AI
         /// Creates an instance of the <see cref="AI{TState}"/> class.
         /// </summary>
         /// <param name="options">The options to configure.</param>
-        /// <param name="logger">The logger instance.</param>
-        public AI(AIOptions<TState> options, ILogger? logger = null)
+        /// <param name="loggerFactory">Optional. The logger factory to use.</param>
+        public AI(AIOptions<TState> options, ILoggerFactory? loggerFactory = null)
         {
             Verify.ParamNotNull(options);
 
@@ -41,9 +41,8 @@ namespace Microsoft.TeamsAI.AI
 
             Options.History ??= new AIHistoryOptions();
 
-
             // Import default actions
-            ImportActions(new DefaultActions<TState>(logger));
+            ImportActions(new DefaultActions<TState>(loggerFactory));
         }
 
         /// <summary>
@@ -255,7 +254,7 @@ namespace Microsoft.TeamsAI.AI
                     int doubleMaxTurns = opts.History.MaxTurns * 2;
 
                     ConversationHistory.AddLine(turnState, $"{userPrefix} {userInput}", doubleMaxTurns);
-                    string assisstantPrefix = Options.History!.AssistantPrefix.Trim();
+                    string assistantPrefix = Options.History!.AssistantPrefix.Trim();
 
                     switch (opts?.History.AssistantHistoryType)
                     {
@@ -265,7 +264,7 @@ namespace Microsoft.TeamsAI.AI
                                 .OfType<PredictedSayCommand>()
                                 .Select(c => c.Response));
 
-                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix}, {text}");
+                            ConversationHistory.AddLine(turnState, $"{assistantPrefix}, {text}");
 
                             break;
 
@@ -273,7 +272,7 @@ namespace Microsoft.TeamsAI.AI
                         default:
                             // Embed the plan object to re-enforce the model
                             // TODO: Add support for XML as well
-                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix} {plan.ToJsonString()}");
+                            ConversationHistory.AddLine(turnState, $"{assistantPrefix} {plan.ToJsonString()}");
                             break;
                     }
 
