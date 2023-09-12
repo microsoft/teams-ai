@@ -7,7 +7,7 @@ namespace Microsoft.TeamsAI.AI.Action
     /// Represents an action.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public class ActionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    public sealed class ActionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// The action name.

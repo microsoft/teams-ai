@@ -13,7 +13,7 @@ namespace Microsoft.TeamsAI.AI.OpenAI
     /// <summary>
     /// The client to make calls to OpenAI's API
     /// </summary>
-    public class OpenAIClient
+    internal sealed class OpenAIClient
     {
         private const string HttpUserAgent = "Microsoft Teams AI";
         private const string OpenAIModerationEndpoint = "https://api.openai.com/v1/moderations";
@@ -46,7 +46,7 @@ namespace Microsoft.TeamsAI.AI.OpenAI
         /// <param name="model">The moderation model to use.</param>
         /// <returns>The moderation result from the API call.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
+        public async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
         {
             try
             {

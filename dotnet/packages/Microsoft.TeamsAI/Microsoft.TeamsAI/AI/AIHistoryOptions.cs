@@ -4,7 +4,7 @@ namespace Microsoft.TeamsAI.AI
     /// <summary>
     /// Options for the AI system.
     /// </summary>
-    public class AIHistoryOptions
+    public sealed class AIHistoryOptions
     {
         /// <summary>
         /// Whether the AI system should track conversation history.
