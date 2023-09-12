@@ -40,7 +40,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Creates a new instance of the <see cref="OpenAIPlanner{TState, TOptions}"/> class.
         /// </summary>
         /// <param name="options">The options to configure the planner.</param>
-        /// <param name="loggerFactory">The logger factory instance.</param>
+        /// <param name="loggerFactory">Optional. The logger factory instance.</param>
         /// <exception cref="ArgumentException"></exception>
         public OpenAIPlanner(TOptions options, ILoggerFactory? loggerFactory = null)
         {
