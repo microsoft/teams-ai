@@ -14,7 +14,8 @@ from botbuilder.schema import Activity, ChannelAccount, ConversationAccount
 from botbuilder.schema.teams import (
     AppBasedLinkQuery,
     MessagingExtensionAction,
-    MessagingExtensionQuery,
+    MessagingExtensionResult,
+    TaskModuleTaskInfo,
 )
 
 from teams import Application
@@ -32,6 +33,7 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
     @pytest.mark.asyncio
     async def test_query(self):
         handler = mock.AsyncMock()
+        handler.return_value = MessagingExtensionResult()
         self.app.message_extensions.query("256")(handler)
         self.assertEqual(len(self.app._routes), 1)
 
@@ -61,7 +63,7 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
                     type="invoke",
                     name="composeExtension/query",
                     text="test",
-                    value=MessagingExtensionQuery(command_id="256"),
+                    value={"commandId": "256"},
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
                     conversation=ConversationAccount(id="convo", name="Convo Name"),
@@ -77,13 +79,9 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
     @pytest.mark.asyncio
     async def test_query_link(self):
         handler = mock.AsyncMock()
+        handler.return_value = MessagingExtensionResult()
         self.app.message_extensions.query_link("256")(handler)
         self.assertEqual(len(self.app._routes), 1)
-
-        @dataclass
-        class Value(AppBasedLinkQuery):
-            command_id: str
-            url: str
 
         await self.app.on_turn(
             TurnContext(
@@ -111,7 +109,7 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
                     type="invoke",
                     name="composeExtension/queryLink",
                     text="test",
-                    value=Value(command_id="256", url=""),
+                    value={"commandId": "256", "url": ""},
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
                     conversation=ConversationAccount(id="convo", name="Convo Name"),
@@ -127,13 +125,9 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
     @pytest.mark.asyncio
     async def test_anonymous_query_link(self):
         handler = mock.AsyncMock()
+        handler.return_value = MessagingExtensionResult()
         self.app.message_extensions.anonymous_query_link("256")(handler)
         self.assertEqual(len(self.app._routes), 1)
-
-        @dataclass
-        class Value(AppBasedLinkQuery):
-            command_id: str
-            url: str
 
         await self.app.on_turn(
             TurnContext(
@@ -161,7 +155,7 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
                     type="invoke",
                     name="composeExtension/anonymousQueryLink",
                     text="test",
-                    value=Value(command_id="256", url=""),
+                    value={"commandId": "256", "url": ""},
                     from_property=ChannelAccount(id="user", name="User Name"),
                     recipient=ChannelAccount(id="bot", name="Bot Name"),
                     conversation=ConversationAccount(id="convo", name="Convo Name"),
@@ -226,6 +220,7 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
     @pytest.mark.asyncio
     async def test_fetch_task(self):
         handler = mock.AsyncMock()
+        handler.return_value = TaskModuleTaskInfo()
         self.app.message_extensions.fetch_task("256")(handler)
         self.assertEqual(len(self.app._routes), 1)
 

@@ -14,9 +14,11 @@ from typing import (
     Pattern,
     TypeVar,
     Union,
+    cast,
 )
 
 from botbuilder.core import InvokeResponse, TurnContext
+from botbuilder.core.serializer_helper import deserializer_helper, serializer_helper
 from botbuilder.schema import Activity, ActivityTypes
 from botbuilder.schema.teams import (
     AppBasedLinkQuery,
@@ -68,8 +70,6 @@ class MessageExtensions(Generic[StateT]):
             if (
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/query"
-                or not context.activity.value
-                or not isinstance(context.activity.value, MessagingExtensionQuery)
             ):
                 return False
 
@@ -85,7 +85,10 @@ class MessageExtensions(Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                value: MessagingExtensionQuery = context.activity.value
+                value = cast(
+                    MessagingExtensionQuery,
+                    deserializer_helper(MessagingExtensionQuery, context.activity.value),
+                )
                 res = await func(context, state, value)
                 await self._invoke_response(context, res)
                 return True
@@ -118,8 +121,6 @@ class MessageExtensions(Generic[StateT]):
             if (
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/queryLink"
-                or not context.activity.value
-                or not isinstance(context.activity.value, AppBasedLinkQuery)
             ):
                 return False
 
@@ -135,7 +136,10 @@ class MessageExtensions(Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                value: AppBasedLinkQuery = context.activity.value
+                value = cast(
+                    AppBasedLinkQuery,
+                    deserializer_helper(AppBasedLinkQuery, context.activity.value),
+                )
 
                 if not isinstance(value.url, str):
                     return False
@@ -173,8 +177,6 @@ class MessageExtensions(Generic[StateT]):
             if (
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/anonymousQueryLink"
-                or not context.activity.value
-                or not isinstance(context.activity.value, AppBasedLinkQuery)
             ):
                 return False
 
@@ -187,7 +189,10 @@ class MessageExtensions(Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                value: AppBasedLinkQuery = context.activity.value
+                value = cast(
+                    AppBasedLinkQuery,
+                    deserializer_helper(AppBasedLinkQuery, context.activity.value),
+                )
 
                 if not isinstance(value.url, str):
                     return False
@@ -231,12 +236,15 @@ class MessageExtensions(Generic[StateT]):
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/submitAction"
                 or not context.activity.value
-                or not isinstance(context.activity.value, MessagingExtensionAction)
                 or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
 
-            message_preview_action = context.activity.value.bot_message_preview_action
+            value = cast(
+                MessagingExtensionAction,
+                deserializer_helper(MessagingExtensionAction, context.activity.value),
+            )
+            message_preview_action = value.bot_message_preview_action
 
             if not isinstance(message_preview_action, str) or message_preview_action != action:
                 return False
@@ -253,7 +261,10 @@ class MessageExtensions(Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                value: MessagingExtensionAction = context.activity.value
+                value = cast(
+                    MessagingExtensionAction,
+                    deserializer_helper(MessagingExtensionAction, context.activity.value),
+                )
 
                 if (
                     not isinstance(value.bot_activity_preview, list)
@@ -294,13 +305,10 @@ class MessageExtensions(Generic[StateT]):
             if (
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/fetchTask"
-                or not context.activity.value
-                or not isinstance(context.activity.value, MessagingExtensionAction)
-                or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
 
-            return True
+            return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(
             func: Callable[
@@ -383,13 +391,10 @@ class MessageExtensions(Generic[StateT]):
             if (
                 context.activity.type != ActivityTypes.invoke
                 or context.activity.name != "composeExtension/submitAction"
-                or not context.activity.value
-                or not isinstance(context.activity.value, MessagingExtensionAction)
-                or not self._activity_with_command_id(context.activity, command_id)
             ):
                 return False
 
-            return True
+            return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(
             func: Callable[
@@ -401,7 +406,10 @@ class MessageExtensions(Generic[StateT]):
                 if not context.activity.value:
                     return False
 
-                value: MessagingExtensionAction = context.activity.value
+                value = cast(
+                    MessagingExtensionAction,
+                    deserializer_helper(MessagingExtensionAction, context.activity.value),
+                )
                 res = await func(context, state, value.data)
                 await self._invoke_action_response(context, res)
                 return True
@@ -414,10 +422,12 @@ class MessageExtensions(Generic[StateT]):
     def _activity_with_command_id(
         self, activity: Activity, match: Union[str, Pattern[str]]
     ) -> bool:
-        command_id = None
+        value = activity.value if isinstance(activity.value, dict) else vars(activity.value)
 
-        if isinstance(activity.value, object):
-            command_id = getattr(activity.value, "command_id")
+        if not "commandId" in value and not "command_id" in value:
+            return False
+
+        command_id = value["commandId"] if "commandId" in value else value["command_id"]
 
         if not isinstance(command_id, str):
             return False
@@ -436,7 +446,8 @@ class MessageExtensions(Generic[StateT]):
 
         await context.send_activity(
             Activity(
-                type=ActivityTypes.invoke_response, value=InvokeResponse(body=response, status=200)
+                type=ActivityTypes.invoke_response,
+                value=InvokeResponse(body=serializer_helper(response), status=200),
             )
         )
 
@@ -463,7 +474,8 @@ class MessageExtensions(Generic[StateT]):
 
         await context.send_activity(
             Activity(
-                type=ActivityTypes.invoke_response, value=InvokeResponse(body=response, status=200)
+                type=ActivityTypes.invoke_response,
+                value=InvokeResponse(body=serializer_helper(response), status=200),
             )
         )
 
@@ -480,6 +492,7 @@ class MessageExtensions(Generic[StateT]):
 
         await context.send_activity(
             Activity(
-                type=ActivityTypes.invoke_response, value=InvokeResponse(body=response, status=200)
+                type=ActivityTypes.invoke_response,
+                value=InvokeResponse(body=serializer_helper(response), status=200),
             )
         )
