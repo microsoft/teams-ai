@@ -21,9 +21,9 @@ namespace Microsoft.TeamsAI.AI.Moderator
         /// Constructs an instance of the moderator.
         /// </summary>
         /// <param name="options">Options to configure the moderator</param>
-        /// <param name="logger">A logger instance</param>
+        /// <param name="loggerFactory">The logger factory instance</param>
         /// <param name="httpClient">HTTP client.</param>
-        public OpenAIModerator(OpenAIModeratorOptions options, ILogger? logger = null, HttpClient? httpClient = null)
+        public OpenAIModerator(OpenAIModeratorOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             _options = options;
 
@@ -32,7 +32,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 Organization = _options.Organization,
             };
 
-            _client = new OpenAIClient(clientOptions, logger, httpClient);
+            _client = new OpenAIClient(clientOptions, loggerFactory, httpClient);
         }
 
         /// <inheritdoc />

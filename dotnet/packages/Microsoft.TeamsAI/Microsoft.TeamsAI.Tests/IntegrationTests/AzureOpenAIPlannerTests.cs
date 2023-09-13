@@ -9,17 +9,20 @@ using System.Reflection;
 using Xunit.Abstractions;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     public sealed class AzureOpenAICompletionTests
     {
         private readonly IConfigurationRoot _configuration;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly RedirectOutput _output;
 
         public AzureOpenAICompletionTests(ITestOutputHelper output)
         {
             _output = new RedirectOutput(output);
+            _loggerFactory = new TestLoggerFactory(_output);
 
             var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -45,7 +48,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("AzureOpenAI").Get<AzureOpenAIConfiguration>();
             var options = new AzureOpenAIPlannerOptions(config.ApiKey, config.ModelId, config.Endpoint);
-            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -86,7 +89,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             Assert.NotNull(config.ChatModelId);
 
             var options = new AzureOpenAIPlannerOptions(config.ApiKey, config.ChatModelId, config.Endpoint);
-            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -124,7 +127,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             var invalidApiKey = "invalidApiKey";
 
             var options = new AzureOpenAIPlannerOptions(invalidApiKey, config.ChatModelId, config.Endpoint);
-            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -159,7 +162,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             Assert.NotNull(config.ApiKey);
 
             var options = new AzureOpenAIPlannerOptions(config.ApiKey, "invalidModel", config.Endpoint);
-            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new AzureOpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);

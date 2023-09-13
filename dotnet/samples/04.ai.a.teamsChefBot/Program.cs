@@ -49,8 +49,8 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
 
     IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
 
-    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
-    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory.CreateLogger<OpenAIModerator<TurnState>>());
+    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
+    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory);
 
     ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
     {
@@ -63,7 +63,8 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
                 AssistantHistoryType = AssistantHistoryType.Text
             }
         },
-        Storage = sp.GetService<IStorage>()
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
     };
 
     return new TeamsChefBotApplication(applicationOptions);
@@ -91,8 +92,8 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
 
     IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
 
-    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>(), loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
-    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>());
+    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory);
+    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
     ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
     {
@@ -105,7 +106,8 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
                 AssistantHistoryType = AssistantHistoryType.Text
             }
         },
-        Storage = sp.GetService<IStorage>()
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
     };
 
     return new TeamsChefBotApplication(applicationOptions);
