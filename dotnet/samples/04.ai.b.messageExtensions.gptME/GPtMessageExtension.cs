@@ -171,7 +171,7 @@ namespace GPT
             }
         }
 
-        private static TaskModuleResponseBase CreateTaskModule(Attachment attachment)
+        private static TaskModuleContinueResponse CreateTaskModule(Attachment attachment)
         {
             return new TaskModuleContinueResponse
             {
