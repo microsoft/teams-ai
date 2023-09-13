@@ -7,7 +7,7 @@ namespace Microsoft.TeamsAI.AI.Action
     /// The data for default DO command action handler.
     /// </summary>
     /// <typeparam name="TState">Type of turn state.</typeparam>
-    public class DoCommandActionData<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal sealed class DoCommandActionData<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// The predicted DO command.

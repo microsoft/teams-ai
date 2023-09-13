@@ -32,7 +32,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
     public class ModerationResult
     {
         /// <summary>
-        /// The OpenAI categories and whether they were flaggged or not.
+        /// The OpenAI categories and whether they were flagged or not.
         /// </summary>
         [JsonPropertyName("categories")]
         public ModerationCategoriesFlagged? CategoriesFlagged { get; set; }
