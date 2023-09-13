@@ -3,13 +3,22 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 import re
-from typing import Any, Awaitable, Callable, Generic, List, Pattern, TypeVar, Union
+from typing import Awaitable, Callable, Generic, List, Pattern, TypeVar, Union
 
 from botbuilder.core import TurnContext
-from botbuilder.schema import ActivityTypes, AdaptiveCardInvokeResponse, InvokeResponse
+from botbuilder.schema import (
+    Activity,
+    ActivityTypes,
+    AdaptiveCardInvokeResponse,
+    InvokeResponse,
+)
 
 from teams.ai import TurnState
+from teams.query import Query
 from teams.route import Route
+
+from .adaptive_cards_search_params import AdaptiveCardsSearchParams
+from .adaptive_cards_search_result import AdaptiveCardsSearchResult
 
 StateT = TypeVar("StateT", bound=TurnState)
 
@@ -22,16 +31,14 @@ class AdaptiveCards(Generic[StateT]):
     _route_registry: List[Route[StateT]]
     _action_submit_filter: str
 
-    def __init__(
-        self, route_registry: List[Route[StateT]], action_submit_filter: str = "verb"
-    ) -> None:
+    def __init__(self, route_registry: List[Route[StateT]], action_submit_filter: str) -> None:
         self._route_registry = route_registry
         self._action_submit_filter = action_submit_filter
 
     def action_execute(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]):
         """
-        Adds a route for handling Adaptive Card Action.Execute events. This method can be used as either
-        a decorator or a method.
+        Adds a route for handling Adaptive Card Action.Execute events.
+        This method can be used as either a decorator or a method.
 
         ```python
         # Use this method as a decorator
@@ -54,9 +61,9 @@ class AdaptiveCards(Generic[StateT]):
                 context.activity.type == ActivityTypes.invoke
                 and context.activity.name == ACTION_INVOKE_NAME
             ):
-                action = context.activity.value.action if context.activity.value else None
-                action_type = action.type if action else None
-                action_verb = action.verb if action else None
+                action = context.activity.value["action"] if context.activity.value else None
+                action_type = action["type"] if action else None
+                action_verb = action["verb"] if action else None
                 if action_type == ACTION_EXECUTE_TYPE:
                     # when verb is a function
                     if callable(verb):
@@ -70,9 +77,9 @@ class AdaptiveCards(Generic[StateT]):
 
             return False
 
-        def __call__(func: Callable[[TurnContext, StateT, Any], Awaitable[Union[str, dict]]]):
+        def __call__(func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]):
             async def __handler__(context: TurnContext, state: StateT) -> bool:
-                result = await func(context, state, context.activity.value.action.data)
+                result = await func(context, state, context.activity.value["action"]["data"])
                 if context.turn_state.get(ActivityTypes.invoke_response) is None:
                     if isinstance(result, str):
                         response = AdaptiveCardInvokeResponse(
@@ -86,7 +93,11 @@ class AdaptiveCards(Generic[StateT]):
                             type="application/vnd.microsoft.card.adaptive",
                             value=result,
                         )
-                    await context.send_activity(InvokeResponse(status=200, body=response))
+                    await context.send_activity(
+                        Activity(
+                            type="invokeResponse", value=InvokeResponse(status=200, body=response)
+                        )
+                    )
                 return True
 
             self._route_registry.append(Route[StateT](__selector__, __handler__))
@@ -96,8 +107,8 @@ class AdaptiveCards(Generic[StateT]):
 
     def action_submit(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]):
         """
-        Adds a route for handling Adaptive Card Action.Submit events. This method can be used as either
-        a decorator or a method.
+        Adds a route for handling Adaptive Card Action.Submit events.
+        This method can be used as either a decorator or a method.
 
         ```python
         # Use this method as a decorator
@@ -135,7 +146,7 @@ class AdaptiveCards(Generic[StateT]):
 
             return False
 
-        def __call__(func: Callable[[TurnContext, StateT, Any], Awaitable[None]]):
+        def __call__(func: Callable[[TurnContext, StateT, dict], Awaitable[None]]):
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 await func(context, state, context.activity.value)
                 return True
@@ -172,7 +183,7 @@ class AdaptiveCards(Generic[StateT]):
                 and context.activity.name == SEARCH_INVOKE_NAME
             ):
                 activity_dataset = (
-                    context.activity.value.dataset if context.activity.value else None
+                    context.activity.value["dataset"] if context.activity.value else None
                 )
                 # when verb is a function
                 if callable(dataset):
@@ -186,22 +197,27 @@ class AdaptiveCards(Generic[StateT]):
 
             return False
 
-        def __call__(func: Callable[[TurnContext, StateT, Any], Awaitable[Any]]):
+        def __call__(
+            func: Callable[
+                [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
+                Awaitable[List[AdaptiveCardsSearchResult]],
+            ]
+        ):
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 params = context.activity.value
                 # Flatten search parameters
-                query = {
-                    "count": params["queryOptions"]["top"]
+                query = Query[AdaptiveCardsSearchParams](
+                    count=params["queryOptions"]["top"]
                     if params and params["queryOptions"] and params["queryOptions"]["top"]
                     else 25,
-                    "skip": params["queryOptions"]["skip"]
+                    skip=params["queryOptions"]["skip"]
                     if params and params["queryOptions"] and params["queryOptions"]["skip"]
                     else 0,
-                    "parameters": {
-                        "queryText": params["queryText"] if params and params["queryText"] else "",
-                        "dataset": params["dataset"] if params and params["dataset"] else "",
-                    },
-                }
+                    parameters=AdaptiveCardsSearchParams(
+                        query_text=params["queryText"] if params and params["queryText"] else "",
+                        dataset=params["dataset"] if params and params["dataset"] else "",
+                    ),
+                )
                 result = await func(context, state, query)
                 if context.turn_state.get(ActivityTypes.invoke_response) is None:
                     # Format invoke response
@@ -209,10 +225,14 @@ class AdaptiveCards(Generic[StateT]):
                         "type": "application/vnd.microsoft.search.searchResponse",
                         "value": {"results": result},
                     }
-                    await context.send_activity(InvokeResponse(status=200, body=response))
+                    await context.send_activity(
+                        Activity(
+                            type="invokeResponse", value=InvokeResponse(status=200, body=response)
+                        )
+                    )
                 return True
 
             self._route_registry.append(Route[StateT](__selector__, __handler__))
             return func
 
-        return False
+        return __call__
