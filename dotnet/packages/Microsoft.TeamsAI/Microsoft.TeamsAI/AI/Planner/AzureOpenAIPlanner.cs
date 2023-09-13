@@ -18,8 +18,8 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// Creates a new instance of the <see cref="AzureOpenAIPlanner{TState}"/> class.
         /// </summary>
         /// <param name="options">The options to configure the planner.</param>
-        /// <param name="logger">The logger instance.</param>
-        public AzureOpenAIPlanner(AzureOpenAIPlannerOptions options, ILogger logger) : base(options, logger)
+        /// <param name="loggerFactory">The logger factory instance.</param>
+        public AzureOpenAIPlanner(AzureOpenAIPlannerOptions options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
         {
         }
 

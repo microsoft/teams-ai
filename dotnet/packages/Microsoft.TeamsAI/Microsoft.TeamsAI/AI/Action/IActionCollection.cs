@@ -17,7 +17,7 @@ namespace Microsoft.TeamsAI.AI.Action
         /// </summary>
         /// <param name="actionName">The name of the action.</param>
         /// <param name="handler">The action handler.</param>
-        /// <param name="allowOverrides">Whether or not this action's properties can be overriden. Default to false.</param>
+        /// <param name="allowOverrides">Whether or not this action's properties can be overridden. Default to false.</param>
         /// <exception cref="ArgumentException"></exception>
         void AddAction(string actionName, IActionHandler<TState> handler, bool allowOverrides = false);
 

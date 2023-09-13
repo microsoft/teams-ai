@@ -1,25 +1,29 @@
 ﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 
+// For Unit Tests - so the Moq framework can mock internal classes
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Microsoft.TeamsAI.AI.OpenAI
 {
     /// <summary>
     /// The client to make calls to OpenAI's API
     /// </summary>
-    public class OpenAIClient
+    internal class OpenAIClient
     {
         private const string HttpUserAgent = "Microsoft Teams AI";
         private const string OpenAIModerationEndpoint = "https://api.openai.com/v1/moderations";
 
         private HttpClient _httpClient;
-        private ILogger? _logger;
+        private ILogger _logger;
         private OpenAIClientOptions _options;
         private static readonly JsonSerializerOptions _serializerOptions = new()
         {
@@ -30,12 +34,12 @@ namespace Microsoft.TeamsAI.AI.OpenAI
         /// Creates a new instance of the <see cref="OpenAIClient"/> class.
         /// </summary>
         /// <param name="options">The OpenAI client options.</param>
-        /// <param name="logger">The logger instance.</param>
-        /// <param name="httpClient">The HTTP client instance.</param>
-        public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
+        /// <param name="loggerFactory">Optional. The logger factory instance.</param>
+        /// <param name="httpClient">Optional. The HTTP client instance.</param>
+        public OpenAIClient(OpenAIClientOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             _httpClient = httpClient ?? DefaultHttpClient.Instance;
-            _logger = logger;
+            _logger = loggerFactory is null ? NullLogger.Instance : loggerFactory.CreateLogger(typeof(OpenAIClient));
             _options = options;
         }
 
@@ -100,7 +104,7 @@ namespace Microsoft.TeamsAI.AI.OpenAI
                 response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             }
 
-            _logger?.LogTrace($"HTTP response: {(int)response.StatusCode} {response.StatusCode:G}");
+            _logger.LogTrace($"HTTP response: {(int)response.StatusCode} {response.StatusCode:G}");
 
             // Throw an exception if not a success status code
             if (response.IsSuccessStatusCode)

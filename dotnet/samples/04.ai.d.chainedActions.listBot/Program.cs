@@ -50,7 +50,7 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
 
     PromptManager<ListState> promptManager = new("./Prompts");
 
-    OpenAIPlanner<ListState> planner = new(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory.CreateLogger<OpenAIPlanner<ListState>>());
+    OpenAIPlanner<ListState> planner = new(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
 
     ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
     {
@@ -58,7 +58,8 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
         {
             Prompt = "Chat"
         },
-        Storage = sp.GetService<IStorage>()
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
     };
 
     return new ListBotApplication(applicationOptions);
@@ -86,7 +87,7 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
 
     PromptManager<ListState> promptManager = new("./Prompts");
 
-    AzureOpenAIPlanner<ListState> planner = new(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory.CreateLogger<AzureOpenAIPlanner<ListState>>());
+    AzureOpenAIPlanner<ListState> planner = new(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory);
 
     ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
     {
@@ -94,7 +95,8 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
         {
             Prompt = "Chat"
         },
-        Storage = sp.GetService<IStorage>()
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
     };
 
     return new ListBotApplication(applicationOptions);

@@ -47,12 +47,12 @@ namespace Microsoft.TeamsAI
         public TTurnStateManager? TurnStateManager { get; set; }
 
         /// <summary>
-        /// Optional. Logger that will be used in this application.
+        /// Optional. Logger factory that will be used in this application.
         /// </summary>
         /// <remarks>
         /// <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}"/> and <see cref="AI.Planner.AzureOpenAIPlanner{TState}"/> prompt completion data will is logged at the <see cref="LogLevel.Information"/> level.
         /// </remarks>
-        public ILogger? Logger { get; set; }
+        public ILoggerFactory? LoggerFactory { get; set; }
 
         /// <summary>
         /// Optional. If true, the bot will automatically remove mentions of the bot's name from incoming

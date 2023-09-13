@@ -5,7 +5,6 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
-using Xunit.Abstractions;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;

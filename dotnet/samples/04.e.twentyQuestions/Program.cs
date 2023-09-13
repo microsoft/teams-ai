@@ -54,12 +54,12 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     IPlanner<GameState> planner = new OpenAIPlanner<GameState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<GameState>>());
+        loggerFactory);
 
     // Create OpenAIModerator
     IModerator<GameState> moderator = new OpenAIModerator<GameState>(
         sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory.CreateLogger<OpenAIModerator<GameState>>(),
+        loggerFactory,
         moderatorHttpClient);
 
     // Create Application
@@ -78,6 +78,7 @@ builder.Services.AddTransient<IBot>(sp =>
         TurnStateManager = new GameStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
     return new GameBot(ApplicationOptions);
 });
@@ -105,7 +106,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create AzureOpenAIPlanner
     IPlanner<GameState> planner = new AzureOpenAIPlanner<GameState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<GameState>>());
+        loggerFactory);
 
     // Create AzureContentSafetyModerator
     IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
@@ -126,6 +127,7 @@ builder.Services.AddTransient<IBot>(sp =>
         TurnStateManager = new GameStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
+        LoggerFactory = loggerFactory,        
     };
     return new GameBot(ApplicationOptions);
 });

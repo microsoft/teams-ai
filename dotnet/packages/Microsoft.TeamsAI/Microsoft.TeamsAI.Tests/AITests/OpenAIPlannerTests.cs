@@ -369,7 +369,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
         {
             private Func<string> customFunction;
 
-            public CustomCompletePromptOpenAIPlanner(OpenAIPlannerOptions options, Func<string> customFunction, ILogger? logger = null) : base(options, logger)
+            public CustomCompletePromptOpenAIPlanner(OpenAIPlannerOptions options, Func<string> customFunction, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
             {
                 this.customFunction = customFunction;
             }
@@ -388,7 +388,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             public Mock<IChatCompletion> ChatCompletionMock { get; } = new Mock<IChatCompletion>();
 
-            public CustomCompletionOpenAIPlanner(OpenAIPlannerOptions options, ILogger? logger = null) : base(options, logger)
+            public CustomCompletionOpenAIPlanner(OpenAIPlannerOptions options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
             {
             }
 

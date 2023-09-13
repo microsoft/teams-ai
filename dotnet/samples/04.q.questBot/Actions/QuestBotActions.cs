@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Action;
 using Microsoft.TeamsAI.AI.Planner;
 using QuestBot.Models;
@@ -17,7 +18,7 @@ namespace QuestBot.Actions
             _application = application;
         }
 
-        [Action(DefaultActionTypes.UnknownActionName)]
+        [Action(AIConstants.UnknownActionName)]
         public async Task<bool> UnknownAsync([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
         {
             await turnContext.SendActivityAsync($"<strong>{action}</strong> action missing");
