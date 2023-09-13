@@ -23,6 +23,3 @@ appPackage/build
 # Teams Toolkit Local Development
 appsettings.Development.json
 env/.env.local
-
-# Local Nuget Source
-LocalPkg/
