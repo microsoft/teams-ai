@@ -31,14 +31,14 @@ app = Application[TurnState](
 
 
 @app.message(re.compile(r"dynamic", re.IGNORECASE))
-async def dynamic_card(context: TurnContext, state: TurnState) -> bool:
+async def dynamic_card(context: TurnContext, _state: TurnState) -> bool:
     attachment = create_dynamic_search_card()
     await context.send_activity(Activity(attachments=[attachment]))
     return True
 
 
 @app.message(re.compile(r"static", re.IGNORECASE))
-async def static_card(context: TurnContext, state: TurnState) -> bool:
+async def static_card(context: TurnContext, _state: TurnState) -> bool:
     attachment = create_static_search_card()
     await context.send_activity(Activity(attachments=[attachment]))
     return True
@@ -46,7 +46,7 @@ async def static_card(context: TurnContext, state: TurnState) -> bool:
 
 @app.adaptive_cards.search("npmpackages")
 async def search_npm_package(
-    context: TurnContext, state: TurnState, query: Query[AdaptiveCardsSearchParams]
+    _context: TurnContext, _state: TurnState, query: Query[AdaptiveCardsSearchParams]
 ):
     search_query = query.parameters.query_text
     count = query.count
@@ -66,13 +66,13 @@ async def search_npm_package(
 
 
 @app.adaptive_cards.action_submit("DynamicSubmit")
-async def on_dynamic_submit(context: TurnContext, state: TurnState, data) -> bool:
+async def on_dynamic_submit(context: TurnContext, _state: TurnState, data) -> bool:
     await context.send_activity(f'Dynamically selected option is: {data["choiceSelect"]}')
     return True
 
 
 @app.adaptive_cards.action_submit("StaticSubmit")
-async def on_static_submit(context: TurnContext, state: TurnState, data) -> bool:
+async def on_static_submit(context: TurnContext, _state: TurnState, data) -> bool:
     await context.send_activity(f'Statically selected option is: {data["choiceSelect"]}')
     return True
 
