@@ -3,7 +3,6 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Any
 from unittest import TestCase
 
 import pytest
@@ -36,7 +35,7 @@ class TestAI(TestCase):
         yield
 
     def test_action_method(self):
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState):
             print("test")
             return True
 
@@ -47,7 +46,7 @@ class TestAI(TestCase):
 
     def test_action_decorator(self):
         @self.ai.action("hello_world")
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState):
             print("test")
             return True
 
@@ -56,7 +55,7 @@ class TestAI(TestCase):
 
     def test_action_default_name(self):
         @self.ai.action()
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState):
             print("test")
             return True
 
@@ -65,7 +64,7 @@ class TestAI(TestCase):
 
     def test_action_method_override(self):
         @self.ai.action()
-        async def hello_world(_context: TurnContext, _state: TurnState, _entities: Any, _name: str):
+        async def hello_world(_context: TurnContext, _state: TurnState):
             print("test")
             return True
 

@@ -7,12 +7,13 @@ from typing import Any, Callable
 
 from botbuilder.core import TurnContext
 
-from teams.ai.planner import OpenAIPlanner, OpenAIPlannerOptions
-from teams.ai.state import TurnState
+from teams.ai import OpenAIPlanner, OpenAIPlannerOptions, TurnState
 
 
 async def add_function(context: TurnContext):
-    options = OpenAIPlannerOptions("api_key", "gpt-3.5-turbo", "tests/planner/test_assets")
+    options = OpenAIPlannerOptions(
+        "api_key", "gpt-3.5-turbo", prompt_folder="tests/planner/test_assets"
+    )
     planner = OpenAIPlanner(options)
 
     def function_to_add(context: TurnContext, state: TurnState):
@@ -22,7 +23,9 @@ async def add_function(context: TurnContext):
 
 
 async def generate_plan(context: TurnContext):
-    options = OpenAIPlannerOptions("api_key", "gpt-3.5-turbo", "tests/planner/test_assets")
+    options = OpenAIPlannerOptions(
+        "api_key", "gpt-3.5-turbo", prompt_folder="tests/planner/test_assets"
+    )
     planner = OpenAIPlanner(options)
     state = await TurnState.from_activity(context.activity)
     await planner.generate_plan(context, state, "test")
