@@ -16,11 +16,14 @@ RouteHandler = Callable[[TurnContext, StateT], Awaitable[bool]]
 class Route(Generic[StateT]):
     selector: Callable[[TurnContext], bool]
     handler: RouteHandler[StateT]
+    is_invoke: bool
 
     def __init__(
         self,
         selector: Callable[[TurnContext], bool],
         handler: RouteHandler[StateT],
+        is_invoke: bool = False,
     ) -> None:
         self.selector = selector
         self.handler = handler
+        self.is_invoke = is_invoke

@@ -403,7 +403,18 @@ class Application(Bot, Generic[StateT]):
     async def _on_activity(self, context: TurnContext, state: TurnState) -> Tuple[bool, int]:
         matches = 0
 
-        for route in self._routes:
+        # ensure we handle invokes first
+        routes = filter(lambda r: not r.is_invoke, self._routes)
+        invoke_routes = filter(lambda r: r.is_invoke, self._routes)
+
+        for route in invoke_routes:
+            if route.selector(context):
+                matches = matches + 1
+
+                if not await route.handler(context, cast(StateT, state)):
+                    return False, matches
+
+        for route in routes:
             if route.selector(context):
                 matches = matches + 1
 
