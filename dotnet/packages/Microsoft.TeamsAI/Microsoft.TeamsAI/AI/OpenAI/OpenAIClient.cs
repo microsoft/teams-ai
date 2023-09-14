@@ -1,35 +1,45 @@
 ﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 
+// For Unit Tests - so the Moq framework can mock internal classes
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Microsoft.TeamsAI.AI.OpenAI
 {
     /// <summary>
     /// The client to make calls to OpenAI's API
     /// </summary>
-    public class OpenAIClient
+    internal class OpenAIClient
     {
         private const string HttpUserAgent = "Microsoft Teams AI";
         private const string OpenAIModerationEndpoint = "https://api.openai.com/v1/moderations";
 
         private HttpClient _httpClient;
-        private ILogger? _logger;
+        private ILogger _logger;
         private OpenAIClientOptions _options;
         private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
-        public OpenAIClient(OpenAIClientOptions options, ILogger? logger = null, HttpClient? httpClient = null)
+        /// <summary>
+        /// Creates a new instance of the <see cref="OpenAIClient"/> class.
+        /// </summary>
+        /// <param name="options">The OpenAI client options.</param>
+        /// <param name="loggerFactory">Optional. The logger factory instance.</param>
+        /// <param name="httpClient">Optional. The HTTP client instance.</param>
+        public OpenAIClient(OpenAIClientOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             _httpClient = httpClient ?? DefaultHttpClient.Instance;
-            _logger = logger;
+            _logger = loggerFactory is null ? NullLogger.Instance : loggerFactory.CreateLogger(typeof(OpenAIClient));
             _options = options;
         }
 
@@ -39,7 +49,7 @@ namespace Microsoft.TeamsAI.AI.OpenAI
         /// <param name="text">The input text to moderate.</param>
         /// <param name="model">The moderation model to use.</param>
         /// <returns>The moderation result from the API call.</returns>
-        /// <exception cref="OpenAIClientException" />
+        /// <exception cref="HttpOperationException" />
         public virtual async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
         {
             try
@@ -61,60 +71,52 @@ namespace Microsoft.TeamsAI.AI.OpenAI
 
                 return result;
             }
-            catch (OpenAIClientException)
+            catch (HttpOperationException)
             {
                 throw;
             }
             catch (Exception e)
             {
-                throw new OpenAIClientException($"Something went wrong: {e.Message}");
+                throw new TeamsAIException($"Something went wrong: {e.Message}", e);
             }
         }
 
         private async Task<HttpResponseMessage> _ExecutePostRequest(string url, HttpContent? content, CancellationToken cancellationToken = default)
         {
             HttpResponseMessage? response = null;
-            try
+
+            using (HttpRequestMessage request = new(HttpMethod.Post, url))
             {
-                using (HttpRequestMessage request = new(HttpMethod.Post, url))
+                request.Headers.Add("Accept", "application/json");
+                request.Headers.Add("User-Agent", HttpUserAgent);
+                request.Headers.Add("Authorization", $"Bearer {_options.ApiKey}");
+
+                if (_options.Organization != null)
                 {
-                    request.Headers.Add("Accept", "application/json");
-                    request.Headers.Add("User-Agent", HttpUserAgent);
-                    request.Headers.Add("Authorization", $"Bearer {_options.ApiKey}");
-
-                    if (_options.Organization != null)
-                    {
-                        request.Headers.Add("OpenAI-Organization", _options.Organization);
-                    }
-
-                    if (content != null)
-                    {
-                        request.Content = content;
-                    }
-
-                    response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                    request.Headers.Add("OpenAI-Organization", _options.Organization);
                 }
 
-                _logger?.LogTrace($"HTTP response: {(int)response.StatusCode} {response.StatusCode:G}");
-
-                // Throw an exception if not a success status code
-                if (response.IsSuccessStatusCode)
+                if (content != null)
                 {
-                    return response;
+                    request.Content = content;
                 }
 
-                HttpStatusCode statusCode = response.StatusCode;
-                string failureReason = response.ReasonPhrase;
-
-                throw new OpenAIClientException($"HTTP response failure status code: {(int)statusCode} ({failureReason})", statusCode);
-
+                response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e)
+
+            _logger.LogTrace($"HTTP response: {(int)response.StatusCode} {response.StatusCode:G}");
+
+            // Throw an exception if not a success status code
+            if (response.IsSuccessStatusCode)
             {
-                response?.Dispose();
-                throw new OpenAIClientException($"Something went wrong {e.Message}");
+                return response;
             }
 
+            HttpStatusCode statusCode = response.StatusCode;
+            string failureReason = response.ReasonPhrase;
+            response?.Dispose();
+
+            throw new HttpOperationException($"HTTP response failure status code: {(int)statusCode} ({failureReason})", statusCode, failureReason);
         }
     }
 }

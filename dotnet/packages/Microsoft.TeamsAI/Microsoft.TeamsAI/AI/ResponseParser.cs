@@ -1,17 +1,16 @@
 ﻿using AdaptiveCards;
 using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.Exceptions;
 using System.Text.Json;
 
 namespace Microsoft.TeamsAI.AI
 {
-    public class ResponseParser
+    internal class ResponseParser
     {
         private static readonly string BREAKING_CHARACTERS = "`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./ \r\n\t";
         private static readonly string NAME_BREAKING_CHARACTERS = "`~!@#$%^&*()+={}|[]\\:\";\'<>?,./ \r\n\t";
-        private static readonly string[] COMMANDS = { AITypes.DoCommand, AITypes.SayCommand };
+        private static readonly string[] COMMANDS = { AIConstants.DoCommand, AIConstants.SayCommand };
         private static readonly string SPACE_CHARACTERS = "\r\n\t";
-        private static readonly string DEFAULT_COMMAND = AITypes.SayCommand;
+        private static readonly string DEFAULT_COMMAND = AIConstants.SayCommand;
         private static readonly string[] IGNORED_TOKENS = { "THEN" };
 
         /// <summary>
@@ -23,9 +22,12 @@ namespace Microsoft.TeamsAI.AI
         {
             int length = text.Length;
 
-            if (length < 2) return null;
+            if (length < 2)
+            {
+                return null;
+            }
 
-            var result = new List<string>();
+            List<string> result = new();
 
             int startIndex;
             int endIndex = -1;
@@ -33,14 +35,20 @@ namespace Microsoft.TeamsAI.AI
             {
                 // Find the first "{"
                 startIndex = text.IndexOf('{', endIndex + 1);
-                if (startIndex == -1) return result;
+                if (startIndex == -1)
+                {
+                    return result;
+                }
 
                 // Find the first "}" such that all the contents sandwiched between S & E is a valid JSON.
                 endIndex = startIndex;
                 while (endIndex < length)
                 {
                     endIndex = text.IndexOf('}', endIndex + 1);
-                if (endIndex == -1) return result;
+                    if (endIndex == -1)
+                    {
+                        return result;
+                    }
 
                     string possibleJSON = text.Substring(startIndex, endIndex - startIndex + 1);
 
@@ -71,7 +79,10 @@ namespace Microsoft.TeamsAI.AI
         {
             string? firstJsonString = GetFirstJsonString(text);
 
-            if (firstJsonString == null) return null;
+            if (firstJsonString == null)
+            {
+                return null;
+            }
 
             return AdaptiveCard.FromJson(firstJsonString);
         }
@@ -90,7 +101,7 @@ namespace Microsoft.TeamsAI.AI
 
             if (plan != null)
             {
-                if (AITypes.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
+                if (AIConstants.Plan.Equals(plan.Type, StringComparison.OrdinalIgnoreCase))
                 {
                     return plan;
                 }
@@ -114,11 +125,11 @@ namespace Microsoft.TeamsAI.AI
                     ParsedCommandResult result;
                     switch (tokens[0])
                     {
-                        case AITypes.DoCommand:
+                        case AIConstants.DoCommand:
                             result = ParseDoCommand(tokens);
                             break;
 
-                        case AITypes.SayCommand:
+                        case AIConstants.SayCommand:
                         default:
                             result = ParseSayCommand(tokens);
                             break;
@@ -131,7 +142,7 @@ namespace Microsoft.TeamsAI.AI
                         // - In the case of `DO DO command` the first DO command wouldn't generate
                         if (result.Command != null)
                         {
-                            if (AITypes.SayCommand.Equals(result.Command.Type, StringComparison.OrdinalIgnoreCase))
+                            if (AIConstants.SayCommand.Equals(result.Command.Type, StringComparison.OrdinalIgnoreCase))
                             {
                                 // Check for duplicate SAY
                                 string response = ((PredictedSayCommand)result.Command).Response.Trim().ToLower();
@@ -168,9 +179,9 @@ namespace Microsoft.TeamsAI.AI
 
             if (tokens.Count > 1)
             {
-                if (!AITypes.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
+                if (!AIConstants.DoCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.DoCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AIConstants.DoCommand} token");
                 }
 
                 string actionName = "";
@@ -335,9 +346,9 @@ namespace Microsoft.TeamsAI.AI
             IPredictedCommand? command = null;
             if (tokens.Count > 1)
             {
-                if (!AITypes.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
+                if (!AIConstants.SayCommand.Equals(tokens.First(), StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ResponseParserException($"Token list passed in doesn't start with {AITypes.SayCommand} token");
+                    throw new ArgumentException($"Token list passed in doesn't start with {AIConstants.SayCommand} token");
                 }
 
                 // Parse command (skips initial SAY token)
@@ -372,7 +383,7 @@ namespace Microsoft.TeamsAI.AI
         }
 
         /// <summary>
-        /// Simple text tokensizer. Breaking characters are added to list as separate tokens.
+        /// Simple text tokenizer. Breaking characters are added to list as separate tokens.
         /// </summary>
         /// <param name="text">Any input string</param>
         /// <returns>A list of tokens</returns>
@@ -380,7 +391,10 @@ namespace Microsoft.TeamsAI.AI
         {
             List<string> tokens = new();
 
-            if (text.Length < 1) return tokens;
+            if (text.Length < 1)
+            {
+                return tokens;
+            }
 
             string token = "";
             int length = text.Length;
@@ -458,7 +472,7 @@ namespace Microsoft.TeamsAI.AI
         }
     }
 
-    enum DoCommandParseState
+    internal enum DoCommandParseState
     {
         FindActionName,
         InActionName,

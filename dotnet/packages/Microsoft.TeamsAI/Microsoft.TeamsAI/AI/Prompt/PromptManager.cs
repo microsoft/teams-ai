@@ -1,13 +1,18 @@
 ﻿using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Utilities;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Diagnostics;
 using Microsoft.SemanticKernel.Orchestration;
-using Microsoft.SemanticKernel.TemplateEngine;
+using Microsoft.SemanticKernel.TemplateEngine.Prompt;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
 
 namespace Microsoft.TeamsAI.AI.Prompt
 {
+    /// <summary>
+    /// The prompt manager.
+    /// </summary>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public class PromptManager<TState> : IPromptManager<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private string? _promptsFolder;
@@ -15,6 +20,11 @@ namespace Microsoft.TeamsAI.AI.Prompt
         private readonly Dictionary<string, TemplateFunctionEntry<TState>> _functions;
         private readonly Dictionary<string, string> _promptVariables;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="PromptManager{TState}"/> class.
+        /// </summary>
+        /// <param name="promptsFolder">The prompt folder. This should be the absolute path, for example, "C:\prompts".</param>
+        /// <param name="promptVariables">Mapping to resolve prompt template variables.</param>
         public PromptManager(string? promptsFolder = null, Dictionary<string, string>? promptVariables = null)
         {
             if (promptsFolder != null)
@@ -52,7 +62,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
                     }
                     else
                     {
-                        throw new PromptManagerException($"Attempting to update a previously registered function `{name}`");
+                        throw new InvalidOperationException($"Attempting to update a previously registered function `{name}`");
                     }
                 }
             }
@@ -68,7 +78,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             if (_templates.ContainsKey(name))
             {
-                throw new PromptManagerException($"Text template `{name}` already exists.");
+                throw new InvalidOperationException($"Text template `{name}` already exists.");
             }
 
             _templates.Add(name, promptTemplate);
@@ -90,7 +100,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
             else
             {
-                throw new PromptManagerException($"Attempting to invoke an unregistered function name {name}");
+                throw new InvalidOperationException($"Attempting to invoke an unregistered function name {name}");
             }
         }
 
@@ -106,31 +116,23 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             if (_promptsFolder == null)
             {
-                throw new PromptManagerException($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
+                throw new InvalidOperationException($"Error while loading prompt. The prompt name `{name}` is not registered to the prompt manager and you have not supplied a valid prompts folder");
             }
 
             return _LoadPromptTemplateFromFile(name);
         }
 
         /// <inheritdoc/>
-        public async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, string name)
+        public async Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, string name)
         {
             PromptTemplate promptTemplate = LoadPromptTemplate(name);
 
-            return await RenderPrompt(turnContext, turnState, promptTemplate);
+            return await RenderPromptAsync(turnContext, turnState, promptTemplate);
         }
 
-        /// TODO: Ensure async methods have "Async" suffix
-        /// TODO: Ensure turnContext and turnState descriptions are same throughout the SDK
         /// <inheritdoc/>
-        public async Task<PromptTemplate> RenderPrompt(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
+        public async Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate)
         {
-            // TODO: Review prompt template standards and make sure they align with SK's.
-            // Convert all the `.` in variable refernces to `_` to conform to SK template rules
-            // Ex. {{ $state.conversation.value }} to {{ $state_conversation_value }}
-            // string updatedPrompt = _TransformPromptTemplateFormat(promptTemplate.Text);
-            // string updatedPrompt = "";
-
             IKernel kernel = Kernel.Builder.Build();
             RegisterFunctionsIntoKernel(kernel, turnContext, turnState);
             SKContext context = kernel.CreateNewContext();
@@ -143,9 +145,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
             {
                 renderedPrompt = await promptRenderer.RenderAsync(promptTemplate.Text, context);
             }
-            catch (TemplateException ex)
+            catch (SKException ex)
             {
-                throw new PromptManagerException($"Failed to render prompt: ${ex.Message}", ex);
+                throw new TeamsAIException($"Failed to render prompt: ${ex.Message}", ex);
             }
 
 
@@ -172,6 +174,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <summary>
         /// Loads value from turn context and turn state into context variables.
         /// </summary>
+        /// <param name="context">The Semantic Kernel context</param>
         /// <param name="turnContext">The context object for this turn.</param>
         /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
         /// <returns>Variables that could be injected into the prompt template</returns>
@@ -183,9 +186,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
 
             // Temp state values override the user configured variables
-            context[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
-            context[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
-            context[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
+            context.Variables[TempState.OutputKey] = turnState.Temp?.Output ?? string.Empty;
+            context.Variables[TempState.InputKey] = turnState.Temp?.Input ?? turnContext.Activity.Text;
+            context.Variables[TempState.HistoryKey] = turnState.Temp?.History ?? string.Empty;
         }
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)
@@ -198,7 +201,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
 
             // Continue only if prompt template exists
             string promptPath = Path.Combine(promptFolder, PROMPT_FILE);
-            if (!File.Exists(promptPath)) { throw new PromptManagerException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
+            if (!File.Exists(promptPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
 
             // Load prompt template
             string text = File.ReadAllText(promptPath);
@@ -206,7 +209,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             // Load prompt configuration. Note: the configuration is optional.
             PromptTemplateConfiguration? config;
             string configPath = Path.Combine(promptFolder, CONFIG_FILE);
-            if (!File.Exists(configPath)) { throw new PromptManagerException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
+            if (!File.Exists(configPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
 
             try
             {
@@ -214,7 +217,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
             }
             catch (Exception ex)
             {
-                throw new PromptManagerException($"Error while loading prompt. {ex.Message}");
+                throw new TeamsAIException($"Error while loading prompt. {ex.Message}");
             }
 
             return new PromptTemplate(text, config);
@@ -224,7 +227,7 @@ namespace Microsoft.TeamsAI.AI.Prompt
         {
             if (Directory.Exists(directoryPath)) { return; }
 
-            throw new PromptManagerException($"Directory doesn't exist `{directoryPath}`");
+            throw new ArgumentException($"Directory doesn't exist `{directoryPath}`");
         }
     }
 }

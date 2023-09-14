@@ -7,46 +7,48 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microsoft.TeamsAI.AI.Action
 {
-    public class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
-    {
-        private readonly ILogger? _logger;
 
-        public DefaultActions(ILogger? logger)
+    internal class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    {
+        private readonly ILogger _logger;
+
+        public DefaultActions(ILoggerFactory? loggerFactory = null)
         {
-            _logger = logger;
+            _logger = loggerFactory is null ? NullLogger.Instance : loggerFactory.CreateLogger(typeof(DefaultActions<TState>));
         }
 
-        [Action(DefaultActionTypes.UnknownActionName)]
+        [Action(AIConstants.UnknownActionName)]
         public Task<bool> UnknownAction([ActionName] string action)
         {
-            _logger?.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
+            _logger.LogError($"An AI action named \"{action}\" was predicted but no handler was registered");
             return Task.FromResult(true);
         }
 
-        [Action(DefaultActionTypes.FlaggedInputActionName)]
+        [Action(AIConstants.FlaggedInputActionName)]
         public Task<bool> FlaggedInputAction()
         {
-            _logger?.LogError($"The users input has been moderated but no handler was registered for {DefaultActionTypes.FlaggedInputActionName}");
+            _logger.LogError($"The users input has been moderated but no handler was registered for {AIConstants.FlaggedInputActionName}");
             return Task.FromResult(true);
         }
 
-        [Action(DefaultActionTypes.FlaggedOutputActionName)]
+        [Action(AIConstants.FlaggedOutputActionName)]
         public Task<bool> FlaggedOutputAction()
         {
-            _logger?.LogError($"The bots output has been moderated but no handler was registered for {DefaultActionTypes.FlaggedOutputActionName}");
+            _logger.LogError($"The bots output has been moderated but no handler was registered for {AIConstants.FlaggedOutputActionName}");
             return Task.FromResult(true);
         }
 
-        [Action(DefaultActionTypes.RateLimitedActionName)]
+        [Action(AIConstants.RateLimitedActionName)]
         public Task<bool> RateLimitedAction()
         {
-            throw new AIException("An AI request failed because it was rate limited");
+            throw new TeamsAIException("An AI request failed because it was rate limited");
         }
 
-        [Action(DefaultActionTypes.PlanReadyActionName)]
+        [Action(AIConstants.PlanReadyActionName)]
         public Task<bool> PlanReadyAction([ActionEntities] Plan plan)
         {
             Verify.ParamNotNull(plan);
@@ -54,8 +56,8 @@ namespace Microsoft.TeamsAI.AI.Action
             return Task.FromResult(plan.Commands.Count > 0);
         }
 
-        [Action(DefaultActionTypes.DoCommandActionName)]
-        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData, [ActionName] string action)
+        [Action(AIConstants.DoCommandActionName)]
+        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData)
         {
             Verify.ParamNotNull(doCommandActionData);
 
@@ -74,7 +76,7 @@ namespace Microsoft.TeamsAI.AI.Action
             return handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, doCommandActionData.PredictedDoCommand.Action);
         }
 
-        [Action(DefaultActionTypes.SayCommandActionName)]
+        [Action(AIConstants.SayCommandActionName)]
         public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
         {
             Verify.ParamNotNull(command);

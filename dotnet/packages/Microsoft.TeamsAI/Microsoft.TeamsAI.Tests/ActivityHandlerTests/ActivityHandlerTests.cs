@@ -726,8 +726,8 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
             await bot.OnTurnAsync(turnContext, default);
 
             // Assert
-            Assert.Single(bot.Record);
-            Assert.Equal("OnMessageActivityAsync", bot.Record[0]);
+            Assert.Equal(bot.Record.Count, 3);
+            Assert.Equal("OnMessageActivityAsync", bot.Record[1]);
         }
 
         [Fact]
@@ -796,8 +796,57 @@ namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
 
             // Assert
             adapterMock.Verify(adapter => adapter.ContinueConversationAsync(It.IsAny<string>(), It.IsAny<Activity>(), It.IsAny<BotCallbackHandler>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.Single(bot.Record);
-            Assert.Equal("OnMessageUpdateActivityAsync", bot.Record[0]);
+            Assert.Equal(bot.Record.Count, 3);
+            Assert.Equal("OnMessageUpdateActivityAsync", bot.Record[1]);
+        }
+
+        [Fact]
+        public async Task Test_BeforeTurnActivity()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var adapterMock = new Mock<BotAdapter>();
+
+            // Act
+            var bot = new TestActivityHandler(new TestApplicationOptions
+            {
+                Adapter = adapterMock.Object,
+                BotAppId = "test-bot-app-id",
+                LongRunningMessages = false,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false,
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            // Before Turn -> On Turn -> After Turn
+            Assert.Equal(bot.Record.Count, 3);
+            Assert.Equal(bot.Record.First(), "OnBeforeTurnAsync");
+        }
+
+        [Fact]
+        public async Task Test_AfterTurnActivity()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var adapterMock = new Mock<BotAdapter>();
+
+            // Act
+            var bot = new TestActivityHandler(new TestApplicationOptions
+            {
+                Adapter = adapterMock.Object,
+                BotAppId = "test-bot-app-id",
+                LongRunningMessages = false,
+                StartTypingTimer = false,
+                RemoveRecipientMention = false,
+            });
+            await bot.OnTurnAsync(turnContext, default);
+
+            // Assert
+            Assert.Equal(bot.Record.Count, 3);  // Before Turn -> On Turn -> After Turn
+            Assert.Equal(bot.Record[2], "OnAfterTurnAsync");
         }
     }
 }

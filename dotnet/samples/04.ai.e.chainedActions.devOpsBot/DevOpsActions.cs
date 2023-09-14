@@ -1,6 +1,7 @@
 ﻿using DevOpsBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Action;
 using Newtonsoft.Json;
 
@@ -75,7 +76,7 @@ namespace DevOpsBot
             return false;
         }
 
-        [Action(DefaultActionTypes.UnknownActionName)]
+        [Action(AIConstants.UnknownActionName)]
         public async Task<bool> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
         {
             ArgumentNullException.ThrowIfNull(turnContext);

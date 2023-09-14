@@ -5,7 +5,10 @@ using System.Text.Json;
 [assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
 namespace Microsoft.TeamsAI.State
 {
-
+    /// <summary>
+    /// The turn state entry.
+    /// </summary>
+    /// <typeparam name="TValue">The type of value.</typeparam>
     public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue> where TValue : class
     {
         private TValue _value;

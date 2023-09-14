@@ -39,8 +39,6 @@
 
   <!-- Exclude local settings from publish -->
   <ItemGroup>
-    <Content Remove="NuGet.Config" />
-    <None Include="NuGet.Config" />
     <Content Remove="appsettings.Development.json" />
     <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

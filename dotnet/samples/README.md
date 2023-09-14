@@ -23,9 +23,9 @@ Follow the instructions below to generate the `.nukpg` NuGet package file of the
 `git clone https://github.com/Microsoft/teams-ai.git`
 
 1. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the `package:read` permission.
-1. Update the `Nuget.Config` file of the sample you are testing with your Github username and your new access token as the password.
+1. Update the shared `Nuget.Config` file under `dotnet/samples/` folder with your Github username and your new access token as the password.
    ![Nuget.Config](./assets/screenshot-1.png)
-1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
+1. In Visual Studio, navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
 
 ![Install Package](./assets/screenshot-0.png)
 
@@ -47,7 +47,7 @@ Follow the instructions below to generate the `.nukpg` NuGet package file of the
 Successfully created package "C:...\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\bin\Debug\Microsoft.TeamsAI.1.0.0.nupkg"
 ```
 
-1. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the `LocalPkg/` folder within the sample folder you are testing.
+1. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the shared local NuGet source folder `dotnet/samples/LocalPkg/`.
 1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
    > Alternatively, you can run `dotnet add package Microsoft.TeamsAI`.
    </details>
