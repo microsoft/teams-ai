@@ -3,129 +3,24 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
 
   - package-ecosystem: nuget
     directory: /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests
     schedule:
-      interval: daily
+      interval: weekly
 
   - package-ecosystem: nuget
     directory: /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI
     schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/01.messaging.echoBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/02.messageExtensions.a.searchCommand
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/03.adaptiveCards.a.typeAheadBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.ai.a.teamsChefBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.ai.b.messageExtensions.gptME
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.ai.c.actionMapping.lightBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.ai.d.chainedActions.listBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.ai.e.chainedActions.devOpsBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.e.twentyQuestions
-    schedule:
-      interval: daily
-
-  - package-ecosystem: nuget
-    directory: /dotnet/samples/04.q.questBot
-    schedule:
-      interval: daily
+      interval: weekly
 
   - package-ecosystem: npm
     directory: /js
     schedule:
-      interval: daily
+      interval: weekly
 
   - package-ecosystem: npm
     directory: /js/packages/teams-ai
     schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/01.messaging.a.echoBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/02.messageExtensions.a.searchCommand
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/03.adaptiveCards.a.typeAheadBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.ai.a.teamsChefBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.ai.b.messageExtensions.AI-ME
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.ai.c.actionMapping.lightBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.ai.d.chainedActions.listBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.ai.e.chainedActions.devOpsBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.e.twentyQuestions
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/04.q.questBot
-    schedule:
-      interval: daily
-
-  - package-ecosystem: npm
-    directory: /js/samples/05.chatModeration
-    schedule:
-      interval: daily
+      interval: weekly
