@@ -59,8 +59,16 @@ jobs:
 
       # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
       # If this step fails, then you should remove it and run the build manually (see below)
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@701f152f28d4350ad289a5e31435e9ab6169a7ca # v2.21.6
+      # - name: Autobuild
+      #   uses: github/codeql-action/autobuild@701f152f28d4350ad289a5e31435e9ab6169a7ca # v2.21.6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0
+
+      - name: Build .NET
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
+        run: dotnet build Microsoft.TeamsAI.sln --configuration Release
 
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
