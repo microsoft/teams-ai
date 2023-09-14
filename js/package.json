@@ -42,7 +42,7 @@
         "eslint-plugin-only-warn": "^1.1.0",
         "eslint-plugin-prettier": "^5.0.0",
         "eslint-plugin-security": "^1.7.1",
-        "exorcist": "^1.0.1",
+        "exorcist": "^2.0.0",
         "mocha": "^6.2.3",
         "mocha-junit-reporter": "^2.0.0",
         "ms-rest-azure": "^2.6.2",
