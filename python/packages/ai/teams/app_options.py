@@ -3,12 +3,13 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from logging import Logger
 from typing import Optional
 
 from botbuilder.core import BotFrameworkAdapterSettings, Storage
 
+from teams.adaptive_cards import AdaptiveCardsOptions
 from teams.ai import AIOptions
 
 
@@ -63,4 +64,9 @@ class ApplicationOptions:
     Care should be used for bots that operate in a shared hosting environment. 
     The incoming request is immediately completed and many shared hosting environments 
     will mark the bot's process as idle and shut it down.
+    """
+
+    adaptive_cards: AdaptiveCardsOptions = field(default_factory=AdaptiveCardsOptions)
+    """
+    Optional. Options used to customize the processing of Adaptive Card requests.
     """

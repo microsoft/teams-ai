@@ -9,3 +9,4 @@ from .app import Application
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .message_extensions import MessagePreviewAction
+from .query import Query
