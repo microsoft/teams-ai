@@ -18,11 +18,11 @@ permissions: read-all
 jobs:
   build-test-lint:
     name: Build/Test/Lint
+    runs-on: windows-latest
     strategy:
       matrix:
         dotnet-version: ['6.0', '7.0']
       fail-fast: false
-    runs-on: windows-latest
     defaults:
       run:
         shell: bash

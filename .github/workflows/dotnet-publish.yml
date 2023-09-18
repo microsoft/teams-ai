@@ -20,13 +20,11 @@ jobs:
   publish:
     name: Publish
     needs: build-test-lint
+    runs-on: windows-latest
     strategy:
       matrix:
-        os: [windows-latest]
         dotnet-version: ['6.0', '7.0']
-        configuration: [Release]
       fail-fast: false
-    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
@@ -42,7 +40,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Pack
-        run: dotnet pack --output . --configuration ${{ matrix.configuration }} Microsoft.TeamsAI/Microsoft.TeamsAI.csproj
+        run: dotnet pack --output . --configuration Release Microsoft.TeamsAI/Microsoft.TeamsAI.csproj
       - name: Publish
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json --skip-duplicate --no-symbols
       - name: Upload
