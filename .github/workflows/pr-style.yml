@@ -1,4 +1,4 @@
-name: pr-style.yml
+name: PR Style
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ permissions: read-all
 
 jobs:
   pr-style:
-    name: pr-style
+    name: PR Style
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
