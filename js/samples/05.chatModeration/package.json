@@ -28,12 +28,12 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/dotenv": "6.1.1",
+        "@types/dotenv": "8.2.0",
         "@types/jsonwebtoken": "^9.0.3",
         "@types/restify": "8.5.7",
         "env-cmd": "^10.1.0",
-        "nodemon": "~1.19.4",
+        "nodemon": "~3.0.1",
         "ts-node": "^10.9.1",
-        "typescript": "^5.1.6"
+        "typescript": "^5.2.2"
     }
 }
