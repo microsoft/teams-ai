@@ -6246,14 +6246,7 @@ mkdirp-classic@^0.5.2:
   resolved "https://registry.yarnpkg.com/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz#fa10c9115cc6d8865be221ba47ee9bed78601113"
   integrity sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==
 
-mkdirp@0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.4.tgz#fd01504a6797ec5c9be81ff43d204961ed64a512"
-  integrity sha512-iG9AK/dJLtJ0XNgTuDbSyNS3zECqDlAhnQW4CsNxBG3LQJBbHmRX1egw39DmtOdCAqY+dKXV+sgPgilNWUKMVw==
-  dependencies:
-    minimist "^1.2.5"
-
-mkdirp@^0.5.1, mkdirp@~0.5.1:
+mkdirp@^0.5.1:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.6.tgz#7def03d2432dcae4ba1d611445c48396062255f6"
   integrity sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==
@@ -7998,10 +7991,10 @@ simple-update-notifier@^2.0.0:
   dependencies:
     semver "^7.5.3"
 
-sinon@^15.2.0:
-  version "15.2.0"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-15.2.0.tgz#5e44d4bc5a9b5d993871137fd3560bebfac27565"
-  integrity sha512-nPS85arNqwBXaIsFCkolHjGIkFo+Oxu9vbgmBJizLAhqe6P2o3Qmj3KCUoRkfhHtvgDhZdWD3risLHAUJ8npjw==
+sinon@^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-16.0.0.tgz#06da4e63624b946c9d7e67cce21c2f67f40f23a9"
+  integrity sha512-B8AaZZm9CT5pqe4l4uWJztfD/mOTa7dL8Qo0W4+s+t74xECOgSZDDQCBjNgIK3+n4kyxQrSTv2V5ul8K25qkiQ==
   dependencies:
     "@sinonjs/commons" "^3.0.0"
     "@sinonjs/fake-timers" "^10.3.0"

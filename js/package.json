@@ -54,7 +54,7 @@
         "replace-in-file": "^4.1.0",
         "rimraf": "^3.0.2",
         "shx": "^0.3.4",
-        "sinon": "^15.2.0",
+        "sinon": "^16.0.0",
         "source-map-support": "^0.5.19",
         "sponge": "^0.1.0",
         "tinyify": "^4.0.0",
