@@ -2,10 +2,22 @@
 # This workflow will build, run tests, and pack for the Microsoft.TeamsAI .NET SDK.
 #
 
-name: DOTNET CI
+name: DOTNET Build/Test/Lint
 
 on:
   workflow_call:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'dotnet/**'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'dotnet/**'
+
+permissions: read-all
 
 jobs:
   build:
@@ -21,12 +33,9 @@ jobs:
       run:
         shell: bash
         working-directory: dotnet/packages/Microsoft.TeamsAI/
+    permissions:
+      contents: read
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
@@ -59,11 +68,6 @@ jobs:
     env:
       SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
