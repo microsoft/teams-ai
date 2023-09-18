@@ -41,14 +41,14 @@ signed CLA, we'll review the request.
 1. All PRs must indicate what programming language they are for in the title with a prefix of [JS], [C#] [PY], or [repo].
 1. All PRs must be prepended with one of the following keywords:
    - _'bump'_ - indicates a change to the version number of the package
-     - note: ':' was removed since dependabot automatically starts all PR titles with 'bump'
+     - note: ':' was removed and 'Bump' (capitalized) allowed since dependabot automatically starts all PR titles with 'Bump'
    - _'chore:'_ - indicates a change to the build process or auxiliary tools
    - _'docs:'_ - indicates a change to the documentation
    - _'feat:'_ - indicates a new feature
    - _'fix:'_ - indicates a bug fix
    - _'port:'_ - indicates a port of a feature from another language
    - _'refactor:'_ - indicates a code change that neither fixes a bug nor adds a feature
-1. All PRs must have an associated work item link in the title and the body of the PR.
+1. All PRs must have an associated work item link in the title and the body of the PR, unless the change is marked as #minor in the PR details.
    - e.g. [JS] feat: #999 Add new feature
 
 The purpose of this is to allow for easier filtering when creating changelogs and release notes.
