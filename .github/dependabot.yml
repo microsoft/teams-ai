@@ -7,6 +7,8 @@ updates:
       include: scope
     labels: 
       - dependencies
+    reviewers:
+      - microsoft/teams-ai-admins
     schedule:
       interval: weekly
 
@@ -18,6 +20,8 @@ updates:
     labels: 
       - dependencies
       - dotnet
+    reviewers:
+      - microsoft/teams-ai-admins
     schedule:
       interval: weekly
     groups:
@@ -34,6 +38,8 @@ updates:
     labels:
       - dependencies
       - JS
+    reviewers:
+      - microsoft/teams-ai-admins
     schedule:
       interval: weekly
     groups:
