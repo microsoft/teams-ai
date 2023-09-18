@@ -1,15 +1,13 @@
 #
-# This workflow will build and run tests for the Microsoft.TeamsAI .NET SDK.
+# This workflow will publish .NET SDK.
 #
 
 name: DOTNET Publish
 
 on:
   push:
-    branches:
-      - 'main'
-    paths:
-      - 'dotnet/**'
+    branches: ['main']
+    paths: ['dotnet/**']
 
 permissions: read-all
 
