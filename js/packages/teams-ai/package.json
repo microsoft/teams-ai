@@ -51,6 +51,7 @@
         "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
+        "test": "npx mocha -r ts-node/register src/**/*.spec.ts",
         "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
         "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
         "test:compat": "api-extractor run --verbose"
