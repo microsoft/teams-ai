@@ -25,9 +25,9 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/dotenv": "6.1.1",
+        "@types/dotenv": "8.2.0",
         "@types/restify": "8.5.7",
-        "nodemon": "~1.19.4",
-        "typescript": "^5.1.6"
+        "nodemon": "~3.0.1",
+        "typescript": "^5.2.2"
     }
 }
