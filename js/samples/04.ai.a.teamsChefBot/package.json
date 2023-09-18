@@ -23,7 +23,7 @@
         "@microsoft/teams-ai": "~0.1.0-preview.2",
         "@microsoft/teamsfx": "^2.2.0",
         "botbuilder": "^4.20.0",
-        "dotenv": "^8.2.0",
+        "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
         "vectra": "^0.3.0"
