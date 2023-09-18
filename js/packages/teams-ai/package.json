@@ -22,20 +22,20 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "axios": "^1.4.0",
+        "axios": "^1.5.0",
         "botbuilder": "^4.20.0",
         "botbuilder-dialogs": "^4.20.0",
         "gpt-3-encoder": "^1.1.4",
-        "yaml": "^2.2.2"
+        "yaml": "^2.3.2"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
-        "@types/jsonwebtoken": "^9.0.2",
-        "@types/node": "^20.3.1",
+        "@types/jsonwebtoken": "^9.0.3",
+        "@types/node": "^20.6.2",
         "eslint": "^8.42.0",
-        "jsonwebtoken": "^9.0.0",
+        "jsonwebtoken": "^9.0.2",
         "typescript": "^5.1.6",
         "@types/mocha": "^10.0.1",
         "@types/assert": "^1.5.6",
@@ -51,6 +51,7 @@
         "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
+        "test": "npx mocha -r ts-node/register src/**/*.spec.ts",
         "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
         "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
         "test:compat": "api-extractor run --verbose"
