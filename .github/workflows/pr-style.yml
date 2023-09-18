@@ -1,20 +1,18 @@
-name: pr-style.yml
+name: PR Style
 
 on:
   pull_request:
     types: [opened, edited, synchronize]
 
+permissions: read-all
+
 jobs:
-  prStyle:
-    name: pr-style
+  pr-style:
+    name: PR Style
     runs-on: ubuntu-latest
-
+    permissions:
+      pull-requests: read
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
-        with:
-          egress-policy: audit
-
       - uses: joshgummersall/pr-style@3fee1c139d76a9e6dbdd15d8895aaaf59bf6ccca # main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
