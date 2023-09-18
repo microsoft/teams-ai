@@ -2,25 +2,48 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    commit-message:
+      prefix: '[repo] bump'
+      include: scope
+    labels: 
+      - dependencies
+    reviewers:
+      - microsoft/teams-ai-admins
     schedule:
       interval: weekly
 
   - package-ecosystem: nuget
-    directory: /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI.Tests
+    directory: /dotnet
+    commit-message:
+      prefix: '[C#] bump'
+      include: scope
+    labels: 
+      - dependencies
+      - dotnet
+    reviewers:
+      - microsoft/teams-ai-admins
     schedule:
       interval: weekly
-
-  - package-ecosystem: nuget
-    directory: /dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI
-    schedule:
-      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
 
   - package-ecosystem: npm
     directory: /js
+    commit-message:
+      prefix: '[JS] bump'
+      include: scope
+    labels:
+      - dependencies
+      - JS
+    reviewers:
+      - microsoft/teams-ai-admins
     schedule:
       interval: weekly
-
-  - package-ecosystem: npm
-    directory: /js/packages/teams-ai
-    schedule:
-      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
