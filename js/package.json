@@ -28,7 +28,7 @@
         "@types/lodash": "^4.14.196",
         "@types/mocha": "^10.0.1",
         "@types/sinon": "^10.0.16",
-        "@typescript-eslint/eslint-plugin": "^6.2.1",
+        "@typescript-eslint/eslint-plugin": "^6.7.0",
         "@typescript-eslint/parser": "^6.2.1",
         "applicationinsights": "^2.7.0",
         "browserify": "^17.0.0",
