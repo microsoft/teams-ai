@@ -1,0 +1,62 @@
+#
+# This workflow will build/test/lint the .NET SDK.
+#
+
+name: DOTNET Build/Test/Lint
+
+on:
+  workflow_call:
+  push:
+    branches: ['**']
+    paths: ['dotnet/**']
+  pull_request:
+    branches: ['**']
+    paths: ['dotnet/**']
+
+permissions: read-all
+
+jobs:
+  build-test-lint:
+    name: Build/Test/Lint
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['6.0', '7.0']
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
+    env:
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Restore
+        run: dotnet restore Microsoft.TeamsAI.sln
+      - name: Build
+        run: dotnet build Microsoft.TeamsAI.sln --no-restore --configuration Release
+      - name: Test
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.TeamsAI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
+      - name: Coverage
+        uses: danielpalme/ReportGenerator-GitHub-Action@fd065e69a702b30deb560dced14bb2905716ef6f # 5.1.22
+        with:
+          reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
+          targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
+          reporttypes: HtmlInline
+          toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
+      - name: Upload Tests
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: testresults-dotnet-${{ matrix.dotnet-version }}
+          path: ${{ env.SOLUTION_DIR }}TestResults
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          egress-policy: audit
