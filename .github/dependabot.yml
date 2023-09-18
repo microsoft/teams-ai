@@ -29,6 +29,10 @@ updates:
         dependency-type: production
       development:
         dependency-type: development
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
 
   - package-ecosystem: npm
     directory: /js
@@ -47,3 +51,6 @@ updates:
         dependency-type: production
       development:
         dependency-type: development
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
