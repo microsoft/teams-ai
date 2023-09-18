@@ -21,4 +21,4 @@ jobs:
         with:
           require_issue: "true"
           skip_authors: "dependabot"
-          title_prefixes: " [repo] chore:, [repo] docs:, [repo] fix:, [JS] bump, [JS] chore:, [JS] docs:, [JS] feat:, [JS] fix:, [JS] port:, [JS] refactor:, [C#] bump, [C#] chore:, [C#] docs:, [C#] feat:, [C#] fix:, [C#] port:, [C#] refactor:, [PY] bump, [PY] chore:, [PY] docs:, [PY] feat:, [PY] fix:, [PY] port:, [PY] refactor:"
+          title_prefixes: " [repo] chore:, [repo] docs:, [repo] fix:, [JS] bump, [JS] Bump, [JS] chore:, [JS] docs:, [JS] feat:, [JS] fix:, [JS] port:, [JS] refactor:, [C#] bump, [C#] Bump: [C#] chore:, [C#] docs:, [C#] feat:, [C#] fix:, [C#] port:, [C#] refactor:, [PY] bump, [PY] Bump [PY] chore:, [PY] docs:, [PY] feat:, [PY] fix:, [PY] port:, [PY] refactor:"
