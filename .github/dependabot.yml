@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     commit-message:
-      prefix: '[repo] bump'
+      prefix: '[repo] bump: '
       include: scope
     labels: 
       - dependencies
@@ -13,9 +13,9 @@ updates:
       interval: weekly
 
   - package-ecosystem: nuget
-    directory: /dotnet
+    directory: /dotnet/packages/Microsoft.TeamsAI
     commit-message:
-      prefix: '[C#] bump'
+      prefix: '[C#] bump: '
       include: scope
     labels: 
       - dependencies
@@ -33,7 +33,7 @@ updates:
   - package-ecosystem: npm
     directory: /js
     commit-message:
-      prefix: '[JS] bump'
+      prefix: '[JS] bump: '
       include: scope
     labels:
       - dependencies
