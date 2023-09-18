@@ -6312,10 +6312,10 @@ moment@^2.21.0:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
-ms-rest-azure@^2.6.2:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/ms-rest-azure/-/ms-rest-azure-2.6.2.tgz#65a08799adb417678ce5722669bc15ca740b429e"
-  integrity sha512-h74ezkiMQ1y8tD0kf0MK2kdCONAP70i032Dt8kBrFsvj3ZqGRj+DHHNRCGLDfkBkSXhILGMeiF8Ji/iSCUJLJg==
+ms-rest-azure@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/ms-rest-azure/-/ms-rest-azure-3.0.2.tgz#9cf05358485a51f1ac207f6691217a043b069483"
+  integrity sha512-6bPqcMw1gAGhMZzLJDdxdz78HctzEX9qKRDJf4zWmDAYC4KwajoGApK5EtuSuu3+ysysFEORvDSD4sOuzYvCIQ==
   dependencies:
     adal-node "^0.2.2"
     async "^2.6.4"
