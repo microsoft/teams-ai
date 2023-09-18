@@ -12,14 +12,14 @@ on:
 permissions: read-all
 
 jobs:
-  ci:
-    name: CI
+  build-test-lint:
+    name: Build/Test/Lint
     uses: ./.github/workflows/dotnet-build-test-lint.yml
     permissions:
       contents: read
   publish:
     name: Publish
-    needs: ci
+    needs: build-test-lint
     strategy:
       matrix:
         os: [windows-latest]
