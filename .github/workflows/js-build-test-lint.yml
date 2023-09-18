@@ -1,0 +1,45 @@
+#
+# This workflow will build/test/lint the Javascript SDK
+#
+
+name: JS Build/Test/Lint
+
+on:
+  workflow_call:
+  push:
+    branches: ['**']
+    paths: ['js/**']
+  pull_request:
+    branches: ['**']
+    paths: ['js/**']
+
+permissions: read-all
+
+jobs:
+  build-test-lint:
+    name: Build/Test/Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+    defaults:
+      run:
+        shell: bash
+        working-directory: js/
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Setup NodeJS ${{ matrix.node-version }}
+        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - name: Test
+        run: yarn test
+      - name: Lint
+        run: yarn lint
