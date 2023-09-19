@@ -66,15 +66,13 @@ deploy:
   # prerequisite: pip install
   - uses: script
     with:
-      run: |
-        pip install poetry
+      run: pip install poetry
 
   - uses: script
     env:
       PYTHONUTF8: "1"
     with:
-      run: |
-        poetry install
+      run: poetry install
 
   # Generate runtime environment variables
   - uses: file/createOrUpdateEnvironmentFile
