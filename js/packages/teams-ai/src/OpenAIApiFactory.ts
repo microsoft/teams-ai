@@ -393,16 +393,15 @@ export class OpenAIApiFactory<TState extends TurnState = DefaultTurnState> imple
  */
 function printChatMessages(messages: ChatCompletionRequestMessage[]): string {
     let text = '';
-    messages.forEach((msg) => {
-        switch (msg.role) {
+    for (let i = 0; i < messages.length; i++) {
+        switch (messages[i].role) {
             case 'system':
-                text += msg.content + '\n';
+                text += messages[i].content + '\n';
                 break;
             default:
-                text += `\n${msg.role}: ${msg.content}`;
+                text += `\n${messages[i].role}: ${messages[i].content}`;
                 break;
         }
-    });
-
+    }
     return text;
 }
