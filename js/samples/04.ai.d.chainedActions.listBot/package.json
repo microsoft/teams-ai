@@ -21,12 +21,12 @@
     "dependencies": {
         "@microsoft/teams-ai": "~0.1.0-preview.2",
         "botbuilder": "^4.20.0",
-        "dotenv": "^8.2.0",
+        "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/jsonwebtoken": "^9.0.2",
+        "@types/jsonwebtoken": "^9.0.3",
         "@types/restify": "8.5.7",
         "nodemon": "~1.19.4",
         "shx": "^0.3.4",
