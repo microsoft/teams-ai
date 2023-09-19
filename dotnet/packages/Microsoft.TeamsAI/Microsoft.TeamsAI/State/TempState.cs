@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamsAI.Utilities;
-
+﻿
 namespace Microsoft.TeamsAI.State
 {
     /// <summary>
@@ -10,10 +9,24 @@ namespace Microsoft.TeamsAI.State
     /// </remarks>
     public class TempState : StateBase
     {
+        /// <summary>
+        /// Name of the input property.
+        /// </summary>
         public const string InputKey = "input";
+
+        /// <summary>
+        /// Name of the output property.
+        /// </summary>
         public const string OutputKey = "output";
+
+        /// <summary>
+        /// Name of the history property.
+        /// </summary>
         public const string HistoryKey = "history";
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="TempState"/> class.
+        /// </summary>
         public TempState() : base()
         {
             this[InputKey] = string.Empty;

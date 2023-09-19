@@ -43,7 +43,8 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
             return true;
         }
 
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+#pragma warning disable CS8766 // Resolve nullable warnings
+        public IDisposable? BeginScope<TState>(TState state)
         {
             return null;
         }

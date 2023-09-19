@@ -49,7 +49,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     IPlanner<AppState> planner = new OpenAIPlanner<AppState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<AppState>>());
+        loggerFactory);
 
     // Create Application
     AIHistoryOptions aiHistoryOptions = new()
@@ -68,6 +68,7 @@ builder.Services.AddTransient<IBot>(sp =>
         TurnStateManager = new AppStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
 
     return new TeamsLightBot(ApplicationOptions);

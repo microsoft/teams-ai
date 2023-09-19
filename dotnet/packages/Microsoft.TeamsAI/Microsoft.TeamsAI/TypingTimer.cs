@@ -7,7 +7,7 @@ namespace Microsoft.TeamsAI
     /// <summary>
     /// Encapsulates the logic for sending "typing" activity to the user.
     /// </summary>
-    public class TypingTimer : IDisposable
+    internal class TypingTimer : IDisposable
     {
         private Timer? _timer;
         /// <summary>
@@ -109,7 +109,7 @@ namespace Microsoft.TeamsAI
             catch (Exception e) when (e is ObjectDisposedException || e is TaskCanceledException || e is NullReferenceException)
             {
                 // We're in the middle of sending an activity on a background thread when the turn ends and
-                // the turn context object is dispoed of or the request is cancelled. We can just eat the
+                // the turn context object is disposed of or the request is cancelled. We can just eat the
                 // error but lets make sure our states cleaned up a bit.
                 Dispose();
             }

@@ -39,7 +39,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             // Assert
             Assert.True(result);
             Assert.Equal(new string[] { "GeneratePlanAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "RenderPrompt", "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal(new string[] { "RenderPromptAsync", "RenderPromptAsync" }, promptManager.Record.ToArray());
             Assert.Equal(new string[] { "ReviewPrompt", "ReviewPlan" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
@@ -73,7 +73,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             // Assert
             Assert.True(result);
             Assert.Equal(new string[] { "GeneratePlanAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal(new string[] { "RenderPromptAsync" }, promptManager.Record.ToArray());
             Assert.Equal(new string[] { "ReviewPrompt", "ReviewPlan" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
@@ -153,16 +153,20 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Prompt = "Test"
             };
             var ai = new AI<TestTurnState>(options);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnState = new TestTurnState();
+            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
+            var turnState = new TestTurnState
+            {
+                TempStateEntry = new TurnStateEntry<TempState>(new())
+            };
 
             // Act
-            var result = await ai.CompletePromptAsync(turnContextMock.Object, turnState, "Test", null, CancellationToken.None);
+            var result = await ai.CompletePromptAsync(turnContext, turnState, "Test", null, CancellationToken.None);
 
             // Assert
             Assert.Equal("Default", result);
             Assert.Equal(new string[] { "CompletePromptAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal(new string[] { "RenderPromptAsync" }, promptManager.Record.ToArray());
+            Assert.Equal("hello", turnState.Temp?.Input);
         }
 
         [Fact]
@@ -176,17 +180,21 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 Prompt = "Test"
             };
             var ai = new AI<TestTurnState>(options);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnState = new TestTurnState();
+            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
+            var turnState = new TestTurnState
+            {
+                TempStateEntry = new TurnStateEntry<TempState>(new())
+            };
             var prompt = new PromptTemplate("Test", new());
 
             // Act
-            var result = await ai.CompletePromptAsync(turnContextMock.Object, turnState, prompt, null, CancellationToken.None);
+            var result = await ai.CompletePromptAsync(turnContext, turnState, prompt, null, CancellationToken.None);
 
             // Assert
             Assert.Equal("Default", result);
             Assert.Equal(new string[] { "CompletePromptAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal(new string[] { "RenderPromptAsync" }, promptManager.Record.ToArray());
+            Assert.Equal("hello", turnState.Temp?.Input);
         }
 
         [Fact]
@@ -212,7 +220,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             Assert.NotNull(function);
             Assert.Equal("Default", result);
             Assert.Equal(new string[] { "CompletePromptAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "AddPromptTemplate", "RenderPrompt" }, promptManager.Record.ToArray());
+            Assert.Equal(new string[] { "AddPromptTemplate", "RenderPromptAsync" }, promptManager.Record.ToArray());
         }
 
         /// <summary>
@@ -231,7 +239,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
                 return true;
             }
 
-            [Action(DefaultActionTypes.SayCommandActionName)]
+            [Action(AIConstants.SayCommandActionName)]
             public bool SayCommand([ActionEntities] PredictedSayCommand command)
             {
                 SayActionRecord.Add(command.Response);

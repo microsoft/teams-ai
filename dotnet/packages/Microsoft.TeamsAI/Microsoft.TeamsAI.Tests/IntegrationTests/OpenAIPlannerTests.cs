@@ -9,6 +9,7 @@ using System.Reflection;
 using Xunit.Abstractions;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
@@ -16,10 +17,12 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
     {
         private readonly IConfigurationRoot _configuration;
         private readonly RedirectOutput _output;
+        private readonly ILoggerFactory _loggerFactory;
 
         public OpenAICompletionTests(ITestOutputHelper output)
         {
             _output = new RedirectOutput(output);
+            _loggerFactory = new TestLoggerFactory(_output);
 
             var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -45,10 +48,10 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
             Assert.NotNull(config.ApiKey);
-            Assert.NotNull(config.ChatModelId);
+            Assert.NotNull(config.ModelId);
 
             var options = new OpenAIPlannerOptions(config.ApiKey, config.ModelId);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -89,7 +92,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             Assert.NotNull(config.ChatModelId);
 
             var options = new OpenAIPlannerOptions(config.ApiKey, config.ChatModelId);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -127,7 +130,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             var invalidApiKey = "invalidApiKey";
 
             var options = new OpenAIPlannerOptions(invalidApiKey, config.ChatModelId);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -148,10 +151,10 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             );
 
             // Act
-            var exception = await Assert.ThrowsAsync<PlannerException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
-            Assert.Equal("Failed to perform AI prompt completion: Access denied: The request is not authorized, HTTP status: 401", exception.Message);
+            Assert.StartsWith("Error while executing AI prompt completion: Incorrect API key provided: invalidA*iKey. You can find your API key at https://platform.openai.com/account/api-keys.", exception.Message);
         }
 
         [Fact(Skip = "OpenAI will throttle requests. This test should only be run manually.")]
@@ -162,7 +165,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             Assert.NotNull(config.ApiKey);
 
             var options = new OpenAIPlannerOptions(config.ApiKey, "invalidModel");
-            var planner = new OpenAIPlanner<TestTurnState>(options, _output);
+            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
             var moderatorMock = new Mock<IModerator<TestTurnState>>();
 
             var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
@@ -183,10 +186,10 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             );
 
             // Act
-            var exception = await Assert.ThrowsAsync<PlannerException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
 
             // Assert
-            Assert.Equal("Failed to perform AI prompt completion: Invalid request: The request is not valid, HTTP status: 404", exception.Message);
+            Assert.StartsWith("Error while executing AI prompt completion: The model `invalidModel` does not exist", exception.Message);
         }
     }
 }

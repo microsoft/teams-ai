@@ -61,12 +61,12 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
+        loggerFactory);
 
     // Create OpenAIModerator
     IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(
         sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory.CreateLogger<OpenAIModerator<TurnState>>(),
+        loggerFactory,
         moderatorHttpClient);
 
     // Create Application
@@ -78,7 +78,8 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         TurnStateManager = new TurnStateManager(),
         Storage = sp.GetService<IStorage>(),
-        AI = aiOptions
+        AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
     return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });
@@ -103,19 +104,13 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
     // Create AzureOpenAIPlanner
     IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
+        loggerFactory);
 
     // Create AzureContentSafetyModerator
-    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(
-        sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>(),
-        moderatorHttpClient);
+    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
     // Create Application
     AIOptions<TurnState> aiOptions = new(
@@ -127,6 +122,7 @@ builder.Services.AddTransient<IBot>(sp =>
         TurnStateManager = new TurnStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
     return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });

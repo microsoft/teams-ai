@@ -20,16 +20,16 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~0.1.0-preview.2",
-        "axios": "^1.4.0",
+        "axios": "^1.5.0",
         "botbuilder": "^4.20.0",
-        "dotenv": "^16.3.0",
-        "jsonwebtoken": "^9.0.0",
+        "dotenv": "^16.3.1",
+        "jsonwebtoken": "^9.0.2",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/jsonwebtoken": "^9.0.2",
+        "@types/jsonwebtoken": "^9.0.3",
         "@types/restify": "8.5.7",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",

@@ -2,11 +2,11 @@
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Bot.Schema;
-using Microsoft.SemanticKernel.TemplateEngine;
 using Moq;
 using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
+using Microsoft.SemanticKernel.Diagnostics;
 
 namespace Microsoft.TeamsAI.Tests.AITests
 {
@@ -63,7 +63,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
-            var exception = Assert.Throws<PromptManagerException>(() => promptManager.AddFunction(name, promptFunctionOverride, false));
+            var exception = Assert.Throws<InvalidOperationException>(() => promptManager.AddFunction(name, promptFunctionOverride, false));
 
             // Assert
             Assert.Equal(exception.Message, $"Attempting to update a previously registered function `{name}`");
@@ -116,7 +116,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var exception = Assert.Throws<PromptManagerException>(() => promptManager.AddPromptTemplate(name, promptTemplate));
+            var exception = Assert.Throws<InvalidOperationException>(() => promptManager.AddPromptTemplate(name, promptTemplate));
 
             // Assert
             Assert.Equal(exception.Message, $"Text template `{name}` already exists.");
@@ -217,7 +217,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             var name = "invalidPromptTemplateFolder";
 
             // Act
-            var exception = Assert.Throws<PromptManagerException>(() => promptManager.LoadPromptTemplate(name));
+            var exception = Assert.Throws<ArgumentException>(() => promptManager.LoadPromptTemplate(name));
 
             // Assert 
             Assert.Equal(exception.Message, $"Directory doesn't exist `{directoryPath}\\{name}`");
@@ -251,7 +251,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, promptString);
@@ -290,7 +290,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddFunction(promptFunctionName, promptFunction);
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -327,18 +327,18 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.AddPromptTemplate(name, promptTemplate);
-            var ex = await Assert.ThrowsAsync<PromptManagerException>(async () => await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate));
+            var ex = await Assert.ThrowsAsync<TeamsAIException>(async () => await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate));
 
             // Assert
-            Assert.Equal("Failed to render prompt: $Function not found: Function `promptFunction` not found", ex.Message);
-            Assert.Equal(typeof(TemplateException), ex.InnerException?.GetType());
+            Assert.Equal("Failed to render prompt: $Function `promptFunction` not found", ex.Message);
+            Assert.Equal(typeof(SKException), ex.InnerException?.GetType());
         }
 
         [Fact]
         public async void RenderPrompt_ResolveVariable()
         {
             // Arrange
-            IPromptManager<TestTurnState> promptManager = new PromptManager<TestTurnState>();
+            PromptManager<TestTurnState> promptManager = new();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new Mock<TurnContext>(botAdapterStub, new Activity { Text = "user message" });
 
@@ -366,7 +366,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
 
             // Act
             promptManager.Variables[variableKey] = variableValue;
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -411,7 +411,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnState, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnState, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -456,7 +456,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnState, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnState, promptTemplate);
 
             // Assert
             Assert.Equal(renderedPrompt.Text, expectedRenderedPrompt);
@@ -490,7 +490,7 @@ namespace Microsoft.TeamsAI.Tests.AITests
             );
 
             // Act
-            var renderedPrompt = await promptManager.RenderPrompt(turnContextMock.Object, turnStateMock.Object, promptTemplate);
+            var renderedPrompt = await promptManager.RenderPromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate);
 
             // Assert
             Assert.Equal("", renderedPrompt.Text);

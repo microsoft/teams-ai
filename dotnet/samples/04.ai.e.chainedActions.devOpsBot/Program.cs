@@ -51,7 +51,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     IPlanner<DevOpsState> planner = new OpenAIPlanner<DevOpsState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<DevOpsState>>());
+        loggerFactory);
 
     // Create Application
     AIOptions<DevOpsState> aiOptions = new(
@@ -62,7 +62,8 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         TurnStateManager = new DevOpsStateManager(),
         Storage = sp.GetService<IStorage>(),
-        AI = aiOptions
+        AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
     return new TeamsDevOpsBot(ApplicationOptions);
 });
@@ -88,7 +89,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create AzureOpenAIPlanner
     IPlanner<DevOpsState> planner = new AzureOpenAIPlanner<DevOpsState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<DevOpsState>>());
+        loggerFactory);
 
     // Create Application
     AIOptions<DevOpsState> aiOptions = new(
@@ -99,7 +100,8 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         TurnStateManager = new DevOpsStateManager(),
         Storage = sp.GetService<IStorage>(),
-        AI = aiOptions
+        AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
     return new TeamsDevOpsBot(ApplicationOptions);
 });
