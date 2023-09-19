@@ -11,6 +11,7 @@ from botbuilder.core import BotFrameworkAdapterSettings, Storage
 
 from teams.adaptive_cards import AdaptiveCardsOptions
 from teams.ai import AIOptions
+from teams.task_modules import TaskModulesOptions
 
 
 @dataclass
@@ -69,4 +70,9 @@ class ApplicationOptions:
     adaptive_cards: AdaptiveCardsOptions = field(default_factory=AdaptiveCardsOptions)
     """
     Optional. Options used to customize the processing of Adaptive Card requests.
+    """
+
+    task_modules: TaskModulesOptions = field(default_factory=TaskModulesOptions)
+    """
+    Optional. Options used to customize the processing of Task Module requests.
     """
