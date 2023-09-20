@@ -66,9 +66,11 @@ deploy:
   # prerequisite: pip install
   - uses: script
     with:
-      run: |
-        pip install poetry
-        poetry install
+      run: pip install poetry
+
+  - uses: script
+    with:
+      run: poetry install
 
   # Generate runtime environment variables
   - uses: file/createOrUpdateEnvironmentFile
