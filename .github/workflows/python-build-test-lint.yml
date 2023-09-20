@@ -24,7 +24,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     defaults:
       run:
-        working-directory: /python
+        working-directory: python/
     permissions:
       contents: read
     steps:
