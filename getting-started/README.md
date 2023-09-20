@@ -1,12 +1,11 @@
 # Getting Started
 
 1. [Prompts](./00.PROMPTS.md)
-2. [Templates](./01.TEMPLATES.md)
-3. [Actions](./02.ACTIONS.md)
-4. [Plans](./03.PLANS.md)
-5. [Chaining](./04.CHAINING.md)
-6. [Storage](./05.STORAGE.md)
-7. [Turns](./06.TURNS.md)
+2. [Prompt Template](./01.PROMPT-TEMPLATES.md)
+3. [Planner](./02.PLANNER.md)
+4. [Actions](./03.ACTIONS.md)
+5. [Chain](./04.CHAIN.md)
+6. [Turns](./05.TURNS.md)
 
 ## Migration Documentation
 
@@ -27,12 +26,11 @@ If you are migrating your existing bot, we recommend starting with the respectiv
 To use this sample with Azure Open AI, update OpenAIPlanner to AzureOpenAIPlanner
 AzureOpenAIPlanner expects an endpoint property, which can be found in the Azure portal
 
-```
+```typescript
 const planner = new AzureOpenAIPlanner({
     apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'text-davinci-003',
-    logRequests: true,
-    endpoint: 
+    logRequests: true
 });
 ```
 Otherwise, please feel free to browse other pages, including Concepts and Prompt Injection.
