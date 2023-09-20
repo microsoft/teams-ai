@@ -96,12 +96,13 @@ All the samples in for the C# .NET SDK can be set up in the same way. You can fi
 
 Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
 
-1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
+1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
 
     ```json
-      "OpenAI": {
-        "ApiKey": "<your-openai-api-key>"
-      },
+      "Azure": {
+        "OpenAIApiKey": "<your-azure-openai-api-key>",
+        "OpenAIEndpoint": "<your-azure-openai-endpoint>"
+      }
     ```
 
 ## Interacting with the bot
@@ -116,35 +117,7 @@ You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The
 
 You can find deployment instructions [here](../README.md#deploy-to-azure).
 
-Note that, this sample requires AI service so you need one more pre-step before deploy to Azure. To configure the Azure resources to have an environment variable for the OpenAI Key:
-
-1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
-
-The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
-
-## Use Azure OpenAI
-
-Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI as AI service.
-
-**As prerequisites**
-
-1. Prepare your own Azure OpenAI service.
-1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI*" part.
-
-**For debugging (F5)**
-
-1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
-
-    ```json
-      "Azure": {
-        "OpenAIApiKey": "<your-azure-openai-api-key>",
-        "OpenAIEndpoint": "<your-azure-openai-endpoint>"
-      }
-    ```
-
-**For deployment to Azure**
-
-To configure the Azure resources to have Azure OpenAI environment variables:
+Note that, this sample requires AI service so you need one more pre-step before deploy to Azure. To configure the Azure resources to have an environment variable for the Azure OpenAI Key and other settings:
 
 1. In `./env/.env.dev.user` file, paste your Azure OpenAI related variables.
 
@@ -152,6 +125,33 @@ To configure the Azure resources to have Azure OpenAI environment variables:
     SECRET_AZURE_OPENAI_API_KEY=
     SECRET_AZURE_OPENAI_ENDPOINT=
     ```
+
+The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
+
+## Use OpenAI
+
+Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI as AI service.
+
+**As prerequisites**
+
+1. Prepare your own OpenAI service.
+1. Modify source code `Program.cs`, comment out the "*#Use Azure OpenAI*" part, and uncomment the "*#Use OpenAI*" part.
+
+**For debugging (F5)**
+
+1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
+
+    ```json
+      "OpenAI": {
+        "ApiKey": "<your-openai-api-key>"
+      },
+    ```
+
+**For deployment to Azure**
+
+To configure the Azure resources to have OpenAI environment variables:
+
+1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
 
 ## Further reading
 

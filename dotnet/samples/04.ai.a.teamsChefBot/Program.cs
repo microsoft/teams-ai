@@ -33,46 +33,7 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-#region Use OpenAI
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
-{
-    throw new Exception("Missing OpenAI configuration.");
-}
-
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003"));
-builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OpenAI.ApiKey, ModerationType.Both));
-
-// Create the Application.
-builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
-{
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
-
-    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
-    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory);
-
-    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
-    {
-        AI = new AIOptions<TurnState>(planner, promptManager)
-        {
-            Moderator = moderator,
-            Prompt = "Chat",
-            History = new AIHistoryOptions()
-            {
-                AssistantHistoryType = AssistantHistoryType.Text
-            }
-        },
-        Storage = sp.GetService<IStorage>(),
-        LoggerFactory = loggerFactory,
-    };
-
-    return new TeamsChefBotApplication(applicationOptions);
-});
-#endregion
-
 #region Use Azure OpenAI and Azure Content Safety
-/**
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
@@ -96,6 +57,45 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
     IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
     ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
+    {
+        AI = new AIOptions<TurnState>(planner, promptManager)
+        {
+            Moderator = moderator,
+            Prompt = "Chat",
+            History = new AIHistoryOptions()
+            {
+                AssistantHistoryType = AssistantHistoryType.Text
+            }
+        },
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
+    };
+
+    return new TeamsChefBotApplication(applicationOptions);
+});
+#endregion
+
+#region Use OpenAI
+/**
+if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+{
+    throw new Exception("Missing OpenAI configuration.");
+}
+
+builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003"));
+builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OpenAI.ApiKey, ModerationType.Both));
+
+// Create the Application.
+builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
+{
+    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
+
+    IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
+
+    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
+    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory);
+
+    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
     {
         AI = new AIOptions<TurnState>(planner, promptManager)
         {

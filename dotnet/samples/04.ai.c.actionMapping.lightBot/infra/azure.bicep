@@ -10,6 +10,18 @@ param botAadAppClientId string
 @description('Required by Bot Framework package in your bot project')
 param botAadAppClientSecret string
 
+@secure()
+@description('The OpenAI API Key to be added to App Service Settings')
+param openAIApiKey string
+
+@secure()
+@description('The Azure OpenAI API Key to be added to App Service Settings')
+param azureOpenAIApiKey string
+
+@secure()
+@description('The Azure OpenAI Endpoint to be added to App Service Settings')
+param azureOpenAIEndpoint string
+
 param webAppSKU string
 
 @maxLength(42)
@@ -55,6 +67,19 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        // ASP.NET Core treats double underscore (__) as colon (:) to support hierarchical keys
+        {
+          name: 'OpenAI__ApiKey'
+          value: openAIApiKey
+        }
+        {
+          name: 'Azure__OpenAIApiKey'
+          value: azureOpenAIApiKey
+        }
+        {
+          name: 'Azure__OpenAIEndpoint'
+          value: azureOpenAIEndpoint
         }
       ]
       ftpsState: 'FtpsOnly'
