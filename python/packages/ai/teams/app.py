@@ -22,6 +22,7 @@ from botbuilder.schema import Activity, ActivityTypes
 
 from teams.adaptive_cards.adaptive_cards import AdaptiveCards
 from teams.ai import AI, TurnState
+from teams.task_modules import TaskModules
 
 from .activity_type import ActivityType, ConversationUpdateType
 from .app_error import ApplicationError
@@ -58,6 +59,7 @@ class Application(Bot, Generic[StateT]):
     _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
     _turn_state_factory: Optional[Callable[[Activity], Awaitable[StateT]]] = None
     _message_extensions: MessageExtensions[StateT]
+    _task_modules: TaskModules[StateT]
 
     def __init__(self, options=ApplicationOptions()) -> None:
         """
@@ -70,6 +72,9 @@ class Application(Bot, Generic[StateT]):
         self._message_extensions = MessageExtensions[StateT](self._routes)
         self._adaptive_card = AdaptiveCards[StateT](
             self._routes, options.adaptive_cards.action_submit_filer
+        )
+        self._task_modules = TaskModules[StateT](
+            self._routes, options.task_modules.task_data_filter
         )
 
         if options.long_running_messages and (not options.auth or not options.bot_app_id):
@@ -119,6 +124,13 @@ class Application(Bot, Generic[StateT]):
         Access the application's adaptive cards functionalities.
         """
         return self._adaptive_card
+
+    @property
+    def task_modules(self) -> TaskModules:
+        """
+        Access the application's task modules functionalities.
+        """
+        return self._task_modules
 
     def activity(self, type: ActivityType):
         """
