@@ -81,7 +81,7 @@ There are a few ways to get the application up and running. The latest way is us
 #### Steps
 
 1. Open the solution in Visual Studio. (For example `EchoBot.sln`).
-   - Ensure that you set the appropriate config values (ex OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.
+   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.
 1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel
 1. Right-click your project and select `Teams Toolkit > Prepare Teams App Dependencies`
 1. If prompted, sign in with a Microsoft 365 account for the Teams organization you want
