@@ -6,8 +6,14 @@ import re
 from typing import Awaitable, Callable, Generic, List, Pattern, TypeVar, Union
 
 from botbuilder.core import TurnContext
+from botbuilder.core.serializer_helper import serializer_helper
 from botbuilder.schema import Activity, ActivityTypes, InvokeResponse
-from botbuilder.schema.teams import TaskModuleResponse, TaskModuleTaskInfo
+from botbuilder.schema.teams import (
+    TaskModuleContinueResponse,
+    TaskModuleMessageResponse,
+    TaskModuleResponse,
+    TaskModuleTaskInfo,
+)
 
 from teams.ai import TurnState
 from teams.route import Route
@@ -61,11 +67,12 @@ class TaskModules(Generic[StateT]):
                 await self._send_response(context, result)
                 return True
 
-            self._route_registry.append(Route[StateT](__selector__, __handler__))
+            self._route_registry.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
 
+    # TODO: Ported the code first. Need more discussion on the functionality.
     def submit(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]):
         """
         Adds a route for handling the submission of a task module.
@@ -103,7 +110,7 @@ class TaskModules(Generic[StateT]):
                 await self._send_response(context, result)
                 return True
 
-            self._route_registry.append(Route[StateT](__selector__, __handler__))
+            self._route_registry.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
@@ -117,7 +124,7 @@ class TaskModules(Generic[StateT]):
     ) -> bool:
         if context.activity.type == ActivityTypes.invoke and context.activity.name == invoke_name:
             data = context.activity.value["data"] if context.activity.value else None
-            if isinstance(data, dict) and isinstance(data[filter_field], str) and len(data) == 1:
+            if isinstance(data, dict) and isinstance(data[filter_field], str):
                 # when verb is a function
                 if callable(verb):
                     return verb(context)
@@ -133,16 +140,15 @@ class TaskModules(Generic[StateT]):
     async def _send_response(self, context: TurnContext, result):
         if context.turn_state.get(ActivityTypes.invoke_response) is None:
             if isinstance(result, str):
-                response = TaskModuleResponse(
-                    task={"type": "message", "value": result},
-                )
+                response = TaskModuleResponse(task=TaskModuleMessageResponse(value=result))
             elif isinstance(result, TaskModuleTaskInfo):
-                response = TaskModuleResponse(
-                    task={"type": "continue", "value": result},
-                )
+                response = TaskModuleResponse(task=TaskModuleContinueResponse(value=result))
             else:
                 response = None
 
             await context.send_activity(
-                Activity(type="invokeResponse", value=InvokeResponse(status=200, body=response))
+                Activity(
+                    type="invokeResponse",
+                    value=InvokeResponse(status=200, body=serializer_helper(response)),
+                )
             )

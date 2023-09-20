@@ -125,6 +125,13 @@ class Application(Bot, Generic[StateT]):
         """
         return self._adaptive_card
 
+    @property
+    def task_modules(self) -> TaskModules:
+        """
+        Access the application's task modules functionalities.
+        """
+        return self._task_modules
+
     def activity(self, type: ActivityType):
         """
         Registers a new activity event listener. This method can be used as either
