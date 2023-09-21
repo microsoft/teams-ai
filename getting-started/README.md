@@ -1,12 +1,11 @@
 # Getting Started
 
 1. [Prompts](./00.PROMPTS.md)
-2. [Templates](./01.TEMPLATES.md)
-3. [Actions](./02.ACTIONS.md)
-4. [Plans](./03.PLANS.md)
-5. [Chaining](./04.CHAINING.md)
-6. [Storage](./05.STORAGE.md)
-7. [Turns](./06.TURNS.md)
+2. [Prompt Templates](./01.PROMPT-TEMPLATES.md)
+3. [Planner](./02.PLANNER.md)
+4. [Actions](./03.ACTIONS.md)
+5. [Chain](./04.CHAIN.md)
+6. [Turns](./05.Turns.md)
 
 ## Migration Documentation
 
@@ -35,4 +34,3 @@ const planner = new AzureOpenAIPlanner({
     endpoint: 
 });
 ```
-Otherwise, please feel free to browse other pages, including Concepts and Prompt Injection.
