@@ -1,11 +1,11 @@
 # Getting Started
 
 1. [Prompts](./00.PROMPTS.md)
-2. [Prompt Templates](./01.PROMPT-TEMPLATES.md)
+2. [Prompt Template](./01.PROMPT-TEMPLATES.md)
 3. [Planner](./02.PLANNER.md)
 4. [Actions](./03.ACTIONS.md)
 5. [Chain](./04.CHAIN.md)
-6. [Turns](./05.Turns.md)
+6. [Turns](./05.TURNS.md)
 
 ## Migration Documentation
 
