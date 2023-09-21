@@ -14,7 +14,7 @@ from teams import Application, ApplicationOptions, TurnState
 from src.config import Config
 
 config = Config()
-app = Application(
+app = Application[TurnState](
     ApplicationOptions(
         bot_app_id=config.app_id,
         auth=BotFrameworkAdapterSettings(
