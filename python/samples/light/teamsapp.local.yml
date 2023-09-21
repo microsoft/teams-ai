@@ -72,11 +72,6 @@ deploy:
     with:
       run: poetry install
 
-  - uses: script
-    with:
-      workingDirectory: ./.venv/Scripts
-      run: activate
-
   # Generate runtime environment variables
   - uses: file/createOrUpdateEnvironmentFile
     with:
