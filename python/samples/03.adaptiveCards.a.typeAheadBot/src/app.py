@@ -66,15 +66,13 @@ async def search_npm_package(
 
 
 @app.adaptive_cards.action_submit("DynamicSubmit")
-async def on_dynamic_submit(context: TurnContext, _state: TurnState, data) -> bool:
+async def on_dynamic_submit(context: TurnContext, _state: TurnState, data) -> None:
     await context.send_activity(f'Dynamically selected option is: {data["choiceSelect"]}')
-    return True
 
 
 @app.adaptive_cards.action_submit("StaticSubmit")
-async def on_static_submit(context: TurnContext, _state: TurnState, data) -> bool:
+async def on_static_submit(context: TurnContext, _state: TurnState, data) -> None:
     await context.send_activity(f'Statically selected option is: {data["choiceSelect"]}')
-    return True
 
 
 # Create API to receive messages from Teams

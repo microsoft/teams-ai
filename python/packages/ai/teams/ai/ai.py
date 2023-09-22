@@ -67,7 +67,9 @@ class AI(Generic[StateT]):
             ),
         }
 
-    def action(self, name: Optional[str] = None, *, allow_overrides=False):
+    def action(
+        self, name: Optional[str] = None, *, allow_overrides=False
+    ) -> Callable[[ActionHandler[StateT]], ActionHandler[StateT]]:
         """
         Registers a new action event listener. This method can be used as either
         a decorator or a method.
@@ -89,7 +91,7 @@ class AI(Generic[StateT]):
         are found `Default: False`
         """
 
-        def __call__(func: ActionHandler[StateT]):
+        def __call__(func: ActionHandler[StateT]) -> ActionHandler[StateT]:
             action_name = name
 
             if not action_name:
@@ -110,7 +112,12 @@ class AI(Generic[StateT]):
 
         return __call__
 
-    def function(self, name: Optional[str] = None, *, allow_overrides=False):
+    def function(
+        self, name: Optional[str] = None, *, allow_overrides=False
+    ) -> Callable[
+        [Callable[[TurnContext, StateT], Awaitable[Any]]],
+        Callable[[TurnContext, StateT], Awaitable[Any]],
+    ]:
         """
         Registers a new prompt function event listener. This method can be used as either
         a decorator or a method.
@@ -132,7 +139,9 @@ class AI(Generic[StateT]):
         are found `Default: False`
         """
 
-        def __call__(func: Callable[[TurnContext, StateT], Awaitable[Any]]):
+        def __call__(
+            func: Callable[[TurnContext, StateT], Awaitable[Any]]
+        ) -> Callable[[TurnContext, StateT], Awaitable[Any]]:
             func_name = name
 
             if not func_name:
