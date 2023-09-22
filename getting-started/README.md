@@ -33,4 +33,3 @@ const planner = new AzureOpenAIPlanner({
     logRequests: true
 });
 ```
-Otherwise, please feel free to browse other pages, including Concepts and Prompt Injection.
