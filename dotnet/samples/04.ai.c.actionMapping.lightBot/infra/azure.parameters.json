@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "resourceBaseName": {
-        "value": "commandbot${{RESOURCE_SUFFIX}}"
+        "value": "bot${{RESOURCE_SUFFIX}}"
       },
       "botAadAppClientId": {
         "value": "${{BOT_ID}}"
@@ -16,6 +16,15 @@
       },
       "botDisplayName": {
         "value": "LightBot"
+      },
+      "openAIApiKey": {
+        "value": "${{SECRET_OPENAI_API_KEY}}"
+      },
+      "azureOpenAIApiKey": {
+        "value": "${{SECRET_AZURE_OPENAI_API_KEY}}"
+      },
+      "azureOpenAIEndpoint": {
+        "value": "${{SECRET_AZURE_OPENAI_ENDPOINT}}"
       }
     }
   }

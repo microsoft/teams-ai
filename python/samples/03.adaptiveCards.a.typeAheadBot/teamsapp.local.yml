@@ -63,6 +63,17 @@ provision:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
 
 deploy:
+  # prerequisite: pip install
+  - uses: script
+    with:
+      run: pip install poetry
+
+  - uses: script
+    env:
+      PYTHONUTF8: "1"
+    with:
+      run: poetry install
+
   # Generate runtime environment variables
   - uses: file/createOrUpdateEnvironmentFile
     with:

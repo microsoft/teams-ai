@@ -33,7 +33,7 @@ storage = MemoryStorage()
 if config.open_ai_key == "":
     raise RuntimeError("OpenAIKey is a required environment variable")
 
-ActionTurnContext = ActionTurnContext[Dict[str, Any]]
+MyActionTurnContext = ActionTurnContext[Dict[str, Any]]
 app = Application[AppTurnState](
     ApplicationOptions(
         bot_app_id=config.app_id,
@@ -82,7 +82,7 @@ async def on_flagged_input(context: TurnContext, _state: AppTurnState):
 
 @app.ai.action("LightsOn")
 async def on_lights_on(
-    context: ActionTurnContext,
+    context: MyActionTurnContext,
     state: AppTurnState,
 ):
     state.conversation.lights_on = True
@@ -92,7 +92,7 @@ async def on_lights_on(
 
 @app.ai.action("LightsOff")
 async def on_lights_off(
-    context: ActionTurnContext,
+    context: MyActionTurnContext,
     state: AppTurnState,
 ):
     state.conversation.lights_on = False
@@ -102,7 +102,7 @@ async def on_lights_off(
 
 @app.ai.action("Pause")
 async def on_pause(
-    context: ActionTurnContext,
+    context: MyActionTurnContext,
     _state: AppTurnState,
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000

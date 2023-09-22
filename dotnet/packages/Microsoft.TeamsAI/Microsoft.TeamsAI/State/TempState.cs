@@ -35,7 +35,7 @@ namespace Microsoft.TeamsAI.State
         }
 
         /// <summary>
-        /// Input pass to an AI prompt
+        /// Input passed to an AI prompt
         /// </summary>
         public string Input
         {
@@ -43,8 +43,9 @@ namespace Microsoft.TeamsAI.State
             set => Set(InputKey, value);
         }
 
+        // TODO: This is currently not used, should store AI prompt/function output here
         /// <summary>
-        /// Formatted conversation history for embedding in an AI prompt
+        /// Output returned from an AI prompt or function
         /// </summary>
         public string Output
         {
@@ -52,8 +53,9 @@ namespace Microsoft.TeamsAI.State
             set => Set(OutputKey, value);
         }
 
+
         /// <summary>
-        /// Output returned from an AI prompt or function
+        /// Formatted conversation history for embedding in an AI prompt
         /// </summary>
         public string History
         {
