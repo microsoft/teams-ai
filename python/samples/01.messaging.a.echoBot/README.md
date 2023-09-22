@@ -11,9 +11,8 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
 
 ## Concepts
 
-- Listen for Message Activities
-- Handle Errors
-- Sending Response Activities
+- Listening/Sending Activities
+- Error Handling
 
 ![Screenshot](./assets/screenshot_0.png)
 

@@ -1,14 +1,27 @@
 # <img src="../../../assets/icon.png" height="10%" width="10%" /> Light Bot
 
-A bot that can turn the lights on and off.
+A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
 
-### In This Sample We Will...
+This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
 
-- Listen for Message Activities
-- Handle Errors
-- Sending Response Activities
+- [Concepts](#concepts)
+- [Prerequisites](#prerequisites)
+- [Run](#run)
+- [Development](#development)
+
+## Concepts
+
+- Listening/Sending Activities
+- Error Handling
+- State Management
+- Prompt Templates
+- Actions
 
 ![Screenshot](./assets/screenshot_0.png)
+
+## Prerequisites
+
+- Install [Python](https://www.python.org/downloads/) (>= 3.8)
 
 ## Run
 

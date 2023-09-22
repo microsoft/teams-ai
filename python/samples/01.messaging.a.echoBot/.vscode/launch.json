@@ -64,7 +64,7 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Python: Current File",
+            "name": "Start",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/app.py",
@@ -78,7 +78,7 @@
             "configurations": [
                 "Launch App (Edge)",
                 "Attach to Local Service",
-                "Python: Current File"
+                "Start"
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
@@ -92,7 +92,7 @@
             "configurations": [
                 "Launch App (Chrome)",
                 "Attach to Local Service",
-                "Python: Current File"
+                "Start"
             ],
             "preLaunchTask": "Start Teams App Locally",
             "presentation": {
