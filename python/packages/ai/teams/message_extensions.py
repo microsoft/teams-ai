@@ -47,7 +47,18 @@ class MessageExtensions(Generic[StateT]):
     def __init__(self, routes: List[Route[StateT]]) -> None:
         self._routes = routes
 
-    def query(self, command_id: Union[str, Pattern[str]]):
+    def query(
+        self, command_id: Union[str, Pattern[str]]
+    ) -> Callable[
+        [
+            Callable[
+                [TurnContext, StateT, MessagingExtensionQuery], Awaitable[MessagingExtensionResult]
+            ]
+        ],
+        Callable[
+            [TurnContext, StateT, MessagingExtensionQuery], Awaitable[MessagingExtensionResult]
+        ],
+    ]:
         """
         Registers a handler that implements a Search based Message Extension.
 
@@ -80,7 +91,10 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, MessagingExtensionQuery],
                 Awaitable[MessagingExtensionResult],
             ]
-        ):
+        ) -> Callable[
+            [TurnContext, StateT, MessagingExtensionQuery],
+            Awaitable[MessagingExtensionResult],
+        ]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
@@ -98,7 +112,12 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def query_link(self, command_id: Union[str, Pattern[str]]):
+    def query_link(
+        self, command_id: Union[str, Pattern[str]]
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
+    ]:
         """
         Registers a handler that implements a Link Unfurling based Message Extension.
 
@@ -131,7 +150,7 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, str],
                 Awaitable[MessagingExtensionResult],
             ]
-        ):
+        ) -> Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult],]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
@@ -153,7 +172,12 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def anonymous_query_link(self, command_id: Union[str, Pattern[str]]):
+    def anonymous_query_link(
+        self, command_id: Union[str, Pattern[str]]
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
+    ]:
         """
         Registers a handler for a command that performs anonymous link unfurling.
 
@@ -184,7 +208,7 @@ class MessageExtensions(Generic[StateT]):
 
         def __call__(
             func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]
-        ):
+        ) -> Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
@@ -206,7 +230,20 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def message_preview(self, command_id: Union[str, Pattern[str]], action: MessagePreviewAction):
+    def message_preview(
+        self, command_id: Union[str, Pattern[str]], action: MessagePreviewAction
+    ) -> Callable[
+        [
+            Callable[
+                [TurnContext, StateT, Activity],
+                Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+            ]
+        ],
+        Callable[
+            [TurnContext, StateT, Activity],
+            Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+        ],
+    ]:
         """
         Registers a handler to process an action of a message that's being
         previewed by the user prior to sending.
@@ -256,7 +293,10 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, Activity],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
             ]
-        ):
+        ) -> Callable[
+            [TurnContext, StateT, Activity],
+            Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+        ]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
@@ -281,7 +321,12 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def fetch_task(self, command_id: Union[str, Pattern[str]]):
+    def fetch_task(
+        self, command_id: Union[str, Pattern[str]]
+    ) -> Callable[
+        [Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]]]],
+        Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]]],
+    ]:
         """
         Registers a handler to process the initial fetch task for an
         Action based message extension.
@@ -315,7 +360,7 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT],
                 Awaitable[Union[TaskModuleTaskInfo, str]],
             ]
-        ):
+        ) -> Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]],]:
             async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state)
                 await self._invoke_task_response(context, res)
@@ -326,7 +371,12 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def select_item(self):
+    def select_item(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult]],
+    ]:
         """
         Registers a handler that implements the logic to handle the
         tap actions for items returned by a Search based message extension.
@@ -356,7 +406,7 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, Any],
                 Awaitable[MessagingExtensionResult],
             ]
-        ):
+        ) -> Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult],]:
             async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state, context.activity.value)
                 await self._invoke_action_response(context, res)
@@ -367,7 +417,20 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
-    def submit_action(self, command_id: Union[str, Pattern[str]]):
+    def submit_action(
+        self, command_id: Union[str, Pattern[str]]
+    ) -> Callable[
+        [
+            Callable[
+                [TurnContext, StateT, Any],
+                Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+            ]
+        ],
+        Callable[
+            [TurnContext, StateT, Any],
+            Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+        ],
+    ]:
         """
         Registers a handler that implements the submit action for an
         Action based Message Extension.
@@ -401,7 +464,10 @@ class MessageExtensions(Generic[StateT]):
                 [TurnContext, StateT, Any],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
             ]
-        ):
+        ) -> Callable[
+            [TurnContext, StateT, Any],
+            Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
+        ]:
             async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
