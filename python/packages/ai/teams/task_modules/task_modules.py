@@ -32,7 +32,12 @@ class TaskModules(Generic[StateT]):
         self._route_registry = route_registry
         self._task_data_filter = task_data_filter
 
-    def fetch(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]):
+    def fetch(
+        self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]],
+        Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]],
+    ]:
         """
         Adds a route for handling the initial fetch of the task module.
         This method can be used as either a decorator or a method.
@@ -60,7 +65,7 @@ class TaskModules(Generic[StateT]):
 
         def __call__(
             func: Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]
-        ):
+        ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
                 result = await func(context, state, context.activity.value["data"])
@@ -73,7 +78,12 @@ class TaskModules(Generic[StateT]):
         return __call__
 
     # TODO: Ported the code first. Need more discussion on the functionality.
-    def submit(self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]):
+    def submit(
+        self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]],
+        Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]],
+    ]:
         """
         Adds a route for handling the submission of a task module.
         This method can be used as either a decorator or a method.
@@ -103,7 +113,7 @@ class TaskModules(Generic[StateT]):
             func: Callable[
                 [TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]
             ]
-        ):
+        ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]:
             async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
                 result = await func(context, state, context.activity.value["data"])

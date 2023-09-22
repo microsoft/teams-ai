@@ -119,20 +119,22 @@ class Application(Bot, Generic[StateT]):
         return self._message_extensions
 
     @property
-    def adaptive_cards(self) -> AdaptiveCards:
+    def adaptive_cards(self) -> AdaptiveCards[StateT]:
         """
         Access the application's adaptive cards functionalities.
         """
         return self._adaptive_card
 
     @property
-    def task_modules(self) -> TaskModules:
+    def task_modules(self) -> TaskModules[StateT]:
         """
         Access the application's task modules functionalities.
         """
         return self._task_modules
 
-    def activity(self, type: ActivityType):
+    def activity(
+        self, type: ActivityType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new activity event listener. This method can be used as either
         a decorator or a method.
@@ -155,13 +157,15 @@ class Application(Bot, Generic[StateT]):
         def __selector__(context: TurnContext):
             return type == str(context.activity.type)
 
-        def __call__(func: RouteHandler[StateT]):
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def message(self, select: Union[str, Pattern[str]]):
+    def message(
+        self, select: Union[str, Pattern[str]]
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new message activity event listener. This method can be used as either
         a decorator or a method.
@@ -193,13 +197,15 @@ class Application(Bot, Generic[StateT]):
             i = context.activity.text.find(select)
             return i > -1
 
-        def __call__(func: RouteHandler[StateT]):
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def conversation_update(self, type: ConversationUpdateType):
+    def conversation_update(
+        self, type: ConversationUpdateType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new message activity event listener. This method can be used as either
         a decorator or a method.
@@ -239,13 +245,13 @@ class Application(Bot, Generic[StateT]):
 
             return False
 
-        def __call__(func: RouteHandler[StateT]):
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def before_turn(self, func: RouteHandler[StateT]):
+    def before_turn(self, func: RouteHandler[StateT]) -> RouteHandler[StateT]:
         """
         Registers a new event listener that will be executed before turns.
         This method can be used as either a decorator or a method and
@@ -266,7 +272,7 @@ class Application(Bot, Generic[StateT]):
         self._before_turn.append(func)
         return func
 
-    def after_turn(self, func: RouteHandler[StateT]):
+    def after_turn(self, func: RouteHandler[StateT]) -> RouteHandler[StateT]:
         """
         Registers a new event listener that will be executed after turns.
         This method can be used as either a decorator or a method and
@@ -287,7 +293,9 @@ class Application(Bot, Generic[StateT]):
         self._after_turn.append(func)
         return func
 
-    def error(self, func: Callable[[TurnContext, Exception], Awaitable[None]]):
+    def error(
+        self, func: Callable[[TurnContext, Exception], Awaitable[None]]
+    ) -> Callable[[TurnContext, Exception], Awaitable[None]]:
         """
         Registers an error handler that will be called anytime
         the app throws an Exception
