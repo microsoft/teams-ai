@@ -8,9 +8,9 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 
 ## Samples
 
-- [Echo](./samples/echo/)
-- [List](./samples/list/)
-- [Teams Chef Bot](./samples/04.ai.a.teamsChefBot/)
+- [Echo](./samples/01.messaging.a.echoBot/)
+- [Chef](./samples/04.ai.a.teamsChefBot/)
+- [Light](./samples/04.ai.c.actionMapping.lightBot/)
 
 ## Development
 
