@@ -29,6 +29,7 @@
             "request": "launch",
             "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
             "cascadeTerminateToConfigurations": [
+                "Attach to Local Service"
             ],
             "presentation": {
                 "group": "all",
@@ -42,6 +43,7 @@
             "request": "launch",
             "url": "https://teams.microsoft.com/l/app/${{local:TEAMS_APP_ID}}?installAppPackage=true&webjoin=true&${account-hint}",
             "cascadeTerminateToConfigurations": [
+                "Attach to Local Service"
             ],
             "presentation": {
                 "group": "all",
@@ -50,12 +52,24 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Python: Current File",
+            "name": "Attach to Local Service",
+            "type": "node",
+            "request": "attach",
+            "port": 9239,
+            "restart": true,
+            "presentation": {
+                "group": "all",
+                "hidden": true
+            },
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Start",
             "type": "python",
             "request": "launch",
-            "program": "app.py",
+            "program": "${workspaceFolder}/src/app.py",
+            "python": "${workspaceFolder}/.venv/Scripts/python.exe",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/src"
         }
     ],
     "compounds": [
@@ -63,9 +77,10 @@
             "name": "Debug (Edge)",
             "configurations": [
                 "Launch App (Edge)",
-                "Python: Current File"
+                "Attach to Local Service",
+                "Start"
             ],
-            "preLaunchTask": "Prepare Teams App Locally",
+            "preLaunchTask": "Start Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 1
@@ -76,9 +91,10 @@
             "name": "Debug (Chrome)",
             "configurations": [
                 "Launch App (Chrome)",
-                "Python: Current File"
+                "Attach to Local Service",
+                "Start"
             ],
-            "preLaunchTask": "Prepare Teams App Locally",
+            "preLaunchTask": "Start Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 2

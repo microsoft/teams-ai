@@ -861,13 +861,13 @@ testing-libs = ["demjson", "simplejson", "ujson", "yajl"]
 
 [[package]]
 name = "jsonschema"
-version = "4.19.0"
+version = "4.19.1"
 description = "An implementation of JSON Schema validation for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jsonschema-4.19.0-py3-none-any.whl", hash = "sha256:043dc26a3845ff09d20e4420d6012a9c91c9aa8999fa184e7efcfeccb41e32cb"},
-    {file = "jsonschema-4.19.0.tar.gz", hash = "sha256:6e1e7569ac13be8139b2dd2c21a55d350066ee3f80df06c608b398cdc6f30e8f"},
+    {file = "jsonschema-4.19.1-py3-none-any.whl", hash = "sha256:cd5f1f9ed9444e554b38ba003af06c0a8c2868131e56bfbef0550fb450c0330e"},
+    {file = "jsonschema-4.19.1.tar.gz", hash = "sha256:ec84cc37cfa703ef7cd4928db24f9cb31428a5d0fa77747b8b51a847458e0bbf"},
 ]
 
 [package.dependencies]
@@ -1326,17 +1326,17 @@ starlette = ["starlette (>=0.26.1,<0.32.0)"]
 
 [[package]]
 name = "openapi-schema-validator"
-version = "0.6.0"
+version = "0.6.1"
 description = "OpenAPI schema validation for Python"
 optional = false
 python-versions = ">=3.8.0,<4.0.0"
 files = [
-    {file = "openapi_schema_validator-0.6.0-py3-none-any.whl", hash = "sha256:9e95b95b621efec5936245025df0d6a7ffacd1551e91d09196b3053040c931d7"},
-    {file = "openapi_schema_validator-0.6.0.tar.gz", hash = "sha256:921b7c1144b856ca3813e41ecff98a4050f7611824dfc5c6ead7072636af0520"},
+    {file = "openapi_schema_validator-0.6.1-py3-none-any.whl", hash = "sha256:e39f2cc92a458a1b9971d8a0519fcc94a4c454d9accffab5189575716fe53bed"},
+    {file = "openapi_schema_validator-0.6.1.tar.gz", hash = "sha256:b8b25e2cb600a0ed18452e675b5dd8cbb99009909c2641c973a4b02c93e33ca2"},
 ]
 
 [package.dependencies]
-jsonschema = ">=4.18.0,<5.0.0"
+jsonschema = ">=4.19.1,<5.0.0"
 jsonschema-specifications = ">=2023.5.2,<2024.0.0"
 rfc3339-validator = "*"
 

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "echo"
+name = "echo-sample"
 version = "0.0.0"
 description = "Echo Sample"
 authors = ["Microsoft <teams@microsoft.com>"]

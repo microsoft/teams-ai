@@ -1,14 +1,24 @@
-# <img src="../../../assets/icon.png" height="10%" width="10%" /> Light Bot
+# <img src="../../../assets/icon.png" height="10%" width="10%" /> Echo Bot
 
-A bot that can turn the lights on and off.
+Teams AI Conversation Bot sample for Teams.
 
-### In This Sample We Will...
+This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
 
-- Listen for Message Activities
-- Handle Errors
-- Sending Response Activities
+- [Concepts](#concepts)
+- [Prerequisites](#prerequisites)
+- [Run](#run)
+- [Development](#development)
+
+## Concepts
+
+- Listening/Sending Activities
+- Error Handling
 
 ![Screenshot](./assets/screenshot_0.png)
+
+## Prerequisites
+
+- Install [Python](https://www.python.org/downloads/) (>= 3.8)
 
 ## Run
 

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "light"
+name = "light-sample"
 version = "0.0.0"
 description = "Light Sample"
 authors = ["Microsoft <teams@microsoft.com>"]
@@ -43,7 +43,7 @@ target-version = ['py38']
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report html:coverage --cov=echo"
+addopts = "--cov-report html:coverage --cov=src"
 
 [tool.mypy]
 python_version = "3.8"
