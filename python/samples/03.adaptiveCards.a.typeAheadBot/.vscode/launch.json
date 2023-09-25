@@ -80,7 +80,7 @@
                 "Attach to Local Service",
                 "Start"
             ],
-            "preLaunchTask": "Start Teams App Locally",
+            "preLaunchTask": "Prepare Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 1
@@ -94,7 +94,7 @@
                 "Attach to Local Service",
                 "Start"
             ],
-            "preLaunchTask": "Start Teams App Locally",
+            "preLaunchTask": "Prepare Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 2

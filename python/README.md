@@ -9,6 +9,7 @@ A set of packages that make it easy to build bots for Microsoft Teams.
 ## Samples
 
 - [Echo](./samples/01.messaging.a.echoBot/)
+- [Type Ahead Bot](./samples/03.adaptiveCards.a.typeAheadBot/)
 - [Chef](./samples/04.ai.a.teamsChefBot/)
 - [Light](./samples/04.ai.c.actionMapping.lightBot/)
 
