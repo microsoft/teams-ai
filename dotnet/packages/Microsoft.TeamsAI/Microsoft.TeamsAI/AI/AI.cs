@@ -431,7 +431,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (string.IsNullOrEmpty(tempState.Input))
                 {
-                    tempState.Input = turnContext.Activity.Text;
+                    tempState.Input = turnContext.Activity.Text ?? string.Empty;
                 }
 
                 if (string.IsNullOrEmpty(tempState.History) && options?.History != null && options.History.TrackHistory)

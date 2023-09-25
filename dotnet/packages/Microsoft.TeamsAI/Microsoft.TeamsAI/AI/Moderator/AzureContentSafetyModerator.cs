@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI.Planner;
+﻿using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
@@ -110,7 +109,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 {
                     Commands = new List<IPredictedCommand>
                             {
-                                new PredictedDoCommand(actionName, new Dictionary<string, object>
+                                new PredictedDoCommand(actionName, new Dictionary<string, object?>
                                 {
                                     { "Result", response.Value }
                                 })
