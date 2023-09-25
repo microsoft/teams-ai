@@ -68,8 +68,9 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/app.py",
+            "cwd": "${workspaceFolder}/src",
             "python": "${workspaceFolder}/.venv/Scripts/python.exe",
-            "console": "integratedTerminal",
+            "console": "integratedTerminal"
         }
     ],
     "compounds": [
@@ -80,7 +81,7 @@
                 "Attach to Local Service",
                 "Start"
             ],
-            "preLaunchTask": "Start Teams App Locally",
+            "preLaunchTask": "Prepare Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 1
@@ -94,7 +95,7 @@
                 "Attach to Local Service",
                 "Start"
             ],
-            "preLaunchTask": "Start Teams App Locally",
+            "preLaunchTask": "Prepare Teams App Locally",
             "presentation": {
                 "group": "all",
                 "order": 2
