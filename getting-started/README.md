@@ -26,11 +26,10 @@ If you are migrating your existing bot, we recommend starting with the respectiv
 To use this sample with Azure Open AI, update OpenAIPlanner to AzureOpenAIPlanner
 AzureOpenAIPlanner expects an endpoint property, which can be found in the Azure portal
 
-```
+```typescript
 const planner = new AzureOpenAIPlanner({
     apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'text-davinci-003',
-    logRequests: true,
-    endpoint: 
+    logRequests: true
 });
 ```
