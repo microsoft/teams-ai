@@ -69,6 +69,8 @@ deploy:
       run: pip install poetry
 
   - uses: script
+    env:
+      PYTHONUTF8: "1"
     with:
       run: poetry install
 
