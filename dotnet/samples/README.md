@@ -13,9 +13,7 @@ In this folder you will find various examples showcasing the different capabilit
 
 `git clone https://github.com/Microsoft/teams-ai.git`
 
-2. Navigate to the `teams-ai/dotnet/samples` folder, pick a sample (ex. `01.a.echoBot`) and open the `.sln` file.
-
-By this point you should have your sample open in your IDE of choice.
+2. Pick your sample from the `dotnet/samples/` folder.
 
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
@@ -24,10 +22,8 @@ There are a few ways to get the application up and running. The latest way is us
 
 #### Additional Prerequisites
 
-- [Visual Studio 2022 17.7.0 Preview 3.0](https://visualstudio.microsoft.com/vs/preview/)
-- Teams Toolkit extension (installed through the Visual Studio installer)
-  - Select Microsoft Teams development tools under ASP.NET and web development.
-  - ![Teams Toolkit Installation](/dotnet/samples/assets/ttk-install.png)
+- Visual Studio 2022 17.7.0 (or a greater version)
+- [Teams Toolkit extension](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/toolkit-v4/install-teams-toolkit-vs?pivots=visual-studio-v17-7)
 
 #### Steps
 
