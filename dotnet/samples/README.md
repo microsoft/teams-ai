@@ -7,55 +7,6 @@ In this folder you will find various examples showcasing the different capabilit
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [Azure OpenAI](https://aka.ms/oai/access) resource or an account with [OpenAI](https://platform.openai.com).
 
-### Consuming the latest version of the library (preview only)
-
-> **NOTE:** As the library has not been published to NuGet's public registry, please complete the following steps to be able to use the samples. Otherwise, the samples will not work.
-
-There are two paths to get the package. Please do one of the following, not both.
-
-<ul><li><details>
-<summary><h4>Option 1: Install package via GitHub package manager</h4></summary>
-
-Follow the instructions below to generate the `.nukpg` NuGet package file of the library to locally consume within the sample:
-
-1. Clone the repository and verify you are on `main` branch:
-
-`git clone https://github.com/Microsoft/teams-ai.git`
-
-1. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the `package:read` permission.
-1. Update the shared `Nuget.Config` file under `dotnet/samples/` folder with your Github username and your new access token as the password.
-   ![Nuget.Config](./assets/screenshot-1.png)
-1. In Visual Studio, navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
-
-![Install Package](./assets/screenshot-0.png)
-
-❕❕ If you followed the above directions, you do not need to do Option 2 below. [Skip to building your sample](#setting-up-a-sample)
-
-</details></li>
-<li><details> <!-- done to minimize whitespace between blocks -->
-    <summary><h4>Option 2: Install Package via local build</h4></summary>
-
-1. Clone the repository and verify you are on `main` branch:
-
-`git clone https://github.com/Microsoft/teams-ai.git`
-
-1. Navigate to the `teams-ai/dotnet/packages/Microsoft.TeamsAI` folder.
-1. Run `dotnet pack` in terminal.
-1. Verify the output you received:
-
-```bash
-Successfully created package "C:...\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\bin\Debug\Microsoft.TeamsAI.1.0.0.nupkg"
-```
-
-1. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the shared local NuGet source folder `dotnet/samples/LocalPkg/`.
-1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
-   > Alternatively, you can run `dotnet add package Microsoft.TeamsAI`.
-   </details>
-   </li>
-   </ul>
-
-Now you may proceed with setting up the sample.
-
 ## Setting up a sample
 
 1. If you have not yet, clone the repository:
@@ -69,7 +20,7 @@ By this point you should have your sample open in your IDE of choice.
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
 <details open>
-    <summary><h3> Using Teams Toolkit for Visual Studio </h3></summary>
+    <summary><h3> Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
 
 #### Additional Prerequisites
 
