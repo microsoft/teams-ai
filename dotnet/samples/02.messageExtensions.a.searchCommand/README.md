@@ -4,7 +4,7 @@ This sample shows how to incorporate a basic Message Extension app into a Micros
 
 ## Set up instructions
 
-All the samples in for the C# .NET SDK can be set up in the same way. You can find the step by step instructions here:
+All the samples in the C# .NET SDK can be set up in the same way. You can find the step by step instructions here:
  [Setup Instructions](../README.md).
 
 ## Interacting with the Message Extension
