@@ -159,6 +159,10 @@ export class TaskModules<TState extends TurnState> {
 
                     // Call handler and then check to see if an invoke response has already been added
                     const result = await handler(context, state, context.activity.value?.data ?? {});
+                    
+                    // if result is null or undefined, this indicates no response should be sent 
+                    if (!result) return;
+
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
                         // Format invoke response
                         let response: TaskModuleResponse | undefined = undefined;
