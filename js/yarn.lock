@@ -1174,10 +1174,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/restify@8.5.7":
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.5.7.tgz#6e702c6915d090a1e6c071d2e7d55c763337d027"
-  integrity sha512-AyVCoo+28MS7FVJikENrDD4vmnF/NuShIQabT/sdy8TIt7/bi9t9EmmY9WIPlkvNyLFUEQHJry+V/8Ym7GO24w==
+"@types/restify@8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.5.8.tgz#f62713ec000ad586ec10a2e7c62a5c1cc9be9658"
+  integrity sha512-IIRXJ1TCcLQ8yeSgAK13xtyzxCgUn3zFKbp7ubmhE+J6zVa9j6fK0G7vi5zYGYqJX24yzqujnlg5Icw9YO6Hjg==
   dependencies:
     "@types/bunyan" "*"
     "@types/formidable" "^1"
