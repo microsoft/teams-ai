@@ -1,0 +1,9 @@
+# Suppress errors for Test
+[*.cs]
+dotnet_diagnostic.CA2000.severity = none # Call System.IDisposable.Dispose on object before all references to it are out of scope
+dotnet_diagnostic.CA2007.severity = none # Do not directly await a Task
+dotnet_diagnostic.IDE0008.severity = none # Use explicit type instead of var
+dotnet_diagnostic.VSTHRD111.severity = none # Use .ConfigureAwait(bool)
+
+# CA1859: Use concrete types when possible for improved performance
+dotnet_diagnostic.CA1859.severity = none

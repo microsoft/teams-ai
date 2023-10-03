@@ -19,7 +19,8 @@ The variations should always include ${item} and ${list} variables.
 */
 
 /**
- *
+ * Generates a greeting message for the user.
+ * @returns {string} The greeting message.
  */
 export function greeting(): string {
     return getRandomResponse([
@@ -32,7 +33,8 @@ export function greeting(): string {
 }
 
 /**
- *
+ * Resets all lists and returns a message indicating that the reset was successful.
+ * @returns {string} The response message.
  */
 export function reset(): string {
     return getRandomResponse([
@@ -45,8 +47,10 @@ export function reset(): string {
 }
 
 /**
- * @param list
- * @param item
+ * Generates a response message for when an item is not found on a list.
+ * @param {string} list The name of the list.
+ * @param {string} item The name of the item.
+ * @returns {string} The response message.
  */
 export function itemNotFound(list: string, item: string): string {
     return getRandomResponse([
@@ -59,8 +63,10 @@ export function itemNotFound(list: string, item: string): string {
 }
 
 /**
- * @param list
- * @param item
+ * Generates a response message for when an item is found on a list.
+ * @param {string} list The name of the list.
+ * @param {string} item The name of the item.
+ * @returns {string} The response message.
  */
 export function itemFound(list: string, item: string): string {
     return getRandomResponse([
@@ -71,9 +77,9 @@ export function itemFound(list: string, item: string): string {
         `A ${item} appears to be in your ${list} list.`
     ]);
 }
-
 /**
- *
+ * Generates a response message for when no lists are found.
+ * @returns {string} The response message.
  */
 export function noListsFound(): string {
     return getRandomResponse([
@@ -86,7 +92,9 @@ export function noListsFound(): string {
 }
 
 /**
- * @param action
+ * Generates a response message for when an unknown action is requested.
+ * @param {string} action The name of the unknown action.
+ * @returns {string} The response message.
  */
 export function unknownAction(action: string): string {
     return getRandomResponse([
@@ -99,7 +107,8 @@ export function unknownAction(action: string): string {
 }
 
 /**
- *
+ * Generates a response message for when the user asks about an off-topic subject.
+ * @returns {string} The response message.
  */
 export function offTopic(): string {
     return getRandomResponse([
@@ -110,9 +119,10 @@ export function offTopic(): string {
         `I'm sorry, I'm not allowed to discuss that topic.`
     ]);
 }
-
 /**
- * @param responses
+ * Returns a random response message from an array of possible responses.
+ * @param {string[]} responses An array of possible response messages.
+ * @returns {string} A randomly selected response message.
  */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));

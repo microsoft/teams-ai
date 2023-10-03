@@ -4,7 +4,8 @@ import { ApplicationTurnState, IDataEntities } from '../bot';
 import { findMapLocation } from '../ShadowFalls';
 
 /**
- * @param app
+ * Registers the 'location' action with the given application object.
+ * @param {Application<ApplicationTurnState>} app The application object to register the action with.
  */
 export function locationAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('location', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -21,9 +22,11 @@ export function locationAction(app: Application<ApplicationTurnState>): void {
 }
 
 /**
- * @param context
- * @param state
- * @param data
+ * Updates the location of the conversation and sends a message to the user if the location has changed.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state The application state object for the current turn of conversation.
+ * @param {IDataEntities} data The data entities extracted from the user's input.
+ * @returns {Promise<boolean>} A promise that resolves to true if the location was successfully updated.
  */
 async function updateLocation(
     context: TurnContext,
@@ -57,7 +60,9 @@ async function updateLocation(
 }
 
 /**
- * @param title
+ * Calculates the encounter chance for a given location title.
+ * @param {string} title The title of the location.
+ * @returns {number} The encounter chance for the location.
  */
 function getEncounterChance(title: string): number {
     title = title.toLowerCase();

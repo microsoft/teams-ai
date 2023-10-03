@@ -46,7 +46,7 @@ Post:
     <summary><h3>Action mapping</h3></summary>
 Since a message extension is a UI-based component, user actions are explicitly defined (as opposed to a conversational bot). This sample shows how ME actions can leverage LLM logic:
 
-````javascript
+```javascript
 // Add a prompt function for getting the current status of the lights
 app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
     return state.conversation.value.lightsOn ? 'on' : 'off';
@@ -71,6 +71,7 @@ app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState,
     await new Promise((resolve) => setTimeout(resolve, time));
     return true;
 });
+```
 
 </details>
 
@@ -114,7 +115,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this samples directory from the repo
+1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
@@ -215,13 +216,13 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 ```bash
 yarn start
-````
+```
 
 4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
 
 ![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
 
--   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above.
 -   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
 -   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import { CardFactory, MessageFactory, TurnContext } from 'botbuilder';
 import { Application, ResponseParser } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, updateDMResponse } from '../bot';
@@ -5,7 +6,8 @@ import { normalizeItemName, searchItemList, textToItemList } from '../items';
 import * as responses from '../responses';
 
 /**
- * @param app
+ * Adds inventory actions to the given application.
+ * @param {Application<ApplicationTurnState>} app The application to add the actions to.
  */
 export function inventoryAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('inventory', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -21,11 +23,12 @@ export function inventoryAction(app: Application<ApplicationTurnState>): void {
         }
     });
 }
-
 /**
- * @param context
- * @param state
- * @param data
+ * Updates the user's inventory based on the given data.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state The state object for the current turn of conversation.
+ * @param {IDataEntities} data The data entities for the current turn of conversation.
+ * @returns {Promise<boolean>} A promise that resolves to true if the inventory was updated successfully, or false otherwise.
  */
 async function updateList(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const items = Object.assign({}, state.user.value.inventory);
@@ -43,7 +46,7 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
 
             if (count > 0) {
                 // Add the item
-                if (items.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(items, name)) {
                     items[name] = items[name] + count;
                 } else {
                     items[name] = count;
@@ -83,9 +86,11 @@ async function updateList(context: TurnContext, state: ApplicationTurnState, dat
 }
 
 /**
- * @param app
- * @param context
- * @param state
+ * Prints the user's inventory to the conversation.
+ * @param {Application<ApplicationTurnState>} app The application object for the current turn of conversation.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state The state object for the current turn of conversation.
+ * @returns {Promise<boolean>} A promise that resolves to true if the inventory was printed successfully, or false otherwise.
  */
 async function printList(
     app: Application<ApplicationTurnState>,

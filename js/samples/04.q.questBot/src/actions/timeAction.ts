@@ -2,9 +2,9 @@ import { TurnContext } from 'botbuilder';
 import { Application, OpenAIPlanner } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from '../bot';
 import { describeConditions, describeSeason, generateTemperature, generateWeather } from '../conditions';
-
 /**
- * @param app
+ * Registers the 'time' action with the given application.
+ * @param {Application} app The application to register the action with.
  */
 export function timeAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('time', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -22,9 +22,11 @@ export function timeAction(app: Application<ApplicationTurnState>): void {
 }
 
 /**
- * @param context
- * @param state
- * @param data
+ * Wait for a specified time and update the conversation state accordingly.
+ * @param {TurnContext} context The context object for the turn.
+ * @param {ApplicationTurnState} state The application state for the turn.
+ * @param {IDataEntities} data The data entities extracted from the user's input.
+ * @returns {Promise<boolean>} A promise that resolves to true if the function handled the user's input, or false otherwise.
  */
 async function waitForTime(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const until = (data.until ?? '').toLowerCase();
@@ -103,8 +105,10 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
 }
 
 /**
- * @param context
- * @param state
+ * Queries the current time and updates the conversation state accordingly.
+ * @param {TurnContext} context The context object for the turn.
+ * @param {ApplicationTurnState} state The application state for the turn.
+ * @returns {Promise<boolean>} A promise that resolves to true if the function handled the user's input, or false otherwise.
  */
 async function queryTime(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     // Render conditions

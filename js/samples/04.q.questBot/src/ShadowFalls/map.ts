@@ -1,14 +1,17 @@
+/* eslint-disable security/detect-object-injection */
 import { IMap, IMapLocation } from '../interfaces';
 
 /**
- * @param name
+ * Finds a map location by name.
+ * @param {string} name The name of the map location.
+ * @returns {IMapLocation | undefined} The map location, or undefined if not found.
  */
 export function findMapLocation(name: string): IMapLocation | undefined {
     let key = name.toLowerCase().trim();
     if (key.startsWith('the ')) {
         key = key.substring('the '.length);
     }
-    if (map.aliases.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(map.aliases, key)) {
         key = map.aliases[key];
     }
     return map.locations[key];

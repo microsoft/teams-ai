@@ -12,7 +12,7 @@ import * as restify from 'restify';
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -22,7 +22,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -92,13 +97,13 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error('Missing OpenAIKey environment variable');
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing OPENAI_API_KEY environment variable');
 }
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey!,
+    apiKey: process.env.OPENAI_API_KEY!,
     defaultModel: 'text-davinci-003',
     logRequests: true
 });
@@ -214,8 +219,10 @@ server.post('/api/messages', async (req, res) => {
 });
 
 /**
- * @param state
- * @param list
+ * Retrieves the items for a given list from the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} list - The name of the list to retrieve items for.
+ * @returns {string[]} - The items in the specified list.
  */
 function getItems(state: ApplicationTurnState, list: string): string[] {
     ensureListExists(state, list);
@@ -223,9 +230,10 @@ function getItems(state: ApplicationTurnState, list: string): string[] {
 }
 
 /**
- * @param state
- * @param list
- * @param items
+ * Sets the items for a given list in the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} list - The name of the list to set items for.
+ * @param {string[]} items - The items to set for the specified list.
  */
 function setItems(state: ApplicationTurnState, list: string, items: string[]): void {
     ensureListExists(state, list);
@@ -233,8 +241,9 @@ function setItems(state: ApplicationTurnState, list: string, items: string[]): v
 }
 
 /**
- * @param state
- * @param listName
+ * Ensures that a list with the given name exists in the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} listName - The name of the list to ensure exists.
  */
 function ensureListExists(state: ApplicationTurnState, listName: string): void {
     const conversation = state.conversation.value;
@@ -250,8 +259,9 @@ function ensureListExists(state: ApplicationTurnState, listName: string): void {
 }
 
 /**
- * @param state
- * @param listName
+ * Deletes a list from the conversation state.
+ * @param {ApplicationTurnState} state - The current turn state.
+ * @param {string} listName - The name of the list to delete.
  */
 function deleteList(state: ApplicationTurnState, listName: string): void {
     const conversation = state.conversation.value;

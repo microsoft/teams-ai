@@ -19,7 +19,8 @@ The variations should always include ${item} and ${list} variables.
 */
 
 /**
- * This method is used for greeting and return rendom responses.
+ * Generates a random greeting message.
+ * @returns {string} The greeting message.
  */
 export function greeting(): string {
     return getRandomResponse([
@@ -33,6 +34,7 @@ export function greeting(): string {
 
 /**
  * This method is used to reset the work items and starting with freshly.
+ * @returns {string} The response message.
  */
 export function reset(): string {
     return getRandomResponse([
@@ -45,9 +47,26 @@ export function reset(): string {
 }
 
 /**
- * This method return random response if the work item not found.
- * @param list
- * @param item
+ * Removes an item from a list.
+ * @template T
+ * @param {T[]} list The list to remove the item from.
+ * @param {T} item The item to remove.
+ * @returns {boolean} True if the item was removed, false otherwise.
+ */
+export function removeItem<T>(list: T[], item: T): boolean {
+    const index = list.indexOf(item);
+    if (index >= 0) {
+        list.splice(index, 1);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Generates a random response when a work item is not found in a list.
+ * @param {string} list The name of the list.
+ * @param {string} item The name of the work item.
+ * @returns {string} The response message.
  */
 export function itemNotFound(list: string, item: string): string {
     return getRandomResponse([
@@ -60,9 +79,23 @@ export function itemNotFound(list: string, item: string): string {
 }
 
 /**
- * This method return random responses if the work item found.
- * @param list
- * @param item
+ * This method return random response no list found.
+ * @returns {string} The response message.
+ */
+export function noListsFound(): string {
+    return getRandomResponse([
+        `You don't have any work items created yet.`,
+        `It looks like you don't have any work items yet.`,
+        `No work items have been created yet.`,
+        `You don't have any work tiems created yet.`
+    ]);
+}
+
+/**
+ * Generates a random response when a work item is found in a list.
+ * @param {string} list The name of the list.
+ * @param {string} item The name of the work item.
+ * @returns {string} The response message.
  */
 export function itemFound(list: string, item: string): string {
     return getRandomResponse([
@@ -75,20 +108,9 @@ export function itemFound(list: string, item: string): string {
 }
 
 /**
- * This method return random response no list found.
- */
-export function noListsFound(): string {
-    return getRandomResponse([
-        `You don't have any work items created yet.`,
-        `It looks like you don't have any work items yet.`,
-        `No work items have been created yet.`,
-        `You don't have any work tiems created yet.`
-    ]);
-}
-
-/**
- * This method return random response for any unknown action.
- * @param action
+ * Generates a random response for any unknown action.
+ * @param {string} action The unknown action.
+ * @returns {string} The response message.
  */
 export function unknownAction(action: string): string {
     return getRandomResponse([
@@ -101,7 +123,8 @@ export function unknownAction(action: string): string {
 }
 
 /**
- * This method return random response if the prompt is off the topic.
+ * Generates a random response if the prompt is off the topic.
+ * @returns {string} The response message.
  */
 export function offTopic(): string {
     return getRandomResponse([
@@ -114,10 +137,12 @@ export function offTopic(): string {
 }
 
 /**
- * This method return random response from the list of items in the array.
- * @param responses
+ * Returns a random response from an array of responses.
+ * @param {string[]} responses The array of responses to choose from.
+ * @returns {string} A random response from the array.
  */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));
+    // eslint-disable-next-line security/detect-object-injection
     return responses[i];
 }

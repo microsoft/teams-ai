@@ -19,7 +19,9 @@ The variations should always include ${item} and ${list} variables.
 */
 
 /**
- * @param status
+ * Returns a string with the current status of the lights and a suggestion to switch them on or off.
+ * @param {boolean} status - A boolean indicating whether the lights are currently on or off.
+ * @returns {string} A string with the current status of the lights and a suggestion to switch them on or off.
  */
 export function lightStatus(status: boolean): string {
     const currently = status ? 'on' : 'off';
@@ -43,7 +45,9 @@ export function lightStatus(status: boolean): string {
 }
 
 /**
- * @param action
+ * Responds when an unknown action is called
+ * @param {string} action The action being performed
+ * @returns {string} the response
  */
 export function unknownAction(action: string): string {
     return getRandomResponse([
@@ -56,7 +60,8 @@ export function unknownAction(action: string): string {
 }
 
 /**
- *
+ * Returns a string indicating that the bot cannot help with the current topic.
+ * @returns {string} A string indicating that the bot cannot help with the current topic.
  */
 export function offTopic(): string {
     return getRandomResponse([
@@ -69,7 +74,9 @@ export function offTopic(): string {
 }
 
 /**
- * @param responses
+ * Returns a random response from an array of responses.
+ * @param {string[]} responses - An array of string responses.
+ * @returns {string} A random response from the array.
  */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));

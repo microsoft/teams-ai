@@ -24,11 +24,13 @@
 
 ## Summary
 
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook Teams apps. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
-This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
+This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
-It shows M365 botbuilder SDK capabilities like:
+The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
+
+The sample shows Teams AI SDK capabilities like:
 
 <details open>
     <summary><h3>Conversational bot scaffolding</h3></summary>
@@ -42,25 +44,29 @@ Open the panel below to learn fine-tuned details on how this sample works.
     Notice that outside of one '\history' command, the 'index.ts' file relies on GPT for all its natural language modelling - no code is specifically written to handle language processing. Rather, a 'predictionEngine' is defined to handle this for you:
 
 ```javascript
-// Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 2048,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
+// Create AI components
+const planner = new OpenAIPlanner({
+    apiKey: process.env.OPENAI_API_KEY || '',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
-```
 
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
+
+// Define storage and application
+const storage = new MemoryStorage();
+const app = new Application<ApplicationTurnState>({
+    storage,
+    ai: {
+        planner,
+        promptManager,
+        prompt: 'chat',
+        history: {
+            assistantHistoryType: 'text'
+        }
+    }
+});
+```
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
@@ -156,7 +162,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this samples directory from the repo
+1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
@@ -189,7 +195,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/04.ai.a.teamsChefBot/
     teamsfx provision --env local
 
     ```
@@ -210,10 +216,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.echobot/`
+1. In a terminal, navigate to `teams-ai/js/samples/04.ai.a.teamsChefBot/`
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echobot/
+    cd teams-ai/js/samples/04.ai.a.teamsChefBot/
     ```
 
 1. Run ngrok tunneling service - point to port 3978
@@ -260,7 +266,7 @@ yarn start
 
 ![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
 
--   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above..
+-   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above.
 -   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
 -   If you are building, testing and publishing your app manually to Azure, you will need to put your credentials in the `.env` file.
 

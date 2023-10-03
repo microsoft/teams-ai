@@ -24,7 +24,6 @@ This sample illustrates the Teams AI SDK's ability to scaffold conversational bo
 
 ## AI-Powered Experiences
 
-
 ### Conversational AI w/Natural Language: [Chef bot](04.ai.a.teamsChefBot/)
 
 A conversational bot for Microsoft Teams, designed as a helper bot for building Teams app. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
@@ -39,9 +38,7 @@ It shows Teams AI SDK capabilities like:
 -   Localization across languages
 -   Conversational session history
 
-
-
-### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.gptME/)
+### AI in Message Extensions: [GPT ME](04.ai.b.messageExtensions.aime/)
 
 A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
@@ -55,7 +52,7 @@ It shows Teams AI SDK capabilities like:
 
 ### Intent to Action Mapping: [Light On/Off AI Assistant](04.ai.c.actionMapping.lightBot/)
 
-A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off. The bot is built using Node.js and the M365 BotBuilder library.
+A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off. The bot is built using Node.js and the Teams AI SDK library.
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams than the Santa sample. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to third party app skills.
 
@@ -87,7 +84,6 @@ It shows a broad range of Teams AI SDK capabilities like:
 -   Topic filtering
 -   Prediction engine mapping intents to actions with third party business logic
 -   Mixing GPT-powered conversational responses with manually defined responses
-
 
 ### Chained Actions: [DevOps AI Assistant](04.ai.e.chainedActions.devOpsBot)
 

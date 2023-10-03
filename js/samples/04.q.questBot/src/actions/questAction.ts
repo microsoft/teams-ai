@@ -1,9 +1,10 @@
+/* eslint-disable security/detect-object-injection */
 import { TurnContext } from 'botbuilder';
 import { Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, IQuest } from '../bot';
 
 /**
- * @param app
+ * @param {Application<ApplicationTurnState>} app - The application instance.
  */
 export function questAction(app: Application<ApplicationTurnState>): void {
     app.ai.action('quest', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
@@ -26,10 +27,12 @@ export function questAction(app: Application<ApplicationTurnState>): void {
 }
 
 /**
- * @param app
- * @param context
- * @param state
- * @param data
+ * Updates a quest.
+ * @param {Application<ApplicationTurnState>} app - The application instance.
+ * @param {TurnContext} context - The context object for the turn.
+ * @param {ApplicationTurnState} state - The state object for the turn.
+ * @param {IDataEntities} data - The data entities for the turn.
+ * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the operation was successful.
  */
 async function updateQuest(
     app: Application<ApplicationTurnState>,
@@ -67,8 +70,10 @@ async function updateQuest(
 }
 
 /**
- * @param state
- * @param data
+ * Removes a quest.
+ * @param {ApplicationTurnState} state - The state object for the turn.
+ * @param {IDataEntities} data - The data entities for the turn.
+ * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the operation was successful.
  */
 async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
@@ -76,7 +81,7 @@ async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Pr
     // Find quest and delete it
     const quests = conversation.quests ?? {};
     const title = (data.title ?? '').trim().toLowerCase();
-    if (quests.hasOwnProperty(title)) {
+    if (Object.prototype.hasOwnProperty.call(quests, title)) {
         delete quests[title];
         conversation.quests = quests;
     }
@@ -85,8 +90,10 @@ async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Pr
 }
 
 /**
- * @param state
- * @param data
+ * Deletes a quest from the conversation and marks the corresponding campaign objective as completed if applicable.
+ * @param {ApplicationTurnState} state The state object for the current turn of conversation.
+ * @param {IDataEntities} data The data entities for the current turn of conversation.
+ * @returns {Promise<boolean>} A promise that resolves to true if the quest was finished successfully, or false otherwise.
  */
 async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
     const conversation = state.conversation.value;
@@ -94,7 +101,7 @@ async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Pr
     // Find quest and delete item
     const quests = conversation.quests ?? {};
     const title = (data.title ?? '').trim().toLowerCase();
-    if (quests.hasOwnProperty(title)) {
+    if (Object.prototype.hasOwnProperty.call(quests, title)) {
         const quest = quests[title];
         delete quests[title];
         conversation.quests = quests;
@@ -116,8 +123,10 @@ async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Pr
 }
 
 /**
- * @param context
- * @param state
+ * Lists all quests in the conversation and sends them to the user.
+ * @param {TurnContext} context - The context object for the turn.
+ * @param {ApplicationTurnState} state - The state object for the turn.
+ * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the operation was successful.
  */
 async function listQuest(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
     const conversation = state.conversation.value;
@@ -141,7 +150,9 @@ async function listQuest(context: TurnContext, state: ApplicationTurnState): Pro
 }
 
 /**
- * @param quest
+ * Prints the details of a quest.
+ * @param {IQuest} quest - The quest object to print.
+ * @returns {string} - A string containing the formatted details of the quest.
  */
 function printQuest(quest: IQuest): string {
     return `✨ <strong>${quest.title}</strong><br>${quest.description.split('\n').join('<br>')}`;

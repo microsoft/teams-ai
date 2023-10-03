@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.33906.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevOpsBot", "DevOpsBot.csproj", "{ECA33BE1-3B61-416F-B835-ED35577E6E8E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECA33BE1-3B61-416F-B835-ED35577E6E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA33BE1-3B61-416F-B835-ED35577E6E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA33BE1-3B61-416F-B835-ED35577E6E8E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{ECA33BE1-3B61-416F-B835-ED35577E6E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA33BE1-3B61-416F-B835-ED35577E6E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA33BE1-3B61-416F-B835-ED35577E6E8E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E116C36-B1A5-4EF5-AA6B-130C0EDC13E3}
+	EndGlobalSection
+EndGlobal

@@ -12,8 +12,13 @@ import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
-    MemoryStorage
+    MemoryStorage,
+    TurnContext
 } from 'botbuilder';
+
+// Read botFilePath and botFileSecret from .env file.
+const ENV_FILE = path.join(__dirname, '..', '.env');
+config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     {},
@@ -29,7 +34,7 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context, error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
@@ -61,7 +66,18 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, ConversationHistory, DefaultPromptManager, DefaultTurnState, OpenAIModerator, OpenAIPlanner, AI } from '@microsoft/botbuilder-m365';
+import {
+    AI,
+    Application,
+    AzureOpenAIPlanner,
+    ConversationHistory,
+    DefaultPromptManager,
+    DefaultTurnState,
+    OpenAIModerator,
+    OpenAIPlanner
+} from '@microsoft/teams-ai';
+import { addSemanticSearch } from './semanticSearch';
+import { addResponseFormatter } from './responseFormatter';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
@@ -69,14 +85,21 @@ type ApplicationTurnState = DefaultTurnState<ConversationState>;
 
 // Create AI components
 const planner = new OpenAIPlanner({
-    apiKey: process.env.OPENAI_API_KEY,
-    defaultModel: 'text-davinci-003',
+    apiKey: process.env.OPENAI_API_KEY || '',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
-const moderator = new OpenAIModerator({
-    apiKey: process.env.OPENAI_API_KEY,
-    moderate: 'both'
-});
+// const planner = new AzureOpenAIPlanner({
+//     apiKey: process.env.AzureOpenAIKey || '',
+//     defaultModel: 'gpt-3.5-turbo',
+//     endpoint: process.env.AzureOpenAIEndpoint || '',
+//     apiVersion: '2023-03-15-preview'
+// });
+
+// const moderator = new OpenAIModerator({
+//     apiKey: process.env.OPENAI_API_KEY || '',
+//     moderate: 'both'
+// });
 const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
@@ -85,7 +108,7 @@ const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
-        moderator,
+        // moderator,
         promptManager,
         prompt: 'chat',
         history: {
@@ -94,17 +117,27 @@ const app = new Application<ApplicationTurnState>({
     }
 });
 
-app.ai.action(AI.FlaggedInputActionName, async (context, state, data) => {
-    await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
-    return false;
-});
+// Add 'semanticSearch' prompt function
+addSemanticSearch(app, process.env.OPENAI_API_KEY || '');
 
-app.ai.action(AI.FlaggedOutputActionName, async (context, state, data) => {
+// Add a custom response formatter to convert markdown code blocks to <pre> tags
+addResponseFormatter(app);
+
+// Register other AI actions
+app.ai.action(
+    AI.FlaggedInputActionName,
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>) => {
+        await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
+        return false;
+    }
+);
+
+app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: ApplicationTurnState, data: any) => {
     await context.sendActivity(`I'm not allowed to talk about such things.`);
     return false;
 });
 
-app.message('/history', async (context, state) => {
+app.message('/history', async (context: TurnContext, state: ApplicationTurnState) => {
     const history = ConversationHistory.toString(state, 2000, '\n\n');
     await context.sendActivity(history);
 });

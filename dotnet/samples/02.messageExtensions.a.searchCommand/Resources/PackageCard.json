@@ -1,0 +1,55 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Medium",
+      "weight": "Bolder",
+      "text": "${id}"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Version",
+          "value": "${version}"
+        },
+        {
+          "title": "Description",
+          "value": "${description}"
+        },
+        {
+          "title": "Tags",
+          "value": "${tags}"
+        },
+        {
+          "title": "Authors",
+          "value": "${authors}"
+        },
+        {
+          "title": "Owners",
+          "value": "${owners}"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "NuGet",
+      "url": "${nugetUrl}"
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "Project",
+      "url": "${projectUrl}"
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "License",
+      "url": "${licenseUrl}"
+    }
+  ]
+}

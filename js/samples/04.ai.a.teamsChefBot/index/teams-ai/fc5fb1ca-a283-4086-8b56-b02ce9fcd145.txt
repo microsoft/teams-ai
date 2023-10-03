@@ -1,0 +1,79 @@
+# Templates
+
+1. [Prompts](./00.PROMPTS.md)
+2. [**Templates**](./01.TEMPLATES.md)
+3. [Actions](./02.ACTIONS.md)
+4. [Plans](./03.PLANS.md)
+5. [Chaining](./04.CHAINING.md)
+6. [Storage](./05.STORAGE.md)
+7. [Turns](./06.TURNS.md)
+
+A simple and powerful way to
+define and compose AI functions **using plain text**.
+You can use it to create natural language prompts, generate responses, extract
+information, **invoke other prompts** or perform any other task that can be
+expressed with text.
+
+The language supports two basic features that allow you to (**#1**) include
+variables and (**#2**) call functions.
+
+You don't need to write any code or import any external libraries, just use the
+curly braces `{{...}}` to embed expressions in your prompts.
+Teams AI will parse your template and execute the logic behind it.
+This way, you can easily integrate AI into your apps with minimal effort and
+maximum flexibility.
+
+- [Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/prompt-engineering/prompt-template-syntax)
+- [Lang Chain](https://python.langchain.com/docs/modules/model_io/prompts/prompt_templates/#what-is-a-prompt-template)
+
+## Variables
+
+To include a variable value in your text, use the `{{$variableName}}` syntax.
+For example, if you have a variable called `name` that holds the user's name,
+you can write:
+
+```Hello {{$name}}!```
+
+This will produce a greeting with the user's name.
+
+Spaces are ignored, so if you find it more readable, you can also write:
+
+```Hello {{ $name }}!```
+
+## Function Calls
+
+To call a function and embed the result in your text, use the
+`{{functionName}}` syntax.
+For example, if you have a function called `getForecast` that returns
+the weather forecast for a given location, you can write:
+
+```The weather today is {{getForecast}}.```
+
+This will produce a sentence with the weather forecast for the default location
+stored in the `input` variable.
+The `input` variable is set automatically by the kernel when invoking a function.
+For instance, the code above is equivalent to:
+
+```The weather today is {{getForecast $input}}.```
+
+## Function Registration
+
+### C#
+
+```C#
+AI.Prompts.AddFunction("getForecast", (turnContext, turnState) =>
+{
+    return Task.FromResult(turnState.Conversation!.Forecast);
+});
+```
+
+### Javascript
+
+```typescript
+app.ai.prompts.addFunction(
+    'getForecast',
+    async (context: TurnContext, state: ApplicationTurnState) => {
+        return state.conversation.value.forecast;
+    }
+);
+```

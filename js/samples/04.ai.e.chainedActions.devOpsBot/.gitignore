@@ -107,3 +107,12 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Teams Toolkit
+env/.env.*.user
+env/.env.local
+appPackage/build
+.deployment
+
+.env.*
+.env

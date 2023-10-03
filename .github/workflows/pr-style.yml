@@ -1,0 +1,22 @@
+name: PR Style
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions: read-all
+
+jobs:
+  pr-style:
+    name: PR Style
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: joshgummersall/pr-style@3fee1c139d76a9e6dbdd15d8895aaaf59bf6ccca # main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          require_issue: "true"
+          skip_authors: "dependabot"
+          title_prefixes: " [repo] bump, [repo] Bump, [repo] chore:, [repo] docs:, [repo] fix:, [JS] bump, [JS] Bump, [JS] chore:, [JS] docs:, [JS] feat:, [JS] fix:, [JS] port:, [JS] refactor:, [C#] bump, [C#] Bump: [C#] chore:, [C#] docs:, [C#] feat:, [C#] fix:, [C#] port:, [C#] refactor:, [PY] bump, [PY] Bump, [PY] chore:, [PY] docs:, [PY] feat:, [PY] fix:, [PY] port:, [PY] refactor:"

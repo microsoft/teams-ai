@@ -97,15 +97,13 @@ export interface ILocation {
 
 export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OpenAIKey) {
-    throw new Error(
-        'Missing environment variables - please check that OpenAIKey is set.'
-    );
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
 
 // Create AI components
 const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OpenAIKey,
+    apiKey: process.env.OPENAI_API_KEY,
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
@@ -119,7 +117,7 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner,
         promptManager,
-        prompt: async (context: TurnContext, state: ApplicationTurnState) => state.temp.value.prompt,
+        prompt: async (_context: TurnContext, state: ApplicationTurnState) => state.temp.value.prompt,
         history: {
             userPrefix: 'Player:',
             assistantPrefix: 'DM:',
@@ -253,10 +251,11 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
         if (Object.entries(campaign).length > 0) {
             campaignFinished = true;
             for (let i = 0; i < campaign.objectives.length; i++) {
+                // eslint-disable-next-line security/detect-object-injection
                 const objective = campaign.objectives[i];
                 if (!objective.completed) {
                     // Ignore if the objective is already a quest
-                    if (!conversation.quests.hasOwnProperty(objective.title.toLowerCase())) {
+                    if (!Object.prototype.hasOwnProperty.call(conversation.quests, objective.title.toLowerCase())) {
                         nextObjective = objective;
                     }
 
@@ -374,7 +373,7 @@ app.message('/profile', async (context: TurnContext, state: ApplicationTurnState
 
 app.ai.action(
     AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action: string = ' ') => {
+    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action = ' ') => {
         await context.sendActivity(`<strong>${action}</strong> action missing`);
         return true;
     }
@@ -383,12 +382,12 @@ app.ai.action(
 addActions(app);
 
 // Register prompt functions
-app.ai.prompts.addFunction('describeGameState', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeGameState', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`;
 });
 
-app.ai.prompts.addFunction('describeCampaign', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeCampaign', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     if (conversation.campaign) {
         return `"${conversation.campaign.title}" - ${conversation.campaign.playerIntro}`;
@@ -397,11 +396,12 @@ app.ai.prompts.addFunction('describeCampaign', async (context: TurnContext, stat
     }
 });
 
-app.ai.prompts.addFunction('describeQuests', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeQuests', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     let text = '';
     let connector = '';
     for (const key in conversation.quests) {
+        // eslint-disable-next-line security/detect-object-injection
         const quest = conversation.quests[key];
         text += `${connector}"${quest.title}" - ${quest.description}`;
         connector = '\n\n';
@@ -410,14 +410,14 @@ app.ai.prompts.addFunction('describeQuests', async (context: TurnContext, state:
     return text.length > 0 ? text : 'none';
 });
 
-app.ai.prompts.addFunction('describePlayerInfo', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describePlayerInfo', async (_context: TurnContext, state: ApplicationTurnState) => {
     const player = state.user.value;
     let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
 });
 
-app.ai.prompts.addFunction('describeLocation', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeLocation', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     if (conversation.location) {
         return `"${conversation.location.title}" - ${conversation.location.description}`;
@@ -426,19 +426,22 @@ app.ai.prompts.addFunction('describeLocation', async (context: TurnContext, stat
     }
 });
 
-app.ai.prompts.addFunction('describeConditions', async (context: TurnContext, state: ApplicationTurnState) => {
+app.ai.prompts.addFunction('describeConditions', async (_context: TurnContext, state: ApplicationTurnState) => {
     const conversation = state.conversation.value;
     return describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 });
 
 /**
- * @param items
- * @param indent
+ * Returns a string representation of the given item list.
+ * @param {IItemList} items - The item list to describe.
+ * @param {string} [indent] - The indentation string to use.
+ * @returns {string} The string representation of the item list.
  */
 export function describeItemList(items: IItemList, indent = '\t'): string {
     let text = '';
     let delim = '';
     for (const key in items) {
+        // eslint-disable-next-line security/detect-object-injection
         text += `${delim}\t\t${key}: ${items[key]}`;
         delim = '\n';
     }
@@ -447,9 +450,11 @@ export function describeItemList(items: IItemList, indent = '\t'): string {
 }
 
 /**
- * @param context
- * @param state
- * @param newResponse
+ * Updates the conversation history with the new response and sends the response to the user.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {ApplicationTurnState} state The state object for the current turn of conversation.
+ * @param {string} newResponse The new response to add to the conversation history and send to the user.
+ * @returns {Promise<void>} A promise that resolves when the response has been sent to the user.
  */
 export async function updateDMResponse(
     context: TurnContext,
@@ -466,8 +471,10 @@ export async function updateDMResponse(
 }
 
 /**
- * @param text
- * @param minValue
+ * Parses a string to a number.
+ * @param {string | undefined} text - The string to parse.
+ * @param {number} [minValue] - The minimum value to return.
+ * @returns {number} The parsed number.
  */
 export function parseNumber(text: string | undefined, minValue?: number): number {
     try {
@@ -483,7 +490,9 @@ export function parseNumber(text: string | undefined, minValue?: number): number
 }
 
 /**
- * @param response
+ * Trims the prompt response by removing common junk that gets returned by the model.
+ * @param {string} response - The response to trim.
+ * @returns {string} The trimmed response.
  */
 export function trimPromptResponse(response: string): string {
     // Remove common junk that gets returned by the model.
@@ -491,7 +500,9 @@ export function trimPromptResponse(response: string): string {
 }
 
 /**
- * @param text
+ * Converts a string to title case.
+ * @param {string} text - The string to convert to title case.
+ * @returns {string} The title case version of the input string.
  */
 export function titleCase(text: string): string {
     return text
