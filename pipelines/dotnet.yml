@@ -40,11 +40,21 @@ steps:
     PathToPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: Packages
 
-- task: UniversalPackages@0
-  displayName: 'Publish Package'
+# - task: UniversalPackages@0
+#   displayName: 'Publish Package'
+#   inputs:
+#     command: publish
+#     publishDirectory: '$(Build.ArtifactStagingDirectory)'
+#     vstsFeedPublish: 'SDK_v4/Teams'
+#     vstsFeedPackagePublish: 'TeamsAI'
+#     packagePublishDescription: 'This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications'
+
+- task: NuGetAuthenticate@0
+  displayName: 'NuGet Authenticate'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet Push'
   inputs:
-    command: publish
-    publishDirectory: '$(Build.ArtifactStagingDirectory)'
-    vstsFeedPublish: 'SDK_v4/Teams'
-    vstsFeedPackagePublish: 'teamsai'
-    packagePublishDescription: 'This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications'
+    command: push
+    publishVstsFeed: 'SDK_v4/Teams'
+    allowPackageConflicts: true
