@@ -34,9 +34,6 @@ steps:
     packagesToPack: '$(projectPath)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
 
-- script: 'dotnet nuget push $(Build.ArtifactStagingDirectory)/**/*.nupkg --api-key $(nugetApiKey) --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols'
-  displayName: 'NuGet Push'
-
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
@@ -53,3 +50,6 @@ steps:
     publishVstsFeed: 'SDK_v4/Teams'
     allowPackageConflicts: true
     includeNugetOrg: true
+
+- script: 'dotnet nuget push $(Build.ArtifactStagingDirectory)/**/*.nupkg --api-key $(nugetApiKey) --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols'
+  displayName: 'NuGet Push'
