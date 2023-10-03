@@ -28,11 +28,18 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 - task: NuGetCommand@2
-  displayName: 'Pack'
+  displayName: 'NuGet Pack'
   inputs:
     command: pack
     packagesToPack: '$(projectPath)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
 
-- script: dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
-  displayName: 'Push'
+- task: NuGetAuthenticate@0
+  displayName: 'NuGet Authenticate'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet Push'
+  inputs:
+    command: push
+    publishVstsFeed: 'SDK_v4/SDK_Dotnet_V4_org'
+    allowPackageConflicts: true
