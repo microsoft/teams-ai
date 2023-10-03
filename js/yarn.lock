@@ -1936,10 +1936,10 @@ axios@^0.27.2:
     follow-redirects "^1.14.9"
     form-data "^4.0.0"
 
-axios@^1.3.4, axios@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.5.0.tgz#f02e4af823e2e46a9768cfc74691fdd0517ea267"
-  integrity sha512-D4DdjDo5CY50Qms0qGQTTw6Q44jl7zRwY7bthds06pUGfChBCTcQs+N743eFWGEd6pRTMd6A+I87aWyFV5wiZQ==
+axios@^1.3.4, axios@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.5.1.tgz#11fbaa11fc35f431193a9564109c88c1f27b585f"
+  integrity sha512-Q28iYCWzNHjAm+yEAot5QaAMxhMghWLFVf7rRdwhUI+c2jix2DUXjAHXVi+s1ibs3mjPO/cCgbA++3BjD0vP/A==
   dependencies:
     follow-redirects "^1.15.0"
     form-data "^4.0.0"
@@ -9265,10 +9265,10 @@ vasync@^2.2.0:
   dependencies:
     verror "1.10.0"
 
-vectra@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/vectra/-/vectra-0.4.1.tgz#df852397b807475ca275fb2076ec62ab8edfe8c2"
-  integrity sha512-/OHSA9ZBnk9YF5FPjERWLj9E2lP5FKNghZBhbChhBa7qCydp/vR57aRoSzYlffncZP5wjoFg00I3fq+YXcDQNA==
+vectra@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/vectra/-/vectra-0.4.4.tgz#8f09789c41def2b0ae672ce1512b14bbe831b797"
+  integrity sha512-SSp/nSC9i2Doh9nHXdDT5lECMy2p++aSHW68Lzgrau+1NeikPtnT0/KlaLIqL3Dq2iKhMf37jGJuKHUvg3hmxQ==
   dependencies:
     axios "^1.3.4"
     cheerio "^1.0.0-rc.12"
