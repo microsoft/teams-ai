@@ -1,0 +1,27 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    version: '6.x'
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore'
+  inputs:
+    command: 'restore'
+    projects: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.TeamsAI.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'DOTNET Build $(buildConfiguration)'
+  inputs:
+    command: 'build'
+    projects: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.TeamsAI.csproj'
+    arguments: '--configuration $(buildConfiguration)'
