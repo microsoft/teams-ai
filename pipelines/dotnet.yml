@@ -58,3 +58,4 @@ steps:
     command: push
     publishVstsFeed: 'SDK_v4/Teams'
     allowPackageConflicts: true
+    includeNugetOrg: true
