@@ -1,0 +1,50 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  projectPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.TeamsAI.csproj'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    version: '6.x'
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore'
+  inputs:
+    command: 'restore'
+    projects: '$(projectPath)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: 'build'
+    projects: '$(projectPath)'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet Pack'
+  inputs:
+    command: pack
+    packagesToPack: '$(projectPath)'
+    packDestination: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathToPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: Packages
+
+- task: UniversalPackages@0
+  displayName: 'Publish Package'
+  inputs:
+    command: publish
+    publishDirectory: '$(Build.ArtifactStagingDirectory)'
+    vstsFeedPublish: 'SDK_v4/SDK_v4_PublicPackages'
+    vstsFeedPackagePublish: 'Microsoft.TeamsAI'
+    packagePublishDescription: 'This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications'
