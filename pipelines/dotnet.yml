@@ -34,12 +34,8 @@ steps:
     packagesToPack: '$(projectPath)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
 
-- task: NuGetAuthenticate@0
-  displayName: 'NuGet Authenticate'
-
-- task: NuGetCommand@2
-  displayName: 'NuGet Push'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish'
   inputs:
-    command: push
-    publishVstsFeed: 'SDK_v4/SDK_Dotnet_V4_org'
-    allowPackageConflicts: true
+    PathToPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: Packages
