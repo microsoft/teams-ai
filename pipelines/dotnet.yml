@@ -46,5 +46,5 @@ steps:
     command: publish
     publishDirectory: '$(Build.ArtifactStagingDirectory)'
     vstsFeedPublish: 'SDK_v4/Teams'
-    vstsFeedPackagePublish: 'Microsoft.TeamsAI'
+    vstsFeedPackagePublish: 'teamsai'
     packagePublishDescription: 'This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications'
