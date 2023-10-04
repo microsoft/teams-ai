@@ -34,14 +34,14 @@ steps:
     packagesToPack: '$(projectPath)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
 
-- task: onebranch.pipeline.signing@1
-  displayName: 'Sign Output'
-  inputs:
-    command: 'sign'
-    signing_profile: 'external_distribution'
-    signing_environment: 'azure-ado'
-    files_to_sign: '**/*.nupkg'
-    search_root: '$(Build.ArtifactStagingDirectory)'
+# - task: onebranch.pipeline.signing@1
+#   displayName: 'Sign Output'
+#   inputs:
+#     command: 'sign'
+#     signing_profile: 'external_distribution'
+#     signing_environment: 'azure-ado'
+#     files_to_sign: '**/*.nupkg'
+#     search_root: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
