@@ -26,12 +26,12 @@
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.4.1"
+        "vectra": "^0.4.4"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/restify": "8.5.7",
-        "@types/node": "^20.6.5",
+        "@types/restify": "8.5.8",
+        "@types/node": "^20.8.2",
         "ts-node": "^10.9.1",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
