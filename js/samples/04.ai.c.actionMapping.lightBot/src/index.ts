@@ -64,7 +64,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { AI, Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
+import { AI, Application, AzureOpenAIPlanner, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 interface ConversationState {
@@ -73,16 +73,28 @@ interface ConversationState {
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 type TData = Record<string, any>;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+if (!process.env.AZURE_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
+    throw new Error(
+        `Missing environment variables - please check that AZURE_OPENAI_API_KEY or OPENAI_API_KEY is set, depending on which service you are using.`
+    );
+} else if (process.env.AZURE_OPENAI_API_KEY && !process.env.AZURE_ENDPOINT) {
+    throw new Error(`Missing environment variables - please check that AZURE_ENDPOINT is set.`);
 }
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY,
-    defaultModel: 'gpt-3.5-turbo',
+// const planner = new OpenAIPlanner<ApplicationTurnState>({
+//     apiKey: process.env.OPENAI_API_KEY || '',
+//     defaultModel: 'gpt-3.5-turbo',
+//     logRequests: true
+// });
+
+const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
+    apiKey: process.env.AZURE_OPENAI_API_KEY || '',
+    defaultModel: 'gpt-35-turbo',
+    endpoint: process.env.AZURE_ENDPOINT || '',
     logRequests: true
 });
+
 const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
@@ -92,12 +104,13 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner,
         promptManager,
-        prompt: 'chatGPT'
+        prompt: 'generate'
     }
 });
 
 // Add a prompt function for getting the current status of the lights
 app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
+    console.log(state.conversation.value.lightsOn);
     return state.conversation.value.lightsOn ? 'on' : 'off';
 });
 
