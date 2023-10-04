@@ -68,8 +68,7 @@ describe('Application', () => {
 
     describe('applicationBuilder', () => {
         it('should create an Application with default options', () => {
-            const app = new ApplicationBuilder()
-            .build();
+            const app = new ApplicationBuilder().build();
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, undefined);
             assert.equal(app.options.botAppId, undefined);
@@ -85,15 +84,15 @@ describe('Application', () => {
 
         it('should create an Application with custom options', () => {
             const app = new ApplicationBuilder()
-            .setRemoveRecipientMention(removeRecipientMention)
-            .withStorage(storage)
-            .withAI(ai)
-            .withLongRunningMessages(adapter, botAppId)
-            .withTurnStateManager(turnStateManager)
-            .withAdaptiveCards(adaptiveCards)
-            .withTaskModules(taskModules)
-            .setStartTypingTimer(startTypingTimer)
-            .build();
+                .setRemoveRecipientMention(removeRecipientMention)
+                .withStorage(storage)
+                .withAI(ai)
+                .withLongRunningMessages(adapter, botAppId)
+                .withTurnStateManager(turnStateManager)
+                .withAdaptiveCards(adaptiveCards)
+                .withTaskModules(taskModules)
+                .setStartTypingTimer(startTypingTimer)
+                .build();
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, adapter);
             assert.equal(app.options.botAppId, botAppId);
@@ -109,9 +108,7 @@ describe('Application', () => {
 
         it('should throw an exception if botId is an empty string for longRunningMessages', () => {
             assert.throws(() => {
-                new ApplicationBuilder()
-                .withLongRunningMessages(adapter, "")
-                .build();
+                new ApplicationBuilder().withLongRunningMessages(adapter, '').build();
             });
         });
     });

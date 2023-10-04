@@ -771,7 +771,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
         this._options.adapter = adapter;
         this._options.botAppId = botAppId;
         return this;
-    };
+    }
 
     /**
      * Configures the storage system to use for storing the bot's state.
@@ -781,7 +781,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
     public withStorage(storage: Storage): this {
         this._options.storage = storage;
         return this;
-    };
+    }
 
     /**
      * Configures the AI system to use for processing incoming messages.
@@ -791,7 +791,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
     public withAI(aiOptions: AIOptions<TState>): this {
         this._options.ai = aiOptions;
         return this;
-    };
+    }
 
     /**
      * Configures the turn state manager to use for managing the bot's turn state.
@@ -801,8 +801,8 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
     public withTurnStateManager(turnStateManager: TurnStateManager<TState>): this {
         this._options.turnStateManager = turnStateManager;
         return this;
-    };
-    
+    }
+
     /**
      * Configures the processing of Adaptive Card requests.
      * @param {AdaptiveCardsOptions} adaptiveCardOptions The options for the Adaptive Cards.
@@ -825,7 +825,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Configures the removing of mentions of the bot's name from incoming messages.
-     * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions. 
+     * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
      * @returns {this} The ApplicationBuilder instance.
      */
     public setRemoveRecipientMention(removeRecipientMention: boolean): this {
@@ -849,7 +849,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      */
     public build(): Application<TState> {
         return new Application(this._options);
-    };
+    }
 }
 
 /**

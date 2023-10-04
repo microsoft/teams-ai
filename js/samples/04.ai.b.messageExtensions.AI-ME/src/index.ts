@@ -108,13 +108,13 @@ const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(_
 const storage = new MemoryStorage();
 const botAppId = process.env.MicrosoftAppId as string;
 const app = new ApplicationBuilder<ApplicationTurnState>()
-.withStorage(storage)
-.withLongRunningMessages(adapter, botAppId)
-.withAI({
-    planner,
-    promptManager
-})
-.build();
+    .withStorage(storage)
+    .withLongRunningMessages(adapter, botAppId)
+    .withAI({
+        planner,
+        promptManager
+    })
+    .build();
 
 app.messageExtensions.fetchTask('CreatePost', async (context: TurnContext, state: ApplicationTurnState) => {
     // Return card as a TaskInfo object
