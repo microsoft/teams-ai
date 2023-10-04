@@ -66,7 +66,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import {
-    Application,
+    ApplicationBuilder,
     DefaultConversationState,
     DefaultPromptManager,
     DefaultTempState,
@@ -106,15 +106,15 @@ const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(_
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
-    storage,
-    adapter,
-    botAppId: process.env.MicrosoftAppId,
-    ai: {
-        planner,
-        promptManager
-    }
-});
+const botAppId = process.env.MicrosoftAppId as string;
+const app = new ApplicationBuilder<ApplicationTurnState>()
+.withStorage(storage)
+.withLongRunningMessages(adapter, botAppId)
+.withAI({
+    planner,
+    promptManager
+})
+.build();
 
 app.messageExtensions.fetchTask('CreatePost', async (context: TurnContext, state: ApplicationTurnState) => {
     // Return card as a TaskInfo object
