@@ -26,7 +26,9 @@
 
 ## Summary
 
-This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
+This sample is a Message Extension (ME) for Microsoft Teams that leverages the gpt-3.5-turbo model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
+
+> NOTE: this bot is not intended to be a chat bot. Speaking to the bot will result in an error message related to `prompt` not being configured.
 
 This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
 
@@ -198,7 +200,10 @@ You can also use the Teams Toolkit CLI to run this sample.
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
 
 1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging AI.
+
+    Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
+
 1. **_This step is specific to Teams._**
 
     - **Edit** the `manifest.json` contained in the `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `${{TEAMS_APP_ID}}` (depending on the scenario the Microsoft App Id may occur multiple times in the `manifest.json`). If you haven't created an Azure app service yet, you can use your bot id for the above. You're bot id should be pasted in where you see `${{BOT_ID}}`. Replace everywhere you see `${{BOT_DOMAIN}}` with the domain part of the URL created by your tunneling solution.
@@ -257,7 +262,8 @@ You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sampl
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
+1. Update the `.env` file and provide your Azure OpenAI Key for leveraging AI.
+   Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 

@@ -67,6 +67,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 
 import {
     ApplicationBuilder,
+    AzureOpenAIPlanner,
     DefaultConversationState,
     DefaultPromptManager,
     DefaultTempState,
@@ -81,10 +82,13 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment OPENAI_API_KEY');
+if (!process.env.AZURE_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
+    throw new Error(
+        `Missing environment variables - please check that AZURE_OPENAI_API_KEY or OPENAI_API_KEY is set, depending on which service you are using.`
+    );
+} else if (process.env.AZURE_OPENAI_API_KEY && !process.env.AZURE_ENDPOINT) {
+    throw new Error(`Missing environment variables - please check that AZURE_ENDPOINT is set.`);
 }
-
 interface TempState extends DefaultTempState {
     post: string | undefined;
     prompt: string | undefined;
@@ -92,13 +96,20 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUserState, TempState>;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
-}
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY,
-    defaultModel: 'text-davinci-003',
+
+// Uncomment this code and comment out the Azure OpenAI Planner code below to switch to the OpenAI API.
+// const planner = new OpenAIPlanner<ApplicationTurnState>({
+//     apiKey: process.env.OPENAI_API_KEY,
+//     defaultModel: 'gpt-3.5-turbo',
+//     logRequests: true
+// });
+
+const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
+    apiKey: process.env.AZURE_OPENAI_API_KEY || '',
+    // Note that model name is different for Azure OpenAI API v.s. OpenAI API
+    defaultModel: 'gpt-35-turbo',
+    endpoint: process.env.AZURE_ENDPOINT || '',
     logRequests: true
 });
 const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
