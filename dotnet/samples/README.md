@@ -13,9 +13,7 @@ In this folder you will find various examples showcasing the different capabilit
 
 `git clone https://github.com/Microsoft/teams-ai.git`
 
-2. Navigate to the `teams-ai/dotnet/samples` folder, pick a sample (ex. `01.a.echoBot`) and open the `.sln` file.
-
-By this point you should have your sample open in your IDE of choice.
+2. Pick your sample from the `dotnet/samples/` folder.
 
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
@@ -24,16 +22,17 @@ There are a few ways to get the application up and running. The latest way is us
 
 #### Additional Prerequisites
 
-- [Visual Studio 2022 17.7.0 Preview 3.0](https://visualstudio.microsoft.com/vs/preview/)
-- Teams Toolkit extension (installed through the Visual Studio installer)
-  - Select Microsoft Teams development tools under ASP.NET and web development.
-  - ![Teams Toolkit Installation](/dotnet/samples/assets/ttk-install.png)
+- Visual Studio 2022 17.7.0 (or a greater version)
+- [Teams Toolkit extension](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/toolkit-v4/install-teams-toolkit-vs?pivots=visual-studio-v17-7)
 
 #### Steps
 
 1. Open the solution in Visual Studio. (For example `EchoBot.sln`).
-   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.
-1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel
+   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.  If you can't find this section, then it means that the bot does not need them.
+1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel.
+
+   ![image](https://github.com/microsoft/teams-ai/assets/115390646/d7246d38-8276-4b2a-bc22-b72f36aa41b9)
+
 1. Right-click your project and select `Teams Toolkit > Prepare Teams App Dependencies`
 1. If prompted, sign in with a Microsoft 365 account for the Teams organization you want
    to install the app to.
@@ -43,7 +42,7 @@ There are a few ways to get the application up and running. The latest way is us
 > a free program to get your own dev environment sandbox that includes Teams.
 
 4. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio
-5. In the launched browser, select the Add button to load the app in Teams
+5. In the launched browser, select the `Add` button to load the app in Teams
 6. This should redirect you to a chat window with the bot.
 </details>
 

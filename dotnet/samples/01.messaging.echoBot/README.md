@@ -7,7 +7,7 @@ It also illustrates a few of the Teams specific calls you can make from your bot
 
 ## Set up instructions
 
-All the samples in for the C# .NET SDK can be set up in the same way: You can find the step by step instructions here:
+All the samples in the C# .NET SDK can be set up in the same way: You can find the step by step instructions here:
  [Setup Instructions](../README.md).
 
 ## Interacting with the Bot
