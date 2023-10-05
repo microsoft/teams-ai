@@ -170,7 +170,9 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
 
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Update the `.env` file and provide your Azure OpenAI Key for leveraging AI.
+
+    Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 

@@ -117,7 +117,10 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging AI
+1. Update the `.env` file and provide your Azure OpenAI key for leveraging AI
+
+    Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
+
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
@@ -145,10 +148,6 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
-
-1. Update the `.env` file and provide your Azure OpenAI key for leveraging AI
-
-    Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
@@ -245,7 +244,9 @@ You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sampl
 
 To configure the Azure resources to have an environment variable for the OpenAI Key:
 
-1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_OPENAI_KEY=` and paste your [OpenAI Key](https://openai.com/api/).
+1. Update the `.env` file and provide your Azure OpenAI Key for leveraging AI.
+
+    Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 

@@ -71,14 +71,15 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import {
+    AI,
     Application,
+    AzureOpenAIPlanner,
     DefaultTurnState,
     OpenAIPlanner,
-    AI,
     DefaultConversationState,
+    DefaultPromptManager,
     DefaultUserState,
-    DefaultTempState,
-    DefaultPromptManager
+    DefaultTempState
 } from '@microsoft/teams-ai';
 import * as responses from './responses';
 
@@ -102,11 +103,21 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY!,
-    defaultModel: 'text-davinci-003',
+// Uncomment this code and comment out the Azure OpenAI Planner code below to switch to the OpenAI API.
+// const planner = new OpenAIPlanner<ApplicationTurnState>({
+//     apiKey: process.env.OPENAI_API_KEY,
+//     defaultModel: 'gpt-3.5-turbo',
+//     logRequests: true
+// });
+
+const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
+    apiKey: process.env.AZURE_OPENAI_API_KEY || '',
+    // Note that model name is different for Azure OpenAI API v.s. OpenAI API
+    defaultModel: 'gpt-35-turbo',
+    endpoint: process.env.AZURE_ENDPOINT || '',
     logRequests: true
 });
+
 const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
@@ -116,14 +127,14 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner,
         promptManager,
-        prompt: 'chatGPT'
+        prompt: 'assistant'
     }
 });
 
 // Define an interface to strongly type data parameters for actions
 interface EntityData {
-    list: string; // <- populated by GPT
-    item: string; // <- populated by GPT
+    list: string; // <- populated by AI
+    item: string; // <- populated by AI
 }
 
 // Listen for new members to join the conversation

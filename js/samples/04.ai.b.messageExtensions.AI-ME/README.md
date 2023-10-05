@@ -4,7 +4,7 @@
 
 <!-- code_chunk_output -->
 
--   [AI in Microsoft Teams Message Extensions: GPT-ME](#ai-in-microsoft-teams-message-extensions-gpt-me)
+-   [AI in Microsoft Teams Message Extensions: AI-ME](#ai-in-microsoft-teams-message-extensions-ai-me)
     -   [Summary](#summary)
         -   [Message extension scaffolding](#message-extension-scaffolding)
         -   [Prompt engineering](#prompt-engineering)
@@ -30,7 +30,7 @@ This sample is a Message Extension (ME) for Microsoft Teams that leverages the g
 
 > NOTE: this bot is not intended to be a chat bot. Speaking to the bot will result in an error message related to `prompt` not being configured.
 
-This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
+This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow AI to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
 
 It shows Teams AI SDK capabilities like:
 
@@ -40,7 +40,7 @@ It shows Teams AI SDK capabilities like:
 
 ### Prompt engineering
 
-The `generate` and `update` directories have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in `generate`:
+The `generate` and `update` directories have descriptive prompt engineering that, in plain language, instructs AI how the message extension should conduct itself at submit time. For example, in `generate`:
 
 ### Generate prompt
 
@@ -68,10 +68,10 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: Tur
     try {
         switch (data.verb) {
             case 'generate':
-                // Call GPT and return response view
+                // Call AI and return response view
                 return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/generate.txt', data: SubmitData);
             case 'update':
-                // Call GPT and return an updated response view
+                // Call AI and return an updated response view
                 return await updatePost(context: TurnContext, state: ApplicationTurnState,  '../src/update.txt', data: SubmitData);
             case 'post':
             default:
@@ -127,7 +127,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Update the `.env` file and provide your Azure OpenAI Key for leveraging AI.
+   Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
@@ -156,7 +157,7 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
 
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Update the `.env` file and provide your Azure OpenAI key for leveraging AI
 
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
@@ -200,9 +201,9 @@ You can also use the Teams Toolkit CLI to run this sample.
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
 
 1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging AI.
+1. Update the `.env` file and provide your Azure OpenAI key for leveraging AI.
 
-    Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_AZURE_OPENAI_KEY=` and paste your Azure OpenAI key.
 
 1. **_This step is specific to Teams._**
 
@@ -241,7 +242,7 @@ yarn start
 
 ## Interacting with the message extension
 
-You can interact with this message extension by finding the "GPT ME" extension beneath your compose area in chats and channels. This may be accessed in the '...' ellipses menu.
+You can interact with this message extension by finding the "AI ME" extension beneath your compose area in chats and channels. This may be accessed in the '...' ellipses menu.
 
 The message extension provides the following functionality:
 
@@ -260,10 +261,9 @@ The message extension has some limitations, including:
 
 You can use Teams Toolkit for VS Code or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
 
-To configure the Azure resources to have an environment variable for the OpenAI Key:
+To configure the Azure resources to have an environment variable for the Azure Open AI Key:
 
-1. Update the `.env` file and provide your Azure OpenAI Key for leveraging AI.
-   Note: If you would prefer to use an [OpenAI Key](https://openai.com/api/) key, you will need to search the sample for all instances of `AZURE_OPENAI_KEY` and replace them with `OPENAI_KEY`. This includes the ARM templates in the `/infra` directory with `SECRET_AZURE_OPENAI_KEY` needing to be updated to `SECRET_AZURE_OPENAI_KEY`. Next, go to the code in `index.ts` and switch usage from `AzureOpenAIPlanner` to `OpenAIPlanner`.
+1. Add a `./env/.env.staging.user` file with a new variable, `SECRET_AZURE_OPENAI_KEY=` and paste your Azure OpenAI Key.
 
 The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
 
