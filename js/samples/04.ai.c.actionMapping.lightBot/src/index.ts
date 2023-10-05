@@ -64,7 +64,14 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { AI, Application, AzureOpenAIPlanner, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
+import {
+    AI,
+    Application,
+    AzureOpenAIPlanner,
+    DefaultPromptManager,
+    DefaultTurnState,
+    OpenAIPlanner
+} from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 interface ConversationState {
@@ -73,12 +80,12 @@ interface ConversationState {
 type ApplicationTurnState = DefaultTurnState<ConversationState>;
 type TData = Record<string, any>;
 
-if (!process.env.AZURE_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
+if (!process.env.AZURE_OPENAI_KEY && !process.env.OPENAI_API_KEY) {
     throw new Error(
-        `Missing environment variables - please check that AZURE_OPENAI_API_KEY or OPENAI_API_KEY is set, depending on which service you are using.`
+        `Missing environment variables - please check that AZURE_OPENAI_KEY or OPENAI_API_KEY is set, depending on which service you are using.`
     );
-} else if (process.env.AZURE_OPENAI_API_KEY && !process.env.AZURE_ENDPOINT) {
-    throw new Error(`Missing environment variables - please check that AZURE_ENDPOINT is set.`);
+} else if (process.env.AZURE_OPENAI_KEY && !process.env.AZURE_OPENAI_ENDPOINT) {
+    throw new Error(`Missing environment variables - please check that AZURE_OPENAI_ENDPOINT is set.`);
 }
 
 // Create AI components
@@ -89,9 +96,9 @@ if (!process.env.AZURE_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
 // });
 
 const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.AZURE_OPENAI_API_KEY || '',
+    apiKey: process.env.AZURE_OPENAI_KEY || '',
     defaultModel: 'gpt-35-turbo',
-    endpoint: process.env.AZURE_ENDPOINT || '',
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT || '',
     logRequests: true
 });
 

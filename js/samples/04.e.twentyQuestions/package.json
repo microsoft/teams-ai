@@ -1,7 +1,7 @@
 {
     "name": "twenty-questions-demo",
     "version": "1.0.0",
-    "description": "GPT powered bot that plays a game of 20 questions.",
+    "description": "AI powered bot that plays a game of 20 questions.",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",

@@ -20,16 +20,16 @@ import {
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-if (!process.env.AZURE_OPENAI_API_KEY) {
-    throw new Error('Missing AZURE_OPENAI_API_KEY environment variable');
+if (!process.env.AZURE_OPENAI_KEY) {
+    throw new Error('Missing AZURE_OPENAI_KEY environment variable');
 }
 
 // Import required bot configuration.
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     {},
     new ConfigurationServiceClientCredentialFactory({
-        MicrosoftAppId: process.env.BOT_ID,
-        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppId: process.env.MicrosoftAppId,
+        MicrosoftAppPassword: process.env.MicrosoftAppPassword,
         MicrosoftAppType: 'MultiTenant'
     })
 );

@@ -44,7 +44,7 @@ With a simple text file written in human language, you can describe the function
 
 ### Moderation
 
-A configurable API call to filter inappropriate content for input content, output content, or both. (See [OpenAIModerator.ts](./js/src/openai/OpenAIModerator.ts))
+A configurable API call to filter inappropriate content for input content, output content, or both. (See [OpenAIModerator.ts](./js/packages/teams-ai/src/OpenAIModerator.ts))
 
 ### Predictive Engine to Map Intents to Actions
 

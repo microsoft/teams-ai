@@ -21,7 +21,7 @@ export function createPostCard(post: string): Attachment {
             },
             {
                 type: 'TextBlock',
-                text: 'by GPT',
+                text: 'by AI Assistant',
                 size: 'Small',
                 horizontalAlignment: 'Right',
                 isSubtle: true

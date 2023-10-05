@@ -18,7 +18,7 @@
             "value": "AI-ME-Infra"
         },
         "openAIKey": {
-            "value": "${{SECRET_OPENAI_KEY}}"
+            "value": "${{SECRET_AZURE_OPENAI_KEY}}"
         }
     }
 }

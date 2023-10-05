@@ -8,7 +8,11 @@
 2. [AI Setup](./01.AI-SETUP.md)
 3. [Activity Routing](./02.ACTIVITY-ROUTING.md)
 4. [QNA](./03.QNA.md)
-5. [**Other**](../OTHER/TEAMS-TOOLKIT.md)
+5. [Other](../OTHER/TEAMS-TOOLKIT.md)
+   - [Teams Toolkit extra information](./TEAMS-TOOLKIT.md)
+   - [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
+   - [**Bot Framework Emulator**](./BOTFRAMEWORK-EMULATOR.md)
+   - [Manual resource setup](./MANUAL-RESOURCE-SETUP.md)
 
 After installing Emulator, you can run it and set it to listen to your local or remote endpoint. For a remote endpoint, Microsoft App Id and password are required. If you are using `ngrok`, your endpoint will be `https://ngrok-url-here/api/messages`. The default port for the bot is `3978`.
 

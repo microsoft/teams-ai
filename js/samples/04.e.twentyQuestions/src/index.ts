@@ -125,7 +125,7 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
             secretWord = '';
             guessCount = remainingGuesses = 0;
         } else {
-            // Ask GPT for a hint
+            // Ask AI for a hint
             const response = await getHint(context, state);
             if (response.toLowerCase().indexOf(secretWord.toLowerCase()) >= 0) {
                 await context.sendActivity(`[${guessCount}] ${responses.blockSecretWord()}`);
@@ -159,7 +159,7 @@ server.post('/api/messages', async (req, res) => {
 });
 
 /**
- * Generates a hint for the user based on their input using OpenAI's GPT-3 API.
+ * Generates a hint for the user based on their input using OpenAI's API.
  * @param {TurnContext} context The current turn context.
  * @param {ApplicationTurnState} state The current turn state.
  * @returns {Promise<string>} A promise that resolves to a string containing the generated hint.

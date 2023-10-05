@@ -111,10 +111,10 @@ const app = new Application<ApplicationTurnState>({
 
 // Define an interface to strongly type data parameters for actions
 interface EntityData {
-    id: number; // <- populated by GPT
-    title: string; // <- populated by GPT
-    assignedTo: string; // <- populated by GPT
-    status: string; // <- populated by GPT
+    id: number; // <- populated by AI
+    title: string; // <- populated by AI
+    assignedTo: string; // <- populated by AI
+    status: string; // <- populated by AI
 }
 
 // Listen for new members to join the conversation

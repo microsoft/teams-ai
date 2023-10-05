@@ -20,7 +20,7 @@ type TData = Record<string, any>;
 const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
     apiKey: process.env.AZURE_OPENAI_KEY!,
     endpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-    defaultModel: 'gpt35-turbo',
+    defaultModel: 'gpt-35-turbo',
     logRequests: true
 });
 

@@ -82,12 +82,12 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-if (!process.env.AZURE_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
+if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
     throw new Error(
-        `Missing environment variables - please check that AZURE_OPENAI_API_KEY or OPENAI_API_KEY is set, depending on which service you are using.`
+        `Missing environment variables - please check that AZURE_OPENAI_KEY or OPENAI_API_KEY is set, depending on which service you are using.`
     );
-} else if (process.env.AZURE_OPENAI_API_KEY && !process.env.AZURE_ENDPOINT) {
-    throw new Error(`Missing environment variables - please check that AZURE_ENDPOINT is set.`);
+} else if (process.env.AZURE_OPENAI_KEY && !process.env.AZURE_OPENAI_ENDPOINT) {
+    throw new Error(`Missing environment variables - please check that AZURE_OPENAI_ENDPOINT is set.`);
 }
 interface TempState extends DefaultTempState {
     post: string | undefined;
@@ -106,10 +106,10 @@ type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUs
 // });
 
 const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.AZURE_OPENAI_API_KEY || '',
+    apiKey: process.env.AZURE_OPENAI_KEY || '',
     // Note that model name is different for Azure OpenAI API v.s. OpenAI API
     defaultModel: 'gpt-35-turbo',
-    endpoint: process.env.AZURE_ENDPOINT || '',
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT || '',
     logRequests: true
 });
 const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
@@ -145,10 +145,10 @@ app.messageExtensions.submitAction<SubmitData>(
         try {
             switch (data.verb) {
                 case 'generate':
-                    // Call GPT and return response view
+                    // Call AI and return response view
                     return await updatePost(context, state, 'generate', data);
                 case 'update':
-                    // Call GPT and return an updated response view
+                    // Call AI and return an updated response view
                     return await updatePost(context, state, 'update', data);
                 case 'preview': {
                     // Preview the post as an adaptive card

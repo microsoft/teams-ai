@@ -16,7 +16,7 @@ export function createInitialView(): Attachment {
             {
                 type: 'Input.Text',
                 id: 'prompt',
-                placeholder: 'Enter a prompt for GPT',
+                placeholder: 'Enter a prompt for AI',
                 isMultiline: true,
                 isRequired: true,
                 errorMessage: 'A prompt is required'

@@ -2,7 +2,11 @@
 2. [AI Setup](./01.AI-SETUP.md)
 3. [Activity Routing](./02.ACTIVITY-ROUTING.md)
 4. [QNA](./03.QNA.md)
-5. [**Other**](../OTHER/TEAMS-TOOLKIT.md)
+5. [Other](../OTHER/TEAMS-TOOLKIT.md)
+   - [**Teams Toolkit extra information**](./TEAMS-TOOLKIT.md)
+   - [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
+   - [Bot Framework Emulator](./BOTFRAMEWORK-EMULATOR.md)
+   - [Manual resource setup](./MANUAL-RESOURCE-SETUP.md)
 
 # How to develop using Teams Toolkit
 

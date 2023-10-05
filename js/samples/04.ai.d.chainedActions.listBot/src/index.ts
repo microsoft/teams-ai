@@ -98,9 +98,10 @@ interface TempState extends DefaultTempState {
 
 type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing OPENAI_API_KEY environment variable');
-}
+// Switch out this if statement to switch between OpenAI API and Azure OpenAI API
+// if (!process.env.OPENAI_API_KEY) {
+//     throw new Error('Missing OPENAI_API_KEY environment variable');
+// }
 
 // Create AI components
 // Uncomment this code and comment out the Azure OpenAI Planner code below to switch to the OpenAI API.
@@ -111,10 +112,10 @@ if (!process.env.OPENAI_API_KEY) {
 // });
 
 const planner = new AzureOpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.AZURE_OPENAI_API_KEY || '',
+    apiKey: process.env.AZURE_OPENAI_KEY || '',
     // Note that model name is different for Azure OpenAI API v.s. OpenAI API
     defaultModel: 'gpt-35-turbo',
-    endpoint: process.env.AZURE_ENDPOINT || '',
+    endpoint: process.env.AZURE_OPENAI_ENDPOINT || '',
     logRequests: true
 });
 
