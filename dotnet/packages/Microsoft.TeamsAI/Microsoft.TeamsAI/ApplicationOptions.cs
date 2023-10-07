@@ -36,6 +36,11 @@ namespace Microsoft.TeamsAI
         public IStorage? Storage { get; set; }
 
         /// <summary>
+        /// Optional. Options used to customize the processing of Adaptive Card requests.
+        /// </summary>
+        public AdaptiveCardsOptions? AdaptiveCards { get; set; }
+
+        /// <summary>
         /// Optional. AI options to use. When provided, a new instance of the AI system will be created.
         /// </summary>
         public AIOptions<TState>? AI { get; set; }

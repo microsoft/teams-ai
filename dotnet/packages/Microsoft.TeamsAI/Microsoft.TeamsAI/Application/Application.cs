@@ -200,7 +200,7 @@ namespace Microsoft.TeamsAI.Application
                 };
 
                 // Remove @mentions
-                if (Options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase))
+                if (Options.RemoveRecipientMention && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(turnContext.Activity.Text))
                 {
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }

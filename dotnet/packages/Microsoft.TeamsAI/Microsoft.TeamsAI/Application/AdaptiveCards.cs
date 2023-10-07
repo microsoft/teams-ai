@@ -121,22 +121,6 @@ namespace Microsoft.TeamsAI.Application
     public delegate Task<IList<AdaptiveCardsSearchResult>> SearchHandler<TState>(ITurnContext turnContext, TState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Options for AdaptiveCards class.
-    /// </summary>
-    public class AdaptiveCardsOptions
-    {
-        /// <summary>
-        /// Data field used to identify the Action.Submit handler to trigger.
-        /// </summary>
-        /// <remarks>
-        /// When an Action.Submit is triggered, the field name specified here will be used to determine
-        /// the handler to route the request to.
-        /// Defaults to a value of "verb".
-        /// </remarks>
-        public string? ActionSubmitFilter { get; set; }
-    }
-
-    /// <summary>
     /// AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
@@ -199,12 +183,19 @@ namespace Microsoft.TeamsAI.Application
             {
                 AdaptiveCardInvokeValue invokeValue = GetAdaptiveCardInvokeValue(turnContext.Activity);
                 AdaptiveCard adaptiveCard = await handler(turnContext, turnState, SafeCast<TData>(invokeValue.Action.Data), cancellationToken);
-                Attachment attachment = new()
+                AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new()
                 {
-                    ContentType = "application/vnd.microsoft.card.adaptive",
-                    Content = adaptiveCard
+                    StatusCode = 200,
+                    Type = "application/vnd.microsoft.card.adaptive",
+                    Value = adaptiveCard
                 };
-                await turnContext.SendActivityAsync(MessageFactory.Attachment(attachment), cancellationToken);
+                InvokeResponse invokeResponse = CreateInvokeResponse(adaptiveCardInvokeResponse);
+                Activity activity = new()
+                {
+                    Type = ActivityTypesEx.InvokeResponse,
+                    Value = invokeResponse
+                };
+                await turnContext.SendActivityAsync(activity, cancellationToken);
             };
             _app.AddRoute(routeSelector, routeHandler, true);
             return _app;
@@ -281,7 +272,19 @@ namespace Microsoft.TeamsAI.Application
             {
                 AdaptiveCardInvokeValue invokeValue = GetAdaptiveCardInvokeValue(turnContext.Activity);
                 string result = await handler(turnContext, turnState, SafeCast<TData>(invokeValue.Action.Data), cancellationToken);
-                await turnContext.SendActivityAsync(MessageFactory.Text(result), cancellationToken);
+                AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new()
+                {
+                    StatusCode = 200,
+                    Type = "application/vnd.microsoft.activity.message",
+                    Value = result
+                };
+                InvokeResponse invokeResponse = CreateInvokeResponse(adaptiveCardInvokeResponse);
+                Activity activity = new()
+                {
+                    Type = ActivityTypesEx.InvokeResponse,
+                    Value = invokeResponse
+                };
+                await turnContext.SendActivityAsync(activity, cancellationToken);
             };
             _app.AddRoute(routeSelector, routeHandler, true);
             return _app;
@@ -341,8 +344,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit<TData>(Regex verbPattern, ActionSubmitHandler<TState, TData> handler)
         {
-            // TODO: use _app.Options.AdaptiveCards.ActionSubmitFilter
-            string filter = DEFAULT_ACTION_SUBMIT_FILTER;
+            string filter = _app.Options.AdaptiveCards?.ActionSubmitFilter ?? DEFAULT_ACTION_SUBMIT_FILTER;
             RouteSelector routeSelector = CreateActionSubmitSelector(verbPattern, filter);
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
