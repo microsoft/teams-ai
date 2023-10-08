@@ -186,7 +186,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. Finally, use the CLI to preview the app in Teams
 
     ```bash
-    teamsfx preview --env local --run-command "poetry run start" --running-pattern "startup"
+    teamsfx preview --env local --run-command "poetry run start 2>&1" --running-pattern "startup complete"
     ```
 
 ### Manually upload the app to a Teams desktop client
@@ -237,12 +237,12 @@ You can also use the Teams Toolkit CLI to run this sample.
 4. Run the app you are in the directory for.
 
 ```bash
-python app.py
+python src/app.py
 ```
 
 5. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
 
-![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](./assets/bot-emulator-setup.PNG)
 
 -   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above.
 -   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.
