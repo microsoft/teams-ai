@@ -58,7 +58,7 @@ class AI(Generic[StateT]):
                 ActionTypes.FLAGGED_OUTPUT, True, self._on_flagged_output
             ),
             ActionTypes.RATE_LIMITED: ActionEntry(
-                ActionTypes.PLAN_READY, True, self._on_plan_ready
+                ActionTypes.RATE_LIMITED, True, self._on_rate_limited
             ),
             ActionTypes.PLAN_READY: ActionEntry(ActionTypes.PLAN_READY, True, self._on_plan_ready),
             ActionTypes.DO_COMMAND: ActionEntry(ActionTypes.DO_COMMAND, True, self._on_do_command),

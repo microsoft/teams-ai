@@ -19,6 +19,8 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
 ## Prerequisites
 
 - Install [Python](https://www.python.org/downloads/) (>= 3.8)
+- Install [Python VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- Install [Teams Toolkit VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 
 ## Run
 

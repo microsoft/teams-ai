@@ -69,7 +69,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/src/app.py",
             "cwd": "${workspaceFolder}/src",
-            "python": "${workspaceFolder}/.venv/Scripts/python.exe",
             "console": "integratedTerminal"
         }
     ],

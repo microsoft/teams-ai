@@ -92,7 +92,7 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
 
 ## Set up instructions
 
-All the samples in for the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../README.md).
+All the samples in the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../README.md).
 
 Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
 
