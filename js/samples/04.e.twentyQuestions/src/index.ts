@@ -93,7 +93,7 @@ const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(_
 const storage = new MemoryStorage();
 const app = new ApplicationBuilder<ApplicationTurnState>()
     .withStorage(storage)
-    .withAI({
+    .withAIOptions({
         planner,
         promptManager
     })

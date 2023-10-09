@@ -110,7 +110,7 @@ const botAppId = process.env.MicrosoftAppId || '';
 const app = new ApplicationBuilder<ApplicationTurnState>()
     .withStorage(storage)
     .withLongRunningMessages(adapter, botAppId)
-    .withAI({
+    .withAIOptions({
         planner,
         promptManager
     })

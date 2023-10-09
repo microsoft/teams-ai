@@ -789,7 +789,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      * @param {AIOptions<TState>} aiOptions The options for the AI system.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withAI(aiOptions: AIOptions<TState>): this {
+    public withAIOptions(aiOptions: AIOptions<TState>): this {
         this._options.ai = aiOptions;
         return this;
     }

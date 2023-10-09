@@ -86,7 +86,7 @@ describe('Application', () => {
             const app = new ApplicationBuilder()
                 .setRemoveRecipientMention(removeRecipientMention)
                 .withStorage(storage)
-                .withAI(ai)
+                .withAIOptions(ai)
                 .withLongRunningMessages(adapter, botAppId)
                 .withTurnStateManager(turnStateManager)
                 .withAdaptiveCardOptions(adaptiveCards)
