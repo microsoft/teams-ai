@@ -11,6 +11,11 @@ updates:
       - microsoft/teams-ai-admins
     schedule:
       interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
 
   - package-ecosystem: nuget
     directory: /dotnet/packages/Microsoft.TeamsAI
