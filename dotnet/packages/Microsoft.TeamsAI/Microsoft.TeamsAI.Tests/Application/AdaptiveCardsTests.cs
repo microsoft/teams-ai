@@ -56,14 +56,15 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteAdaptiveCardHandler<TestTurnState, TestAdaptiveCardActionData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteAdaptiveCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                Assert.Equal("test-value", data.TestKey);
+                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
+                Assert.Equal("test-value", actionData.TestKey);
                 var adaptiveCard = new AdaptiveCard("1.4")
                 {
                     Body = new List<AdaptiveElement>
                     {
-                        new AdaptiveTextBlock(data.TestKey)
+                        new AdaptiveTextBlock(actionData.TestKey)
                     }
                 };
                 return Task.FromResult(adaptiveCard);
@@ -109,14 +110,15 @@ namespace Microsoft.TeamsAI.Tests.Application
             });
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteAdaptiveCardHandler<TestTurnState, TestAdaptiveCardActionData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteAdaptiveCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                Assert.Equal("test-value", data.TestKey);
+                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
+                Assert.Equal("test-value", actionData.TestKey);
                 var adaptiveCard = new AdaptiveCard("1.4")
                 {
                     Body = new List<AdaptiveElement>
                     {
-                        new AdaptiveTextBlock(data.TestKey)
+                        new AdaptiveTextBlock(actionData.TestKey)
                     }
                 };
                 return Task.FromResult(adaptiveCard);
@@ -169,10 +171,11 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteTextHandler<TestTurnState, TestAdaptiveCardActionData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteTextHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                Assert.Equal("test-value", data.TestKey);
-                return Task.FromResult(data.TestKey!);
+                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
+                Assert.Equal("test-value", actionData.TestKey);
+                return Task.FromResult(actionData.TestKey!);
             };
 
             // Act
@@ -215,10 +218,11 @@ namespace Microsoft.TeamsAI.Tests.Application
             });
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteTextHandler<TestTurnState, TestAdaptiveCardActionData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteTextHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                Assert.Equal("test-value", data.TestKey);
-                return Task.FromResult(data.TestKey!);
+                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
+                Assert.Equal("test-value", actionData.TestKey);
+                return Task.FromResult(actionData.TestKey!);
             };
 
             // Act
@@ -244,9 +248,10 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            ActionExecuteTextHandler<TestTurnState, TestAdaptiveCardActionData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteTextHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                return Task.FromResult(data.TestKey!);
+                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
+                return Task.FromResult(actionData.TestKey!);
             };
 
             // Act
@@ -275,11 +280,12 @@ namespace Microsoft.TeamsAI.Tests.Application
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             var called = false;
-            ActionSubmitHandler<TestTurnState, TestAdaptiveCardSubmitData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 called = true;
-                Assert.Equal("test-verb", data.Verb);
-                Assert.Equal("test-value", data.TestKey);
+                TestAdaptiveCardSubmitData submitData = Cast<TestAdaptiveCardSubmitData>(data);
+                Assert.Equal("test-verb", submitData.Verb);
+                Assert.Equal("test-value", submitData.TestKey);
                 return Task.CompletedTask;
             };
 
@@ -309,11 +315,12 @@ namespace Microsoft.TeamsAI.Tests.Application
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             var called = false;
-            ActionSubmitHandler<TestTurnState, TestAdaptiveCardSubmitData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 called = true;
-                Assert.Equal("test-verb", data.Verb);
-                Assert.Equal("test-value", data.TestKey);
+                TestAdaptiveCardSubmitData submitData = Cast<TestAdaptiveCardSubmitData>(data);
+                Assert.Equal("test-verb", submitData.Verb);
+                Assert.Equal("test-value", submitData.TestKey);
                 return Task.CompletedTask;
             };
 
@@ -342,7 +349,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            ActionSubmitHandler<TestTurnState, TestAdaptiveCardSubmitData> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.CompletedTask;
             };
@@ -498,6 +505,15 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             // Assert
             Assert.Equal("Unexpected AdaptiveCards.OnSearch() triggered for activity type: invoke", exception.Message);
+        }
+
+        private static T Cast<T>(object data)
+        {
+            JObject? obj = data as JObject;
+            Assert.NotNull(obj);
+            T? result = obj.ToObject<T>();
+            Assert.NotNull(result);
+            return result;
         }
 
         private class TestAdaptiveCardActionData
