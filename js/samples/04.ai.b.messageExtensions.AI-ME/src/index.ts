@@ -106,7 +106,7 @@ const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(_
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
-const botAppId = process.env.MicrosoftAppId as string;
+const botAppId = process.env.MicrosoftAppId || '';
 const app = new ApplicationBuilder<ApplicationTurnState>()
     .withStorage(storage)
     .withLongRunningMessages(adapter, botAppId)

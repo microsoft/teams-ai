@@ -89,8 +89,8 @@ describe('Application', () => {
                 .withAI(ai)
                 .withLongRunningMessages(adapter, botAppId)
                 .withTurnStateManager(turnStateManager)
-                .withAdaptiveCards(adaptiveCards)
-                .withTaskModules(taskModules)
+                .withAdaptiveCardOptions(adaptiveCards)
+                .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
                 .build();
             assert.notEqual(app.options, undefined);

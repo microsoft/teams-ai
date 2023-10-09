@@ -65,7 +65,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
+import { ApplicationBuilder, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 if (!process.env.OPENAI_API_KEY) {
@@ -91,13 +91,13 @@ const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(_
 // Define storage and application
 // - Note that we're not passing a prompt in our AI options as we manually ask for hints.
 const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
-    storage,
-    ai: {
+const app = new ApplicationBuilder<ApplicationTurnState>()
+    .withStorage(storage)
+    .withAI({
         planner,
         promptManager
-    }
-});
+    })
+    .build();
 
 // List for /reset command and then delete the conversation state
 app.message('/quit', async (context: TurnContext, state: ApplicationTurnState) => {

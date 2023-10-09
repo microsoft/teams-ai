@@ -756,6 +756,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Configures the application to use long running messages.
+     * Default state for longRunningMessages is false
      * @param {BotAdapter} adapter The adapter to use for routing incoming requests.
      * @param {string} botAppId The Microsoft App ID for the bot.
      * @returns {this} The ApplicationBuilder instance.
@@ -763,7 +764,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
     public withLongRunningMessages(adapter: BotAdapter, botAppId: string): this {
         if (!botAppId) {
             throw new Error(
-                `The Application.longRunningMessages property is unavailable because no botAppId was configured.`
+                `The Application.longRunningMessages property is unavailable because botAppId cannot be null or undefined.`
             );
         }
 
@@ -808,7 +809,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      * @param {AdaptiveCardsOptions} adaptiveCardOptions The options for the Adaptive Cards.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withAdaptiveCards(adaptiveCardOptions: AdaptiveCardsOptions): this {
+    public withAdaptiveCardOptions(adaptiveCardOptions: AdaptiveCardsOptions): this {
         this._options.adaptiveCards = adaptiveCardOptions;
         return this;
     }
@@ -818,13 +819,14 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      * @param {TaskModulesOptions} taskModuleOptions The options for the Task Modules.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withTaskModules(taskModuleOptions: TaskModulesOptions): this {
+    public withTaskModuleOptions(taskModuleOptions: TaskModulesOptions): this {
         this._options.taskModules = taskModuleOptions;
         return this;
     }
 
     /**
      * Configures the removing of mentions of the bot's name from incoming messages.
+     * Default state for removeRecipientMention is true
      * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
      * @returns {this} The ApplicationBuilder instance.
      */
@@ -835,6 +837,7 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Configures the typing timer when messages are received.
+     * Default state for startTypingTimer is true
      * @param {boolean} startTypingTimer The boolean for starting the typing timer.
      * @returns {this} The ApplicationBuilder instance.
      */
