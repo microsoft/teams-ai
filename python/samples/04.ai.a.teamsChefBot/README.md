@@ -165,6 +165,10 @@ You can also use the Teams Toolkit CLI to run this sample.
     BOT_DOMAIN={ngrok-url}.ngrok.io
     ```
 
+1. Fill your Azure OpenAI endpoint and deployment name of `text-davinci-003` to `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_MODEL_DEPLOYMENT_NAME` in `env/.env.local` file.
+
+1. Fill your Azure OpenAI key to `AZURE_OPENAI_KEY` in `env/.env.local.user` file.
+
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
@@ -182,7 +186,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. Finally, use the CLI to preview the app in Teams
 
     ```bash
-    teamsfx preview --env local
+    teamsfx preview --env local --run-command "poetry run start 2>&1" --running-pattern "startup complete"
     ```
 
 ### Manually upload the app to a Teams desktop client
@@ -206,7 +210,7 @@ You can also use the Teams Toolkit CLI to run this sample.
     - Use the current `https` URL you were given by running ngrok. Append with the path `/api/messages` used by this sample.
     - Ensure that you've [enabled the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0)
 
-1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
+1. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration, as well as the Azure Open AI key, endpoint and `text-davinci-003` model's deployment name. (Note the App Password is referred to as the "client secret" in the Azure Portal and you can always create a new client secret anytime.)
 
 1. **_This step is specific to Teams._**
 
@@ -216,7 +220,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. Run your app from the command line:
 
     ```bash
-    python app.py
+    python src/app.py
     ```
 
 1. [Upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) in Teams.
@@ -229,15 +233,16 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
 2. Launch Bot Framework Emulator
-3. Run the app you are in the directory for.
+3. Update the `.env` configuration for the bot to use the Microsoft App Id and App Password from the Bot Framework registration, as well as the Azure Open AI key, endpoint and `text-davinci-003` model's deployment name.
+4. Run the app you are in the directory for.
 
 ```bash
-python app.py
+python src/app.py
 ```
 
-4. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
+5. Add your app's messaging endpoint to the "Open a Bot" dialog. The endpoint your localhost endpoint with the path `/api/messages` appended. It should look something like this: `http://localhost:3978/api/messages`.
 
-![Bot Framework setup menu with a localhost url endpoint added under Bot URL](https://github.com/microsoft/teams-ai/assets/14900841/6c4f29bc-3e5c-4df1-b618-2b5a590e420e)
+![Bot Framework setup menu with a localhost url endpoint added under Bot URL](./assets/bot-emulator-setup.PNG)
 
 -   In order to test remote apps, you will need to use a tunneling service like ngrok along with an Microsoft App Id and password pasted into the dialog shown above.
 -   Channel-specific features (For example, Teams Message Extensions) are not supported in Emulator and therefore not fully-testable.

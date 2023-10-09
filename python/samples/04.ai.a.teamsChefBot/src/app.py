@@ -26,6 +26,7 @@ planner = AzureOpenAIPlanner(
         Config.AZURE_OPENAI_KEY,
         Config.AZURE_OPENAI_MODEL_DEPLOYMENT_NAME,
         Config.AZURE_OPENAI_ENDPOINT,
+        prompt_folder="src/prompts",
     )
 )
 storage = MemoryStorage()
