@@ -148,7 +148,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteAdaptiveCardHandler<TState> handler)
         {
-            return OnActionExecute(new Regex($"^{verb}$"), handler);
+            return OnActionExecute(new Regex(@"^" + Regex.Escape(verb) + @"$"), handler);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteTextHandler<TState> handler)
         {
-            return OnActionExecute(new Regex($"^{verb}$"), handler);
+            return OnActionExecute(new Regex(@"^" + Regex.Escape(verb) + @"$"), handler);
         }
 
         /// <summary>
@@ -330,7 +330,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit(string verb, ActionSubmitHandler<TState> handler)
         {
-            return OnActionSubmit(new Regex($"^{verb}$"), handler);
+            return OnActionSubmit(new Regex(@"^" + Regex.Escape(verb) + @"$"), handler);
         }
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(string dataset, SearchHandler<TState> handler)
         {
-            return OnSearch(new Regex($"^{dataset}$"), handler);
+            return OnSearch(new Regex(@"^" + Regex.Escape(dataset) + @"$"), handler);
         }
 
         /// <summary>
