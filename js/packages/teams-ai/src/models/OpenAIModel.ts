@@ -1,87 +1,20 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { PromptFunctions, PromptMemory, PromptSection, Tokenizer } from "promptrix";
-import { PromptCompletionModel, PromptResponse, ChatCompletionFunction } from "./ai/types";
-import { ChatCompletionRequestMessage, CreateChatCompletionRequest, CreateChatCompletionResponse, CreateCompletionRequest, CreateCompletionResponse, OpenAICreateChatCompletionRequest, OpenAICreateCompletionRequest } from "./internals";
+import { PromptFunctions, PromptTemplate } from "../prompts";
+import { PromptCompletionModel, PromptResponse } from "./PromptCompletionModel";
+import { ChatCompletionRequestMessage, CreateChatCompletionRequest, CreateChatCompletionResponse, CreateCompletionRequest, CreateCompletionResponse, OpenAICreateChatCompletionRequest, OpenAICreateCompletionRequest } from "../internals";
+import { Tokenizer } from "../tokenizers";
 import { Colorize } from "../internals";
+import { TurnContext } from 'botbuilder';
+import { TurnState } from '../TurnState';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
  */
 export interface BaseOpenAIModelOptions {
     /**
-     * Type of completion API to call.
+     * Optional. Type of completion to use for the default model. Defaults to 'chat'.
      */
-    completion_type: 'text' | 'chat';
-
-    /**
-     * Optional. Maximum number of tokens to let the prompt use when rendering.
-     * @remarks
-     * Defaults to `1024`.
-     *
-     * If the rendered prompt exceeds this limit, most `PromptCompletionClient` classes will return
-     * a `response.status == 'too_long'`.
-     */
-    max_input_tokens?: number;
-
-    /**
-     * Optional. What sampling temperature to use, between `0` and `2`.
-     * @remarks
-     * Higher values like `0.8` will make the output more random, while lower values like `0.2` will
-     * make it more focused and deterministic.
-     *
-     * It's generally recommended to use this or `top_p` but not both.
-     */
-    temperature?: number;
-
-    /**
-     * Optional. An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
-     * @remarks
-     * A value of `0.1` means only the tokens comprising the top 10% probability mass are considered.
-     *
-     * It's generally recommended to use this or `temperature` but not both.
-     */
-    top_p?: number;
-
-    /**
-     * Optional. The maximum number of tokens to generate for a completion.
-     * @remarks
-     * This value plus the `max_input_tokens` value cannot exceed the maximum number of tokens for
-     * the models context window.
-     */
-    max_tokens?: number;
-
-    /**
-     * Optional. Up to 4 sequences where the API will stop generating further tokens.
-     * @remarks
-     * The returned text will not contain the stop sequence.
-     */
-    stop?: Array<string> | string;
-
-    /**
-     * Optional. Presence penalty value between `-2.0` and `2.0`.
-     * @remarks
-     * Positive values penalize new tokens based on whether they appear in the text so far,
-     * increasing the model's likelihood to talk about new topics.
-     */
-    presence_penalty?: number;
-
-    /**
-     * Optional. Frequency penalty value between `-2.0` and `2.0`.
-     * @remarks
-     * Positive values penalize new tokens based on their existing frequency in the text so far,
-     * decreasing the model's likelihood to repeat the same line verbatim.
-     */
-    frequency_penalty?: number;
-
-    /**
-     * Optional. Logit bias modifies the likelihood of specified tokens appearing in the completion.
-     */
-    logit_bias?: object;
-
-    /**
-     * Optional. Number of candidate completions to generate server side.
-     */
-    best_of?: number;
+    completion_type?: 'chat' | 'text';
 
     /**
      * Optional. Whether to log requests to the console.
@@ -102,22 +35,6 @@ export interface BaseOpenAIModelOptions {
      * Optional. Request options to use when calling the OpenAI API.
      */
     requestConfig?: AxiosRequestConfig;
-
-    /**
-     * Optional. A list of functions the model may generate JSON inputs for.
-     */
-    functions?: ChatCompletionFunction[];
-
-    /**
-     * Optional. Controls how the model responds to function calls.
-     * @remarks
-     * `"none"` means the model does not call a function, and responds to the end-user.
-     * `"auto"` means the model can pick between an end-user or calling a function.
-     * Specifying a particular function via `{"name":\ "my_function"}` forces the model to call that function.
-     * `"none"` is the default when no functions are present.
-     * `"auto"` is the default if functions are present.
-     */
-    function_call?: { name: string; } | 'none' | 'auto';
 }
 
 /**
@@ -132,7 +49,7 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
     apiKey: string;
 
     /**
-     * Model to use for completion.
+     * Default model to use for completion.
      * @remarks
      * For Azure OpenAI this is the name of the deployment to use.
      */
@@ -166,7 +83,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
     azureEndpoint: string;
 
     /**
-     * Name of the Azure OpenAI deployment (model) to use.
+     * Default name of the Azure OpenAI deployment (model) to use.
      */
     azureDeployment: string;
 
@@ -180,7 +97,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
  * @remarks
  */
-export class OpenAIModel implements PromptCompletionModel {
+export class OpenAIModel<TState extends TurnState = TurnState> implements PromptCompletionModel<TState> {
     private readonly _httpClient: AxiosInstance;
     private readonly _useAzure: boolean;
 
@@ -200,6 +117,7 @@ export class OpenAIModel implements PromptCompletionModel {
         if ((options as AzureOpenAIModelOptions).azureApiKey) {
             this._useAzure = true;
             this.options = Object.assign({
+                completion_type: 'chat',
                 retryPolicy: [2000, 5000],
                 azureApiVersion: '2023-05-15',
             }, options) as AzureOpenAIModelOptions;
@@ -211,13 +129,14 @@ export class OpenAIModel implements PromptCompletionModel {
             }
 
             if (!endpoint.toLowerCase().startsWith('https://')) {
-                throw new Error(`Client created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`);
+                throw new Error(`Model created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`);
             }
 
             this.options.azureEndpoint = endpoint;
         } else {
             this._useAzure = false;
             this.options = Object.assign({
+                completion_type: 'chat',
                 retryPolicy: [2000, 5000]
             }, options) as OpenAIModelOptions;
         }
@@ -238,21 +157,20 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     /**
-     * Completes a prompt using the OpenAI API.
-     * @remarks
-     * The API used, Chat Completion or Text Completion, will be determined by the `this.options.completion_type` property.
-     * @param memory Memory to use when rendering the prompt.
+     * Completes a prompt using OpenAI or Azure OpenAI.
+     * @param context Current turn context.
+     * @param state Current turn state.
      * @param functions Functions to use when rendering the prompt.
      * @param tokenizer Tokenizer to use when rendering the prompt.
-     * @param prompt Prompt to complete.
+     * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    public async completePrompt(memory: PromptMemory, functions: PromptFunctions, tokenizer: Tokenizer, prompt: PromptSection): Promise<PromptResponse> {
+    public async completePrompt(context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse> {
         const startTime = Date.now();
-        const max_input_tokens = this.options.max_input_tokens ?? 1024;
+        const max_input_tokens = template.config.completion.max_input_tokens;
         if (this.options.completion_type == 'text') {
             // Render prompt
-            const result = await prompt.renderAsText(memory, functions, tokenizer, max_input_tokens);
+            const result = await template.prompt.renderAsText(context, state, functions, tokenizer, max_input_tokens);
             if (result.tooLong) {
                 return { status: 'too_long', message: `The generated text completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.` };
             }
@@ -288,17 +206,13 @@ export class OpenAIModel implements PromptCompletionModel {
             }
         } else {
             // Render prompt
-            const result = await prompt.renderAsMessages(memory, functions, tokenizer, max_input_tokens);
+            const result = await template.prompt.renderAsMessages(context, state, functions, tokenizer, max_input_tokens);
             if (result.tooLong) {
                 return { status: 'too_long', message: `The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.` };
             }
             if (this.options.logRequests) {
                 console.log(Colorize.title('CHAT PROMPT:'));
                 console.log(Colorize.output(result.output));
-                if (Array.isArray(this.options.functions) && this.options.functions.length > 0) {
-                    console.log(Colorize.title('FUNCTIONS:'));
-                    console.log(Colorize.output(this.options.functions));
-                }
             }
 
             // Call chat completion API

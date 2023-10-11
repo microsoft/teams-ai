@@ -1,4 +1,12 @@
-import { PromptSection } from "./types";
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+import { PromptSection } from "./PromptSection";
 import { LayoutEngine } from "./LayoutEngine";
 import { TurnState } from '../TurnState';
 

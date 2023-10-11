@@ -1,0 +1,1 @@
+{"model":"gpt-3.5-turbo-16k","sources":["packages/teams-ai/src"],"temperature":0.2,"max_input_tokens":12000,"max_tokens":3000}

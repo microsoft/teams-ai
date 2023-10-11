@@ -6,3 +6,6 @@
  * Licensed under the MIT License.
  */
 
+export * from './ChatCompletionAction';
+export * from './OpenAIModel';
+export * from './PromptCompletionModel';

@@ -1,12 +1,13 @@
 import { strict as assert } from "assert";
 import { UserMessage } from "./UserMessage";
-import { VolatileMemory } from "./VolatileMemory";
-import { PromptManager } from "./PromptManager";
-import { GPT3Tokenizer } from "./GPT3Tokenizer";
+import { TestAdapter } from "botbuilder";
+import { TestPromptManager } from "./TestPromptManager";
+import { GPT3Tokenizer } from "../tokenizers";
+import { TestTurnState } from "../TestTurnState";
 
 describe("UserMessage", () => {
-    const memory = new VolatileMemory();
-    const functions = new PromptManager();
+    const adapter = new TestAdapter();
+    const functions = new TestPromptManager();
     const tokenizer = new GPT3Tokenizer();
 
     describe("constructor", () => {
@@ -23,21 +24,27 @@ describe("UserMessage", () => {
 
     describe("renderAsMessages", () => {
         it("should render a UserMessage to an array of messages", async () => {
-            const section = new UserMessage("Hello World");
-            const rendered = await section.renderAsMessages(memory, functions, tokenizer, 100);
-            assert.deepEqual(rendered.output, [{ role: "user", content: "Hello World" }]);
-            assert.equal(rendered.length, 2);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new UserMessage("Hello World");
+                const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
+                assert.deepEqual(rendered.output, [{ role: "user", content: "Hello World" }]);
+                assert.equal(rendered.length, 2);
+                assert.equal(rendered.tooLong, false);
+            });
         });
     });
 
     describe("renderAsText", () => {
         it("should render a TemplateSection to a string", async () => {
-            const section = new UserMessage("Hello World");
-            const rendered = await section.renderAsText(memory, functions, tokenizer, 100);
-            assert.equal(rendered.output, "user: Hello World");
-            assert.equal(rendered.length, 5);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new UserMessage("Hello World");
+                const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
+                assert.equal(rendered.output, "user: Hello World");
+                assert.equal(rendered.length, 5);
+                assert.equal(rendered.tooLong, false);
+            });
         });
     });
 });

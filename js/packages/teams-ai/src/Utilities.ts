@@ -1,4 +1,4 @@
-import { Tokenizer } from "./models/types";
+import { Tokenizer } from "./tokenizers";
 import { stringify } from "yaml";
 
 /**

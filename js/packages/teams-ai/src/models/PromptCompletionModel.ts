@@ -9,13 +9,14 @@ import { Tokenizer } from '../tokenizers';
 export interface PromptCompletionModel<TState extends TurnState = TurnState> {
     /**
      * Completes a prompt.
-     * @param memory Memory to use when rendering the prompt.
+     * @param context Current turn context.
+     * @param state Current turn state.
      * @param functions Functions to use when rendering the prompt.
      * @param tokenizer Tokenizer to use when rendering the prompt.
-     * @param prompt Prompt to complete.
+     * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    completePrompt(context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, prompt: PromptTemplate): Promise<PromptResponse>;
+    completePrompt(context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse>;
 }
 
 /**

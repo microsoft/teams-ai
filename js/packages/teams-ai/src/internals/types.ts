@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { ChatCompletionFunction } from "../models/types";
+import { ChatCompletionAction } from "../models/ChatCompletionAction";
 
 /**
  * @private
@@ -82,7 +82,7 @@ export interface CreateCompletionResponseUsage {
  */
 export interface CreateChatCompletionRequest {
     messages: Array<ChatCompletionRequestMessage>;
-    functions?: Array<ChatCompletionFunction>;
+    functions?: Array<ChatCompletionAction>;
     function_call?: CreateChatCompletionRequestFunctionCall;
     temperature?: number | null;
     top_p?: number | null;

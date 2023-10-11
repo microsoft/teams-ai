@@ -1,9 +1,19 @@
-import { Message, PromptFunctions, PromptSection, RenderedPromptSection } from "./types";
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+import { Message } from "./Message";
+import { PromptFunctions } from "./PromptFunctions";
+import { RenderedPromptSection, PromptSection } from "./PromptSection";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { LayoutEngine } from "./LayoutEngine";
 import { TurnContext } from "botbuilder";
 import { TurnState } from '../TurnState';
-import { Tokenizer } from "../ai";
+import { Tokenizer } from "../tokenizers";
 
 /**
  * A group of sections that will rendered as a single message.

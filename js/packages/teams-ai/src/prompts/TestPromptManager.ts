@@ -1,28 +1,34 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import { TurnState } from '../TurnState';
 import { PromptManager, PromptManagerOptions } from './PromptManager';
-import { PromptTemplate } from './types';
+import { PromptTemplate } from './PromptTemplate';
 
 export interface TestPromptManagerOptions extends PromptManagerOptions {
     /**
-     * Optional. Map of prompts to load.
+     * Optional. List of prompts to load.
      */
-    prompts?: Record<string, PromptTemplate>;
+    prompts?: PromptTemplate[];
 }
 
 /**
  * A prompt manager used for testing.
  */
-export class TestPromptManager<TState extends TurnState = TurnState> extends PromptManager {
+export class TestPromptManager<TState extends TurnState = TurnState> extends PromptManager<TState> {
     public constructor(options: Partial<TestPromptManagerOptions> = {}) {
         super(Object.assign({
             promptsFolder: 'test',
         } as PromptManagerOptions, options));
 
         // Add any pre-defined prompts
-        if (options.prompts) {
-            for (const key in options.prompts) {
-                this.addPrompt(key, options.prompts[key]);
-            }
+        if (Array.isArray(options.prompts)) {
+            options.prompts.forEach((prompt) => this.addPrompt(prompt));
         }
     }
 

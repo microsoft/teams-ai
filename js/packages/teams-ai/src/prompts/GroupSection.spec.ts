@@ -1,13 +1,14 @@
 import { strict as assert } from "assert";
 import { GroupSection } from "./GroupSection";
 import { TextSection } from "./TextSection";
-import { VolatileMemory } from "./VolatileMemory";
-import { PromptManager } from "./PromptManager";
-import { GPT3Tokenizer } from "./GPT3Tokenizer";
+import { TestAdapter } from "botbuilder";
+import { TestPromptManager } from "./TestPromptManager";
+import { GPT3Tokenizer } from "../tokenizers";
+import { TestTurnState } from "../TestTurnState";
 
 describe("GroupSection", () => {
-    const memory = new VolatileMemory();
-    const functions = new PromptManager();
+    const adapter = new TestAdapter();
+    const functions = new TestPromptManager();
     const tokenizer = new GPT3Tokenizer();
 
     describe("constructor", () => {
@@ -35,93 +36,117 @@ describe("GroupSection", () => {
 
     describe("renderAsMessages", () => {
         it("should render a TextSection to an array of messages", async () => {
-            const section = new GroupSection([
-                new TextSection("Hello World", "user")
-            ]);
-            const rendered = await section.renderAsMessages(memory, functions, tokenizer, 100);
-            assert.deepEqual(rendered.output, [{ role: "system", content: "Hello World" }]);
-            assert.equal(rendered.length, 2);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new TextSection("Hello World", "user")
+                ]);
+                const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
+                assert.deepEqual(rendered.output, [{ role: "system", content: "Hello World" }]);
+                assert.equal(rendered.length, 2);
+                assert.equal(rendered.tooLong, false);
+            });
         });
 
         it("should identify a output as being too long", async () => {
-            const section = new GroupSection([
-                new TextSection("Hello World", "user")
-            ]);
-            const rendered = await section.renderAsMessages(memory, functions, tokenizer, 1);
-            assert.deepEqual(rendered.output, [{ role: "system", content: "Hello World" }]);
-            assert.equal(rendered.length, 2);
-            assert.equal(rendered.tooLong, true);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new TextSection("Hello World", "user")
+                ]);
+                const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 1);
+                assert.deepEqual(rendered.output, [{ role: "system", content: "Hello World" }]);
+                assert.equal(rendered.length, 2);
+                assert.equal(rendered.tooLong, true);
+            });
         });
 
         it("should render multiple TextSections as a single messages", async () => {
-            const section = new GroupSection([
-                new TextSection("Hello", "user"),
-                new TextSection("World", "user")
-            ]);
-            const rendered = await section.renderAsMessages(memory, functions, tokenizer, 100);
-            assert.deepEqual(rendered.output, [{ role: "system", content: "Hello\n\nWorld" }]);
-            assert.equal(rendered.length, 4);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new TextSection("Hello", "user"),
+                    new TextSection("World", "user")
+                ]);
+                const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
+                assert.deepEqual(rendered.output, [{ role: "system", content: "Hello\n\nWorld" }]);
+                assert.equal(rendered.length, 4);
+                assert.equal(rendered.tooLong, false);
+            });
         });
 
         it("should render a hierarchy of sections to a single message", async () => {
-            const section = new GroupSection([
-                new GroupSection([
-                    new TextSection("Hello", "user")
-                ]),
-                new TextSection("World", "user")
-            ]);
-            const rendered = await section.renderAsMessages(memory, functions, tokenizer, 100);
-            assert.deepEqual(rendered.output, [{ role: "system", content: "Hello\n\nWorld" }]);
-            assert.equal(rendered.length, 4);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new GroupSection([
+                        new TextSection("Hello", "user")
+                    ]),
+                    new TextSection("World", "user")
+                ]);
+                const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
+                assert.deepEqual(rendered.output, [{ role: "system", content: "Hello\n\nWorld" }]);
+                assert.equal(rendered.length, 4);
+                assert.equal(rendered.tooLong, false);
+            });
         });
     });
 
     describe("renderAsText", () => {
         it("should render a TextSection to a string", async () => {
-            const section = new GroupSection([
-                new TextSection("Hello World", "user")
-            ]);
-            const rendered = await section.renderAsText(memory, functions, tokenizer, 100);
-            assert.equal(rendered.output, "Hello World");
-            assert.equal(rendered.length, 2);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new TextSection("Hello World", "user")
+                ]);
+                const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
+                assert.equal(rendered.output, "Hello World");
+                assert.equal(rendered.length, 2);
+                assert.equal(rendered.tooLong, false);
+            });
         });
 
         it("should identify a text output as being too long", async () => {
-            const section = new GroupSection([
-                new TextSection("Hello World", "user")
-            ]);
-            const rendered = await section.renderAsText(memory, functions, tokenizer, 1);
-            assert.equal(rendered.output, "Hello World");
-            assert.equal(rendered.length, 2);
-            assert.equal(rendered.tooLong, true);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new TextSection("Hello World", "user")
+                ]);
+                const rendered = await section.renderAsText(context, state, functions, tokenizer, 1);
+                assert.equal(rendered.output, "Hello World");
+                assert.equal(rendered.length, 2);
+                assert.equal(rendered.tooLong, true);
+            });
         });
 
         it("should render multiple TextSections to a string", async () => {
-            const section = new GroupSection([
-                new TextSection("Hello", "user"),
-                new TextSection("World", "user")
-            ]);
-            const rendered = await section.renderAsText(memory, functions, tokenizer, 100);
-            assert.equal(rendered.output, "Hello\n\nWorld");
-            assert.equal(rendered.length, 4);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new TextSection("Hello", "user"),
+                    new TextSection("World", "user")
+                ]);
+                const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
+                assert.equal(rendered.output, "Hello\n\nWorld");
+                assert.equal(rendered.length, 4);
+                assert.equal(rendered.tooLong, false);
+            });
         });
 
         it("should render a hierarchy of sections to a string", async () => {
-            const section = new GroupSection([
-                new GroupSection([
-                    new TextSection("Hello", "user")
-                ]),
-                new TextSection("World", "user")
-            ]);
-            const rendered = await section.renderAsText(memory, functions, tokenizer, 100);
-            assert.equal(rendered.output, "Hello\n\nWorld");
-            assert.equal(rendered.length, 4);
-            assert.equal(rendered.tooLong, false);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const section = new GroupSection([
+                    new GroupSection([
+                        new TextSection("Hello", "user")
+                    ]),
+                    new TextSection("World", "user")
+                ]);
+                const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
+                assert.equal(rendered.output, "Hello\n\nWorld");
+                assert.equal(rendered.length, 4);
+                assert.equal(rendered.tooLong, false);
+            });
         });
     });
 });

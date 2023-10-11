@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { Message, FunctionRegistry, GPT3Tokenizer, Prompt, PromptFunctions, PromptMemory, Tokenizer, VolatileMemory } from "promptrix";
-import { PromptResponse, PromptResponseValidator, Validation } from "../models/types";
+import { PromptResponse, PromptResponseValidator, Validation } from "../models/ChatCompletionAction";
 import { DefaultResponseValidator } from "../DefaultResponseValidator";
 import { TestModel } from "../TestModel";
 import { AlphaWave } from "../LLMClient";

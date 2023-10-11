@@ -1,4 +1,4 @@
-import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "../models/types";
+import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "../models/ChatCompletionAction";
 
 /**
  * A test model that can be used to test the prompt completion system.

@@ -1,10 +1,23 @@
-import { PromptFunctions, PromptFunction, PromptTemplate } from "./types";
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+import { PromptFunctions, PromptFunction } from "./PromptFunctions";
+import { PromptTemplate } from "./PromptTemplate";
 import { TurnState } from '../TurnState';
-import { Tokenizer } from "../ai";
+import { Tokenizer } from "../tokenizers";
 import { TurnContext } from "botbuilder";
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { TemplateSection } from "./TemplateSection";
+import { CompletionConfig } from "./PromptTemplate";
+import { DataSource } from "../dataSources";
+import { PromptSection } from "./PromptSection";
+//import { DataSourceSection } from "./DataSourceSection";
 
 /**
  * Options used to configure the prompt manager.
@@ -39,6 +52,7 @@ export interface PromptManagerOptions {
  */
 export class PromptManager<TState extends TurnState = TurnState> implements PromptFunctions<TState> {
     private readonly _options: PromptManagerOptions;
+    private readonly _dataSources: Map<string, DataSource<TState>> = new Map();
     private readonly _functions: Map<string, PromptFunction<TState>> = new Map();
     private readonly _prompts: Map<string, PromptTemplate<TState>> = new Map();
 
@@ -50,14 +64,65 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
         this._options = Object.assign({}, options);
     }
 
-    public addFunction(name: string, value: PromptFunction<TState>): void {
+    /**
+     * Registers a new data source with the prompt manager.
+     * @param dataSource Data source to add.
+     * @returns The prompt manager for chaining.
+     */
+    public addDataSource(dataSource: DataSource<TState>): this {
+        if (this._dataSources.has(dataSource.name)) {
+            throw new Error(`DataSource '${dataSource.name}' already exists.`);
+        }
+
+        this._dataSources.set(dataSource.name, dataSource);
+
+        return this;
+    }
+
+    /**
+     * Looks up a data source by name.
+     * @param name Name of the data source to lookup.
+     * @returns The data source.
+     */
+    public getDataSource(name: string): DataSource<TState> {
+        const dataSource = this._dataSources.get(name);
+        if (!dataSource) {
+            throw new Error(`DataSource '${name}' not found.`);
+        }
+
+        return dataSource;
+    }
+
+    /**
+     * Checks for the existence of a named data source.
+     * @param name Name of the data source to lookup.
+     * @returns True if the data source exists.
+     */
+    public hasDataSource(name: string): boolean {
+        return this._dataSources.has(name);
+    }
+
+    /**
+     * Registers a new prompt template function with the prompt manager.
+     * @param name Name of the function to add.
+     * @param fn Function to add.
+     * @returns The prompt manager for chaining.
+     */
+    public addFunction(name: string, fn: PromptFunction<TState>): this {
         if (this._functions.has(name)) {
             throw new Error(`Function '${name}' already exists.`);
         }
 
-        this._functions.set(name, value);
+        this._functions.set(name, fn);
+
+        return this;
     }
 
+    /**
+     * Looks up a prompt template function by name.
+     * @param name Name of the function to lookup.
+     * @returns The function.
+     */
     public getFunction(name: string): PromptFunction<TState> {
         const fn = this._functions.get(name);
         if (!fn) {
@@ -67,10 +132,24 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
         return fn;
     }
 
+    /**
+     * Checks for the existence of a named prompt template function.
+     * @param name Name of the function to lookup.
+     * @returns True if the function exists.
+     */
     public hasFunction(name: string): boolean {
         return this._functions.has(name);
     }
 
+    /**
+     * Invokes a prompt template function by name.
+     * @param name Name of the function to invoke.
+     * @param context Turn context for the current turn of conversation with the user.
+     * @param state Turn state for the current turn of conversation with the user.
+     * @param tokenizer Tokenizer to use when rendering the prompt.
+     * @param args Arguments to pass to the function.
+     * @returns Value returned by the function.
+     */
     public invokeFunction(name: string, context: TurnContext, state: TState, tokenizer: Tokenizer, args: string[]): Promise<any> {
         const fn = this.getFunction(name);
         return fn(context, state as any, this as any, tokenizer, args);
@@ -78,22 +157,19 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
 
     /**
      * Registers a new prompt template with the prompt manager.
-     * @summary
-     * The template will be pre-parsed and cached for use when the template is rendered by name.
-     * @param name Unique name of the prompt template.
      * @param prompt Prompt template to add.
      * @returns The prompt manager for chaining.
      */
-    public addPrompt(name: string, prompt: PromptTemplate<TState>): this {
-        if (this._prompts.has(name)) {
+    public addPrompt(prompt: PromptTemplate<TState>): this {
+        if (this._prompts.has(prompt.name)) {
             throw new Error(
-                `The PromptManager.addPromptTemplate() method was called with a previously registered prompt named "${name}".`
+                `The PromptManager.addPrompt() method was called with a previously registered prompt named "${name}".`
             );
         }
 
         // Clone and cache prompt
         const clone = Object.assign({}, prompt);
-        this._prompts.set(name, clone);
+        this._prompts.set(prompt.name, clone);
 
         return this;
     }
@@ -102,53 +178,61 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * Loads a named prompt template from the filesystem.
      * @summary
      * The template will be pre-parsed and cached for use when the template is rendered by name.
+     *
+     * Any augmentations will also be added to the template.
      * @param name Name of the prompt to load.
      * @returns The loaded and parsed prompt template.
      */
     public async getPrompt(name: string): Promise<PromptTemplate<TState>> {
         if (!this._prompts.has(name)) {
-            const entry = {} as PromptTemplate<TState>;
+            const template = { name } as PromptTemplate<TState>;
 
             // Load template from disk
             const folder = path.join(this._options.promptsFolder, name);
             const configFile = path.join(folder, 'config.json');
             const promptFile = path.join(folder, 'skprompt.txt');
-            const functionsFile = path.join(folder, 'functions.json');
+            const actionsFile = path.join(folder, 'actions.json');
 
             // Load prompt config
             try {
                 // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const config = await fs.readFile(configFile, 'utf-8');
-                entry.config = JSON.parse(config);
+                template.config = JSON.parse(config);
             } catch (err: unknown) {
                 throw new Error(
-                    `PromptManager.loadPromptTemplate(): an error occurred while loading '${configFile}'. The file is either invalid or missing.`
+                    `PromptManager.getPrompt(): an error occurred while loading '${configFile}'. The file is either invalid or missing.`
                 );
             }
 
             // Load prompt text
+            const sections: PromptSection[] = [];
             try {
                 // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const role = this._options.role || 'system';
-                const template = await fs.readFile(promptFile, 'utf-8');
-                entry.prompt = new TemplateSection(template, role);
+                const prompt = await fs.readFile(promptFile, 'utf-8');
+                sections.push(new TemplateSection(prompt, role));
             } catch (err: unknown) {
                 throw new Error(
-                    `DefaultPromptManager.loadPromptTemplate(): an error occurred while loading '${promptFile}'. The file is either invalid or missing.`
+                    `PromptManager.getPrompt(): an error occurred while loading '${promptFile}'. The file is either invalid or missing.`
                 );
             }
 
-            // Load prompt functions
+            // Load optional actions
             try {
                 // eslint-disable-next-line security/detect-non-literal-fs-filename
-                const functions = await fs.readFile(functionsFile, 'utf-8');
-                entry.functions = JSON.parse(functions);
+                const actions = await fs.readFile(actionsFile, 'utf-8');
+                template.actions = JSON.parse(actions);
             } catch (err: unknown) {
-                // Ignore missing functions file
+                // Ignore missing actions file
             }
 
+            // Update the templates config file with defaults and migrate as needed
+            this.updateConfig(template);
+
+            // Add augmentations
+
             // Cache loaded template
-            this._prompts.set(name, entry);
+            this._prompts.set(name, template);
         }
 
         return this._prompts.get(name)!;
@@ -174,5 +258,48 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
         }
 
         return true;
-   }
+    }
+
+    private updateConfig(template: PromptTemplate<TState>): void {
+        // Set config defaults
+        template.config.completion = Object.assign({
+            frequency_penalty: 0.0,
+            include_history: true,
+            max_tokens: 150,
+            max_input_tokens: 2048,
+            presence_penalty: 0.0,
+            temperature: 0.0,
+            top_p: 0.0
+        } as CompletionConfig, template.config.completion);
+
+        // Migrate old schema
+        if (template.config.schema === 1) {
+            template.config.schema = 1.1;
+            if (Array.isArray(template.config.default_backends) && template.config.default_backends.length > 0) {
+                template.config.completion.model = template.config.default_backends[0];
+            }
+        }
+    }
+
+    // private appendAugmentations(template: PromptTemplate<TState>, sections: PromptSection[]): void {
+    //     // Check for augmentation
+    //     const augmentation = template.config.augmentation;
+    //     if (augmentation) {
+    //         // First append data sources
+    //         for (const source in augmentation.data_sources ?? {}) {
+
+    //         }
+
+    //         // Finally append augmentation
+    //         switch (augmentation.augmentation_type) {
+    //             default:
+    //             case 'none':
+    //             case 'functions':
+    //                 // No augmentation needed
+    //                 break;
+
+
+    //         }
+    //     }
+    // }
 }
