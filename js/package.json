@@ -1,6 +1,6 @@
 {
     "private": true,
-    "name": "teams-ai",
+    "name": "@microsoft/teams-ai",
     "version": "0.1.0",
     "workspaces": [
         "./packages/*",

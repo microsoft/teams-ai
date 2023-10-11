@@ -44,14 +44,48 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
         // Add application routes to handle OAuth callbacks
         app.addRoute(
-            (context) => Promise.resolve(context.activity.type === ActivityTypes.Event && context.activity.name === tokenResponseEventName),
+            (context) =>
+                Promise.resolve(
+                    context.activity.type === ActivityTypes.Event && context.activity.name === tokenResponseEventName
+                ),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
                 await this.runDialog(context, state, userDialogStatePropertyName);
             },
-            false);
+            false
+        );
         app.addRoute(
-            (context) => Promise.resolve(context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName),
+            (context) =>
+                Promise.resolve(
+                    context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName
+                ),
+            async (context, state) => {
+                const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+                const result = await this.runDialog(context, state, userDialogStatePropertyName);
+
+                if (result.status === DialogTurnStatus.complete && result.result?.token) {
+                    // Populate the token in the temp state
+                    state.temp.value.authToken = await this.signInUser(context, state);
+
+                    await context.sendActivity({
+                        value: { status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                } else {
+                    await context.sendActivity({
+                        value: { status: 400 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+        app.addRoute(
+            (context) =>
+                Promise.resolve(
+                    context.activity.type === ActivityTypes.Invoke &&
+                        context.activity.name === tokenExchangeOperationName
+                ),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
                 await this.runDialog(context, state, userDialogStatePropertyName);
@@ -60,18 +94,8 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
                     type: ActivityTypes.InvokeResponse
                 });
             },
-            true);
-        app.addRoute(
-            (context) => Promise.resolve(context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName),
-            async (context, state) => {
-                const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                await this.runDialog(context, state, userDialogStatePropertyName);
-                await context.sendActivity({
-                    value: { status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
-            },
-            true);
+            true
+        );
     }
 
     /**
@@ -82,7 +106,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @param state Application state.
      * @returns The authentication token or undefined if the user is still login in.
      */
-    public async signInUser(context: TurnContext, state: TState): Promise<string|undefined> {
+    public async signInUser(context: TurnContext, state: TState): Promise<string | undefined> {
         // Get property names to use
         const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
         const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
@@ -93,7 +117,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
 
         const results = await this.runDialog(context, state, userDialogStatePropertyName);
-        if (results.status === DialogTurnStatus.complete) {
+        if (results.status === DialogTurnStatus.complete && results.result != undefined) {
             // Get user auth state
             const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
             if (!userAuthState.signedIn && userAuthState.message) {
@@ -117,6 +141,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     /**
      * Signs out a user.
      * @param context Current turn context.
+     * @param state
      */
     public signOutUser(context: TurnContext, state: TState): Promise<void> {
         // Delete user auth state
@@ -135,6 +160,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @param context
      * @private
      */
     private getUserAuthStatePropertyName(context: TurnContext): string {
@@ -142,6 +168,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @param context
      * @private
      */
     private getUserDialogStatePropertyName(context: TurnContext): string {
@@ -149,9 +176,16 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @param context
+     * @param state
+     * @param dialogStateProperty
      * @private
      */
-    private async runDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<OAuthPromptResult>> {
+    private async runDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<OAuthPromptResult>> {
         // Save the
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);

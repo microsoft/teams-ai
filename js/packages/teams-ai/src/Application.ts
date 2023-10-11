@@ -198,7 +198,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _authentication?: Authentication<TState>;
-        private _typingTimer: any;
+    private _typingTimer: any;
 
     /**
      * Creates a new Application instance.
