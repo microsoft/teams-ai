@@ -148,7 +148,8 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteAdaptiveCardHandler<TState> handler)
         {
-            return OnActionExecute(new Regex(@"^" + Regex.Escape(verb) + @"$"), handler);
+            RouteSelector routeSelector = CreateActionExecuteSelector((string input) => verb.Equals(input));
+            return OnActionExecute(routeSelector, handler);
         }
 
         /// <summary>
@@ -159,7 +160,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteAdaptiveCardHandler<TState> handler)
         {
-            RouteSelector routeSelector = CreateActionExecuteSelector(verbPattern);
+            RouteSelector routeSelector = CreateActionExecuteSelector((string input) => verbPattern.IsMatch(input));
             return OnActionExecute(routeSelector, handler);
         }
 
@@ -239,7 +240,8 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteTextHandler<TState> handler)
         {
-            return OnActionExecute(new Regex(@"^" + Regex.Escape(verb) + @"$"), handler);
+            RouteSelector routeSelector = CreateActionExecuteSelector((string input) => verb.Equals(input));
+            return OnActionExecute(routeSelector, handler);
         }
 
         /// <summary>
@@ -250,7 +252,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteTextHandler<TState> handler)
         {
-            RouteSelector routeSelector = CreateActionExecuteSelector(verbPattern);
+            RouteSelector routeSelector = CreateActionExecuteSelector((string input) => verbPattern.IsMatch(input));
             return OnActionExecute(routeSelector, handler);
         }
 
@@ -330,7 +332,9 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit(string verb, ActionSubmitHandler<TState> handler)
         {
-            return OnActionSubmit(new Regex(@"^" + Regex.Escape(verb) + @"$"), handler);
+            string filter = _app.Options.AdaptiveCards?.ActionSubmitFilter ?? DEFAULT_ACTION_SUBMIT_FILTER;
+            RouteSelector routeSelector = CreateActionSubmitSelector((string input) => verb.Equals(input), filter);
+            return OnActionSubmit(routeSelector, handler);
         }
 
         /// <summary>
@@ -342,7 +346,7 @@ namespace Microsoft.TeamsAI.Application
         public Application<TState, TTurnStateManager> OnActionSubmit(Regex verbPattern, ActionSubmitHandler<TState> handler)
         {
             string filter = _app.Options.AdaptiveCards?.ActionSubmitFilter ?? DEFAULT_ACTION_SUBMIT_FILTER;
-            RouteSelector routeSelector = CreateActionSubmitSelector(verbPattern, filter);
+            RouteSelector routeSelector = CreateActionSubmitSelector((string input) => verbPattern.IsMatch(input), filter);
             return OnActionSubmit(routeSelector, handler);
         }
 
@@ -407,7 +411,8 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(string dataset, SearchHandler<TState> handler)
         {
-            return OnSearch(new Regex(@"^" + Regex.Escape(dataset) + @"$"), handler);
+            RouteSelector routeSelector = CreateSearchSelector((string input) => dataset.Equals(input));
+            return OnSearch(routeSelector, handler);
         }
 
         /// <summary>
@@ -418,7 +423,7 @@ namespace Microsoft.TeamsAI.Application
         /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(Regex datasetPattern, SearchHandler<TState> handler)
         {
-            RouteSelector routeSelector = CreateSearchSelector(datasetPattern);
+            RouteSelector routeSelector = CreateSearchSelector((string input) => datasetPattern.IsMatch(input));
             return OnSearch(routeSelector, handler);
         }
 
@@ -500,7 +505,7 @@ namespace Microsoft.TeamsAI.Application
             return _app;
         }
 
-        private RouteSelector CreateActionExecuteSelector(Regex verbPattern)
+        private RouteSelector CreateActionExecuteSelector(Func<string, bool> isMatch)
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -510,12 +515,12 @@ namespace Microsoft.TeamsAI.Application
                     return Task.FromResult(false);
                 }
                 AdaptiveCardInvokeValue? invokeValue = GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity);
-                return Task.FromResult(invokeValue != null && verbPattern.IsMatch(invokeValue.Action.Verb));
+                return Task.FromResult(invokeValue != null && isMatch(invokeValue.Action.Verb));
             };
             return routeSelector;
         }
 
-        private RouteSelector CreateActionSubmitSelector(Regex verbPattern, string filter)
+        private RouteSelector CreateActionSubmitSelector(Func<string, bool> isMatch, string filter)
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -525,12 +530,12 @@ namespace Microsoft.TeamsAI.Application
                     return Task.FromResult(false);
                 }
                 JObject? data = turnContext.Activity.Value as JObject;
-                return Task.FromResult(data != null && data[filter] != null && data[filter]!.Type == JTokenType.String && verbPattern.IsMatch(data[filter]!.Value<string>()));
+                return Task.FromResult(data != null && data[filter] != null && data[filter]!.Type == JTokenType.String && isMatch(data[filter]!.Value<string>()!));
             };
             return routeSelector;
         }
 
-        private RouteSelector CreateSearchSelector(Regex datasetPattern)
+        private RouteSelector CreateSearchSelector(Func<string, bool> isMatch)
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -540,7 +545,7 @@ namespace Microsoft.TeamsAI.Application
                     return Task.FromResult(false);
                 }
                 AdaptiveCardSearchInvokeValue? searchInvokeValue = GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity);
-                return Task.FromResult(searchInvokeValue != null && datasetPattern.IsMatch(searchInvokeValue.Dataset));
+                return Task.FromResult(searchInvokeValue != null && isMatch(searchInvokeValue.Dataset));
             };
             return routeSelector;
         }
