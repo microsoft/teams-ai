@@ -2,7 +2,6 @@
 using Microsoft.TeamsAI.AI.Planner;
 using System.Reflection;
 using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamsAI.AI.Moderator;
 using Microsoft.TeamsAI.Utilities;
@@ -23,7 +22,12 @@ namespace Microsoft.TeamsAI.AI
     {
         private readonly IActionCollection<TState> _actions;
 
-        public AI(AIOptions<TState> options, ILogger? logger = null)
+        /// <summary>
+        /// Creates an instance of the <see cref="AI{TState}"/> class.
+        /// </summary>
+        /// <param name="options">The options to configure.</param>
+        /// <param name="loggerFactory">Optional. The logger factory to use.</param>
+        public AI(AIOptions<TState> options, ILoggerFactory? loggerFactory = null)
         {
             Verify.ParamNotNull(options);
 
@@ -37,9 +41,8 @@ namespace Microsoft.TeamsAI.AI
 
             Options.History ??= new AIHistoryOptions();
 
-
             // Import default actions
-            ImportActions(new DefaultActions<TState>(logger));
+            ImportActions(new DefaultActions<TState>(loggerFactory));
         }
 
         /// <summary>
@@ -60,6 +63,9 @@ namespace Microsoft.TeamsAI.AI
         /// </summary>
         public IPlanner<TState> Planner => Options.Planner;
 
+        /// <summary>
+        /// Returns the prompt manager being used by the AI system.
+        /// </summary>
         public IPromptManager<TState> Prompts => Options.PromptManager;
 
         /// <summary>
@@ -102,7 +108,7 @@ namespace Microsoft.TeamsAI.AI
                 }
                 else
                 {
-                    throw new AIException($"Attempting to register an already existing action `{name}` that does not allow overrides.");
+                    throw new InvalidOperationException($"Attempting to register an already existing action `{name}` that does not allow overrides.");
                 }
             }
 
@@ -142,7 +148,7 @@ namespace Microsoft.TeamsAI.AI
             HashSet<string> uniquenessCheck = new(from x in result select x.Name, StringComparer.OrdinalIgnoreCase);
             if (result.Count > uniquenessCheck.Count)
             {
-                throw new AIException("Function overloads are not supported, please differentiate function names");
+                throw new InvalidOperationException("Function overloads are not supported, please differentiate function names");
             }
 
             // Register the actions
@@ -167,7 +173,7 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
+        /// <exception cref="InvalidOperationException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
@@ -180,7 +186,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (aIOptions.Prompt == null)
                 {
-                    throw new AIException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
+                    throw new InvalidOperationException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
                 }
                 else
                 {
@@ -191,7 +197,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, aIOptions);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPrompt(turnContext, turnState, prompt);
+            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
 
             return await ChainAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
         }
@@ -212,7 +218,7 @@ namespace Microsoft.TeamsAI.AI
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        /// <exception cref="AIException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
+        /// <exception cref="InvalidOperationException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
         public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, PromptTemplate prompt, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
@@ -224,7 +230,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, opts);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await opts.PromptManager.RenderPrompt(turnContext, turnState, prompt);
+            PromptTemplate renderedPrompt = await opts.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
 
             // Review prompt
             Plan? plan = await opts.Moderator!.ReviewPrompt(turnContext, turnState, renderedPrompt);
@@ -237,7 +243,7 @@ namespace Microsoft.TeamsAI.AI
             }
 
             // Process generated plan
-            bool continueChain = await _actions[DefaultActionTypes.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
+            bool continueChain = await this._actions[AIConstants.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
             if (continueChain)
             {
                 // Update conversation history
@@ -248,7 +254,7 @@ namespace Microsoft.TeamsAI.AI
                     int doubleMaxTurns = opts.History.MaxTurns * 2;
 
                     ConversationHistory.AddLine(turnState, $"{userPrefix} {userInput}", doubleMaxTurns);
-                    string assisstantPrefix = Options.History!.AssistantPrefix.Trim();
+                    string assistantPrefix = Options.History!.AssistantPrefix.Trim();
 
                     switch (opts?.History.AssistantHistoryType)
                     {
@@ -258,7 +264,7 @@ namespace Microsoft.TeamsAI.AI
                                 .OfType<PredictedSayCommand>()
                                 .Select(c => c.Response));
 
-                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix}, {text}");
+                            ConversationHistory.AddLine(turnState, $"{assistantPrefix}, {text}");
 
                             break;
 
@@ -266,7 +272,7 @@ namespace Microsoft.TeamsAI.AI
                         default:
                             // Embed the plan object to re-enforce the model
                             // TODO: Add support for XML as well
-                            ConversationHistory.AddLine(turnState, $"{assisstantPrefix} {plan.ToJsonString()}");
+                            ConversationHistory.AddLine(turnState, $"{assistantPrefix} {plan.ToJsonString()}");
                             break;
                     }
 
@@ -288,27 +294,27 @@ namespace Microsoft.TeamsAI.AI
                         };
 
                         // Call action handler
-                        continueChain = await _actions[DefaultActionTypes.DoCommandActionName]
+                        continueChain = await this._actions[AIConstants.DoCommandActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, data, doCommand.Action);
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
-                        continueChain = await _actions[DefaultActionTypes.UnknownActionName]
+                        continueChain = await this._actions[AIConstants.UnknownActionName]
                             .Handler
                             .PerformAction(turnContext, turnState!, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
-                    continueChain = await _actions[DefaultActionTypes.SayCommandActionName]
+                    continueChain = await this._actions[AIConstants.SayCommandActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState!, sayCommand, DefaultActionTypes.SayCommandActionName);
+                        .PerformAction(turnContext, turnState!, sayCommand, AIConstants.SayCommandActionName);
                 }
                 else
                 {
-                    throw new AIException($"Unknown command of {command.Type} predicted");
+                    throw new InvalidOperationException($"Unknown command of {command.Type} predicted");
                 }
             }
 
@@ -335,7 +341,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, promptTemplate);
+            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPromptAsync(turnContext, turnState, promptTemplate);
 
             // Complete the prompt
             return await aiOptions.Planner.CompletePromptAsync(turnContext, turnState, renderedPrompt, aiOptions, cancellationToken);
@@ -361,7 +367,7 @@ namespace Microsoft.TeamsAI.AI
             _SetTempStateValues(turnState, turnContext, aiOptions);
 
             // Render the prompt
-            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPrompt(turnContext, turnState, name);
+            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPromptAsync(turnContext, turnState, name);
 
             // Complete the prompt
             return await aiOptions.Planner.CompletePromptAsync(turnContext, turnState, renderedPrompt, aiOptions, cancellationToken);
@@ -425,7 +431,7 @@ namespace Microsoft.TeamsAI.AI
             {
                 if (string.IsNullOrEmpty(tempState.Input))
                 {
-                    tempState.Input = turnContext.Activity.Text;
+                    tempState.Input = turnContext.Activity.Text ?? string.Empty;
                 }
 
                 if (string.IsNullOrEmpty(tempState.History) && options?.History != null && options.History.TrackHistory)

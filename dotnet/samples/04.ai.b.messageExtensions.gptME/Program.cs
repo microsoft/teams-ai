@@ -40,8 +40,51 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 bool PREVIEW_MODE = false;
 
+#region Use Azure OpenAI and Azure Content Safety
+// Following code is for using Azure OpenAI and Azure Content Safety
+if (config.Azure == null
+    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
+    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
+    || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
+    || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
+{
+    throw new Exception("Missing Azure configuration.");
+}
+builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
+builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
+
+// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+builder.Services.AddTransient<IBot>(sp =>
+{
+    // Create loggers
+    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
+
+    // Create AzureOpenAIPlanner
+    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(
+        sp.GetService<AzureOpenAIPlannerOptions>()!,
+        loggerFactory);
+
+    // Create AzureContentSafetyModerator
+    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
+
+    // Create Application
+    AIOptions<TurnState> aiOptions = new(
+        planner: planner,
+        promptManager: new PromptManager<TurnState>("./Prompts"),
+        moderator: moderator);
+    ApplicationOptions<TurnState, TurnStateManager> ApplicationOptions = new()
+    {
+        TurnStateManager = new TurnStateManager(),
+        Storage = sp.GetService<IStorage>(),
+        AI = aiOptions,
+        LoggerFactory = loggerFactory,
+    };
+    return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
+});
+#endregion
+
 #region Use OpenAI
-// Use OpenAI
+/** // Use OpenAI
 if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new Exception("Missing OpenAI configuration.");
@@ -61,60 +104,12 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<TurnState>>());
+        loggerFactory);
 
     // Create OpenAIModerator
     IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(
         sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory.CreateLogger<OpenAIModerator<TurnState>>(),
-        moderatorHttpClient);
-
-    // Create Application
-    AIOptions<TurnState> aiOptions = new(
-        planner: planner,
-        promptManager: new PromptManager<TurnState>("./Prompts"),
-        moderator: moderator);
-    ApplicationOptions<TurnState, TurnStateManager> ApplicationOptions = new()
-    {
-        TurnStateManager = new TurnStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions
-    };
-    return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
-});
-#endregion
-
-#region Use Azure OpenAI and Azure Content Safety
-/** // Following code is for using Azure OpenAI and Azure Content Safety
-if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
-    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
-    || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
-    || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
-{
-    throw new Exception("Missing Azure configuration.");
-}
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
-builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
-
-// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-builder.Services.AddTransient<IBot>(sp =>
-{
-    // Create loggers
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
-
-    // Create AzureOpenAIPlanner
-    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(
-        sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<TurnState>>());
-
-    // Create AzureContentSafetyModerator
-    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(
-        sp.GetService<AzureContentSafetyModeratorOptions>()!,
-        loggerFactory.CreateLogger<AzureContentSafetyModerator<TurnState>>(),
+        loggerFactory,
         moderatorHttpClient);
 
     // Create Application
@@ -127,6 +122,7 @@ builder.Services.AddTransient<IBot>(sp =>
         TurnStateManager = new TurnStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
+        LoggerFactory = loggerFactory,
     };
     return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
 });

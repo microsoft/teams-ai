@@ -7,82 +7,32 @@ In this folder you will find various examples showcasing the different capabilit
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [Azure OpenAI](https://aka.ms/oai/access) resource or an account with [OpenAI](https://platform.openai.com).
 
-### Consuming the latest version of the library (preview only)
-
-> **NOTE:** As the library has not been published to NuGet's public registry, please complete the following steps to be able to use the samples. Otherwise, the samples will not work.
-
-There are two paths to get the package. Please do one of the following, not both.
-
-<ul><li><details>
-<summary><h4>Option 1: Install package via GitHub package manager</h4></summary>
-
-Follow the instructions below to generate the `.nukpg` NuGet package file of the library to locally consume within the sample:
-
-1. Clone the repository and verify you are on `main` branch:
-
-`git clone https://github.com/Microsoft/teams-ai.git`
-
-1. Generate a [Personal Github Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the `package:read` permission.
-1. Update the `Nuget.Config` file of the sample you are testing with your Github username and your new access token as the password.
-   ![Nuget.Config](./assets/screenshot-1.png)
-1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
-
-![Install Package](./assets/screenshot-0.png)
-
-❕❕ If you followed the above directions, you do not need to do Option 2 below. [Skip to building your sample](#setting-up-a-sample)
-
-</details></li>
-<li><details> <!-- done to minimize whitespace between blocks -->
-    <summary><h4>Option 2: Install Package via local build</h4></summary>
-
-1. Clone the repository and verify you are on `main` branch:
-
-`git clone https://github.com/Microsoft/teams-ai.git`
-
-1. Navigate to the `teams-ai/dotnet/packages/Microsoft.TeamsAI` folder.
-1. Run `dotnet pack` in terminal.
-1. Verify the output you received:
-
-```bash
-Successfully created package "C:...\teams-ai\dotnet\packages\Microsoft.TeamsAI\Microsoft.TeamsAI\bin\Debug\Microsoft.TeamsAI.1.0.0.nupkg"
-```
-
-1. Move the `Microsoft.TeamsAI.1.0.0.nupkg` to the `LocalPkg/` folder within the sample folder you are testing.
-1. Navigate to `Tools > Nuget Package Manager > Manage Nuget Packages For Solution` and install `Microsoft.TeamsAI`.
-   > Alternatively, you can run `dotnet add package Microsoft.TeamsAI`.
-   </details>
-   </li>
-   </ul>
-
-Now you may proceed with setting up the sample.
-
 ## Setting up a sample
 
 1. If you have not yet, clone the repository:
 
 `git clone https://github.com/Microsoft/teams-ai.git`
 
-2. Navigate to the `teams-ai/dotnet/samples` folder, pick a sample (ex. `01.a.echoBot`) and open the `.sln` file.
-
-By this point you should have your sample open in your IDE of choice.
+2. Pick your sample from the `dotnet/samples/` folder.
 
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
 <details open>
-    <summary><h3> Using Teams Toolkit for Visual Studio </h3></summary>
+    <summary><h3> Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
 
 #### Additional Prerequisites
 
-- [Visual Studio 2022 17.7.0 Preview 3.0](https://visualstudio.microsoft.com/vs/preview/)
-- Teams Toolkit extension (installed through the Visual Studio installer)
-  - Select Microsoft Teams development tools under ASP.NET and web development.
-  - ![Teams Toolkit Installation](/dotnet/samples/assets/ttk-install.png)
+- Visual Studio 2022 17.7.0 (or a greater version)
+- [Teams Toolkit extension](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/toolkit-v4/install-teams-toolkit-vs?pivots=visual-studio-v17-7)
 
 #### Steps
 
 1. Open the solution in Visual Studio. (For example `EchoBot.sln`).
-   - Ensure that you set the appropriate config values (ex OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.
-1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel
+   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.  If you can't find this section, then it means that the bot does not need them.
+1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel.
+
+   ![image](https://github.com/microsoft/teams-ai/assets/115390646/d7246d38-8276-4b2a-bc22-b72f36aa41b9)
+
 1. Right-click your project and select `Teams Toolkit > Prepare Teams App Dependencies`
 1. If prompted, sign in with a Microsoft 365 account for the Teams organization you want
    to install the app to.
@@ -92,7 +42,7 @@ There are a few ways to get the application up and running. The latest way is us
 > a free program to get your own dev environment sandbox that includes Teams.
 
 4. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio
-5. In the launched browser, select the Add button to load the app in Teams
+5. In the launched browser, select the `Add` button to load the app in Teams
 6. This should redirect you to a chat window with the bot.
 </details>
 

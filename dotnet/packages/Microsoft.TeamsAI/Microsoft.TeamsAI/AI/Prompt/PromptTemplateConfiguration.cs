@@ -1,5 +1,5 @@
 ﻿using Microsoft.SemanticKernel.SemanticFunctions;
-using Microsoft.TeamsAI.Exceptions;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static Microsoft.SemanticKernel.SemanticFunctions.PromptTemplateConfig;
@@ -98,6 +98,9 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// </summary>
         public class InputConfig
         {
+            /// <summary>
+            /// List of all input parameters for a semantic function.
+            /// </summary>
             [JsonPropertyName("parameters")]
             [JsonPropertyOrder(1)]
             public List<InputParameterValues> Parameters { get; set; } = new();
@@ -189,11 +192,11 @@ namespace Microsoft.TeamsAI.AI.Prompt
         /// <returns>Prompt template configuration.</returns>
         internal static PromptTemplateConfiguration FromJson(string json)
         {
-            var result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
+            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
 
             if (result == null)
             {
-                throw new PromptManagerException("Failed to deserialize prompt configuration JSON string");
+                throw new SerializationException("Failed to deserialize prompt configuration JSON string");
             }
 
             return result;

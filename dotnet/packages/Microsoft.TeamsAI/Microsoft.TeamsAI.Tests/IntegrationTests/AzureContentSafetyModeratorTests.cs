@@ -5,24 +5,18 @@ using Microsoft.TeamsAI.AI;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
-using Xunit.Abstractions;
-using Microsoft.TeamsAI.AI.Action;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.State;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.Tests.TestUtils;
 
 namespace Microsoft.TeamsAI.Tests.IntegrationTests
 {
     public sealed class AzureContentSafetyModeratorTests
     {
         private readonly IConfigurationRoot _configuration;
-        private readonly RedirectOutput _output;
 
-        public AzureContentSafetyModeratorTests(ITestOutputHelper output)
+        public AzureContentSafetyModeratorTests()
         {
-            _output = new RedirectOutput(output);
-
             var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             if (string.IsNullOrWhiteSpace(currentAssemblyDirectory))
@@ -50,7 +44,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("AzureContentSafety").Get<AzureContentSafetyConfiguration>();
             var options = new AzureContentSafetyModeratorOptions(config.ApiKey, config.Endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options, _output);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
 
             var botAdapterMock = new Mock<BotAdapter>();
             // TODO: when TurnState is implemented, get the user input
@@ -69,8 +63,8 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             if (flagged)
             {
                 Assert.NotNull(result);
-                Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
-                Assert.Equal(DefaultActionTypes.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
+                Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
             }
             else
             {
@@ -86,7 +80,7 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("AzureContentSafety").Get<AzureContentSafetyConfiguration>();
             var options = new AzureContentSafetyModeratorOptions(config.ApiKey, config.Endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState>(options, _output);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
 
             var turnContextMock = new Mock<ITurnContext>();
             var turnStateMock = new Mock<TurnState>();
@@ -101,12 +95,12 @@ namespace Microsoft.TeamsAI.Tests.IntegrationTests
             // Assert
             if (flagged)
             {
-                Assert.Equal(AITypes.DoCommand, result.Commands[0].Type);
-                Assert.Equal(DefaultActionTypes.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
+                Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
             }
             else
             {
-                Assert.Equal(AITypes.SayCommand, result.Commands[0].Type);
+                Assert.Equal(AIConstants.SayCommand, result.Commands[0].Type);
             }
         }
     }

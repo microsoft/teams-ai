@@ -6,16 +6,87 @@ This is a conversational bot for Microsoft Teams that thinks it's a Chef to help
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
 
-It shows SDK capabilities like:
+## Set up instructions
 
-<details open>
-    <summary><h3>Bot scaffolding</h3></summary>
+All the samples in the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../README.md).
+
+Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
+
+1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
+
+    ```json
+      "Azure": {
+        "OpenAIApiKey": "<your-azure-openai-api-key>",
+        "OpenAIEndpoint": "<your-azure-openai-endpoint>",
+        "ContentSafetyApiKey": "<your-azure-content-safety-api-key>",
+        "ContentSafetyEndpoint": "<your-azure-content-safety-endpoint>"
+      }
+    ```
+
+## Interacting with the bot
+
+![Teams Chef Bot](./assets/TeamsChefBot.png)
+
+Interacting with the bot is simple - talk to it! You can invoke it by using @ mention and talk to it in plain language.
+
+The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation. This is possible due to the `skprompt.txt` file's contents.
+
+## Deploy to Azure
+
+You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
+
+You can find deployment instructions [here](../README.md#deploy-to-azure).
+
+Note that, this sample requires AI service so you need one more pre-step before deploy to Azure. To configure the Azure resources to have an environment variable for the Azure OpenAI Key and other settings:
+
+1. In `./env/.env.dev.user` file, paste your Azure OpenAI related variables.
+
+    ```bash
+    SECRET_AZURE_OPENAI_API_KEY=
+    SECRET_AZURE_OPENAI_ENDPOINT=
+    SECRET_AZURE_CONTENT_SAFETY_API_KEY=
+    SECRET_AZURE_CONTENT_SAFETY_ENDPOINT=
+    ```
+
+The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
+
+## Use OpenAI
+
+Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI as AI service.
+
+**As prerequisites**
+
+1. Prepare your own OpenAI service.
+1. Modify source code `Program.cs`, comment out the "*#Use Azure OpenAI and Azure Content Safety*" part, and uncomment the "*#Use OpenAI*" part.
+
+**For debugging (F5)**
+
+1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
+
+    ```json
+      "OpenAI": {
+        "ApiKey": "<your-openai-api-key>"
+      },
+    ```
+
+**For deployment to Azure**
+
+To configure the Azure resources to have OpenAI environment variables:
+
+1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
+
+## Appendix
+
+Here's a list of the different capabilities shown in this sample:
+
+<details close>
+    <summary><h5>Bot scaffolding</h5></summary>
     Throughout the 'Program.cs' file you'll see the scaffolding created to run a simple conversational bot, e.g. storage, authentication, and conversation state.
 </details>
 
 </details>
-<details open>
-    <summary><h3>Prompt engineering</h3></summary>
+<details close>
+    <summary><h5>Prompt engineering</h5></summary>
 The 'Prompts/Chat/skprompt.txt' file has descriptive prompt engineering that, in plain language and with minor training, instructs GPT how the bot should conduct itself and facilitate conversation.
 
 #### skprompt.txt
@@ -36,8 +107,8 @@ AI:
 - The variables "*{{input}}*", and "*{{history}}*" are automatically resolved from `TurnState.Temp`.
 
 </details>
-<details open>
-    <summary><h3>Conversational session history</h3></summary>
+<details close>
+    <summary><h5>Conversational session history</h5></summary>
     Because this sample leaves the conversation to GPT, the bot simply facilitates user conversation as-is. But because it includes the 'skprompt.txt' file to guide it, GPT will store and leverage session history appropriately.
 
 For example, let's say the user's name is "Dave". The bot might carry on the following conversation:
@@ -55,79 +126,10 @@ AI: Great question! You can build a variety ...
 Notice that the bot remembered Dave's first message when responding to the second.
 
 </details>
-<details open>
-    <summary><h3>Localization across languages</h3></summary>
+<details close>
+    <summary><h5>Localization across languages</h5></summary>
     Because this sample leverages GPT for all its natural language modelling, the user can talk to an AI bot in any language of their choosing. The bot will understand and respond appropriately with no additional code required.
 </details>
-
-## Set up instructions
-
-All the samples in for the C# .NET SDK can be set up in the same way. You can find the step by step instructions here: [Setup Instructions](../README.md).
-
-Note that, this sample requires AI service so you need one more pre-step before Local Debug (F5).
-
-1. Set your [OpenAI API Key](https://openai.com/api/) to *appsettings.Development.json*.
-
-    ```json
-      "OpenAI": {
-        "ApiKey": "<your-openai-api-key>"
-      },
-    ```
-
-## Interacting with the bot
-
-![Teams Chef Bot](./assets/TeamsChefBot.png)
-
-Interacting with the bot is simple - talk to it! You can invoke it by using @ mention and talk to it in plain language.
-
-The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation. This is possible due to the `skprompt.txt` file's contents.
-
-## Deploy to Azure
-
-You can use Teams Toolkit for Visual Studio or CLI to host the bot in Azure. The sample includes Bicep templates in the `/infra` directory which are used by the tools to create resources in Azure.
-
-You can find deployment instructions [here](../README.md#deploy-to-azure).
-
-Note that, this sample requires AI service so you need one more pre-step before deploy to Azure. To configure the Azure resources to have an environment variable for the OpenAI Key:
-
-1. In `./env/.env.dev.user` file, paste your [OpenAI API Key](https://openai.com/api/) to the environment variable `SECRET_OPENAI_KEY=`.
-
-The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in any logging output and is optional.
-
-## Use Azure OpenAI
-
-Above steps use OpenAI as AI service, optionally, you can also use Azure OpenAI as AI service.
-
-**As prerequisites**
-
-1. Prepare your own Azure OpenAI service and Azure AI Content Safety service.
-1. Modify source code `Program.cs`, comment out the "*#Use OpenAI*" part, and uncomment the "*#Use Azure OpenAI and Azure Content Safety*" part.
-
-**For debugging (F5)**
-
-1. Set your Azure OpenAI related settings to *appsettings.Development.json*.
-
-    ```json
-      "Azure": {
-        "OpenAIApiKey": "<your-azure-openai-api-key>",
-        "OpenAIEndpoint": "<your-azure-openai-endpoint>",
-        "ContentSafetyApiKey": "<your-azure-content-safety-api-key>",
-        "ContentSafetyEndpoint": "<your-azure-content-safety-endpoint>"
-      }
-    ```
-
-**For deployment to Azure**
-
-To configure the Azure resources to have Azure OpenAI environment variables:
-
-1. In `./env/.env.dev.user` file, paste your Azure OpenAI related variables.
-
-    ```bash
-    SECRET_AZURE_OPENAI_API_KEY=
-    SECRET_AZURE_OPENAI_ENDPOINT=
-    SECRET_AZURE_CONTENT_SAFETY_API_KEY=
-    SECRET_AZURE_CONTENT_SAFETY_ENDPOINT=
-    ```
 
 ## Further reading
 

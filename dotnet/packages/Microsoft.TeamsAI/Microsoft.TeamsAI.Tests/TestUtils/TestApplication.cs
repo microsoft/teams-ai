@@ -5,6 +5,9 @@ namespace Microsoft.TeamsAI.Tests.TestUtils
     {
         public TestApplication(TestApplicationOptions options) : base(options)
         {
+            ArgumentNullException.ThrowIfNull(options);
+
+            options.StartTypingTimer = false;
         }
     }
 

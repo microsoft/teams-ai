@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamsAI.Utilities;
-
+﻿
 namespace Microsoft.TeamsAI.State
 {
     /// <summary>
@@ -10,10 +9,24 @@ namespace Microsoft.TeamsAI.State
     /// </remarks>
     public class TempState : StateBase
     {
+        /// <summary>
+        /// Name of the input property.
+        /// </summary>
         public const string InputKey = "input";
+
+        /// <summary>
+        /// Name of the output property.
+        /// </summary>
         public const string OutputKey = "output";
+
+        /// <summary>
+        /// Name of the history property.
+        /// </summary>
         public const string HistoryKey = "history";
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="TempState"/> class.
+        /// </summary>
         public TempState() : base()
         {
             this[InputKey] = string.Empty;
@@ -22,7 +35,7 @@ namespace Microsoft.TeamsAI.State
         }
 
         /// <summary>
-        /// Input pass to an AI prompt
+        /// Input passed to an AI prompt
         /// </summary>
         public string Input
         {
@@ -30,8 +43,9 @@ namespace Microsoft.TeamsAI.State
             set => Set(InputKey, value);
         }
 
+        // TODO: This is currently not used, should store AI prompt/function output here
         /// <summary>
-        /// Formatted conversation history for embedding in an AI prompt
+        /// Output returned from an AI prompt or function
         /// </summary>
         public string Output
         {
@@ -39,8 +53,9 @@ namespace Microsoft.TeamsAI.State
             set => Set(OutputKey, value);
         }
 
+
         /// <summary>
-        /// Output returned from an AI prompt or function
+        /// Formatted conversation history for embedding in an AI prompt
         /// </summary>
         public string History
         {

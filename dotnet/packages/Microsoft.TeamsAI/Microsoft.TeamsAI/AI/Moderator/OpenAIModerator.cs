@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI.Planner;
+﻿using Microsoft.TeamsAI.AI.Planner;
 using Microsoft.TeamsAI.AI.Prompt;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
     /// <summary>
     /// An moderator that uses OpenAI's moderation API.
     /// </summary>
-    /// <typeparam name="TState"></typeparam>
+    /// <typeparam name="TState">The turn state class.</typeparam>
     public class OpenAIModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         private readonly OpenAIModeratorOptions _options;
@@ -22,9 +21,9 @@ namespace Microsoft.TeamsAI.AI.Moderator
         /// Constructs an instance of the moderator.
         /// </summary>
         /// <param name="options">Options to configure the moderator</param>
-        /// <param name="logger">A logger instance</param>
+        /// <param name="loggerFactory">The logger factory instance</param>
         /// <param name="httpClient">HTTP client.</param>
-        public OpenAIModerator(OpenAIModeratorOptions options, ILogger? logger = null, HttpClient? httpClient = null)
+        public OpenAIModerator(OpenAIModeratorOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             _options = options;
 
@@ -33,7 +32,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 Organization = _options.Organization,
             };
 
-            _client = new OpenAIClient(clientOptions, logger, httpClient);
+            _client = new OpenAIClient(clientOptions, loggerFactory, httpClient);
         }
 
         /// <inheritdoc />
@@ -96,14 +95,14 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 {
                     if (result.Flagged)
                     {
-                        string actionName = isModelInput ? DefaultActionTypes.FlaggedInputActionName : DefaultActionTypes.FlaggedOutputActionName;
+                        string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
 
                         // Flagged
                         return new Plan()
                         {
                             Commands = new List<IPredictedCommand>
                             {
-                                new PredictedDoCommand(actionName, new Dictionary<string, object>
+                                new PredictedDoCommand(actionName, new Dictionary<string, object?>
                                 {
                                     { "Result", result }
                                 })
@@ -115,16 +114,16 @@ namespace Microsoft.TeamsAI.AI.Moderator
                 return null;
 
             }
-            catch (OpenAIClientException e)
+            catch (HttpOperationException e)
             {
                 // Rate limited
-                if (e.statusCode != null && (int)e.statusCode == 429)
+                if (e.StatusCode != null && (int)e.StatusCode == 429)
                 {
                     return new Plan()
                     {
                         Commands = new List<IPredictedCommand>
                         {
-                            new PredictedDoCommand(DefaultActionTypes.RateLimitedActionName)
+                            new PredictedDoCommand(AIConstants.RateLimitedActionName)
                         }
                     };
 

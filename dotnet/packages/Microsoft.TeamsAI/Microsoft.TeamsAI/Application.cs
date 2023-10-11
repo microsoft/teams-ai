@@ -26,12 +26,15 @@ namespace Microsoft.TeamsAI
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
+    /// <typeparam name="TTurnStateManager">Type of the turn state manager.</typeparam>
+
     public class Application<TState, TTurnStateManager> : IBot
         where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>, new()
     {
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
+        private TypingTimer? _typingTimer;
 
         /// <summary>
         /// Creates a new Application instance.
@@ -47,11 +50,11 @@ namespace Microsoft.TeamsAI
 
             if (Options.AI != null)
             {
-                _ai = new AI<TState>(Options.AI, Options.Logger);
+                _ai = new AI<TState>(Options.AI, Options.LoggerFactory);
             }
 
             // Validate long running messages configuration
-            if (Options.LongRunningMessages == true && (Options.Adapter == null || Options.BotAppId == null))
+            if (Options.LongRunningMessages && (Options.Adapter == null || Options.BotAppId == null))
             {
                 throw new ArgumentException("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.");
             }
@@ -76,6 +79,47 @@ namespace Microsoft.TeamsAI
 
                 return _ai;
             }
+        }
+
+        /// <summary>
+        /// Manually start a timer to periodically send "typing" activities.
+        /// </summary>
+        /// <remarks>
+        /// The timer waits 1000ms to send its initial "typing" activity and then send an additional
+        /// "typing" activity every 1000ms.The timer will automatically end once an outgoing activity
+        /// has been sent. If the timer is already running or the current activity is not a "message"
+        /// the call is ignored.
+        /// </remarks>
+        /// <param name="turnContext">The turn context.</param>
+        public void StartTypingTimer(ITurnContext turnContext)
+        {
+            if (turnContext.Activity.Type != ActivityTypes.Message)
+            {
+                return;
+            }
+
+            if (_typingTimer == null)
+            {
+                _typingTimer = new TypingTimer(_typingTimerDelay);
+            }
+
+            if (_typingTimer.IsRunning() == false)
+            {
+                _typingTimer.Start(turnContext);
+            }
+
+        }
+
+        /// <summary>
+        /// Manually stop the typing timer.
+        /// </summary>
+        /// <remarks>
+        /// If the timer isn't running nothing happens.
+        /// </remarks>
+        public void StopTypingTimer()
+        {
+            _typingTimer?.Dispose();
+            _typingTimer = null;
         }
 
         /// <summary>
@@ -150,15 +194,12 @@ namespace Microsoft.TeamsAI
         /// </summary>
         private async Task _OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            TypingTimer? timer = null;
-
             try
             {
                 // Start typing timer if configured
                 if (Options.StartTypingTimer)
                 {
-                    timer = new TypingTimer(_typingTimerDelay);
-                    timer.Start(turnContext);
+                    StartTypingTimer(turnContext);
                 };
 
                 // Remove @mentions
@@ -200,8 +241,8 @@ namespace Microsoft.TeamsAI
             }
             finally
             {
-                // Dipose the timer if configured
-                timer?.Dispose();
+                // Stop the timer if configured
+                StopTypingTimer();
             }
         }
 
@@ -878,9 +919,9 @@ namespace Microsoft.TeamsAI
         /// When the <see cref="RunActivityHandlerAsync(ITurnContext, TState, CancellationToken)"/>
         /// method receives a message reaction activity, it calls this method.
         /// If the message reaction indicates that reactions were added to a message, it calls
-        /// <see cref="OnReactionsAddedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, CancellationToken)"/>.
+        /// <see cref="OnReactionsAddedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>.
         /// If the message reaction indicates that reactions were removed from a message, it calls
-        /// <see cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, CancellationToken)"/>.
+        /// <see cref="OnReactionsRemovedAsync(IList{MessageReaction}, ITurnContext{IMessageReactionActivity}, TState, CancellationToken)"/>.
         ///
         /// In a derived class, override this method to add logic that applies to all message reaction activities.
         /// Add logic to apply before the reactions added or removed logic before the call to the base class
@@ -2004,9 +2045,8 @@ namespace Microsoft.TeamsAI
         /// <returns>A task that represents the work queued to execute.</returns>
         private Task _StartLongRunningCall(ITurnContext turnContext, Func<ITurnContext, CancellationToken, Task> handler, CancellationToken cancellationToken = default)
         {
-            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && Options.LongRunningMessages == true)
+            if (ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && Options.LongRunningMessages)
             {
-                /// <see cref="BotAdapter.ContinueConversationAsync"/> supports <see cref="Activity"/> as input
                 return Options.Adapter!.ContinueConversationAsync(Options.BotAppId, turnContext.Activity, (context, ct) => handler(context, ct), cancellationToken);
             }
             else

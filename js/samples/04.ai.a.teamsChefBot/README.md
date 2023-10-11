@@ -24,11 +24,13 @@
 
 ## Summary
 
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook Teams apps. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
-This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
+This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
-It shows Teams AI SDK capabilities like:
+The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
+
+The sample shows Teams AI SDK capabilities like:
 
 <details open>
     <summary><h3>Conversational bot scaffolding</h3></summary>
@@ -42,25 +44,29 @@ Open the panel below to learn fine-tuned details on how this sample works.
     Notice that outside of one '\history' command, the 'index.ts' file relies on GPT for all its natural language modelling - no code is specifically written to handle language processing. Rather, a 'predictionEngine' is defined to handle this for you:
 
 ```javascript
-// Create prediction engine
-const predictionEngine = new OpenAIPredictionEngine({
-    configuration: {
-        apiKey: process.env.OPENAI_API_KEY
-    },
-    prompt: path.join(__dirname, '../src/prompt.txt'),
-    promptConfig: {
-        model: 'text-davinci-003',
-        temperature: 0.4,
-        max_tokens: 2048,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0.6,
-        stop: [' Human:', ' AI:']
-    },
+// Create AI components
+const planner = new OpenAIPlanner({
+    apiKey: process.env.OPENAI_API_KEY || '',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
-```
 
+const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
+
+// Define storage and application
+const storage = new MemoryStorage();
+const app = new Application<ApplicationTurnState>({
+    storage,
+    ai: {
+        planner,
+        promptManager,
+        prompt: 'chat',
+        history: {
+            assistantHistoryType: 'text'
+        }
+    }
+});
+```
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>

@@ -1,0 +1,54 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+name: DOTNET CodeQL
+
+on:
+  push:
+    branches: ['main']
+    paths: ['dotnet/**']
+  pull_request:
+    branches: ['main']
+    paths: ['dotnet/**']
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@fdcae64e1484d349b3366718cdfef3d404390e85 # v2.22.1
+        with:
+          languages: csharp
+      - name: Setup .NET
+        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
+        with:
+          dotnet-version: 6.0
+      - name: Build .NET
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
+        run: dotnet build Microsoft.TeamsAI.sln --configuration Release
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@fdcae64e1484d349b3366718cdfef3d404390e85 # v2.22.1
+        with:
+          category: "/language:csharp"

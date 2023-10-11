@@ -1,0 +1,61 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    commit-message:
+      prefix: '[repo] bump: '
+      include: scope
+    labels: 
+      - dependencies
+    reviewers:
+      - microsoft/teams-ai-admins
+    schedule:
+      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+
+  - package-ecosystem: nuget
+    directory: /dotnet/packages/Microsoft.TeamsAI
+    commit-message:
+      prefix: '[C#] bump: '
+      include: scope
+    labels: 
+      - dependencies
+      - dotnet
+    reviewers:
+      - microsoft/teams-ai-admins
+    schedule:
+      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+
+  - package-ecosystem: npm
+    directory: /js
+    commit-message:
+      prefix: '[JS] bump: '
+      include: scope
+    labels:
+      - dependencies
+      - JS
+    reviewers:
+      - microsoft/teams-ai-admins
+    schedule:
+      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

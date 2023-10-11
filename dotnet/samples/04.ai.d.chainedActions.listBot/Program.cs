@@ -32,41 +32,7 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-#region Use OpenAI
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
-{
-    throw new Exception("Missing OpenAI configuration.");
-}
-
-builder.Services.AddSingleton(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003")
-{
-    LogRequests = true
-});
-
-// Create the Application.
-builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
-{
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    PromptManager<ListState> promptManager = new("./Prompts");
-
-    OpenAIPlanner<ListState> planner = new(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory.CreateLogger<OpenAIPlanner<ListState>>());
-
-    ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
-    {
-        AI = new AIOptions<ListState>(planner, promptManager)
-        {
-            Prompt = "Chat"
-        },
-        Storage = sp.GetService<IStorage>()
-    };
-
-    return new ListBotApplication(applicationOptions);
-});
-#endregion
-
 #region Use Azure OpenAI
-/**
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
@@ -86,7 +52,7 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
 
     PromptManager<ListState> promptManager = new("./Prompts");
 
-    AzureOpenAIPlanner<ListState> planner = new(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory.CreateLogger<AzureOpenAIPlanner<ListState>>());
+    AzureOpenAIPlanner<ListState> planner = new(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory);
 
     ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
     {
@@ -94,7 +60,43 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
         {
             Prompt = "Chat"
         },
-        Storage = sp.GetService<IStorage>()
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
+    };
+
+    return new ListBotApplication(applicationOptions);
+});
+#endregion
+
+#region Use OpenAI
+/**
+if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
+{
+    throw new Exception("Missing OpenAI configuration.");
+}
+
+builder.Services.AddSingleton(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003")
+{
+    LogRequests = true
+});
+
+// Create the Application.
+builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
+{
+    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
+
+    PromptManager<ListState> promptManager = new("./Prompts");
+
+    OpenAIPlanner<ListState> planner = new(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
+
+    ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
+    {
+        AI = new AIOptions<ListState>(planner, promptManager)
+        {
+            Prompt = "Chat"
+        },
+        Storage = sp.GetService<IStorage>(),
+        LoggerFactory = loggerFactory,
     };
 
     return new ListBotApplication(applicationOptions);

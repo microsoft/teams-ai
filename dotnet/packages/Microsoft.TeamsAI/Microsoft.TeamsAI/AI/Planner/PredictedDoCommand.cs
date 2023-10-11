@@ -11,7 +11,7 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// <summary>
         /// Type to indicate that a DO command is being returned.
         /// </summary>
-        public string Type { get; } = AITypes.DoCommand;
+        public string Type { get; } = AIConstants.DoCommand;
 
         /// <summary>
         /// The named action that the AI system should perform.
@@ -26,19 +26,28 @@ namespace Microsoft.TeamsAI.AI.Planner
         /// </summary>
         [JsonPropertyName("entities")]
         [JsonConverter(typeof(DictionaryJsonConverter))]
-        public Dictionary<string, object>? Entities { get; set; }
+        public Dictionary<string, object?>? Entities { get; set; }
 
-        public PredictedDoCommand(string action, Dictionary<string, object> entities)
+        /// <summary>
+        /// Creates a new instance of the <see cref="PredictedDoCommand"/> class.
+        /// </summary>
+        /// <param name="action">The action name.</param>
+        /// <param name="entities">The entities to be passed on to action handler.</param>
+        public PredictedDoCommand(string action, Dictionary<string, object?> entities)
         {
             Action = action;
             Entities = entities;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="PredictedDoCommand"/> class.
+        /// </summary>
+        /// <param name="action"></param>
         [JsonConstructor]
         public PredictedDoCommand(string action)
         {
             Action = action;
-            Entities = new Dictionary<string, object>();
+            Entities = new Dictionary<string, object?>();
         }
     }
 }
