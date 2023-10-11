@@ -1,7 +1,10 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
+using Microsoft.TeamsAI.Application;
 using NewApp = Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.Tests.TestUtils;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.TeamsAI.Tests.Application
 {
@@ -17,7 +20,6 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var turnState = new TestTurnState();
             var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
@@ -50,7 +52,6 @@ namespace Microsoft.TeamsAI.Tests.Application
             var activity = MessageFactory.Text("hello.1");
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TestTurnState();
             var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
@@ -108,7 +109,6 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var turnState = new TestTurnState();
             var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
@@ -144,7 +144,6 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TestTurnState();
             var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
@@ -195,7 +194,6 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TestTurnState();
             var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
@@ -238,7 +236,6 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var turnState = new TestTurnState();
             var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
@@ -275,6 +272,644 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Assert
             Assert.Single(selectedRoutes);
             Assert.Equal(1, selectedRoutes[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnActivity_String_Selector()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var types = new List<string>();
+            app.OnActivity(ActivityTypes.Message, (context, _, _) =>
+            {
+                types.Add(context.Activity.Type);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+
+            // Assert
+            Assert.Single(types);
+            Assert.Equal(ActivityTypes.Message, types[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnActivity_Regex_Selector()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageDelete
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var types = new List<string>();
+            app.OnActivity(new Regex("^message$"), (context, _, _) =>
+            {
+                types.Add(context.Activity.Type);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+
+            // Assert
+            Assert.Single(types);
+            Assert.Equal(ActivityTypes.Message, types[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnActivity_Function_Selector()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Name = "Message"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var types = new List<string>();
+            app.OnActivity((context, _) => Task.FromResult(context.Activity?.Name != null), (context, _, _) =>
+            {
+                types.Add(context.Activity.Type);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+
+            // Assert
+            Assert.Single(types);
+            Assert.Equal(ActivityTypes.Message, types[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnActivity_Multiple_Selectors()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageDelete,
+                Name = "Delete"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var types = new List<string>();
+            app.OnActivity(new MultipleRouteSelector
+            {
+                Strings = new[] { ActivityTypes.Invoke },
+                Regexes = new[] { new Regex("^message$") },
+                RouteSelectors = new RouteSelector[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
+            },
+            (context, _, _) =>
+            {
+                types.Add(context.Activity.Type);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Equal(3, types.Count);
+            Assert.Equal(ActivityTypes.Message, types[0]);
+            Assert.Equal(ActivityTypes.MessageDelete, types[1]);
+            Assert.Equal(ActivityTypes.Invoke, types[2]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_MembersAdded()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                MembersAdded = new List<ChannelAccount> { new() },
+                Name = "1",
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.MembersAdded, (context, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_MembersRemoved()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                MembersRemoved = new List<ChannelAccount> { new() },
+                Name = "1",
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.MembersRemoved, (context, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_SingleEvent()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRenamed"
+                },
+                Name = "1"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRenamed"
+                }
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamRenamed, (context, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_MultipleEvents()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                MembersAdded = new List<ChannelAccount> { new() },
+                Name = "1"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelDeleted"
+                },
+                Name = "2"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRenamed"
+                }
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(
+                new[] { ConversationUpdateEvents.TeamRenamed, ConversationUpdateEvents.ChannelDeleted, ConversationUpdateEvents.MembersAdded },
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Equal(2, names.Count);
+            Assert.Equal("1", names[0]);
+            Assert.Equal("2", names[1]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessage_String_Selector()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "hello a"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "welcome"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Text = "hello b"
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var texts = new List<string>();
+            app.OnMessage("hello", (context, _, _) =>
+            {
+                texts.Add(context.Activity.Text);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(texts);
+            Assert.Equal("hello a", texts[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessage_Regex_Selector()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "hello"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "welcome"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Text = "hello"
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var texts = new List<string>();
+            app.OnMessage(new Regex("llo"), (context, _, _) =>
+            {
+                texts.Add(context.Activity.Text);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(texts);
+            Assert.Equal("hello", texts[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessage_Function_Selector()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "hello"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var texts = new List<string>();
+            app.OnMessage((context, _) => Task.FromResult(context.Activity?.Text != null), (context, _, _) =>
+            {
+                texts.Add(context.Activity.Text);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+
+            // Assert
+            Assert.Single(texts);
+            Assert.Equal("hello", texts[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessage_Multiple_Selectors()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "hello a",
+                Name = "hello"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "welcome"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                Text = "hello world"
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var texts = new List<string>();
+            app.OnMessage(new MultipleRouteSelector
+            {
+                Strings = new[] { "world" },
+                Regexes = new[] { new Regex("come") },
+                RouteSelectors = new RouteSelector[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
+            },
+            (context, _, _) =>
+            {
+                texts.Add(context.Activity.Text);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Equal(3, texts.Count);
+            Assert.Equal("hello a", texts[0]);
+            Assert.Equal("welcome", texts[1]);
+            Assert.Equal("hello world", texts[2]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessageReactionsAdded()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.MessageReaction,
+                ReactionsAdded = new List<MessageReaction> { new() },
+                Name = "1",
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageReaction
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnMessageReactionsAdded((context, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessageReactionsRemoved()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.MessageReaction,
+                ReactionsRemoved = new List<MessageReaction> { new() },
+                Name = "1",
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageReaction
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnMessageReactionsRemoved((context, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
         }
     }
 }
