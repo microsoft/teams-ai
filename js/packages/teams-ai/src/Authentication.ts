@@ -32,6 +32,8 @@ import { Application } from './Application';
  */
 export class Authentication<TState extends TurnState = DefaultTurnState> {
     private readonly _oauthPrompt: OAuthPrompt;
+    private _authSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
+    private _authFailureHandler?: (context: TurnContext, state: TState) => Promise<void>;
 
     /**
      * Creates a new instance of the `Authentication` class.
@@ -63,19 +65,25 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
                 const result = await this.runDialog(context, state, userDialogStatePropertyName);
 
-                if (result.status === DialogTurnStatus.complete && result.result?.token) {
-                    // Populate the token in the temp state
-                    state.temp.value.authToken = await this.signInUser(context, state);
+                if (result.status === DialogTurnStatus.complete) {
+                    if (result.result?.token) {
+                        // Populate the token in the temp state
+                        state.temp.value.authToken = await this.signInUser(context, state);
 
-                    await context.sendActivity({
-                        value: { status: 200 } as InvokeResponse,
-                        type: ActivityTypes.InvokeResponse
-                    });
-                } else {
-                    await context.sendActivity({
-                        value: { status: 400 } as InvokeResponse,
-                        type: ActivityTypes.InvokeResponse
-                    });
+                        await context.sendActivity({
+                            value: { status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+
+                        await this._authSuccessHandler?.(context, state);
+                    } else {
+                        await context.sendActivity({
+                            value: { status: 400 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+
+                        await this._authFailureHandler?.(context, state);
+                    }
                 }
             },
             true
@@ -88,11 +96,28 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
                 ),
             async (context, state) => {
                 const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                await this.runDialog(context, state, userDialogStatePropertyName);
-                await context.sendActivity({
-                    value: { status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
+                const result = await this.runDialog(context, state, userDialogStatePropertyName);
+
+                if (result.status === DialogTurnStatus.complete) {
+                    if (result.result?.token) {
+                        // Populate the token in the temp state
+                        state.temp.value.authToken = await this.signInUser(context, state);
+
+                        await context.sendActivity({
+                            value: { status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+
+                        await this._authSuccessHandler?.(context, state);
+                    } else {
+                        await context.sendActivity({
+                            value: { status: 400 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+
+                        await this._authFailureHandler?.(context, state);
+                    }
+                }
             },
             true
         );
@@ -157,6 +182,22 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
 
         return this._oauthPrompt.signOutUser(context);
+    }
+
+    /**
+     * The handler function is called when the user has successfully signed in
+     * @param status 'success' or 'failure'
+     * @param handler The handler function to call
+     */
+    public async onUserSignIn(
+        status: 'success' | 'failure',
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): Promise<void> {
+        if ('success' === status) {
+            this._authSuccessHandler = handler;
+        } else if ('failure' === status) {
+            this._authFailureHandler = handler;
+        }
     }
 
     /**
