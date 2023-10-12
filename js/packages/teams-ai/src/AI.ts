@@ -6,11 +6,10 @@
  * Licensed under the MIT License.
  */
 
-import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
-import { DefaultModerator } from './embeddings/DefaultModerator';
+import { Channels, TurnContext } from 'botbuilder';
+import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
-import { ResponseParser } from './embeddings/ResponseParser';
 import { TurnState } from './TurnState';
 import { Schema } from 'jsonschema';
 
@@ -215,12 +214,7 @@ export class AI<TState extends TurnState = TurnState> {
             AI.SayCommandActionName,
             async (context, state, data, action) => {
                 const response = data.response;
-                const card = ResponseParser.parseAdaptiveCard(response);
-                if (card) {
-                    const attachment = CardFactory.adaptiveCard(card);
-                    const activity = MessageFactory.attachment(attachment);
-                    await context.sendActivity(activity);
-                } else if (context.activity.channelId == Channels.Msteams) {
+                if (context.activity.channelId == Channels.Msteams) {
                     await context.sendActivity(response.split('\n').join('<br>'));
                 } else {
                     await context.sendActivity(response);
