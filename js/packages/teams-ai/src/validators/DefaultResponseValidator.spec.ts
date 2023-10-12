@@ -1,11 +1,12 @@
 import { strict as assert } from "assert";
-import { FunctionRegistry, GPT3Tokenizer, VolatileMemory } from "promptrix";
 import { DefaultResponseValidator } from "./DefaultResponseValidator";
+import { TestAdapter } from "botbuilder";
+import { GPT3Tokenizer } from "../tokenizers";
+import { TestTurnState } from "../TestTurnState";
 
 
 describe("DefaultResponseValidator", () => {
-    const memory = new VolatileMemory();
-    const functions = new FunctionRegistry();
+    const adapter = new TestAdapter();
     const tokenizer = new GPT3Tokenizer();
 
     describe("constructor", () => {
@@ -17,10 +18,13 @@ describe("DefaultResponseValidator", () => {
 
     describe("validateResponse", () => {
         it("should return isValid === true", async () => {
-            const validator = new DefaultResponseValidator();
-            const response = await validator.validateResponse(memory, functions, tokenizer, { status: 'success', message: 'Hello World' }, 3);
-            assert.notDeepEqual(response, undefined);
-            assert.equal(response.valid, true);
+            await adapter.sendTextToBot('test', async (context) => {
+                const state = await TestTurnState.create(context);
+                const validator = new DefaultResponseValidator();
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: 'Hello World' }, 3);
+                assert.notDeepEqual(response, undefined);
+                assert.equal(response.valid, true);
+            });
         });
     });
 });

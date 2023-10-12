@@ -10,13 +10,14 @@ import { Response } from "./Response";
  * Parses any JSON returned by the model and optionally verifies it against a JSON schema.
  * @template TContent Optional. Type of the content of the message. Defaults to `Record<string, any>`.
  */
-export class JSONResponseValidator<TState extends TurnState = TurnState, TValue = Record<string, any>> implements PromptResponseValidator {
+export class JSONResponseValidator<TState extends TurnState = TurnState, TValue = Record<string, any>> implements PromptResponseValidator<TState> {
 
     /**
      * Creates a new `JSONResponseValidator` instance.
      * @param schema Optional. JSON schema to validate the response against.
      * @param missingJsonFeedback Optional. Custom feedback to give when no JSON is returned.
      * @param errorFeedback Optional. Custom feedback to give when an error is detected.
+     * @param instanceName Optional. Name of the instance to use in feedback messages.
      */
     public constructor(schema?: Schema, missingJsonFeedback?: string, errorFeedback?: string, instanceName?: string) {
         this.schema = schema;
@@ -45,18 +46,11 @@ export class JSONResponseValidator<TState extends TurnState = TurnState, TValue 
         // Parse the response text
         const parsed = Response.parseAllObjects(text);
         if (parsed.length == 0) {
-            if (typeof message === 'object' && message.content === null)
-                return Promise.resolve({
-                    type: 'Validation',
-                    valid: true,
-                    value: null
-                });
-            else
-                return Promise.resolve({
-                    type: 'Validation',
-                    valid: false,
-                    feedback: this.missingJsonFeedback
-                });
+            return Promise.resolve({
+                type: 'Validation',
+                valid: false,
+                feedback: this.missingJsonFeedback
+            });
         }
 
         // Validate the response against the schema
