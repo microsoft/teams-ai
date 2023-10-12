@@ -4,7 +4,9 @@ using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Utilities;
+using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
+using System.Net;
 
 namespace Microsoft.TeamsAI.Application
 {
@@ -276,6 +278,43 @@ namespace Microsoft.TeamsAI.Application
             {
                 return handler(turnContext, cancellationToken);
             }
+        }
+
+        internal static T? GetInvokeValue<T>(IInvokeActivity activity)
+        {
+            if (activity.Value == null)
+            {
+                return default;
+            }
+
+            JObject? obj = activity.Value as JObject;
+            if (obj == null)
+            {
+                return default;
+            }
+
+            T? invokeValue;
+
+            try
+            {
+                invokeValue = obj.ToObject<T>();
+            }
+            catch
+            {
+                return default;
+            }
+
+            return invokeValue;
+        }
+
+        internal static Activity CreateInvokeResponseActivity(object body)
+        {
+            Activity activity = new()
+            {
+                Type = ActivityTypesEx.InvokeResponse,
+                Value = new InvokeResponse { Status = (int)HttpStatusCode.OK, Body = body }
+            };
+            return activity;
         }
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.TeamsAI.State;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using System.Net;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.TeamsAI.Application
@@ -175,7 +174,7 @@ namespace Microsoft.TeamsAI.Application
             {
                 AdaptiveCardInvokeValue? invokeValue;
                 if (turnContext.Activity.Type != ActivityTypes.Invoke || turnContext.Activity.Name != ACTION_INVOKE_NAME
-                    || (invokeValue = GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null || invokeValue.Action == null || invokeValue.Action.Type != ACTION_EXECUTE_TYPE)
+                    || (invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null || invokeValue.Action == null || invokeValue.Action.Type != ACTION_EXECUTE_TYPE)
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnActionExecute() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -187,12 +186,7 @@ namespace Microsoft.TeamsAI.Application
                     Type = "application/vnd.microsoft.card.adaptive",
                     Value = adaptiveCard
                 };
-                InvokeResponse invokeResponse = CreateInvokeResponse(adaptiveCardInvokeResponse);
-                Activity activity = new()
-                {
-                    Type = ActivityTypesEx.InvokeResponse,
-                    Value = invokeResponse
-                };
+                Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(adaptiveCardInvokeResponse);
                 await turnContext.SendActivityAsync(activity, cancellationToken);
             };
             _app.AddRoute(routeSelector, routeHandler, true);
@@ -266,7 +260,7 @@ namespace Microsoft.TeamsAI.Application
             {
                 AdaptiveCardInvokeValue? invokeValue;
                 if (turnContext.Activity.Type != ActivityTypes.Invoke || turnContext.Activity.Name != ACTION_INVOKE_NAME
-                    || (invokeValue = GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null || invokeValue.Action == null || invokeValue.Action.Type != ACTION_EXECUTE_TYPE)
+                    || (invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null || invokeValue.Action == null || invokeValue.Action.Type != ACTION_EXECUTE_TYPE)
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnActionExecute() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -278,12 +272,7 @@ namespace Microsoft.TeamsAI.Application
                     Type = "application/vnd.microsoft.activity.message",
                     Value = result
                 };
-                InvokeResponse invokeResponse = CreateInvokeResponse(adaptiveCardInvokeResponse);
-                Activity activity = new()
-                {
-                    Type = ActivityTypesEx.InvokeResponse,
-                    Value = invokeResponse
-                };
+                Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(adaptiveCardInvokeResponse);
                 await turnContext.SendActivityAsync(activity, cancellationToken);
             };
             _app.AddRoute(routeSelector, routeHandler, true);
@@ -434,7 +423,7 @@ namespace Microsoft.TeamsAI.Application
             {
                 AdaptiveCardSearchInvokeValue? searchInvokeValue;
                 if (turnContext.Activity.Type != ActivityTypes.Invoke || turnContext.Activity.Name != SEARCH_INVOKE_NAME
-                    || (searchInvokeValue = GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
+                    || (searchInvokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnSearch() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -455,12 +444,7 @@ namespace Microsoft.TeamsAI.Application
                             Results = results
                         }
                     };
-                    InvokeResponse invokeResponse = CreateInvokeResponse(searchInvokeResponse);
-                    Activity activity = new()
-                    {
-                        Type = ActivityTypesEx.InvokeResponse,
-                        Value = invokeResponse
-                    };
+                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(searchInvokeResponse);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -509,7 +493,7 @@ namespace Microsoft.TeamsAI.Application
                 {
                     return Task.FromResult(false);
                 }
-                AdaptiveCardInvokeValue? invokeValue = GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity);
+                AdaptiveCardInvokeValue? invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity);
                 return Task.FromResult(invokeValue != null && verbPattern.IsMatch(invokeValue.Action.Verb));
             };
             return routeSelector;
@@ -539,42 +523,10 @@ namespace Microsoft.TeamsAI.Application
                 {
                     return Task.FromResult(false);
                 }
-                AdaptiveCardSearchInvokeValue? searchInvokeValue = GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity);
+                AdaptiveCardSearchInvokeValue? searchInvokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity);
                 return Task.FromResult(searchInvokeValue != null && datasetPattern.IsMatch(searchInvokeValue.Dataset));
             };
             return routeSelector;
-        }
-
-        private static InvokeResponse CreateInvokeResponse(object? body)
-        {
-            return new InvokeResponse { Status = (int)HttpStatusCode.OK, Body = body };
-        }
-
-        private static T? GetInvokeValue<T>(IInvokeActivity activity)
-        {
-            if (activity.Value == null)
-            {
-                return default;
-            }
-
-            JObject? obj = activity.Value as JObject;
-            if (obj == null)
-            {
-                return default;
-            }
-
-            T? invokeValue;
-
-            try
-            {
-                invokeValue = obj.ToObject<T>();
-            }
-            catch
-            {
-                return default;
-            }
-
-            return invokeValue;
         }
 
         private class AdaptiveCardSearchInvokeValue : SearchInvokeValue
