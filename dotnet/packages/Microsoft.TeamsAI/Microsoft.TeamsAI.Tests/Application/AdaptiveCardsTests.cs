@@ -3,16 +3,16 @@ using Microsoft.TeamsAI.Tests.TestUtils;
 using Microsoft.TeamsAI.Application;
 using Newtonsoft.Json;
 using Microsoft.Bot.Builder;
-using AdaptiveCards;
 using Newtonsoft.Json.Linq;
 using Microsoft.TeamsAI.Exceptions;
+using Moq;
 
 namespace Microsoft.TeamsAI.Tests.Application
 {
     public class AdaptiveCardsTests
     {
         [Fact]
-        public async void Test_OnActionExecute_Verb_AdaptiveCard()
+        public async void Test_OnActionExecute_Verb()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -31,43 +31,23 @@ namespace Microsoft.TeamsAI.Tests.Application
                     {
                         type = "Action.Execute",
                         verb = "test-verb",
-                        data = new
-                        {
-                            testKey = "test-value"
-                        }
+                        data = new { testKey = "test-value" }
                     }
                 })
             });
+            var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
             var expectedInvokeResponse = new InvokeResponse()
             {
                 Status = 200,
-                Body = new AdaptiveCardInvokeResponse()
-                {
-                    StatusCode = 200,
-                    Type = "application/vnd.microsoft.card.adaptive",
-                    Value = new AdaptiveCard("1.4")
-                    {
-                        Body = new List<AdaptiveElement>
-                        {
-                            new AdaptiveTextBlock("test-value")
-                        }
-                    }
-                }
+                Body = adaptiveCardInvokeResponseMock.Object
             };
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteAdaptiveCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
                 Assert.Equal("test-value", actionData.TestKey);
-                var adaptiveCard = new AdaptiveCard("1.4")
-                {
-                    Body = new List<AdaptiveElement>
-                    {
-                        new AdaptiveTextBlock(actionData.TestKey)
-                    }
-                };
-                return Task.FromResult(adaptiveCard);
+                return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
 
             // Act
@@ -82,7 +62,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnActionExecute_Verb_AdaptiveCard_NotHit()
+        public async void Test_OnActionExecute_Verb_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -91,7 +71,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 activitiesToSend = arg;
             }
             var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
+            var turnContext1 = new TurnContext(adapter, new Activity()
             {
                 Type = ActivityTypes.Invoke,
                 Name = "adaptiveCard/action",
@@ -100,141 +80,34 @@ namespace Microsoft.TeamsAI.Tests.Application
                     action = new
                     {
                         type = "Action.Execute",
-                        verb = "test-verb",
-                        data = new
-                        {
-                            testKey = "test-value"
-                        }
+                        verb = "not-test-verb"
                     }
                 })
             });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteAdaptiveCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
-                Assert.Equal("test-value", actionData.TestKey);
-                var adaptiveCard = new AdaptiveCard("1.4")
-                {
-                    Body = new List<AdaptiveElement>
-                    {
-                        new AdaptiveTextBlock(actionData.TestKey)
-                    }
-                };
-                return Task.FromResult(adaptiveCard);
-            };
-
-            // Act
-            adaptiveCards.OnActionExecute("not-test-verb", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnActionExecute_Verb_Text()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
+            var turnContext2 = new TurnContext(adapter, new Activity()
             {
                 Type = ActivityTypes.Invoke,
-                Name = "adaptiveCard/action",
-                Value = JObject.FromObject(new
-                {
-                    action = new
-                    {
-                        type = "Action.Execute",
-                        verb = "test-verb",
-                        data = new
-                        {
-                            testKey = "test-value"
-                        }
-                    }
-                })
+                Name = "application/search"
             });
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new AdaptiveCardInvokeResponse()
-                {
-                    StatusCode = 200,
-                    Type = "application/vnd.microsoft.activity.message",
-                    Value = "test-value"
-                }
-            };
+            var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteTextHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
-                Assert.Equal("test-value", actionData.TestKey);
-                return Task.FromResult(actionData.TestKey!);
+                return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
 
             // Act
             adaptiveCards.OnActionExecute("test-verb", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnActionExecute_Verb_Text_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "adaptiveCard/action",
-                Value = JObject.FromObject(new
-                {
-                    action = new
-                    {
-                        type = "Action.Execute",
-                        verb = "test-verb",
-                        data = new
-                        {
-                            testKey = "test-value"
-                        }
-                    }
-                })
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
-            ActionExecuteTextHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
-                Assert.Equal("test-value", actionData.TestKey);
-                return Task.FromResult(actionData.TestKey!);
-            };
-
-            // Act
-            adaptiveCards.OnActionExecute("not-test-verb", handler);
-            await app.OnTurnAsync(turnContext);
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
 
             // Assert
             Assert.Null(activitiesToSend);
         }
 
         [Fact]
-        public async void Test_OnActionExecute_RouteSelector_Text_ActivityNotMatched()
+        public async void Test_OnActionExecute_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -242,16 +115,16 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "application/search"
             });
+            var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            ActionExecuteTextHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
-                return Task.FromResult(actionData.TestKey!);
+                return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
 
             // Act
