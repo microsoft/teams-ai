@@ -1,12 +1,14 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Schema;
+using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.TeamsAI.Application
 {
@@ -34,6 +36,9 @@ namespace Microsoft.TeamsAI.Application
         private readonly ConcurrentQueue<Route<TState>> _invokeRoutes;
         private readonly ConcurrentQueue<Route<TState>> _routes;
 
+        private readonly ConcurrentQueue<TurnEventHandler<TState>> _beforeTurn;
+        private readonly ConcurrentQueue<TurnEventHandler<TState>> _afterTurn;
+
         /// <summary>
         /// Creates a new Application instance.
         /// </summary>
@@ -59,6 +64,8 @@ namespace Microsoft.TeamsAI.Application
 
             _routes = new ConcurrentQueue<Route<TState>>();
             _invokeRoutes = new ConcurrentQueue<Route<TState>>();
+            _beforeTurn = new ConcurrentQueue<TurnEventHandler<TState>>();
+            _afterTurn = new ConcurrentQueue<TurnEventHandler<TState>>();
         }
 
         /// <summary>
@@ -98,7 +105,7 @@ namespace Microsoft.TeamsAI.Application
         /// Invoke-based activities receive special treatment and are matched separately as they typically
         /// have shorter execution timeouts.
         /// </summary>
-        /// <param name="selector">Function that's used to select a route. The function should return true to trigger the route.</param>
+        /// <param name="selector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <param name="isInvokeRoute">Boolean indicating if the RouteSelector is for an activity that uses "invoke" which require special handling. Defaults to `false`.</param>
         /// <returns>The application instance for chaining purposes.</returns>
@@ -115,6 +122,327 @@ namespace Microsoft.TeamsAI.Application
             {
                 _routes.Enqueue(route);
             }
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming activities of a given type.
+        /// </summary>
+        /// <param name="type">Name of the activity type to match.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnActivity(string type, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(type);
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) => Task.FromResult(string.Equals(type, context.Activity?.Type, StringComparison.OrdinalIgnoreCase));
+            OnActivity(routeSelector, handler);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming activities of a given type.
+        /// </summary>
+        /// <param name="typePattern">Regular expression to match against the incoming activity type.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnActivity(Regex typePattern, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(typePattern);
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) => Task.FromResult(context.Activity?.Type != null && typePattern.IsMatch(context.Activity?.Type));
+            OnActivity(routeSelector, handler);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming activities of a given type.
+        /// </summary>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnActivity(RouteSelector routeSelector, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(routeSelector);
+            Verify.ParamNotNull(handler);
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming activities of a given type.
+        /// </summary>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnActivity(MultipleRouteSelector routeSelectors, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(routeSelectors);
+            Verify.ParamNotNull(handler);
+            if (routeSelectors.Strings != null)
+            {
+                foreach (string type in routeSelectors.Strings)
+                {
+                    OnActivity(type, handler);
+                }
+            }
+            if (routeSelectors.Regexes != null)
+            {
+                foreach (Regex typePattern in routeSelectors.Regexes)
+                {
+                    OnActivity(typePattern, handler);
+                }
+            }
+            if (routeSelectors.RouteSelectors != null)
+            {
+                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
+                {
+                    OnActivity(routeSelector, handler);
+                }
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Handles conversation update events.
+        /// </summary>
+        /// <param name="conversationUpdateEvent">Name of the conversation update event to handle, can use <see cref="ConversationUpdateEvents"/>.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnConversationUpdate(string conversationUpdateEvent, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(conversationUpdateEvent);
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector;
+            switch (conversationUpdateEvent)
+            {
+                case ConversationUpdateEvents.MembersAdded:
+                {
+                    routeSelector = (context, _) => Task.FromResult
+                    (
+                        string.Equals(context.Activity?.Type, ActivityTypes.ConversationUpdate, StringComparison.OrdinalIgnoreCase)
+                        && context.Activity?.MembersAdded != null
+                        && context.Activity.MembersAdded.Count > 0
+                    );
+                    break;
+                }
+                case ConversationUpdateEvents.MembersRemoved:
+                {
+                    routeSelector = (context, _) => Task.FromResult
+                    (
+                        string.Equals(context.Activity?.Type, ActivityTypes.ConversationUpdate, StringComparison.OrdinalIgnoreCase)
+                        && context.Activity?.MembersRemoved != null
+                        && context.Activity.MembersRemoved.Count > 0
+                    );
+                    break;
+                }
+                default:
+                {
+                    routeSelector = (context, _) => Task.FromResult
+                    (
+                        string.Equals(context.Activity?.Type, ActivityTypes.ConversationUpdate, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(context.Activity?.GetChannelData<TeamsChannelData>()?.EventType, conversationUpdateEvent)
+                    );
+                    break;
+                }
+            }
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles conversation update events.
+        /// </summary>
+        /// <param name="conversationUpdateEvents">Name of the conversation update events to handle, can use <see cref="ConversationUpdateEvents"/> as array item.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnConversationUpdate(string[] conversationUpdateEvents, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(conversationUpdateEvents);
+            Verify.ParamNotNull(handler);
+            foreach (string conversationUpdateEvent in conversationUpdateEvents)
+            {
+                OnConversationUpdate(conversationUpdateEvent, handler);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming messages with a given keyword.
+        /// <br/>
+        /// This method provides a simple way to have a bot respond anytime a user sends your bot a
+        /// message with a specific word or phrase.
+        /// <br/>
+        /// For example, you can easily clear the current conversation anytime a user sends "/reset":
+        /// <br/>
+        /// <code>application.OnMessage("/reset", (context, state, _) => ...);</code>
+        /// </summary>
+        /// <param name="text">Substring of the incoming message text.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessage(string text, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(text);
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _)
+                => Task.FromResult
+                (
+                    string.Equals(ActivityTypes.Message, context.Activity?.Type, StringComparison.OrdinalIgnoreCase)
+                    && context.Activity?.Text != null
+                    && context.Activity.Text.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0
+                );
+            OnMessage(routeSelector, handler);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming messages with a given keyword.
+        /// <br/>
+        /// This method provides a simple way to have a bot respond anytime a user sends your bot a
+        /// message with a specific word or phrase.
+        /// <br/>
+        /// For example, you can easily clear the current conversation anytime a user sends "/reset":
+        /// <br/>
+        /// <code>application.OnMessage(new Regex("reset"), (context, state, _) => ...);</code>
+        /// </summary>
+        /// <param name="textPattern">Regular expression to match against the text of an incoming message.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessage(Regex textPattern, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(textPattern);
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _)
+                => Task.FromResult
+                (
+                    string.Equals(ActivityTypes.Message, context.Activity?.Type, StringComparison.OrdinalIgnoreCase)
+                    && context.Activity?.Text != null
+                    && textPattern.IsMatch(context.Activity.Text)
+                );
+            OnMessage(routeSelector, handler);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming messages with a given keyword.
+        /// <br/>
+        /// This method provides a simple way to have a bot respond anytime a user sends your bot a
+        /// message with a specific word or phrase.
+        /// </summary>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessage(RouteSelector routeSelector, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(routeSelector);
+            Verify.ParamNotNull(handler);
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles incoming messages with a given keyword.
+        /// <br/>
+        /// This method provides a simple way to have a bot respond anytime a user sends your bot a
+        /// message with a specific word or phrase.
+        /// </summary>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessage(MultipleRouteSelector routeSelectors, RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(routeSelectors);
+            Verify.ParamNotNull(handler);
+            if (routeSelectors.Strings != null)
+            {
+                foreach (string text in routeSelectors.Strings)
+                {
+                    OnMessage(text, handler);
+                }
+            }
+            if (routeSelectors.Regexes != null)
+            {
+                foreach (Regex textPattern in routeSelectors.Regexes)
+                {
+                    OnMessage(textPattern, handler);
+                }
+            }
+            if (routeSelectors.RouteSelectors != null)
+            {
+                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
+                {
+                    OnMessage(routeSelector, handler);
+                }
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Handles message reactions added events.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessageReactionsAdded(RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) => Task.FromResult
+            (
+                string.Equals(context.Activity?.Type, ActivityTypes.MessageReaction, StringComparison.OrdinalIgnoreCase)
+                && context.Activity?.ReactionsAdded != null
+                && context.Activity.ReactionsAdded.Count > 0
+            );
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles message reactions removed events.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessageReactionsRemoved(RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) => Task.FromResult
+            (
+                string.Equals(context.Activity?.Type, ActivityTypes.MessageReaction, StringComparison.OrdinalIgnoreCase)
+                && context.Activity?.ReactionsRemoved != null
+                && context.Activity.ReactionsRemoved.Count > 0
+            );
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Add a handler that will execute before the turn's activity handler logic is processed.
+        /// <br/>
+        /// Handler returns true to continue execution of the current turn. Handler returning false
+        /// prevents the turn from running, but the bots state is still saved, which lets you
+        /// track the reason why the turn was not processed. It also means you can use this as
+        /// a way to call into the dialog system. For example, you could use the OAuthPrompt to sign the
+        /// user in before allowing the AI system to run.
+        /// </summary>
+        /// <param name="handler">Function to call before turn execution.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnBeforeTurn(TurnEventHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            _beforeTurn.Enqueue(handler);
+            return this;
+        }
+
+        /// <summary>
+        /// Add a handler that will execute after the turn's activity handler logic is processed.
+        /// <br/>
+        /// Handler returns true to finish execution of the current turn. Handler returning false
+        /// prevents the bots state from being saved.
+        /// </summary>
+        /// <param name="handler">Function to call after turn execution.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnAfterTurn(TurnEventHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            _afterTurn.Enqueue(handler);
             return this;
         }
 
@@ -212,7 +540,19 @@ namespace Microsoft.TeamsAI.Application
 
                 TState turnState = await turnStateManager!.LoadStateAsync(storage, turnContext);
 
-                // TODO: Call before activity handler
+                // Call before turn handler
+                foreach (TurnEventHandler<TState> beforeTurnHandler in _beforeTurn)
+                {
+                    if (!await beforeTurnHandler(turnContext, turnState, cancellationToken))
+                    {
+                        // Save turn state
+                        // - This lets the bot keep track of why it ended the previous turn. It also
+                        //   allows the dialog system to be used before the AI system is called.
+                        await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
+
+                        return;
+                    }
+                }
 
                 bool eventHandlerCalled = false;
 
@@ -251,7 +591,16 @@ namespace Microsoft.TeamsAI.Application
                     await _ai.ChainAsync(turnContext, turnState);
                 }
 
-                // TODO: Call after turn activity handler
+                // Call after turn handler
+                foreach (TurnEventHandler<TState> afterTurnHandler in _afterTurn)
+                {
+                    if (!await afterTurnHandler(turnContext, turnState, cancellationToken))
+                    {
+                        return;
+                    }
+                }
+                await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
+
             }
             finally
             {

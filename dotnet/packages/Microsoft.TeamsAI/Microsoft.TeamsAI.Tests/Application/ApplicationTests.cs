@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using NewApp = Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using System.Reflection;
 
@@ -13,7 +14,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -31,7 +32,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act 1
             app.StartTypingTimer(turnContext);
@@ -59,7 +60,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -73,7 +74,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         public void Test_StopTypingTimer_WithoutEverStartingTypingTimer()
         {
             // Arrange
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StopTypingTimer();
@@ -90,7 +91,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -99,6 +100,101 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Assert
             var timer = app.GetType().GetField("_typingTimer", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(app);
             Assert.Null(timer);
+        }
+
+        [Fact]
+        public async Task Test_TurnEventHandler_BeforeTurn_AfterTurn()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var messages = new List<string>();
+            app.OnBeforeTurn((context, _, _) =>
+            {
+                messages.Add(context.Activity?.Text ?? string.Empty);
+                return Task.FromResult(true);
+            });
+            app.OnAfterTurn((context, _, _) =>
+            {
+                messages.Add(context.Activity?.Text ?? string.Empty);
+                return Task.FromResult(true);
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(2, messages.Count);
+            Assert.Equal("hello", messages[0]);
+            Assert.Equal("hello", messages[1]);
+        }
+
+        [Fact]
+        public async Task Test_TurnEventHandler_BeforeTurn_ReturnsFalse()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var messages = new List<string>();
+            app.OnBeforeTurn((context, _, _) =>
+            {
+                messages.Add(context.Activity?.Text ?? string.Empty);
+                return Task.FromResult(false);
+            });
+            app.OnAfterTurn((context, _, _) =>
+            {
+                messages.Add(context.Activity?.Text ?? string.Empty);
+                return Task.FromResult(true);
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Single(messages);
+            Assert.Equal("hello", messages[0]);
+        }
+
+        [Fact]
+        public async Task Test_TurnEventHandler_AfterTurn_ReturnsFalse()
+        {
+            // Arrange
+            var activity = MessageFactory.Text("hello");
+            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
+            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var messages = new List<string>();
+            app.OnBeforeTurn((context, _, _) =>
+            {
+                messages.Add(context.Activity?.Text ?? string.Empty);
+                return Task.FromResult(true);
+            });
+            app.OnAfterTurn((context, _, _) =>
+            {
+                messages.Add(context.Activity?.Text ?? string.Empty);
+                return Task.FromResult(false);
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(2, messages.Count);
+            Assert.Equal("hello", messages[0]);
+            Assert.Equal("hello", messages[1]);
         }
     }
 }
