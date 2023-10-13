@@ -53,6 +53,21 @@ const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
 const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
 
 /**
+ * @private
+ */
+const QUERY_SETTING_URL = `composeExtension/querySettingUrl`;
+
+/**
+ * @private
+ */
+const ME_CONFIGURE_SETTING = `composeExtension/setting`;
+
+/**
+ * @private
+ */
+const QUERY_CARD_BUTTON_CLICKED = `composeExtension/onCardButtonClicked`;
+
+/**
  * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
  * @template TState Type of the turn state object being persisted.
  */
@@ -539,6 +554,160 @@ export class MessageExtensions<TState extends TurnState> {
                 type: ActivityTypes.InvokeResponse
             });
         }
+    }
+
+    /**
+     * Registers a handler that invokes the fetch of the configuration settings for a Message Extension.
+     @summary
+     * The `composeExtension/querySettingUrl` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
+     * @param {(context: TurnContext, state: TState) => Promise<void>} handler Function defined by the developer to call when the command is received.
+     * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
+     * @param {TState} handler.state Current state of the turn.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public queryUrlSetting(handler: (context: TurnContext, state: TState) => Promise<void>): Application<TState> {
+        // Define static route selector
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_SETTING_URL
+            );
+
+        // Add route
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                try {
+                    // Call handler and then check to see if an invoke response has already been added
+                    await handler(context, state);
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
+                        await context.sendActivity({
+                            value: { status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                } catch (error) {
+                    await context.sendActivity({
+                        value: {
+                            status: 500,
+                            body: `${QUERY_SETTING_URL} invoke failed. \n ${
+                                error instanceof Error ? error.message : error
+                            }`
+                        } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
+        return this._app;
+    }
+
+    /**
+     * Registers a handler that implements the logic to invoke configuring Message Extension settings
+     * @summary
+     * The `composeExtension/setting` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
+     * @template TData Message Extension settings to be configured.
+     * @param {(context: TurnContext, state: TState, settings: TData) => Promise<void>} handler Function defined by the developer to call when the command is received.
+     * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
+     * @param {TState} handler.state Current state of the turn.
+     * @param {TData} handler.settings The configuration settings that was submitted.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public configureSettings<TData extends Record<string, any>>(
+        handler: (context: TurnContext, state: TState, settings: TData) => Promise<void>
+    ): Application<TState> {
+        // Define static route selector
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === ME_CONFIGURE_SETTING
+            );
+
+        // Add route
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                try {
+                    // Call handler and then check to see if an invoke response has already been added
+                    await handler(context, state, context.activity.value ?? {});
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
+                        await context.sendActivity({
+                            value: { status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                } catch (error) {
+                    await context.sendActivity({
+                        value: {
+                            status: 500,
+                            body: `${ME_CONFIGURE_SETTING} invoke failed. \n ${
+                                error instanceof Error ? error.message : error
+                            }`
+                        } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
+        return this._app;
+    }
+
+    /**
+     * Registers a handler that implements the logic when a user has clicked on a button in a Message Extension card.
+     * @summary
+     * The `composeExtension/onCardButtonClicked` INVOKE activity does not contain any sort of command ID,
+     * so only a single select item handler can be registered. Developers will need to include a
+     * type name of some sort in the preview item they return if they need to support multiple select item handlers.
+     * @template TData Message Extension data passed on invoke.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<void>} handler Function defined by the developer to call when the command is received.
+     * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
+     * @param {TState} handler.state Current state of the turn.
+     * @param {TData} handler.settings The configuration settings that was submitted.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public handleOnButtonClicked<TData extends Record<string, any>>(
+        handler: (context: TurnContext, state: TState, settings: TData) => Promise<void>
+    ): Application<TState> {
+        // Define static route selector
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_CARD_BUTTON_CLICKED
+            );
+
+        // Add route
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                try {
+                    // Call handler and then check to see if an invoke response has already been added
+                    await handler(context, state, context.activity.value ?? {});
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
+                        await context.sendActivity({
+                            value: { status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                } catch (error) {
+                    await context.sendActivity({
+                        value: {
+                            status: 500,
+                            body: `${QUERY_CARD_BUTTON_CLICKED} invoke failed. \n ${
+                                error instanceof Error ? error.message : error
+                            }`
+                        } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
+        return this._app;
     }
 }
 
