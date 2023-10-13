@@ -170,7 +170,7 @@ namespace Microsoft.TeamsAI.Application
                 AdaptiveCardInvokeValue? invokeValue;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
-                    || (invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
+                    || (invokeValue = Utilities.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
                     || invokeValue.Action == null
                     || !string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE))
                 {
@@ -178,10 +178,10 @@ namespace Microsoft.TeamsAI.Application
                 }
 
                 AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = await handler(turnContext, turnState, invokeValue.Action.Data, cancellationToken);
-                Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(adaptiveCardInvokeResponse);
+                Activity activity = Utilities.CreateInvokeResponseActivity(adaptiveCardInvokeResponse);
                 await turnContext.SendActivityAsync(activity, cancellationToken);
             };
-            _app.AddRoute(routeSelector, routeHandler, true);
+            _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
             return _app;
         }
 
@@ -270,7 +270,7 @@ namespace Microsoft.TeamsAI.Application
 
                 await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
             };
-            _app.AddRoute(routeSelector, routeHandler);
+            _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: false);
             return _app;
         }
 
@@ -351,7 +351,7 @@ namespace Microsoft.TeamsAI.Application
                 AdaptiveCardSearchInvokeValue? searchInvokeValue;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
-                    || (searchInvokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
+                    || (searchInvokeValue = Utilities.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnSearch() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -372,11 +372,11 @@ namespace Microsoft.TeamsAI.Application
                             Results = results
                         }
                     };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(searchInvokeResponse);
+                    Activity activity = Utilities.CreateInvokeResponseActivity(searchInvokeResponse);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
-            _app.AddRoute(routeSelector, routeHandler, true);
+            _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
             return _app;
         }
 
@@ -422,7 +422,7 @@ namespace Microsoft.TeamsAI.Application
                 return Task.FromResult(
                     string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
-                    && (invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) != null
+                    && (invokeValue = Utilities.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) != null
                     && invokeValue.Action != null
                     && string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE)
                     && isMatch(invokeValue.Action.Verb));
@@ -455,7 +455,7 @@ namespace Microsoft.TeamsAI.Application
                 return Task.FromResult(
                     string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
-                    && (searchInvokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) != null
+                    && (searchInvokeValue = Utilities.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) != null
                     && isMatch(searchInvokeValue.Dataset!));
             };
             return routeSelector;
