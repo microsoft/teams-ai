@@ -13,7 +13,7 @@ import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from 
 import { Tokenizer } from "../tokenizers";
 import { ActionResponseValidator, JSONResponseValidator, Validation } from "../validators";
 import { Augmentation } from "./Augmentation";
-import { AugmentationSection } from "./AugmentationSection";
+import { ActionAugmentationSection } from "./ActionAugmentationSection";
 import { Schema } from "jsonschema";
 import { Message, PromptSection } from "../prompts";
 
@@ -56,13 +56,13 @@ export const InnerMonologueSchema: Schema = {
 export class MonologueAugmentation<TState extends TurnState = TurnState>
     implements Augmentation<TState, InnerMonologue|null>
 {
-    private readonly _section: AugmentationSection<TState>;
+    private readonly _section: ActionAugmentationSection<TState>;
     private readonly _monologueValidator: JSONResponseValidator<TState, InnerMonologue> = new JSONResponseValidator(InnerMonologueSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
     private readonly _actionValidator: ActionResponseValidator<TState>;
 
     public constructor(actions: ChatCompletionAction[]) {
         actions = appendSAYAction(actions);
-        this._section = new AugmentationSection<TState>(actions, [
+        this._section = new ActionAugmentationSection<TState>(actions, [
             `Return a JSON object with your thoughts and the next action to perform.`,
             `Only respond with the JSON format below and base your plan on the actions above.`,
             `Response Format:`,

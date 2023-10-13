@@ -6,5 +6,5 @@
  * Licensed under the MIT License.
  */
 
-export * from "./AugmentationSection";
+export * from "./ActionAugmentationSection";
 export * from "./MonologueAugmentation";
