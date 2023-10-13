@@ -71,9 +71,9 @@ export interface PredictedDoCommand extends PredictedCommand {
     action: string;
 
     /**
-     * Any entities that the AI system should use to perform the action.
+     * Any parameters that the AI system should use to perform the action.
      */
-    entities: Record<string, any>;
+    parameters: Record<string, any>;
 }
 
 /**

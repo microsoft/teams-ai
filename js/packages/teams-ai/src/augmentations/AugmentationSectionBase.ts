@@ -13,7 +13,6 @@ import { Tokenizer } from "../tokenizers";
 import { ChatCompletionAction } from "../models";
 import { Schema } from "jsonschema";
 import { stringify } from "yaml";
-import { Validation } from "../validators";
 
 /**
  * Base class for all prompt augmentations.
@@ -62,34 +61,6 @@ export class AugmentationSectionBase<TState extends TurnState = TurnState> exten
         } else {
             return Promise.resolve({ output: [{ role: 'system', content: this._text }], length: this._tokens.length, tooLong: false });
         }
-    }
-
-    protected async validateActionParameters(context: TurnContext, state: TState, tokenizer: Tokenizer, actionName: string, parameters?: string): Promise<Validation<Record<string, any>|null>> {
-        // Validate that the action exists
-        if (!this.actions.has(actionName)) {
-            return {
-                type: 'Validation',
-                valid: false,
-                feedback: `The action "${actionName}" does not exist. Try a different action.`
-            };
-        }
-
-        // Does the action expect parameters?
-        const action = this.actions.get(actionName)!;
-        if (!action.parameters) {
-            return { type: 'Validation', valid: true, value: null };
-        }
-
-        // Validate that we got parameters
-        const validator = new JSONResponseValidator(
-            action.parameters,
-            `No arguments were sent with function call. Call the "${function_call.name}" with required arguments as a valid JSON object.`,
-            `The function arguments had errors. Apply these fixes and call "${function_call.name}" function again:`
-        );
-        const args = function_call.arguments === '{}' ? null : function_call.arguments ?? '{}'
-        const message: Message = { role: 'assistant', content: args };
-        const result = await validator.validateResponse(memory, functions, tokenizer, { status: 'success', message }, remaining_attempts);
-
     }
 }
 

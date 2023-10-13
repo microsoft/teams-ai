@@ -103,7 +103,7 @@ export class ActionResponseValidator<TState extends TurnState = TurnState> imple
                 valid: true,
                 value: {
                     name: function_call.name,
-                    parameters
+                    parameters: parameters
                 }
             };
         } else if (this._isRequired) {

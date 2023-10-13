@@ -204,7 +204,7 @@ export class AI<TState extends TurnState = TurnState> {
         this.defaultAction<PredictedDoCommandAndHandler<TState>>(
             AI.DoCommandActionName,
             async (context, state, data, action) => {
-                const { entities, handler } = data;
+                const { parameters: entities, handler } = data;
                 return await handler(context, state, entities, action);
             }
         );

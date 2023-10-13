@@ -209,7 +209,7 @@ export class ResponseParser {
                             command = {
                                 type: 'DO',
                                 action: actionName,
-                                entities: {}
+                                parameters: {}
                             };
                             parseState = DoCommandParseState.findEntityName;
                         } else {
@@ -258,7 +258,7 @@ export class ResponseParser {
                         // eslint-disable-next-line security/detect-possible-timing-attacks
                         if (token === quoteType) {
                             // Save pair and look for additional pairs
-                            command!.entities[entityName] = entityValue;
+                            command!.parameters[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -269,7 +269,7 @@ export class ResponseParser {
                         if (token == '`' && tokens[length + 1] == '`' && tokens[length + 2] == '`') {
                             // Save pair and look for additional pairs
                             length += 2;
-                            command!.entities[entityName] = entityValue;
+                            command!.parameters[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -280,7 +280,7 @@ export class ResponseParser {
                         // Accumulate tokens until you hit a space
                         if (SPACE_CHARACTERS.indexOf(token) >= 0) {
                             // Save pair and look for additional pairs
-                            command!.entities[entityName] = entityValue;
+                            command!.parameters[entityName] = entityValue;
                             parseState = DoCommandParseState.findEntityName;
                             entityName = entityValue = '';
                         } else {
@@ -296,13 +296,13 @@ export class ResponseParser {
                 command = {
                     type: 'DO',
                     action: actionName,
-                    entities: {}
+                    parameters: {}
                 };
             }
 
             // Append final entity
             if (command && entityName) {
-                command.entities[entityName] = entityValue;
+                command.parameters[entityName] = entityValue;
             }
         }
 

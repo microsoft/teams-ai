@@ -188,7 +188,7 @@ export class OpenAIPlanner<
                     {
                         type: 'DO',
                         action: AI.RateLimitedActionName,
-                        entities: {}
+                        parameters: {}
                     } as PredictedDoCommand
                 ]
             };

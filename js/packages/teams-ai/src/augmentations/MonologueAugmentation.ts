@@ -9,12 +9,13 @@
 import { TurnContext } from "botbuilder-core";
 import { TurnState } from "../TurnState";
 import { ChatCompletionAction, PromptResponse } from "../models";
-import { Plan } from "../planners";
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from "../planners";
 import { Tokenizer } from "../tokenizers";
-import { JSONResponseValidator, Validation } from "../validators";
+import { ActionResponseValidator, JSONResponseValidator, Validation } from "../validators";
 import { Augmentation } from "./Augmentation";
 import { AugmentationSectionBase } from "./AugmentationSectionBase";
 import { Schema } from "jsonschema";
+import { Message } from "../prompts";
 
 export interface InnerMonologue {
     thoughts: {
@@ -57,14 +58,19 @@ export class MonologueAugmentation<TState extends TurnState = TurnState>
     implements Augmentation<TState, InnerMonologue|null>
 {
     private readonly _monologueValidator: JSONResponseValidator<TState, InnerMonologue> = new JSONResponseValidator(InnerMonologueSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
+    private readonly _actionValidator: ActionResponseValidator<TState>;
 
     public constructor(actions: ChatCompletionAction[]) {
-        super(actions, [
+        super(appendSAYAction(actions), [
             `Return a JSON object with your thoughts and the next action to perform.`,
-            `Only respond with the JSON format below and based your plan on the actions above.`,
+            `Only respond with the JSON format below and base your plan on the actions above.`,
             `Response Format:`,
             `{"thoughts":{"thought":"<your current thought>","reasoning":"<self reflect on why you made this decision>","plan":"- short bulleted\\n- list that conveys\\n- long-term plan"},"action":{"name":"<action name>","parameters":{"<name>":"<value>"}}}`
         ].join('\n'));
+
+        // Create the action validator
+        // - NOTE: it sucks that we need to append the SAY twice :(
+        this._actionValidator = new ActionResponseValidator(appendSAYAction(actions), true);
     }
 
     public async validateResponse(context: TurnContext, state: TState, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue|null>> {
@@ -77,7 +83,8 @@ export class MonologueAugmentation<TState extends TurnState = TurnState>
         // Validate that the action exists and its parameters are valid
         const monologue = validationResult.value as InnerMonologue;
         const parameters = JSON.stringify(monologue.action.parameters ?? {});
-        const actionValidation = await this.validateActionParameters(context, state, tokenizer, monologue.action.name, parameters);
+        const message: Message = { role: 'assistant', content: null, function_call: { name: monologue.action.name, arguments: parameters } };
+        const actionValidation = await this._actionValidator.validateResponse(context, state, tokenizer, { status: 'success', message }, remaining_attempts);
         if (!actionValidation.valid) {
             return actionValidation as any;
         }
@@ -87,6 +94,40 @@ export class MonologueAugmentation<TState extends TurnState = TurnState>
     }
 
     public createPlanFromResponse(context: TurnContext, state: TState, validation: Validation<InnerMonologue|null>): Promise<Plan> {
-        throw new Error("Method not implemented.");
+        // Identify the action to perform
+        let command: PredictedCommand;
+        const monologue = validation.value as InnerMonologue;
+        if (monologue.action.name == 'SAY') {
+            command = {
+                type: 'SAY',
+                response: monologue.action.parameters!.text
+            } as PredictedSayCommand;
+        } else {
+            command = {
+                type: 'DO',
+                action: monologue.action.name,
+                parameters: monologue.action.parameters ?? {}
+            } as PredictedDoCommand;
+        }
+        return Promise.resolve({ type: 'plan', commands: [command] });
     }
+}
+
+function appendSAYAction(actions: ChatCompletionAction[]): ChatCompletionAction[] {
+    const clone = actions.slice();
+    clone.push({
+        name: 'SAY',
+        description: 'use to ask the user a question or say something',
+        parameters: {
+            type: 'object',
+            properties: {
+                text: {
+                    type: 'string',
+                    description: 'text to say or question to ask'
+                }
+            },
+            required: ['text']
+        }
+    });
+    return clone;
 }

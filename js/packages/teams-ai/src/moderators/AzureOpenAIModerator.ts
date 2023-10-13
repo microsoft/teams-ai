@@ -213,7 +213,7 @@ export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends 
                                 {
                                     type: 'DO',
                                     action: AI.FlaggedInputActionName,
-                                    entities: result
+                                    parameters: result
                                 } as PredictedDoCommand
                             ]
                         };
@@ -222,7 +222,7 @@ export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends 
                     // Rate limited
                     return {
                         type: 'plan',
-                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand]
+                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, parameters: {} } as PredictedDoCommand]
                     };
                 }
                 break;
@@ -262,7 +262,7 @@ export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends 
                                         {
                                             type: 'DO',
                                             action: AI.FlaggedOutputActionName,
-                                            entities: result
+                                            parameters: result
                                         } as PredictedDoCommand
                                     ]
                                 };
@@ -272,7 +272,7 @@ export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends 
                             return {
                                 type: 'plan',
                                 commands: [
-                                    { type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand
+                                    { type: 'DO', action: AI.RateLimitedActionName, parameters: {} } as PredictedDoCommand
                                 ]
                             };
                         }
