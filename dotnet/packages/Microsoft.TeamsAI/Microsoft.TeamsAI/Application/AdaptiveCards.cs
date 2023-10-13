@@ -270,6 +270,7 @@ namespace Microsoft.TeamsAI.Application
         ///   }
         /// }
         /// ```
+        /// </remarks>
         /// <param name="verbPattern">Regular expression to match against the named action to be handled.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
@@ -301,6 +302,7 @@ namespace Microsoft.TeamsAI.Application
         ///   }
         /// }
         /// ```
+        /// </remarks>
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
@@ -342,6 +344,7 @@ namespace Microsoft.TeamsAI.Application
         ///   }
         /// }
         /// ```
+        /// </remarks>
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
