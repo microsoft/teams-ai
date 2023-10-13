@@ -78,16 +78,17 @@ describe("MonologueAugmentation", () => {
         it("should create a MonologueAugmentation", () => {
             const augmentation = new MonologueAugmentation(actions);
             assert.notEqual(augmentation, undefined);
-            assert.notEqual(augmentation.actions, undefined);
         });
     });
 
-    describe("renderAsMessages", () => {
+    describe("createPromptSection", () => {
         it("should render a MonologueAugmentation to an array of messages", async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
-                const section = new MonologueAugmentation(actions);
-                const rendered = await section.renderAsMessages(context,state, functions, tokenizer, 2000);
+                const augmentation = new MonologueAugmentation(actions);
+                const section = await augmentation.createPromptSection(context, state);
+                assert.notEqual(section, undefined);
+                const rendered = await section!.renderAsMessages(context,state, functions, tokenizer, 2000);
                 assert.equal(rendered.output.length, 1);
                 assert.equal(rendered.output[0].role, 'system');
                 assert.equal(rendered.output[0].content?.includes('test action'), true);

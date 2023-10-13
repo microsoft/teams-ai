@@ -13,9 +13,9 @@ import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from 
 import { Tokenizer } from "../tokenizers";
 import { ActionResponseValidator, JSONResponseValidator, Validation } from "../validators";
 import { Augmentation } from "./Augmentation";
-import { AugmentationSectionBase } from "./AugmentationSectionBase";
+import { AugmentationSection } from "./AugmentationSection";
 import { Schema } from "jsonschema";
-import { Message } from "../prompts";
+import { Message, PromptSection } from "../prompts";
 
 export interface InnerMonologue {
     thoughts: {
@@ -54,23 +54,25 @@ export const InnerMonologueSchema: Schema = {
 };
 
 export class MonologueAugmentation<TState extends TurnState = TurnState>
-    extends AugmentationSectionBase<TState>
     implements Augmentation<TState, InnerMonologue|null>
 {
+    private readonly _section: AugmentationSection<TState>;
     private readonly _monologueValidator: JSONResponseValidator<TState, InnerMonologue> = new JSONResponseValidator(InnerMonologueSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
     private readonly _actionValidator: ActionResponseValidator<TState>;
 
     public constructor(actions: ChatCompletionAction[]) {
-        super(appendSAYAction(actions), [
+        actions = appendSAYAction(actions);
+        this._section = new AugmentationSection<TState>(actions, [
             `Return a JSON object with your thoughts and the next action to perform.`,
             `Only respond with the JSON format below and base your plan on the actions above.`,
             `Response Format:`,
             `{"thoughts":{"thought":"<your current thought>","reasoning":"<self reflect on why you made this decision>","plan":"- short bulleted\\n- list that conveys\\n- long-term plan"},"action":{"name":"<action name>","parameters":{"<name>":"<value>"}}}`
         ].join('\n'));
+        this._actionValidator = new ActionResponseValidator(actions, true);
+    }
 
-        // Create the action validator
-        // - NOTE: it sucks that we need to append the SAY twice :(
-        this._actionValidator = new ActionResponseValidator(appendSAYAction(actions), true);
+    public createPromptSection(context: TurnContext, state: TState): Promise<PromptSection|undefined> {
+        return Promise.resolve(this._section);
     }
 
     public async validateResponse(context: TurnContext, state: TState, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue|null>> {

@@ -17,7 +17,7 @@ import { stringify } from "yaml";
 /**
  * Base class for all prompt augmentations.
  */
-export class AugmentationSectionBase<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
+export class AugmentationSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
     private readonly _text: string;
     private _tokens?: number[];
     private readonly _actions: Map<string, ChatCompletionAction> = new Map();
