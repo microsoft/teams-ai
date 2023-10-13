@@ -5,7 +5,6 @@ using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Utilities;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel.Design;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.TeamsAI.Application
@@ -20,43 +19,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<MessagingExtensionResult> SubmitActionCardHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension submitting action events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="data">The data associated with the action.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<TaskModuleTaskInfo> SubmitActionTaskModuleContinueHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension submitting action events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="data">The data associated with the action.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<string> SubmitActionTaskModuleMessageHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension submitting action events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="data">The data associated with the action.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task SubmitActionHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
+    public delegate Task<MessagingExtensionActionResponse> SubmitActionHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
 
     /// <summary>
     /// Function for handling Message Extension botMessagePreview edit events
@@ -68,43 +31,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<MessagingExtensionResult> BotMessagePreviewEditCardHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension botMessagePreview edit events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="activityPreview">The activity that's being previewed by the user.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<TaskModuleTaskInfo> BotMessagePreviewEditTaskModuleContinueHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension botMessagePreview edit events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="activityPreview">The activity that's being previewed by the user.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<string> BotMessagePreviewEditTaskModuleMessageHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension botMessagePreview edit events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="activityPreview">The activity that's being previewed by the user.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task BotMessagePreviewEditHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
+    public delegate Task<MessagingExtensionActionResponse> BotMessagePreviewEditHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
 
     /// <summary>
     /// Function for handling Message Extension botMessagePreview send events
@@ -127,18 +54,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<TaskModuleTaskInfo> FetchTaskContinueHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension fetchTask events
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<string> FetchTaskMessageHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken);
+    public delegate Task<TaskModuleResponse> FetchTaskHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken);
 
     /// <summary>
     /// Function for handling Message Extension query events.
@@ -221,297 +137,6 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="commandId">ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(string commandId, SubmitActionCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), SUBMIT_ACTION_INVOKE_NAME);
-            return OnSubmitAction(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(Regex commandIdPattern, SubmitActionCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), SUBMIT_ACTION_INVOKE_NAME);
-            return OnSubmitAction(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(RouteSelector routeSelector, SubmitActionCardHandler<TState> handler)
-        {
-            MessagingExtensionAction? messagingExtensionAction;
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = Application<TState, TTurnStateManager>.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null)
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                MessagingExtensionResult result = await handler(turnContext, turnState, messagingExtensionAction.Data, cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        ComposeExtension = result
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler, true);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(MultipleRouteSelector routeSelectors, SubmitActionCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnSubmitAction(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnSubmitAction(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnSubmitAction(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="commandId">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(string commandId, SubmitActionTaskModuleContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), SUBMIT_ACTION_INVOKE_NAME);
-            return OnSubmitAction(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(Regex commandIdPattern, SubmitActionTaskModuleContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), SUBMIT_ACTION_INVOKE_NAME);
-            return OnSubmitAction(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(RouteSelector routeSelector, SubmitActionTaskModuleContinueHandler<TState> handler)
-        {
-            MessagingExtensionAction? messagingExtensionAction;
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = Application<TState, TTurnStateManager>.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null)
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                TaskModuleTaskInfo result = await handler(turnContext, turnState, messagingExtensionAction.Data, cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        Task = new TaskModuleContinueResponse(result),
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler, true);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(MultipleRouteSelector routeSelectors, SubmitActionTaskModuleContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnSubmitAction(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnSubmitAction(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnSubmitAction(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="commandId">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(string commandId, SubmitActionTaskModuleMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), SUBMIT_ACTION_INVOKE_NAME);
-            return OnSubmitAction(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(Regex commandIdPattern, SubmitActionTaskModuleMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), SUBMIT_ACTION_INVOKE_NAME);
-            return OnSubmitAction(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(RouteSelector routeSelector, SubmitActionTaskModuleMessageHandler<TState> handler)
-        {
-            MessagingExtensionAction? messagingExtensionAction;
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = Application<TState, TTurnStateManager>.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null)
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                string result = await handler(turnContext, turnState, messagingExtensionAction.Data, cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        Task = new TaskModuleMessageResponse(result),
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler, true);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmitAction(MultipleRouteSelector routeSelectors, SubmitActionTaskModuleMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnSubmitAction(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnSubmitAction(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnSubmitAction(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler that implements the submit action for an Action based Message Extension.
-        /// </summary>
-        /// <param name="commandId">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSubmitAction(string commandId, SubmitActionHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
@@ -552,13 +177,12 @@ namespace Microsoft.TeamsAI.Application
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
-                await handler(turnContext, turnState, messagingExtensionAction.Data, cancellationToken);
+                MessagingExtensionActionResponse result = await handler(turnContext, turnState, messagingExtensionAction.Data, cancellationToken);
 
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    MessagingExtensionActionResponse response = new();
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
+                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -595,312 +219,6 @@ namespace Microsoft.TeamsAI.Application
                 foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
                 {
                     OnSubmitAction(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="commandId">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(string commandId, BotMessagePreviewEditCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), SUBMIT_ACTION_INVOKE_NAME, "edit");
-            return OnBotMessagePreviewEdit(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(Regex commandIdPattern, BotMessagePreviewEditCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), SUBMIT_ACTION_INVOKE_NAME, "edit");
-            return OnBotMessagePreviewEdit(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(RouteSelector routeSelector, BotMessagePreviewEditCardHandler<TState> handler)
-        {
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                MessagingExtensionAction? messagingExtensionAction;
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = Application<TState, TTurnStateManager>.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null
-                    || !string.Equals(messagingExtensionAction.BotMessagePreviewAction, "edit"))
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                MessagingExtensionResult result = await handler(turnContext, turnState, messagingExtensionAction.BotActivityPreview.FirstOrDefault(), cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        ComposeExtension = result
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(MultipleRouteSelector routeSelectors, BotMessagePreviewEditCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnBotMessagePreviewEdit(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnBotMessagePreviewEdit(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnBotMessagePreviewEdit(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="commandId">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(string commandId, BotMessagePreviewEditTaskModuleContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), SUBMIT_ACTION_INVOKE_NAME, "edit");
-            return OnBotMessagePreviewEdit(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(Regex commandIdPattern, BotMessagePreviewEditTaskModuleContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), SUBMIT_ACTION_INVOKE_NAME, "edit");
-            return OnBotMessagePreviewEdit(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(RouteSelector routeSelector, BotMessagePreviewEditTaskModuleContinueHandler<TState> handler)
-        {
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                MessagingExtensionAction? messagingExtensionAction;
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = Application<TState, TTurnStateManager>.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null
-                    || !string.Equals(messagingExtensionAction.BotMessagePreviewAction, "edit"))
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                TaskModuleTaskInfo result = await handler(turnContext, turnState, messagingExtensionAction.BotActivityPreview.FirstOrDefault(), cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        Task = new TaskModuleContinueResponse(result)
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(MultipleRouteSelector routeSelectors, BotMessagePreviewEditTaskModuleContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnBotMessagePreviewEdit(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnBotMessagePreviewEdit(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnBotMessagePreviewEdit(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="commandId">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(string commandId, BotMessagePreviewEditTaskModuleMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), SUBMIT_ACTION_INVOKE_NAME, "edit");
-            return OnBotMessagePreviewEdit(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(Regex commandIdPattern, BotMessagePreviewEditTaskModuleMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), SUBMIT_ACTION_INVOKE_NAME, "edit");
-            return OnBotMessagePreviewEdit(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(RouteSelector routeSelector, BotMessagePreviewEditTaskModuleMessageHandler<TState> handler)
-        {
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                MessagingExtensionAction? messagingExtensionAction;
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = Application<TState, TTurnStateManager>.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null
-                    || !string.Equals(messagingExtensionAction.BotMessagePreviewAction, "edit"))
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                string result = await handler(turnContext, turnState, messagingExtensionAction.BotActivityPreview.FirstOrDefault(), cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        Task = new TaskModuleMessageResponse(result)
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the 'edit' action of a message that's being previewed by the
-        /// user prior to sending.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(MultipleRouteSelector routeSelectors, BotMessagePreviewEditTaskModuleMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnBotMessagePreviewEdit(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnBotMessagePreviewEdit(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnBotMessagePreviewEdit(routeSelector, handler);
                 }
             }
             return _app;
@@ -956,13 +274,12 @@ namespace Microsoft.TeamsAI.Application
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
-                await handler(turnContext, turnState, messagingExtensionAction.BotActivityPreview.FirstOrDefault(), cancellationToken);
+                MessagingExtensionActionResponse result = await handler(turnContext, turnState, messagingExtensionAction.BotActivityPreview.FirstOrDefault(), cancellationToken);
 
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    MessagingExtensionActionResponse response = new();
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
+                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -1112,7 +429,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="commandId">ID of the commands to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(string commandId, FetchTaskContinueHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnFetchTask(string commandId, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
             Verify.ParamNotNull(handler);
@@ -1126,7 +443,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="commandIdPattern">ID of the commands to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(Regex commandIdPattern, FetchTaskContinueHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnFetchTask(Regex commandIdPattern, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(commandIdPattern);
             Verify.ParamNotNull(handler);
@@ -1140,7 +457,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="routeSelector">ID of the commands to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(RouteSelector routeSelector, FetchTaskContinueHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnFetchTask(RouteSelector routeSelector, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -1152,16 +469,12 @@ namespace Microsoft.TeamsAI.Application
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnFetchTask() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
-                TaskModuleTaskInfo result = await handler(turnContext, turnState, cancellationToken);
+                TaskModuleResponse result = await handler(turnContext, turnState, cancellationToken);
 
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        Task = new TaskModuleContinueResponse(result)
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
+                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -1175,104 +488,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(MultipleRouteSelector routeSelectors, FetchTaskContinueHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string commandId in routeSelectors.Strings)
-                {
-                    OnFetchTask(commandId, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex commandIdPattern in routeSelectors.Regexes)
-                {
-                    OnFetchTask(commandIdPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnFetchTask(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the initial fetch task for an Action based message extension.
-        /// </summary>
-        /// <param name="commandId">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(string commandId, FetchTaskMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandId);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), FETCH_TASK_INVOKE_NAME);
-            return OnFetchTask(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the initial fetch task for an Action based message extension.
-        /// </summary>
-        /// <param name="commandIdPattern">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(Regex commandIdPattern, FetchTaskMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(commandIdPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), FETCH_TASK_INVOKE_NAME);
-            return OnFetchTask(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Registers a handler to process the initial fetch task for an Action based message extension.
-        /// </summary>
-        /// <param name="routeSelector">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(RouteSelector routeSelector, FetchTaskMessageHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelector);
-            Verify.ParamNotNull(handler);
-            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
-            {
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, FETCH_TASK_INVOKE_NAME))
-                {
-                    throw new TeamsAIException($"Unexpected MessageExtensions.OnFetchTask() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                string result = await handler(turnContext, turnState, cancellationToken);
-
-                // Check to see if an invoke response has already been added
-                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
-                {
-                    MessagingExtensionActionResponse response = new()
-                    {
-                        Task = new TaskModuleMessageResponse(result)
-                    };
-                    Activity activity = Application<TState, TTurnStateManager>.CreateInvokeResponseActivity(response);
-                    await turnContext.SendActivityAsync(activity, cancellationToken);
-                }
-            };
-            _app.AddRoute(routeSelector, routeHandler, true);
-            return _app;
-        }
-
-        /// <summary>
-        /// Registers a handler to process the initial fetch task for an Action based message extension.
-        /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetchTask(MultipleRouteSelector routeSelectors, FetchTaskMessageHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnFetchTask(MultipleRouteSelector routeSelectors, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);

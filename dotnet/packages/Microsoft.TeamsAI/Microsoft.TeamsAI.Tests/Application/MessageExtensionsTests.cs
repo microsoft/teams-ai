@@ -13,7 +13,7 @@ namespace Microsoft.TeamsAI.Tests.Application
     public class MessageExtensionsTests
     {
         [Fact]
-        public async void Test_OnSubmitAction_CommandId_Card()
+        public async void Test_OnSubmitAction_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -36,299 +36,11 @@ namespace Microsoft.TeamsAI.Tests.Application
                     }
                 })
             });
-            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
+            var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var expectedInvokeResponse = new InvokeResponse()
             {
                 Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    ComposeExtension = messagingExtensionResultMock.Object
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            SubmitActionCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
-                Assert.Equal("test-title", actionData.Title);
-                Assert.Equal("test-content", actionData.Content);
-                return Task.FromResult(messagingExtensionResultMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_CommandId_Card_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    data = new
-                    {
-                        title = "test-title",
-                        content = "test-content"
-                    }
-                })
-            });
-            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            SubmitActionCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
-                Assert.Equal("test-title", actionData.Title);
-                Assert.Equal("test-content", actionData.Content);
-                return Task.FromResult(messagingExtensionResultMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction("not-test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_CommandId_TaskModuleContinue()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    data = new
-                    {
-                        title = "test-title",
-                        content = "test-content"
-                    }
-                })
-            });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    Task = new TaskModuleContinueResponse(taskModuleMock.Object)
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            SubmitActionTaskModuleContinueHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
-                Assert.Equal("test-title", actionData.Title);
-                Assert.Equal("test-content", actionData.Content);
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_CommandId_TaskModuleContinue_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    data = new
-                    {
-                        title = "test-title",
-                        content = "test-content"
-                    }
-                })
-            });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            SubmitActionTaskModuleContinueHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
-                Assert.Equal("test-title", actionData.Title);
-                Assert.Equal("test-content", actionData.Content);
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction("not-test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_CommandId_TaskModuleMessage()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    data = new
-                    {
-                        title = "test-title",
-                        content = "test-content"
-                    }
-                })
-            });
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    Task = new TaskModuleMessageResponse("test-message")
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            SubmitActionTaskModuleMessageHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
-                Assert.Equal("test-title", actionData.Title);
-                Assert.Equal("test-content", actionData.Content);
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_CommandId_TaskModuleMessage_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    data = new
-                    {
-                        title = "test-title",
-                        content = "test-content"
-                    }
-                })
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            SubmitActionTaskModuleMessageHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
-                Assert.Equal("test-title", actionData.Title);
-                Assert.Equal("test-content", actionData.Content);
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction("not-test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_CommandId_NoResponse()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    data = new
-                    {
-                        title = "test-title",
-                        content = "test-content"
-                    }
-                })
-            });
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
+                Body = actionResponseMock.Object
             };
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
@@ -337,7 +49,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
                 Assert.Equal("test-title", actionData.Title);
                 Assert.Equal("test-content", actionData.Content);
-                return Task.CompletedTask;
+                return Task.FromResult(actionResponseMock.Object);
             };
 
             // Act
@@ -352,7 +64,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSubmitAction_CommandId_NoResponse_NotHit()
+        public async void Test_OnSubmitAction_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -375,6 +87,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     }
                 })
             });
+            var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             SubmitActionHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
@@ -382,7 +95,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
                 Assert.Equal("test-title", actionData.Title);
                 Assert.Equal("test-content", actionData.Content);
-                return Task.CompletedTask;
+                return Task.FromResult(actionResponseMock.Object);
             };
 
             // Act
@@ -394,7 +107,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnSubmitAction_RouteSelector_Card_ActivityNotMatched()
+        public async void Test_OnSubmitAction_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -402,92 +115,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "composeExtension/fetchTask"
             });
-            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            SubmitActionCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                return Task.FromResult(messagingExtensionResultMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_RouteSelector_TaskModuleContinue_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask"
-            });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            SubmitActionTaskModuleContinueHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_RouteSelector_TaskModuleMessage_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask"
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            SubmitActionTaskModuleMessageHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnSubmitAction(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnSubmitAction_RouteSelector_NoResponse_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask"
-            });
+            var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
@@ -496,7 +124,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
             SubmitActionHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                return Task.CompletedTask;
+                return Task.FromResult(actionResponseMock.Object);
             };
 
             // Act
@@ -508,7 +136,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_Card()
+        public async void Test_OnBotMessagePreviewEdit_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -533,306 +161,18 @@ namespace Microsoft.TeamsAI.Tests.Application
                     botActivityPreview = new List<Activity> { activity }
                 }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
             });
-            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
+            var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var expectedInvokeResponse = new InvokeResponse()
             {
                 Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    ComposeExtension = messagingExtensionResultMock.Object
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            BotMessagePreviewEditCardHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
-            {
-                Assert.Equivalent(activity, activityPreview);
-                return Task.FromResult(messagingExtensionResultMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_Card_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var activity = new Activity()
-            {
-                Type = ActivityTypes.Message
-            };
-
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    botMessagePreviewAction = "send",
-                    botActivityPreview = new List<Activity> { activity }
-                }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
-            });
-            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            BotMessagePreviewEditCardHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
-            {
-                Assert.Equivalent(activity, activityPreview);
-                return Task.FromResult(messagingExtensionResultMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_TaskModuleContinue()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var activity = new Activity()
-            {
-                Type = ActivityTypes.Message
-            };
-
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    botMessagePreviewAction = "edit",
-                    botActivityPreview = new List<Activity> { activity }
-                }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
-            });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    Task = new TaskModuleContinueResponse(taskModuleMock.Object)
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            BotMessagePreviewEditTaskModuleContinueHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
-            {
-                Assert.Equivalent(activity, activityPreview);
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_TaskModuleContinue_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var activity = new Activity()
-            {
-                Type = ActivityTypes.Message
-            };
-
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    botMessagePreviewAction = "send",
-                    botActivityPreview = new List<Activity> { activity }
-                }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
-            });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            BotMessagePreviewEditTaskModuleContinueHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
-            {
-                Assert.Equivalent(activity, activityPreview);
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_TaskModuleMessage()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var activity = new Activity()
-            {
-                Type = ActivityTypes.Message
-            };
-
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    botMessagePreviewAction = "edit",
-                    botActivityPreview = new List<Activity> { activity }
-                }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
-            });
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    Task = new TaskModuleMessageResponse("test-message")
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            BotMessagePreviewEditTaskModuleMessageHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
-            {
-                Assert.Equivalent(activity, activityPreview);
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_TaskModuleMessage_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var activity = new Activity()
-            {
-                Type = ActivityTypes.Message
-            };
-
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    botMessagePreviewAction = "send",
-                    botActivityPreview = new List<Activity> { activity }
-                }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            BotMessagePreviewEditTaskModuleMessageHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
-            {
-                Assert.Equivalent(activity, activityPreview);
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_NoResponse()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var activity = new Activity()
-            {
-                Type = ActivityTypes.Message
-            };
-
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                    botMessagePreviewAction = "edit",
-                    botActivityPreview = new List<Activity> { activity }
-                }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
-            });
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
+                Body = actionResponseMock.Object
             };
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
-                return Task.CompletedTask;
+                return Task.FromResult(actionResponseMock.Object);
             };
 
             // Act
@@ -847,7 +187,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewEdit_CommandId_NoResponse_NotHit()
+        public async void Test_OnBotMessagePreviewEdit_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -872,12 +212,13 @@ namespace Microsoft.TeamsAI.Tests.Application
                     botActivityPreview = new List<Activity> { activity }
                 }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
             });
+            var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
-                return Task.CompletedTask;
+                return Task.FromResult(actionResponseMock.Object);
             };
 
             // Act
@@ -889,7 +230,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnBotMessagePreviewEdit_RouteSelector_Card_ActivityNotMatched()
+        public async void Test_OnBotMessagePreviewEdit_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -897,92 +238,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "composeExtension/fetchTask"
             });
-            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            BotMessagePreviewEditCardHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                return Task.FromResult(messagingExtensionResultMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_RouteSelector_TaskModuleContinue_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask"
-            });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            BotMessagePreviewEditTaskModuleContinueHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_RouteSelector_TaskModuleMessage_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask"
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            BotMessagePreviewEditTaskModuleMessageHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
-            {
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnBotMessagePreviewEdit(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnBotMessagePreviewEdit_RouteSelector_NoResponse_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask"
-            });
+            var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
@@ -991,7 +247,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
-                return Task.CompletedTask;
+                return Task.FromResult(actionResponseMock.Object);
             };
 
             // Act
@@ -1123,7 +379,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnFetchTask_CommandId_Continue()
+        public async void Test_OnFetchTask_CommandId()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1141,20 +397,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                     commandId = "test-command",
                 })
             });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
+            var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var expectedInvokeResponse = new InvokeResponse()
             {
                 Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    Task = new TaskModuleContinueResponse(taskModuleMock.Object)
-                }
+                Body = taskModuleResponseMock.Object
             };
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            FetchTaskContinueHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
-                return Task.FromResult(taskModuleMock.Object);
+                return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
@@ -1169,7 +422,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnFetchTask_CommandId_Continue_NotHit()
+        public async void Test_OnFetchTask_CommandId_NotHit()
         {
             // Arrange
             Activity[]? activitiesToSend = null;
@@ -1187,12 +440,12 @@ namespace Microsoft.TeamsAI.Tests.Application
                     commandId = "test-command",
                 })
             });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
+            var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            FetchTaskContinueHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
-                return Task.FromResult(taskModuleMock.Object);
+                return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
@@ -1204,86 +457,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
-        public async void Test_OnFetchTask_CommandId_Message()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                })
-            });
-            var expectedInvokeResponse = new InvokeResponse()
-            {
-                Status = 200,
-                Body = new MessagingExtensionActionResponse()
-                {
-                    Task = new TaskModuleMessageResponse("test-message")
-                }
-            };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            FetchTaskMessageHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
-            {
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnFetchTask("test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.NotNull(activitiesToSend);
-            Assert.Equal(1, activitiesToSend.Length);
-            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
-            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
-        }
-
-        [Fact]
-        public async void Test_OnFetchTask_CommandId_Message_NotHit()
-        {
-            // Arrange
-            Activity[]? activitiesToSend = null;
-            void CaptureSend(Activity[] arg)
-            {
-                activitiesToSend = arg;
-            }
-            var adapter = new SimpleAdapter(CaptureSend);
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/fetchTask",
-                Value = JObject.FromObject(new
-                {
-                    commandId = "test-command",
-                })
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            FetchTaskMessageHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
-            {
-                return Task.FromResult("test-message");
-            };
-
-            // Act
-            messageExtensions.OnFetchTask("not-test-command", handler);
-            await app.OnTurnAsync(turnContext);
-
-            // Assert
-            Assert.Null(activitiesToSend);
-        }
-
-        [Fact]
-        public async void Test_OnFetchTask_RouteSelector_Continue_ActivityNotMatched()
+        public async void Test_OnFetchTask_RouteSelector_ActivityNotMatched()
         {
             var adapter = new SimpleAdapter();
             var turnContext = new TurnContext(adapter, new Activity()
@@ -1291,44 +465,16 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "composeExtension/submitAction"
             });
-            var taskModuleMock = new Mock<TaskModuleTaskInfo>();
+            var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            FetchTaskContinueHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
-                return Task.FromResult(taskModuleMock.Object);
-            };
-
-            // Act
-            messageExtensions.OnFetchTask(routeSelector, handler);
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
-
-            // Assert
-            Assert.Equal("Unexpected MessageExtensions.OnFetchTask() triggered for activity type: invoke", exception.Message);
-        }
-
-        [Fact]
-        public async void Test_OnFetchTask_RouteSelector_Message_ActivityNotMatched()
-        {
-            var adapter = new SimpleAdapter();
-            var turnContext = new TurnContext(adapter, new Activity()
-            {
-                Type = ActivityTypes.Invoke,
-                Name = "composeExtension/submitAction"
-            });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
-            {
-                return Task.FromResult(true);
-            };
-            FetchTaskMessageHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
-            {
-                return Task.FromResult("test-message");
+                return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
