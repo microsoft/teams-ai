@@ -1,5 +1,4 @@
-﻿using AdaptiveCards;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.State;
@@ -78,19 +77,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<AdaptiveCard> ActionExecuteAdaptiveCardHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Adaptive Card Action.Execute events.
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="data">The data associated with the action.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<string> ActionExecuteTextHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
+    public delegate Task<AdaptiveCardInvokeResponse> ActionExecuteHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
 
     /// <summary>
     /// Function for handling Adaptive Card Action.Submit events.
@@ -147,7 +134,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="verb">The named action to be handled.</param>
         /// <param name="handler">The code to execute when the action is triggered.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteAdaptiveCardHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
@@ -161,7 +148,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="verbPattern">The named action to be handled.</param>
         /// <param name="handler">The code to execute when the action is triggered.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteAdaptiveCardHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
@@ -175,7 +162,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="routeSelector">The named action to be handled.</param>
         /// <param name="handler">The code to execute when the action is triggered.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(RouteSelector routeSelector, ActionExecuteAdaptiveCardHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnActionExecute(RouteSelector routeSelector, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -191,13 +178,7 @@ namespace Microsoft.TeamsAI.Application
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnActionExecute() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
-                AdaptiveCard adaptiveCard = await handler(turnContext, turnState, invokeValue.Action.Data, cancellationToken);
-                AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new()
-                {
-                    StatusCode = 200,
-                    Type = "application/vnd.microsoft.card.adaptive",
-                    Value = adaptiveCard
-                };
+                AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = await handler(turnContext, turnState, invokeValue.Action.Data, cancellationToken);
                 InvokeResponse invokeResponse = CreateInvokeResponse(adaptiveCardInvokeResponse);
                 Activity activity = new()
                 {
@@ -216,110 +197,7 @@ namespace Microsoft.TeamsAI.Application
         /// <param name="routeSelectors">The named actions to be handled.</param>
         /// <param name="handler">The code to execute when the action is triggered.</param>
         /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(MultipleRouteSelector routeSelectors, ActionExecuteAdaptiveCardHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelectors);
-            Verify.ParamNotNull(handler);
-            if (routeSelectors.Strings != null)
-            {
-                foreach (string verb in routeSelectors.Strings)
-                {
-                    OnActionExecute(verb, handler);
-                }
-            }
-            if (routeSelectors.Regexes != null)
-            {
-                foreach (Regex verbPattern in routeSelectors.Regexes)
-                {
-                    OnActionExecute(verbPattern, handler);
-                }
-            }
-            if (routeSelectors.RouteSelectors != null)
-            {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
-                {
-                    OnActionExecute(routeSelector, handler);
-                }
-            }
-            return _app;
-        }
-
-        /// <summary>
-        /// Adds a route to the application for handling Adaptive Card Action.Execute events.
-        /// </summary>
-        /// <param name="verb">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteTextHandler<TState> handler)
-        {
-            Verify.ParamNotNull(verb);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateActionExecuteSelector((string input) => string.Equals(verb, input));
-            return OnActionExecute(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Adds a route to the application for handling Adaptive Card Action.Execute events.
-        /// </summary>
-        /// <param name="verbPattern">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteTextHandler<TState> handler)
-        {
-            Verify.ParamNotNull(verbPattern);
-            Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = CreateActionExecuteSelector((string input) => verbPattern.IsMatch(input));
-            return OnActionExecute(routeSelector, handler);
-        }
-
-        /// <summary>
-        /// Adds a route to the application for handling Adaptive Card Action.Execute events.
-        /// </summary>
-        /// <param name="routeSelector">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(RouteSelector routeSelector, ActionExecuteTextHandler<TState> handler)
-        {
-            Verify.ParamNotNull(routeSelector);
-            Verify.ParamNotNull(handler);
-            RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
-            {
-                AdaptiveCardInvokeValue? invokeValue;
-                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
-                    || (invokeValue = GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
-                    || invokeValue.Action == null
-                    || !string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE))
-                {
-                    throw new TeamsAIException($"Unexpected AdaptiveCards.OnActionExecute() triggered for activity type: {turnContext.Activity.Type}");
-                }
-
-                string result = await handler(turnContext, turnState, invokeValue.Action.Data, cancellationToken);
-                AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new()
-                {
-                    StatusCode = 200,
-                    Type = "application/vnd.microsoft.activity.message",
-                    Value = result
-                };
-                InvokeResponse invokeResponse = CreateInvokeResponse(adaptiveCardInvokeResponse);
-                Activity activity = new()
-                {
-                    Type = ActivityTypesEx.InvokeResponse,
-                    Value = invokeResponse
-                };
-                await turnContext.SendActivityAsync(activity, cancellationToken);
-            };
-            _app.AddRoute(routeSelector, routeHandler, true);
-            return _app;
-        }
-
-        /// <summary>
-        /// Adds a route to the application for handling Adaptive Card Action.Execute events.
-        /// </summary>
-        /// <param name="routeSelectors">The named actions to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(MultipleRouteSelector routeSelectors, ActionExecuteTextHandler<TState> handler)
+        public Application<TState, TTurnStateManager> OnActionExecute(MultipleRouteSelector routeSelectors, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -551,14 +429,14 @@ namespace Microsoft.TeamsAI.Application
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
-                bool isAction = string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME);
-                if (!isAction)
-                {
-                    return Task.FromResult(false);
-                }
-                AdaptiveCardInvokeValue? invokeValue = GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity);
-                return Task.FromResult(invokeValue != null && isMatch(invokeValue.Action.Verb));
+                AdaptiveCardInvokeValue? invokeValue;
+                return Task.FromResult(
+                    string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
+                    && (invokeValue = AdaptiveCards<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) != null
+                    && invokeValue.Action != null
+                    && string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE)
+                    && isMatch(invokeValue.Action.Verb));
             };
             return routeSelector;
         }
@@ -567,15 +445,15 @@ namespace Microsoft.TeamsAI.Application
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
-                bool isSubmit = string.Equals(turnContext.Activity.Type, ActivityTypes.Message, StringComparison.OrdinalIgnoreCase)
+                JObject? obj;
+                return Task.FromResult(
+                    string.Equals(turnContext.Activity.Type, ActivityTypes.Message, StringComparison.OrdinalIgnoreCase)
                     && string.IsNullOrEmpty(turnContext.Activity.Text)
-                    && turnContext.Activity.Value != null;
-                if (!isSubmit)
-                {
-                    return Task.FromResult(false);
-                }
-                JObject? data = turnContext.Activity.Value as JObject;
-                return Task.FromResult(data != null && data[filter] != null && data[filter]!.Type == JTokenType.String && isMatch(data[filter]!.Value<string>()!));
+                    && turnContext.Activity.Value != null
+                    && (obj = turnContext.Activity.Value as JObject) != null
+                    && obj[filter] != null
+                    && obj[filter]!.Type == JTokenType.String
+                    && isMatch(obj[filter]!.Value<string>()!));
             };
             return routeSelector;
         }
@@ -584,14 +462,12 @@ namespace Microsoft.TeamsAI.Application
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
-                bool isSearch = string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME);
-                if (!isSearch)
-                {
-                    return Task.FromResult(false);
-                }
-                AdaptiveCardSearchInvokeValue? searchInvokeValue = GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity);
-                return Task.FromResult(searchInvokeValue != null && isMatch(searchInvokeValue.Dataset));
+                AdaptiveCardSearchInvokeValue? searchInvokeValue;
+                return Task.FromResult(
+                    string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
+                    && (searchInvokeValue = GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) != null
+                    && isMatch(searchInvokeValue.Dataset));
             };
             return routeSelector;
         }
