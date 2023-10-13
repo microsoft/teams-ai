@@ -9,6 +9,9 @@
 import {
     ActivityTypes,
     InvokeResponse,
+    MemoryStorage,
+    Storage,
+    TeamsSSOTokenExchangeMiddleware,
     TurnContext,
     tokenExchangeOperationName,
     tokenResponseEventName,
@@ -32,6 +35,7 @@ import { Application } from './Application';
  */
 export class Authentication<TState extends TurnState = DefaultTurnState> {
     private readonly _oauthPrompt: OAuthPrompt;
+    private readonly _storage: Storage;
     private _authSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
     private _authFailureHandler?: (context: TurnContext, state: TState) => Promise<void>;
 
@@ -40,9 +44,14 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @param app Application for adding routes.
      * @param settings Authentication settings.
      */
-    constructor(app: Application<TState>, settings: OAuthPromptSettings) {
+    constructor(app: Application<TState>, settings: OAuthPromptSettings, storage?: Storage) {
         // Create OAuthPrompt
         this._oauthPrompt = new OAuthPrompt('OAuthPrompt', settings);
+
+        this._storage = storage || new MemoryStorage();
+
+        // Handles deduplication of token exchange event when using SSO
+        app.adapter.use(new TeamsSSOTokenExchangeMiddleware(this._storage, settings.connectionName));
 
         // Add application routes to handle OAuth callbacks
         app.addRoute(

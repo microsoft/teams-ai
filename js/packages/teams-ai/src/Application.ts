@@ -198,6 +198,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _authentication?: Authentication<TState>;
+    private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
 
     /**
@@ -214,6 +215,8 @@ export class Application<TState extends TurnState = DefaultTurnState> {
             options
         ) as ApplicationOptions<TState>;
 
+        this._adapter = this._options.adapter;
+
         // Create default turn state manager if needed
         if (!this._options.turnStateManager) {
             this._options.turnStateManager = new DefaultTurnStateManager() as any;
@@ -226,7 +229,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         // Create OAuthPrompt if configured
         if (this._options.authentication) {
-            this._authentication = new Authentication<TState>(this, this._options.authentication);
+            this._authentication = new Authentication<TState>(
+                this,
+                this._options.authentication,
+                this._options.storage
+            );
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -247,6 +254,20 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      */
     public get adaptiveCards(): AdaptiveCards<TState> {
         return this._adaptiveCards;
+    }
+
+    /**
+     * The bot's adapter.
+     * @returns {BotAdapter} The bot's adapter that is configured for the application.
+     */
+    public get adapter(): BotAdapter {
+        if (!this._adapter) {
+            throw new Error(
+                `The Application.adapter property is unavailable because it was not configured when creating the Application.`
+            );
+        }
+
+        return this._adapter;
     }
 
     /**
