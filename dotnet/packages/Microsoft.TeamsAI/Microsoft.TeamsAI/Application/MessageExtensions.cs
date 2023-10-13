@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace Microsoft.TeamsAI.Application
 {
     /// <summary>
-    /// Function for handling Message Extension submitting action events
+    /// Function for handling Message Extension submitting action events.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     /// <param name="turnContext">A strongly-typed context object for this turn.</param>
@@ -22,7 +22,7 @@ namespace Microsoft.TeamsAI.Application
     public delegate Task<MessagingExtensionActionResponse> SubmitActionHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Function for handling Message Extension botMessagePreview edit events
+    /// Function for handling Message Extension botMessagePreview edit events.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     /// <param name="turnContext">A strongly-typed context object for this turn.</param>
@@ -34,7 +34,7 @@ namespace Microsoft.TeamsAI.Application
     public delegate Task<MessagingExtensionActionResponse> BotMessagePreviewEditHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Function for handling Message Extension botMessagePreview send events
+    /// Function for handling Message Extension botMessagePreview send events.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     /// <param name="turnContext">A strongly-typed context object for this turn.</param>
@@ -46,7 +46,7 @@ namespace Microsoft.TeamsAI.Application
     public delegate Task BotMessagePreviewSendHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Function for handling Message Extension fetchTask events
+    /// Function for handling Message Extension fetchTask events.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     /// <param name="turnContext">A strongly-typed context object for this turn.</param>
@@ -91,18 +91,6 @@ namespace Microsoft.TeamsAI.Application
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
     public delegate Task<MessagingExtensionResult> QueryLinkHandler<TState>(ITurnContext turnContext, TState turnState, string url, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Function for handling Message Extension anonymous link unfurling events.
-    /// </summary>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
-    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="url">The URL that should be unfurled.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used by other objects
-    /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task<MessagingExtensionResult> AnonymousQueryLinkHandler<TState>(ITurnContext turnContext, TState turnState, string url, CancellationToken cancellationToken);
 
     /// <summary>
     /// MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
@@ -719,7 +707,7 @@ namespace Microsoft.TeamsAI.Application
             return _app;
         }
 
-        private RouteSelector CreateTaskSelector(Func<string, bool> isMatch, string invokeName, string? botMessagePreviewAction = default)
+        private static RouteSelector CreateTaskSelector(Func<string, bool> isMatch, string invokeName, string? botMessagePreviewAction = default)
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {

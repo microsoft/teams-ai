@@ -635,15 +635,12 @@ namespace Microsoft.TeamsAI.Application
             {
                 return default;
             }
-
             JObject? obj = activity.Value as JObject;
             if (obj == null)
             {
                 return default;
             }
-
             T? invokeValue;
-
             try
             {
                 invokeValue = obj.ToObject<T>();
@@ -652,7 +649,6 @@ namespace Microsoft.TeamsAI.Application
             {
                 return default;
             }
-
             return invokeValue;
         }
 

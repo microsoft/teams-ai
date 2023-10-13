@@ -168,8 +168,11 @@ namespace Microsoft.TeamsAI.Application
             RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
             {
                 AdaptiveCardInvokeValue? invokeValue;
-                if (turnContext.Activity.Type != ActivityTypes.Invoke || turnContext.Activity.Name != ACTION_INVOKE_NAME
-                    || (invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null || invokeValue.Action == null || invokeValue.Action.Type != ACTION_EXECUTE_TYPE)
+                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
+                    || (invokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
+                    || invokeValue.Action == null
+                    || !string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE))
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnActionExecute() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -346,13 +349,14 @@ namespace Microsoft.TeamsAI.Application
             RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
             {
                 AdaptiveCardSearchInvokeValue? searchInvokeValue;
-                if (turnContext.Activity.Type != ActivityTypes.Invoke || turnContext.Activity.Name != SEARCH_INVOKE_NAME
+                if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
                     || (searchInvokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnSearch() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
-                AdaptiveCardsSearchParams adaptiveCardsSearchParams = new(searchInvokeValue.QueryText, searchInvokeValue.Dataset);
+                AdaptiveCardsSearchParams adaptiveCardsSearchParams = new(searchInvokeValue.QueryText, searchInvokeValue.Dataset ?? string.Empty);
                 Query<AdaptiveCardsSearchParams> query = new(searchInvokeValue.QueryOptions.Top, searchInvokeValue.QueryOptions.Skip, adaptiveCardsSearchParams);
                 IList<AdaptiveCardsSearchResult> results = await handler(turnContext, turnState, query, cancellationToken);
 
@@ -452,7 +456,7 @@ namespace Microsoft.TeamsAI.Application
                     string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
                     && (searchInvokeValue = Application<TState, TTurnStateManager>.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) != null
-                    && isMatch(searchInvokeValue.Dataset));
+                    && isMatch(searchInvokeValue.Dataset!));
             };
             return routeSelector;
         }
@@ -460,7 +464,7 @@ namespace Microsoft.TeamsAI.Application
         private class AdaptiveCardSearchInvokeValue : SearchInvokeValue
         {
             [JsonProperty("dataset")]
-            public string Dataset { get; set; }
+            public string? Dataset { get; set; }
         }
 
         private class AdaptiveCardsSearchInvokeResponseValue
