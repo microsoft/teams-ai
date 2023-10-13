@@ -10,15 +10,15 @@ using System.Text.RegularExpressions;
 namespace Microsoft.TeamsAI.Application
 {
     /// <summary>
-    /// Function for handling Message Extension submitting action events.
+    /// Function for handling Message Extension submitAction events.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     /// <param name="turnContext">A strongly-typed context object for this turn.</param>
     /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
-    /// <param name="data">The data associated with the action.</param>
+    /// <param name="data">The data that was submitted.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of MessagingExtensionActionResponse.</returns>
     public delegate Task<MessagingExtensionActionResponse> SubmitActionHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
 
     /// <summary>
@@ -30,7 +30,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="activityPreview">The activity that's being previewed by the user.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of MessagingExtensionActionResponse.</returns>
     public delegate Task<MessagingExtensionActionResponse> BotMessagePreviewEditHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken);
 
     /// <summary>
@@ -53,7 +53,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of TaskModuleResponse.</returns>
     public delegate Task<TaskModuleResponse> FetchTaskHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken);
 
     /// <summary>
@@ -65,7 +65,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="query">The query parameters that were sent by the client.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of MessagingExtensionResult.</returns>
     public delegate Task<MessagingExtensionResult> QueryHandler<TState>(ITurnContext turnContext, TState turnState, Query<Dictionary<string, object>> query, CancellationToken cancellationToken);
 
     /// <summary>
@@ -77,7 +77,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="item">The item that was selected.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of MessagingExtensionResult.</returns>
     public delegate Task<MessagingExtensionResult> SelectItemHandler<TState>(ITurnContext turnContext, TState turnState, object item, CancellationToken cancellationToken);
 
     /// <summary>
@@ -89,7 +89,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="url">The URL that should be unfurled.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of MessagingExtensionResult.</returns>
     public delegate Task<MessagingExtensionResult> QueryLinkHandler<TState>(ITurnContext turnContext, TState turnState, string url, CancellationToken cancellationToken);
 
     /// <summary>
@@ -124,7 +124,7 @@ namespace Microsoft.TeamsAI.Application
         /// </summary>
         /// <param name="commandId">ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSubmitAction(string commandId, SubmitActionHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
@@ -136,9 +136,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements the submit action for an Action based Message Extension.
         /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
+        /// <param name="commandIdPattern">Regular expression to match against the ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSubmitAction(Regex commandIdPattern, SubmitActionHandler<TState> handler)
         {
             Verify.ParamNotNull(commandIdPattern);
@@ -150,9 +150,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements the submit action for an Action based Message Extension.
         /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSubmitAction(RouteSelector routeSelector, SubmitActionHandler<TState> handler)
         {
             MessagingExtensionAction? messagingExtensionAction;
@@ -181,9 +181,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements the submit action for an Action based Message Extension.
         /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSubmitAction(MultipleRouteSelector routeSelectors, SubmitActionHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -218,7 +218,7 @@ namespace Microsoft.TeamsAI.Application
         /// </summary>
         /// <param name="commandId">ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(string commandId, BotMessagePreviewEditHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
@@ -231,9 +231,9 @@ namespace Microsoft.TeamsAI.Application
         /// Registers a handler to process the 'edit' action of a message that's being previewed by the
         /// user prior to sending.
         /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
+        /// <param name="commandIdPattern">Regular expression to match against the ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(Regex commandIdPattern, BotMessagePreviewEditHandler<TState> handler)
         {
             Verify.ParamNotNull(commandIdPattern);
@@ -246,9 +246,9 @@ namespace Microsoft.TeamsAI.Application
         /// Registers a handler to process the 'edit' action of a message that's being previewed by the
         /// user prior to sending.
         /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(RouteSelector routeSelector, BotMessagePreviewEditHandler<TState> handler)
         {
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
@@ -279,9 +279,9 @@ namespace Microsoft.TeamsAI.Application
         /// Registers a handler to process the 'edit' action of a message that's being previewed by the
         /// user prior to sending.
         /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewEdit(MultipleRouteSelector routeSelectors, BotMessagePreviewEditHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -316,7 +316,7 @@ namespace Microsoft.TeamsAI.Application
         /// </summary>
         /// <param name="commandId">ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewSend(string commandId, BotMessagePreviewSendHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
@@ -329,9 +329,9 @@ namespace Microsoft.TeamsAI.Application
         /// Registers a handler to process the 'send' action of a message that's being previewed by the
         /// user prior to sending.
         /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
+        /// <param name="commandIdPattern">Regular expression to match against the ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewSend(Regex commandIdPattern, BotMessagePreviewSendHandler<TState> handler)
         {
             Verify.ParamNotNull(commandIdPattern);
@@ -344,9 +344,9 @@ namespace Microsoft.TeamsAI.Application
         /// Registers a handler to process the 'send' action of a message that's being previewed by the
         /// user prior to sending.
         /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewSend(RouteSelector routeSelector, BotMessagePreviewSendHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
@@ -381,9 +381,9 @@ namespace Microsoft.TeamsAI.Application
         /// Registers a handler to process the 'send' action of a message that's being previewed by the
         /// user prior to sending.
         /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnBotMessagePreviewSend(MultipleRouteSelector routeSelectors, BotMessagePreviewSendHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -417,7 +417,7 @@ namespace Microsoft.TeamsAI.Application
         /// </summary>
         /// <param name="commandId">ID of the commands to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnFetchTask(string commandId, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
@@ -429,9 +429,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler to process the initial fetch task for an Action based message extension.
         /// </summary>
-        /// <param name="commandIdPattern">ID of the commands to register the handler for.</param>
+        /// <param name="commandIdPattern">Regular expression to match against the ID of the commands to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnFetchTask(Regex commandIdPattern, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(commandIdPattern);
@@ -443,9 +443,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler to process the initial fetch task for an Action based message extension.
         /// </summary>
-        /// <param name="routeSelector">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnFetchTask(RouteSelector routeSelector, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
@@ -474,9 +474,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler to process the initial fetch task for an Action based message extension.
         /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnFetchTask(MultipleRouteSelector routeSelectors, FetchTaskHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -510,7 +510,7 @@ namespace Microsoft.TeamsAI.Application
         /// </summary>
         /// <param name="commandId">ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnQuery(string commandId, QueryHandler<TState> handler)
         {
             Verify.ParamNotNull(commandId);
@@ -522,9 +522,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements a Search based Message Extension.
         /// </summary>
-        /// <param name="commandIdPattern">ID of the command to register the handler for.</param>
+        /// <param name="commandIdPattern">Regular expression to match against the ID of the command to register the handler for.</param>
         /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnQuery(Regex commandIdPattern, QueryHandler<TState> handler)
         {
             Verify.ParamNotNull(commandIdPattern);
@@ -536,9 +536,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements a Search based Message Extension.
         /// </summary>
-        /// <param name="routeSelector">ID of the command to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnQuery(RouteSelector routeSelector, QueryHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
@@ -579,9 +579,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements a Search based Message Extension.
         /// </summary>
-        /// <param name="routeSelectors">ID of the commands to register the handler for.</param>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnQuery(MultipleRouteSelector routeSelectors, QueryHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -613,9 +613,15 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements the logic to handle the tap actions for items returned
         /// by a Search based message extension.
+        /// <remarks>
+        /// The `composeExtension/selectItem` INVOKE activity does not contain any sort of command ID,
+        /// so only a single select item handler can be registered. Developers will need to include a
+        /// type name of some sort in the preview item they return if they need to support multiple
+        /// select item handlers.
+        /// </remarks>>
         /// </summary>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSelectItem(SelectItemHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
@@ -646,8 +652,8 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler that implements a Link Unfurling based Message Extension.
         /// </summary>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnQueryLink(QueryLinkHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
@@ -679,8 +685,8 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Registers a handler for a command that performs anonymous link unfurling.
         /// </summary>
-        /// <param name="handler">Function to call when the command is received.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnAnonymousQueryLink(QueryLinkHandler<TState> handler)
         {
             RouteSelector routeSelector = (turnContext, cancellationToken) =>

@@ -75,7 +75,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="data">The data associated with the action.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>An instance of AdaptiveCardInvokeResponse, which can be created using <see cref="AdaptiveCardInvokeResponseFactory"/>.</returns>
     public delegate Task<AdaptiveCardInvokeResponse> ActionExecuteHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken);
 
     /// <summary>
@@ -99,7 +99,7 @@ namespace Microsoft.TeamsAI.Application
     /// <param name="query">The query arguments.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
-    /// <returns>A task that represents the work queued to execute.</returns>
+    /// <returns>A list of AdaptiveCardsSearchResult.</returns>
     public delegate Task<IList<AdaptiveCardsSearchResult>> SearchHandler<TState>(ITurnContext turnContext, TState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken);
 
     /// <summary>
@@ -131,8 +131,8 @@ namespace Microsoft.TeamsAI.Application
         /// Adds a route to the application for handling Adaptive Card Action.Execute events.
         /// </summary>
         /// <param name="verb">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="handler">Function to call when the action is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
@@ -144,9 +144,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Execute events.
         /// </summary>
-        /// <param name="verbPattern">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="verbPattern">Regular expression to match against the named action to be handled.</param>
+        /// <param name="handler">Function to call when the action is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
@@ -158,9 +158,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Execute events.
         /// </summary>
-        /// <param name="routeSelector">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(RouteSelector routeSelector, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
@@ -188,9 +188,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Execute events.
         /// </summary>
-        /// <param name="routeSelectors">The named actions to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionExecute(MultipleRouteSelector routeSelectors, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -222,9 +222,26 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Submit events.
         /// </summary>
+        /// <remarks>
+        /// The route will be added for the specified verb(s) and will be filtered using the
+        /// `actionSubmitFilter` option. The default filter is to use the `verb` field.
+        /// 
+        /// For outgoing AdaptiveCards you will need to include the verb's name in the cards Action.Submit.
+        /// For example:
+        ///
+        /// ```JSON
+        /// {
+        ///   "type": "Action.Submit",
+        ///   "title": "OK",
+        ///   "data": {
+        ///     "verb": "ok"
+        ///   }
+        /// }
+        /// ```
+        /// </remarks>
         /// <param name="verb">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="handler">Function to call when the action is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit(string verb, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
@@ -237,9 +254,26 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Submit events.
         /// </summary>
-        /// <param name="verbPattern">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <remarks>
+        /// The route will be added for the specified verb(s) and will be filtered using the
+        /// `actionSubmitFilter` option. The default filter is to use the `verb` field.
+        /// 
+        /// For outgoing AdaptiveCards you will need to include the verb's name in the cards Action.Submit.
+        /// For example:
+        ///
+        /// ```JSON
+        /// {
+        ///   "type": "Action.Submit",
+        ///   "title": "OK",
+        ///   "data": {
+        ///     "verb": "ok"
+        ///   }
+        /// }
+        /// ```
+        /// </remarks>
+        /// <param name="verbPattern">Regular expression to match against the named action to be handled.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit(Regex verbPattern, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
@@ -252,9 +286,26 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Submit events.
         /// </summary>
-        /// <param name="routeSelector">The named action to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <remarks>
+        /// The route will be added for the specified verb(s) and will be filtered using the
+        /// `actionSubmitFilter` option. The default filter is to use the `verb` field.
+        /// 
+        /// For outgoing AdaptiveCards you will need to include the verb's name in the cards Action.Submit.
+        /// For example:
+        ///
+        /// ```JSON
+        /// {
+        ///   "type": "Action.Submit",
+        ///   "title": "OK",
+        ///   "data": {
+        ///     "verb": "ok"
+        ///   }
+        /// }
+        /// ```
+        /// </remarks>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit(RouteSelector routeSelector, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
@@ -277,9 +328,26 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card Action.Submit events.
         /// </summary>
-        /// <param name="routeSelectors">The named actions to be handled.</param>
-        /// <param name="handler">The code to execute when the action is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <remarks>
+        /// The route will be added for the specified verb(s) and will be filtered using the
+        /// `actionSubmitFilter` option. The default filter is to use the `verb` field.
+        /// 
+        /// For outgoing AdaptiveCards you will need to include the verb's name in the cards Action.Submit.
+        /// For example:
+        ///
+        /// ```JSON
+        /// {
+        ///   "type": "Action.Submit",
+        ///   "title": "OK",
+        ///   "data": {
+        ///     "verb": "ok"
+        ///   }
+        /// }
+        /// ```
+        /// </remarks>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnActionSubmit(MultipleRouteSelector routeSelectors, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
@@ -311,9 +379,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card dynamic search events.
         /// </summary>
-        /// <param name="dataset">The dataset to be handled.</param>
-        /// <param name="handler">The code to execute when the search is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="dataset">The dataset to be searched.</param>
+        /// <param name="handler">Function to call when the search is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(string dataset, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(dataset);
@@ -325,9 +393,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card dynamic search events.
         /// </summary>
-        /// <param name="datasetPattern">The dataset to be handled.</param>
-        /// <param name="handler">The code to execute when the search is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="datasetPattern">Regular expression to match against the dataset to be searched.</param>
+        /// <param name="handler">Function to call when the search is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(Regex datasetPattern, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(datasetPattern);
@@ -339,9 +407,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card dynamic search events.
         /// </summary>
-        /// <param name="routeSelector">The dataset to be handled.</param>
-        /// <param name="handler">The code to execute when the search is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(RouteSelector routeSelector, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
@@ -383,9 +451,9 @@ namespace Microsoft.TeamsAI.Application
         /// <summary>
         /// Adds a route to the application for handling Adaptive Card dynamic search events.
         /// </summary>
-        /// <param name="routeSelectors">The datasets to be handled.</param>
-        /// <param name="handler">The code to execute when the search is triggered.</param>
-        /// <returns>The application for chaining purposes.</returns>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSearch(MultipleRouteSelector routeSelectors, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
