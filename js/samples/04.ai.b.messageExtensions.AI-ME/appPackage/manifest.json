@@ -1,23 +1,23 @@
 {
-    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+    "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.16",
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.package.name",
     "name": {
-        "short": "GPT ME-${{TEAMSFX_ENV}}",
-        "full": "GPT Message Extensions"
+        "short": "AI ME-${{TEAMSFX_ENV}}",
+        "full": "AI Message Extensions"
     },
     "developer": {
         "name": "Microsoft Teams",
         "mpnId": "",
         "websiteUrl": "https://teams.microsoft.com",
-        "privacyUrl": "https://privacy.microsoft.com/en-us/privacystatement",
-        "termsOfUseUrl": "https://www.microsoft.com/en-us/legal/terms-of-use"
+        "privacyUrl": "https://privacy.microsoft.com/privacystatement",
+        "termsOfUseUrl": "https://www.microsoft.com/legal/terms-of-use"
     },
     "description": {
-        "short": "Sample Message Extension that lets you add GPT snippets to posts ",
-        "full": "Sample Message Extension that lets you add GPT snippets to posts "
+        "short": "Sample Message Extension that lets you add AI snippets to posts ",
+        "full": "Sample Message Extension that lets you add AI snippets to posts "
     },
     "icons": {
         "outline": "outline.png",
@@ -32,7 +32,7 @@
                     "id": "CreatePost",
                     "type": "action",
                     "title": "Create Post",
-                    "description": "Use GPT to create a post",
+                    "description": "Use AI to create a post",
                     "initialRun": true,
                     "fetchTask": true,
                     "context": ["commandBox", "compose"],
@@ -58,7 +58,5 @@
         }
     ],
     "permissions": ["identity", "messageTeamMembers"],
-    "validDomains": [
-        "${{BOT_DOMAIN}}"
-    ]
+    "validDomains": ["${{BOT_DOMAIN}}"]
 }

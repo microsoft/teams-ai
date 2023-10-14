@@ -14,11 +14,11 @@
 
 # Manual setup
 
-> If you already have [uploaded a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file available from the samples, you can skip the first 2 steps.
+> If you already have [uploaded a custom app](https://learn.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file available from the samples, you can skip the first 2 steps.
 
-1. Create [Bot Framework registration resource](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration) in Azure
+1. Create [Bot Framework registration resource](https://docs.microsoft.com/azure/bot-service/bot-service-quickstart-registration) in Azure
 
-1. [Enable the Teams Channel](https://docs.microsoft.com/en-us/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0) in Azure
+1. [Enable the Teams Channel](https://docs.microsoft.com/azure/bot-service/channel-connect-teams?view=azure-bot-service-4.0) in Azure
 
 1. In a terminal, navigate to `teams-ai/js/samples/<sample-foldername-here>`
 
@@ -43,7 +43,7 @@
 
 1. Verify your app manifest has all RSC permissions needed to perform its tasks. (If you are using the Teams Toolkit, this is done for you.)
 
-   - Optionally use [App Studio](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/app-studio-overview) to verify your manifest has the correct permissions.
+   - Optionally use [App Studio](https://docs.microsoft.com/microsoftteams/platform/concepts/build-and-test/app-studio-overview) to verify your manifest has the correct permissions.
 
 1. **Edit** the `manifest.json` contained in the `appPackage` folder to replace your Microsoft App Id (that was created when you registered your bot earlier) _everywhere_ you see the place holder string `${{TEAMS_APP_ID}}`
 
@@ -60,4 +60,4 @@
    yarn start
    ```
 
-1. In Teams, [upload the app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) and install the app to test.
+1. In Teams, [upload the app](https://learn.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) file (manifest.zip created in the previous step) and install the app to test.
