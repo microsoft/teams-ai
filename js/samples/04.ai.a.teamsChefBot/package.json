@@ -22,16 +22,16 @@
     "dependencies": {
         "@microsoft/teams-ai": "~0.1.0-preview.2",
         "@microsoft/teamsfx": "^2.3.0",
-        "botbuilder": "^4.20.0",
+        "botbuilder": "^4.20.1",
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "vectra": "^0.3.0"
+        "vectra": "^0.4.4"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/restify": "8.5.7",
-        "@types/node": "^20.6.2",
+        "@types/restify": "8.5.8",
+        "@types/node": "^20.8.4",
         "ts-node": "^10.9.1",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",

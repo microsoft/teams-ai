@@ -54,7 +54,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create AzureOpenAIPlanner
     IPlanner<QuestState> planner = new AzureOpenAIPlanner<QuestState>(
         sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<AzureOpenAIPlanner<QuestState>>());
+        loggerFactory);
 
     // Create Application
     AIOptions<QuestState> aiOptions = new(

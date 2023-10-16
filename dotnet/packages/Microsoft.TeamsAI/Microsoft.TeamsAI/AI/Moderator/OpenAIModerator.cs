@@ -102,7 +102,7 @@ namespace Microsoft.TeamsAI.AI.Moderator
                         {
                             Commands = new List<IPredictedCommand>
                             {
-                                new PredictedDoCommand(actionName, new Dictionary<string, object>
+                                new PredictedDoCommand(actionName, new Dictionary<string, object?>
                                 {
                                     { "Result", result }
                                 })
