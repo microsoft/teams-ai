@@ -1,7 +1,11 @@
 ﻿using EchoBot;
+using EchoBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
+using Microsoft.TeamsAI;
+using NewApp = Microsoft.TeamsAI.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,11 +36,20 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>();
-
-    return new TeamsEchoBot(new()
+    ApplicationOptions<AppState, AppStateManager> applicationOptions = new()
     {
         Storage = storage,
-    });
+    };
+
+    NewApp.Application<AppState, AppStateManager> app = new(applicationOptions);
+
+    // Listen for user to say "/reset" and then delete conversation state
+    app.OnMessage("/reset", ActivityHandlers.ResetMessageHandler);
+
+    // Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
+    app.OnActivity(ActivityTypes.Message, ActivityHandlers.MessageHandler);
+
+    return app;
 });
 
 var app = builder.Build();
