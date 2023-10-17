@@ -1,9 +1,10 @@
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using SearchCommand;
+using NewApp = Microsoft.TeamsAI.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,16 +30,29 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
+builder.Services.AddSingleton<ActivityHandlers>();
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-builder.Services.AddTransient<ApplicationOptions<TurnState, TurnStateManager>>(sp =>
+builder.Services.AddTransient<IBot>(sp =>
 {
-    return new()
+    IStorage storage = sp.GetService<IStorage>()!;
+    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
     {
-        Storage = sp.GetService<IStorage>()
+        Storage = storage,
     };
+
+    NewApp.Application<TurnState, TurnStateManager> app = new(applicationOptions);
+    NewApp.MessageExtensions<TurnState, TurnStateManager> messageExtensions = new(app);
+
+    ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
+
+    // Listen for search actions
+    messageExtensions.OnQuery("searchCmd", activityHandlers.QueryHandler);
+    // Listen for item tap
+    messageExtensions.OnSelectItem(activityHandlers.SelectItemHandler);
+
+    return app;
 });
-builder.Services.AddTransient<IBot, SearchCommandMessageExtension>();
 
 var app = builder.Build();
 

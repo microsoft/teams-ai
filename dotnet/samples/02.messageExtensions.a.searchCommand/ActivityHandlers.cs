@@ -3,7 +3,7 @@ using AdaptiveCards.Templating;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI;
+using Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.State;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,20 +13,27 @@ using System.Web;
 
 namespace SearchCommand
 {
-    public class SearchCommandMessageExtension : Application<TurnState, TurnStateManager>
+    /// <summary>
+    /// Defines the activity handlers.
+    /// </summary>
+    public class ActivityHandlers
     {
         private readonly HttpClient _httpClient;
         private readonly string _packageCardFilePath = Path.Combine(".", "Resources", "PackageCard.json");
 
-        public SearchCommandMessageExtension(ApplicationOptions<TurnState, TurnStateManager> options, IHttpClientFactory httpClientFactory) : base(options)
+        public ActivityHandlers(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("WebClient");
         }
 
-        protected override async Task<MessagingExtensionResponse> OnMessagingExtensionQueryAsync(MessagingExtensionQuery query, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+        /// <summary>
+        /// Handles Message Extension query events.
+        /// </summary>
+        public QueryHandler<TurnState> QueryHandler => async (ITurnContext turnContext, TurnState turnState, Query<Dictionary<string, object>> query, CancellationToken cancellationToken) =>
         {
-            string text = query?.Parameters?[0]?.Value as string ?? string.Empty;
-            int count = query?.QueryOptions?.Count ?? 10;
+            string text = (string)query.Parameters["queryText"];
+            int count = query.Count;
+
             Package[] packages = await SearchPackages(text, count, cancellationToken);
 
             // Format search results
@@ -50,22 +57,21 @@ namespace SearchCommand
                 }.ToAttachment()
             }).ToList();
 
-            // Return results as a list
-            return new MessagingExtensionResponse
+            return new MessagingExtensionResult
             {
-                ComposeExtension = new MessagingExtensionResult
-                {
-                    Type = "result",
-                    AttachmentLayout = "list",
-                    Attachments = attachments
-                }
+                Type = "result",
+                AttachmentLayout = "list",
+                Attachments = attachments
             };
-        }
+        };
 
-        protected override async Task<MessagingExtensionResponse> OnMessagingExtensionSelectItemAsync(JObject query, ITurnContext<IInvokeActivity> turnContext, TurnState turnState, CancellationToken cancellationToken)
+        /// <summary>
+        /// Handles Message Extension selecting item events.
+        /// </summary>
+        public SelectItemHandler<TurnState> SelectItemHandler => async (ITurnContext turnContext, TurnState turnState, object item, CancellationToken cancellationToken) =>
         {
-            // Generate detailed result
-            CardPackage package = CardPackage.Create(query.ToObject<Package>()!);
+            JObject? obj = item as JObject;
+            CardPackage package = CardPackage.Create(obj!.ToObject<Package>()!);
             string cardTemplate = await File.ReadAllTextAsync(_packageCardFilePath, cancellationToken)!;
             string cardContent = new AdaptiveCardTemplate(cardTemplate).Expand(package);
             MessagingExtensionAttachment attachment = new()
@@ -74,17 +80,13 @@ namespace SearchCommand
                 Content = JsonConvert.DeserializeObject(cardContent)
             };
 
-            // Return results
-            return new MessagingExtensionResponse
+            return new MessagingExtensionResult
             {
-                ComposeExtension = new MessagingExtensionResult
-                {
-                    Type = "result",
-                    AttachmentLayout = "list",
-                    Attachments = new List<MessagingExtensionAttachment> { attachment }
-                }
+                Type = "result",
+                AttachmentLayout = "list",
+                Attachments = new List<MessagingExtensionAttachment> { attachment }
             };
-        }
+        };
 
         private async Task<Package[]> SearchPackages(string text, int size, CancellationToken cancellationToken)
         {
