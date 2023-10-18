@@ -1,11 +1,10 @@
-﻿using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.Tests.TestUtils;
-using Microsoft.TeamsAI.Application;
-using Newtonsoft.Json;
-using Microsoft.Bot.Builder;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI.Exceptions;
+using Microsoft.TeamsAI.Tests.TestUtils;
 using Moq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TeamsAI.Tests.Application
 {
@@ -41,7 +40,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = adaptiveCardInvokeResponseMock.Object
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -90,7 +89,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "application/search"
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -116,7 +115,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "application/search"
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -150,7 +149,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 }),
                 Recipient = new("test-id")
             });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             var called = false;
             ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
@@ -185,7 +184,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 }),
                 Recipient = new("test-id")
             });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             var called = false;
             ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
@@ -216,7 +215,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Text = "test-text",
                 Recipient = new("test-id")
             });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -263,7 +262,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             });
             IList<AdaptiveCardsSearchResult> searchResults = new List<AdaptiveCardsSearchResult>
             {
-                new AdaptiveCardsSearchResult("test-title", "test-value")
+                new("test-title", "test-value")
             };
             var expectedInvokeResponse = new InvokeResponse()
             {
@@ -278,7 +277,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     }
                 }
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
@@ -326,9 +325,9 @@ namespace Microsoft.TeamsAI.Tests.Application
             });
             IList<AdaptiveCardsSearchResult> searchResults = new List<AdaptiveCardsSearchResult>
             {
-                new AdaptiveCardsSearchResult("test-title", "test-value")
+                new("test-title", "test-value")
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
@@ -357,9 +356,9 @@ namespace Microsoft.TeamsAI.Tests.Application
             });
             IList<AdaptiveCardsSearchResult> searchResults = new List<AdaptiveCardsSearchResult>
             {
-                new AdaptiveCardsSearchResult("test-title", "test-value")
+                new("test-title", "test-value")
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -389,13 +388,13 @@ namespace Microsoft.TeamsAI.Tests.Application
             return result;
         }
 
-        private class TestAdaptiveCardActionData
+        private sealed class TestAdaptiveCardActionData
         {
             [JsonProperty("testKey")]
             public string? TestKey { get; set; }
         }
 
-        private class TestAdaptiveCardSubmitData
+        private sealed class TestAdaptiveCardSubmitData
         {
             [JsonProperty("verb")]
             public string? Verb { get; set; }

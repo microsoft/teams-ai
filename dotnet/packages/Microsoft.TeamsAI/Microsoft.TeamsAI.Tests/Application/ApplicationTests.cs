@@ -1,6 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using NewApp = Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using System.Reflection;
 
@@ -14,7 +13,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -32,7 +31,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act 1
             app.StartTypingTimer(turnContext);
@@ -60,7 +59,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -74,7 +73,7 @@ namespace Microsoft.TeamsAI.Tests.Application
         public void Test_StopTypingTimer_WithoutEverStartingTypingTimer()
         {
             // Arrange
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StopTypingTimer();
@@ -91,7 +90,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -108,7 +107,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -140,7 +139,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -171,7 +170,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Arrange
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
