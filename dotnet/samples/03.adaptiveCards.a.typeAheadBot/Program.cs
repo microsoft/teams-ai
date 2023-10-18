@@ -4,6 +4,8 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using TypeAheadBot;
+using System.Text.RegularExpressions;
+using Microsoft.Bot.Schema;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,17 +29,41 @@ builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
 builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>()!);
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
+// Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
+builder.Services.AddSingleton<ActivityHandlers>();
 
-// Create the Application.
-builder.Services.AddTransient<ApplicationOptions<TurnState, TurnStateManager>>(sp =>
+// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+builder.Services.AddTransient<IBot>(sp =>
 {
-    return new ApplicationOptions<TurnState, TurnStateManager>()
+    IStorage storage = sp.GetService<IStorage>()!;
+    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
     {
-        Storage = sp.GetService<IStorage>()
+        Storage = storage,
     };
+
+    Application<TurnState, TurnStateManager> app = new(applicationOptions);
+
+    ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
+
+    // Listen for new members to join the conversation
+    app.OnConversationUpdate("membersAdded", activityHandlers.MembersAddedHandler);
+
+    // Listen for messages that trigger returning an adaptive card
+    app.OnMessage(new Regex(@"static", RegexOptions.IgnoreCase), activityHandlers.StaticMessageHandler);
+    app.OnMessage(new Regex(@"dynamic", RegexOptions.IgnoreCase), activityHandlers.DynamicMessageHandler);
+
+    // Listen for query from dynamic search card
+    app.AdaptiveCards.OnSearch("nugetpackages", activityHandlers.SearchHandler);
+    // Listen for submit buttons
+    app.AdaptiveCards.OnActionSubmit("StaticSubmit", activityHandlers.StaticSubmitHandler);
+    app.AdaptiveCards.OnActionSubmit("DynamicSubmit", activityHandlers.DynamicSubmitHandler);
+
+    // Listen for ANY message to be received. MUST BE AFTER ANY OTHER HANDLERS
+    app.OnActivity(ActivityTypes.Message, activityHandlers.MessageHandler);
+
+    return app;
 });
-builder.Services.AddTransient<IBot, TypeAheadBotApplication>();
 
 var app = builder.Build();
 
