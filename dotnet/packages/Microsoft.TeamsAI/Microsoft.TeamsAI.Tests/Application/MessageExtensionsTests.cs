@@ -1,7 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Moq;
@@ -42,7 +41,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = actionResponseMock.Object
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             SubmitActionHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -88,7 +87,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             SubmitActionHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -116,7 +115,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/fetchTask"
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -167,7 +166,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = actionResponseMock.Object
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
@@ -213,7 +212,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
@@ -239,7 +238,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/fetchTask"
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -289,7 +288,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = new MessagingExtensionActionResponse()
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             BotMessagePreviewSendHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
@@ -334,7 +333,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     botActivityPreview = new List<Activity> { activity }
                 }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
             });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             BotMessagePreviewSendHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
@@ -359,7 +358,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "composeExtension/fetchTask"
             });
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -403,7 +402,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = taskModuleResponseMock.Object
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
@@ -441,7 +440,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
@@ -466,7 +465,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/submitAction"
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -522,7 +521,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             QueryHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
@@ -573,7 +572,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             QueryHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
@@ -602,7 +601,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/selectItem"
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
@@ -635,7 +634,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "composeExtension/selectItem",
-                Value = JObject.FromObject(new {})
+                Value = JObject.FromObject(new { })
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
             var expectedInvokeResponse = new InvokeResponse()
@@ -646,7 +645,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             SelectItemHandler<TestTurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
@@ -689,7 +688,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             SelectItemHandler<TestTurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
@@ -732,7 +731,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
@@ -767,7 +766,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/query"
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
@@ -810,7 +809,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
@@ -845,7 +844,7 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/query"
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new TeamsAI.Application.Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
             var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
@@ -869,7 +868,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             return result;
         }
 
-        private class MessageExtensionActionData
+        private sealed class MessageExtensionActionData
         {
             [JsonProperty("title")]
             public string? Title { get; set; }

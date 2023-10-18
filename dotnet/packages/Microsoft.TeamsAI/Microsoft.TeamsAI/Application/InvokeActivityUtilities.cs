@@ -3,9 +3,9 @@ using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
-namespace Microsoft.TeamsAI.Application
+namespace Microsoft.TeamsAI
 {
-    internal static class Utilities
+    internal static class InvokeActivityUtilities
     {
         public static T? GetInvokeValue<T>(IInvokeActivity activity)
         {
