@@ -84,7 +84,9 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler for a command that performs anonymous link unfurling.
-     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
+     * @summary
+     * The `composeExtension/anonymousQueryLink` INVOKE activity does not contain any sort of command ID,
+     * so only a single select item handler can be registered.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.
@@ -92,42 +94,33 @@ export class MessageExtensions<TState extends TurnState> {
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public anonymousQueryLink(
-        commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
-        (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, ANONYMOUS_QUERY_LINK_INVOKE_NAME);
-            this._app.addRoute(
-                selector,
-                async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== ANONYMOUS_QUERY_LINK_INVOKE_NAME
-                    ) {
-                        throw new Error(
-                            `Unexpected MessageExtensions.anonymousQueryLink() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
-
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.url ?? '');
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        const response = {
-                            composeExtension: result
-                        };
-
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 },
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                },
-                true
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === ANONYMOUS_QUERY_LINK_INVOKE_NAME
             );
-        });
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state, context.activity.value?.url ?? '');
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Format invoke response
+                    const response = {
+                        composeExtension: result
+                    };
+                    // Queue up invoke response
+                    await context.sendActivity({
+                        value: { body: response, status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
         return this._app;
     }
 
@@ -366,7 +359,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Link Unfurling based Message Extension.
-     * @param {(string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[])} commandId - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.
@@ -374,42 +366,34 @@ export class MessageExtensions<TState extends TurnState> {
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public queryLink(
-        commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
-        (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, QUERY_LINK_INVOKE_NAME);
-            this._app.addRoute(
-                selector,
-                async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== QUERY_LINK_INVOKE_NAME
-                    ) {
-                        throw new Error(
-                            `Unexpected MessageExtensions.queryLink() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
-
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.url);
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        const response: MessagingExtensionActionResponse = {
-                            composeExtension: result
-                        };
-
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                },
-                true
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_LINK_INVOKE_NAME
             );
-        });
+
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state, context.activity.value?.url);
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Format invoke response
+                    const response: MessagingExtensionActionResponse = {
+                        composeExtension: result
+                    };
+
+                    // Queue up invoke response
+                    await context.sendActivity({
+                        value: { body: response, status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
         return this._app;
     }
 
@@ -766,3 +750,16 @@ function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edi
         return botMessagePreviewAction == undefined;
     }
 }
+
+// TODO: Refactor Test utils into testing folder (after breaking changes are completed)
+export const TestMessageExtensionsInvokeTypes = {
+    ANONYMOUS_QUERY_LINK_INVOKE_NAME,
+    FETCH_TASK_INVOKE_NAME,
+    QUERY_INVOKE_NAME,
+    QUERY_LINK_INVOKE_NAME,
+    SELECT_ITEM_INVOKE_NAME,
+    SUBMIT_ACTION_INVOKE_NAME,
+    QUERY_SETTING_URL,
+    ME_CONFIGURE_SETTING,
+    QUERY_CARD_BUTTON_CLICKED
+};
