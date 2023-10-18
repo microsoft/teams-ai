@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.TeamsAI.State;
 
-namespace Microsoft.TeamsAI.Application
+namespace Microsoft.TeamsAI
 {
     /// <summary>
     /// Turn event handler to do something before or after a turn is run. Returning false from

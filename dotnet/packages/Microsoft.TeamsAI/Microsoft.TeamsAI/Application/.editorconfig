@@ -1,0 +1,8 @@
+###############################
+# Core EditorConfig Options   #
+###############################
+root = false
+
+[*.cs]
+# Keep Application in the root namespace
+dotnet_diagnostic.IDE0130.severity = none # Namespace does not match folder structure

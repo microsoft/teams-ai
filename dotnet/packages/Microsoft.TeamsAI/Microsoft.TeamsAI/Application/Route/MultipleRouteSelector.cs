@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Microsoft.TeamsAI.Application
+namespace Microsoft.TeamsAI
 {
     /// <summary>
     /// Combination of String, Regex, and RouteSelector selectors.
