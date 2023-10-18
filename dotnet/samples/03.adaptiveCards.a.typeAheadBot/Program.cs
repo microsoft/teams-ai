@@ -44,7 +44,6 @@ builder.Services.AddTransient<IBot>(sp =>
     };
 
     NewApp.Application<TurnState, TurnStateManager> app = new(applicationOptions);
-    NewApp.AdaptiveCards<TurnState, TurnStateManager> adaptiveCards = new(app);
 
     ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
 
@@ -56,10 +55,10 @@ builder.Services.AddTransient<IBot>(sp =>
     app.OnMessage(new Regex(@"dynamic", RegexOptions.IgnoreCase), activityHandlers.DynamicMessageHandler);
 
     // Listen for query from dynamic search card
-    adaptiveCards.OnSearch("nugetpackages", activityHandlers.SearchHandler);
+    app.AdaptiveCards.OnSearch("nugetpackages", activityHandlers.SearchHandler);
     // Listen for submit buttons
-    adaptiveCards.OnActionSubmit("StaticSubmit", activityHandlers.StaticSubmitHandler);
-    adaptiveCards.OnActionSubmit("DynamicSubmit", activityHandlers.DynamicSubmitHandler);
+    app.AdaptiveCards.OnActionSubmit("StaticSubmit", activityHandlers.StaticSubmitHandler);
+    app.AdaptiveCards.OnActionSubmit("DynamicSubmit", activityHandlers.DynamicSubmitHandler);
 
     // Listen for ANY message to be received. MUST BE AFTER ANY OTHER HANDLERS
     app.OnActivity(ActivityTypes.Message, activityHandlers.MessageHandler);
