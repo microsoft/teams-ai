@@ -54,6 +54,9 @@ namespace Microsoft.TeamsAI
                 _ai = new AI<TState>(Options.AI, Options.LoggerFactory);
             }
 
+            AdaptiveCards = new AdaptiveCards<TState, TTurnStateManager>(this);
+            MessageExtensions = new MessageExtensions<TState, TTurnStateManager>(this);
+
             // Validate long running messages configuration
             if (Options.LongRunningMessages && (Options.Adapter == null || Options.BotAppId == null))
             {
@@ -65,6 +68,16 @@ namespace Microsoft.TeamsAI
             _beforeTurn = new ConcurrentQueue<TurnEventHandler<TState>>();
             _afterTurn = new ConcurrentQueue<TurnEventHandler<TState>>();
         }
+
+        /// <summary>
+        /// Fluent interface for accessing Adaptive Card specific features.
+        /// </summary>
+        public AdaptiveCards<TState, TTurnStateManager> AdaptiveCards { get; }
+
+        /// <summary>
+        /// Fluent interface for accessing Message Extensions' specific features.
+        /// </summary>
+        public MessageExtensions<TState, TTurnStateManager> MessageExtensions { get; }
 
         /// <summary>
         /// Fluent interface for accessing AI specific features.
