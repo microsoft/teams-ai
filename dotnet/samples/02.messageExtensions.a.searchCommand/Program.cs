@@ -42,14 +42,13 @@ builder.Services.AddTransient<IBot>(sp =>
     };
 
     NewApp.Application<TurnState, TurnStateManager> app = new(applicationOptions);
-    NewApp.MessageExtensions<TurnState, TurnStateManager> messageExtensions = new(app);
 
     ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
 
     // Listen for search actions
-    messageExtensions.OnQuery("searchCmd", activityHandlers.QueryHandler);
+    app.MessageExtensions.OnQuery("searchCmd", activityHandlers.QueryHandler);
     // Listen for item tap
-    messageExtensions.OnSelectItem(activityHandlers.SelectItemHandler);
+    app.MessageExtensions.OnSelectItem(activityHandlers.SelectItemHandler);
 
     return app;
 });
