@@ -1,4 +1,4 @@
-﻿namespace Microsoft.TeamsAI.Application
+﻿namespace Microsoft.TeamsAI
 {
     /// <summary>
     /// Conversation update events.

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.Application;
-using NewApp = Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using System.Text.RegularExpressions;
 
@@ -20,7 +18,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -52,7 +50,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var activity = MessageFactory.Text("hello.1");
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -109,7 +107,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
             });
@@ -144,7 +142,7 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
             });
@@ -194,7 +192,7 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
             });
@@ -236,7 +234,7 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 StartTypingTimer = false
             });
@@ -290,7 +288,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -327,7 +325,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -365,7 +363,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -408,7 +406,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -461,7 +459,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -506,7 +504,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -558,7 +556,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -612,7 +610,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -661,7 +659,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -707,7 +705,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -746,7 +744,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -792,7 +790,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -845,7 +843,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false
@@ -890,7 +888,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new NewApp.Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false

@@ -8,7 +8,7 @@ using Microsoft.TeamsAI.Utilities;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.TeamsAI.Application
+namespace Microsoft.TeamsAI
 {
     /// <summary>
     /// Application class for routing and processing incoming requests.
