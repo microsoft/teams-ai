@@ -3,7 +3,7 @@ using AdaptiveCards.Templating;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.Application;
+using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

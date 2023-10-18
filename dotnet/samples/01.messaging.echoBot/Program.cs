@@ -5,7 +5,6 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
-using NewApp = Microsoft.TeamsAI.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +40,7 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = storage,
     };
 
-    NewApp.Application<AppState, AppStateManager> app = new(applicationOptions);
+    Application<AppState, AppStateManager> app = new(applicationOptions);
 
     // Listen for user to say "/reset" and then delete conversation state
     app.OnMessage("/reset", ActivityHandlers.ResetMessageHandler);

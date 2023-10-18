@@ -4,7 +4,6 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using SearchCommand;
-using NewApp = Microsoft.TeamsAI.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +40,7 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = storage,
     };
 
-    NewApp.Application<TurnState, TurnStateManager> app = new(applicationOptions);
+    Application<TurnState, TurnStateManager> app = new(applicationOptions);
 
     ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
 
