@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.Application;
+using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.State;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

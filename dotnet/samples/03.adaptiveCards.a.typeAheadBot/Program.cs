@@ -2,7 +2,6 @@
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsAI;
-using NewApp = Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.State;
 using TypeAheadBot;
 using System.Text.RegularExpressions;
@@ -43,7 +42,7 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = storage,
     };
 
-    NewApp.Application<TurnState, TurnStateManager> app = new(applicationOptions);
+    Application<TurnState, TurnStateManager> app = new(applicationOptions);
 
     ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
 
