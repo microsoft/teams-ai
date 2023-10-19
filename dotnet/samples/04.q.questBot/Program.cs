@@ -3,6 +3,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Planner;
@@ -75,7 +76,15 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions
     };
-    return new TeamsQuestBot(ApplicationOptions);
+    TeamsQuestBot app = new(ApplicationOptions);
+    TeamsQuestBotHandlers handlers = new(app);
+
+    // register turn and activity handlers
+    app.OnBeforeTurn(handlers.OnBeforeTurnAsync);
+    app.OnAfterTurn(handlers.OnAfterTurnAsync);
+    app.OnActivity(ActivityTypes.Message, handlers.OnMessageActivityAsync);
+
+    return app;
 });
 #endregion
 
@@ -96,7 +105,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     IPlanner<QuestState> planner = new OpenAIPlanner<QuestState>(
         sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory.CreateLogger<OpenAIPlanner<QuestState>>());
+        loggerFactory);
 
     // Create Application
     AIOptions<QuestState> aiOptions = new(
@@ -117,7 +126,15 @@ builder.Services.AddTransient<IBot>(sp =>
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions
     };
-    return new TeamsQuestBot(ApplicationOptions);
+    TeamsQuestBot app = new(ApplicationOptions);
+    TeamsQuestBotHandlers handlers = new(app);
+
+    // register turn and activity handlers
+    app.OnBeforeTurn(handlers.OnBeforeTurnAsync);
+    app.OnAfterTurn(handlers.OnAfterTurnAsync);
+    app.OnActivity(ActivityTypes.Message, handlers.OnMessageActivityAsync);
+
+    return app;
 });
 **/
 #endregion
