@@ -43,7 +43,7 @@ bool PREVIEW_MODE = false;
 #region Use Azure OpenAI and Azure Content Safety
 // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
+    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
     || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
     || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
@@ -79,7 +79,16 @@ builder.Services.AddTransient<IBot>(sp =>
         AI = aiOptions,
         LoggerFactory = loggerFactory,
     };
-    return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
+
+    Application<TurnState, TurnStateManager> app = new(ApplicationOptions);
+    ActivityHandlers routeHandlers = new(app, PREVIEW_MODE);
+
+    app.MessageExtensions.OnFetchTask("CreatePost", routeHandlers.FetchTaskHandler);
+    app.MessageExtensions.OnSubmitAction("CreatePost", routeHandlers.SubmitActionHandler);
+    app.MessageExtensions.OnBotMessagePreviewEdit("CreatePost", routeHandlers.BotMessagePreviewEditHandler);
+    app.MessageExtensions.OnBotMessagePreviewSend("CreatePost", routeHandlers.BotMessagePreviewSendHandler);
+
+    return app;
 });
 #endregion
 
@@ -124,7 +133,16 @@ builder.Services.AddTransient<IBot>(sp =>
         AI = aiOptions,
         LoggerFactory = loggerFactory,
     };
-    return new GPTMessageExtension(ApplicationOptions, PREVIEW_MODE);
+
+    Application<TurnState, TurnStateManager> app = new(ApplicationOptions);
+    ActivityHandlers routeHandlers = new(app, PREVIEW_MODE);
+
+    app.MessageExtensions.OnFetchTask("CreatePost", routeHandlers.FetchTaskHandler);
+    app.MessageExtensions.OnSubmitAction("CreatePost", routeHandlers.SubmitActionHandler);
+    app.MessageExtensions.OnBotMessagePreviewEdit("CreatePost", routeHandlers.BotMessagePreviewEditHandler);
+    app.MessageExtensions.OnBotMessagePreviewSend("CreatePost", routeHandlers.BotMessagePreviewSendHandler);
+
+    return app;
 });
 **/
 #endregion
