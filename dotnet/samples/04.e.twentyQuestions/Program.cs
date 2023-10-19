@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
 using Microsoft.TeamsAI;
 using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.AI.Moderator;
@@ -36,7 +37,7 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 #region Use Azure OpenAI and Azure Content Safety
 // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
+    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
     || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
     || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
@@ -71,14 +72,20 @@ builder.Services.AddTransient<IBot>(sp =>
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
+    ApplicationOptions<GameState, GameStateManager> applicationOptions = new()
     {
         TurnStateManager = new GameStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
-        LoggerFactory = loggerFactory,        
+        LoggerFactory = loggerFactory,
     };
-    return new GameBot(ApplicationOptions);
+    Application<GameState, GameStateManager> app = new(applicationOptions);
+    GameBotHandlers handlers = new(app);
+
+    // register turn and activity handlers
+    app.OnActivity(ActivityTypes.Message, handlers.OnMessageActivityAsync);
+
+    return app;
 });
 #endregion
 
@@ -122,14 +129,20 @@ builder.Services.AddTransient<IBot>(sp =>
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
+    ApplicationOptions<GameState, GameStateManager> applicationOptions = new()
     {
         TurnStateManager = new GameStateManager(),
         Storage = sp.GetService<IStorage>(),
         AI = aiOptions,
         LoggerFactory = loggerFactory,
     };
-    return new GameBot(ApplicationOptions);
+    Application<GameState, GameStateManager> app = new(applicationOptions);
+    GameBotHandlers handlers = new(app);
+
+    // register turn and activity handlers
+    app.OnActivity(ActivityTypes.Message, handlers.OnMessageActivityAsync);
+
+    return app;
 });
 **/
 #endregion
