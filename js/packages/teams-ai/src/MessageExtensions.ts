@@ -60,7 +60,7 @@ const QUERY_SETTING_URL = `composeExtension/querySettingUrl`;
 /**
  * @private
  */
-const ME_CONFIGURE_SETTING = `composeExtension/setting`;
+const CONFIGURE_SETTINGS = `composeExtension/setting`;
 
 /**
  * @private
@@ -605,7 +605,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === ME_CONFIGURE_SETTING
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === CONFIGURE_SETTINGS
             );
 
         // Add route
@@ -626,7 +626,7 @@ export class MessageExtensions<TState extends TurnState> {
                     await context.sendActivity({
                         value: {
                             status: 500,
-                            body: `${ME_CONFIGURE_SETTING} invoke failed. \n ${
+                            body: `${CONFIGURE_SETTINGS} invoke failed. \n ${
                                 error instanceof Error ? error.message : error
                             }`
                         } as InvokeResponse,
@@ -754,12 +754,12 @@ function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edi
 // TODO: Refactor Test utils into testing folder (after breaking changes are completed)
 export const TestMessageExtensionsInvokeTypes = {
     ANONYMOUS_QUERY_LINK_INVOKE_NAME,
+    CONFIGURE_SETTINGS,
     FETCH_TASK_INVOKE_NAME,
+    QUERY_CARD_BUTTON_CLICKED,
     QUERY_INVOKE_NAME,
     QUERY_LINK_INVOKE_NAME,
-    SELECT_ITEM_INVOKE_NAME,
-    SUBMIT_ACTION_INVOKE_NAME,
     QUERY_SETTING_URL,
-    ME_CONFIGURE_SETTING,
-    QUERY_CARD_BUTTON_CLICKED
+    SELECT_ITEM_INVOKE_NAME,
+    SUBMIT_ACTION_INVOKE_NAME
 };
