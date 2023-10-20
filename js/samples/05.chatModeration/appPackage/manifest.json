@@ -1,5 +1,5 @@
 {
-    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
+    "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.15",
     "id": "${{TEAMS_APP_ID}}",
@@ -12,8 +12,8 @@
         "name": "Microsoft",
         "mpnId": "",
         "websiteUrl": "https://microsoft.com",
-        "privacyUrl": "https://privacy.microsoft.com/en-us/privacystatement",
-        "termsOfUseUrl": "https://www.microsoft.com/en-us/legal/terms-of-use"
+        "privacyUrl": "https://privacy.microsoft.com/privacystatement",
+        "termsOfUseUrl": "https://www.microsoft.com/legal/terms-of-use"
     },
     "description": {
         "short": "Sample bot that demonstrates moderation capabilities",
