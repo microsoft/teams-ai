@@ -77,11 +77,11 @@ export class MessageExtensions<TState extends TurnState> {
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public anonymousQueryLink(
-        commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        url: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
-        (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, ANONYMOUS_QUERY_LINK_INVOKE_NAME);
+        (Array.isArray(url) ? url : [url]).forEach((url) => {
+            const selector = createQueryLinkSelector(url, ANONYMOUS_QUERY_LINK_INVOKE_NAME);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
