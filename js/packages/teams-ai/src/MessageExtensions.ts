@@ -218,8 +218,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the initial fetch task for an Action based message extension.
      * @summary
-     * Handlers should response with either an initial TaskInfo object or a string containing
-     * a message to display to the user.
+     * Handlers should response with an initial TaskInfo object to display to the user.
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
@@ -228,7 +227,7 @@ export class MessageExtensions<TState extends TurnState> {
      */
     public fetchTask(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>
+        handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, FETCH_TASK_INVOKE_NAME);
@@ -248,25 +247,13 @@ export class MessageExtensions<TState extends TurnState> {
                     // Call handler and then check to see if an invoke response has already been added
                     const result = await handler(context, state);
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        let response: TaskModuleResponse;
-                        if (typeof result == 'string') {
-                            // Return message
-                            response = {
-                                task: {
-                                    type: 'message',
-                                    value: result
-                                }
-                            };
-                        } else {
-                            // Return card
-                            response = {
-                                task: {
-                                    type: 'continue',
-                                    value: result
-                                }
-                            };
-                        }
+                        // Return card
+                        const response: TaskModuleResponse = {
+                            task: {
+                                type: 'continue',
+                                value: result
+                            }
+                        };
 
                         // Queue up invoke response
                         await context.sendActivity({
@@ -351,7 +338,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Link Unfurling based Message Extension.
-     * @param {(string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[])} commandId - ID of the command(s) to register the handler for.
+     * @param {(string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[])} url - The url link to register the handler for.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.
@@ -359,11 +346,11 @@ export class MessageExtensions<TState extends TurnState> {
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public queryLink(
-        commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
+        url: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
-        (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, QUERY_LINK_INVOKE_NAME);
+        (Array.isArray(url) ? url : [url]).forEach((url) => {
+            const selector = createQueryLinkSelector(url, QUERY_LINK_INVOKE_NAME);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
@@ -511,7 +498,7 @@ export class MessageExtensions<TState extends TurnState> {
                         value: result
                     }
                 };
-            } else if (typeof result == 'object') {
+            } else if (typeof result == 'object' && result != null) {
                 if ((result as TaskModuleTaskInfo).card) {
                     // Return another task module
                     response = {
@@ -578,6 +565,48 @@ function createTaskSelector(
             return Promise.resolve(
                 isInvoke &&
                     context?.activity?.value?.commandId === commandId &&
+                    matchesPreviewAction(context.activity, botMessagePreviewAction)
+            );
+        };
+    }
+}
+
+/**
+ * Creates a route selector function for an invoke query link activity type.
+ * @param {string | RegExp | RouteSelector} url The url link register the handler for.
+ * @param {string} invokeName The name of the invoke activity.
+ * @param {'edit' | 'send'} botMessagePreviewAction The bot message preview action to match.
+ * @returns {RouteSelector} The route selector function.
+ */
+function createQueryLinkSelector(
+    url: string | RegExp | RouteSelector,
+    invokeName: string,
+    botMessagePreviewAction?: 'edit' | 'send'
+): RouteSelector {
+    if (typeof url == 'function') {
+        // Return the passed in selector function
+        return url;
+    } else if (url instanceof RegExp) {
+        // Return a function that matches the commandId using a RegExp
+        return (context: TurnContext) => {
+            const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
+            if (
+                isInvoke &&
+                typeof context?.activity?.value?.url == 'string' &&
+                matchesPreviewAction(context.activity, botMessagePreviewAction)
+            ) {
+                return Promise.resolve(url.test(context.activity.value.url));
+            } else {
+                return Promise.resolve(false);
+            }
+        };
+    } else {
+        // Return a function that attempts to match commandId
+        return (context: TurnContext) => {
+            const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
+            return Promise.resolve(
+                isInvoke &&
+                    context?.activity?.value?.url === url &&
                     matchesPreviewAction(context.activity, botMessagePreviewAction)
             );
         };
