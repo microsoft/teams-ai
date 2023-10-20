@@ -96,23 +96,6 @@ describe('MessageExtensions', () => {
     });
 
     describe(`${CONFIGURE_SETTINGS}`, () => {
-        it('should send 500 when the handler fails', async () => {
-            const activity = createTestInvoke(CONFIGURE_SETTINGS, {});
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
-
-            mockApp.messageExtensions.configureSettings(async (context: TurnContext, _state, value) => {
-                throw new Error('handler try failed');
-            });
-
-            await testAdapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
-                const response = context.turnState.get(INVOKE_RESPONSE_KEY);
-                assert.equal(response.value.status, 500);
-                assert.equal(response.value.body, `${CONFIGURE_SETTINGS} invoke failed. \n handler try failed`);
-            });
-        });
-
         it('should return InvokeResponse with status code 200 with the configure setting invoke name', async () => {
             const activity = createTestInvoke(CONFIGURE_SETTINGS, { theme: 'dark' });
             // Not sure why but without this line, the test adapter sends back an empty response.
@@ -541,22 +524,6 @@ describe('MessageExtensions', () => {
                 assert.deepEqual(response.value.body, undefined);
             });
         });
-        it('should send 500 when the handler fails', async () => {
-            const activity = createTestInvoke(QUERY_CARD_BUTTON_CLICKED, {});
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
-
-            mockApp.messageExtensions.handleOnButtonClicked(async (context: TurnContext, _state, value) => {
-                throw new Error('handler try failed');
-            });
-
-            await testAdapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
-                const response = context.turnState.get(INVOKE_RESPONSE_KEY);
-                assert.equal(response.value.status, 500);
-                assert.equal(response.value.body, `${QUERY_CARD_BUTTON_CLICKED} invoke failed. \n handler try failed`);
-            });
-        });
     });
 
     describe(`${QUERY_LINK_INVOKE_NAME}`, () => {
@@ -628,31 +595,16 @@ describe('MessageExtensions', () => {
             activity.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.queryUrlSetting(async (context: TurnContext, _state) => {
-                console.log('queryUrlSetting does not return a value');
+                return {
+                    value: 'https://fake-url'
+                } as MessagingExtensionResult;
             });
 
             await testAdapter.processActivity(activity, async (context: TurnContext) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
-                assert.deepEqual(response.value.body, undefined);
-            });
-        });
-
-        it('should return InvokeResponse with status code 500 when querySettingUrl fails to invoke', async () => {
-            const activity = createTestInvoke(QUERY_SETTING_URL, {});
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
-
-            mockApp.messageExtensions.queryUrlSetting(async (context: TurnContext, _state) => {
-                throw new Error('queryUrlSetting failed');
-            });
-
-            await testAdapter.processActivity(activity, async (context: TurnContext) => {
-                await mockApp.run(context);
-                const response = context.turnState.get(INVOKE_RESPONSE_KEY);
-                assert.equal(response.value.status, 500);
-                assert.deepEqual(response.value.body, `${QUERY_SETTING_URL} invoke failed. \n queryUrlSetting failed`);
+                assert.deepEqual(response.value.body.composeExtension.value, 'https://fake-url');
             });
         });
     });

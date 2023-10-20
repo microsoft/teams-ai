@@ -545,12 +545,14 @@ export class MessageExtensions<TState extends TurnState> {
      * Registers a handler that invokes the fetch of the configuration settings for a Message Extension.
      @summary
      * The `composeExtension/querySettingUrl` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
-     * @param {(context: TurnContext, state: TState) => Promise<void>} handler Function defined by the developer to call when the command is received.
+     * @param {(context: TurnContext, state: TState) => Promise<MessagingExtensionResult>} handler Function defined by the developer to call when the command is received.
      * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
      * @param {TState} handler.state Current state of the turn.
      * @returns {Application<TState>} The application for chaining purposes.
      */
-    public queryUrlSetting(handler: (context: TurnContext, state: TState) => Promise<void>): Application<TState> {
+    public queryUrlSetting(
+        handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult>
+    ): Application<TState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
@@ -561,24 +563,14 @@ export class MessageExtensions<TState extends TurnState> {
         this._app.addRoute(
             selector,
             async (context, state) => {
-                try {
-                    // Call handler and then check to see if an invoke response has already been added
-                    await handler(context, state);
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
-                        await context.sendActivity({
-                            value: { status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                } catch (error) {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state);
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    const response: MessagingExtensionActionResponse = {
+                        composeExtension: result
+                    };
                     await context.sendActivity({
-                        value: {
-                            status: 500,
-                            body: `${QUERY_SETTING_URL} invoke failed. \n ${
-                                error instanceof Error ? error.message : error
-                            }`
-                        } as InvokeResponse,
+                        value: { status: 200, body: response } as InvokeResponse,
                         type: ActivityTypes.InvokeResponse
                     });
                 }
@@ -613,24 +605,12 @@ export class MessageExtensions<TState extends TurnState> {
         this._app.addRoute(
             selector,
             async (context, state) => {
-                try {
-                    // Call handler and then check to see if an invoke response has already been added
-                    await handler(context, state, context.activity.value ?? {});
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
-                        await context.sendActivity({
-                            value: { status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                } catch (error) {
+                // Call handler and then check to see if an invoke response has already been added
+                await handler(context, state, context.activity.value ?? {});
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
                     await context.sendActivity({
-                        value: {
-                            status: 500,
-                            body: `${CONFIGURE_SETTINGS} invoke failed. \n ${
-                                error instanceof Error ? error.message : error
-                            }`
-                        } as InvokeResponse,
+                        value: { status: 200 } as InvokeResponse,
                         type: ActivityTypes.InvokeResponse
                     });
                 }
@@ -667,24 +647,12 @@ export class MessageExtensions<TState extends TurnState> {
         this._app.addRoute(
             selector,
             async (context, state) => {
-                try {
-                    // Call handler and then check to see if an invoke response has already been added
-                    await handler(context, state, context.activity.value ?? {});
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
-                        await context.sendActivity({
-                            value: { status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                } catch (error) {
+                // Call handler and then check to see if an invoke response has already been added
+                await handler(context, state, context.activity.value ?? {});
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
                     await context.sendActivity({
-                        value: {
-                            status: 500,
-                            body: `${QUERY_CARD_BUTTON_CLICKED} invoke failed. \n ${
-                                error instanceof Error ? error.message : error
-                            }`
-                        } as InvokeResponse,
+                        value: { status: 200 } as InvokeResponse,
                         type: ActivityTypes.InvokeResponse
                     });
                 }
