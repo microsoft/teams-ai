@@ -87,6 +87,7 @@ export class MessageExtensions<TState extends TurnState> {
      * @summary
      * The `composeExtension/anonymousQueryLink` INVOKE activity does not contain any sort of command ID,
      * so only a single select item handler can be registered.
+     * For more information visit https://learn.microsoft.com/microsoftteams/platform/messaging-extensions/how-to/link-unfurling?#enable-zero-install-link-unfurling
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.
