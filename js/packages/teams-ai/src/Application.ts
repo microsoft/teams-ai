@@ -293,7 +293,9 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      */
     public get authentication(): Authentication<TState> {
         if (!this._authentication) {
-            throw new Error(`The Application.authentication property is unavailable because no authentication options were configured.`);
+            throw new Error(
+                `The Application.authentication property is unavailable because no authentication options were configured.`
+            );
         }
 
         return this._authentication;
@@ -511,16 +513,29 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 const state = await turnStateManager!.loadState(storage, context);
 
                 // Sign the user in
-                if (this._authentication && context.activity.type === ActivityTypes.Message) {
-                    // Get the auth token
-                    const token = await this._authentication.signInUser(context, state);
-                    if (token) {
-                        state['temp'].value.authToken = token;
-                    } else {
-                        // Save turn state and end
-                        // - This saves the current dialog stack.
-                        await turnStateManager!.saveState(storage, context, state);
-                        return false;
+                if (this._authentication) {
+                    if (context.activity.type === ActivityTypes.Message) {
+                        // Get the auth token
+                        const token = await this._authentication.signInUser(context, state);
+                        if (token) {
+                            state['temp'].value.authToken = token;
+                        } else {
+                            // Save turn state and end
+                            // - This saves the current dialog stack.
+                            await turnStateManager!.saveState(storage, context, state);
+                            return false;
+                        }
+                    }
+
+                    if (this.authentication.isInvokeActivityThatAllowsAuthSignIn(context)) {
+                        const token = await this.authentication.signInUser(context, state);
+
+                        if (token) {
+                            state['temp'].value.authToken = token;
+                        } else {
+                            // Appropriate invoke response has been sent
+                            return false;
+                        }
                     }
                 }
 
@@ -958,9 +973,4 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
 /**
  * @private
  */
-type ApplicationEventHandler<TState extends TurnState> = (
-    context: TurnContext,
-    state: TState
-) => Promise<boolean>;
-
-
+type ApplicationEventHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<boolean>;

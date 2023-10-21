@@ -28,19 +28,19 @@ import { TurnState } from './TurnState';
 const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
 
 /**
- * @private
+ * @public
  */
-const FETCH_TASK_INVOKE_NAME = `composeExtension/fetchTask`;
+export const FETCH_TASK_INVOKE_NAME = `composeExtension/fetchTask`;
 
 /**
- * @private
+ * @public
  */
-const QUERY_INVOKE_NAME = `composeExtension/query`;
+export const QUERY_INVOKE_NAME = `composeExtension/query`;
 
 /**
- * @private
+ * @public
  */
-const QUERY_LINK_INVOKE_NAME = `composeExtension/queryLink`;
+export const QUERY_LINK_INVOKE_NAME = `composeExtension/queryLink`;
 
 /**
  * @private
@@ -69,7 +69,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler for a command that performs anonymous link unfurling.
-     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
+     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} url - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.

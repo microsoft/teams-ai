@@ -10,8 +10,10 @@ import {
     ActivityTypes,
     InvokeResponse,
     MemoryStorage,
+    SignInUrlResponse,
     Storage,
     TeamsSSOTokenExchangeMiddleware,
+    TokenResponse,
     TurnContext,
     tokenExchangeOperationName,
     tokenResponseEventName,
@@ -29,12 +31,15 @@ import { TurnState } from './TurnState';
 import { DefaultTurnState } from './DefaultTurnStateManager';
 import { TurnStateProperty } from './TurnStateProperty';
 import { Application } from './Application';
+import * as UserTokenAccess from './UserTokenAccess';
+import { FETCH_TASK_INVOKE_NAME, QUERY_INVOKE_NAME, QUERY_LINK_INVOKE_NAME } from './MessageExtensions';
 
 /**
  * Authentication service.
  */
 export class Authentication<TState extends TurnState = DefaultTurnState> {
     private readonly _oauthPrompt: OAuthPrompt;
+    private readonly _oAuthPromptSettings: OAuthPromptSettings;
     private readonly _storage: Storage;
     private _authSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
     private _authFailureHandler?: (context: TurnContext, state: TState) => Promise<void>;
@@ -43,14 +48,16 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * Creates a new instance of the `Authentication` class.
      * @param app Application for adding routes.
      * @param settings Authentication settings.
+     * @param storage
      */
     constructor(app: Application<TState>, settings: OAuthPromptSettings, storage?: Storage) {
         // Create OAuthPrompt
+        this._oAuthPromptSettings = settings;
         this._oauthPrompt = new OAuthPrompt('OAuthPrompt', settings);
 
         this._storage = storage || new MemoryStorage();
 
-        // Handles deduplication of token exchange event when using SSO
+        // Handles deduplication of token exchange event when using SSO with Bot Authentication
         app.adapter.use(new TeamsSSOTokenExchangeMiddleware(this._storage, settings.connectionName));
 
         // Add application routes to handle OAuth callbacks
@@ -141,34 +148,63 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @returns The authentication token or undefined if the user is still login in.
      */
     public async signInUser(context: TurnContext, state: TState): Promise<string | undefined> {
-        // Get property names to use
-        const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
-        const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+        if (this.isInvokeActivityThatAllowsAuthSignIn(context)) {
+            // Do token exchange
+            const authObj = context.activity.value.authentication;
+            if (authObj && authObj.token) {
+                // Message extension token exchange invoke activity
+                const isTokenExchangable = await this.tokenIsExchangeable(context);
+                if (!isTokenExchangable) {
+                    await context.sendActivity({
+                        value: { status: 412 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
 
-        // Save message if not signed in
-        if (!state.conversation.value[userAuthStatePropertyName]) {
-            state.conversation.value[userAuthStatePropertyName] = { signedIn: false, message: context.activity.text };
-        }
-
-        const results = await this.runDialog(context, state, userDialogStatePropertyName);
-        if (results.status === DialogTurnStatus.complete && results.result != undefined) {
-            // Get user auth state
-            const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
-            if (!userAuthState.signedIn && userAuthState.message) {
-                // Restore user message
-                context.activity.text = userAuthState.message;
-                userAuthState.signedIn = true;
-                delete userAuthState.message;
-                state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                    return undefined;
+                }
             }
 
-            // Delete persisted dialog state
-            delete state.conversation.value[userDialogStatePropertyName];
+            // Messaging extension Auth flow
+            const token = await this.authenticateMessageExtensions(context, state);
 
-            // Return token
-            return results.result?.token;
+            if (!token) {
+                // Sign in card is sent to user
+                return undefined;
+            }
+
+            return token;
         } else {
-            return undefined;
+            // Bot Auth Flow
+
+            // Get property names to use
+            const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
+            const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+
+            // Save message if not signed in
+            if (!state.conversation.value[userAuthStatePropertyName]) {
+                state.conversation.value[userAuthStatePropertyName] = { signedIn: false, message: context.activity.text };
+            }
+
+            const results = await this.runDialog(context, state, userDialogStatePropertyName);
+            if (results.status === DialogTurnStatus.complete && results.result != undefined) {
+                // Get user auth state
+                const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
+                if (!userAuthState.signedIn && userAuthState.message) {
+                    // Restore user message
+                    context.activity.text = userAuthState.message;
+                    userAuthState.signedIn = true;
+                    delete userAuthState.message;
+                    state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                }
+
+                // Delete persisted dialog state
+                delete state.conversation.value[userDialogStatePropertyName];
+
+                // Return token
+                return results.result?.token;
+            } else {
+                return undefined;
+            }
         }
     }
 
@@ -207,6 +243,96 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         } else if ('failure' === status) {
             this._authFailureHandler = handler;
         }
+    }
+
+    public isInvokeActivityThatAllowsAuthSignIn(context: TurnContext): boolean {
+        return (
+            context.activity.type == ActivityTypes.Invoke &&
+            (context.activity.name == QUERY_INVOKE_NAME ||
+                context.activity.name == FETCH_TASK_INVOKE_NAME ||
+                context.activity.name == QUERY_LINK_INVOKE_NAME)
+        );
+    }
+
+    private async authenticateMessageExtensions(context: TurnContext, state: TState): Promise<string | undefined> {
+        const value = context.activity.value;
+
+        // When the Bot Service Auth flow completes, the query.State will contain a magic code used for verification.
+        const magicCode = value.state && Number.isInteger(Number(value.state)) ? value.state : '';
+
+        const tokenResponse = await this.getUserToken(context, magicCode);
+
+        if (!tokenResponse || !tokenResponse.token) {
+            // There is no token, so the user has not signed in yet.
+            // Retrieve the OAuth Sign in Link to use in the MessagingExtensionResult Suggested Actions
+
+            const signInResource = await this.getSignInResource(context);
+            const signInLink = signInResource.signInLink;
+            // Do 'silentAuth' if this is a composeExtension/query request otherwise do normal `auth` flow.
+            const authType = context.activity.name === QUERY_INVOKE_NAME ? 'silentAuth' : 'auth';
+
+            const response = {
+                composeExtension: {
+                    type: authType,
+                    suggestedActions: {
+                        actions: [
+                            {
+                                type: 'openUrl',
+                                value: signInLink,
+                                title: 'Bot Service OAuth'
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // Queue up invoke response
+            await context.sendActivity({
+                value: { body: response, status: 200 } as InvokeResponse,
+                type: ActivityTypes.InvokeResponse
+            });
+
+            return;
+        }
+
+        return tokenResponse.token;
+    }
+
+    /**
+     * @param context
+     * @internal
+     */
+    public async tokenIsExchangeable(context: TurnContext) {
+        let tokenExchangeResponse;
+        try {
+            tokenExchangeResponse = await this.exchangeToken(context);
+        } catch (err) {
+            // Ignore Exceptions
+            // If token exchange failed for any reason, tokenExchangeResponse above stays null, and hence we send back a failure invoke response to the caller.
+            console.log('tokenExchange error: ' + err);
+        }
+        if (!tokenExchangeResponse || !tokenExchangeResponse.token) {
+            return false;
+        }
+        return true;
+    }
+
+    public async exchangeToken(context: TurnContext): Promise<TokenResponse | undefined> {
+        const tokenExchangeRequest = context.activity.value.authentication;
+
+        if (!tokenExchangeRequest || !tokenExchangeRequest.token) {
+            return;
+        }
+
+        return await UserTokenAccess.exchangeToken(context, this._oAuthPromptSettings, tokenExchangeRequest);
+    }
+
+    public async getUserToken(context: TurnContext, magicCode: string): Promise<TokenResponse> {
+        return await UserTokenAccess.getUserToken(context, this._oAuthPromptSettings, magicCode);
+    }
+
+    public async getSignInResource(context: TurnContext): Promise<SignInUrlResponse> {
+        return await UserTokenAccess.getSignInResource(context, this._oAuthPromptSettings);
     }
 
     /**
