@@ -80,7 +80,7 @@ namespace Microsoft.TeamsAI
                     || !string.Equals(turnContext.Activity.Name, FETCH_INVOKE_NAME)
                     || (taskModuleAction = InvokeActivityUtilities.GetInvokeValue<TaskModuleAction>(turnContext.Activity)) == null)
                 {
-                    throw new TeamsAIException($"Unexpected TaskModules.fetch() triggered for activity type: {turnContext.Activity.Type}");
+                    throw new TeamsAIException($"Unexpected TaskModules.OnFetch() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
                 TaskModuleResponse result = await handler(turnContext, turnState, taskModuleAction.Value, cancellationToken);
@@ -182,7 +182,7 @@ namespace Microsoft.TeamsAI
                     || !string.Equals(turnContext.Activity.Name, SUBMIT_INVOKE_NAME)
                     || (taskModuleAction = InvokeActivityUtilities.GetInvokeValue<TaskModuleAction>(turnContext.Activity)) == null)
                 {
-                    throw new TeamsAIException($"Unexpected TaskModules.submit() triggered for activity type: {turnContext.Activity.Type}");
+                    throw new TeamsAIException($"Unexpected TaskModules.OnSubmit() triggered for activity type: {turnContext.Activity.Type}");
                 }
 
                 TaskModuleResponse result = await handler(turnContext, turnState, taskModuleAction.Value, cancellationToken);

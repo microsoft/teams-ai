@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
+using Microsoft.TeamsAI.Exceptions;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
@@ -102,6 +103,35 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
+        public async void Test_OnFetch_RouteSelector_ActivityNotMatched()
+        {
+            var adapter = new SimpleAdapter();
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "task/fetch"
+            });
+            var taskModuleResponseMock = new Mock<TaskModuleResponse>();
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                return Task.FromResult(true);
+            };
+            FetchHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            {
+                return Task.FromResult(taskModuleResponseMock.Object);
+            };
+
+            // Act
+            taskModules.OnFetch(routeSelector, handler);
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
+
+            // Assert
+            Assert.Equal("Unexpected TaskModules.OnFetch() triggered for activity type: invoke", exception.Message);
+        }
+
+        [Fact]
         public async void Test_OnSubmit_Verb()
         {
             // Arrange
@@ -192,6 +222,35 @@ namespace Microsoft.TeamsAI.Tests.Application
 
             // Assert
             Assert.Null(activitiesToSend);
+        }
+
+        [Fact]
+        public async void Test_OnSubmit_RouteSelector_ActivityNotMatched()
+        {
+            var adapter = new SimpleAdapter();
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "task/submit"
+            });
+            var taskModuleResponseMock = new Mock<TaskModuleResponse>();
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                return Task.FromResult(true);
+            };
+            SubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            {
+                return Task.FromResult(taskModuleResponseMock.Object);
+            };
+
+            // Act
+            taskModules.OnSubmit(routeSelector, handler);
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
+
+            // Assert
+            Assert.Equal("Unexpected TaskModules.OnSubmit() triggered for activity type: invoke", exception.Message);
         }
 
     }
