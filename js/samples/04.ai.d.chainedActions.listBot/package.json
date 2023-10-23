@@ -26,8 +26,8 @@
         "restify": "~11.1.0"
     },
     "devDependencies": {
-        "@types/jsonwebtoken": "^9.0.3",
-        "@types/restify": "8.5.8",
+        "@types/jsonwebtoken": "^9.0.4",
+        "@types/restify": "8.5.9",
         "nodemon": "~1.19.4",
         "shx": "^0.3.4",
         "ts-node": "^10.9.1",
