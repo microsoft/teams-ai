@@ -4,9 +4,6 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  Agent.WorkFolder: 'js'
-
 steps:
 - task: NodeTool@0
   inputs:
@@ -17,13 +14,17 @@ steps:
   displayName: 'Install Yarn'
 
 - script: 'yarn'
+  workingDirectory: 'js'
   displayName: 'Install Dependencies'
 
 - script: 'yarn build'
+  workingDirectory: 'js'
   displayName: 'Build'
 
 - script: 'yarn test'
+  workingDirectory: 'js'
   displayName: 'Test'
 
 - script: 'yarn lint'
+  workingDirectory: 'js'
   displayName: 'Lint'
