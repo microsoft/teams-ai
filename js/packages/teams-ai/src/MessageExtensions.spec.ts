@@ -234,10 +234,6 @@ describe('MessageExtensions', () => {
                 commandId: 'show task'
             });
 
-            activity2.deliveryMode = 'expectReplies';
-            activity3.deliveryMode = 'expectReplies';
-            activity4.deliveryMode = 'expectReplies';
-
             mockApp.messageExtensions.fetchTask(
                 [
                     'showTaskModule',
@@ -429,8 +425,6 @@ describe('MessageExtensions', () => {
                 botActivityPreview: ['preview'],
                 botMessagePreviewAction: 'send'
             });
-
-            activity2.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.botMessagePreviewSend(
                 ['create preview', 'preview'],
