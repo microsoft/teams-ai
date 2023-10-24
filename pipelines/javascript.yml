@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  projectPath: 'js'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '16.x'
+  displayName: 'Install Node'
+
+- script: 'npm i -g yarn'
+  displayName: 'Install Yarn'
+
+- script: 'yarn'
+  displayName: 'Install Dependencies'
+
+- script: 'yarn build'
+  displayName: 'Build'
+
+- script: 'yarn test'
+  displayName: 'Test'
+
+- script: 'yarn lint'
+  displayName: 'Lint'
