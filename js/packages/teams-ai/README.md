@@ -57,6 +57,24 @@ If you are starting a new project, you can use the [Teams AI SDK echobot sample]
 
 You can either copy-paste the code into your own project, or clone the repo and run the Teams Toolkit features to explore.
 
+### Optional ApplicationBuilder Class 
+
+You may also use the `ApplicationBuilder` class to instantiate your `Application` instance. This option provides greater readability and separates the management of the various configuration options (e.g., storage, turn state, AI module options, etc).
+
+js `index.ts`:
+
+```js
+// Old method:
+// const app = new Application()<ApplicationTurnState>
+//    {
+//        storage
+//    };
+
+const app = new ApplicationBuilder()<ApplicationTurnState>
+    .withStorage(storage)
+    .build(); // this function internally calls the Application constructor
+```
+
 ## AI Setup
 
 The detailed steps for setting up your bot to use AI are in the [GPT Setup Guide](getting-started/01.AI-SETUP.md).

@@ -49,14 +49,14 @@ steps:
     PathToPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: Packages
 
-- task: NuGetAuthenticate@0
+- task: NuGetAuthenticate@1
   displayName: 'NuGet Authenticate'
 
 - task: NuGetCommand@2
   displayName: 'Azure NuGet Push'
   inputs:
     command: push
-    publishVstsFeed: 'SDK_v4/Teams'
+    publishVstsFeed: 'Github_Pipelines/Teams'
     allowPackageConflicts: true
     includeNugetOrg: true
 

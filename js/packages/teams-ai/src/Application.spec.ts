@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
-import { Application } from './Application';
+import { Application, ApplicationBuilder } from './Application';
 import { TestPlanner } from './TestPlanner';
 import { TestPromptManager } from './TestPromptManager';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
@@ -63,6 +63,53 @@ describe('Application', () => {
             assert.equal(app.options.storage, storage);
             assert.deepEqual(app.options.taskModules, taskModules);
             assert.equal(app.options.turnStateManager, turnStateManager);
+        });
+    });
+
+    describe('applicationBuilder', () => {
+        it('should create an Application with default options', () => {
+            const app = new ApplicationBuilder().build();
+            assert.notEqual(app.options, undefined);
+            assert.equal(app.options.adapter, undefined);
+            assert.equal(app.options.botAppId, undefined);
+            assert.equal(app.options.storage, undefined);
+            assert.equal(app.options.ai, undefined);
+            assert.notEqual(app.options.turnStateManager, undefined);
+            assert.equal(app.options.adaptiveCards, undefined);
+            assert.equal(app.options.taskModules, undefined);
+            assert.equal(app.options.removeRecipientMention, true);
+            assert.equal(app.options.startTypingTimer, true);
+            assert.equal(app.options.longRunningMessages, false);
+        });
+
+        it('should create an Application with custom options', () => {
+            const app = new ApplicationBuilder()
+                .setRemoveRecipientMention(removeRecipientMention)
+                .withStorage(storage)
+                .withAIOptions(ai)
+                .withLongRunningMessages(adapter, botAppId)
+                .withTurnStateManager(turnStateManager)
+                .withAdaptiveCardOptions(adaptiveCards)
+                .withTaskModuleOptions(taskModules)
+                .setStartTypingTimer(startTypingTimer)
+                .build();
+            assert.notEqual(app.options, undefined);
+            assert.equal(app.options.adapter, adapter);
+            assert.equal(app.options.botAppId, botAppId);
+            assert.equal(app.options.storage, storage);
+            assert.equal(app.options.ai, ai);
+            assert.equal(app.options.turnStateManager, turnStateManager);
+            assert.equal(app.options.adaptiveCards, adaptiveCards);
+            assert.equal(app.options.taskModules, taskModules);
+            assert.equal(app.options.removeRecipientMention, removeRecipientMention);
+            assert.equal(app.options.startTypingTimer, startTypingTimer);
+            assert.equal(app.options.longRunningMessages, longRunningMessages);
+        });
+
+        it('should throw an exception if botId is an empty string for longRunningMessages', () => {
+            assert.throws(() => {
+                new ApplicationBuilder().withLongRunningMessages(adapter, '').build();
+            });
         });
     });
 
