@@ -6,6 +6,7 @@ trigger:
   paths:
     include:
     - js
+    - pipelines/javascript.yml
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -54,5 +55,6 @@ steps:
   displayName: 'Publish'
   inputs:
     command: publish
+    workingDir: '$(Build.ArtifactStagingDirectory)/js/packages/teams-ai'
     publishRegistry: useFeed
     publishFeed: 'Github_Pipelines/Teams'
