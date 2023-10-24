@@ -56,7 +56,7 @@ steps:
   displayName: 'Azure NuGet Push'
   inputs:
     command: push
-    publishVstsFeed: 'SDK_v4/Teams'
+    publishVstsFeed: 'Github_Pipelines/DomoreexpGithub'
     allowPackageConflicts: true
     includeNugetOrg: true
 
