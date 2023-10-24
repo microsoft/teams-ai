@@ -38,13 +38,16 @@ steps:
 - task: CopyFiles@2
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
-    contents: js/packages/teams-ai/*
+    contents: |
+      js/packages/teams-ai/*
+      js/packages/teams-ai/src/*
+      js/packages/teams-ai/lib/*
     targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathToPublish: '$(Build.ArtifactStagingDirectory)'
+    PathToPublish: '$(Build.ArtifactStagingDirectory)/js/packages/teams-ai'
     ArtifactName: Packages
 
 - task: Npm@1
