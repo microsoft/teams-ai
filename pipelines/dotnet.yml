@@ -49,7 +49,7 @@ steps:
     PathToPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: Packages
 
-- task: NuGetAuthenticate@0
+- task: NuGetAuthenticate@1
   displayName: 'NuGet Authenticate'
 
 - task: NuGetCommand@2
