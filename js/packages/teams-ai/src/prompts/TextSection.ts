@@ -11,13 +11,13 @@ import { PromptFunctions } from "./PromptFunctions";
 import { RenderedPromptSection } from "./PromptSection";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { TurnContext } from "botbuilder";
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * A section of text that will be rendered as a message.
  */
-export class TextSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
+export class TextSection extends PromptSectionBase {
     private _length: number = -1;
 
     public readonly text: string;
@@ -38,7 +38,7 @@ export class TextSection<TState extends TurnState = TurnState> extends PromptSec
         this.role = role;
     }
 
-    public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache length
         if (this._length < 0) {
             this._length = tokenizer.encode(this.text).length;

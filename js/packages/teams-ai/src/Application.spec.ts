@@ -1,8 +1,7 @@
 import { strict as assert } from 'assert';
 import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
 import { Application, ApplicationBuilder } from './Application';
-import { TestPlanner } from './TestPlanner';
-import { TestPromptManager } from './prompts/TestPromptManager';
+import { TestPlanner } from '././planners';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
 import { TaskModulesOptions } from './TaskModules';
@@ -12,8 +11,7 @@ describe('Application', () => {
     const adapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
     const ai: AIOptions<TurnState> = {
-        planner: new TestPlanner(),
-        promptManager: new TestPromptManager()
+        planner: new TestPlanner()
     };
     const botAppId = 'testBot';
     const longRunningMessages = true;
@@ -71,7 +69,6 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.ai, undefined);
-            assert.notEqual(app.options.turnStateManager, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.taskModules, undefined);
             assert.equal(app.options.removeRecipientMention, true);
@@ -85,7 +82,6 @@ describe('Application', () => {
                 .withStorage(storage)
                 .withAIOptions(ai)
                 .withLongRunningMessages(adapter, botAppId)
-                .withTurnStateManager(turnStateManager)
                 .withAdaptiveCardOptions(adaptiveCards)
                 .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
@@ -95,7 +91,6 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, botAppId);
             assert.equal(app.options.storage, storage);
             assert.equal(app.options.ai, ai);
-            assert.equal(app.options.turnStateManager, turnStateManager);
             assert.equal(app.options.adaptiveCards, adaptiveCards);
             assert.equal(app.options.taskModules, taskModules);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);

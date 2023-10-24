@@ -21,7 +21,7 @@ describe("DefaultResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new DefaultResponseValidator();
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: 'Hello World' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'user', content: 'Hello World' } }, 3);
                 assert.notDeepEqual(response, undefined);
                 assert.equal(response.valid, true);
             });

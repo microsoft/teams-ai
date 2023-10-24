@@ -6,7 +6,6 @@
  * Licensed under the MIT License.
  */
 
-import { TurnState } from '../TurnState';
 import { PromptManager, PromptManagerOptions } from './PromptManager';
 import { PromptTemplate } from './PromptTemplate';
 
@@ -20,7 +19,7 @@ export interface TestPromptManagerOptions extends PromptManagerOptions {
 /**
  * A prompt manager used for testing.
  */
-export class TestPromptManager<TState extends TurnState = TurnState> extends PromptManager<TState> {
+export class TestPromptManager extends PromptManager {
     public constructor(options: Partial<TestPromptManagerOptions> = {}) {
         super(Object.assign({
             promptsFolder: 'test',
@@ -32,7 +31,7 @@ export class TestPromptManager<TState extends TurnState = TurnState> extends Pro
         }
     }
 
-    public override getPrompt(name: string): Promise<PromptTemplate<TState>> {
+    public override getPrompt(name: string): Promise<PromptTemplate> {
         if (!this.hasPrompt(name)) {
             throw new Error(`Prompt '${name}' not found.`);
         }

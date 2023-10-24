@@ -3,7 +3,7 @@ import { MonologueAugmentation } from "./MonologueAugmentation";
 import { TestAdapter } from "botbuilder";
 import { GPT3Tokenizer } from "../tokenizers";
 import { TestTurnState } from "../TestTurnState";
-import { ChatCompletionAction } from "../models";
+import { ChatCompletionAction, PromptResponse } from "../models";
 import { TestPromptManager } from "../prompts";
 
 describe("MonologueAugmentation", () => {
@@ -86,7 +86,7 @@ describe("MonologueAugmentation", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const section = await augmentation.createPromptSection(context, state);
+                const section = await augmentation.createPromptSection();
                 assert.notEqual(section, undefined);
                 const rendered = await section!.renderAsMessages(context,state, functions, tokenizer, 2000);
                 assert.equal(rendered.output.length, 1);
@@ -141,9 +141,10 @@ describe("MonologueAugmentation", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response = await augmentation.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assistant', content: valid_SAY } }, 3);
-                assert.equal(response.valid, true);
-                const plan = await augmentation.createPlanFromResponse(context, state, response);
+                const response: PromptResponse<string> = { status: 'success', message: { role: 'assistant', content: valid_SAY } };
+                const validation = await augmentation.validateResponse(context, state, tokenizer, response, 3);
+                assert.equal(validation.valid, true);
+                const plan = await augmentation.createPlanFromResponse(context, state, { status: 'success', message: { role: 'assistant', content: validation.value } });
                 assert.notEqual(plan, undefined);
                 assert.deepEqual(plan, {
                     type: 'plan',
@@ -161,9 +162,10 @@ describe("MonologueAugmentation", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response = await augmentation.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assistant', content: valid_monologue } }, 3);
-                assert.equal(response.valid, true);
-                const plan = await augmentation.createPlanFromResponse(context, state, response);
+                const response: PromptResponse<string> = { status: 'success', message: { role: 'assistant', content: valid_monologue } };
+                const validation = await augmentation.validateResponse(context, state, tokenizer, response, 3);
+                assert.equal(validation.valid, true);
+                const plan = await augmentation.createPlanFromResponse(context, state, { status: 'success', message: { role: 'assistant', content: validation.value } });
                 assert.notEqual(plan, undefined);
                 assert.deepEqual(plan, {
                     type: 'plan',

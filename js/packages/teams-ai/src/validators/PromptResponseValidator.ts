@@ -7,24 +7,24 @@
  */
 
 import { TurnContext } from "botbuilder";
-import { TurnState } from "../TurnState";
 import { Tokenizer } from "../tokenizers";
 import { PromptResponse } from "../models";
+import { Memory } from "../MemoryFork";
 
 /**
  * A validator that can be used to validate prompt responses.
  */
-export interface PromptResponseValidator<TState extends TurnState = TurnState, TValue = any> {
+export interface PromptResponseValidator<TValue = any> {
     /**
      * Validates a response to a prompt.
      * @param context Context for the current turn of conversation with the user.
-     * @param state State for the current turn of conversation with the user.
+     * @param memory An interface for accessing state values.
      * @param tokenizer Tokenizer to use for encoding and decoding text.
      * @param response Response to validate.
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    validateResponse(context: TurnContext, state: TState, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>>;
+    validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>>;
 }
 
 /**

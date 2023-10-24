@@ -381,7 +381,7 @@ export class AI<TState extends TurnState = TurnState> {
         // Generate plan
         let plan = await this._options.moderator.reviewInput(context, state);
         if (!plan) {
-            plan = await this._options.planner.generatePlan(context, state, this);
+            plan = await this._options.planner.beginTask(context, state, this);
             plan = await this._options.moderator.reviewOutput(context, state, plan);
         }
 

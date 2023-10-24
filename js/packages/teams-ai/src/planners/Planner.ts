@@ -15,13 +15,39 @@ import { AI } from '../AI';
  */
 export interface Planner<TState extends TurnState> {
     /**
-     * Completes a prompt and generates a plan for the AI system to execute.
+     * Starts a new task.
+     * @remarks
+     * This method is called when the AI system is ready to start a new task. The planner should
+     * generate a plan that the AI system will execute. Returning an empty plan signals that
+     * there is no work to be performed.
+     *
+     * The planner should take the users input from `state.temp.input`.
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      * @param ai The AI system that is generating the plan.
      * @returns The plan that was generated.
      */
-    generatePlan(
+    beginTask(
+        context: TurnContext,
+        state: TState,
+        ai: AI<TState>
+    ): Promise<Plan>;
+
+    /**
+     * Continues the current task.
+     * @remarks
+     * This method is called when the AI system has finished executing the previous plan and is
+     * ready to continue the current task. The planner should generate a plan that the AI system
+     * will execute. Returning an empty plan signals that the task is completed and there is no work
+     * to be performed.
+     *
+     * The output from the last plan step that was executed is passed to the planner via `state.temp.input`.
+     * @param context Context for the current turn of conversation.
+     * @param state Application state for the current turn of conversation.
+     * @param ai The AI system that is generating the plan.
+     * @returns The plan that was generated.
+     */
+    continueTask(
         context: TurnContext,
         state: TState,
         ai: AI<TState>

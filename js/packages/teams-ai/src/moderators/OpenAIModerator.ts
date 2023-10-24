@@ -15,9 +15,9 @@ import {
     CreateModerationResponseResultsInner,
     CreateModerationResponse,
     OpenAIClientResponse
-} from './OpenAIClients';
+} from '../internals';
 import { Moderator } from './Moderator';
-import { AI } from '../ai';
+import { AI } from '../AI';
 
 /**
  * Options for the OpenAI based moderator.

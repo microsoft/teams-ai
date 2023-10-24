@@ -6,7 +6,15 @@
  * Licensed under the MIT License.
  */
 
+export * from "./augmentations";
+export * from "./dataSources";
+export * from "./embeddings";
+export * from "./models";
+export * from "./moderators";
+export * from "./planners";
 export * from "./prompts";
+export * from "./tokenizers";
+export * from "./validators";
 export * from "./AdaptiveCards";
 export * from "./AI";
 export * from "./Application";

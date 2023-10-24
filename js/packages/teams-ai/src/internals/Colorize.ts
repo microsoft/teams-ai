@@ -1,3 +1,11 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 const colorizer = require('json-colorizer');
 
 /**

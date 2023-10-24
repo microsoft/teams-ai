@@ -1,3 +1,11 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { PromptFunctions, PromptTemplate } from "../prompts";
 import { PromptCompletionModel, PromptResponse } from "./PromptCompletionModel";
@@ -5,7 +13,7 @@ import { ChatCompletionRequestMessage, CreateChatCompletionRequest, CreateChatCo
 import { Tokenizer } from "../tokenizers";
 import { Colorize } from "../internals";
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
+import { Memory } from '../MemoryFork';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -97,7 +105,7 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
  * @remarks
  */
-export class OpenAIModel<TState extends TurnState = TurnState> implements PromptCompletionModel<TState> {
+export class OpenAIModel implements PromptCompletionModel {
     private readonly _httpClient: AxiosInstance;
     private readonly _useAzure: boolean;
 
@@ -159,20 +167,20 @@ export class OpenAIModel<TState extends TurnState = TurnState> implements Prompt
     /**
      * Completes a prompt using OpenAI or Azure OpenAI.
      * @param context Current turn context.
-     * @param state Current turn state.
+     * @param memory An interface for accessing state values.
      * @param functions Functions to use when rendering the prompt.
      * @param tokenizer Tokenizer to use when rendering the prompt.
      * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    public async completePrompt(context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse> {
+    public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>> {
         const startTime = Date.now();
         const max_input_tokens = template.config.completion.max_input_tokens;
         if (this.options.completion_type == 'text') {
             // Render prompt
-            const result = await template.prompt.renderAsText(context, state, functions, tokenizer, max_input_tokens);
+            const result = await template.prompt.renderAsText(context, memory, functions, tokenizer, max_input_tokens);
             if (result.tooLong) {
-                return { status: 'too_long', message: `The generated text completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.` };
+                return { status: 'too_long', error: new Error(`The generated text completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`) };
             }
             if (this.options.logRequests) {
                 console.log(Colorize.title('PROMPT:'));
@@ -200,15 +208,15 @@ export class OpenAIModel<TState extends TurnState = TurnState> implements Prompt
                     console.log(Colorize.title('HEADERS:'));
                     console.log(Colorize.output(response.headers));
                 }
-                return { status: 'rate_limited', message: `The text completion API returned a rate limit error.` }
+                return { status: 'rate_limited', error: new Error(`The text completion API returned a rate limit error.`) }
             } else {
-                return { status: 'error', message: `The text completion API returned an error status of ${response.status}: ${response.statusText}` };
+                return { status: 'error', error: new Error(`The text completion API returned an error status of ${response.status}: ${response.statusText}`) };
             }
         } else {
             // Render prompt
-            const result = await template.prompt.renderAsMessages(context, state, functions, tokenizer, max_input_tokens);
+            const result = await template.prompt.renderAsMessages(context, memory, functions, tokenizer, max_input_tokens);
             if (result.tooLong) {
-                return { status: 'too_long', message: `The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.` };
+                return { status: 'too_long', error: new Error(`The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`) };
             }
             if (this.options.logRequests) {
                 console.log(Colorize.title('CHAT PROMPT:'));
@@ -236,9 +244,9 @@ export class OpenAIModel<TState extends TurnState = TurnState> implements Prompt
                     console.log(Colorize.title('HEADERS:'));
                     console.log(Colorize.output(response.headers));
                 }
-                return { status: 'rate_limited', message: `The chat completion API returned a rate limit error.` }
+                return { status: 'rate_limited', error: new Error(`The chat completion API returned a rate limit error.`) }
             } else {
-                return { status: 'error', message: `The chat completion API returned an error status of ${response.status}: ${response.statusText}` };
+                return { status: 'error', error: new Error(`The chat completion API returned an error status of ${response.status}: ${response.statusText}`) };
             }
         }
     }

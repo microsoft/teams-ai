@@ -7,14 +7,14 @@
  */
 
 import { TurnContext } from "botbuilder";
-import { TurnState } from "../TurnState";
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 
-export interface PromptFunctions<TState extends TurnState = TurnState> {
+export interface PromptFunctions {
     hasFunction(name: string): boolean;
-    getFunction(name: string): PromptFunction<TState>;
-    invokeFunction(name: string, context: TurnContext, state: TState, tokenizer: Tokenizer, args: string[]): Promise<any>;
+    getFunction(name: string): PromptFunction;
+    invokeFunction(name: string, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: string[]): Promise<any>;
 }
 
-export type PromptFunction<TState extends TurnState = TurnState, TArgs = any> = (context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, args: TArgs) => Promise<any>;
+export type PromptFunction<TArgs = string[]> = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, args: TArgs) => Promise<any>;

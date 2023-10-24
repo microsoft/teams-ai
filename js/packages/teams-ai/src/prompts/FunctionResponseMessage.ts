@@ -12,13 +12,13 @@ import { RenderedPromptSection } from "./PromptSection";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { Utilities } from "../Utilities";
 import { TurnContext } from "botbuilder";
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * Message containing the response to a function call.
  */
-export class FunctionResponseMessage<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
+export class FunctionResponseMessage extends PromptSectionBase {
     private _text: string = '';
     private _length: number = -1;
 
@@ -38,7 +38,7 @@ export class FunctionResponseMessage<TState extends TurnState = TurnState> exten
         this.response = response;
     }
 
-    public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache response text and length
         if (this._length < 0) {
             this._text = Utilities.toString(tokenizer, this.response);

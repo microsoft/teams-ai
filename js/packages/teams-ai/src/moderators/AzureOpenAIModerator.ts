@@ -23,7 +23,7 @@ import {
     ContentSafetyHarmCategory,
     ContentSafetyOptions,
     ModerationSeverity
-} from '../OpenAIClients';
+} from '../internals';
 import { AI } from '../AI';
 import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
 

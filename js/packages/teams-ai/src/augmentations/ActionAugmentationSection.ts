@@ -8,16 +8,16 @@
 
 import { Message, PromptFunctions, RenderedPromptSection, PromptSectionBase } from "../prompts";
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
 import { ChatCompletionAction } from "../models";
 import { Schema } from "jsonschema";
 import { stringify } from "yaml";
+import { Memory } from "../MemoryFork";
 
 /**
  * Base class for all prompt augmentations.
  */
-export class ActionAugmentationSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
+export class ActionAugmentationSection extends PromptSectionBase {
     private readonly _text: string;
     private _tokens?: number[];
     private readonly _actions: Map<string, ChatCompletionAction> = new Map();
@@ -48,7 +48,7 @@ export class ActionAugmentationSection<TState extends TurnState = TurnState> ext
         return this._actions;
     }
 
-    public renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>> {
+    public renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>> {
         // Tokenize text on first use
         if (!this._tokens) {
             this._tokens = tokenizer.encode(this._text);

@@ -30,7 +30,7 @@ describe("ActionResponseValidator", () => {
     ];
     const valid_test_call: Message = {
         role: 'assistant',
-        content: null,
+        content: undefined,
         function_call: {
             name: 'test',
             arguments: '{"foo":"bar"}'
@@ -38,14 +38,14 @@ describe("ActionResponseValidator", () => {
     };
     const invalid_test_call: Message = {
         role: 'assistant',
-        content: null,
+        content: undefined,
         function_call: {
             name: 'test'
         }
     };
     const empty_call: Message = {
         role: 'assistant',
-        content: null,
+        content: undefined,
         function_call: {
             name: 'empty'
         }
@@ -56,7 +56,7 @@ describe("ActionResponseValidator", () => {
     };
     const invalid_action_call: Message = {
         role: 'assistant',
-        content: null,
+        content: undefined,
         function_call: {
             name: 'invalid'
         }

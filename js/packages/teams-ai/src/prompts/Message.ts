@@ -15,7 +15,7 @@ export interface Message<TContent = string> {
     /**
      * Text of the message.
      */
-    content: TContent|null;
+    content: TContent|undefined;
 
     /**
      * Optional. A named function to call.

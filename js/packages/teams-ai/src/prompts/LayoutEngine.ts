@@ -10,39 +10,39 @@ import { Message } from "./Message";
 import { PromptFunctions } from "./PromptFunctions";
 import { RenderedPromptSection, PromptSection } from "./PromptSection";
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * Base layout engine that renders a set of `auto`, `fixed`, or `proportional` length sections.
  * @remarks
  * This class is used internally by the `Prompt` and `GroupSection` classes to render their sections.
  */
-export class LayoutEngine<TState extends TurnState> implements PromptSection<TState> {
-    public readonly sections: PromptSection<TState>[];
+export class LayoutEngine implements PromptSection {
+    public readonly sections: PromptSection[];
     public readonly required: boolean;
     public readonly tokens: number;
     public readonly separator: string;
 
-    public constructor(sections: PromptSection<TState>[], tokens: number, required: boolean, separator: string) {
+    public constructor(sections: PromptSection[], tokens: number, required: boolean, separator: string) {
         this.sections = sections;
         this.required = required;
         this.tokens = tokens;
         this.separator = separator;
     }
 
-    public async renderAsText(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
         // Start a new layout
         // - Adds all sections from the current LayoutEngine hierarchy to a flat array
-        const layout: PromptSectionLayout<TState, string>[] = [];
+        const layout: PromptSectionLayout<string>[] = [];
         this.addSectionsToLayout(this.sections, layout);
 
         // Layout sections
         const remaining = await this.layoutSections(
             layout,
             maxTokens,
-            (section) => section.renderAsText(context, state, functions, tokenizer, maxTokens),
-            (section, remaining) => section.renderAsText(context, state, functions, tokenizer, remaining),
+            (section) => section.renderAsText(context, memory, functions, tokenizer, maxTokens),
+            (section, remaining) => section.renderAsText(context, memory, functions, tokenizer, remaining),
             true,
             tokenizer
         );
@@ -60,18 +60,18 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         return { output: text, length: tokenizer.encode(text).length, tooLong: remaining < 0 };
     }
 
-    public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Start a new layout
         // - Adds all sections from the current LayoutEngine hierarchy to a flat array
-        const layout: PromptSectionLayout<TState, Message[]>[] = [];
+        const layout: PromptSectionLayout<Message[]>[] = [];
         this.addSectionsToLayout(this.sections, layout);
 
         // Layout sections
         const remaining = await this.layoutSections(
             layout,
             maxTokens,
-            (section) => section.renderAsMessages(context, state, functions, tokenizer, maxTokens),
-            (section, remaining) => section.renderAsMessages(context, state, functions, tokenizer, remaining)
+            (section) => section.renderAsMessages(context, memory, functions, tokenizer, maxTokens),
+            (section, remaining) => section.renderAsMessages(context, memory, functions, tokenizer, remaining)
         );
 
         // Build output
@@ -86,7 +86,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         return { output: output, length: this.getLayoutLength(layout), tooLong: remaining < 0 };
     }
 
-    private addSectionsToLayout<T>(sections: PromptSection<TState>[], layout: PromptSectionLayout<TState, T>[]): void {
+    private addSectionsToLayout<T>(sections: PromptSection[], layout: PromptSectionLayout<T>[]): void {
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
             if (section instanceof LayoutEngine) {
@@ -98,10 +98,10 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
     }
 
     private async layoutSections<T>(
-        layout: PromptSectionLayout<TState, T>[],
+        layout: PromptSectionLayout<T>[],
         maxTokens: number,
-        cbFixed: (section: PromptSection<TState>) => Promise<RenderedPromptSection<T>>,
-        cbProportional: (section: PromptSection<TState>, remaining: number) => Promise<RenderedPromptSection<T>>,
+        cbFixed: (section: PromptSection) => Promise<RenderedPromptSection<T>>,
+        cbProportional: (section: PromptSection, remaining: number) => Promise<RenderedPromptSection<T>>,
         textLayout: boolean = false,
         tokenizer?: Tokenizer
     ): Promise<number> {
@@ -129,7 +129,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         return remaining;
     }
 
-    private async layoutFixedSections<T>(layout: PromptSectionLayout<TState, T>[], callback: (section: PromptSection<TState>) => Promise<RenderedPromptSection<T>>): Promise<void> {
+    private async layoutFixedSections<T>(layout: PromptSectionLayout<T>[], callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>): Promise<void> {
         const promises: Promise<RenderedPromptSection<T>>[] = [];
         for (let i = 0; i < layout.length; i++) {
             const section = layout[i];
@@ -141,7 +141,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         await Promise.all(promises);
     }
 
-    private async layoutProportionalSections<T>(layout: PromptSectionLayout<TState, T>[], callback: (section: PromptSection<TState>) => Promise<RenderedPromptSection<T>>): Promise<void> {
+    private async layoutProportionalSections<T>(layout: PromptSectionLayout<T>[], callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>): Promise<void> {
         const promises: Promise<RenderedPromptSection<T>>[] = [];
         for (let i = 0; i < layout.length; i++) {
             const section = layout[i];
@@ -153,7 +153,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         await Promise.all(promises);
     }
 
-    private getLayoutLength<T>(layout: PromptSectionLayout<TState, T>[], textLayout: boolean = false, tokenizer?: Tokenizer): number {
+    private getLayoutLength<T>(layout: PromptSectionLayout<T>[], textLayout: boolean = false, tokenizer?: Tokenizer): number {
         if (textLayout && tokenizer) {
             const output: string[] = [];
             for (let i = 0; i < layout.length; i++) {
@@ -176,7 +176,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         }
     }
 
-    private dropLastOptionalSection<T>(layout: PromptSectionLayout<TState, T>[]): boolean {
+    private dropLastOptionalSection<T>(layout: PromptSectionLayout<T>[]): boolean {
         for (let i = layout.length - 1; i >= 0; i--) {
             const section = layout[i];
             if (!section.section.required) {
@@ -188,7 +188,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
         return false;
     }
 
-    private needsMoreLayout<T>(layout: PromptSectionLayout<TState, T>[]): boolean {
+    private needsMoreLayout<T>(layout: PromptSectionLayout<T>[]): boolean {
         for (let i = 0; i < layout.length; i++) {
             const section = layout[i];
             if (!section.layout) {
@@ -200,7 +200,7 @@ export class LayoutEngine<TState extends TurnState> implements PromptSection<TSt
     }
 }
 
-interface PromptSectionLayout<TState extends TurnState, T> {
-    section: PromptSection<TState>;
+interface PromptSectionLayout<T> {
+    section: PromptSection;
     layout?: RenderedPromptSection<T>;
 }

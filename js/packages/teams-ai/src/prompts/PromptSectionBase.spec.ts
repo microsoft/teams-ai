@@ -10,13 +10,13 @@ import { RenderedPromptSection } from "./PromptSection";
 import { Message } from "./Message";
 
 
-export class TestSection extends PromptSectionBase<TurnState> {
+export class TestSection extends PromptSectionBase {
     public async renderAsMessages(context: TurnContext, state: TurnState, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         return this.returnMessages([{ role: 'test', content: 'Hello Big World' }], 3, tokenizer, maxTokens);
     }
 }
 
-export class MultiTestSection extends PromptSectionBase<TurnState> {
+export class MultiTestSection extends PromptSectionBase {
     public async renderAsMessages(context: TurnContext, state: TurnState, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         return this.returnMessages([{ role: 'test', content: 'Hello Big' },{ role: 'test', content: 'World' }], 3, tokenizer, maxTokens);
     }

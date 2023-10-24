@@ -10,13 +10,13 @@ import { Message } from "./Message";
 import { PromptFunctions } from "./PromptFunctions";
 import { PromptSection, RenderedPromptSection } from "./PromptSection";
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * Abstract Base class for most prompt sections.
  */
-export abstract class PromptSectionBase<TState extends TurnState> implements PromptSection<TState> {
+export abstract class PromptSectionBase implements PromptSection {
     public readonly required: boolean;
     public readonly tokens: number;
     public readonly separator: string;
@@ -36,9 +36,9 @@ export abstract class PromptSectionBase<TState extends TurnState> implements Pro
         this.textPrefix = textPrefix;
     }
 
-    public async renderAsText(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
         // Render as messages
-        const asMessages = await this.renderAsMessages(context, state, functions, tokenizer, maxTokens);
+        const asMessages = await this.renderAsMessages(context, memory, functions, tokenizer, maxTokens);
         if (asMessages.output.length === 0) {
             return { output: '', length: 0, tooLong: false };
         }
@@ -62,7 +62,7 @@ export abstract class PromptSectionBase<TState extends TurnState> implements Pro
         return { output: text, length: length, tooLong: length > maxTokens };
     }
 
-    public abstract renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    public abstract renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
 
     protected returnMessages(output: Message[], length: number, tokenizer: Tokenizer, maxTokens: number): RenderedPromptSection<Message[]> {
         // Truncate if fixed length

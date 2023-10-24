@@ -8,7 +8,6 @@
 
 import { PromptFunctions, PromptFunction } from "./PromptFunctions";
 import { PromptTemplate } from "./PromptTemplate";
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
 import { TurnContext } from "botbuilder";
 import * as fs from 'fs/promises';
@@ -17,7 +16,13 @@ import { TemplateSection } from "./TemplateSection";
 import { CompletionConfig } from "./PromptTemplate";
 import { DataSource } from "../dataSources";
 import { PromptSection } from "./PromptSection";
-//import { DataSourceSection } from "./DataSourceSection";
+import { Memory } from "../MemoryFork";
+import { DataSourceSection } from "./DataSourceSection";
+import { FunctionsAugmentation, MonologueAugmentation, SequenceAugmentation } from "../augmentations";
+import { ConversationHistory } from "./ConversationHistory";
+import { UserMessage } from "./UserMessage";
+import { GroupSection } from "./GroupSection";
+import { Prompt } from "./Prompt";
 
 /**
  * Options used to configure the prompt manager.
@@ -29,9 +34,68 @@ export interface PromptManagerOptions {
     promptsFolder: string;
 
     /**
-     * Optional. Message role to use for loaded prompts. Defaults to 'system'.
+     * Optional. Message role to use for loaded prompts.
+     * @remarks
+     * Defaults to 'system'.
      */
     role?: string;
+
+    /**
+     * Optional. Maximum number of tokens to of conversation history to include in prompts.
+     * @remarks
+     * The default is to let conversation history consume the remainder of the prompts
+     * `max_input_tokens` budget. Setting this a value greater then 1 will override that and
+     * all prompts will use a fixed token budget.
+     */
+    max_conversation_history_tokens?: number;
+
+    /**
+     * Optional. Maximum number of messages to use when rendering conversation_history.
+     * @remarks
+     * This controls the automatic pruning of the conversation history that's done by the planners
+     * LLMClient instance. This helps keep your memory from getting too big and defaults to a value
+     * of `10` (or 5 turns.)
+     */
+    max_history_messages?: number;
+
+    /**
+     * Optional. Maximum number of tokens user input to include in prompts.
+     * @remarks
+     * This defaults to unlimited but can set to a value greater then `1` to limit the length of
+     * user input included in prompts. For example, if set to `100` then the any user input over
+     * 100 tokens in length will be truncated.
+     */
+    max_input_tokens?: number;
+}
+
+/**
+ * The configured PromptManager options.
+ */
+export interface ConfiguredPromptManagerOptions {
+    /**
+     * Path to the filesystem folder containing all the applications prompts.
+     */
+    promptsFolder: string;
+
+    /**
+     * Message role to use for loaded prompts.
+     */
+    role: string;
+
+    /**
+     * Maximum number of tokens to of conversation history to include in prompts.
+     */
+    max_conversation_history_tokens: number;
+
+    /**
+     * Maximum number of messages to use when rendering conversation_history.
+     */
+    max_history_messages: number;
+
+    /**
+     * Maximum number of tokens user input to include in prompts.
+     */
+    max_input_tokens: number;
 }
 
 /**
@@ -50,18 +114,27 @@ export interface PromptManagerOptions {
  * registered with the prompt manager.
  * @template TState Optional. Type of the applications turn state.
  */
-export class PromptManager<TState extends TurnState = TurnState> implements PromptFunctions<TState> {
-    private readonly _options: PromptManagerOptions;
-    private readonly _dataSources: Map<string, DataSource<TState>> = new Map();
-    private readonly _functions: Map<string, PromptFunction<TState>> = new Map();
-    private readonly _prompts: Map<string, PromptTemplate<TState>> = new Map();
+export class PromptManager implements PromptFunctions {
+    private readonly _options: ConfiguredPromptManagerOptions;
+    private readonly _dataSources: Map<string, DataSource> = new Map();
+    private readonly _functions: Map<string, PromptFunction> = new Map();
+    private readonly _prompts: Map<string, PromptTemplate> = new Map();
 
     /**
      * Creates a new 'PromptManager' instance.
      * @param options Options used to configure the prompt manager.
      */
     public constructor(options: PromptManagerOptions) {
-        this._options = Object.assign({}, options);
+        this._options = Object.assign({
+            role: 'system',
+            max_conversation_history_tokens: 1.0,
+            max_history_messages: 10,
+            max_input_tokens: -1
+        }, options as ConfiguredPromptManagerOptions);
+    }
+
+    public get options(): ConfiguredPromptManagerOptions {
+        return this._options;
     }
 
     /**
@@ -69,7 +142,7 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * @param dataSource Data source to add.
      * @returns The prompt manager for chaining.
      */
-    public addDataSource(dataSource: DataSource<TState>): this {
+    public addDataSource(dataSource: DataSource): this {
         if (this._dataSources.has(dataSource.name)) {
             throw new Error(`DataSource '${dataSource.name}' already exists.`);
         }
@@ -84,7 +157,7 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * @param name Name of the data source to lookup.
      * @returns The data source.
      */
-    public getDataSource(name: string): DataSource<TState> {
+    public getDataSource(name: string): DataSource {
         const dataSource = this._dataSources.get(name);
         if (!dataSource) {
             throw new Error(`DataSource '${name}' not found.`);
@@ -108,7 +181,7 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * @param fn Function to add.
      * @returns The prompt manager for chaining.
      */
-    public addFunction(name: string, fn: PromptFunction<TState>): this {
+    public addFunction(name: string, fn: PromptFunction): this {
         if (this._functions.has(name)) {
             throw new Error(`Function '${name}' already exists.`);
         }
@@ -123,7 +196,7 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * @param name Name of the function to lookup.
      * @returns The function.
      */
-    public getFunction(name: string): PromptFunction<TState> {
+    public getFunction(name: string): PromptFunction {
         const fn = this._functions.get(name);
         if (!fn) {
             throw new Error(`Function '${name}' not found.`);
@@ -145,14 +218,14 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * Invokes a prompt template function by name.
      * @param name Name of the function to invoke.
      * @param context Turn context for the current turn of conversation with the user.
-     * @param state Turn state for the current turn of conversation with the user.
+     * @param memory An interface for accessing state values.
      * @param tokenizer Tokenizer to use when rendering the prompt.
      * @param args Arguments to pass to the function.
      * @returns Value returned by the function.
      */
-    public invokeFunction(name: string, context: TurnContext, state: TState, tokenizer: Tokenizer, args: string[]): Promise<any> {
+    public invokeFunction(name: string, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: string[]): Promise<any> {
         const fn = this.getFunction(name);
-        return fn(context, state as any, this as any, tokenizer, args);
+        return fn(context, memory as any, this as any, tokenizer, args);
     }
 
     /**
@@ -160,7 +233,7 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * @param prompt Prompt template to add.
      * @returns The prompt manager for chaining.
      */
-    public addPrompt(prompt: PromptTemplate<TState>): this {
+    public addPrompt(prompt: PromptTemplate): this {
         if (this._prompts.has(prompt.name)) {
             throw new Error(
                 `The PromptManager.addPrompt() method was called with a previously registered prompt named "${name}".`
@@ -183,9 +256,9 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
      * @param name Name of the prompt to load.
      * @returns The loaded and parsed prompt template.
      */
-    public async getPrompt(name: string): Promise<PromptTemplate<TState>> {
+    public async getPrompt(name: string): Promise<PromptTemplate> {
         if (!this._prompts.has(name)) {
-            const template = { name } as PromptTemplate<TState>;
+            const template = { name } as PromptTemplate;
 
             // Load template from disk
             const folder = path.join(this._options.promptsFolder, name);
@@ -205,7 +278,7 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
             }
 
             // Load prompt text
-            const sections: PromptSection[] = [];
+            let sections: PromptSection[] = [];
             try {
                 // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const role = this._options.role || 'system';
@@ -230,6 +303,25 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
             this.updateConfig(template);
 
             // Add augmentations
+            this.appendAugmentations(template, sections);
+
+            // Group everything into a system message
+            sections = [new GroupSection(sections, 'system')];
+
+            // Include conversation history
+            // - The ConversationHistory section will use the remaining tokens from
+            //   max_input_tokens.
+            if (template.config.completion.include_history) {
+                sections.push(new ConversationHistory(`conversation.${template.name}_history`, this.options.max_conversation_history_tokens));
+            }
+
+            // Include user input
+            if (template.config.completion.include_input) {
+                sections.push(new UserMessage('{{$temp.input}}', this.options.max_input_tokens));
+            }
+
+            // Create prompt
+            template.prompt = new Prompt(sections);
 
             // Cache loaded template
             this._prompts.set(name, template);
@@ -260,11 +352,12 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
         return true;
     }
 
-    private updateConfig(template: PromptTemplate<TState>): void {
+    private updateConfig(template: PromptTemplate): void {
         // Set config defaults
         template.config.completion = Object.assign({
             frequency_penalty: 0.0,
             include_history: true,
+            include_input: true,
             max_tokens: 150,
             max_input_tokens: 2048,
             presence_penalty: 0.0,
@@ -281,25 +374,50 @@ export class PromptManager<TState extends TurnState = TurnState> implements Prom
         }
     }
 
-    // private appendAugmentations(template: PromptTemplate<TState>, sections: PromptSection[]): void {
-    //     // Check for augmentation
-    //     const augmentation = template.config.augmentation;
-    //     if (augmentation) {
-    //         // First append data sources
-    //         for (const source in augmentation.data_sources ?? {}) {
+    private appendAugmentations(template: PromptTemplate, sections: PromptSection[]): void {
+        // Check for augmentation
+        const augmentation = template.config.augmentation;
+        if (augmentation) {
+            // First append data sources
+            // - We're using a minimum of 2 tokens for each data source to prevent
+            //   any sort of prompt rendering conflicts between sources and conversation history.
+            // - If we wanted to let users specify a percentage% for a data source we would need
+            //   to track the percentage they gave the data source(s) and give the remaining to
+            //   the ConversationHistory section.
+            const data_sources = augmentation.data_sources ?? {};
+            for (const name in data_sources) {
+                if (!this.hasDataSource(name)) {
+                    throw new Error(`DataSource '${name}' not found for prompt '${template.name}'.`);
+                }
+                const dataSource = this.getDataSource(name);
+                const tokens = Math.max(data_sources[name], 2);
+                sections.push(new DataSourceSection(dataSource, tokens));
+            }
 
-    //         }
+            // Next create augmentation
+            switch (augmentation.augmentation_type) {
+                default:
+                case 'none':
+                    // No augmentation needed
+                    break;
+                case 'functions':
+                    template.augmentation = new FunctionsAugmentation(template.actions ?? []);
+                    break;
+                case 'monologue':
+                    template.augmentation = new MonologueAugmentation(template.actions ?? []);
+                    break;
+                case 'sequence':
+                    template.augmentation = new SequenceAugmentation(template.actions ?? []);
+                    break;
+            }
 
-    //         // Finally append augmentation
-    //         switch (augmentation.augmentation_type) {
-    //             default:
-    //             case 'none':
-    //             case 'functions':
-    //                 // No augmentation needed
-    //                 break;
-
-
-    //         }
-    //     }
-    // }
+            // Append the augmentations prompt section
+            if (template.augmentation) {
+                const section = template.augmentation.createPromptSection();
+                if (section) {
+                    sections.push(section);
+                }
+            }
+        }
+    }
 }

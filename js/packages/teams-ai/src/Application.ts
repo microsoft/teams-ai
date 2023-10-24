@@ -515,8 +515,7 @@ export class Application<TState extends TurnState = TurnState> {
 
                 // Call AI module if configured
                 if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
-                    // Begin a new chain of AI calls
-                    await this._ai.chain(context, state);
+                    await this._ai.run(context, state);
 
                     // Call afterTurn event handlers
                     if (await this.callEventHandlers(context, state, this._afterTurn)) {
@@ -526,6 +525,12 @@ export class Application<TState extends TurnState = TurnState> {
 
                     // End dispatch
                     return true;
+                }
+
+                // Call afterTurn event handlers
+                if (await this.callEventHandlers(context, state, this._afterTurn)) {
+                    // Save turn state
+                    await state.save(context, storage);
                 }
 
                 // activity wasn't handled
@@ -750,7 +755,7 @@ export class Application<TState extends TurnState = TurnState> {
  * A builder class for simplifying the creation of an Application instance.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
-export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
+export class ApplicationBuilder<TState extends TurnState = TurnState> {
     private _options: Partial<ApplicationOptions<TState>> = {};
 
     /**
@@ -790,16 +795,6 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      */
     public withAIOptions(aiOptions: AIOptions<TState>): this {
         this._options.ai = aiOptions;
-        return this;
-    }
-
-    /**
-     * Configures the turn state manager to use for managing the bot's turn state.
-     * @param {TurnStateManager<TState>} turnStateManager The turn state manager to use.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withTurnStateManager(turnStateManager: TurnStateManager<TState>): this {
-        this._options.turnStateManager = turnStateManager;
         return this;
     }
 

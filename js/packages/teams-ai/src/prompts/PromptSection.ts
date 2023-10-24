@@ -7,12 +7,12 @@
  */
 
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
 import { Tokenizer } from '../tokenizers';
 import { PromptFunctions } from './PromptFunctions';
 import { Message } from './Message';
+import { Memory } from '../MemoryFork';
 
-export interface PromptSection<TState extends TurnState = TurnState> {
+export interface PromptSection {
     /**
      * If true the section is mandatory otherwise it can be safely dropped.
      */
@@ -28,22 +28,22 @@ export interface PromptSection<TState extends TurnState = TurnState> {
     /**
      * Renders the section as a string of text.
      * @param context Context for the current turn of conversation with the user.
-     * @param state Current turn state.
+     * @param memory An interface for accessing state values.
      * @param functions Registry of functions that can be used by the section.
      * @param tokenizer Tokenizer to use when rendering the section.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      */
-    renderAsText(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
 
     /**
      * Renders the section as a list of messages.
      * @param context Context for the current turn of conversation with the user.
-     * @param state Current turn state.
+     * @param memory An interface for accessing state values.
      * @param functions Registry of functions that can be used by the section.
      * @param tokenizer Tokenizer to use when rendering the section.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      */
-    renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
 }
 
 export interface RenderedPromptSection<T> {

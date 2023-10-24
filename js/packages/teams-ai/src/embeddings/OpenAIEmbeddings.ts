@@ -1,7 +1,15 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { EmbeddingsModel, EmbeddingsResponse } from "./ai/types";
-import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "./internals";
-import { Colorize } from "./internals";
+import { EmbeddingsModel, EmbeddingsResponse } from "./EmbeddingsModel";
+import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "../internals";
+import { Colorize } from "../internals";
 
 export interface BaseOpenAIEmbeddingsOptions {
     /**

@@ -7,33 +7,29 @@
  */
 
 import { TurnContext } from "botbuilder-core";
-import { TurnState } from "../TurnState";
-import { PromptResponseValidator, Validation } from "../validators";
+import { PromptResponseValidator } from "../validators";
 import { Plan } from "../planners";
 import { PromptSection } from "../prompts";
+import { Memory } from "../MemoryFork";
+import { PromptResponse } from "../models";
 
-export interface Augmentation<TState extends TurnState = TurnState, TValue = any> extends PromptResponseValidator<TState, TValue> {
+export interface Augmentation<TValue = any> extends PromptResponseValidator<TValue> {
     /**
      * Creates an optional prompt section for the augmentation.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
      */
-    createPromptSection(
-        context: TurnContext,
-        state: TState,
-    ): Promise<PromptSection|undefined>;
+    createPromptSection(): PromptSection|undefined;
 
     /**
      * Creates a plan given validated response value.
      * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param validation The validation that was performed.
+     * @param memory An interface for accessing state variables.
+     * @param response The validated and transformed response for the prompt.
      * @returns The created plan.
      */
     createPlanFromResponse(
         context: TurnContext,
-        state: TState,
-        validation: Validation<TValue>,
+        memory: Memory,
+        response: PromptResponse<TValue>
     ): Promise<Plan>;
 
 }

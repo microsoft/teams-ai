@@ -2,9 +2,9 @@ import { TurnContext } from "botbuilder";
 import { ChatCompletionAction, PromptResponse } from "../models";
 import { JSONResponseValidator } from "./JSONResponseValidator";
 import { PromptResponseValidator, Validation } from "./PromptResponseValidator";
-import { TurnState } from "../TurnState";
 import { Tokenizer } from "../tokenizers";
 import { Message } from "../prompts";
+import { Memory } from "../MemoryFork";
 
 export interface ValidatedChatCompletionAction {
     name: string;
@@ -17,7 +17,7 @@ export interface ValidatedChatCompletionAction {
  * @remarks
  *
  */
-export class ActionResponseValidator<TState extends TurnState = TurnState> implements PromptResponseValidator<TState> {
+export class ActionResponseValidator implements PromptResponseValidator<ValidatedChatCompletionAction|undefined> {
     private readonly _actions: Map<string, ChatCompletionAction> = new Map();
     private readonly _isRequired: boolean;
     private readonly _noun: string;
@@ -51,13 +51,13 @@ export class ActionResponseValidator<TState extends TurnState = TurnState> imple
     /**
      * Validates a response to a prompt.
      * @param context Context for the current turn of conversation with the user.
-     * @param state State for the current turn of conversation with the user.
+     * @param memory An interface for accessing state values.
      * @param tokenizer Tokenizer to use for encoding and decoding text.
      * @param response Response to validate.
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public async validateResponse(context: TurnContext, state: TState, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<ValidatedChatCompletionAction|null>> {
+    public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<ValidatedChatCompletionAction|undefined>> {
         if (typeof response.message == 'object' && response.message.function_call) {
             // Ensure name is specified
             const function_call = response.message.function_call;
@@ -87,11 +87,11 @@ export class ActionResponseValidator<TState extends TurnState = TurnState> imple
                     `No arguments were sent with called ${this._noun}. Call the "${function_call.name}" ${this._noun} with required arguments as a valid JSON object.`,
                     `The ${this._noun} arguments had errors. Apply these fixes and call "${function_call.name}" ${this._noun} again:`
                 );
-                const args = function_call.arguments === '{}' ? null : function_call.arguments ?? '{}'
+                const args = function_call.arguments === '{}' ? undefined : function_call.arguments ?? '{}'
                 const message: Message = { role: 'assistant', content: args };
-                const result = await validator.validateResponse(context, state, tokenizer, { status: 'success', message }, remaining_attempts);
+                const result = await validator.validateResponse(context, memory, tokenizer, { status: 'success', message }, remaining_attempts);
                 if (!result.valid) {
-                    return result as Validation<ValidatedChatCompletionAction|null>;
+                    return result as Validation<ValidatedChatCompletionAction|undefined>;
                 } else {
                     parameters = result.value!;
                 }

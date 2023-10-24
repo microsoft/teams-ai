@@ -1,4 +1,12 @@
-import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "../models/ChatCompletionAction";
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "./EmbeddingsModel";
 
 /**
  * A test model that can be used to test the prompt completion system.

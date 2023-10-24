@@ -11,8 +11,8 @@ import { PromptFunctions } from "./PromptFunctions";
 import { RenderedPromptSection } from "./PromptSection";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { TurnContext } from "botbuilder";
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * An `assistant` message containing a function to call.
@@ -20,7 +20,7 @@ import { Tokenizer } from "../tokenizers";
  * The function call information is returned by the model so we use an "assistant" message to
  * represent it in conversation history.
  */
-export class FunctionCallMessage<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
+export class FunctionCallMessage extends PromptSectionBase {
     private _length: number = -1;
 
     public readonly function_call: FunctionCall;
@@ -36,13 +36,13 @@ export class FunctionCallMessage<TState extends TurnState = TurnState> extends P
         this.function_call = function_call;
     }
 
-    public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache response text and length
         if (this._length < 0) {
             this._length = tokenizer.encode(JSON.stringify(this.function_call)).length;
         }
 
         // Return output
-        return this.returnMessages([{ role: 'assistant', content: null, function_call: this.function_call }], this._length, tokenizer, maxTokens);
+        return this.returnMessages([{ role: 'assistant', content: undefined, function_call: this.function_call }], this._length, tokenizer, maxTokens);
     }
 }

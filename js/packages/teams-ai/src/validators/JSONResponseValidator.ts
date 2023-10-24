@@ -1,16 +1,16 @@
 import { TurnContext } from "botbuilder";
-import { TurnState } from "../TurnState";
 import { Tokenizer } from "../tokenizers";
 import { PromptResponse } from "../models";
 import { Validation, PromptResponseValidator } from "./PromptResponseValidator";
 import { Validator, Schema, ValidationError } from "jsonschema";
 import { Response } from "./Response";
+import { Memory } from "../MemoryFork";
 
 /**
  * Parses any JSON returned by the model and optionally verifies it against a JSON schema.
  * @template TContent Optional. Type of the content of the message. Defaults to `Record<string, any>`.
  */
-export class JSONResponseValidator<TState extends TurnState = TurnState, TValue = Record<string, any>> implements PromptResponseValidator<TState> {
+export class JSONResponseValidator<TValue = Record<string, any>> implements PromptResponseValidator<TValue|undefined> {
 
     /**
      * Creates a new `JSONResponseValidator` instance.
@@ -33,15 +33,15 @@ export class JSONResponseValidator<TState extends TurnState = TurnState, TValue 
     /**
      * Validates a response to a prompt.
      * @param context Context for the current turn of conversation with the user.
-     * @param state State for the current turn of conversation with the user.
+     * @param memory An interface for accessing state values.
      * @param tokenizer Tokenizer to use for encoding and decoding text.
      * @param response Response to validate.
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public validateResponse(context: TurnContext, state: TState, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue|null>> {
-        const message = response.message;
-        const text = typeof message === 'string' ? message : message.content ?? '';
+    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue|undefined>> {
+        const message = response.message!;
+        const text = message.content ?? '';
 
         // Parse the response text
         const parsed = Response.parseAllObjects(text);

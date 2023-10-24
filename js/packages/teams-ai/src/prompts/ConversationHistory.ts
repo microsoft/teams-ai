@@ -12,13 +12,13 @@ import { RenderedPromptSection } from "./PromptSection";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { Utilities } from "../Utilities";
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * A section that renders the conversation history.
  */
-export class ConversationHistory<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
+export class ConversationHistory extends PromptSectionBase {
     public readonly variable: string;
     public readonly userPrefix: string;
     public readonly assistantPrefix: string;
@@ -38,9 +38,9 @@ export class ConversationHistory<TState extends TurnState = TurnState> extends P
         this.assistantPrefix = assistantPrefix;
     }
 
-    public async renderAsText(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
       // Get messages from memory
-      const history: Message[] = (state.getValue<Message[]>(this.variable) ?? []).slice();
+      const history: Message[] = (memory.getValue<Message[]>(this.variable) ?? []).slice();
 
       // Populate history and stay under the token budget
       let tokens = 0;
@@ -74,9 +74,9 @@ export class ConversationHistory<TState extends TurnState = TurnState> extends P
       return { output: lines.join(this.separator), length: tokens, tooLong: tokens > maxTokens };
    }
 
-    public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Get messages from memory
-        const history: Message[] = (state.getValue<Message[]>(this.variable) ?? []).slice();
+        const history: Message[] = (memory.getValue<Message[]>(this.variable) ?? []).slice();
 
         // Populate messages and stay under the token budget
         let tokens = 0;

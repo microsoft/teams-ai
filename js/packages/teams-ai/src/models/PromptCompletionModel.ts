@@ -1,22 +1,30 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import { TurnContext } from 'botbuilder-core';
-import { TurnState } from '../TurnState';
 import { Message, PromptFunctions, PromptTemplate } from '../prompts';
 import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * An AI model that can be used to complete prompts.
  */
-export interface PromptCompletionModel<TState extends TurnState = TurnState> {
+export interface PromptCompletionModel {
     /**
      * Completes a prompt.
      * @param context Current turn context.
-     * @param state Current turn state.
+     * @param memory An interface for accessing state values.
      * @param functions Functions to use when rendering the prompt.
      * @param tokenizer Tokenizer to use when rendering the prompt.
      * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    completePrompt(context: TurnContext, state: TState, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse>;
+    completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>>;
 }
 
 /**
@@ -45,5 +53,10 @@ export interface PromptResponse<TContent = unknown> {
      * @remarks
      * This will be a `Message<TContent>` object if the status is `success`, otherwise it will be a `string`.
      */
-    message: Message<TContent>|string;
+    message?: Message<TContent>;
+
+    /**
+     * Error returned.
+     */
+    error?: Error;
 }

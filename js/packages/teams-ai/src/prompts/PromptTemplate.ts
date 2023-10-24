@@ -6,14 +6,14 @@
  * Licensed under the MIT License.
  */
 
-import { TurnState } from "../TurnState";
 import { PromptSection } from "./PromptSection";
 import { ChatCompletionAction } from '../models';
+import { Augmentation } from "../augmentations";
 
 /**
  * Prompt template cached by the prompt manager.
  */
-export interface PromptTemplate<TState extends TurnState = TurnState> {
+export interface PromptTemplate {
     /**
      * Name of the prompt template.
      */
@@ -22,7 +22,7 @@ export interface PromptTemplate<TState extends TurnState = TurnState> {
     /**
      * Text of the prompt template.
      */
-    prompt: PromptSection<TState>;
+    prompt: PromptSection;
 
     /**
      * Configuration settings for the prompt template.
@@ -33,6 +33,11 @@ export interface PromptTemplate<TState extends TurnState = TurnState> {
      * Optional list of actions the model may generate JSON inputs for.
      */
     actions?: ChatCompletionAction[];
+
+    /**
+     * Optional augmentation for the prompt template.
+     */
+    augmentation?: Augmentation;
 }
 
 /**
@@ -100,6 +105,14 @@ export interface CompletionConfig {
      * Defaults to true.
      */
     include_history: boolean;
+
+    /**
+     * If true, the prompt will be augmented with the users input.
+     * @remarks
+     * New in schema version 1.1.
+     * Defaults to true.
+     */
+    include_input: boolean;
 
     /**
      * The maximum number of tokens to generate.

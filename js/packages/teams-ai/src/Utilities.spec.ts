@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { Utilities } from "./Utilities";
-import { GPT3Tokenizer } from "./prompts/GPT3Tokenizer";
+import { GPT3Tokenizer } from "./tokenizers";
 
 describe("Utilities", () => {
     const tokenizer = new GPT3Tokenizer();

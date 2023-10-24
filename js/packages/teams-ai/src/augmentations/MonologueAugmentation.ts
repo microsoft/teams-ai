@@ -7,7 +7,6 @@
  */
 
 import { TurnContext } from "botbuilder-core";
-import { TurnState } from "../TurnState";
 import { ChatCompletionAction, PromptResponse } from "../models";
 import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from "../planners";
 import { Tokenizer } from "../tokenizers";
@@ -16,6 +15,7 @@ import { Augmentation } from "./Augmentation";
 import { ActionAugmentationSection } from "./ActionAugmentationSection";
 import { Schema } from "jsonschema";
 import { Message, PromptSection } from "../prompts";
+import { Memory } from "../MemoryFork";
 
 export interface InnerMonologue {
     thoughts: {
@@ -53,16 +53,14 @@ export const InnerMonologueSchema: Schema = {
     required: ["thoughts", "action"]
 };
 
-export class MonologueAugmentation<TState extends TurnState = TurnState>
-    implements Augmentation<TState, InnerMonologue|null>
-{
-    private readonly _section: ActionAugmentationSection<TState>;
-    private readonly _monologueValidator: JSONResponseValidator<TState, InnerMonologue> = new JSONResponseValidator(InnerMonologueSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
-    private readonly _actionValidator: ActionResponseValidator<TState>;
+export class MonologueAugmentation implements Augmentation<InnerMonologue|undefined> {
+    private readonly _section: ActionAugmentationSection;
+    private readonly _monologueValidator: JSONResponseValidator<InnerMonologue> = new JSONResponseValidator(InnerMonologueSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
+    private readonly _actionValidator: ActionResponseValidator;
 
     public constructor(actions: ChatCompletionAction[]) {
         actions = appendSAYAction(actions);
-        this._section = new ActionAugmentationSection<TState>(actions, [
+        this._section = new ActionAugmentationSection(actions, [
             `Return a JSON object with your thoughts and the next action to perform.`,
             `Only respond with the JSON format below and base your plan on the actions above.`,
             `Response Format:`,
@@ -71,13 +69,13 @@ export class MonologueAugmentation<TState extends TurnState = TurnState>
         this._actionValidator = new ActionResponseValidator(actions, true);
     }
 
-    public createPromptSection(context: TurnContext, state: TState): Promise<PromptSection|undefined> {
-        return Promise.resolve(this._section);
+    public createPromptSection(): PromptSection|undefined {
+        return this._section;
     }
 
-    public async validateResponse(context: TurnContext, state: TState, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue|null>> {
+    public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue|undefined>> {
         // Validate that we got a well-formed inner monologue
-        const validationResult = await this._monologueValidator.validateResponse(context, state, tokenizer, response, remaining_attempts);
+        const validationResult = await this._monologueValidator.validateResponse(context, memory, tokenizer, response, remaining_attempts);
         if (!validationResult.valid) {
             return validationResult;
         }
@@ -85,8 +83,8 @@ export class MonologueAugmentation<TState extends TurnState = TurnState>
         // Validate that the action exists and its parameters are valid
         const monologue = validationResult.value as InnerMonologue;
         const parameters = JSON.stringify(monologue.action.parameters ?? {});
-        const message: Message = { role: 'assistant', content: null, function_call: { name: monologue.action.name, arguments: parameters } };
-        const actionValidation = await this._actionValidator.validateResponse(context, state, tokenizer, { status: 'success', message }, remaining_attempts);
+        const message: Message = { role: 'assistant', content: undefined, function_call: { name: monologue.action.name, arguments: parameters } };
+        const actionValidation = await this._actionValidator.validateResponse(context, memory, tokenizer, { status: 'success', message }, remaining_attempts);
         if (!actionValidation.valid) {
             return actionValidation as any;
         }
@@ -95,10 +93,10 @@ export class MonologueAugmentation<TState extends TurnState = TurnState>
         return validationResult;
     }
 
-    public createPlanFromResponse(context: TurnContext, state: TState, validation: Validation<InnerMonologue|null>): Promise<Plan> {
+    public createPlanFromResponse(context: TurnContext, memory: Memory, response: PromptResponse<InnerMonologue|undefined>): Promise<Plan> {
         // Identify the action to perform
         let command: PredictedCommand;
-        const monologue = validation.value as InnerMonologue;
+        const monologue = response.message!.content as InnerMonologue;
         if (monologue.action.name == 'SAY') {
             command = {
                 type: 'SAY',

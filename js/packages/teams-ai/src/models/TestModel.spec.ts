@@ -19,6 +19,7 @@ describe("TestModel", () => {
             completion: {
                 frequency_penalty: 0,
                 include_history: true,
+                include_input: true,
                 max_input_tokens: 100,
                 max_tokens: 100,
                 presence_penalty: 0,
@@ -36,9 +37,9 @@ describe("TestModel", () => {
         });
 
         it("should create a TestModel with custom params", () => {
-            const client = new TestModel('error', 'Hello Error');
+            const client = new TestModel('error', { role: 'assistant', content: 'Hello Error' });
             assert.equal(client.status, 'error');
-            assert.equal(client.response, 'Hello Error');
+            assert.equal(client.response, { role: 'assistant', content: 'Hello Error' });
         });
     });
 

@@ -7,10 +7,10 @@
  */
 
 import { TurnContext } from "botbuilder";
-import { TurnState, DefaultConversationState, DefaultUserState, DefaultTempState } from "../TurnState";
 import { RenderedPromptSection } from "../prompts";
 import { Tokenizer } from "../tokenizers";
 import { DataSource } from "./DataSource";
+import { Memory } from "../MemoryFork";
 
 export class TextDataSource implements DataSource {
     private readonly _name: string;
@@ -26,7 +26,7 @@ export class TextDataSource implements DataSource {
         return this._name;
     }
 
-    public renderData(context: TurnContext, state: TurnState<DefaultConversationState, DefaultUserState, DefaultTempState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
         // Tokenize text on first use
         if (!this._tokens) {
             this._tokens = tokenizer.encode(this._text);

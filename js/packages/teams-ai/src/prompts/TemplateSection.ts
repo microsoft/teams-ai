@@ -12,8 +12,8 @@ import { RenderedPromptSection } from "./PromptSection";
 import { PromptSectionBase } from "./PromptSectionBase";
 import { Utilities } from "../Utilities";
 import { TurnContext } from 'botbuilder';
-import { TurnState } from '../TurnState';
 import { Tokenizer } from "../tokenizers";
+import { Memory } from "../MemoryFork";
 
 /**
  * A template section that will be rendered as a message.
@@ -29,8 +29,8 @@ import { Tokenizer } from "../tokenizers";
  *
  * Function arguments are optional and separated by spaces. They can be quoted using `'`, `"`, or `\`` delimiters.
  */
-export class TemplateSection<TState extends TurnState = TurnState> extends PromptSectionBase<TState> {
-    private _parts: PartRenderer<TState>[] = [];
+export class TemplateSection extends PromptSectionBase {
+    private _parts: PartRenderer[] = [];
 
     public readonly template: string;
     public readonly role: string;
@@ -51,9 +51,9 @@ export class TemplateSection<TState extends TurnState = TurnState> extends Promp
         this.parseTemplate();
     }
 
-    public async renderAsMessages(context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Render parts in parallel
-        const renderedParts = await Promise.all(this._parts.map((part) => part(context, state, functions, tokenizer, maxTokens)));
+        const renderedParts = await Promise.all(this._parts.map((part) => part(context, memory, functions, tokenizer, maxTokens)));
 
         // Join all parts
         const text = renderedParts.join('');
@@ -126,20 +126,20 @@ export class TemplateSection<TState extends TurnState = TurnState> extends Promp
         }
     }
 
-    private createTextRenderer(text: string): PartRenderer<TState> {
-        return (context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
+    private createTextRenderer(text: string): PartRenderer {
+        return (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
             return Promise.resolve(text);
         };
     }
 
-    private createVariableRenderer(name: string): PartRenderer<TState> {
-        return (context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
-            const value = state.getValue(name);
+    private createVariableRenderer(name: string): PartRenderer {
+        return (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
+            const value = memory.getValue(name);
             return Promise.resolve(Utilities.toString(tokenizer, value));
         };
     }
 
-    private createFunctionRenderer(param: string): PartRenderer<TState> {
+    private createFunctionRenderer(param: string): PartRenderer {
         let name = '';
         let args: string[] = [];
         function savePart() {
@@ -186,14 +186,14 @@ export class TemplateSection<TState extends TurnState = TurnState> extends Promp
         savePart();
 
         // Return renderer
-        return async (context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
-            const value = await functions.invokeFunction(name, context, state, tokenizer, args);
+        return async (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
+            const value = await functions.invokeFunction(name, context, memory, tokenizer, args);
             return Utilities.toString(tokenizer, value);
         };
     }
 }
 
-type PartRenderer<TState extends TurnState> = (context: TurnContext, state: TState, functions: PromptFunctions<TState>, tokenizer: Tokenizer, maxTokens: number) => Promise<string>;
+type PartRenderer = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number) => Promise<string>;
 
 enum ParseState {
     inText,

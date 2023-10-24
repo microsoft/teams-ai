@@ -17,6 +17,13 @@ describe("JSONResponseValidator", () => {
         },
         required: ["foo"]
     };
+    const message = { role: 'assstant', content: '{"foo":"bar"}' };
+    const emptyMessage = { role: 'assstant', content: '' };
+    const nullMessage = { role: 'assstant', content: undefined };
+    const invalidMessage = { role: 'assstant', content:  '{"foo":7}' };
+    const multiMessage = { role: 'assstant', content: '{"foo":"taco"}\n{"foo":"bar"}' };
+    const invalidMultiMessage = { role: 'assstant', content: '{"foo":1}\n{"foo":"bar"}\n{"foo":3}' };
+    const invalidMultiMessage2 = { role: 'assstant', content: '{"bar":"foo"}\n{"foo":3}' };
 
     describe("constructor", () => {
         it("should create a JSONResponseValidator", () => {
@@ -35,7 +42,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator();
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '{"foo":"bar"}' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, true);
                 assert.deepEqual(response.value, { foo: 'bar' });
@@ -46,7 +53,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator();
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assstant', content: '{"foo":"bar"}' } }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, true);
                 assert.deepEqual(response.value, { foo: 'bar' });
@@ -57,7 +64,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator(schema);
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '{"foo":"bar"}' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, true);
                 assert.deepEqual(response.value, { foo: 'bar' });
@@ -68,7 +75,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator();
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: emptyMessage }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, false);
                 assert.equal(response.feedback, 'No valid JSON objects were found in the response. Return a valid JSON object.');
@@ -80,7 +87,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator();
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assistant', content: null } }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: nullMessage }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, false);
                 assert.equal(response.feedback, 'No valid JSON objects were found in the response. Return a valid JSON object.');
@@ -92,7 +99,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator(schema);
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '{"foo":7}' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: invalidMessage }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, false);
                 assert.equal(response.feedback, `The JSON returned had errors. Apply these fixes:\nconvert "instance.foo" to a string`);
@@ -103,7 +110,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator(schema);
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '{"foo":"taco"}\n{"foo":"bar"}' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: multiMessage }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, true);
                 assert.deepEqual(response.value, { foo: 'bar' });
@@ -114,7 +121,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator(schema);
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '{"foo":1}\n{"foo":"bar"}\n{"foo":3}' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: invalidMultiMessage }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, true);
                 assert.deepEqual(response.value, { foo: 'bar' });
@@ -125,7 +132,7 @@ describe("JSONResponseValidator", () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const validator = new JSONResponseValidator(schema);
-                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: '{"bar":"foo"}\n{"foo":3}' }, 3);
+                const response = await validator.validateResponse(context, state, tokenizer, { status: 'success', message: invalidMultiMessage2 }, 3);
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, false);
                 assert.equal(response.feedback, `The JSON returned had errors. Apply these fixes:\nconvert "instance.foo" to a string`);
