@@ -28,3 +28,14 @@ steps:
 - script: 'yarn lint'
   workingDirectory: 'js'
   displayName: 'Lint'
+
+- task: CopyFiles@2
+  inputs:
+    contents: 'js/packages/teams-ai/lib/**'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathToPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: Packages
