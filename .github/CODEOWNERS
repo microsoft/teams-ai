@@ -1,13 +1,13 @@
 * @microsoft/teams-ai-admins @microsoft/teams-ai-maintainer
 
 # JS
-/js @corinagum @Stevenic
+/js @corinagum @Stevenic @aacebo @lilyydu
 
 # .NET
-/dotnet @singhk97
+/dotnet @singhk97 @swatDong @kuojianlu @lilyydu
 
 # Python
-/python @aacebo
+/python @aacebo @blackchoey @lilyydu
 
 # TTK
 **/teamsapp.yml @microsoft/teams-ai-devs
