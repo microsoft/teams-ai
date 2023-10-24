@@ -39,3 +39,10 @@ steps:
   inputs:
     PathToPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: Packages
+
+- task: Npm@1
+  displayName: 'Publish'
+  inputs:
+    command: publish
+    publishRegistry: useFeed
+    publishFeed: 'Github_Pipelines/Teams'
