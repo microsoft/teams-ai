@@ -1,5 +1,11 @@
 trigger:
-- main
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - dotnet
 
 pool:
   vmImage: 'windows-latest'
