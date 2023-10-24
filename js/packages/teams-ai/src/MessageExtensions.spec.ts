@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { Application, Query } from './Application';
-import { createTestInvoke } from './TestUtils';
-import { MessageExtensions, TestMessageExtensionsInvokeTypes } from './MessageExtensions';
+import { createTestInvoke } from './TestUtilities';
+import { MessageExtensions } from './MessageExtensions';
 import {
     INVOKE_RESPONSE_KEY,
     MessagingExtensionResult,
@@ -10,23 +10,56 @@ import {
     TurnContext
 } from 'botbuilder';
 
-const {
-    ANONYMOUS_QUERY_LINK_INVOKE_NAME,
-    CONFIGURE_SETTINGS,
-    FETCH_TASK_INVOKE_NAME,
-    QUERY_CARD_BUTTON_CLICKED,
-    QUERY_INVOKE_NAME,
-    QUERY_LINK_INVOKE_NAME,
-    QUERY_SETTING_URL,
-    SELECT_ITEM_INVOKE_NAME,
-    SUBMIT_ACTION_INVOKE_NAME
-} = TestMessageExtensionsInvokeTypes;
+/**
+ * @private
+ */
+const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
+
+/**
+ * @private
+ */
+const FETCH_TASK_INVOKE_NAME = `composeExtension/fetchTask`;
+
+/**
+ * @private
+ */
+const QUERY_INVOKE_NAME = `composeExtension/query`;
+
+/**
+ * @private
+ */
+const QUERY_LINK_INVOKE_NAME = `composeExtension/queryLink`;
+
+/**
+ * @private
+ */
+const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
+
+/**
+ * @private
+ */
+const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
+
+/**
+ * @private
+ */
+const QUERY_SETTING_URL = `composeExtension/querySettingUrl`;
+
+/**
+ * @private
+ */
+const CONFIGURE_SETTINGS = `composeExtension/setting`;
+
+/**
+ * @private
+ */
+const QUERY_CARD_BUTTON_CLICKED = `composeExtension/onCardButtonClicked`;
 
 describe('MessageExtensions', () => {
-    const testAdapter = new TestAdapter();
+    const adapter = new TestAdapter();
     let mockApp: Application;
     beforeEach(() => {
-        mockApp = new Application({ adapter: testAdapter });
+        mockApp = new Application({ adapter });
     });
     it('should exist when Application is instantiated', () => {
         assert.notEqual(mockApp.messageExtensions, undefined);
@@ -38,8 +71,6 @@ describe('MessageExtensions', () => {
             const activity = createTestInvoke(ANONYMOUS_QUERY_LINK_INVOKE_NAME, {
                 url: 'https://www.youtube.com/watch?v=971YIvosuUk&ab_channel=MicrosoftDeveloper'
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             // Set up the anonymousQueryLink handler
             mockApp.messageExtensions.anonymousQueryLink(async () => {
@@ -63,7 +94,7 @@ describe('MessageExtensions', () => {
                     ]
                 };
             });
-            await testAdapter.processActivity(activity, async (context: TurnContext) => {
+            await adapter.processActivity(activity, async (context: TurnContext) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
 
@@ -98,14 +129,12 @@ describe('MessageExtensions', () => {
     describe(`${CONFIGURE_SETTINGS}`, () => {
         it('should return InvokeResponse with status code 200 with the configure setting invoke name', async () => {
             const activity = createTestInvoke(CONFIGURE_SETTINGS, { theme: 'dark' });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.configureSettings(async (context: TurnContext, _state, value) => {
                 assert.equal(value.theme, 'dark');
             });
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -117,8 +146,6 @@ describe('MessageExtensions', () => {
     describe(`${FETCH_TASK_INVOKE_NAME}`, () => {
         it('should return InvokeResponse with status code 200 with the task invoke card', async () => {
             const activity = createTestInvoke(FETCH_TASK_INVOKE_NAME, { commandId: 'showTaskModule' });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.fetchTask('showTaskModule', async (context: TurnContext, _state) => {
                 return {
@@ -140,7 +167,7 @@ describe('MessageExtensions', () => {
                 } as TaskModuleTaskInfo;
             });
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -171,14 +198,12 @@ describe('MessageExtensions', () => {
 
         it('should return InvokeResponse with status code 200 with a string message', async () => {
             const activity = createTestInvoke(FETCH_TASK_INVOKE_NAME, { commandId: 'showMessage' });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.fetchTask('showMessage', async (context: TurnContext, _state) => {
                 return 'Fetch task string';
             });
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.deepEqual(response.value, {
@@ -209,8 +234,6 @@ describe('MessageExtensions', () => {
                 commandId: 'show task'
             });
 
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             activity2.deliveryMode = 'expectReplies';
             activity3.deliveryMode = 'expectReplies';
             activity4.deliveryMode = 'expectReplies';
@@ -229,26 +252,26 @@ describe('MessageExtensions', () => {
                 }
             );
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.body.task.value.commandId, 'showTaskModule');
             });
 
-            await testAdapter.processActivity(activity2, async (context) => {
+            await adapter.processActivity(activity2, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
 
                 assert.match(response.value.body.task.value.commandId, regexp);
             });
 
-            await testAdapter.processActivity(activity3, async (context) => {
+            await adapter.processActivity(activity3, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
 
                 assert.equal(response.value.body.task.value.commandId, 'show task module');
             });
-            await testAdapter.processActivity(activity4, async (context) => {
+            await adapter.processActivity(activity4, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.body.task.value.commandId, 'show task');
@@ -263,8 +286,6 @@ describe('MessageExtensions', () => {
                 botMessagePreviewAction: 'edit'
             });
 
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             mockApp.messageExtensions.fetchTask(
                 async (context) => {
                     return context.activity.name === SUBMIT_ACTION_INVOKE_NAME;
@@ -273,7 +294,7 @@ describe('MessageExtensions', () => {
                     assert.fail('should not have reached this point');
                 }
             );
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 assert.rejects(
                     () => mockApp.run(context),
                     new Error('Unexpected MessageExtensions.fetchTask() triggered for activity type: invoke')
@@ -297,8 +318,6 @@ describe('MessageExtensions', () => {
                     formField3: 'formField3_value'
                 }
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             mockApp.messageExtensions.submitAction('giveKudos', async (context: TurnContext, _state, value) => {
                 return {
                     type: 'result',
@@ -324,7 +343,7 @@ describe('MessageExtensions', () => {
                 } as MessagingExtensionResult;
             });
 
-            await testAdapter.processActivity(activity, async (context: TurnContext) => {
+            await adapter.processActivity(activity, async (context: TurnContext) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -361,8 +380,6 @@ describe('MessageExtensions', () => {
                 botActivityPreview: [1],
                 botMessagePreviewAction: 'send'
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             mockApp.messageExtensions.botMessagePreviewSend(
                 'Create Preview',
                 async (context: TurnContext, _state, previewActivity) => {
@@ -370,7 +387,7 @@ describe('MessageExtensions', () => {
                 }
             );
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -384,8 +401,6 @@ describe('MessageExtensions', () => {
                 botActivityPreview: [1],
                 botMessagePreviewAction: 'edit'
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             mockApp.messageExtensions.botMessagePreviewEdit(
                 'Create Preview',
                 async (context: TurnContext, _state, previewActivity) => {
@@ -394,7 +409,7 @@ describe('MessageExtensions', () => {
                 }
             );
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -415,8 +430,6 @@ describe('MessageExtensions', () => {
                 botMessagePreviewAction: 'send'
             });
 
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             activity2.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.botMessagePreviewSend(
@@ -426,13 +439,13 @@ describe('MessageExtensions', () => {
                 }
             );
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.notEqual(response, undefined);
             });
 
-            await testAdapter.processActivity(activity2, async (context) => {
+            await adapter.processActivity(activity2, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.notEqual(response, undefined);
@@ -447,8 +460,6 @@ describe('MessageExtensions', () => {
                 botMessagePreviewAction: 'edit'
             });
 
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             mockApp.messageExtensions.botMessagePreviewSend(
                 async (context) => {
                     return context.activity.name === FETCH_TASK_INVOKE_NAME;
@@ -457,7 +468,7 @@ describe('MessageExtensions', () => {
                     assert.fail('should not have reached this point');
                 }
             );
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 assert.rejects(
                     () => mockApp.run(context),
                     new Error(
@@ -471,8 +482,6 @@ describe('MessageExtensions', () => {
     describe(`${QUERY_INVOKE_NAME}`, () => {
         it('should return InvokeResponse with status code 200 with the query invoke name', async () => {
             const activity = createTestInvoke(QUERY_INVOKE_NAME, { commandId: 'showQuery' });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
             interface MyParams {}
 
             mockApp.messageExtensions.query(
@@ -485,7 +494,7 @@ describe('MessageExtensions', () => {
                 }
             );
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -508,8 +517,6 @@ describe('MessageExtensions', () => {
                 displayText: 'Yes',
                 value: 'Yes'
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.handleOnButtonClicked(async (context: TurnContext, _state, button) => {
                 assert.equal(button.title, 'Query button');
@@ -517,7 +524,7 @@ describe('MessageExtensions', () => {
                 assert.equal(button.value, 'Yes');
             });
 
-            await testAdapter.processActivity(activity, async (context) => {
+            await adapter.processActivity(activity, async (context) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -531,8 +538,6 @@ describe('MessageExtensions', () => {
             const activity = createTestInvoke(QUERY_LINK_INVOKE_NAME, {
                 url: 'https://www.youtube.com/watch?v=971YIvosuUk&ab_channel=MicrosoftDeveloper'
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             // Set up the queryLink handler
             mockApp.messageExtensions.queryLink(async () => {
@@ -556,7 +561,7 @@ describe('MessageExtensions', () => {
                     ]
                 };
             });
-            await testAdapter.processActivity(activity, async (context: TurnContext) => {
+            await adapter.processActivity(activity, async (context: TurnContext) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
 
@@ -591,8 +596,6 @@ describe('MessageExtensions', () => {
     describe(`${QUERY_SETTING_URL}`, async () => {
         it('should return InvokeResponse with status code 200 when querySettingUrl is invoked', async () => {
             const activity = createTestInvoke(QUERY_SETTING_URL, {});
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             mockApp.messageExtensions.queryUrlSetting(async (context: TurnContext, _state) => {
                 return {
@@ -600,7 +603,7 @@ describe('MessageExtensions', () => {
                 } as MessagingExtensionResult;
             });
 
-            await testAdapter.processActivity(activity, async (context: TurnContext) => {
+            await adapter.processActivity(activity, async (context: TurnContext) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
@@ -635,14 +638,12 @@ describe('MessageExtensions', () => {
                 ],
                 type: 'result'
             });
-            // Not sure why but without this line, the test adapter sends back an empty response.
-            activity.deliveryMode = 'expectReplies';
 
             // Set up the selectItem handler
             mockApp.messageExtensions.selectItem(async (_context, _state, item) => {
                 return item as MessagingExtensionResult;
             });
-            await testAdapter.processActivity(activity, async (context: TurnContext) => {
+            await adapter.processActivity(activity, async (context: TurnContext) => {
                 await mockApp.run(context);
                 const response = context.turnState.get(INVOKE_RESPONSE_KEY);
                 assert.equal(response.value.status, 200);
