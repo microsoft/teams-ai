@@ -719,16 +719,3 @@ function matchesPreviewAction(activity: Activity, botMessagePreviewAction?: 'edi
         return botMessagePreviewAction == undefined;
     }
 }
-
-// TODO: Refactor Test utils into testing folder (after breaking changes are completed)
-export const TestMessageExtensionsInvokeTypes = {
-    ANONYMOUS_QUERY_LINK_INVOKE_NAME,
-    CONFIGURE_SETTINGS,
-    FETCH_TASK_INVOKE_NAME,
-    QUERY_CARD_BUTTON_CLICKED,
-    QUERY_INVOKE_NAME,
-    QUERY_LINK_INVOKE_NAME,
-    QUERY_SETTING_URL,
-    SELECT_ITEM_INVOKE_NAME,
-    SUBMIT_ACTION_INVOKE_NAME
-};
