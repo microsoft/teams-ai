@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  projectPath: 'js'
+  Agent.WorkFolder: 'js'
 
 steps:
 - task: NodeTool@0
