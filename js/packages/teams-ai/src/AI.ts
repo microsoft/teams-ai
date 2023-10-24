@@ -22,11 +22,11 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
      * The handler that should be called to execute the command.
      * @param context Current turn context.
      * @param state Current turn state.
-     * @param entities Entities predicted by the model.
-     * @param action Name of the command being executed.
+     * @param parameters Optional parameters for the action.
+     * @param action Name of the action being executed.
      * @returns Whether the AI system should continue executing the plan.
      */
-    handler: (context: TurnContext, state: TState, entities?: Record<string, any>, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, parameters?: Record<string, any>, action?: string) => Promise<string>;
 }
 
 /**
@@ -44,6 +44,34 @@ export interface AIOptions<TState extends TurnState> {
      * returned by the model.
      */
     moderator?: Moderator<TState>;
+
+    /**
+     * Optional. Maximum number of actions to execute in a single turn.
+     * @remarks
+     * The default value is 25.
+     */
+    max_actions?: number;
+
+    /**
+     * Optional. Maximum amount of time to spend executing a single turn in milliseconds.
+     * @remarks
+     * The default value is 300000 or 5 minutes.
+     */
+    max_time?: number;
+
+    /**
+     * Optional. If true, the AI system will allow the planner to loop.
+     * @remarks
+     * The default value is `true`.
+     *
+     * Looping is needed for augmentations like `functions` and `monologue` where the LLM needs to
+     * see the result of the last action that was performed. The AI system will attempt to autodetect
+     * if it needs to loop so you generally don't need to worry about this setting.
+     *
+     * If you're using an augmentation like `sequence` you can set this to `false` to guard against
+     * any accidental looping.
+     */
+    allow_looping?: boolean;
 }
 
 /**
@@ -60,6 +88,28 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
      * The moderator being used for moderating input passed to the model and the output
      */
     moderator: Moderator<TState>;
+
+    /**
+     * Maximum number of actions to execute in a single turn.
+     */
+    max_steps: number;
+
+    /**
+     * Maximum amount of time to spend executing a single turn in milliseconds.
+     */
+    max_time: number;
+
+    /**
+     * If true, the AI system will allow the planner to loop.
+     */
+    allow_looping: boolean;
+}
+
+export interface TooManyStepsParameters {
+    max_steps: number;
+    max_time: number;
+    start_time: number;
+    step_count: number;
 }
 
 /**
@@ -72,6 +122,8 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
 export class AI<TState extends TurnState = TurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
+
+    public static readonly StopCommandName = 'STOP';
 
     /**
      * An action that will be called anytime an unknown action is predicted by the planner.
@@ -101,6 +153,11 @@ export class AI<TState extends TurnState = TurnState> {
      * An action that will be called anytime the planner is rate limited.
      */
     public static readonly RateLimitedActionName = '___RateLimited___';
+
+    /**
+     * The task either executed too many steps or timed out.
+     */
+    public static readonly TooManyStepsActionName = '___TooManySteps___';
 
     /**
      * An action that will be called after the plan has been predicted by the planner and it has
@@ -146,7 +203,11 @@ export class AI<TState extends TurnState = TurnState> {
      * @param {ConfiguredAIOptions} options The options used to configure the AI system.
      */
     public constructor(options: AIOptions<TState>) {
-        this._options = Object.assign({}, options) as ConfiguredAIOptions<TState>;
+        this._options = Object.assign({
+            max_steps: 25,
+            max_time: 300000,
+            allow_looping: true
+        }, options) as ConfiguredAIOptions<TState>;
 
         // Create moderator if needed
         if (!this._options.moderator) {
@@ -158,36 +219,36 @@ export class AI<TState extends TurnState = TurnState> {
             AI.UnknownActionName,
             (context, state, data, action?) => {
                 console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
-                return Promise.resolve(true);
+                return Promise.resolve(AI.StopCommandName);
             }
         );
 
         // Register default FlaggedInputAction handler
         this.defaultAction(
             AI.FlaggedInputActionName,
-            (context, state, data, action) => {
+            () => {
                 console.error(
                     `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
                 );
-                return Promise.resolve(true);
+                return Promise.resolve(AI.StopCommandName);
             }
         );
 
         // Register default FlaggedOutputAction handler
         this.defaultAction(
             AI.FlaggedOutputActionName,
-            (context, state, data, action) => {
+            () => {
                 console.error(
                     `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
                 );
-                return Promise.resolve(true);
+                return Promise.resolve(AI.StopCommandName);
             }
         );
 
         // Register default RateLimitedActionName
         this.defaultAction(
             AI.RateLimitedActionName,
-            (context, state, data, action) => {
+            () => {
                 throw new Error(`An AI request failed because it was rate limited`);
             }
         );
@@ -195,8 +256,9 @@ export class AI<TState extends TurnState = TurnState> {
         // Register default PlanReadyActionName
         this.defaultAction<Plan>(
             AI.PlanReadyActionName,
-            async (context, state, plan) => {
-                return Array.isArray(plan.commands) && plan.commands.length > 0;
+            (context, state, plan) => {
+                const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
+                return Promise.resolve(!isValid ? AI.StopCommandName : '');
             }
         );
 
@@ -220,7 +282,20 @@ export class AI<TState extends TurnState = TurnState> {
                     await context.sendActivity(response);
                 }
 
-                return true;
+                return '';
+            }
+        );
+
+        // Register default TooManyStepsActionName
+        this.defaultAction<TooManyStepsParameters>(
+            AI.TooManyStepsActionName,
+            async (context, state, data, action) => {
+                const { max_steps, step_count } = data;
+                if (step_count > max_steps) {
+                    throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
+                } else {
+                    throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
+                }
             }
         );
     }
@@ -257,15 +332,15 @@ export class AI<TState extends TurnState = TurnState> {
      * flagged input, and flagged output. You can override these actions by registering your own
      * handler for them. The names of the built-in actions are available as static properties on
      * the AI class.
-     * @template TEntities Optional. The type of entities that the action handler expects.
+     * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
-     * @param schema Optional. Schema for the actions entities.
+     * @param schema Optional. Schema for the actions parameters.
      * @returns The AI system instance for chaining purposes.
      */
-    public action<TEntities extends Record<string, any> | undefined>(
+    public action<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, entities: TEntities, action?: string) => Promise<boolean>,
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
         schema?: Schema
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
@@ -294,15 +369,15 @@ export class AI<TState extends TurnState = TurnState> {
      * Registers the default handler for a named action.
      * @summary
      * Default handlers can be replaced by calling the action() method with the same name.
-     * @template TEntities Optional. The type of entities that the action handler expects.
+     * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
-     * @param schema Optional. The schema for the actions entities.
+     * @param schema Optional. The schema for the actions parameters.
      * @returns The AI system instance for chaining purposes.
      */
-    public defaultAction<TEntities extends Record<string, any> | undefined>(
+    public defaultAction<TParameters extends (Record<string, any> | undefined)>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, entities: TEntities, action?: string) => Promise<boolean>,
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
         schema?: Schema
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
@@ -314,25 +389,25 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Manually executes a named action.
-     * @template TEntities Optional. Type of entities expected to be passed to the action.
+     * @template TParameters Optional. Type of entities expected to be passed to the action.
      * @param context Current turn context.
      * @param state Current turn state.
      * @param action Name of the action to execute.
-     * @param entities Optional. Entities to pass to the action.
+     * @param parameters Optional. Entities to pass to the action.
      * @returns True if the action thinks other actions should be executed.
      */
-    public async doAction<TEntities = Record<string, any>>(
+    public async doAction<TParameters = Record<string, any>>(
         context: TurnContext,
         state: TState,
         action: string,
-        entities?: TEntities
-    ): Promise<boolean> {
+        parameters?: TParameters
+    ): Promise<string> {
         if (!this._actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }
 
         const handler = this._actions.get(action)!.handler;
-        return await handler(context, state, entities, action);
+        return await handler(context, state, parameters, action);
     }
 
     /**
@@ -366,11 +441,15 @@ export class AI<TState extends TurnState = TurnState> {
      * and output then the plan is executed.
      * @param context Current turn context.
      * @param state Current turn state.
+     * @param start_time Optional. Time the AI system started running
+     * @param step_count Optional. Number of steps that have been executed.
      * @returns True if the plan was completely executed, otherwise false.
      */
     public async run(
         context: TurnContext,
-        state: TState
+        state: TState,
+        start_time?: number,
+        step_count?: number
     ): Promise<boolean> {
         // Populate {{$temp.input}}
         if (typeof state.temp.input != 'string') {
@@ -378,49 +457,97 @@ export class AI<TState extends TurnState = TurnState> {
             state.temp.input = context.activity.text;
         }
 
+        // Initialize start time and action count
+        const { max_steps, max_time } = this._options;
+        if (start_time === undefined) {
+            start_time = Date.now();
+        }
+        if (step_count === undefined) {
+            step_count = 0;
+        }
+
+        // Review input on first loop
+        let plan: Plan|undefined = step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
+
         // Generate plan
-        let plan = await this._options.moderator.reviewInput(context, state);
         if (!plan) {
-            plan = await this._options.planner.beginTask(context, state, this);
+            if (step_count == 0) {
+                plan = await this._options.planner.beginTask(context, state, this);
+            } else {
+                plan = await this._options.planner.continueTask(context, state, this);
+            }
+
+            // Review the plans output
             plan = await this._options.moderator.reviewOutput(context, state, plan);
         }
 
         // Process generated plan
-        let continuePlan = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, '');
-        if (continuePlan) {
-            // Run predicted commands
-            for (let i = 0; i < plan.commands.length && continuePlan; i++) {
-                // eslint-disable-next-line security/detect-object-injection
-                const cmd = plan.commands[i];
-                switch (cmd.type) {
-                    case 'DO': {
-                        const { action } = cmd as PredictedDoCommand;
-                        if (this._actions.has(action)) {
-                            // Call action handler
-                            const handler = this._actions.get(action)!.handler;
-                            continuePlan = await this._actions
-                                .get(AI.DoCommandActionName)!
-                                .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
-                        } else {
-                            // Redirect to UnknownAction handler
-                            continuePlan = await this._actions
-                                .get(AI.UnknownActionName)!
-                                .handler(context, state, plan, action);
-                        }
-                        break;
-                    }
-                    case 'SAY':
-                        continuePlan = await this._actions
-                            .get(AI.SayCommandActionName)!
-                            .handler(context, state, cmd, AI.SayCommandActionName);
-                        break;
-                    default:
-                        throw new Error(`AI.run(): unknown command of '${cmd.type}' predicted.`);
-                }
-            }
+        let completed = false;
+        let response = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, AI.PlanReadyActionName);
+        if (response == AI.StopCommandName) {
+            return false;
         }
 
-        return continuePlan;
+        // Run predicted commands
+        // - If the plan ends on a SAY command then the plan is considered complete, otherwise we'll loop
+        completed = true;
+        let should_loop = false;
+        for (let i = 0; i < plan.commands.length; i++) {
+            // Check for timeout
+            if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
+                completed = false;
+                const parameters: TooManyStepsParameters = { max_steps, max_time, start_time: start_time!, step_count: step_count! };
+                await this._actions.get(AI.TooManyStepsActionName)!.handler(context, state, parameters, AI.TooManyStepsActionName);
+                break;
+            }
+
+            // eslint-disable-next-line security/detect-object-injection
+            let output: string;
+            const cmd = plan.commands[i];
+            switch (cmd.type) {
+                case 'DO': {
+                    const { action } = cmd as PredictedDoCommand;
+                    if (this._actions.has(action)) {
+                        // Call action handler
+                        const handler = this._actions.get(action)!.handler;
+                        output = await this._actions
+                            .get(AI.DoCommandActionName)!
+                            .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
+                        should_loop = output.length > 0;
+                        } else {
+                        // Redirect to UnknownAction handler
+                        output = await this._actions
+                            .get(AI.UnknownActionName)!
+                            .handler(context, state, plan, action);
+                    }
+                    break;
+                }
+                case 'SAY':
+                    should_loop = false;
+                    output = await this._actions
+                        .get(AI.SayCommandActionName)!
+                        .handler(context, state, cmd, AI.SayCommandActionName);
+                    break;
+                default:
+                    throw new Error(`AI.run(): unknown command of '${cmd.type}' predicted.`);
+            }
+
+            // Check for stop command
+            if (output == AI.StopCommandName) {
+                completed = false;
+                break;
+            }
+
+            // Copy the actions output to the input
+            state.temp.input = output;
+        }
+
+        // Check for looping
+        if (completed && should_loop && this._options.allow_looping) {
+            return await this.run(context, state, start_time, step_count);
+        } else {
+            return completed;
+        }
     }
 }
 
@@ -428,7 +555,7 @@ export class AI<TState extends TurnState = TurnState> {
  * @private
  */
 interface ActionEntry<TState> {
-    handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<string>;
     schema?: Schema;
     allowOverrides: boolean;
 }

@@ -186,13 +186,17 @@ export class LLMClient<TContent = any> {
             input_variable: 'temp.input',
             max_history_messages: 10,
             max_repair_attempts: 3,
-            tokenizer: new GPT3Tokenizer(),
             logRepairs: false
         }, options) as ConfiguredLLMClientOptions<TContent>;
 
         // Create validator to use
         if (!this.options.validator) {
             this.options.validator = new DefaultResponseValidator<TContent>();
+        }
+
+        // Create tokenizer to use
+        if (!this.options.tokenizer) {
+            this.options.tokenizer = new GPT3Tokenizer();
         }
     }
 
@@ -274,6 +278,7 @@ export class LLMClient<TContent = any> {
         try {
             // Ask client to complete prompt
             const response = await model.completePrompt(context, memory, functions, tokenizer, template) as PromptResponse<TContent>;
+            console.log(response);
             if (response.status !== 'success') {
                 // The response isn't valid so we don't care that the messages type is potentially incorrect.
                 return response;

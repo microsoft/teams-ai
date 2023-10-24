@@ -61,7 +61,7 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
      * @remarks
      * For Azure OpenAI this is the name of the deployment to use.
      */
-    model: string;
+    defaultModel: string;
 
     /**
      * Optional. Organization to use when calling the OpenAI API.
@@ -275,7 +275,7 @@ export class OpenAIModel implements PromptCompletionModel {
         } else {
             const options = this.options as OpenAIModelOptions;
             const url = `${options.endpoint ?? 'https://api.openai.com'}/v1/completions`;
-            (request as OpenAICreateCompletionRequest).model = options.model;
+            (request as OpenAICreateCompletionRequest).model = options.defaultModel;
             return this.post(url, request);
         }
     }
@@ -291,7 +291,7 @@ export class OpenAIModel implements PromptCompletionModel {
         } else {
             const options = this.options as OpenAIModelOptions;
             const url = `${options.endpoint ?? 'https://api.openai.com'}/v1/chat/completions`;
-            (request as OpenAICreateChatCompletionRequest).model = options.model;
+            (request as OpenAICreateChatCompletionRequest).model = options.defaultModel;
             return this.post(url, request);
         }
     }
