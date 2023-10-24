@@ -20,6 +20,8 @@ import {
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
+console.log(process.env.BOT_ID);
+
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     {},
     new ConfigurationServiceClientCredentialFactory({
@@ -39,6 +41,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
@@ -69,26 +72,36 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import {
     AI,
     Application,
-    AzureOpenAIPlanner,
-    ConversationHistory,
-    DefaultPromptManager,
-    DefaultTurnState,
+    ActionPlanner,
     OpenAIModerator,
-    OpenAIPlanner
+    OpenAIModel,
+    PromptManager,
+    TurnState
 } from '@microsoft/teams-ai';
-import { addSemanticSearch } from './semanticSearch';
 import { addResponseFormatter } from './responseFormatter';
+import { VectraDataSource } from './VectraDataSource';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type ApplicationTurnState = TurnState<ConversationState>;
 
 // Create AI components
-const planner = new OpenAIPlanner({
+const model = new OpenAIModel({
     apiKey: process.env.OPENAI_API_KEY || '',
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'chat',
+});
+
 // const planner = new AzureOpenAIPlanner({
 //     apiKey: process.env.AzureOpenAIKey || '',
 //     defaultModel: 'gpt-3.5-turbo',
@@ -100,25 +113,22 @@ const planner = new OpenAIPlanner({
 //     apiKey: process.env.OPENAI_API_KEY || '',
 //     moderate: 'both'
 // });
-const promptManager = new DefaultPromptManager(path.join(__dirname, '../src/prompts'));
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        // moderator,
-        promptManager,
-        prompt: 'chat',
-        history: {
-            assistantHistoryType: 'text'
-        }
+        planner
     }
 });
 
-// Add 'semanticSearch' prompt function
-addSemanticSearch(app, process.env.OPENAI_API_KEY || '');
+// Register your data source with planner
+planner.prompts.addDataSource(new VectraDataSource({
+    name: 'teams-ai',
+    apiKey:  process.env.OPENAI_API_KEY!,
+    indexFolder: path.join(__dirname, '../index'),
+}));
 
 // Add a custom response formatter to convert markdown code blocks to <pre> tags
 addResponseFormatter(app);
@@ -135,11 +145,6 @@ app.ai.action(
 app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: ApplicationTurnState, data: any) => {
     await context.sendActivity(`I'm not allowed to talk about such things.`);
     return false;
-});
-
-app.message('/history', async (context: TurnContext, state: ApplicationTurnState) => {
-    const history = ConversationHistory.toString(state, 2000, '\n\n');
-    await context.sendActivity(history);
 });
 
 // Listen for incoming server requests.
