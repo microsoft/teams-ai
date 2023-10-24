@@ -31,7 +31,8 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    contents: 'js/packages/teams-ai/lib/**'
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: js/packages/teams-ai/*
     targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
