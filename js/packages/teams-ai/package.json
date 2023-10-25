@@ -26,19 +26,19 @@
         "botbuilder": "^4.20.1",
         "botbuilder-dialogs": "^4.20.1",
         "gpt-3-encoder": "^1.1.4",
-        "yaml": "^2.3.2"
+        "yaml": "^2.3.3"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
-        "@types/jsonwebtoken": "^9.0.3",
-        "@types/node": "^20.8.4",
-        "eslint": "^8.51.0",
+        "@types/jsonwebtoken": "^9.0.4",
+        "@types/node": "^20.8.7",
+        "eslint": "^8.52.0",
         "jsonwebtoken": "^9.0.2",
         "typescript": "^5.2.2",
-        "@types/mocha": "^10.0.2",
-        "@types/assert": "^1.5.7",
+        "@types/mocha": "^10.0.3",
+        "@types/assert": "^1.5.8",
         "mocha": "10.2.0",
         "nyc": "^15.1.0",
         "shx": "^0.3.4",

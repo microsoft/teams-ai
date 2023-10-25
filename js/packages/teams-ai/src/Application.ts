@@ -131,6 +131,7 @@ export type ConversationUpdateEvents =
     | 'membersRemoved'
     | 'teamRenamed'
     | 'teamDeleted'
+    | 'teamHardDeleted'
     | 'teamArchived'
     | 'teamUnarchived'
     | 'teamRestored';
@@ -331,6 +332,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
         event: ConversationUpdateEvents | ConversationUpdateEvents[],
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
+        if (typeof handler !== 'function') {
+            throw new Error(
+                `ConversationUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
+            );
+        }
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             const selector = createConversationUpdateSelector(e);
             this.addRoute(selector, handler);
@@ -896,6 +902,22 @@ function createActivitySelector(type: string | RegExp | RouteSelector): RouteSel
  */
 function createConversationUpdateSelector(event: ConversationUpdateEvents): RouteSelector {
     switch (event) {
+        case 'channelCreated':
+        case 'channelDeleted':
+        case 'channelRenamed':
+        case 'channelRestored':
+            /**
+             * @param {TurnContext} context The context object for the current turn of conversation.
+             * @returns {Promise<boolean>} A Promise that resolves to a boolean indicating whether the activity is a conversation update event related to channels.
+             */
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        context?.activity?.channelData?.eventType == event &&
+                        context?.activity?.channelData?.channel &&
+                        context.activity.channelData?.team
+                );
+            };
         case 'membersAdded':
             /**
              * @param {TurnContext} context The context object for the current turn of conversation.
@@ -918,6 +940,23 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
                     context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         Array.isArray(context?.activity?.membersRemoved) &&
                         context.activity.membersRemoved.length > 0
+                );
+            };
+        case 'teamRenamed':
+        case 'teamDeleted':
+        case 'teamHardDeleted':
+        case 'teamArchived':
+        case 'teamUnarchived':
+        case 'teamRestored':
+            /**
+             * @param {TurnContext} context The context object for the current turn of conversation.
+             * @returns {Promise<boolean>} A Promise that resolves to a boolean indicating whether the activity is a conversation update event related to teams.
+             */
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        context?.activity?.channelData?.eventType == event &&
+                        context?.activity?.channelData?.team
                 );
             };
         default:
