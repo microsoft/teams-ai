@@ -27,12 +27,12 @@ import {
     OAuthPrompt,
     OAuthPromptSettings
 } from 'botbuilder-dialogs';
-import { TurnState } from './TurnState';
-import { DefaultTurnState } from './DefaultTurnStateManager';
-import { TurnStateProperty } from './TurnStateProperty';
-import { Application } from './Application';
+import { TurnState } from '../TurnState';
+import { DefaultTurnState } from '../DefaultTurnStateManager';
+import { TurnStateProperty } from '../TurnStateProperty';
+import { Application } from '../Application';
 import * as UserTokenAccess from './UserTokenAccess';
-import { FETCH_TASK_INVOKE_NAME, QUERY_INVOKE_NAME, QUERY_LINK_INVOKE_NAME } from './MessageExtensions';
+import { FETCH_TASK_INVOKE_NAME, QUERY_INVOKE_NAME, QUERY_LINK_INVOKE_NAME } from '../MessageExtensions';
 
 /**
  * Authentication service.
