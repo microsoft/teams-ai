@@ -71,7 +71,7 @@ describe('MessageExtensions', () => {
             const activity = createTestInvoke(ANONYMOUS_QUERY_LINK_INVOKE_NAME, {
                 url: 'https://www.youtube.com/watch?v=971YIvosuUk&ab_channel=MicrosoftDeveloper'
             });
-
+            activity.channelId = 'msteams';
             // Set up the anonymousQueryLink handler
             mockApp.messageExtensions.anonymousQueryLink(async () => {
                 return {
@@ -129,6 +129,7 @@ describe('MessageExtensions', () => {
     describe(`${CONFIGURE_SETTINGS}`, () => {
         it('should return InvokeResponse with status code 200 with the configure setting invoke name', async () => {
             const activity = createTestInvoke(CONFIGURE_SETTINGS, { theme: 'dark' });
+            activity.channelId = 'msteams';
 
             mockApp.messageExtensions.configureSettings(async (context: TurnContext, _state, value) => {
                 assert.equal(value.theme, 'dark');
@@ -146,6 +147,7 @@ describe('MessageExtensions', () => {
     describe(`${FETCH_TASK_INVOKE_NAME}`, () => {
         it('should return InvokeResponse with status code 200 with the task invoke card', async () => {
             const activity = createTestInvoke(FETCH_TASK_INVOKE_NAME, { commandId: 'showTaskModule' });
+            activity.channelId = 'msteams';
 
             mockApp.messageExtensions.fetchTask('showTaskModule', async (context: TurnContext, _state) => {
                 return {
@@ -198,6 +200,7 @@ describe('MessageExtensions', () => {
 
         it('should return InvokeResponse with status code 200 with a string message', async () => {
             const activity = createTestInvoke(FETCH_TASK_INVOKE_NAME, { commandId: 'showMessage' });
+            activity.channelId = 'msteams';
 
             mockApp.messageExtensions.fetchTask('showMessage', async (context: TurnContext, _state) => {
                 return 'Fetch task string';
@@ -223,16 +226,22 @@ describe('MessageExtensions', () => {
             const activity = createTestInvoke(FETCH_TASK_INVOKE_NAME, {
                 commandId: 'showTaskModule'
             });
+            activity.channelId = 'msteams';
             const regexp = new RegExp(/show$/, 'i');
             const activity2 = createTestInvoke(FETCH_TASK_INVOKE_NAME, {
                 commandId: 'Show'
             });
+            activity2.channelId = 'msteams';
+
             const activity3 = createTestInvoke(FETCH_TASK_INVOKE_NAME, {
                 commandId: 'show task module'
             });
+            activity3.channelId = 'msteams';
+
             const activity4 = createTestInvoke(FETCH_TASK_INVOKE_NAME, {
                 commandId: 'show task'
             });
+            activity4.channelId = 'msteams';
 
             mockApp.messageExtensions.fetchTask(
                 [
@@ -314,6 +323,8 @@ describe('MessageExtensions', () => {
                     formField3: 'formField3_value'
                 }
             });
+            activity.channelId = 'msteams';
+
             mockApp.messageExtensions.submitAction('giveKudos', async (context: TurnContext, _state, value) => {
                 return {
                     type: 'result',
@@ -376,6 +387,8 @@ describe('MessageExtensions', () => {
                 botActivityPreview: [1],
                 botMessagePreviewAction: 'send'
             });
+            activity.channelId = 'msteams';
+
             mockApp.messageExtensions.botMessagePreviewSend(
                 'Create Preview',
                 async (context: TurnContext, _state, previewActivity) => {
@@ -397,6 +410,8 @@ describe('MessageExtensions', () => {
                 botActivityPreview: [1],
                 botMessagePreviewAction: 'edit'
             });
+            activity.channelId = 'msteams';
+
             mockApp.messageExtensions.botMessagePreviewEdit(
                 'Create Preview',
                 async (context: TurnContext, _state, previewActivity) => {
@@ -420,11 +435,14 @@ describe('MessageExtensions', () => {
                 botActivityPreview: ['create preview'],
                 botMessagePreviewAction: 'send'
             });
+            activity.channelId = 'msteams';
+
             const activity2 = createTestInvoke(SUBMIT_ACTION_INVOKE_NAME, {
                 commandId: 'preview',
                 botActivityPreview: ['preview'],
                 botMessagePreviewAction: 'send'
             });
+            activity2.channelId = 'msteams';
 
             mockApp.messageExtensions.botMessagePreviewSend(
                 ['create preview', 'preview'],
@@ -453,6 +471,7 @@ describe('MessageExtensions', () => {
                 botActivityPreview: [1],
                 botMessagePreviewAction: 'edit'
             });
+            activity.channelId = 'msteams';
 
             mockApp.messageExtensions.botMessagePreviewSend(
                 async (context) => {
@@ -476,6 +495,8 @@ describe('MessageExtensions', () => {
     describe(`${QUERY_INVOKE_NAME}`, () => {
         it('should return InvokeResponse with status code 200 with the query invoke name', async () => {
             const activity = createTestInvoke(QUERY_INVOKE_NAME, { commandId: 'showQuery' });
+            activity.channelId = 'msteams';
+
             interface MyParams {}
 
             mockApp.messageExtensions.query(
@@ -511,6 +532,7 @@ describe('MessageExtensions', () => {
                 displayText: 'Yes',
                 value: 'Yes'
             });
+            activity.channelId = 'msteams';
 
             mockApp.messageExtensions.handleOnButtonClicked(async (context: TurnContext, _state, button) => {
                 assert.equal(button.title, 'Query button');
@@ -532,6 +554,7 @@ describe('MessageExtensions', () => {
             const activity = createTestInvoke(QUERY_LINK_INVOKE_NAME, {
                 url: 'https://www.youtube.com/watch?v=971YIvosuUk&ab_channel=MicrosoftDeveloper'
             });
+            activity.channelId = 'msteams';
 
             // Set up the queryLink handler
             mockApp.messageExtensions.queryLink(async () => {
@@ -590,6 +613,7 @@ describe('MessageExtensions', () => {
     describe(`${QUERY_SETTING_URL}`, async () => {
         it('should return InvokeResponse with status code 200 when querySettingUrl is invoked', async () => {
             const activity = createTestInvoke(QUERY_SETTING_URL, {});
+            activity.channelId = 'msteams';
 
             mockApp.messageExtensions.queryUrlSetting(async (context: TurnContext, _state) => {
                 return {
@@ -632,6 +656,7 @@ describe('MessageExtensions', () => {
                 ],
                 type: 'result'
             });
+            activity.channelId = 'msteams';
 
             // Set up the selectItem handler
             mockApp.messageExtensions.selectItem(async (_context, _state, item) => {
