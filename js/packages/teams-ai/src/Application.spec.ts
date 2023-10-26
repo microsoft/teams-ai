@@ -200,7 +200,27 @@ describe('Application', () => {
             mockApp = new Application({ adapter });
         });
 
-        it('should route to an instantiated conversationUpdate handler', async () => {
+        it('should route to an instantiated conversationUpdate handler when channelId is Teams', async () => {
+            let handlerCalled = false;
+            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+                handlerCalled = true;
+                assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
+            });
+
+            const activity = createTestConversationUpdate();
+            activity.channelId = 'msteams';
+            activity.membersAdded = [
+                { id: '123', name: 'Member One' },
+                { id: '42', name: "Don't Panic" }
+            ];
+
+            await adapter.processActivity(activity, async (context) => {
+                await mockApp.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should route to an instantiated conversationUpdate handler when channelId is not defined', async () => {
             let handlerCalled = false;
             mockApp.conversationUpdate('membersAdded', async (context, _state) => {
                 handlerCalled = true;
@@ -256,7 +276,7 @@ describe('Application', () => {
                 });
 
                 const activity = createTestConversationUpdate(channelData);
-
+                activity.channelId = 'msteams';
                 await adapter.processActivity(activity, async (context) => {
                     await mockApp.run(context);
                     assert.equal(handlerCalled, true);
@@ -269,6 +289,7 @@ describe('Application', () => {
             const team = { id: 'mockTeamId' };
             const channel = { id: 'mockChannelId' };
             const activity = createTestConversationUpdate({ channel, eventType: 'channelCreated', team });
+            activity.channelId = 'msteams';
 
             mockApp.conversationUpdate('channelCreated', async (context, _state) => {
                 handlerCalled = true;
