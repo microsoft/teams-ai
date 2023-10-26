@@ -134,7 +134,9 @@ export type ConversationUpdateEvents =
     | 'teamHardDeleted'
     | 'teamArchived'
     | 'teamUnarchived'
-    | 'teamRestored';
+    | 'teamRestored'
+    | 'topicName'
+    | 'historyDisclosed';
 
 /**
  * Function for handling an incoming request.
@@ -912,7 +914,8 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.channelId === 'msteams' &&
+                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.channel &&
                         context.activity.channelData?.team
@@ -954,7 +957,8 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.channelId === 'msteams' &&
+                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.team
                 );
@@ -1039,6 +1043,7 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             };
     }
 }
+// channelData: eventype of editMessage
 
 /**
  * @private
