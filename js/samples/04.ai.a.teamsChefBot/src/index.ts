@@ -20,8 +20,6 @@ import {
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-console.log(process.env.BOT_ID);
-
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     {},
     new ConfigurationServiceClientCredentialFactory({
@@ -92,6 +90,14 @@ const model = new OpenAIModel({
     logRequests: true
 });
 
+// const model = new OpenAIModel({
+//     azureApiKey: process.env.AzureOpenAIKey || '',
+//     azureDefaultDeployment: 'gpt-3.5-turbo',
+//     azureEndpoint: process.env.AzureOpenAIEndpoint || '',
+//     azureApiVersion: '2023-03-15-preview',
+//     logRequests: true
+// });
+
 const prompts = new PromptManager({
     promptsFolder: path.join(__dirname, '../src/prompts')
 });
@@ -101,13 +107,6 @@ const planner = new ActionPlanner({
     prompts,
     defaultPrompt: 'chat',
 });
-
-// const planner = new AzureOpenAIPlanner({
-//     apiKey: process.env.AzureOpenAIKey || '',
-//     defaultModel: 'gpt-3.5-turbo',
-//     endpoint: process.env.AzureOpenAIEndpoint || '',
-//     apiVersion: '2023-03-15-preview'
-// });
 
 // const moderator = new OpenAIModerator({
 //     apiKey: process.env.OPENAI_API_KEY || '',
@@ -119,7 +118,8 @@ const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner
+        planner,
+        // moderator
     }
 });
 
@@ -138,13 +138,13 @@ app.ai.action(
     AI.FlaggedInputActionName,
     async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>) => {
         await context.sendActivity(`I'm sorry your message was flagged: ${JSON.stringify(data)}`);
-        return false;
+        return AI.StopCommandName;
     }
 );
 
 app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: ApplicationTurnState, data: any) => {
     await context.sendActivity(`I'm not allowed to talk about such things.`);
-    return false;
+    return AI.StopCommandName;
 });
 
 // Listen for incoming server requests.

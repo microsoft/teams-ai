@@ -86,14 +86,14 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
     azureApiKey: string;
 
     /**
+     * Default name of the Azure OpenAI deployment (model) to use.
+     */
+    azureDefaultDeployment: string;
+
+    /**
      * Deployment endpoint to use.
      */
     azureEndpoint: string;
-
-    /**
-     * Default name of the Azure OpenAI deployment (model) to use.
-     */
-    azureDeployment: string;
 
     /**
      * Optional. Version of the API being called. Defaults to `2023-05-15`.
@@ -270,7 +270,7 @@ export class OpenAIModel implements PromptCompletionModel {
     protected createCompletion(request: CreateCompletionRequest): Promise<AxiosResponse<CreateCompletionResponse>> {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIModelOptions;
-            const url = `${options.azureEndpoint}/openai/deployments/${options.azureDeployment}/completions?api-version=${options.azureApiVersion!}`;
+            const url = `${options.azureEndpoint}/openai/deployments/${options.azureDefaultDeployment}/completions?api-version=${options.azureApiVersion!}`;
             return this.post(url, request);
         } else {
             const options = this.options as OpenAIModelOptions;
@@ -286,7 +286,7 @@ export class OpenAIModel implements PromptCompletionModel {
     protected createChatCompletion(request: CreateChatCompletionRequest): Promise<AxiosResponse<CreateChatCompletionResponse>> {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIModelOptions;
-            const url = `${options.azureEndpoint}/openai/deployments/${options.azureDeployment}/chat/completions?api-version=${options.azureApiVersion!}`;
+            const url = `${options.azureEndpoint}/openai/deployments/${options.azureDefaultDeployment}/chat/completions?api-version=${options.azureApiVersion!}`;
             return this.post(url, request);
         } else {
             const options = this.options as OpenAIModelOptions;
