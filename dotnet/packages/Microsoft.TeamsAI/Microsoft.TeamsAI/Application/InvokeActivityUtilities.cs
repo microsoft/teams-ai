@@ -30,7 +30,7 @@ namespace Microsoft.TeamsAI
             return invokeValue;
         }
 
-        public static Activity CreateInvokeResponseActivity(object body)
+        public static Activity CreateInvokeResponseActivity(object? body = default)
         {
             Activity activity = new()
             {

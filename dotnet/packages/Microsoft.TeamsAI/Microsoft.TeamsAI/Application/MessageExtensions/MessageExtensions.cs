@@ -24,6 +24,9 @@ namespace Microsoft.TeamsAI
         private static readonly string SELECT_ITEM_INVOKE_NAME = "composeExtension/selectItem";
         private static readonly string QUERY_LINK_INVOKE_NAME = "composeExtension/queryLink";
         private static readonly string ANONYMOUS_QUERY_LINK_INVOKE_NAME = "composeExtension/anonymousQueryLink";
+        private static readonly string CONFIGURE_SETTINGS = "composeExtension/setting";
+        private static readonly string QUERY_SETTING_URL = "composeExtension/querySettingUrl";
+        private static readonly string QUERY_CARD_BUTTON_CLICKED = "composeExtension/onCardButtonClicked";
 
         private readonly Application<TState, TTurnStateManager> _app;
 
@@ -600,12 +603,18 @@ namespace Microsoft.TeamsAI
         }
 
         /// <summary>
-        /// Registers a handler for a command that performs anonymous link unfurling.
+        /// Registers a handler that implements the logic to handle anonymous link unfurling.
         /// </summary>
+        /// <remarks>
+        /// The `composeExtension/anonymousQueryLink` INVOKE activity does not contain any sort of command ID,
+        /// so only a single select item handler can be registered.
+        /// For more information visit https://learn.microsoft.com/microsoftteams/platform/messaging-extensions/how-to/link-unfurling?#enable-zero-install-link-unfurling
+        /// </remarks>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnAnonymousQueryLink(QueryLinkHandler<TState> handler)
         {
+            Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
@@ -624,6 +633,105 @@ namespace Microsoft.TeamsAI
                         ComposeExtension = result
                     };
                     Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return _app;
+        }
+
+        /// <summary>
+        /// Registers a handler that invokes the fetch of the configuration settings for a Message Extension.
+        /// </summary>
+        /// <remarks>
+        /// The `composeExtension/querySettingUrl` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
+        /// </remarks>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnQueryUrlSetting(QueryUrlSettingHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                return Task.FromResult(string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.Name, QUERY_SETTING_URL));
+            };
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                MessagingExtensionResult result = await handler(turnContext, turnState, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    MessagingExtensionActionResponse response = new()
+                    {
+                        ComposeExtension = result
+                    };
+                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return _app;
+        }
+
+        /// <summary>
+        /// Registers a handler that implements the logic to invoke configuring Message Extension settings.
+        /// </summary>
+        /// <remarks>
+        /// The `composeExtension/setting` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
+        /// </remarks>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnConfigureSettings(ConfigureSettingsHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                return Task.FromResult(string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.Name, CONFIGURE_SETTINGS));
+            };
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity();
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return _app;
+        }
+
+        /// <summary>
+        /// Registers a handler that implements the logic when a user has clicked on a button in a Message Extension card.
+        /// </summary>
+        /// <remarks>
+        /// The `composeExtension/onCardButtonClicked` INVOKE activity does not contain any sort of command ID,
+        /// so only a single select item handler can be registered. Developers will need to include a
+        /// type name of some sort in the preview item they return if they need to support multiple select item handlers.
+        /// </remarks>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnCardButtonClicked(CardButtonClickedHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                return Task.FromResult(string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.Name, QUERY_CARD_BUTTON_CLICKED));
+            };
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity();
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
