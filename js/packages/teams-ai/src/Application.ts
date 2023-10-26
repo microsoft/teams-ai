@@ -286,10 +286,12 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * @template TState
      * Fluent interface for accessing Authentication specific features.
-     * @remarks
+     * @description
      * This property is only available if the Application was configured with `authentication` options. An
      * exception will be thrown if you attempt to access it otherwise.
+     * @returns {Authentication<TState>} The Authentication instance.
      */
     public get authentication(): Authentication<TState> {
         if (!this._authentication) {

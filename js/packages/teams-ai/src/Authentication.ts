@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -10,7 +11,6 @@ import {
     ActivityTypes,
     InvokeResponse,
     MemoryStorage,
-    SignInUrlResponse,
     Storage,
     TeamsSSOTokenExchangeMiddleware,
     TokenResponse,
@@ -46,9 +46,9 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Creates a new instance of the `Authentication` class.
-     * @param app Application for adding routes.
-     * @param settings Authentication settings.
-     * @param storage
+     * @param {Application} app - The application instance.
+     * @param {OAuthPromptSettings} settings - Authentication settings.
+     * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
      */
     constructor(app: Application<TState>, settings: OAuthPromptSettings, storage?: Storage) {
         // Create OAuthPrompt
@@ -141,11 +141,12 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Signs in a user.
-     * @remarks
+     *
      * This method will be called automatically by the Application class.
-     * @param context Current turn context.
-     * @param state Application state.
-     * @returns The authentication token or undefined if the user is still login in.
+     * @template TState
+     * @param {TurnContext} context - Current turn context.
+     * @param {TState} state Application state.
+     * @returns {string | undefined} The authentication token or undefined if the user is still login in.
      */
     public async signInUser(context: TurnContext, state: TState): Promise<string | undefined> {
         if (this.isInvokeActivityThatAllowsAuthSignIn(context)) {
@@ -182,7 +183,10 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
             // Save message if not signed in
             if (!state.conversation.value[userAuthStatePropertyName]) {
-                state.conversation.value[userAuthStatePropertyName] = { signedIn: false, message: context.activity.text };
+                state.conversation.value[userAuthStatePropertyName] = {
+                    signedIn: false,
+                    message: context.activity.text
+                };
             }
 
             const results = await this.runDialog(context, state, userDialogStatePropertyName);
@@ -210,8 +214,10 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Signs out a user.
-     * @param context Current turn context.
-     * @param state
+     * @template TState
+     * @param {TurnContext} context - Current turn context.
+     * @param {TState} state - Application state.
+     * @returns {Promise<void>} A Promise representing the asynchronous operation.
      */
     public signOutUser(context: TurnContext, state: TState): Promise<void> {
         // Delete user auth state
@@ -231,8 +237,9 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
     /**
      * The handler function is called when the user has successfully signed in
-     * @param status 'success' or 'failure'
-     * @param handler The handler function to call
+     * @template TState
+     * @param {'success' | 'failure' } status - The status of the sign in process
+     * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
     public async onUserSignIn(
         status: 'success' | 'failure',
@@ -245,6 +252,11 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
     }
 
+    /**
+     * Returns true if the incomming invoke type is one that allows user authentication.
+     * @param {TurnContext} context - Current turn context.
+     * @returns {boolean} Returns true if the incomming invoke type is one that allows user authentication. Otherwise false.
+     */
     public isInvokeActivityThatAllowsAuthSignIn(context: TurnContext): boolean {
         return (
             context.activity.type == ActivityTypes.Invoke &&
@@ -254,19 +266,44 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         );
     }
 
+    private async tokenIsExchangeable(context: TurnContext) {
+        let tokenExchangeResponse;
+        try {
+            tokenExchangeResponse = await this.exchangeToken(context);
+        } catch (err) {
+            // Ignore Exceptions
+            // If token exchange failed for any reason, tokenExchangeResponse above stays null, and hence we send back a failure invoke response to the caller.
+            console.log('tokenExchange error: ' + err);
+        }
+        if (!tokenExchangeResponse || !tokenExchangeResponse.token) {
+            return false;
+        }
+        return true;
+    }
+
+    private async exchangeToken(context: TurnContext): Promise<TokenResponse | undefined> {
+        const tokenExchangeRequest = context.activity.value.authentication;
+
+        if (!tokenExchangeRequest || !tokenExchangeRequest.token) {
+            return;
+        }
+
+        return await UserTokenAccess.exchangeToken(context, this._oAuthPromptSettings, tokenExchangeRequest);
+    }
+
     private async authenticateMessageExtensions(context: TurnContext, state: TState): Promise<string | undefined> {
         const value = context.activity.value;
 
         // When the Bot Service Auth flow completes, the query.State will contain a magic code used for verification.
         const magicCode = value.state && Number.isInteger(Number(value.state)) ? value.state : '';
 
-        const tokenResponse = await this.getUserToken(context, magicCode);
+        const tokenResponse = await UserTokenAccess.getUserToken(context, this._oAuthPromptSettings, magicCode);
 
         if (!tokenResponse || !tokenResponse.token) {
             // There is no token, so the user has not signed in yet.
             // Retrieve the OAuth Sign in Link to use in the MessagingExtensionResult Suggested Actions
 
-            const signInResource = await this.getSignInResource(context);
+            const signInResource = await UserTokenAccess.getSignInResource(context, this._oAuthPromptSettings);
             const signInLink = signInResource.signInLink;
             // Do 'silentAuth' if this is a composeExtension/query request otherwise do normal `auth` flow.
             const authType = context.activity.name === QUERY_INVOKE_NAME ? 'silentAuth' : 'auth';
@@ -298,65 +335,14 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         return tokenResponse.token;
     }
 
-    /**
-     * @param context
-     * @internal
-     */
-    public async tokenIsExchangeable(context: TurnContext) {
-        let tokenExchangeResponse;
-        try {
-            tokenExchangeResponse = await this.exchangeToken(context);
-        } catch (err) {
-            // Ignore Exceptions
-            // If token exchange failed for any reason, tokenExchangeResponse above stays null, and hence we send back a failure invoke response to the caller.
-            console.log('tokenExchange error: ' + err);
-        }
-        if (!tokenExchangeResponse || !tokenExchangeResponse.token) {
-            return false;
-        }
-        return true;
-    }
-
-    public async exchangeToken(context: TurnContext): Promise<TokenResponse | undefined> {
-        const tokenExchangeRequest = context.activity.value.authentication;
-
-        if (!tokenExchangeRequest || !tokenExchangeRequest.token) {
-            return;
-        }
-
-        return await UserTokenAccess.exchangeToken(context, this._oAuthPromptSettings, tokenExchangeRequest);
-    }
-
-    public async getUserToken(context: TurnContext, magicCode: string): Promise<TokenResponse> {
-        return await UserTokenAccess.getUserToken(context, this._oAuthPromptSettings, magicCode);
-    }
-
-    public async getSignInResource(context: TurnContext): Promise<SignInUrlResponse> {
-        return await UserTokenAccess.getSignInResource(context, this._oAuthPromptSettings);
-    }
-
-    /**
-     * @param context
-     * @private
-     */
     private getUserAuthStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:AuthState__`;
     }
 
-    /**
-     * @param context
-     * @private
-     */
     private getUserDialogStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:DialogState__`;
     }
 
-    /**
-     * @param context
-     * @param state
-     * @param dialogStateProperty
-     * @private
-     */
     private async runDialog(
         context: TurnContext,
         state: TState,

@@ -3,11 +3,15 @@
 
 import { CloudAdapterBase, TokenResponse, TurnContext } from 'botbuilder-core';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
-
 import { SignInUrlResponse, TokenExchangeRequest, UserTokenClient } from 'botframework-connector';
 
 /**
  * @internal
+ * Retrieves the user token for a given connection name and magic code.
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
+ * @param {string} magicCode The magic code to use for token retrieval.
+ * @returns {Promise<TokenResponse>} A TokenResponse object containing the user token.
  */
 export async function getUserToken(
     context: TurnContext,
@@ -31,6 +35,9 @@ export async function getUserToken(
 
 /**
  * @internal
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
+ * @returns {Promise<SignInUrlResponse>} A SignInUrlResponse object containing the sign-in URL.
  */
 export async function getSignInResource(
     context: TurnContext,
@@ -48,6 +55,8 @@ export async function getSignInResource(
 
 /**
  * @internal
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
  */
 export async function signOutUser(context: TurnContext, settings: OAuthPromptSettings): Promise<void> {
     const userTokenClient = context.turnState.get<UserTokenClient>(
@@ -66,6 +75,10 @@ export async function signOutUser(context: TurnContext, settings: OAuthPromptSet
 
 /**
  * @internal
+ * @param {TurnContext} context The context object for the current turn of conversation.
+ * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
+ * @param {TokenExchangeRequest} tokenExchangeRequest The token exchange request details to be sent to the Bot Framework Token Service.
+ * @returns {Promise<TokenResponse>} A TokenResponse object containing the user token.
  */
 export async function exchangeToken(
     context: TurnContext,
