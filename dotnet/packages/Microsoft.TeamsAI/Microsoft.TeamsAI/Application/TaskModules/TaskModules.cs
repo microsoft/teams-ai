@@ -71,11 +71,11 @@ namespace Microsoft.TeamsAI
         /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnFetch(RouteSelector routeSelector, FetchHandler<TState> handler)
         {
-            TaskModuleAction? taskModuleAction;
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
+                TaskModuleAction? taskModuleAction;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, FETCH_INVOKE_NAME)
                     || (taskModuleAction = InvokeActivityUtilities.GetInvokeValue<TaskModuleAction>(turnContext.Activity)) == null)
@@ -91,7 +91,6 @@ namespace Microsoft.TeamsAI
                     Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
-
             };
 
             _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
@@ -173,11 +172,11 @@ namespace Microsoft.TeamsAI
         /// <returns>The application instance for chaining purposes.</returns>
         public Application<TState, TTurnStateManager> OnSubmit(RouteSelector routeSelector, SubmitHandler<TState> handler)
         {
-            TaskModuleAction? taskModuleAction;
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
+                TaskModuleAction? taskModuleAction;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SUBMIT_INVOKE_NAME)
                     || (taskModuleAction = InvokeActivityUtilities.GetInvokeValue<TaskModuleAction>(turnContext.Activity)) == null)
@@ -193,7 +192,6 @@ namespace Microsoft.TeamsAI
                     Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
-
             };
 
             _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
