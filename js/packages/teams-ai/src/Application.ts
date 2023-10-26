@@ -515,29 +515,17 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 const state = await turnStateManager!.loadState(storage, context);
 
                 // Sign the user in
-                if (this._authentication) {
-                    if (context.activity.type === ActivityTypes.Message) {
-                        // Get the auth token
-                        const token = await this._authentication.signInUser(context, state);
-                        if (token) {
-                            state['temp'].value.authToken = token;
-                        } else {
-                            // Save turn state and end
-                            // - This saves the current dialog stack.
-                            await turnStateManager!.saveState(storage, context, state);
-                            return false;
-                        }
-                    }
+                if (this._authentication && this._authentication.canSignInUser(context)) {
+                    // Get the auth token
+                    const token = await this._authentication.signInUser(context, state);
+                    if (token) {
+                        state['temp'].value.authToken = token;
+                    } else {
+                        // Save turn state and end
+                        // - This saves the current dialog stack.
+                        await turnStateManager!.saveState(storage, context, state);
 
-                    if (this.authentication.isInvokeActivityThatAllowsAuthSignIn(context)) {
-                        const token = await this.authentication.signInUser(context, state);
-
-                        if (token) {
-                            state['temp'].value.authToken = token;
-                        } else {
-                            // Appropriate invoke response has been sent
-                            return false;
-                        }
+                        return false;
                     }
                 }
 

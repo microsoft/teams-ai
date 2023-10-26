@@ -78,29 +78,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
                     context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName
                 ),
             async (context, state) => {
-                const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                const result = await this.runDialog(context, state, userDialogStatePropertyName);
-
-                if (result.status === DialogTurnStatus.complete) {
-                    if (result.result?.token) {
-                        // Populate the token in the temp state
-                        state.temp.value.authToken = await this.signInUser(context, state);
-
-                        await context.sendActivity({
-                            value: { status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-
-                        await this._authSuccessHandler?.(context, state);
-                    } else {
-                        await context.sendActivity({
-                            value: { status: 400 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-
-                        await this._authFailureHandler?.(context, state);
-                    }
-                }
+                await this.continueConversationalBotAuthFlow(context, state);
             },
             true
         );
@@ -111,29 +89,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
                         context.activity.name === tokenExchangeOperationName
                 ),
             async (context, state) => {
-                const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-                const result = await this.runDialog(context, state, userDialogStatePropertyName);
-
-                if (result.status === DialogTurnStatus.complete) {
-                    if (result.result?.token) {
-                        // Populate the token in the temp state
-                        state.temp.value.authToken = await this.signInUser(context, state);
-
-                        await context.sendActivity({
-                            value: { status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-
-                        await this._authSuccessHandler?.(context, state);
-                    } else {
-                        await context.sendActivity({
-                            value: { status: 400 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-
-                        await this._authFailureHandler?.(context, state);
-                    }
-                }
+                await this.continueConversationalBotAuthFlow(context, state);
             },
             true
         );
@@ -149,67 +105,23 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @returns {string | undefined} The authentication token or undefined if the user is still login in.
      */
     public async signInUser(context: TurnContext, state: TState): Promise<string | undefined> {
-        if (this.isInvokeActivityThatAllowsAuthSignIn(context)) {
-            // Do token exchange
-            const authObj = context.activity.value.authentication;
-            if (authObj && authObj.token) {
-                // Message extension token exchange invoke activity
-                const isTokenExchangable = await this.tokenIsExchangeable(context);
-                if (!isTokenExchangable) {
-                    await context.sendActivity({
-                        value: { status: 412 } as InvokeResponse,
-                        type: ActivityTypes.InvokeResponse
-                    });
-
-                    return undefined;
-                }
-            }
-
-            // Messaging extension Auth flow
-            const token = await this.authenticateMessageExtensions(context, state);
-
-            if (!token) {
-                // Sign in card is sent to user
-                return undefined;
-            }
-
-            return token;
+        if (this.isMessageExtensionThatAllowsAuthSignIn(context)) {
+            return await this.authenticateMessageExtensions(context, state);
+        } else if (context.activity.type === ActivityTypes.Message) {
+            // Conversational Bot Auth Flow
+            return await this.authenticateConversationalBotFlow(context, state);
         } else {
-            // Bot Auth Flow
-
-            // Get property names to use
-            const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
-            const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-
-            // Save message if not signed in
-            if (!state.conversation.value[userAuthStatePropertyName]) {
-                state.conversation.value[userAuthStatePropertyName] = {
-                    signedIn: false,
-                    message: context.activity.text
-                };
-            }
-
-            const results = await this.runDialog(context, state, userDialogStatePropertyName);
-            if (results.status === DialogTurnStatus.complete && results.result != undefined) {
-                // Get user auth state
-                const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
-                if (!userAuthState.signedIn && userAuthState.message) {
-                    // Restore user message
-                    context.activity.text = userAuthState.message;
-                    userAuthState.signedIn = true;
-                    delete userAuthState.message;
-                    state.conversation.value[userAuthStatePropertyName] = userAuthState;
-                }
-
-                // Delete persisted dialog state
-                delete state.conversation.value[userDialogStatePropertyName];
-
-                // Return token
-                return results.result?.token;
-            } else {
-                return undefined;
-            }
+            throw new Error(`signInUser() is not supported for this activity type.`);
         }
+    }
+
+    /**
+     * Determines whether user sign in is allowed for the given activity type.
+     * @param {TurnContext} context - Current turn context.
+     * @returns {boolean} true if the user can sign in for the given activity type, false otherwise.
+     */
+    public canSignInUser(context: TurnContext): boolean {
+        return this.isMessageExtensionThatAllowsAuthSignIn(context) || context.activity.type === ActivityTypes.Message;
     }
 
     /**
@@ -252,12 +164,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
     }
 
-    /**
-     * Returns true if the incomming invoke type is one that allows user authentication.
-     * @param {TurnContext} context - Current turn context.
-     * @returns {boolean} Returns true if the incomming invoke type is one that allows user authentication. Otherwise false.
-     */
-    public isInvokeActivityThatAllowsAuthSignIn(context: TurnContext): boolean {
+    private isMessageExtensionThatAllowsAuthSignIn(context: TurnContext): boolean {
         return (
             context.activity.type == ActivityTypes.Invoke &&
             (context.activity.name == QUERY_INVOKE_NAME ||
@@ -292,6 +199,22 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     }
 
     private async authenticateMessageExtensions(context: TurnContext, state: TState): Promise<string | undefined> {
+        const authObj = context.activity.value.authentication;
+
+        // Token Exchange
+        if (authObj && authObj.token) {
+            // Message extension token exchange invoke activity
+            const isTokenExchangable = await this.tokenIsExchangeable(context);
+            if (!isTokenExchangable) {
+                await context.sendActivity({
+                    value: { status: 412 } as InvokeResponse,
+                    type: ActivityTypes.InvokeResponse
+                });
+
+                return undefined;
+            }
+        }
+
         const value = context.activity.value;
 
         // When the Bot Service Auth flow completes, the query.State will contain a magic code used for verification.
@@ -335,12 +258,73 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         return tokenResponse.token;
     }
 
+    private async authenticateConversationalBotFlow(context: TurnContext, state: TState): Promise<string | undefined> {
+        // Get property names to use
+        const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
+        const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+
+        // Save message if not signed in
+        if (!state.conversation.value[userAuthStatePropertyName]) {
+            state.conversation.value[userAuthStatePropertyName] = {
+                signedIn: false,
+                message: context.activity.text
+            };
+        }
+
+        const results = await this.runDialog(context, state, userDialogStatePropertyName);
+        if (results.status === DialogTurnStatus.complete && results.result != undefined) {
+            // Get user auth state
+            const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
+            if (!userAuthState.signedIn && userAuthState.message) {
+                // Restore user message
+                context.activity.text = userAuthState.message;
+                userAuthState.signedIn = true;
+                delete userAuthState.message;
+                state.conversation.value[userAuthStatePropertyName] = userAuthState;
+            }
+
+            // Delete persisted dialog state
+            delete state.conversation.value[userDialogStatePropertyName];
+
+            // Return token
+            return results.result?.token;
+        } else {
+            return undefined;
+        }
+    }
+
     private getUserAuthStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:AuthState__`;
     }
 
     private getUserDialogStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:DialogState__`;
+    }
+
+    private async continueConversationalBotAuthFlow(context: TurnContext, state: TState): Promise<void> {
+        const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+        const result = await this.runDialog(context, state, userDialogStatePropertyName);
+
+        if (result.status === DialogTurnStatus.complete) {
+            if (result.result?.token) {
+                // Populate the token in the temp state
+                state.temp.value.authToken = await this.signInUser(context, state);
+
+                await context.sendActivity({
+                    value: { status: 200 } as InvokeResponse,
+                    type: ActivityTypes.InvokeResponse
+                });
+
+                await this._authSuccessHandler?.(context, state);
+            } else {
+                await context.sendActivity({
+                    value: { status: 400 } as InvokeResponse,
+                    type: ActivityTypes.InvokeResponse
+                });
+
+                await this._authFailureHandler?.(context, state);
+            }
+        }
     }
 
     private async runDialog(
