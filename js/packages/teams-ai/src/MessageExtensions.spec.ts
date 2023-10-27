@@ -534,10 +534,10 @@ describe('MessageExtensions', () => {
             });
             activity.channelId = 'msteams';
 
-            mockApp.messageExtensions.handleOnButtonClicked(async (context: TurnContext, _state, button) => {
-                assert.equal(button.title, 'Query button');
-                assert.equal(button.displayText, 'Yes');
-                assert.equal(button.value, 'Yes');
+            mockApp.messageExtensions.handleOnButtonClicked(async (context: TurnContext, _state, data) => {
+                assert.equal(data.title, 'Query button');
+                assert.equal(data.displayText, 'Yes');
+                assert.equal(data.value, 'Yes');
             });
 
             await adapter.processActivity(activity, async (context) => {
