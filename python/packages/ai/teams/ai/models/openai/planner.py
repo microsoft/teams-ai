@@ -168,11 +168,12 @@ class OpenAIPlanner(Planner):
                         )
                     ]
                 )
-        except OpenAIClientError:
+        except OpenAIClientError as e:
             return Plan(
                 commands=[
                     PredictedDoCommand(
-                        action=ActionTypes.RATE_LIMITED,
+                        action=ActionTypes.HTTP_ERROR,
+                        entities={"status": e.status, "message": e.message},
                     )
                 ]
             )
@@ -203,11 +204,12 @@ class OpenAIPlanner(Planner):
                                 )
                             ]
                         )
-                except OpenAIClientError:
+                except OpenAIClientError as e:
                     return Plan(
                         commands=[
                             PredictedDoCommand(
-                                action=ActionTypes.RATE_LIMITED,
+                                action=ActionTypes.HTTP_ERROR,
+                                entities={"status": e.status, "message": e.message},
                             )
                         ]
                     )
