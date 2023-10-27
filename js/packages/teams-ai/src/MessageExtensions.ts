@@ -650,11 +650,11 @@ export class MessageExtensions<TState extends TurnState> {
      * @param {(context: TurnContext, state: TState, data: TData) => Promise<void>} handler Function defined by the developer to call when the command is received.
      * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
      * @param {TState} handler.state Current state of the turn.
-     * @param {TData} handler.settings The configuration settings that was submitted.
+     * @param {TData} handler.data The data that was submitted.
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public handleOnButtonClicked<TData extends Record<string, any>>(
-        handler: (context: TurnContext, state: TState, settings: TData) => Promise<void>
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<void>
     ): Application<TState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
