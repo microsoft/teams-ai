@@ -43,6 +43,15 @@ export interface BaseOpenAIModelOptions {
      * Optional. Request options to use when calling the OpenAI API.
      */
     requestConfig?: AxiosRequestConfig;
+
+    /**
+     * Optional. Whether to use `system` messages when calling the OpenAI API.
+     * @remarks
+     * The current generation of models tend to follow instructions from `user` messages better
+     * then `system` messages so the default is `false`, which causes any `system` message in the
+     * prompt to be sent as `user` messages instead.
+     */
+    useSystemMessages?: boolean;
 }
 
 /**
@@ -128,6 +137,7 @@ export class OpenAIModel implements PromptCompletionModel {
                 completion_type: 'chat',
                 retryPolicy: [2000, 5000],
                 azureApiVersion: '2023-05-15',
+                useSystemMessages: false
             }, options) as AzureOpenAIModelOptions;
 
             // Cleanup and validate endpoint
@@ -145,7 +155,8 @@ export class OpenAIModel implements PromptCompletionModel {
             this._useAzure = false;
             this.options = Object.assign({
                 completion_type: 'chat',
-                retryPolicy: [2000, 5000]
+                retryPolicy: [2000, 5000],
+                useSystemMessages: false
             }, options) as OpenAIModelOptions;
         }
 
@@ -217,6 +228,9 @@ export class OpenAIModel implements PromptCompletionModel {
             const result = await template.prompt.renderAsMessages(context, memory, functions, tokenizer, max_input_tokens);
             if (result.tooLong) {
                 return { status: 'too_long', error: new Error(`The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`) };
+            }
+            if (!this.options.useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
+                result.output[0].role = 'user';
             }
             if (this.options.logRequests) {
                 console.log(Colorize.title('CHAT PROMPT:'));

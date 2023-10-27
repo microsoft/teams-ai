@@ -76,11 +76,12 @@ import {
     OpenAIModel,
     PromptManager,
     TurnState,
-    Memory
+    Memory,
+    DefaultConversationState
 } from '@microsoft/teams-ai';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ConversationState {
+interface ConversationState extends DefaultConversationState {
     lightsOn: boolean;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
