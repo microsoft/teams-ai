@@ -204,9 +204,10 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     public static readonly FlaggedOutputActionName = '___FlaggedOutput___';
 
     /**
-     * An action that will be called anytime the planner is rate limited.
+     * An action that will be called anytime the planner encounters an HTTP response with
+     * status code >= `400`.
      */
-    public static readonly RateLimitedActionName = '___RateLimited___';
+    public static readonly HttpErrorActionName = '___HttpError___';
 
     /**
      * An action that will be called after the plan has been predicted by the planner and it has
@@ -307,11 +308,11 @@ export class AI<TState extends TurnState = DefaultTurnState> {
             true
         );
 
-        // Register default RateLimitedActionName
+        // Register default HttpErrorActionName
         this.action(
-            AI.RateLimitedActionName,
+            AI.HttpErrorActionName,
             (context, state, data, action) => {
-                throw new Error(`An AI request failed because it was rate limited`);
+                throw new Error(`An AI http request failed`);
             },
             true
         );
