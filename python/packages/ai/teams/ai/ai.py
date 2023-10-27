@@ -57,9 +57,7 @@ class AI(Generic[StateT]):
             ActionTypes.FLAGGED_OUTPUT: ActionEntry(
                 ActionTypes.FLAGGED_OUTPUT, True, self._on_flagged_output
             ),
-            ActionTypes.RATE_LIMITED: ActionEntry(
-                ActionTypes.RATE_LIMITED, True, self._on_rate_limited
-            ),
+            ActionTypes.HTTP_ERROR: ActionEntry(ActionTypes.HTTP_ERROR, True, self._on_http_error),
             ActionTypes.PLAN_READY: ActionEntry(ActionTypes.PLAN_READY, True, self._on_plan_ready),
             ActionTypes.DO_COMMAND: ActionEntry(ActionTypes.DO_COMMAND, True, self._on_do_command),
             ActionTypes.SAY_COMMAND: ActionEntry(
@@ -263,12 +261,19 @@ class AI(Generic[StateT]):
         )
         return True
 
-    async def _on_rate_limited(
+    async def _on_http_error(
         self,
-        _context: ActionTurnContext,
+        _context: ActionTurnContext[dict],
         _state: StateT,
     ) -> bool:
-        raise ApplicationError("An AI request failed because it was rate limited")
+        status = _context.data.get("status")
+        message = _context.data.get("message")
+        raise ApplicationError(
+            (
+                "An AI request failed because an http error occurred. "
+                f"Status code:{status}. Message:{message}"
+            )
+        )
 
     async def _on_plan_ready(
         self,

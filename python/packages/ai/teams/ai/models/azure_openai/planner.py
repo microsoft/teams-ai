@@ -5,20 +5,20 @@ Licensed under the MIT License.
 
 from typing import Optional
 
+from botbuilder.core import TurnContext
 from semantic_kernel.connectors.ai.open_ai import (
     AzureChatCompletion,
     AzureTextCompletion,
 )
 
-from botbuilder.core import TurnContext
-
-from teams.ai.state import TurnState
-from teams.ai.prompts import PromptTemplate
 from teams.ai.models.openai import OpenAIPlanner
 from teams.ai.planner import Plan
+from teams.ai.prompts import PromptTemplate
+from teams.ai.state import TurnState
 
 from .client import AzureOpenAIClient
 from .planner_options import AzureOpenAIPlannerOptions
+
 
 class AzureOpenAIPlanner(OpenAIPlanner):
     _options: AzureOpenAIPlannerOptions

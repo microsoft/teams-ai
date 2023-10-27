@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from unittest import TestCase
+from unittest import IsolatedAsyncioTestCase, mock
 
 import pytest
 from botbuilder.core import TurnContext
@@ -11,6 +11,7 @@ from botbuilder.core import TurnContext
 from teams import (
     AI,
     ActionEntry,
+    ActionTurnContext,
     AIOptions,
     ApplicationError,
     OpenAIPlanner,
@@ -19,7 +20,7 @@ from teams import (
 )
 
 
-class TestAI(TestCase):
+class TestAI(IsolatedAsyncioTestCase):
     ai: AI
 
     @pytest.fixture(autouse=True)
@@ -72,3 +73,20 @@ class TestAI(TestCase):
             self.ai.action()(hello_world)
 
         self.assertRaises(ApplicationError, wrapper)
+
+    @pytest.mark.asyncio
+    async def test_on_http_error_action(self):
+        context = mock.MagicMock(spec=ActionTurnContext)
+        context.data = {"status": 400, "message": "bad request"}
+
+        with self.assertRaises(ApplicationError) as context_manager:
+            await self.ai._on_http_error(context, {})
+
+        exception = context_manager.exception
+        self.assertEqual(
+            str(exception),
+            (
+                "An AI request failed because an http error occurred. "
+                "Status code:400. Message:bad request"
+            ),
+        )
