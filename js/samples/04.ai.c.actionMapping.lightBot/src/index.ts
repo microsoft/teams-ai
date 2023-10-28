@@ -86,6 +86,10 @@ interface ConversationState extends DefaultConversationState {
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+}
+
 // Create AI components
 const model = new OpenAIModel({
     apiKey: process.env.OPENAI_API_KEY || '',

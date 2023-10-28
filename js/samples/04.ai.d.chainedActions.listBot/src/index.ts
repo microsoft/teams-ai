@@ -10,12 +10,10 @@ import * as restify from 'restify';
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
-    CardFactory,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
-    MessageFactory,
     TurnContext
 } from 'botbuilder';
 
@@ -79,11 +77,9 @@ import {
     OpenAIModel,
     PromptManager,
     TurnState,
-    Memory,
     DefaultConversationState
 } from '@microsoft/teams-ai';
 import * as responses from './responses';
-import { throttlingRetryPolicy } from '@azure/ms-rest-js';
 
 // Strongly type the applications turn state
 interface ConversationState extends DefaultConversationState {
@@ -91,6 +87,11 @@ interface ConversationState extends DefaultConversationState {
     lists: Record<string, string[]>;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
+
+
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+}
 
 // Create AI components
 const model = new OpenAIModel({
@@ -106,7 +107,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat',
+    defaultPrompt: 'monologue',
 });
 
 // Define storage and application
