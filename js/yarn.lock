@@ -827,17 +827,6 @@
   resolved "https://registry.yarnpkg.com/@microsoft/recognizers-text/-/recognizers-text-1.3.1.tgz#eda98a9148101ecdb04ed1424082d472b04aabd9"
   integrity sha512-HikLoRUgSzM4OKP3JVBzUUp3Q7L4wgI17p/3rERF01HVmopcujY3i6wgx8PenCwbenyTNxjr1AwSDSVuFlYedQ==
 
-"@microsoft/teams-ai@~0.1.0-preview.2":
-  version "0.1.0-preview.2"
-  resolved "https://registry.yarnpkg.com/@microsoft/teams-ai/-/teams-ai-0.1.0-preview.2.tgz#38f6c3fbf9fea7fcae3221dc828d0eafb0294834"
-  integrity sha512-Dp7ZnGKS5rA/Xa2MkC28gveUC/nvwqK7CGaqo3uTtyVvEcSXgitPUmN0FtSoXb11PvyQNipky0D/qskRIpHWww==
-  dependencies:
-    axios "^1.3.4"
-    botbuilder "^4.19.0"
-    botbuilder-dialogs "^4.19.0"
-    gpt-3-encoder "^1.1.4"
-    yaml "^2.2.2"
-
 "@microsoft/teamsfx@^2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@microsoft/teamsfx/-/teamsfx-2.3.0.tgz#a9139e53f0d03be4ae7341102c33cd79b2bb9533"
@@ -2108,7 +2097,7 @@ botbuilder-dialogs-adaptive-runtime-core@4.20.1-preview:
   dependencies:
     dependency-graph "^0.10.0"
 
-"botbuilder-dialogs@>=4.18.0 <5.0.0", botbuilder-dialogs@^4.19.0, botbuilder-dialogs@^4.20.1:
+"botbuilder-dialogs@>=4.18.0 <5.0.0", botbuilder-dialogs@^4.20.1:
   version "4.20.1"
   resolved "https://registry.yarnpkg.com/botbuilder-dialogs/-/botbuilder-dialogs-4.20.1.tgz#3dd1b3ab0e3e2fd43e1bd350ae2152261424f96b"
   integrity sha512-PmQgnt74b23jn9Zaj52DHjE2SgUdMOWUgQ/rOn8/iWJ7ynqSd7tSvfiXG0gDg8q/LGeGk3LMA0tMfVXln48UVA==
@@ -2130,7 +2119,7 @@ botbuilder-stdlib@4.20.1-internal:
   resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.20.1-internal.tgz#7784a851f27989cdd5e43dbe1bf7d77e69ccea4d"
   integrity sha512-zOxA6cjRE6cqsReIJ+fwvxAMjXu2AlD0XuYM6/QPW86xbev7aA4gW4e8OZL6ckgX3IRYAtUbL7ikadxdeoMVjQ==
 
-"botbuilder@>=4.18.0 <5.0.0", botbuilder@^4.19.0, botbuilder@^4.20.1:
+"botbuilder@>=4.18.0 <5.0.0", botbuilder@^4.20.1:
   version "4.20.1"
   resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.20.1.tgz#efff94cbf2a4e8dc8590b1e77ad833685ea3896d"
   integrity sha512-Yc/JdyxrhmWDUET0YVSoHhmMYO0eAwlzpRLlyOkZilv55QsNyLZeNdKcqbrBbA9izg790SW6LqTHlkkbtkvWJA==
@@ -9670,11 +9659,6 @@ yaml@^1.10.0:
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
-
-yaml@^2.2.2:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.3.tgz#01f6d18ef036446340007db8e016810e5d64aad9"
-  integrity sha512-zw0VAJxgeZ6+++/su5AFoqBbZbrEakwu+X0M5HmcwUiBL7AzcuPKjj5we4xfQLp78LkEMpD0cOnUhmgOVy3KdQ==
 
 yaml@^2.3.2:
   version "2.3.2"

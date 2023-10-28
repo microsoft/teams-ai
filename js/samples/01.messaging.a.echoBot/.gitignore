@@ -114,5 +114,4 @@ env/.env.local
 appPackage/build
 .deployment
 
-.env.*
 .env
