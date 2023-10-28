@@ -12,7 +12,7 @@ import {
     Attachment,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     MessageFactory,
     MessagingExtensionResult,
@@ -25,7 +25,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -33,16 +38,17 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error.toString()}`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -66,13 +72,17 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import {
-    ApplicationBuilder,
-    DefaultConversationState,
-    DefaultPromptManager,
+    AI,
+    Application,
+    ActionPlanner,
+    OpenAIModerator,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
     DefaultTempState,
-    DefaultTurnState,
+    DefaultConversationState,
     DefaultUserState,
-    OpenAIPlanner
+    ApplicationBuilder
 } from '@microsoft/teams-ai';
 import { createInitialView, createEditView, createPostCard } from './cards';
 
@@ -85,23 +95,48 @@ if (!process.env.OPENAI_API_KEY) {
     throw new Error('Missing environment OPENAI_API_KEY');
 }
 
+interface ConversationState extends DefaultConversationState {
+}
+
+interface UserState extends DefaultUserState {
+}
+
 interface TempState extends DefaultTempState {
     post: string | undefined;
     prompt: string | undefined;
 }
 
-type ApplicationTurnState = DefaultTurnState<DefaultConversationState, DefaultUserState, TempState>;
+type ApplicationTurnState = TurnState<ConversationState, UserState, TempState>;
 
 if (!process.env.OPENAI_API_KEY) {
     throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
+
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY,
-    defaultModel: 'text-davinci-003',
+// Create AI components
+const model = new OpenAIModel({
+    apiKey: process.env.OPENAI_API_KEY || '',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
+// const model = new OpenAIModel({
+//     azureApiKey: process.env.AzureOpenAIKey || '',
+//     azureDefaultDeployment: 'gpt-3.5-turbo',
+//     azureEndpoint: process.env.AzureOpenAIEndpoint || '',
+//     azureApiVersion: '2023-03-15-preview',
+//     logRequests: true
+// });
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'chat',
+});
 
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
@@ -110,12 +145,9 @@ const botAppId = process.env.MicrosoftAppId || '';
 const app = new ApplicationBuilder<ApplicationTurnState>()
     .withStorage(storage)
     .withLongRunningMessages(adapter, botAppId)
-    .withAIOptions({
-        planner,
-        promptManager
-    })
     .build();
 
+// Implement Message Extension Logic
 app.messageExtensions.fetchTask('CreatePost', async (context: TurnContext, state: ApplicationTurnState) => {
     // Return card as a TaskInfo object
     const card = createInitialView();
@@ -167,7 +199,7 @@ app.messageExtensions.submitAction<SubmitData>(
 
 app.messageExtensions.botMessagePreviewEdit(
     'CreatePost',
-    async (context: TurnContext, state: DefaultTurnState, previewActivity: any) => {
+    async (context: TurnContext, state: TurnState, previewActivity: any) => {
         // Get post text from previewed card
         const post: string = previewActivity?.attachments?.[0]?.content?.body[0]?.text ?? '';
         const card = createEditView(post, PREVIEW_MODE);
@@ -177,7 +209,7 @@ app.messageExtensions.botMessagePreviewEdit(
 
 app.messageExtensions.botMessagePreviewSend(
     'CreatePost',
-    async (context: TurnContext, state: DefaultTurnState, previewActivity: any) => {
+    async (context: TurnContext, state: ApplicationTurnState, previewActivity: any) => {
         // Create a new activity using the card in the preview activity
         const card = previewActivity?.attachments?.[0];
         const activity = card && MessageFactory.attachment(card);
@@ -238,14 +270,14 @@ async function updatePost(
     data: SubmitData
 ): Promise<TaskModuleTaskInfo> {
     // Create new or updated post
-    state.temp.value['post'] = data.post;
-    state.temp.value['prompt'] = data.prompt;
-    const post = await app.ai.completePrompt(context, state, prompt);
-    if (!post) {
-        throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
+    state.temp.post = data.post;
+    state.temp.prompt = data.prompt;
+    const response = await planner.completePrompt(context, state, prompt);
+    if (response.status !== 'success') {
+        throw new Error(`The request to OpenAI had the following error: ${response.error}`);
     }
 
     // Return card
-    const card = createEditView(post, PREVIEW_MODE);
+    const card = createEditView(response.message?.content!, PREVIEW_MODE);
     return createTaskInfo(card);
 }
