@@ -34,7 +34,10 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
     private readonly _defaultPrompt?: string;
 
     public constructor(options: ActionPlannerOptions<TState>) {
-        this._options = Object.assign({}, options);
+        this._options = Object.assign({
+            max_repair_attempts: 3,
+            logRepairs: false
+        }, options);
         if (typeof this._options.defaultPrompt == 'function') {
             this._promptFactory = this._options.defaultPrompt;
         } else {

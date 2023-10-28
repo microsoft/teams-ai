@@ -63,6 +63,8 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
         this._section = new ActionAugmentationSection(actions, [
             `Return a JSON object with your thoughts and the next action to perform.`,
             `Only respond with the JSON format below and base your plan on the actions above.`,
+            `If you're not sure what to do, you can always say something by returning a SAY action.`,
+            `If you're told your JSON response has errors, do your best to fix them.`,
             `Response Format:`,
             `{"thoughts":{"thought":"<your current thought>","reasoning":"<self reflect on why you made this decision>","plan":"- short bulleted\\n- list that conveys\\n- long-term plan"},"action":{"name":"<action name>","parameters":{"<name>":"<value>"}}}`
         ].join('\n'));

@@ -10,10 +10,12 @@ import * as restify from 'restify';
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
+    CardFactory,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
+    MessageFactory,
     TurnContext
 } from 'botbuilder';
 
@@ -43,6 +45,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
@@ -72,142 +75,105 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 
 import {
     Application,
-    DefaultTurnState,
-    OpenAIPlanner,
-    AI,
-    DefaultConversationState,
-    DefaultUserState,
-    DefaultTempState,
-    DefaultPromptManager
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
+    Memory,
+    DefaultConversationState
 } from '@microsoft/teams-ai';
 import * as responses from './responses';
+import { throttlingRetryPolicy } from '@azure/ms-rest-js';
 
 // Strongly type the applications turn state
 interface ConversationState extends DefaultConversationState {
     greeted: boolean;
-    listNames: string[];
     lists: Record<string, string[]>;
 }
-
-type UserState = DefaultUserState;
-
-interface TempState extends DefaultTempState {
-    lists: Record<string, string[]>;
-}
-
-type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
-
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing OPENAI_API_KEY environment variable');
-}
+type ApplicationTurnState = TurnState<ConversationState>;
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY!,
-    defaultModel: 'text-davinci-003',
+const model = new OpenAIModel({
+    apiKey: process.env.OPENAI_API_KEY || '',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'chat',
+});
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        promptManager,
-        prompt: 'chatGPT'
+        planner
     }
 });
 
-// Define an interface to strongly type data parameters for actions
-interface EntityData {
-    list: string; // <- populated by GPT
-    item: string; // <- populated by GPT
-}
-
 // Listen for new members to join the conversation
 app.conversationUpdate('membersAdded', async (context: TurnContext, state: ApplicationTurnState) => {
-    if (!state.conversation.value.greeted) {
-        state.conversation.value.greeted = true;
+    if (!state.conversation.greeted) {
+        state.conversation.greeted = true;
         await context.sendActivity(responses.greeting());
     }
 });
 
-// List for /reset command and then delete the conversation state
+// ListEN for /reset command and then delete the conversation state
 app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.delete();
+    state.deleteConversationState();
     await context.sendActivity(responses.reset());
 });
 
 // Register action handlers
-app.ai.action('createList', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    ensureListExists(state, data.list);
-    return true;
-});
+interface ListOnly {
+    list: string;
+}
 
-app.ai.action('deleteList', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    deleteList(state, data.list);
-    return true;
-});
+interface ListAndItems extends ListOnly {
+    items?: string[];
+}
 
-app.ai.action('addItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const items = getItems(state, data.list);
-    items.push(data.item);
-    setItems(state, data.list, items);
-    return true;
-});
-
-app.ai.action('removeItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const items = getItems(state, data.list);
-    const index = items.indexOf(data.item);
-    if (index >= 0) {
-        items.splice(index, 1);
-        setItems(state, data.list, items);
-        return true;
+app.ai.action('createList', async (context: TurnContext, state: ApplicationTurnState, parameters: ListAndItems) => {
+    ensureListExists(state, parameters.list);
+    if (Array.isArray(parameters.items) && parameters.items.length > 0) {
+        await app.ai.doAction(context, state, 'addItems', parameters);
+        return `list created and items added. think about your next action`;
     } else {
-        await context.sendActivity(responses.itemNotFound(data.list, data.item));
-
-        // End the current chain
-        return false;
+        return `list created. think about your next action`;
     }
 });
 
-app.ai.action('findItem', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const items = getItems(state, data.list);
-    const index = items.indexOf(data.item);
-    if (index >= 0) {
-        await context.sendActivity(responses.itemFound(data.list, data.item));
-    } else {
-        await context.sendActivity(responses.itemNotFound(data.list, data.item));
-    }
-
-    // End the current chain
-    return false;
+app.ai.action('deleteList', async (context: TurnContext, state: ApplicationTurnState, parameters: ListOnly) => {
+    deleteList(state, parameters.list);
+    return `list deleted. think about your next action`;
 });
 
-app.ai.action('summarizeLists', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const lists = state.conversation.value.lists;
-    if (lists) {
-        // Chain into a new summarization prompt
-        state.temp.value.lists = lists;
-        await app.ai.chain(context, state, 'summarize');
-    } else {
-        await context.sendActivity(responses.noListsFound());
-    }
-
-    // End the current chain
-    return false;
+app.ai.action('addItems', async (context: TurnContext, state: ApplicationTurnState, parameters: ListAndItems) => {
+    const items = getItems(state, parameters.list);
+    items.push(...(parameters.items ?? []));
+    setItems(state, parameters.list, items);
+    return `items added. think about your next action`;
 });
 
-// Register a handler to handle unknown actions that might be predicted
-app.ai.action(
-    AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
-        await context.sendActivity(responses.unknownAction(action!));
-        return false;
-    }
-);
+app.ai.action('removeItems', async (context: TurnContext, state: ApplicationTurnState, parameters: ListAndItems) => {
+    const items = getItems(state, parameters.list);
+    (parameters.items ?? []).forEach((item: string) => {
+        const index = items.indexOf(item);
+        if (index >= 0) {
+            items.splice(index, 1);
+        }
+    });
+    setItems(state, parameters.list, items);
+    return `items removed. think about your next action`;
+});
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
@@ -226,7 +192,7 @@ server.post('/api/messages', async (req, res) => {
  */
 function getItems(state: ApplicationTurnState, list: string): string[] {
     ensureListExists(state, list);
-    return state.conversation.value.lists[list];
+    return state.conversation.lists[list];
 }
 
 /**
@@ -237,7 +203,7 @@ function getItems(state: ApplicationTurnState, list: string): string[] {
  */
 function setItems(state: ApplicationTurnState, list: string, items: string[]): void {
     ensureListExists(state, list);
-    state.conversation.value.lists[list] = items ?? [];
+    state.conversation.lists[list] = items ?? [];
 }
 
 /**
@@ -246,15 +212,12 @@ function setItems(state: ApplicationTurnState, list: string, items: string[]): v
  * @param {string} listName - The name of the list to ensure exists.
  */
 function ensureListExists(state: ApplicationTurnState, listName: string): void {
-    const conversation = state.conversation.value;
-    if (typeof conversation.lists != 'object') {
-        conversation.lists = {};
-        conversation.listNames = [];
+    if (typeof state.conversation.lists != 'object') {
+        state.conversation.lists = {};
     }
 
-    if (!Object.prototype.hasOwnProperty.call(conversation.lists, listName)) {
-        conversation.lists[listName] = [];
-        conversation.listNames.push(listName);
+    if (!Object.prototype.hasOwnProperty.call(state.conversation.lists, listName)) {
+        state.conversation.lists[listName] = [];
     }
 }
 
@@ -264,15 +227,7 @@ function ensureListExists(state: ApplicationTurnState, listName: string): void {
  * @param {string} listName - The name of the list to delete.
  */
 function deleteList(state: ApplicationTurnState, listName: string): void {
-    const conversation = state.conversation.value;
-    if (typeof conversation.lists == 'object' && Object.prototype.hasOwnProperty.call(conversation.lists, listName)) {
-        delete conversation.lists[listName];
-    }
-
-    if (Array.isArray(conversation.listNames)) {
-        const pos = conversation.listNames.indexOf(listName);
-        if (pos >= 0) {
-            conversation.listNames.splice(pos, 1);
-        }
+    if (typeof state.conversation.lists == 'object' && Object.prototype.hasOwnProperty.call(state.conversation.lists, listName)) {
+        delete state.conversation.lists[listName];
     }
 }

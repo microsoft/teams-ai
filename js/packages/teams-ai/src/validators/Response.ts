@@ -141,9 +141,7 @@ export class Response {
                     if (value == null) {
                         continue;
                     } else if (Array.isArray(value)) {
-                        if (value.length == 0) {
-                            continue;
-                        }
+                        // keep empty arrays
                     } else if (typeof (value as Date).toISOString !== 'function') {
                         const cleaned = this.removeEmptyValuesFromObject(value);
                         if (Object.keys(cleaned).length == 0) {
