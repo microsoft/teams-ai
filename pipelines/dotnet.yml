@@ -1,5 +1,12 @@
 trigger:
-- main
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - dotnet
+    - pipelines/dotnet.yml
 
 pool:
   vmImage: 'windows-latest'

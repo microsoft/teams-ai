@@ -136,7 +136,7 @@ app.ai.action(
     }
 );
 
-app.ai.action(AI.RateLimitedActionName, async (context, state, data) => {
-    await context.sendActivity('An AI request failed because it was rate limited. Please try again later.');
+app.ai.action(AI.HttpErrorActionName, async (context, state, data) => {
+    await context.sendActivity('An AI request failed. Please try again later.');
     return false;
 });
