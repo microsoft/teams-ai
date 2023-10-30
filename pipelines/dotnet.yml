@@ -45,22 +45,23 @@ steps:
   displayName: 'Sign'
   inputs:
     ConnectedServiceName: 'Teams ESRP CodeSign v3'
-    FolderPath: 'pipelines'
+    FolderPath: '$(Build.ArtifactStagingDirectory)'
     Pattern: '*.nupkg'
     signConfigType: 'inlineSignParams'
     SessionTimeout: '60'
     MaxConcurrency: '50'
     MaxRetryAttempts: '5'
     PendingAnalysisWaitTimeoutMinutes: '5'
-
-# - task: onebranch.pipeline.signing@1
-#   displayName: 'Sign Output'
-#   inputs:
-#     command: 'sign'
-#     signing_profile: 'external_distribution'
-#     signing_environment: 'azure-ado'
-#     files_to_sign: '**/*.nupkg'
-#     search_root: '$(Build.ArtifactStagingDirectory)'
+    inlineOperation: |
+      [
+        {
+          "KeyCode": "CP-401405",
+          "OperationCode": "NuGetSign",
+          "ToolName": "sign",
+          "ToolVersion": "1.0",
+          "Parameters": {}
+        }
+      ]
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'

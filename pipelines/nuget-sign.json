@@ -1,9 +1,0 @@
-[
-    {
-        "KeyCode": "CP-401405",
-        "OperationCode": "NuGetSign",
-        "ToolName": "sign",
-        "ToolVersion": "1.0",
-        "Parameters": {}
-    }
-]
