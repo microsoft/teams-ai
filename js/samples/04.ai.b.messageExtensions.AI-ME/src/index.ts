@@ -141,7 +141,7 @@ const planner = new ActionPlanner({
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
 const storage = new MemoryStorage();
-const botAppId = process.env.MicrosoftAppId || '';
+const botAppId = process.env.BOT_ID || '';
 const app = new ApplicationBuilder<ApplicationTurnState>()
     .withStorage(storage)
     .withLongRunningMessages(adapter, botAppId)
