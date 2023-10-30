@@ -35,7 +35,6 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
 #region Use Azure OpenAI and Azure Content Safety
-/**
 // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
@@ -95,11 +94,10 @@ builder.Services.AddTransient<IBot>(sp =>
 
     return app;
 });
-**/
 #endregion
 
 #region Use OpenAI
- // Use OpenAI
+/** // Use OpenAI
 if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new Exception("Missing OpenAI configuration.");
@@ -160,6 +158,7 @@ builder.Services.AddTransient<IBot>(sp =>
 
     return app;
 });
+**/
 #endregion
 
 var app = builder.Build();
