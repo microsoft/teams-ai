@@ -53,7 +53,7 @@ export const PlanSchema: Schema = {
 
 export class SequenceAugmentation implements Augmentation<Plan|undefined> {
     private readonly _section: ActionAugmentationSection;
-    private readonly _planValidator: JSONResponseValidator<Plan> = new JSONResponseValidator(PlanSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
+    private readonly _planValidator: JSONResponseValidator<Plan> = new JSONResponseValidator(PlanSchema,  `No valid JSON objects were found in the response. Return a valid JSON object that uses the SAY command.`);
     private readonly _actionValidator: ActionResponseValidator;
 
     public constructor(actions: ChatCompletionAction[]) {
