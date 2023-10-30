@@ -106,7 +106,7 @@ export class OpenAIModerator<TState extends TurnState = TurnState> implements Mo
                     // Rate limited
                     return {
                         type: 'plan',
-                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, parameters: {} } as PredictedDoCommand]
+                        commands: [{ type: 'DO', action: AI.HttpErrorActionName, parameters: {} } as PredictedDoCommand]
                     };
                 }
                 break;
@@ -154,7 +154,7 @@ export class OpenAIModerator<TState extends TurnState = TurnState> implements Mo
                             return {
                                 type: 'plan',
                                 commands: [
-                                    { type: 'DO', action: AI.RateLimitedActionName, parameters: {} } as PredictedDoCommand
+                                    { type: 'DO', action: AI.HttpErrorActionName, parameters: {} } as PredictedDoCommand
                                 ]
                             };
                         }

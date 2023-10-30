@@ -247,12 +247,11 @@ export class AI<TState extends TurnState = TurnState> {
         );
 
         // Register default HttpErrorActionName
-        this.action(
+        this.defaultAction(
             AI.HttpErrorActionName,
             (context, state, data, action) => {
                 throw new Error(`An AI http request failed`);
-            },
-            true
+            }
         );
 
         // Register default PlanReadyActionName

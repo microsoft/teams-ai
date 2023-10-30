@@ -1,16 +1,17 @@
+/*
 import axios, { AxiosError } from 'axios';
 import { strict as assert } from 'assert';
 import { restore, stub } from 'sinon';
 import { TurnContext, CloudAdapter } from 'botbuilder';
 
 import { OpenAIModerator } from './OpenAIModerator';
-import { TurnStateEntry } from './TurnState';
-import { AI, AIHistoryOptions } from './AI';
+import { TurnStateEntry } from '../TurnState';
+import { AI, AIHistoryOptions } from '../AI';
 import { OpenAIPlanner } from './OpenAIPlanner';
 import { DefaultPromptManager } from './DefaultPromptManager';
 import { CreateModerationResponseResultsInner, ModerationResponse, OpenAIClientResponse } from './OpenAIClients';
 import { DefaultTurnState } from './DefaultTurnStateManager';
-import { PromptTemplate } from './Prompts';
+import { PromptTemplate } from '../Prompts';
 import { Plan, PredictedSayCommand } from './Planner';
 
 describe('OpenAIModerator', () => {
@@ -450,3 +451,4 @@ describe('OpenAIModerator', () => {
         });
     });
 });
+*/

@@ -222,7 +222,7 @@ export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends 
                     // Rate limited
                     return {
                         type: 'plan',
-                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, parameters: {} } as PredictedDoCommand]
+                        commands: [{ type: 'DO', action: AI.HttpErrorActionName, parameters: {} } as PredictedDoCommand]
                     };
                 }
                 break;
@@ -272,7 +272,7 @@ export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends 
                             return {
                                 type: 'plan',
                                 commands: [
-                                    { type: 'DO', action: AI.RateLimitedActionName, parameters: {} } as PredictedDoCommand
+                                    { type: 'DO', action: AI.HttpErrorActionName, parameters: {} } as PredictedDoCommand
                                 ]
                             };
                         }
