@@ -64,6 +64,10 @@ export abstract class PromptSectionBase implements PromptSection {
 
     public abstract renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
 
+    protected getTokenBudget(maxTokens: number): number {
+        return this.tokens > 1.0 ? Math.min(this.tokens, maxTokens) : maxTokens;
+    }
+
     protected returnMessages(output: Message[], length: number, tokenizer: Tokenizer, maxTokens: number): RenderedPromptSection<Message[]> {
         // Truncate if fixed length
         if (this.tokens > 1.0) {

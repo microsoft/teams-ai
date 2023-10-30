@@ -278,7 +278,6 @@ export class LLMClient<TContent = any> {
         try {
             // Ask client to complete prompt
             const response = await model.completePrompt(context, memory, functions, tokenizer, template) as PromptResponse<TContent>;
-            console.log(response);
             if (response.status !== 'success') {
                 // The response isn't valid so we don't care that the messages type is potentially incorrect.
                 return response;

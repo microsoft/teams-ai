@@ -25,7 +25,8 @@ export class DataSourceSection extends PromptSectionBase {
 
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>> {
         // Render data source
-        const rendered = await this._dataSource.renderData(context, memory, tokenizer, maxTokens);
+        const budget = this.getTokenBudget(maxTokens);
+        const rendered = await this._dataSource.renderData(context, memory, tokenizer, budget);
 
         // Return as a 'system' message
         // - The role will typically end up being ignored because as this section is usually added

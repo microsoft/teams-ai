@@ -80,7 +80,7 @@ export class ConversationHistory extends PromptSectionBase {
 
         // Populate messages and stay under the token budget
         let tokens = 0;
-        const budget = this.tokens > 1.0 ? Math.min(this.tokens, maxTokens) : maxTokens;
+        const budget = this.getTokenBudget(maxTokens);
         const messages: Message[] = [];
         for (let i = history.length - 1; i >= 0; i--) {
             // Clone message
