@@ -9,4 +9,5 @@
 export * from "./AzureOpenAIClient";
 export * from "./Colorize";
 export * from "./OpenAIClient";
+export * from "./TestUtilities";
 export * from "./types";
