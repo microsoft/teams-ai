@@ -46,7 +46,7 @@ steps:
   inputs:
     ConnectedServiceName: 'Teams ESRP CodeSign v3'
     FolderPath: '$(Build.ArtifactStagingDirectory)'
-    Pattern: '*.nupkg'
+    Pattern: '*.nupkg,*.snupkg'
     signConfigType: 'inlineSignParams'
     SessionTimeout: '60'
     MaxConcurrency: '50'
@@ -54,13 +54,20 @@ steps:
     PendingAnalysisWaitTimeoutMinutes: '5'
     inlineOperation: |
      [
-        {
-          "KeyCode": "CP-401405",
-          "OperationCode": "NuGetSign",
-          "ToolName": "sign",
-          "ToolVersion": "1.0",
-          "Parameters": {}
-        }
+         {
+             "keyCode": "CP-401405",
+             "operationSetCode": "NuGetSign",
+             "parameters": [],
+             "toolName": "sign",
+             "toolVersion": "1.0"
+         },
+         {
+             "keyCode": "CP-401405",
+             "operationSetCode": "NuGetVerify",
+             "parameters": [],
+             "toolName": "sign",
+             "toolVersion": "1.0"
+         }
      ]
 
 - task: PublishBuildArtifacts@1
