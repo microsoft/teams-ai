@@ -50,7 +50,7 @@ steps:
     SessionTimeout: '60'
     MaxConcurrency: '50'
     MaxRetryAttempts: '5'
-    PendingAnalysisWaitTimeoutMinutes: '5''
+    PendingAnalysisWaitTimeoutMinutes: '5'
 
 # - task: onebranch.pipeline.signing@1
 #   displayName: 'Sign Output'
