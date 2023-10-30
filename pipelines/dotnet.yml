@@ -40,6 +40,17 @@ steps:
     command: pack
     packagesToPack: '$(projectPath)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
+  
+- task: EsrpCodeSigning@4
+  inputs:
+    ConnectedServiceName: 'Teams ESRP CodeSign v3'
+    FolderPath: '$(Build.ArtifactStagingDirectory)'
+    Pattern: '*.dll,*.exe,*.nupkg'
+    signConfigType: 'inlineSignParams'
+    SessionTimeout: '60'
+    MaxConcurrency: '50'
+    MaxRetryAttempts: '5'
+    PendingAnalysisWaitTimeoutMinutes: '5''
 
 # - task: onebranch.pipeline.signing@1
 #   displayName: 'Sign Output'
