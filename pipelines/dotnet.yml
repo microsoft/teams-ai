@@ -53,7 +53,7 @@ steps:
     MaxRetryAttempts: '5'
     PendingAnalysisWaitTimeoutMinutes: '5'
     inlineOperation: |
-      [
+     [
         {
           "KeyCode": "CP-401405",
           "OperationCode": "NuGetSign",
@@ -61,7 +61,7 @@ steps:
           "ToolVersion": "1.0",
           "Parameters": {}
         }
-      ]
+     ]
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
