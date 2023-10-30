@@ -9,9 +9,6 @@ on:
   push:
     branches: ['**']
     paths: ['js/**']
-  pull_request:
-    branches: ['**']
-    paths: ['js/**']
 
 permissions: read-all
 

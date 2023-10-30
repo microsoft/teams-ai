@@ -9,9 +9,6 @@ on:
   push:
     branches: ['**']
     paths: ['dotnet/**']
-  pull_request:
-    branches: ['**']
-    paths: ['dotnet/**']
 
 permissions: read-all
 
