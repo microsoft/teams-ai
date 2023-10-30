@@ -1,11 +1,15 @@
 import { Application, AI, PredictedSayCommand } from '@microsoft/teams-ai';
 
+/**
+ *
+ * @param app
+ */
 export function addResponseFormatter(app: Application): void {
     app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data) => {
         // Replace markdown code blocks with <pre> tags
         let addTag = false;
         let inCodeBlock = false;
-        let output: string[] = [];
+        const output: string[] = [];
         const response = data.response.split('\n');
         for (const line of response) {
             if (line.startsWith('```')) {

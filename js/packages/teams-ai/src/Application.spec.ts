@@ -1,11 +1,12 @@
 import { strict as assert } from 'assert';
 import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
-import { Application, ApplicationBuilder } from './Application';
-import { TestPlanner } from '././planners';
+import { Application, ApplicationBuilder, ConversationUpdateEvents } from './Application';
+import { TestPlanner } from './planners';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
 import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
+import { createTestConversationUpdate } from './internals';
 
 describe('Application', () => {
     const adapter = new TestAdapter();
@@ -180,6 +181,129 @@ describe('Application', () => {
                 assert.equal(called, true);
                 assert.equal(handled, true);
             });
+        });
+    });
+
+    describe('conversationUpdate', () => {
+        // Optional pre-configured mock Application using Test Adapter. If other mocks are needed, feel free to ignore mockApp and create your own.
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+
+        it('should route to an instantiated conversationUpdate handler when channelId is Teams', async () => {
+            let handlerCalled = false;
+            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+                handlerCalled = true;
+                assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
+            });
+
+            const activity = createTestConversationUpdate();
+            activity.channelId = 'msteams';
+            activity.membersAdded = [
+                { id: '123', name: 'Member One' },
+                { id: '42', name: "Don't Panic" }
+            ];
+
+            await adapter.processActivity(activity, async (context) => {
+                await mockApp.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should route to an instantiated conversationUpdate handler when channelId is not defined', async () => {
+            let handlerCalled = false;
+            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+                handlerCalled = true;
+                assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
+            });
+
+            const activity = createTestConversationUpdate();
+            activity.membersAdded = [
+                { id: '123', name: 'Member One' },
+                { id: '42', name: "Don't Panic" }
+            ];
+
+            await adapter.processActivity(activity, async (context) => {
+                await mockApp.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        const testData = [
+            {
+                event: 'channelCreated',
+                channelData: {
+                    channel: { id: 'mockChannelId' },
+                    team: { id: 'mockTeamId' },
+                    eventType: 'channelCreated'
+                }
+            },
+            {
+                event: 'channelDeleted',
+                channelData: {
+                    channel: { id: 'mockChannelId' },
+                    team: { id: 'mockTeamId' },
+                    eventType: 'channelDeleted'
+                }
+            },
+            {
+                event: 'teamRenamed',
+                channelData: { team: { id: 'mockTeamId' }, eventType: 'teamRenamed' }
+            },
+            {
+                event: 'teamDeleted',
+                channelData: { team: { id: 'mockTeamId' }, eventType: 'teamDeleted' }
+            }
+        ];
+
+        for (const { event, channelData } of testData) {
+            it(`should route to correct handler for '${event}'`, async () => {
+                let handlerCalled = false;
+                mockApp.conversationUpdate(event as ConversationUpdateEvents, async (context, _state) => {
+                    handlerCalled = true;
+                    assert.equal(context.activity.channelData.eventType, event);
+                    assert.deepEqual(context.activity.channelData, channelData);
+                });
+
+                const activity = createTestConversationUpdate(channelData);
+                activity.channelId = 'msteams';
+                await adapter.processActivity(activity, async (context) => {
+                    await mockApp.run(context);
+                    assert.equal(handlerCalled, true);
+                });
+            });
+        }
+
+        it('should route to channel* events for correct eventType and when channel and team exist', async () => {
+            let handlerCalled = false;
+            const team = { id: 'mockTeamId' };
+            const channel = { id: 'mockChannelId' };
+            const activity = createTestConversationUpdate({ channel, eventType: 'channelCreated', team });
+            activity.channelId = 'msteams';
+
+            mockApp.conversationUpdate('channelCreated', async (context, _state) => {
+                handlerCalled = true;
+                assert.equal(typeof context.activity.channelData, 'object');
+                assert.equal(context.activity.channelData.eventType, 'channelCreated');
+                assert.deepEqual(context.activity.channelData.channel, channel);
+                assert.deepEqual(context.activity.channelData.team, team);
+            });
+
+            await adapter.processActivity(activity, async (context) => {
+                await mockApp.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should throw an error if handler is not a function', () => {
+            assert.throws(
+                () => mockApp.conversationUpdate('membersRemoved', {} as any),
+                new Error(
+                    `ConversationUpdate 'handler' for membersRemoved is object. Type of 'handler' must be a function.`
+                )
+            );
         });
     });
 });

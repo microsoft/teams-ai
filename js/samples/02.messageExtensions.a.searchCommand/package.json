@@ -28,7 +28,7 @@
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/restify": "8.5.8",
+        "@types/restify": "8.5.9",
         "nodemon": "~1.19.4",
         "typescript": "^5.2.2",
         "ts-node": "^10.9.1"
