@@ -42,10 +42,11 @@ steps:
     packDestination: '$(Build.ArtifactStagingDirectory)'
   
 - task: EsrpCodeSigning@4
+  displayName: 'Sign'
   inputs:
     ConnectedServiceName: 'Teams ESRP CodeSign v3'
-    FolderPath: '$(Build.ArtifactStagingDirectory)'
-    Pattern: '*.dll,*.exe,*.nupkg'
+    FolderPath: 'pipelines'
+    Pattern: '*.nupkg'
     signConfigType: 'inlineSignParams'
     SessionTimeout: '60'
     MaxConcurrency: '50'
