@@ -35,6 +35,7 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
 #region Use Azure OpenAI and Azure Content Safety
+/**
 // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
     || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
@@ -61,7 +62,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create AzureContentSafetyModerator
     IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
-    // Create Application
+    // Setup Application
     AIHistoryOptions aiHistoryOptions = new()
     {
         AssistantHistoryType = AssistantHistoryType.Text
@@ -72,14 +73,21 @@ builder.Services.AddTransient<IBot>(sp =>
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> applicationOptions = new()
+    var applicationBuilder = new ApplicationBuilder<GameState, GameStateManager>()
+    .WithAIOptions(aiOptions)
+    .WithLoggerFactory(loggerFactory)
+    .WithTurnStateManager(new GameStateManager());
+
+    // Set storage options
+    IStorage? storage = sp.GetService<IStorage>();
+    if (storage != null)
     {
-        TurnStateManager = new GameStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
-    Application<GameState, GameStateManager> app = new(applicationOptions);
+        applicationBuilder.WithStorage(storage);
+    }
+
+    // Create Application
+    Application<GameState, GameStateManager> app = applicationBuilder.Build();
+
     GameBotHandlers handlers = new(app);
 
     // register turn and activity handlers
@@ -87,10 +95,11 @@ builder.Services.AddTransient<IBot>(sp =>
 
     return app;
 });
+**/
 #endregion
 
 #region Use OpenAI
-/** // Use OpenAI
+ // Use OpenAI
 if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
 {
     throw new Exception("Missing OpenAI configuration.");
@@ -118,7 +127,7 @@ builder.Services.AddTransient<IBot>(sp =>
         loggerFactory,
         moderatorHttpClient);
 
-    // Create Application
+    // Setup Application
     AIHistoryOptions aiHistoryOptions = new()
     {
         AssistantHistoryType = AssistantHistoryType.Text
@@ -129,14 +138,21 @@ builder.Services.AddTransient<IBot>(sp =>
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> applicationOptions = new()
+    var applicationBuilder = new ApplicationBuilder<GameState, GameStateManager>()
+    .WithAIOptions(aiOptions)
+    .WithLoggerFactory(loggerFactory)
+    .WithTurnStateManager(new GameStateManager());
+
+    // Set storage options
+    IStorage? storage = sp.GetService<IStorage>();
+    if (storage != null)
     {
-        TurnStateManager = new GameStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
-    Application<GameState, GameStateManager> app = new(applicationOptions);
+        applicationBuilder.WithStorage(storage);
+    }
+
+    // Create Application
+    Application<GameState, GameStateManager> app = applicationBuilder.Build();
+
     GameBotHandlers handlers = new(app);
 
     // register turn and activity handlers
@@ -144,7 +160,6 @@ builder.Services.AddTransient<IBot>(sp =>
 
     return app;
 });
-**/
 #endregion
 
 var app = builder.Build();
