@@ -52,6 +52,7 @@ steps:
     MaxConcurrency: '50'
     MaxRetryAttempts: '5'
     PendingAnalysisWaitTimeoutMinutes: '5'
+    VerboseLogin: true
     inlineOperation: |
      [
          {
