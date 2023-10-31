@@ -22,7 +22,7 @@ import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
-import { Authentication } from './auth/Authentication';
+import { Authentication } from './authentication/Authentication';
 
 /**
  * @private
