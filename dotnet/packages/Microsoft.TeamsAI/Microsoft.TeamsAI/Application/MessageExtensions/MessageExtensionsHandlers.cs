@@ -87,4 +87,39 @@ namespace Microsoft.TeamsAI
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionResult.</returns>
     public delegate Task<MessagingExtensionResult> QueryLinkHandler<TState>(ITurnContext turnContext, TState turnState, string url, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+
+    /// <summary>
+    /// Function for handling Message Extension configuring query setting url events.
+    /// </summary>
+    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
+    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects
+    /// or threads to receive notice of cancellation.</param>
+    /// <returns>An instance of MessagingExtensionResult.</returns>
+    public delegate Task<MessagingExtensionResult> QueryUrlSettingHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+
+    /// <summary>
+    /// Function for handling Message Extension configuring settings events.
+    /// </summary>
+    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
+    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+    /// <param name="settings">The configuration settings that was submitted.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects
+    /// or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the work queued to execute.</returns>
+    public delegate Task ConfigureSettingsHandler<TState>(ITurnContext turnContext, TState turnState, object settings, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+
+    /// <summary>
+    /// Function for handling Message Extension clicking card button events.
+    /// </summary>
+    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
+    /// <param name="turnContext">A strongly-typed context object for this turn.</param>
+    /// <param name="turnState">The turn state object that stores arbitrary data for this turn.</param>
+    /// <param name="cardData">The card data.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used by other objects
+    /// or threads to receive notice of cancellation.</param>
+    /// <returns>A task that represents the work queued to execute.</returns>
+    public delegate Task CardButtonClickedHandler<TState>(ITurnContext turnContext, TState turnState, object cardData, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
 }

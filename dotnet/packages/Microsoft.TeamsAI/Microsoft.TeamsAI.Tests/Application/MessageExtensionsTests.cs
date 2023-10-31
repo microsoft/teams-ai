@@ -859,6 +859,214 @@ namespace Microsoft.TeamsAI.Tests.Application
             Assert.Null(activitiesToSend);
         }
 
+        [Fact]
+        public async void Test_OnQueryUrlSetting()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/querySettingUrl"
+            });
+            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
+            var expectedInvokeResponse = new InvokeResponse()
+            {
+                Status = 200,
+                Body = new MessagingExtensionActionResponse()
+                {
+                    ComposeExtension = messagingExtensionResultMock.Object
+                }
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            QueryUrlSettingHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
+            {
+                return Task.FromResult(messagingExtensionResultMock.Object);
+            };
+
+            // Act
+            app.MessageExtensions.OnQueryUrlSetting(handler);
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async void Test_OnQueryUrlSetting_NotHit()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/settings"
+            });
+            var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
+            {
+                return Task.FromResult(messagingExtensionResultMock.Object);
+            };
+
+            // Act
+            app.MessageExtensions.OnAnonymousQueryLink(handler);
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Null(activitiesToSend);
+        }
+
+        [Fact]
+        public async void Test_OnConfigureSettings()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/setting",
+                Value = JObject.FromObject(new
+                {
+                    state = "test-state"
+                })
+            });
+            var expectedInvokeResponse = new InvokeResponse()
+            {
+                Status = 200
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            ConfigureSettingsHandler<TestTurnState> handler = (turnContext, turnState, settings, cancellationToken) =>
+            {
+                JObject? obj = settings as JObject;
+                Assert.NotNull(obj);
+                Assert.Equal("test-state", obj["state"]);
+                return Task.CompletedTask;
+            };
+
+            // Act
+            app.MessageExtensions.OnConfigureSettings(handler);
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async void Test_OnConfigureSettings_NotHit()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/querySettingUrl"
+            });
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            ConfigureSettingsHandler<TestTurnState> handler = (turnContext, turnState, settings, cancellationToken) =>
+            {
+                return Task.CompletedTask;
+            };
+
+            // Act
+            app.MessageExtensions.OnConfigureSettings(handler);
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Null(activitiesToSend);
+        }
+
+        [Fact]
+        public async void Test_OnCardButtonClicked()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/onCardButtonClicked"
+            });
+            var expectedInvokeResponse = new InvokeResponse()
+            {
+                Status = 200
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            CardButtonClickedHandler<TestTurnState> handler = (turnContext, turnState, cardData, cancellationToken) =>
+            {
+                return Task.CompletedTask;
+            };
+
+            // Act
+            app.MessageExtensions.OnCardButtonClicked(handler);
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async void Test_OnCardButtonClicked_NotHit()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var turnContext = new TurnContext(adapter, new Activity()
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/querySettingUrl"
+            });
+            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            CardButtonClickedHandler<TestTurnState> handler = (turnContext, turnState, cardData, cancellationToken) =>
+            {
+                return Task.CompletedTask;
+            };
+
+            // Act
+            app.MessageExtensions.OnCardButtonClicked(handler);
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Null(activitiesToSend);
+        }
+
         private static T Cast<T>(object data)
         {
             JObject? obj = data as JObject;
