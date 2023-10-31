@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI.AI;
@@ -385,6 +386,69 @@ namespace Microsoft.TeamsAI
                     OnMessage(routeSelector, handler);
                 }
             }
+            return this;
+        }
+
+        /// <summary>
+        /// Handles message edit events.
+        /// </summary>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessageEdit(RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                TeamsChannelData teamsChannelData;
+                return Task.FromResult(
+                    string.Equals(turnContext.Activity.Type, ActivityTypes.MessageUpdate, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams)
+                    && (teamsChannelData = turnContext.Activity.GetChannelData<TeamsChannelData>()) != null
+                    && string.Equals(teamsChannelData.EventType, "editMessage"));
+            };
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles message undo soft delete events.
+        /// </summary>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessageUndelete(RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                TeamsChannelData teamsChannelData;
+                return Task.FromResult(
+                    string.Equals(turnContext.Activity.Type, ActivityTypes.MessageUpdate, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams)
+                    && (teamsChannelData = turnContext.Activity.GetChannelData<TeamsChannelData>()) != null
+                    && string.Equals(teamsChannelData.EventType, "undeleteMessage"));
+            };
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles message soft delete events.
+        /// </summary>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnMessageDelete(RouteHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            {
+                TeamsChannelData teamsChannelData;
+                return Task.FromResult(
+                    string.Equals(turnContext.Activity.Type, ActivityTypes.MessageDelete, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams)
+                    && (teamsChannelData = turnContext.Activity.GetChannelData<TeamsChannelData>()) != null
+                    && string.Equals(teamsChannelData.EventType, "softDeleteMessage"));
+            };
+            AddRoute(routeSelector, handler, isInvokeRoute: false);
             return this;
         }
 
