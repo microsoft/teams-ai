@@ -27,6 +27,9 @@ import {
 import { AI } from '../AI';
 import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
 
+// Export the moderation severity
+export { ModerationSeverity } from '../internals';
+
 /**
  * Options for the OpenAI based moderator.
  */
