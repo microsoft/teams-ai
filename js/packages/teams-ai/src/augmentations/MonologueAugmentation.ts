@@ -17,6 +17,9 @@ import { Schema } from "jsonschema";
 import { Message, PromptSection } from "../prompts";
 import { Memory } from "../MemoryFork";
 
+const MISSING_ACTION_FEEDBACK = `The JSON returned had errors. Apply these fixes:\nadd the \"action\" property to \"instance\"`;
+const SAY_REDIRECT_FEEDBACK = `The JSON returned was missing an action. Return a valid JSON object that contains your thoughts and uses the SAY action.`;
+
 export interface InnerMonologue {
     thoughts: {
         thought: string;
@@ -79,6 +82,11 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
         // Validate that we got a well-formed inner monologue
         const validationResult = await this._monologueValidator.validateResponse(context, memory, tokenizer, response, remaining_attempts);
         if (!validationResult.valid) {
+            // Catch the case where the action is missing.
+            // - GPT-3.5 gets stuck in a loop here sometimes so we'll redirect it to just use the SAY action.
+            if (validationResult.feedback == MISSING_ACTION_FEEDBACK) {
+                validationResult.feedback = SAY_REDIRECT_FEEDBACK;
+            }
             return validationResult;
         }
 

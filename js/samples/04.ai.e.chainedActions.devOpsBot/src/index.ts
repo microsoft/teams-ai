@@ -11,7 +11,7 @@ import * as restify from 'restify';
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -21,7 +21,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -36,12 +41,13 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error.message}`);
+    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error.message}`,
+        `${error.toString()}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -54,6 +60,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 // Set the onTurnError for the singleton CloudAdapter.
 adapter.onTurnError = onTurnErrorHandler;
 
+
 // Create HTTP server.
 const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
@@ -65,116 +72,127 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import {
-    AI,
     Application,
-    DefaultConversationState,
-    DefaultPromptManager,
-    DefaultTempState,
-    DefaultTurnState,
-    DefaultUserState,
-    OpenAIPlanner
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
+    DefaultConversationState
 } from '@microsoft/teams-ai';
 import * as responses from './responses';
 
 // Strongly type the applications turn state
 interface ConversationState extends DefaultConversationState {
     greeted: boolean;
-    workItems: EntityData[];
+    nextId: number;
+    workItems: WorkItem[];
+    members: string[];
 }
 
-type UserState = DefaultUserState;
+type ApplicationTurnState = TurnState<ConversationState>;
 
-interface TempState extends DefaultTempState {
-    workItems: EntityData[];
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
 }
-
-type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: `${process.env.OPENAIAPIKEY}`,
-    defaultModel: 'text-davinci-003',
+const model = new OpenAIModel({
+    apiKey: process.env.OPENAI_API_KEY || '',
+    defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'sequence',
+});
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        promptManager,
-        prompt: 'chatGPT'
+        planner
     }
 });
 
-// Define an interface to strongly type data parameters for actions
-interface EntityData {
-    id: number; // <- populated by GPT
-    title: string; // <- populated by GPT
-    assignedTo: string; // <- populated by GPT
-    status: string; // <- populated by GPT
-}
-
 // Listen for new members to join the conversation
 app.conversationUpdate('membersAdded', async (context: TurnContext, state: ApplicationTurnState) => {
-    if (!state.conversation.value.greeted) {
-        state.conversation.value.greeted = true;
+    if (!state.conversation.greeted) {
+        state.conversation.greeted = true;
         await context.sendActivity(responses.greeting());
     }
 });
 
 // List for /reset command and then delete the conversation state
 app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.delete();
+    state.deleteConversationState();
     await context.sendActivity(responses.reset());
 });
 
-// Register action handlers
-app.ai.action('createWI', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const id = createNewWorkItem(state, data);
-    await context.sendActivity(`New work item created with ID: ${id} and assigned to: ${data.assignedTo}`);
-    return false;
-});
+// Register user related handlers
+interface UserUpdate {
+    added?: string[];
+    removed?: string[];
+}
 
-app.ai.action('assignWI', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    assignWorkItem(state, data);
-    return true;
-});
-
-app.ai.action('updateWI', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    updateWorkItem(state, data);
-    return true;
-});
-
-app.ai.action('triageWI', async (context, state, data: EntityData) => {
-    triageWorkItem(state, data);
-    return true;
-});
-
-app.ai.action('summarize', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const workItems = ensureWorkItemsInitialized(state).workItems;
-    if (workItems.length != 0) {
-        // Chain into a new summarization prompt
-        state.temp.value.workItems = workItems;
-        await app.ai.chain(context, state, 'summarize');
+app.ai.action('updateMembers', async (context: TurnContext, state: ApplicationTurnState, parameters: UserUpdate) => {
+    parameters.added = parameters.added || [];
+    parameters.removed = parameters.removed || [];
+    if (parameters.added.length > 0 || parameters.removed.length > 0) {
+        const conversation = ensureStateInitialized(state);
+        parameters.removed.forEach((user) => {
+            const index = conversation.members.indexOf(user);
+            if (index > -1) {
+                conversation.members.splice(index, 1);
+            }
+        });
+        parameters.added.forEach((user) => {
+            if (!conversation.members.includes(user)) {
+                conversation.members.push(user);
+            }
+        });
+        return `members updated. think about your next action`;
     } else {
-        await context.sendActivity(responses.noListsFound());
+        return `no member changes made. think about your next action`;
     }
-
-    // End the current chain
-    return false;
 });
 
-// Register a handler to handle unknown actions that might be predicted
-app.ai.action(
-    AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: EntityData, action?: string) => {
-        await context.sendActivity(responses.unknownAction(action!));
-        return false;
+// Register work item related handlers
+interface WorkItem {
+    id: number; // <- populated by GPT
+    title: string; // <- populated by GPT
+    assignedTo: string; // <- populated by GPT
+    status: string; // <- populated by GPT
+}
+
+app.ai.action('createWI', async (context: TurnContext, state: ApplicationTurnState, parameters: WorkItem) => {
+    const conversation = ensureStateInitialized(state);
+    parameters.id = conversation.nextId++;
+    parameters.status = 'proposed';
+    conversation.workItems.push(parameters);
+    if (parameters.assignedTo) {
+        return `work item created with id ${parameters.id}. think about your next action`;
+    } else {
+        return `work item created with id ${parameters.id} but needs to be assigned. think about your next action`;
     }
-);
+});
+
+app.ai.action('updateWI', async (context: TurnContext, state: ApplicationTurnState, parameters: WorkItem) => {
+    const conversation = ensureStateInitialized(state);
+    const workItem = conversation.workItems.find((x) => x.id == parameters.id);
+    if (workItem) {
+        if (parameters.title) workItem.title = parameters.title;
+        if (parameters.assignedTo) workItem.assignedTo = parameters.assignedTo;
+        if (parameters.status) workItem.status = parameters.status;
+    }
+    return `work item ${parameters.id} was updated. think about your next action`;
+});
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {
@@ -186,81 +204,19 @@ server.post('/api/messages', async (req, res) => {
 });
 
 /**
- * This method is used to create new work item.
- * @param {ApplicationTurnState} state The application turn state.
- * @param {EntityData} workItemInfo Data containing the work item information.
- * @returns {number} The ID of the newly created work item.
- */
-function createNewWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): number {
-    const conversation = ensureWorkItemsInitialized(state);
-
-    if (workItemInfo.id == null) {
-        workItemInfo.id = conversation.workItems.length + 1;
-    }
-    workItemInfo.status = 'Proposed';
-    conversation.workItems.push(workItemInfo);
-    return workItemInfo.id;
-}
-
-/**
- * This method is used to assign a work item to a person.
- * @param {ApplicationTurnState} state The application turn state.
- * @param {EntityData} workItemInfo Data containing the work item information.
- */
-function assignWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): void {
-    const conversation = ensureWorkItemsInitialized(state);
-
-    if (workItemInfo.id != null) {
-        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
-        if (workItem != null) {
-            workItem.assignedTo = workItemInfo.assignedTo;
-        }
-    }
-}
-
-/**
- * This method is used to triage work item.
- * @param {ApplicationTurnState} state The application turn state.
- * @param {EntityData} workItemInfo Data containing the work item information.
- */
-function triageWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): void {
-    const conversation = ensureWorkItemsInitialized(state);
-
-    if (workItemInfo.id != null) {
-        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
-        if (workItem != null) {
-            workItem.status = workItemInfo.status;
-        }
-    }
-}
-
-/**
- * This method is used to make sure that work items are initialized properly.
+ * This method is used to make sure that the conversation state is initialized.
  * @param {ApplicationTurnState} state The application turn state.
  * @returns {ConversationState} The conversation state
  */
-function ensureWorkItemsInitialized(state: ApplicationTurnState): ConversationState {
-    const conversation = state.conversation.value;
-    if (typeof conversation.workItems != 'object') {
-        conversation.workItems = [];
+function ensureStateInitialized(state: ApplicationTurnState): ConversationState {
+    if (state.conversation.nextId == undefined) {
+        state.conversation.nextId = 1;
     }
-    return conversation;
-}
-
-/**
- * This method is used to update the existing work item.
- * @param {ApplicationTurnState} state The application turn state.
- * @param {EntityData} workItemInfo Data containing the work item information.
- */
-function updateWorkItem(state: ApplicationTurnState, workItemInfo: EntityData): void {
-    const conversation = ensureWorkItemsInitialized(state);
-
-    if (workItemInfo.id != null) {
-        const workItem = conversation.workItems.find((x) => x.id == workItemInfo.id);
-        if (workItem != null) {
-            if (workItemInfo.title !== null) workItem.title = workItemInfo.title;
-            if (workItemInfo.assignedTo !== null) workItem.assignedTo = workItemInfo.assignedTo;
-            if (workItemInfo.status !== null) workItem.status = workItemInfo.status;
-        }
+    if (!Array.isArray(state.conversation.workItems)) {
+        state.conversation.workItems = [];
     }
+    if (!Array.isArray(state.conversation.members)) {
+        state.conversation.members = [];
+    }
+    return state.conversation;
 }
