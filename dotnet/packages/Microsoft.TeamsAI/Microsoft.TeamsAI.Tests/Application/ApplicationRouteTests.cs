@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI.Tests.TestUtils;
@@ -527,6 +528,391 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
+        public async Task Test_OnConversationUpdate_ChannelCreated()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelCreated",
+                    Channel = new ChannelInfo(),
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.ChannelCreated,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_ChannelRenamed()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelRenamed",
+                    Channel = new ChannelInfo(),
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.ChannelRenamed,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_ChannelDeleted()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelDeleted",
+                    Channel = new ChannelInfo(),
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.ChannelDeleted,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_ChannelRestored()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelRestored",
+                    Channel = new ChannelInfo(),
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.ChannelRestored,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_TeamRenamed()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRenamed",
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamRenamed,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_TeamDeleted()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamDeleted",
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamDeleted,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_TeamHardDeleted()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamHardDeleted",
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamHardDeleted,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_TeamArchived()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamArchived",
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamArchived,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_TeamUnarchived()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamUnarchived",
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamUnarchived,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_TeamRestored()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRestored",
+                    Team = new TeamInfo(),
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(ConversationUpdateEvents.TeamRestored,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
         public async Task Test_OnConversationUpdate_SingleEvent()
         {
             // Arrange
@@ -535,9 +921,11 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.ConversationUpdate,
                 ChannelData = new TeamsChannelData
                 {
-                    EventType = "teamRenamed"
+                    EventType = "teamRenamed",
+                    Team = new TeamInfo(),
                 },
-                Name = "1"
+                Name = "1",
+                ChannelId = Channels.Msteams,
             };
             var activity2 = new Activity
             {
@@ -551,7 +939,6 @@ namespace Microsoft.TeamsAI.Tests.Application
                     EventType = "teamRenamed"
                 }
             };
-
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
@@ -593,9 +980,12 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.ConversationUpdate,
                 ChannelData = new TeamsChannelData
                 {
-                    EventType = "channelDeleted"
+                    EventType = "channelDeleted",
+                    Channel = new ChannelInfo(),
+                    Team = new TeamInfo(),
                 },
-                Name = "2"
+                Name = "2",
+                ChannelId = Channels.Msteams,
             };
             var activity3 = new Activity
             {
@@ -605,7 +995,6 @@ namespace Microsoft.TeamsAI.Tests.Application
                     EventType = "teamRenamed"
                 }
             };
-
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);

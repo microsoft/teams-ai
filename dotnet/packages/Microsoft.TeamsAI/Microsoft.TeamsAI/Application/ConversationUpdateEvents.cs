@@ -59,5 +59,20 @@
         /// TeamRestored event
         /// </summary>
         public const string TeamRestored = "teamRestored";
+
+        /// <summary>
+        /// TeamHardDeleted event
+        /// </summary>
+        public const string TeamHardDeleted = "teamHardDeleted";
+
+        /// <summary>
+        /// TopicName event 
+        /// </summary>
+        public const string TopicName = "topicName";
+
+        /// <summary>
+        /// HistoryDisclosed event
+        /// </summary>
+        public const string HistoryDisclosed = "historyDisclosed";
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI.AI;
@@ -233,6 +234,21 @@ namespace Microsoft.TeamsAI
             RouteSelector routeSelector;
             switch (conversationUpdateEvent)
             {
+                case ConversationUpdateEvents.ChannelCreated:
+                case ConversationUpdateEvents.ChannelDeleted:
+                case ConversationUpdateEvents.ChannelRenamed:
+                case ConversationUpdateEvents.ChannelRestored:
+                {
+                    routeSelector = (context, _) => Task.FromResult
+                    (
+                        string.Equals(context.Activity?.ChannelId, Channels.Msteams)
+                        && string.Equals(context.Activity?.Type, ActivityTypes.ConversationUpdate, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(context.Activity?.GetChannelData<TeamsChannelData>()?.EventType, conversationUpdateEvent)
+                        && context.Activity?.GetChannelData<TeamsChannelData>()?.Channel != null
+                        && context.Activity?.GetChannelData<TeamsChannelData>()?.Team != null
+                    );
+                    break;
+                }
                 case ConversationUpdateEvents.MembersAdded:
                 {
                     routeSelector = (context, _) => Task.FromResult
@@ -250,6 +266,22 @@ namespace Microsoft.TeamsAI
                         string.Equals(context.Activity?.Type, ActivityTypes.ConversationUpdate, StringComparison.OrdinalIgnoreCase)
                         && context.Activity?.MembersRemoved != null
                         && context.Activity.MembersRemoved.Count > 0
+                    );
+                    break;
+                }
+                case ConversationUpdateEvents.TeamRenamed:
+                case ConversationUpdateEvents.TeamDeleted:
+                case ConversationUpdateEvents.TeamHardDeleted:
+                case ConversationUpdateEvents.TeamArchived:
+                case ConversationUpdateEvents.TeamUnarchived:
+                case ConversationUpdateEvents.TeamRestored:
+                {
+                    routeSelector = (context, _) => Task.FromResult
+                    (
+                        string.Equals(context.Activity?.ChannelId, Channels.Msteams)
+                        && string.Equals(context.Activity?.Type, ActivityTypes.ConversationUpdate, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(context.Activity?.GetChannelData<TeamsChannelData>()?.EventType, conversationUpdateEvent)
+                        && context.Activity?.GetChannelData<TeamsChannelData>()?.Team != null
                     );
                     break;
                 }
