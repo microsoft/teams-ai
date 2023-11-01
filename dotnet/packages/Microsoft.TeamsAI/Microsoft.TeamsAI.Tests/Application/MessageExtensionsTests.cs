@@ -41,8 +41,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = actionResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SubmitActionHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
@@ -52,7 +54,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnSubmitAction("test-command", handler);
+            app.MessageExtensions.OnSubmitAction("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -87,8 +89,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SubmitActionHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
@@ -98,7 +102,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnSubmitAction("not-test-command", handler);
+            app.MessageExtensions.OnSubmitAction("not-test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -115,8 +119,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/fetchTask"
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -127,7 +133,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnSubmitAction(routeSelector, handler);
+            app.MessageExtensions.OnSubmitAction(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -166,8 +172,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = actionResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
@@ -175,7 +183,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
+            app.MessageExtensions.OnBotMessagePreviewEdit("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -212,8 +220,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             BotMessagePreviewEditHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
@@ -221,7 +231,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnBotMessagePreviewEdit("test-command", handler);
+            app.MessageExtensions.OnBotMessagePreviewEdit("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -238,8 +248,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/fetchTask"
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -250,7 +262,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnBotMessagePreviewEdit(routeSelector, handler);
+            app.MessageExtensions.OnBotMessagePreviewEdit(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -288,8 +300,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = new MessagingExtensionActionResponse()
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             BotMessagePreviewSendHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
@@ -297,7 +311,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnBotMessagePreviewSend("test-command", handler);
+            app.MessageExtensions.OnBotMessagePreviewSend("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -333,8 +347,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                     botActivityPreview = new List<Activity> { activity }
                 }, new JsonSerializer() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             BotMessagePreviewSendHandler<TestTurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
@@ -342,7 +358,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnBotMessagePreviewSend("test-command", handler);
+            app.MessageExtensions.OnBotMessagePreviewSend("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -358,8 +374,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "composeExtension/fetchTask"
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -370,7 +388,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnBotMessagePreviewSend(routeSelector, handler);
+            app.MessageExtensions.OnBotMessagePreviewSend(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -402,15 +420,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = taskModuleResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
-            messageExtensions.OnFetchTask("test-command", handler);
+            app.MessageExtensions.OnFetchTask("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -440,15 +460,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             FetchTaskHandler<TestTurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
-            messageExtensions.OnFetchTask("not-test-command", handler);
+            app.MessageExtensions.OnFetchTask("not-test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -465,8 +487,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/submitAction"
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -477,7 +501,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnFetchTask(routeSelector, handler);
+            app.MessageExtensions.OnFetchTask(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -521,8 +545,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             QueryHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal(1, query.Parameters.Count);
@@ -533,7 +559,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnQuery("test-command", handler);
+            app.MessageExtensions.OnQuery("test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -572,8 +598,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             QueryHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal(1, query.Parameters.Count);
@@ -584,7 +612,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnQuery("not-test-command", handler);
+            app.MessageExtensions.OnQuery("not-test-command", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -601,8 +629,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/selectItem"
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -613,7 +643,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnQuery(routeSelector, handler);
+            app.MessageExtensions.OnQuery(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -645,15 +675,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SelectItemHandler<TestTurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
 
             // Act
-            messageExtensions.OnSelectItem(handler);
+            app.MessageExtensions.OnSelectItem(handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -688,15 +720,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SelectItemHandler<TestTurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
 
             // Act
-            messageExtensions.OnSelectItem(handler);
+            app.MessageExtensions.OnSelectItem(handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -731,8 +765,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 Assert.Equal("test-url", url);
@@ -740,7 +776,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnQueryLink(handler);
+            app.MessageExtensions.OnQueryLink(handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -766,15 +802,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/query"
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
 
             // Act
-            messageExtensions.OnQueryLink(handler);
+            app.MessageExtensions.OnQueryLink(handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -809,8 +847,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                     ComposeExtension = messagingExtensionResultMock.Object
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 Assert.Equal("test-url", url);
@@ -818,7 +858,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            messageExtensions.OnAnonymousQueryLink(handler);
+            app.MessageExtensions.OnAnonymousQueryLink(handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -844,15 +884,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "composeExtension/query"
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var messageExtensions = new MessageExtensions<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             QueryLinkHandler<TestTurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
 
             // Act
-            messageExtensions.OnAnonymousQueryLink(handler);
+            app.MessageExtensions.OnAnonymousQueryLink(handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
