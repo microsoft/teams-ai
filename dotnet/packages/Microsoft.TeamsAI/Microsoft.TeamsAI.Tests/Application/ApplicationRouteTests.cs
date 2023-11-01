@@ -855,6 +855,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
+                StartTypingTimer = false
             });
             var names = new List<string>();
             app.OnMessageEdit((turnContext, _, _) =>
@@ -907,6 +908,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
+                StartTypingTimer = false
             });
             var names = new List<string>();
             app.OnMessageUndelete((turnContext, _, _) =>
@@ -959,6 +961,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             var app = new Application<TestTurnState, TestTurnStateManager>(new()
             {
                 RemoveRecipientMention = false,
+                StartTypingTimer = false
             });
             var names = new List<string>();
             app.OnMessageDelete((turnContext, _, _) =>
