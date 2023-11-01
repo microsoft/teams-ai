@@ -67,20 +67,26 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create AzureContentSafetyModerator
     IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
-    // Create Application
+    // Setup Application
     AIOptions<TurnState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<TurnState>("./Prompts"),
         moderator: moderator);
-    ApplicationOptions<TurnState, TurnStateManager> ApplicationOptions = new()
-    {
-        TurnStateManager = new TurnStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
+    var applicationBuilder = new ApplicationBuilder<TurnState, TurnStateManager>()
+    .WithAIOptions(aiOptions)
+    .WithLoggerFactory(loggerFactory)
+    .WithTurnStateManager(new TurnStateManager());
 
-    Application<TurnState, TurnStateManager> app = new(ApplicationOptions);
+    // Set storage options
+    IStorage? storage = sp.GetService<IStorage>();
+    if (storage != null)
+    {
+        applicationBuilder.WithStorage(storage);
+    }
+
+    // Create Application
+    Application<TurnState, TurnStateManager> app = applicationBuilder.Build();
+
     ActivityHandlers routeHandlers = new(app, PREVIEW_MODE);
 
     app.MessageExtensions.OnFetchTask("CreatePost", routeHandlers.FetchTaskHandler);
@@ -121,20 +127,26 @@ builder.Services.AddTransient<IBot>(sp =>
         loggerFactory,
         moderatorHttpClient);
 
-    // Create Application
+    // Setup Application
     AIOptions<TurnState> aiOptions = new(
         planner: planner,
         promptManager: new PromptManager<TurnState>("./Prompts"),
         moderator: moderator);
-    ApplicationOptions<TurnState, TurnStateManager> ApplicationOptions = new()
-    {
-        TurnStateManager = new TurnStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
+    var applicationBuilder = new ApplicationBuilder<TurnState, TurnStateManager>()
+    .WithAIOptions(aiOptions)
+    .WithLoggerFactory(loggerFactory)
+    .WithTurnStateManager(new TurnStateManager());
 
-    Application<TurnState, TurnStateManager> app = new(ApplicationOptions);
+    // Set storage options
+    IStorage? storage = sp.GetService<IStorage>();
+    if (storage != null)
+    {
+        applicationBuilder.WithStorage(storage);
+    }
+
+    // Create Application
+    Application<TurnState, TurnStateManager> app = applicationBuilder.Build();
+
     ActivityHandlers routeHandlers = new(app, PREVIEW_MODE);
 
     app.MessageExtensions.OnFetchTask("CreatePost", routeHandlers.FetchTaskHandler);

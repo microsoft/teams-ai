@@ -538,11 +538,13 @@ namespace Microsoft.TeamsAI.Tests.Application
                 {
                     EventType = "teamRenamed"
                 },
-                Name = "1"
+                Name = "1",
+                ChannelId = "msteams"
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.ConversationUpdate
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelId = "msteams"
             };
             var activity3 = new Activity
             {
@@ -550,7 +552,8 @@ namespace Microsoft.TeamsAI.Tests.Application
                 ChannelData = new TeamsChannelData
                 {
                     EventType = "teamRenamed"
-                }
+                },
+                ChannelId = "msteams"
             };
 
             var adapter = new NotImplementedAdapter();
@@ -587,7 +590,8 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 Type = ActivityTypes.ConversationUpdate,
                 MembersAdded = new List<ChannelAccount> { new() },
-                Name = "1"
+                Name = "1",
+                ChannelId = "msteams"
             };
             var activity2 = new Activity
             {
@@ -596,7 +600,8 @@ namespace Microsoft.TeamsAI.Tests.Application
                 {
                     EventType = "channelDeleted"
                 },
-                Name = "2"
+                Name = "2",
+                ChannelId = "msteams"
             };
             var activity3 = new Activity
             {
@@ -604,7 +609,8 @@ namespace Microsoft.TeamsAI.Tests.Application
                 ChannelData = new TeamsChannelData
                 {
                     EventType = "teamRenamed"
-                }
+                },
+                ChannelId = "msteams"
             };
 
             var adapter = new NotImplementedAdapter();
@@ -634,6 +640,65 @@ namespace Microsoft.TeamsAI.Tests.Application
             Assert.Equal(2, names.Count);
             Assert.Equal("1", names[0]);
             Assert.Equal("2", names[1]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_BypassNonTeamsEvent()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                MembersAdded = new List<ChannelAccount> { new() },
+                Name = "1",
+                ChannelId = "msteams"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelDeleted"
+                },
+                Name = "2",
+                ChannelId = "directline"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRenamed"
+                },
+                ChannelId = "directline"
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(
+                new[] { ConversationUpdateEvents.TeamRenamed, ConversationUpdateEvents.ChannelDeleted, ConversationUpdateEvents.MembersAdded },
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
         }
 
         [Fact]

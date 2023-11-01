@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.TeamsAI.AI;
 using Microsoft.TeamsAI.Tests.TestUtils;
 using System.Reflection;
 
@@ -7,6 +8,89 @@ namespace Microsoft.TeamsAI.Tests.Application
 {
     public class ApplicationTests
     {
+
+        [Fact]
+        public void Test_Application_DefaultSetup()
+        {
+            // Arrange
+            ApplicationOptions<TestTurnState, TestTurnStateManager> applicationOptions = new();
+
+            // Act
+            Application<TestTurnState, TestTurnStateManager> app = new(applicationOptions);
+
+            // Assert
+            Assert.NotEqual(null, app.Options);
+            Assert.Null(app.Options.Adapter);
+            Assert.Null(app.Options.BotAppId);
+            Assert.Null(app.Options.Storage);
+            Assert.Null(app.Options.AI);
+            Assert.NotEqual(null, app.Options.TurnStateManager);
+            Assert.Null(app.Options.AdaptiveCards);
+            Assert.Null(app.Options.TaskModules);
+            Assert.Null(app.Options.LoggerFactory);
+            Assert.Equal(true, app.Options.RemoveRecipientMention);
+            Assert.Equal(true, app.Options.StartTypingTimer);
+            Assert.Equal(false, app.Options.LongRunningMessages);
+        }
+
+        [Fact]
+        public void Test_Application_CustomSetup()
+        {
+            // Arrange
+            bool removeRecipientMention = false;
+            bool startTypingTimer = false;
+            bool longRunningMessages = true;
+            string botAppId = "testBot";
+            IStorage storage = new MemoryStorage();
+            BotAdapter adapter = new SimpleAdapter();
+            TestLoggerFactory loggerFactory = new();
+            TestTurnStateManager turnStateManager = new();
+            AdaptiveCardsOptions adaptiveCardOptions = new()
+            {
+                ActionSubmitFilter = "cardFilter"
+            };
+            TaskModulesOptions taskModuleOptions = new()
+            {
+                TaskDataFilter = "taskFilter",
+            };
+            AIOptions<TestTurnState> aiOptions = new(
+                planner: new TestPlanner(),
+                promptManager: new TestPromptManager(),
+                moderator: new TestModerator()
+            );
+            ApplicationOptions<TestTurnState, TestTurnStateManager> applicationOptions = new()
+            {
+                RemoveRecipientMention = removeRecipientMention,
+                StartTypingTimer = startTypingTimer,
+                LongRunningMessages = longRunningMessages,
+                BotAppId = botAppId,
+                Storage = storage,
+                Adapter = adapter,
+                LoggerFactory = loggerFactory,
+                TurnStateManager = turnStateManager,
+                AdaptiveCards = adaptiveCardOptions,
+                TaskModules = taskModuleOptions,
+                AI = aiOptions
+            };
+
+            // Act
+            Application<TestTurnState, TestTurnStateManager> app = new(applicationOptions);
+
+            // Assert
+            Assert.NotNull(app.Options);
+            Assert.Equal(adapter, app.Options.Adapter);
+            Assert.Equal(botAppId, app.Options.BotAppId);
+            Assert.Equal(storage, app.Options.Storage);
+            Assert.Equal(aiOptions, app.Options.AI);
+            Assert.Equal(turnStateManager, app.Options.TurnStateManager);
+            Assert.Equal(adaptiveCardOptions, app.Options.AdaptiveCards);
+            Assert.Equal(taskModuleOptions, app.Options.TaskModules);
+            Assert.Equal(loggerFactory, app.Options.LoggerFactory);
+            Assert.Equal(removeRecipientMention, app.Options.RemoveRecipientMention);
+            Assert.Equal(startTypingTimer, app.Options.StartTypingTimer);
+            Assert.Equal(longRunningMessages, app.Options.LongRunningMessages);
+        }
+
         [Fact]
         public void Test_StartTypingTimer_MessageActivityType()
         {
