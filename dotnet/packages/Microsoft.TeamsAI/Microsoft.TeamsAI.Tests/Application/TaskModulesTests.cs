@@ -42,15 +42,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = taskModuleResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             FetchHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
-            taskModules.OnFetch("test-verb", handler);
+            app.TaskModules.OnFetch("test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -87,15 +89,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             FetchHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
-            taskModules.OnFetch("test-verb", handler);
+            app.TaskModules.OnFetch("test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -112,8 +116,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "task/fetch"
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -124,7 +130,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            taskModules.OnFetch(routeSelector, handler);
+            app.TaskModules.OnFetch(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -163,15 +169,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = taskModuleResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
 
             // Act
-            taskModules.OnSubmit("test-verb", handler);
+            app.TaskModules.OnSubmit("test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -208,8 +216,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 })
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
 
             SubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -217,7 +227,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            taskModules.OnSubmit("test-verb", handler);
+            app.TaskModules.OnSubmit("test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -234,8 +244,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "task/submit"
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var taskModules = new TaskModules<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -246,7 +258,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            taskModules.OnSubmit(routeSelector, handler);
+            app.TaskModules.OnSubmit(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
