@@ -929,7 +929,8 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.ConversationUpdate
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelId = Channels.Msteams,
             };
             var activity3 = new Activity
             {
@@ -937,7 +938,8 @@ namespace Microsoft.TeamsAI.Tests.Application
                 ChannelData = new TeamsChannelData
                 {
                     EventType = "teamRenamed"
-                }
+                },
+                ChannelId = Channels.Msteams,
             };
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
@@ -973,7 +975,8 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 Type = ActivityTypes.ConversationUpdate,
                 MembersAdded = new List<ChannelAccount> { new() },
-                Name = "1"
+                Name = "1",
+                ChannelId = Channels.Msteams,
             };
             var activity2 = new Activity
             {
@@ -993,7 +996,8 @@ namespace Microsoft.TeamsAI.Tests.Application
                 ChannelData = new TeamsChannelData
                 {
                     EventType = "teamRenamed"
-                }
+                },
+                ChannelId = Channels.Msteams,
             };
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
@@ -1022,6 +1026,65 @@ namespace Microsoft.TeamsAI.Tests.Application
             Assert.Equal(2, names.Count);
             Assert.Equal("1", names[0]);
             Assert.Equal("2", names[1]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_BypassNonTeamsEvent()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                MembersAdded = new List<ChannelAccount> { new() },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "channelDeleted"
+                },
+                Name = "2",
+                ChannelId = Channels.Directline,
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "teamRenamed"
+                },
+                ChannelId = Channels.Directline,
+            };
+
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate(
+                new[] { ConversationUpdateEvents.TeamRenamed, ConversationUpdateEvents.ChannelDeleted, ConversationUpdateEvents.MembersAdded },
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
         }
 
         [Fact]
@@ -1207,6 +1270,165 @@ namespace Microsoft.TeamsAI.Tests.Application
             Assert.Equal("hello a", texts[0]);
             Assert.Equal("welcome", texts[1]);
             Assert.Equal("hello world", texts[2]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessageEdit()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.MessageUpdate,
+                ChannelId = Channels.Msteams,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "editMessage"
+                },
+                Name = "1"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageUpdate,
+                ChannelId = Channels.Msteams,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "softDeleteMessage"
+                }
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnMessageEdit((turnContext, _, _) =>
+            {
+                names.Add(turnContext.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessageUnDelete()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.MessageUpdate,
+                ChannelId = Channels.Msteams,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "undeleteMessage"
+                },
+                Name = "1"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageUpdate,
+                ChannelId = Channels.Msteams,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "softDeleteMessage"
+                }
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnMessageUndelete((turnContext, _, _) =>
+            {
+                names.Add(turnContext.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnMessageDelete()
+        {
+            // Arrange
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.MessageDelete,
+                ChannelId = Channels.Msteams,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "softDeleteMessage"
+                },
+                Name = "1"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.MessageDelete,
+                ChannelId = Channels.Msteams,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "unknown"
+                }
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Message
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnMessageDelete((turnContext, _, _) =>
+            {
+                names.Add(turnContext.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("1", names[0]);
         }
 
         [Fact]

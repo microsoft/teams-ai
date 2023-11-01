@@ -40,8 +40,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Status = 200,
                 Body = adaptiveCardInvokeResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
@@ -50,7 +52,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnActionExecute("test-verb", handler);
+            app.AdaptiveCards.OnActionExecute("test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -89,15 +91,17 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "application/search"
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
 
             // Act
-            adaptiveCards.OnActionExecute("test-verb", handler);
+            app.AdaptiveCards.OnActionExecute("test-verb", handler);
             await app.OnTurnAsync(turnContext1);
             await app.OnTurnAsync(turnContext2);
 
@@ -115,8 +119,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Name = "application/search"
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -127,7 +133,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnActionExecute(routeSelector, handler);
+            app.AdaptiveCards.OnActionExecute(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -149,8 +155,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 }),
                 Recipient = new("test-id")
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             var called = false;
             ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -162,7 +170,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnActionSubmit("test-verb", handler);
+            app.AdaptiveCards.OnActionSubmit("test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -184,8 +192,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 }),
                 Recipient = new("test-id")
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             var called = false;
             ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
@@ -197,7 +207,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnActionSubmit("not-test-verb", handler);
+            app.AdaptiveCards.OnActionSubmit("not-test-verb", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -215,8 +225,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                 Text = "test-text",
                 Recipient = new("test-id")
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -227,7 +239,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnActionSubmit(routeSelector, handler);
+            app.AdaptiveCards.OnActionSubmit(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
@@ -277,8 +289,10 @@ namespace Microsoft.TeamsAI.Tests.Application
                     }
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
@@ -287,7 +301,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnSearch("test-dataset", handler);
+            app.AdaptiveCards.OnSearch("test-dataset", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -327,8 +341,10 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 new("test-title", "test-value")
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
@@ -337,7 +353,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnSearch("not-test-dataset", handler);
+            app.AdaptiveCards.OnSearch("not-test-dataset", handler);
             await app.OnTurnAsync(turnContext);
 
             // Assert
@@ -358,8 +374,10 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 new("test-title", "test-value")
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
-            var adaptiveCards = new AdaptiveCards<TestTurnState, TestTurnStateManager>(app);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                StartTypingTimer = false
+            });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
@@ -372,7 +390,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             };
 
             // Act
-            adaptiveCards.OnSearch(routeSelector, handler);
+            app.AdaptiveCards.OnSearch(routeSelector, handler);
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await app.OnTurnAsync(turnContext));
 
             // Assert
