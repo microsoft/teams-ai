@@ -5,6 +5,7 @@
 name: DOTNET Publish
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
     paths: ['dotnet/**']
