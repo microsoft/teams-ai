@@ -10,7 +10,7 @@ import { Memory } from "../MemoryFork";
  * Parses any JSON returned by the model and optionally verifies it against a JSON schema.
  * @template TContent Optional. Type of the content of the message. Defaults to `Record<string, any>`.
  */
-export class JSONResponseValidator<TValue = Record<string, any>> implements PromptResponseValidator<TValue|undefined> {
+export class JSONResponseValidator<TValue = Record<string, any>> implements PromptResponseValidator<TValue> {
 
     /**
      * Creates a new `JSONResponseValidator` instance.
@@ -39,7 +39,7 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue|undefined>> {
+    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>> {
         const message = response.message!;
         const text = message.content ?? '';
 

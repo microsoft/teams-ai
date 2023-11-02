@@ -23,6 +23,7 @@
         "botbuilder-azure-blobs": "^4.20.1",
         "@microsoft/teams-ai": "~1.0.0-preview.1",
         "dotenv": "^16.3.1",
+        "jsonschema": "1.4.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
     },

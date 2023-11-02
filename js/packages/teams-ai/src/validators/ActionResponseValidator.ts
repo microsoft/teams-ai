@@ -17,7 +17,7 @@ export interface ValidatedChatCompletionAction {
  * @remarks
  *
  */
-export class ActionResponseValidator implements PromptResponseValidator<ValidatedChatCompletionAction|undefined> {
+export class ActionResponseValidator implements PromptResponseValidator<ValidatedChatCompletionAction> {
     private readonly _actions: Map<string, ChatCompletionAction> = new Map();
     private readonly _isRequired: boolean;
     private readonly _noun: string;
@@ -57,7 +57,7 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<ValidatedChatCompletionAction|undefined>> {
+    public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<ValidatedChatCompletionAction>> {
         if (typeof response.message == 'object' && response.message.function_call) {
             // Ensure name is specified
             const function_call = response.message.function_call;
@@ -91,7 +91,7 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
                 const message: Message = { role: 'assistant', content: args };
                 const result = await validator.validateResponse(context, memory, tokenizer, { status: 'success', message }, remaining_attempts);
                 if (!result.valid) {
-                    return result as Validation<ValidatedChatCompletionAction|undefined>;
+                    return result as Validation<ValidatedChatCompletionAction>;
                 } else {
                     parameters = result.value!;
                 }
