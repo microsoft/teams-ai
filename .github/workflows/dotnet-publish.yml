@@ -9,7 +9,7 @@ on:
     branches: ['main']
     paths: [
       'dotnet/**',
-      '.github/workflows/dotnet-*'
+      '.github/workflows/dotnet-publish.yml'
     ]
 
 permissions: read-all
