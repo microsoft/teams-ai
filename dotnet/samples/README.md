@@ -51,7 +51,7 @@ There are a few ways to get the application up and running. The latest way is us
 
 > Note these instructions are for running the sample on your local machine, the tunnelling solution is required because the Teams service needs to call into the bot.
 
-#### Additional requirements
+#### Additional Requirements
 
 - [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 
