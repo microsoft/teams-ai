@@ -12,6 +12,7 @@
 name: DOTNET CodeQL
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
     paths: ['dotnet/**']

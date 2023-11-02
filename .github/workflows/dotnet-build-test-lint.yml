@@ -6,6 +6,7 @@ name: DOTNET Build/Test/Lint
 
 on:
   workflow_call:
+  workflow_dispatch:
   push:
     branches: ['**']
     paths: ['dotnet/**']
