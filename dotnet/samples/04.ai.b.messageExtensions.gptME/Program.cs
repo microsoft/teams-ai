@@ -3,12 +3,12 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +43,7 @@ bool PREVIEW_MODE = false;
 #region Use Azure OpenAI and Azure Content Safety
 // Following code is for using Azure OpenAI and Azure Content Safety
 if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey) 
+    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
     || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
     || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
     || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))

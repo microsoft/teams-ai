@@ -3,10 +3,10 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
 using QuestBot.State;
 using QuestBot.Store;
 

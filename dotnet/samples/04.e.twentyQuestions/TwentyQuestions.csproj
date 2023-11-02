@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.19.3" />
-    <PackageReference Include="Microsoft.TeamsAI" Version="1.0.*-*" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
+    <PackageReference Include="Microsoft.Teams.AI" Version="1.0.*-*" />
   </ItemGroup>
 
   <!-- Include prompt as content in build output -->
