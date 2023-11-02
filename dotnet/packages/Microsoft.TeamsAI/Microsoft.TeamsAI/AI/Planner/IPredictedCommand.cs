@@ -1,7 +1,7 @@
-﻿using Microsoft.TeamsAI.Utilities.JsonConverters;
+﻿using Microsoft.Teams.AI.Utilities.JsonConverters;
 using System.Text.Json.Serialization;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// A predicted command is a command that the AI system should execute.

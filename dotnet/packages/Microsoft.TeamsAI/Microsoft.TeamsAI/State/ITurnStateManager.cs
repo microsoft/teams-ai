@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.State
+namespace Microsoft.Teams.AI.State
 {
     /// <summary>
     /// Interface implemented by classes responsible for loading and saving an applications turn state.

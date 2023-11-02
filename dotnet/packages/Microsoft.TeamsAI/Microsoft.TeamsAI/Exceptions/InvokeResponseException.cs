@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Microsoft.TeamsAI.Exceptions
+namespace Microsoft.Teams.AI.Exceptions
 {
     /// <summary>
     /// A custom exception for invoke response errors.

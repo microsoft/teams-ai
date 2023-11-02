@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public class TestApplication : Application<TestTurnState, TestTurnStateManager>
     {

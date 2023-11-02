@@ -1,7 +1,7 @@
 ﻿
 using System.Runtime.CompilerServices;
 
-namespace Microsoft.TeamsAI.Utilities
+namespace Microsoft.Teams.AI.Utilities
 {
     /// <summary>
     /// Utility class for verifying arguments.

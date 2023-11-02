@@ -1,12 +1,12 @@
-﻿using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
+﻿using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.AI.OpenAI;
+using Microsoft.Teams.AI.AI.OpenAI;
 
-namespace Microsoft.TeamsAI.AI.Moderator
+namespace Microsoft.Teams.AI.AI.Moderator
 {
     /// <summary>
     /// An moderator that uses OpenAI's moderation API.

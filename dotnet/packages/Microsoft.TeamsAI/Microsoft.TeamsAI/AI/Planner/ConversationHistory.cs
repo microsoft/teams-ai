@@ -1,9 +1,9 @@
-﻿using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.Tokenizers;
 using System.Text;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// Class that provides utility methods for working with conversation history.

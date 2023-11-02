@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Microsoft.TeamsAI.Exceptions
+namespace Microsoft.Teams.AI.Exceptions
 {
     /// <summary>
     /// Exception thrown when an HTTP operation fails.

@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.State
+namespace Microsoft.Teams.AI.State
 {
     /// <summary>
     /// Represents a turn state entry.

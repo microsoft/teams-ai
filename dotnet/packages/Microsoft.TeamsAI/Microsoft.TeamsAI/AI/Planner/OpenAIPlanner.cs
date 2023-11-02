@@ -1,6 +1,6 @@
 ﻿using Azure.AI.OpenAI;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
@@ -9,15 +9,15 @@ using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextCompletion;
 using Microsoft.SemanticKernel.SemanticFunctions;
-using PromptTemplate = Microsoft.TeamsAI.AI.Prompt.PromptTemplate;
-using Microsoft.TeamsAI.State;
+using PromptTemplate = Microsoft.Teams.AI.AI.Prompt.PromptTemplate;
+using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
 using System.Runtime.CompilerServices;
 using System.Net;
 
 // For Unit Test
-[assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
-namespace Microsoft.TeamsAI.AI.Planner
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// A planner that uses OpenAI's textCompletion and chatCompletion API's to generate plans.

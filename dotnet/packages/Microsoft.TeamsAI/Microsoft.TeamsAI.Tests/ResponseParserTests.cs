@@ -1,8 +1,8 @@
 ﻿using AdaptiveCards;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Planner;
 
-namespace Microsoft.TeamsAI.Tests
+namespace Microsoft.Teams.AI.Tests
 {
     public class ResponseParserTests
     {
