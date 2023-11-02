@@ -13,7 +13,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  projectPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.TeamsAI.csproj'
+  projectPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.Teams.AI.csproj'
 
 steps:
 - task: UseDotNet@2

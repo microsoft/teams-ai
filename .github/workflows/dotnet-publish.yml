@@ -40,7 +40,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Pack
-        run: dotnet pack --output . --configuration Release Microsoft.TeamsAI/Microsoft.TeamsAI.csproj
+        run: dotnet pack --output . --configuration Release Microsoft.TeamsAI/Microsoft.Teams.AI.csproj
       - name: Publish
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json --skip-duplicate --no-symbols
       - name: Upload
