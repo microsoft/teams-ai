@@ -18,7 +18,7 @@ In this folder you will find various examples showcasing the different capabilit
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
 <details open>
-    <summary><h3> Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
+    <summary><h3>Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
 
 #### Additional Prerequisites
 

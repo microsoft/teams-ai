@@ -7,10 +7,7 @@ name: DOTNET Publish
 on:
   push:
     branches: ['main']
-    paths: [
-      'dotnet/**',
-      '.github/workflows/dotnet-publish.yml'
-    ]
+    paths: ['dotnet/**']
 
 permissions: read-all
 
