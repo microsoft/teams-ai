@@ -1,9 +1,9 @@
-﻿using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Options for the <see cref="Application{TState, TTurnStateManager}"/> class.

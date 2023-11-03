@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using Microsoft.TeamsAI.AI.OpenAI;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.AI.OpenAI;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class OpenAIClientTests
     {

@@ -1,7 +1,7 @@
 ﻿using DevOpsBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 using Newtonsoft.Json;
 
 namespace DevOpsBot

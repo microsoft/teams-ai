@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// Additional options needed to use the Azure OpenAI service.

@@ -7,16 +7,16 @@ using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.AzureSdk;
 using Microsoft.SemanticKernel.Orchestration;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Net;
 
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class OpenAIPlannerTests
     {

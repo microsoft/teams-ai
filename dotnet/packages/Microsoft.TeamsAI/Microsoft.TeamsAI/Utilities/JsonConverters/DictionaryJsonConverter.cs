@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Microsoft.TeamsAI.Utilities.JsonConverters
+namespace Microsoft.Teams.AI.Utilities.JsonConverters
 {
     internal class DictionaryJsonConverter : JsonConverter<Dictionary<string, object>>
     {

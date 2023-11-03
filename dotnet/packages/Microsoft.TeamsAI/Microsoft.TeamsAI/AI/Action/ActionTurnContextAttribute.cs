@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
     /// <summary>
     /// Attribute to represent the <see cref="ITurnContext"/> parameter of an action method.

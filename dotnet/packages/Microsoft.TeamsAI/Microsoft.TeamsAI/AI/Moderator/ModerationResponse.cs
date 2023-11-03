@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Microsoft.TeamsAI.AI.Moderator
+namespace Microsoft.Teams.AI.AI.Moderator
 {
     /// <summary>
     /// The result from the OpenAI's moderation API call.

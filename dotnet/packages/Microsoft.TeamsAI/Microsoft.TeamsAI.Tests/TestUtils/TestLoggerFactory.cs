@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     internal sealed class TestLoggerFactory : ILoggerFactory
     {

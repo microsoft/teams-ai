@@ -1,7 +1,7 @@
 ﻿using ListBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 using System.Text.Json;
 
 namespace ListBot

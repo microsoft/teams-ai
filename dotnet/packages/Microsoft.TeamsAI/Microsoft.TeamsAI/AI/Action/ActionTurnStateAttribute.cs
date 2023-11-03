@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
     /// <summary>
     /// Attribute to represent the <see cref="TurnState"/> parameter of an action method.

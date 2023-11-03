@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Reflection;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     internal sealed class TestActivityHandler : TestApplication
     {

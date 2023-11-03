@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI.Tests
+namespace Microsoft.Teams.AI.Tests
 {
     public class UtilitiesTest
     {

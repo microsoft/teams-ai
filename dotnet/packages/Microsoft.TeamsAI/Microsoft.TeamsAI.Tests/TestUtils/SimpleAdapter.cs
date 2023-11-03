@@ -4,7 +4,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public class SimpleAdapter : BotAdapter
     {

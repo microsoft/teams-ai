@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI.State
+namespace Microsoft.Teams.AI.State
 {
     /// <summary>
     /// Defines the default state scopes persisted by the <see cref="TurnStateManager{TurnState, TConversationState, TUserState, TTempState}"/>.

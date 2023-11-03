@@ -1,11 +1,11 @@
 ﻿
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Schema;
 using Moq;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.StateTests
+namespace Microsoft.Teams.AI.Tests.StateTests
 {
     /// <summary>
     /// TODO: Add tests that enforce required properties. Ex. If a required param/object is null, should throw exception.

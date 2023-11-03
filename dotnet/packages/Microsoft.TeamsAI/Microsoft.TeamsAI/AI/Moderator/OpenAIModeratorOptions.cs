@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.AI.Moderator
+namespace Microsoft.Teams.AI.AI.Moderator
 {
     /// <summary>
     /// Options for the OpenAI Moderator.
