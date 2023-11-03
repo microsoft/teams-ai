@@ -33,9 +33,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 // See https://aka.ms/about-bot-adapter to learn more about how bots work.
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
-// Create storage to use
-//const storage = new MemoryStorage();
-
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
