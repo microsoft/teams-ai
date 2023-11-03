@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -15,14 +16,13 @@ import {
     Activity,
     ResourceResponse
 } from 'botbuilder';
-import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { TurnState, TurnStateManager } from './TurnState';
 import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
-import { Authentication } from './authentication/Authentication';
+import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 
 /**
  * @private
@@ -66,7 +66,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. OAuth prompt settings to use for authentication.
      */
-    authentication?: OAuthPromptSettings;
+    authentication?: AuthenticationOptions;
 
     /**
      * Optional. Application ID of the bot.
@@ -197,7 +197,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
-    private readonly _authentication?: Authentication<TState>;
+    private readonly _authentication?: AuthenticationManager<TState>;
     private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
 
@@ -229,11 +229,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         // Create OAuthPrompt if configured
         if (this._options.authentication) {
-            this._authentication = new Authentication<TState>(
-                this,
-                this._options.authentication,
-                this._options.storage
-            );
+            this._authentication = new AuthenticationManager(this, this._options.authentication, this._options.storage);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -293,7 +289,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * exception will be thrown if you attempt to access it otherwise.
      * @returns {Authentication<TState>} The Authentication instance.
      */
-    public get authentication(): Authentication<TState> {
+    public get authentication(): AuthenticationManager<TState> {
         if (!this._authentication) {
             throw new Error(
                 `The Application.authentication property is unavailable because no authentication options were configured.`
@@ -515,18 +511,8 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 const state = await turnStateManager!.loadState(storage, context);
 
                 // Sign the user in
-                if (this._authentication && this._authentication.canSignInUser(context)) {
-                    // Get the auth token
-                    const token = await this._authentication.signInUser(context, state);
-                    if (token) {
-                        state['temp'].value.authToken = token;
-                    } else {
-                        // Save turn state and end
-                        // - This saves the current dialog stack.
-                        await turnStateManager!.saveState(storage, context, state);
-
-                        return false;
-                    }
+                if (this._authentication) {
+                    await this._authentication.authenticate(context, state);
                 }
 
                 // Call beforeTurn event handlers

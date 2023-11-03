@@ -7,7 +7,7 @@
  * Licensed under the MIT License.
  */
 
-import { ActivityTypes, Storage, TurnContext } from 'botbuilder';
+import { Storage, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { TurnState } from '../TurnState';
 import { DefaultTurnState } from '../DefaultTurnStateManager';
@@ -17,12 +17,13 @@ import { BotAuthentication } from './BotAuthentication';
 import * as UserTokenAccess from './UserTokenAccess';
 
 /**
- * Authentication service.
+ * User authentication service.
  */
 export class Authentication<TState extends TurnState = DefaultTurnState> {
-    private readonly _messagingExtensionAuth: MessagingExtensionAuthentication<TState>;
+    private readonly _messagingExtensionAuth: MessagingExtensionAuthentication;
     private readonly _botAuth: BotAuthentication<TState>;
-    private readonly _oauthPromptSettings: OAuthPromptSettings;
+
+    public readonly settings: OAuthPromptSettings;
 
     /**
      * Creates a new instance of the `Authentication` class.
@@ -36,11 +37,11 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         app: Application<TState>,
         settings: OAuthPromptSettings,
         storage?: Storage,
-        messagingExtensionsAuth?: MessagingExtensionAuthentication<TState>,
+        messagingExtensionsAuth?: MessagingExtensionAuthentication,
         botAuth?: BotAuthentication<TState>
     ) {
-        this._oauthPromptSettings = settings;
-        this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication(settings);
+        this.settings = settings;
+        this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
         this._botAuth = botAuth || new BotAuthentication(app, settings, storage);
     }
 
@@ -54,12 +55,18 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @returns {string | undefined} The authentication token or undefined if the user is still login in.
      */
     public async signInUser(context: TurnContext, state: TState): Promise<string | undefined> {
-        if (this.isMessagingExtensionAuthFlow(context)) {
-            return await this._messagingExtensionAuth.authenticate(context, state);
-        } else if (this.isBotAuthFlow(context)) {
+        // Check if user is signed in.
+        const token = await this.isUserSignedIn(context);
+        if (token) {
+            return token;
+        }
+
+        if (this._messagingExtensionAuth.isValidActivity(context)) {
+            return await this._messagingExtensionAuth.authenticate(context, this.settings);
+        }
+
+        if (this._botAuth.isValidActivity(context)) {
             return await this._botAuth.authenticate(context, state);
-        } else {
-            throw new Error(`signInUser() is not supported for this activity type.`);
         }
     }
 
@@ -71,21 +78,27 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @returns {Promise<void>} A Promise representing the asynchronous operation.
      */
     public signOutUser(context: TurnContext, state: TState): Promise<void> {
-        if (this.isBotAuthFlow(context)) {
+        if (this._botAuth.isValidActivity(context)) {
             this._botAuth.deleteAuthFlowState(context, state);
         }
 
         // Signout flow is agnostic of the activity type.
-        return UserTokenAccess.signOutUser(context, this._oauthPromptSettings);
+        return UserTokenAccess.signOutUser(context, this.settings);
     }
 
     /**
-     * Determines whether user sign in is allowed for the incomming activity type.
-     * @param {TurnContext} context - Current turn context.
-     * @returns {boolean} true if the user can sign in for the incomming activity type, false otherwise.
+     * Check is the user is signed, if they are then returns the token.
+     * @param {TurnContext} context Current turn context.
+     * @returns {string | undefined} The token string or undefined if the user is not signed in.
      */
-    public canSignInUser(context: TurnContext): boolean {
-        return this.isBotAuthFlow(context) || this.isMessagingExtensionAuthFlow(context);
+    public async isUserSignedIn(context: TurnContext): Promise<string | undefined> {
+        const tokenResponse = await UserTokenAccess.getUserToken(context, this.settings, '');
+
+        if (tokenResponse && tokenResponse.token) {
+            return tokenResponse.token;
+        }
+
+        return undefined;
     }
 
     /**
@@ -99,12 +112,87 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     public async onUserSignIn(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
         this._botAuth.onUserSignIn(handler);
     }
+}
 
-    private isBotAuthFlow(context: TurnContext): boolean {
-        return context.activity.type == ActivityTypes.Message;
+export class AuthenticationManager<TState extends TurnState = DefaultTurnState> {
+    private readonly _authentications: Map<string, Authentication<TState>> = new Map<string, Authentication<TState>>();
+    private readonly defaultSettingName: string;
+
+    /**
+     * Creates a new instance of the `AuthenticationManager` class.
+     * @param {Application} app - The application instance.
+     * @param {AuthenticationOptions} options - Authentication options.
+     * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
+     */
+    constructor(app: Application<TState>, options: AuthenticationOptions, storage?: Storage) {
+        if (!options.settings || Object.keys(options.settings).length === 0) {
+            throw new Error('Authentication settings are required.');
+        }
+
+        this.defaultSettingName = options.defaultSetting || Object.keys(options.settings)[0];
+
+        const settings = options.settings;
+
+        for (const key in settings) {
+            if (key in settings) {
+                const setting = settings[key];
+                const authentication = new Authentication(app, setting, storage);
+
+                this._authentications.set(key, authentication);
+            }
+        }
     }
 
-    private isMessagingExtensionAuthFlow(context: TurnContext): boolean {
-        return this._messagingExtensionAuth.isValidActivity(context);
+    public getConnection(name: string): Authentication<TState> {
+        const connection = this._authentications.get(name);
+
+        if (!connection) {
+            throw new Error(`Could not find connection name ${name}`);
+        }
+
+        return connection;
     }
+
+    public async authenticate(context: TurnContext, state: TState, settingName?: string): Promise<string | undefined> {
+        if (!settingName) {
+            settingName = this.defaultSettingName;
+        }
+
+        // Get authentication instace
+        const auth: Authentication<TState> = this.getConnection(settingName);
+
+        // Sign the user in
+        if (auth) {
+            // Get the auth token
+            console.log('authenticating user')
+            const token = await auth.signInUser(context, state);
+            if (token) {
+                this.setTokenInState(state, settingName, token);
+            } else {
+                return undefined;
+            }
+        }
+    }
+
+    private setTokenInState(state: TState, settingName: string, token: string) {
+        if (!state['temp'].value.authTokens) {
+            state['temp'].value.authTokens = {};
+        }
+
+        state['temp'].value.authTokens[settingName] = token;
+    }
+}
+
+export interface AuthenticationSettings {
+    // Key uniquely identifies the connection string.
+    [key: string]: OAuthPromptSettings;
+}
+
+export interface AuthenticationOptions {
+    settings: AuthenticationSettings;
+
+    /**
+     * Describes the default settings the bot should use if the user does not specify a setting name.
+     */
+    defaultSetting?: string;
 }

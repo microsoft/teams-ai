@@ -39,7 +39,9 @@ export interface DefaultTempState {
     /**
      * Token returned if the Application was configured with authentication support.
      */
-    authToken?: string;
+    authTokens: {
+        [key: string]: string;
+    };
 
     /**
      * Input passed to an AI prompt

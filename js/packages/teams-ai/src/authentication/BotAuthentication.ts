@@ -45,10 +45,12 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     private _oauthPrompt: OAuthPrompt;
     private _storage: Storage;
     private _userSignInHandler?: (context: TurnContext, state: TState) => Promise<void>;
+    private _connectionName: string;
 
     public constructor(app: Application<TState>, oauthPromptSettings: OAuthPromptSettings, storage?: Storage) {
         // Create OAuthPrompt
         this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthPromptSettings);
+        this._connectionName = oauthPromptSettings.connectionName;
 
         this._storage = storage || new MemoryStorage();
 
@@ -62,7 +64,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
                     context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName
                 ),
             async (context, state) => {
-                await this.continueConversationalBotAuthFlow(context, state);
+                await this.handleSignInActivity(context, state);
             },
             true
         );
@@ -73,7 +75,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
                         context.activity.name === tokenExchangeOperationName
                 ),
             async (context, state) => {
-                await this.continueConversationalBotAuthFlow(context, state);
+                await this.handleSignInActivity(context, state);
             },
             true
         );
@@ -93,15 +95,15 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         }
 
         const results = await this.runDialog(context, state, userDialogStatePropertyName);
-        if (results.status === DialogTurnStatus.complete && results.result != undefined) {
+        if (results.status === DialogTurnStatus.complete && results.result?.token) {
             // Get user auth state
             const userAuthState = state.conversation.value[userAuthStatePropertyName] as UserAuthState;
             if (!userAuthState.signedIn && userAuthState.message) {
                 // Restore user message
                 context.activity.text = userAuthState.message;
-                userAuthState.signedIn = true;
-                delete userAuthState.message;
-                state.conversation.value[userAuthStatePropertyName] = userAuthState;
+                state.conversation.value[userAuthStatePropertyName] = {
+                    signedIn: true
+                };
             }
 
             // Delete persisted dialog state
@@ -113,6 +115,11 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
             return undefined;
         }
     }
+
+    public isValidActivity(context: TurnContext): boolean {
+        return context.activity.type === ActivityTypes.Message;
+    }
+
     /**
      * The handler function is called when the user has successfully signed in
      * @template TState
@@ -122,7 +129,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         this._userSignInHandler = handler;
     }
 
-    public async continueConversationalBotAuthFlow(context: TurnContext, state: TState): Promise<void> {
+    public async handleSignInActivity(context: TurnContext, state: TState): Promise<void> {
         const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
         const result = await this.runDialog(context, state, userDialogStatePropertyName);
 
@@ -152,7 +159,6 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         state: TState,
         dialogStateProperty: string
     ): Promise<DialogTurnResult<OAuthPromptResult>> {
-        // Save the
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this._oauthPrompt);
@@ -178,11 +184,11 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         }
     }
 
-    private getUserAuthStatePropertyName(context: TurnContext): string {
-        return `__${context.activity.from.id}:AuthState__`;
+    public getUserAuthStatePropertyName(context: TurnContext): string {
+        return `__${context.activity.from.id}:${this._connectionName}:AuthState__`;
     }
 
-    private getUserDialogStatePropertyName(context: TurnContext): string {
-        return `__${context.activity.from.id}:DialogState__`;
+    public getUserDialogStatePropertyName(context: TurnContext): string {
+        return `__${context.activity.from.id}:${this._connectionName}:DialogState__`;
     }
 }
