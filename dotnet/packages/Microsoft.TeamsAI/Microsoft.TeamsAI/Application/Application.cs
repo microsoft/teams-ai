@@ -29,8 +29,8 @@ namespace Microsoft.TeamsAI
         where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>, new()
     {
-        private static readonly string CONFIG_FETCH_NAME = "config/fetch";
-        private static readonly string CONFIG_SUBMIT_NAME = "config/submit";
+        private static readonly string CONFIG_FETCH_INVOKE_NAME = "config/fetch";
+        private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
 
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
@@ -531,7 +531,7 @@ namespace Microsoft.TeamsAI
         }
 
         /// <summary>
-        /// Handles config fetch events.
+        /// Handles config fetch events for Microsoft Teams.
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
@@ -540,7 +540,8 @@ namespace Microsoft.TeamsAI
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) => Task.FromResult(
                 string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                && string.Equals(turnContext.Activity.Name, CONFIG_FETCH_NAME));
+                && string.Equals(turnContext.Activity.Name, CONFIG_FETCH_INVOKE_NAME)
+                && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams));
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
                 ConfigResponseBase result = await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
@@ -557,7 +558,7 @@ namespace Microsoft.TeamsAI
         }
 
         /// <summary>
-        /// Handles config submit events.
+        /// Handles config submit events for Microsoft Teams.
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
@@ -566,7 +567,8 @@ namespace Microsoft.TeamsAI
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) => Task.FromResult(
                 string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                && string.Equals(turnContext.Activity.Name, CONFIG_SUBMIT_NAME));
+                && string.Equals(turnContext.Activity.Name, CONFIG_SUBMIT_INVOKE_NAME)
+                && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams));
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
                 ConfigResponseBase result = await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);

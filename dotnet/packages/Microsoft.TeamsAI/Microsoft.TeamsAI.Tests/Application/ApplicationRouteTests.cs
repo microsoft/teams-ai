@@ -1536,20 +1536,30 @@ namespace Microsoft.TeamsAI.Tests.Application
             var activity1 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "config/fetch"
+                Name = "config/fetch",
+                ChannelId = Channels.Msteams
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "config/submit"
+                Name = "config/fetch",
+                ChannelId = Channels.Outlook
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Invoke,
+                Name = "config/submit",
+                ChannelId = Channels.Msteams
+            };
+            var activity4 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                ChannelId = Channels.Msteams
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
+            var turnContext4 = new TurnContext(adapter, activity4);
             var configResponseMock = new Mock<ConfigResponseBase>();
             var expectedInvokeResponse = new InvokeResponse()
             {
@@ -1572,6 +1582,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             await app.OnTurnAsync(turnContext1);
             await app.OnTurnAsync(turnContext2);
             await app.OnTurnAsync(turnContext3);
+            await app.OnTurnAsync(turnContext4);
 
             // Assert
             Assert.Single(names);
@@ -1600,20 +1611,31 @@ namespace Microsoft.TeamsAI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/submit",
+                ChannelId = Channels.Msteams,
                 Value = JObject.FromObject(data)
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "config/fetch"
+                Name = "config/submit",
+                ChannelId = Channels.Outlook,
+                Value = JObject.FromObject(data)
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Invoke,
+                Name = "config/fetch",
+                ChannelId = Channels.Msteams
+            };
+            var activity4 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                ChannelId = Channels.Msteams
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
+            var turnContext4 = new TurnContext(adapter, activity4);
             var configResponseMock = new Mock<ConfigResponseBase>();
             var expectedInvokeResponse = new InvokeResponse()
             {
@@ -1638,6 +1660,7 @@ namespace Microsoft.TeamsAI.Tests.Application
             await app.OnTurnAsync(turnContext1);
             await app.OnTurnAsync(turnContext2);
             await app.OnTurnAsync(turnContext3);
+            await app.OnTurnAsync(turnContext4);
 
             // Assert
             Assert.Single(names);
