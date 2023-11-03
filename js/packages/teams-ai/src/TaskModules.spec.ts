@@ -7,8 +7,6 @@ import {
     INVOKE_RESPONSE_KEY,
     TaskModuleContinueResponse,
     TaskModuleMessageResponse,
-    // MessagingExtensionResult,
-    // TaskModuleTaskInfo,
     TestAdapter,
     TurnContext
 } from 'botbuilder';
@@ -147,8 +145,6 @@ describe('TaskModules', () => {
                 });
             });
         });
-
-        // it('fetch() with array of verbs', async () => {});
     });
 
     describe(SUBMIT_INVOKE_NAME, () => {
@@ -188,7 +184,5 @@ describe('TaskModules', () => {
                 });
             });
         });
-
-        // it('submit() with array of verbs', async () => {});
     });
 });
