@@ -13,7 +13,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  projectPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.Teams.AI.csproj'
+  package: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.Teams.AI.csproj'
 
 steps:
 - task: UseDotNet@2
@@ -21,25 +21,24 @@ steps:
     version: '6.x'
     includePreviewVersions: true
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   displayName: 'Restore'
   inputs:
-    command: 'restore'
-    restoreSolution: 'dotnet/packages/Microsoft.TeamsAI/*.sln'
-    noCache: true
+    command: restore
+    projects: '$(package)'
 
-# - task: DotNetCoreCLI@2
-#   displayName: 'Build'
-#   inputs:
-#     command: 'build'
-#     projects: '$(projectPath)'
-#     arguments: '--configuration $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: build
+    projects: '$(package)'
+    arguments: '--configuration $(buildConfiguration)'
 
-- task: NuGetCommand@2
-  displayName: 'NuGet Pack'
+- task: DotNetCoreCLI@2
+  displayName: 'Pack'
   inputs:
     command: pack
-    packagesToPack: '$(projectPath)'
+    packagesToPack: '$(package)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
     includeSymbols: true
   
