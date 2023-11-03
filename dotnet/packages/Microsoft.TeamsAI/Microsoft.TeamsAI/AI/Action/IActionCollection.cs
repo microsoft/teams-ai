@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
     internal interface IActionCollection<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {

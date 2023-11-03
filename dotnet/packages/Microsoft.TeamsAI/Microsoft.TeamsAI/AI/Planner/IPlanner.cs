@@ -1,8 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// A planner is responsible for generating a plan that the AI system will execute.

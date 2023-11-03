@@ -1,5 +1,5 @@
 ﻿using LightBot.Model;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 
 namespace LightBot
 {

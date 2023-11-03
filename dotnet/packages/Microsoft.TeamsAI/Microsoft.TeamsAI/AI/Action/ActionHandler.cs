@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
     // TODO: add analyzer to show type warning at compile time.
     /// <summary>

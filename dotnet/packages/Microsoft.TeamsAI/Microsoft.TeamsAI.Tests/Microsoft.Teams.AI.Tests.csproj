@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.TeamsAI\Microsoft.TeamsAI.csproj" />
+    <ProjectReference Include="..\Microsoft.TeamsAI\Microsoft.Teams.AI.csproj" />
   </ItemGroup>
 
 </Project>

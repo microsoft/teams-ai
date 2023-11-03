@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Microsoft.TeamsAI.Utilities.JsonConverters;
+using Microsoft.Teams.AI.Utilities.JsonConverters;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// A predicted DO command is an action that the AI system should perform.

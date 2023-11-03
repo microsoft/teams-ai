@@ -1,8 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.State;
 using TypeAheadBot;
 
 var builder = WebApplication.CreateBuilder(args);

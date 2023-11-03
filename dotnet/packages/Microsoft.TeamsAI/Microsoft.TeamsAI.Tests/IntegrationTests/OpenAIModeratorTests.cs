@@ -1,18 +1,18 @@
-﻿using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.AI;
+﻿using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Reflection;
 using Xunit.Abstractions;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.TeamsAI.Tests.IntegrationTests
+namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {
     public sealed class OpenAIModeratorTests
     {

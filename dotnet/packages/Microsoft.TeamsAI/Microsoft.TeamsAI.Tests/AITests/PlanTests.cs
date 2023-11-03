@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.AI.Planner;
+﻿using Microsoft.Teams.AI.AI.Planner;
 
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class PlanTests
     {

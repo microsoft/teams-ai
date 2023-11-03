@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Prompt;
 
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public class TestPromptManager : IPromptManager<TestTurnState>
     {

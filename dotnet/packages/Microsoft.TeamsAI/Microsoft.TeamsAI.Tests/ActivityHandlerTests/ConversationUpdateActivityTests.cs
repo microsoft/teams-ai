@@ -1,4 +1,4 @@
-﻿using Microsoft.TeamsAI.Tests.TestUtils;
+﻿using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema.Teams;
@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
+namespace Microsoft.Teams.AI.Tests.ActivityHandlerTests
 {
     public class ConversationUpdateActivityTests
     {

@@ -3,8 +3,8 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Rest;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.State;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
