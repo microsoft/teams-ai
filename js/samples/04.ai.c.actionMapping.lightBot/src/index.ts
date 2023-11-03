@@ -86,14 +86,23 @@ interface ConversationState extends DefaultConversationState {
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
 }
 
 // Create AI components
 const model = new OpenAIModel({
-    apiKey: process.env.OPENAI_API_KEY || '',
+    // OpenAI Support
+    apiKey: process.env.OPENAI_KEY!,
     defaultModel: 'gpt-3.5-turbo',
+
+    // Azure OpenAI Support
+    azureApiKey: process.env.AZURE_OPENAI_KEY!,
+    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+    azureApiVersion: '2023-03-15-preview',
+
+    // Request logging
     logRequests: true
 });
 

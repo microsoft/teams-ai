@@ -13,7 +13,7 @@ import { AI } from '../AI';
 /**
  * A planner is responsible for generating a plan that the AI system will execute.
  */
-export interface Planner<TState extends TurnState> {
+export interface Planner<TState extends TurnState = TurnState> {
     /**
      * Starts a new task.
      * @remarks

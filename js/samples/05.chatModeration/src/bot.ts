@@ -6,66 +6,71 @@ import {
     AzureOpenAIModerator,
     ModerationSeverity,
     AI,
-    OpenAIModerator
+    OpenAIModerator,
+    Moderator
 } from '@microsoft/teams-ai';
 import { MemoryStorage, TurnContext } from 'botbuilder';
 import * as path from 'path';
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
 }
 
 // Create AI components
 const model = new OpenAIModel({
-    apiKey: process.env.OPENAI_API_KEY || '',
+    // OpenAI Support
+    apiKey: process.env.OPENAI_KEY!,
     defaultModel: 'gpt-3.5-turbo',
+
+    // Azure OpenAI Support
+    azureApiKey: process.env.AZURE_OPENAI_KEY!,
+    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+    azureApiVersion: '2023-03-15-preview',
+
+    // Request logging
     logRequests: true
 });
 
-const moderator = new OpenAIModerator({
-    apiKey: process.env.OPENAI_API_KEY!,
-    moderate: 'both',
-});
+// Create appropriate moderator
+let moderator: Moderator;
+if (process.env.OPENAI_KEY) {
+    moderator = new OpenAIModerator({
+        apiKey: process.env.OPENAI_API_KEY!,
+        moderate: 'both',
+    });
+} else {
+    if (!process.env.AZURE_MODERATOR_KEY || !process.env.AZURE_MODERATOR_ENDPOINT) {
+        throw new Error('Missing environment variables - please check that both AZURE_MODERATOR_KEY and AZURE_MODERATOR_ENDPOINT are set.');
+    }
 
-// if (!process.env.AZURE_API_KEY) {
-//     throw new Error('Missing environment variables - please check that AZURE_API_KEY is set.');
-// }
-//
-// const model = new OpenAIModel({
-//     azureApiKey: process.env.AZURE_API_KEY || '',
-//     azureDefaultDeployment: 'gpt35turbo',
-//     azureEndpoint: process.env.AZURE_AI_ENDPOINT || '',
-//     azureApiVersion: '2023-03-15-preview',
-//     logRequests: true
-// });
-//
-// Create a moderator
-// const moderator = new AzureOpenAIModerator({
-//     apiKey: process.env.AZURE_MODERATOR_API_KEY!,
-//     endpoint: process.env.AZURE_MODERATOR_ENDPOINT!,
-//     apiVersion: '2023-04-30-preview',
-//     moderate: 'both',
-//     categories: [
-//         {
-//             category: 'Hate',
-//             severity: ModerationSeverity.High
-//         },
-//         {
-//             category: 'SelfHarm',
-//             severity: ModerationSeverity.High
-//         },
-//         {
-//             category: 'Sexual',
-//             severity: ModerationSeverity.High
-//         },
-//         {
-//             category: 'Violence',
-//             severity: ModerationSeverity.High
-//         }
-//     ]
-//     // breakByBlocklists: true,
-//     // blocklistNames: [] // Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. You could attach multiple lists name here.
-// });
+    moderator = new AzureOpenAIModerator({
+        apiKey: process.env.AZURE_MODERATOR_KEY!,
+        endpoint: process.env.AZURE_MODERATOR_ENDPOINT!,
+        apiVersion: '2023-04-30-preview',
+        moderate: 'both',
+        categories: [
+            {
+                category: 'Hate',
+                severity: ModerationSeverity.High
+            },
+            {
+                category: 'SelfHarm',
+                severity: ModerationSeverity.High
+            },
+            {
+                category: 'Sexual',
+                severity: ModerationSeverity.High
+            },
+            {
+                category: 'Violence',
+                severity: ModerationSeverity.High
+            }
+        ]
+        // breakByBlocklists: true,
+        // blocklistNames: [] // Text blocklist Name. Only support following characters: 0-9 A-Z a-z - . _ ~. You could attach multiple lists name here.
+    });
+}
 
 const prompts = new PromptManager({
     promptsFolder: path.join(__dirname, '../src/prompts')

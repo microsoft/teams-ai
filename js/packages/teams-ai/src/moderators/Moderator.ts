@@ -14,7 +14,7 @@ import { TurnState } from '../TurnState';
  * A moderator is responsible for reviewing and approving AI prompts and plans.
  * @template TState Type of the applications turn state.
  */
-export interface Moderator<TState extends TurnState> {
+export interface Moderator<TState extends TurnState = TurnState> {
     /**
      * Reviews an incoming utterance and generated prompt before it's sent to the planner.
      * @summary
