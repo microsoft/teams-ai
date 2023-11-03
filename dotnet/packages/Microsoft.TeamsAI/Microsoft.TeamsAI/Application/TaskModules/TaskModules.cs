@@ -78,7 +78,7 @@ namespace Microsoft.TeamsAI
                 TaskModuleAction? taskModuleAction;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, FETCH_INVOKE_NAME)
-                    || (taskModuleAction = InvokeActivityUtilities.GetInvokeValue<TaskModuleAction>(turnContext.Activity)) == null)
+                    || (taskModuleAction = ActivityUtilities.GetTypedValue<TaskModuleAction>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected TaskModules.OnFetch() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -88,7 +88,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -179,7 +179,7 @@ namespace Microsoft.TeamsAI
                 TaskModuleAction? taskModuleAction;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SUBMIT_INVOKE_NAME)
-                    || (taskModuleAction = InvokeActivityUtilities.GetInvokeValue<TaskModuleAction>(turnContext.Activity)) == null)
+                    || (taskModuleAction = ActivityUtilities.GetTypedValue<TaskModuleAction>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected TaskModules.OnSubmit() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -189,7 +189,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };

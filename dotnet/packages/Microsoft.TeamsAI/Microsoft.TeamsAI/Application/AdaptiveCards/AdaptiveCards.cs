@@ -78,7 +78,7 @@ namespace Microsoft.TeamsAI
                 AdaptiveCardInvokeValue? invokeValue;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
-                    || (invokeValue = InvokeActivityUtilities.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
+                    || (invokeValue = ActivityUtilities.GetTypedValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
                     || invokeValue.Action == null
                     || !string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE))
                 {
@@ -86,7 +86,7 @@ namespace Microsoft.TeamsAI
                 }
 
                 AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = await handler(turnContext, turnState, invokeValue.Action.Data, cancellationToken);
-                Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(adaptiveCardInvokeResponse);
+                Activity activity = ActivityUtilities.CreateInvokeResponseActivity(adaptiveCardInvokeResponse);
                 await turnContext.SendActivityAsync(activity, cancellationToken);
             };
             _app.AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
@@ -327,7 +327,7 @@ namespace Microsoft.TeamsAI
                 AdaptiveCardSearchInvokeValue? searchInvokeValue;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
-                    || (searchInvokeValue = InvokeActivityUtilities.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
+                    || (searchInvokeValue = ActivityUtilities.GetTypedValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected AdaptiveCards.OnSearch() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -348,7 +348,7 @@ namespace Microsoft.TeamsAI
                             Results = results
                         }
                     };
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(searchInvokeResponse);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(searchInvokeResponse);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -398,7 +398,7 @@ namespace Microsoft.TeamsAI
                 return Task.FromResult(
                     string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
-                    && (invokeValue = InvokeActivityUtilities.GetInvokeValue<AdaptiveCardInvokeValue>(turnContext.Activity)) != null
+                    && (invokeValue = ActivityUtilities.GetTypedValue<AdaptiveCardInvokeValue>(turnContext.Activity)) != null
                     && invokeValue.Action != null
                     && string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE)
                     && isMatch(invokeValue.Action.Verb));
@@ -431,7 +431,7 @@ namespace Microsoft.TeamsAI
                 return Task.FromResult(
                     string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(turnContext.Activity.Name, SEARCH_INVOKE_NAME)
-                    && (searchInvokeValue = InvokeActivityUtilities.GetInvokeValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) != null
+                    && (searchInvokeValue = ActivityUtilities.GetTypedValue<AdaptiveCardSearchInvokeValue>(turnContext.Activity)) != null
                     && isMatch(searchInvokeValue.Dataset!));
             };
             return routeSelector;
