@@ -1,4 +1,4 @@
-﻿using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.State;
 
 namespace DevOpsBot.Model
 {

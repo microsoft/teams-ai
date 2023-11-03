@@ -1,7 +1,7 @@
 ﻿
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI.AI.Prompt
+namespace Microsoft.Teams.AI.AI.Prompt
 {
     /// <summary>
     /// A template for a prompt.

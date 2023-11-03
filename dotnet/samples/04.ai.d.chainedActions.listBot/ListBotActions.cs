@@ -1,8 +1,8 @@
 ﻿using ListBot.Model;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI;
 
 namespace ListBot
 {

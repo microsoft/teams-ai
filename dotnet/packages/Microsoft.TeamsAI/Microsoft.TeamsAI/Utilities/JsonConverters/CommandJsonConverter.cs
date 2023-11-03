@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Planner;
 
-namespace Microsoft.TeamsAI.Utilities.JsonConverters
+namespace Microsoft.Teams.AI.Utilities.JsonConverters
 {
     internal class PredictedCommandJsonConverter : JsonConverter<IPredictedCommand>
     {

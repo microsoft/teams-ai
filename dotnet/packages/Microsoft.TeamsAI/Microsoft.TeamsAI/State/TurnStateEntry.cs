@@ -1,9 +1,9 @@
-﻿using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Utilities;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
-[assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
-namespace Microsoft.TeamsAI.State
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
+namespace Microsoft.Teams.AI.State
 {
     /// <summary>
     /// The turn state entry.

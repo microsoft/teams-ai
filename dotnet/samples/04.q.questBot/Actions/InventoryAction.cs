@@ -1,8 +1,8 @@
 ﻿using AdaptiveCards;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Action;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Action;
 using QuestBot.Models;
 using QuestBot.State;
 using System.Text.Json;

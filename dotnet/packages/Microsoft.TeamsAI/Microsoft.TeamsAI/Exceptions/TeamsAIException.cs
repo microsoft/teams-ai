@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.Exceptions
+namespace Microsoft.Teams.AI.Exceptions
 {
     /// <summary>
     /// Base exception for the TeamsAI library.

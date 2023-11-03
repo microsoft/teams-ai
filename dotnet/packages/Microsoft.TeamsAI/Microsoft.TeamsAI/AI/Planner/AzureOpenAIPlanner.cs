@@ -3,9 +3,9 @@ using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextCompletion;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// Planner that uses the Azure OpenAI service.

@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
 
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public class TestModerator : IModerator<TestTurnState>
     {

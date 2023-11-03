@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 
 // For Unit Test
-[assembly: InternalsVisibleTo("Microsoft.TeamsAI.Tests")]
-namespace Microsoft.TeamsAI.Utilities
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
+namespace Microsoft.Teams.AI.Utilities
 {
     /// <summary>
     /// Provide a default HttpClient to be shared across the library.

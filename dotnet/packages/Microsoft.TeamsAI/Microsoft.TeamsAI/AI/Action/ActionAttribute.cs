@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
     /// <summary>
     /// Attribute that marks a method as an action.
