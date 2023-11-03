@@ -169,7 +169,7 @@ export class OpenAIPlanner<
         if (model.startsWith('gpt-')) {
             // Request base chat completion
             const temp = (state['temp']?.value ?? {}) as DefaultTempState;
-            const chatRequest = await this.createChatCompletionRequest(state, prompt, temp.input, options);
+            const chatRequest = this.createChatCompletionRequest(state, prompt, temp.input, options);
             const result = await this.createChatCompletion(chatRequest);
             status = result?.status;
             response = status === 200 ? result.data?.choices[0]?.message?.content ?? '' : '';
@@ -188,8 +188,11 @@ export class OpenAIPlanner<
                 commands: [
                     {
                         type: 'DO',
-                        action: AI.RateLimitedActionName,
-                        entities: {}
+                        action: AI.HttpErrorActionName,
+                        entities: {
+                            code: '429',
+                            message: 'rate limited'
+                        }
                     } as PredictedDoCommand
                 ]
             };

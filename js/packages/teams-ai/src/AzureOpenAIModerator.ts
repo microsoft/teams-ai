@@ -28,6 +28,7 @@ import {
 import { PromptTemplate } from './Prompts';
 import { ConfiguredAIOptions, AI } from './AI';
 import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
+import { AxiosError } from 'axios';
 
 /**
  * Options for the OpenAI based moderator.
@@ -139,14 +140,14 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
      * This method is called by the moderator to moderate the input.
      * @template TState Optional. Type of the applications turn state.
      */
-    protected async createModeration(input: string): Promise<CreateModerationResponseResultsInner | undefined> {
+    protected async createModeration(input: string): Promise<CreateModerationResponseResultsInner> {
         const response = (await this._azureContentSafetyClient.createModeration({
             text: input,
             ...this._contentSafetyOptions
         } as CreateContentSafetyRequest)) as OpenAIClientResponse<ModerationResponse>;
         const data = response.data as CreateContentSafetyResponse;
         if (!data) {
-            return undefined;
+            throw new AxiosError(response.statusText, response.status.toString());
         }
         // Check if the input is safe for each category
         const hateResult: boolean =
@@ -205,11 +206,12 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
             case 'input':
             case 'both': {
                 const input = state?.temp?.value.input ?? context.activity.text;
-                const result = await this.createModeration(input);
-                if (result) {
+
+                try {
+                    const result = await this.createModeration(input);
+
                     if (result.flagged) {
                         // Input flagged
-                        // console.info(`ReviewPrompt: Azure Content Safety Result: ${JSON.stringify(result)}`);
                         return {
                             type: 'plan',
                             commands: [
@@ -221,13 +223,26 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                             ]
                         };
                     }
-                } else {
-                    // Rate limited
-                    return {
-                        type: 'plan',
-                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand]
-                    };
+                } catch (err) {
+                    if (err instanceof AxiosError) {
+                        return {
+                            type: 'plan',
+                            commands: [
+                                {
+                                    type: 'DO',
+                                    action: AI.HttpErrorActionName,
+                                    entities: {
+                                        code: err.code,
+                                        message: err.message
+                                    }
+                                } as PredictedDoCommand
+                            ]
+                        };
+                    }
+
+                    throw err;
                 }
+
                 break;
             }
         }
@@ -249,11 +264,12 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                     if (cmd.type == 'SAY') {
                         const predictedSayCommand = cmd as PredictedSayCommand;
                         const output = predictedSayCommand.response;
-                        const result = await this.createModeration(output);
-                        if (result) {
+
+                        try {
+                            const result = await this.createModeration(output);
+
                             if (result.flagged) {
                                 // Output flagged
-                                // console.info(`ReviewPlan: Azure Content Safety Result: ${JSON.stringify(result)}`);
                                 return {
                                     type: 'plan',
                                     commands: [
@@ -265,14 +281,24 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
                                     ]
                                 };
                             }
-                        } else {
-                            // Rate limited
-                            return {
-                                type: 'plan',
-                                commands: [
-                                    { type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand
-                                ]
-                            };
+                        } catch (err) {
+                            if (err instanceof AxiosError) {
+                                return {
+                                    type: 'plan',
+                                    commands: [
+                                        {
+                                            type: 'DO',
+                                            action: AI.HttpErrorActionName,
+                                            entities: {
+                                                code: err.code,
+                                                message: err.message
+                                            }
+                                        } as PredictedDoCommand
+                                    ]
+                                };
+                            }
+
+                            throw err;
                         }
                     }
                 }

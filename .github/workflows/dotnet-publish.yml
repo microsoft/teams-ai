@@ -5,6 +5,7 @@
 name: DOTNET Publish
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
     paths: ['dotnet/**']
@@ -15,8 +16,7 @@ jobs:
   build-test-lint:
     name: Build/Test/Lint
     uses: ./.github/workflows/dotnet-build-test-lint.yml
-    permissions:
-      contents: read
+    permissions: read-all
   publish:
     name: Publish
     needs: build-test-lint
