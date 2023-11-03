@@ -11,8 +11,11 @@
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/microsoft/teams-ai</PackageProjectUrl>
+    <PackageIconUrl>https://github-production-user-asset-6210df.s3.amazonaws.com/14900841/240368384-972a9a1b-679a-4725-bfc0-a1e76151a78a.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageDescription>SDK focused on building AI based applications for Microsoft Teams.</PackageDescription>
+    <PackageTags>bots;ai;teams</PackageTags>
     <RepositoryUrl>https://github.com/microsoft/teams-ai</RepositoryUrl>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
