@@ -9,6 +9,9 @@
     <Version>1.0.0-preview</Version>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/microsoft/teams-ai</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageDescription>SDK focused on building AI based applications for Microsoft Teams.</PackageDescription>
     <RepositoryUrl>https://github.com/microsoft/teams-ai</RepositoryUrl>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
