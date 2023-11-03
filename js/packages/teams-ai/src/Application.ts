@@ -512,7 +512,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
                 // Sign the user in
                 if (this._authentication) {
-                    await this._authentication.authenticate(context, state);
+                    const signedIn = await this._authentication.signUserIn(context, state);
+
+                    if (!signedIn) {
+                        return false;
+                    }
                 }
 
                 // Call beforeTurn event handlers

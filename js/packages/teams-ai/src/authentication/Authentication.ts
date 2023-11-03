@@ -114,6 +114,9 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     }
 }
 
+/**
+ * The user authentication manager.
+ */
 export class AuthenticationManager<TState extends TurnState = DefaultTurnState> {
     private readonly _authentications: Map<string, Authentication<TState>> = new Map<string, Authentication<TState>>();
     private readonly defaultSettingName: string;
@@ -143,7 +146,13 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         }
     }
 
-    public getConnection(name: string): Authentication<TState> {
+    /**
+     * @template TState
+     * Gets the authentication instance for the specified connection name.
+     * @param {string} name The setting name.
+     * @returns {Authentication<TState>} The authentication instance.
+     */
+    public get(name: string): Authentication<TState> {
         const connection = this._authentications.get(name);
 
         if (!connection) {
@@ -153,41 +162,90 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         return connection;
     }
 
-    public async authenticate(context: TurnContext, state: TState, settingName?: string): Promise<string | undefined> {
+    /**
+     * Signs in a user.
+     * @template TState
+     * @param {TurnContext} context The turn context.
+     * @param {TState} state The turn state.
+     * @param {string} settingName Optional. The name of the setting to use. If not specified, the default setting name is used.
+     * @returns {Promise<boolean>} True if authentication completed successfully, otherwise false.
+     */
+    public async signUserIn(context: TurnContext, state: TState, settingName?: string): Promise<boolean> {
         if (!settingName) {
             settingName = this.defaultSettingName;
         }
 
         // Get authentication instace
-        const auth: Authentication<TState> = this.getConnection(settingName);
+        const auth: Authentication<TState> = this.get(settingName);
 
         // Sign the user in
         if (auth) {
             // Get the auth token
-            console.log('authenticating user')
+            console.log('authenticating user');
             const token = await auth.signInUser(context, state);
             if (token) {
                 this.setTokenInState(state, settingName, token);
+                return true;
             } else {
-                return undefined;
+                return false;
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * Signs out a user.
+     * @template TState
+     * @param {TurnContext} context The turn context.
+     * @param {TState} state The turn state.
+     * @param {string} settingName Optional. The name of the setting to use. If not specified, the default setting name is used.
+     */
+    public async signOutUser(context: TurnContext, state: TState, settingName?: string): Promise<void> {
+        if (!settingName) {
+            settingName = this.defaultSettingName;
+        }
+
+        // Get authentication instace
+        const auth: Authentication<TState> = this.get(settingName);
+
+        // Sign the user out
+        if (auth) {
+            await auth.signOutUser(context, state);
+            this.deleteTokenFromState(state, settingName);
         }
     }
 
     private setTokenInState(state: TState, settingName: string, token: string) {
-        if (!state['temp'].value.authTokens) {
-            state['temp'].value.authTokens = {};
+        if (!state.temp.value.authTokens) {
+            state.temp.value.authTokens = {};
         }
 
-        state['temp'].value.authTokens[settingName] = token;
+        state.temp.value.authTokens[settingName] = token;
+    }
+
+    private deleteTokenFromState(state: TState, settingName: string) {
+        if (!state.temp.value.authTokens || !state.temp.value.authTokens[settingName]) {
+            return;
+        }
+
+        delete state.temp.value.authTokens[settingName];
     }
 }
 
+/**
+ * The authentication settings.
+ */
 export interface AuthenticationSettings {
-    // Key uniquely identifies the connection string.
+    /**
+     * Key uniquely identifies the connection string.
+     */
     [key: string]: OAuthPromptSettings;
 }
 
+/**
+ * The authentication options to configure the authentication manager
+ */
 export interface AuthenticationOptions {
     settings: AuthenticationSettings;
 
