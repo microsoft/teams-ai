@@ -12,7 +12,9 @@
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageDescription>SDK focused on building AI based applications for Microsoft Teams.</PackageDescription>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/microsoft/teams-ai</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -27,7 +29,7 @@
       Suppress a warning about upcoming deprecation of PackageLicenseUrl. When embedding licenses are supported,
       replace PackageLicenseUrl with PackageLicenseExpression.
     -->
-    <NoWarn>$(NoWarn);NU5125</NoWarn>
+    <NoWarn>NU5125</NoWarn>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
@@ -44,6 +46,10 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
