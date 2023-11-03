@@ -41,34 +41,34 @@ steps:
     packagesToPack: '$(projectPath)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
   
-- task: EsrpCodeSigning@4
-  displayName: 'Sign'
-  inputs:
-    ConnectedServiceName: 'Teams ESRP CodeSign v3'
-    FolderPath: '$(Build.ArtifactStagingDirectory)'
-    Pattern: '*.nupkg,*.snupkg'
-    signConfigType: 'inlineSignParams'
-    SessionTimeout: '60'
-    MaxConcurrency: '50'
-    MaxRetryAttempts: '5'
-    PendingAnalysisWaitTimeoutMinutes: '5'
-    inlineOperation: |
-     [
-         {
-             "keyCode": "CP-401405",
-             "operationSetCode": "NuGetSign",
-             "parameters": [],
-             "toolName": "sign",
-             "toolVersion": "1.0"
-         },
-         {
-             "keyCode": "CP-401405",
-             "operationSetCode": "NuGetVerify",
-             "parameters": [],
-             "toolName": "sign",
-             "toolVersion": "1.0"
-         }
-     ]
+# - task: EsrpCodeSigning@4
+#   displayName: 'Sign'
+#   inputs:
+#     ConnectedServiceName: 'Teams ESRP CodeSign v3'
+#     FolderPath: '$(Build.ArtifactStagingDirectory)'
+#     Pattern: '*.nupkg,*.snupkg'
+#     signConfigType: 'inlineSignParams'
+#     SessionTimeout: '60'
+#     MaxConcurrency: '50'
+#     MaxRetryAttempts: '5'
+#     PendingAnalysisWaitTimeoutMinutes: '5'
+#     inlineOperation: |
+#      [
+#          {
+#              "keyCode": "CP-401405",
+#              "operationSetCode": "NuGetSign",
+#              "parameters": [],
+#              "toolName": "sign",
+#              "toolVersion": "1.0"
+#          },
+#          {
+#              "keyCode": "CP-401405",
+#              "operationSetCode": "NuGetVerify",
+#              "parameters": [],
+#              "toolName": "sign",
+#              "toolVersion": "1.0"
+#          }
+#      ]
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
