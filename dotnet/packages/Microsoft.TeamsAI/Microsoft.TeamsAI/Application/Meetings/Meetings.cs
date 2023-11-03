@@ -7,7 +7,7 @@ using Microsoft.TeamsAI.Utilities;
 namespace Microsoft.TeamsAI
 {
     /// <summary>
-    /// AdaptiveCards class to enable fluent style registration of handlers related to Microsoft Teams Meetings.
+    /// Meetings class to enable fluent style registration of handlers related to Microsoft Teams Meetings.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
     /// <typeparam name="TTurnStateManager">The type of the turn state manager object used by the application.</typeparam>
