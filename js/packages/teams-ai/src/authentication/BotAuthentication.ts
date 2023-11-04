@@ -185,7 +185,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     }
 
     public getUserAuthStatePropertyName(context: TurnContext): string {
-        return `__${context.activity.from.id}:${this._connectionName}:AuthState__`;
+        return `__${context.activity.from.id}:${this._connectionName}:Bot:AuthState__`;
     }
 
     public getUserDialogStatePropertyName(context: TurnContext): string {

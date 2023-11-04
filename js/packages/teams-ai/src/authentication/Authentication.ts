@@ -11,7 +11,7 @@ import { Storage, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { TurnState } from '../TurnState';
 import { DefaultTurnState } from '../DefaultTurnStateManager';
-import { Application } from '../Application';
+import { Application, Selector } from '../Application';
 import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
 import { BotAuthentication } from './BotAuthentication';
 import * as UserTokenAccess from './UserTokenAccess';
@@ -28,6 +28,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     /**
      * Creates a new instance of the `Authentication` class.
      * @param {Application} app - The application instance.
+     * @param {string} name - The name of the connection.
      * @param {OAuthPromptSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
      * @param {MessagingExtensionAuthentication} messagingExtensionsAuth - Handles messaging extension flow authentication.
@@ -35,11 +36,13 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      */
     constructor(
         app: Application<TState>,
+        name: string,
         settings: OAuthPromptSettings,
         storage?: Storage,
         messagingExtensionsAuth?: MessagingExtensionAuthentication,
         botAuth?: BotAuthentication<TState>
     ) {
+        this._name = name;
         this.settings = settings;
         this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
         this._botAuth = botAuth || new BotAuthentication(app, settings, storage);
@@ -62,12 +65,17 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
 
         if (this._messagingExtensionAuth.isValidActivity(context)) {
-            return await this._messagingExtensionAuth.authenticate(context, this.settings);
+            return await this._messagingExtensionAuth.authenticate(context, state);
         }
 
         if (this._botAuth.isValidActivity(context)) {
             return await this._botAuth.authenticate(context, state);
         }
+
+        throw new AuthError(
+            'invalidActivity',
+            `Incomming activity is not a valid activity to initiate authentication flow.`
+        );
     }
 
     /**
@@ -78,9 +86,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @returns {Promise<void>} A Promise representing the asynchronous operation.
      */
     public signOutUser(context: TurnContext, state: TState): Promise<void> {
-        if (this._botAuth.isValidActivity(context)) {
-            this._botAuth.deleteAuthFlowState(context, state);
-        }
+        this._botAuth.deleteAuthFlowState(context, state);
 
         // Signout flow is agnostic of the activity type.
         return UserTokenAccess.signOutUser(context, this.settings);
@@ -132,14 +138,14 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
             throw new Error('Authentication settings are required.');
         }
 
-        this.defaultSettingName = options.defaultSetting || Object.keys(options.settings)[0];
+        this.defaultSettingName = options.default || Object.keys(options.settings)[0];
 
         const settings = options.settings;
 
         for (const key in settings) {
             if (key in settings) {
                 const setting = settings[key];
-                const authentication = new Authentication(app, setting, storage);
+                const authentication = new Authentication(app, key, setting, storage);
 
                 this._authentications.set(key, authentication);
             }
@@ -168,30 +174,43 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
      * @param {TurnContext} context The turn context.
      * @param {TState} state The turn state.
      * @param {string} settingName Optional. The name of the setting to use. If not specified, the default setting name is used.
-     * @returns {Promise<boolean>} True if authentication completed successfully, otherwise false.
+     * @returns {Promise<SignInResponse>} The sign in response.
      */
-    public async signUserIn(context: TurnContext, state: TState, settingName?: string): Promise<boolean> {
+    public async signUserIn(context: TurnContext, state: TState, settingName?: string): Promise<SignInResponse> {
         if (!settingName) {
             settingName = this.defaultSettingName;
         }
 
         // Get authentication instace
         const auth: Authentication<TState> = this.get(settingName);
+        let status: 'pending' | 'complete' | 'error';
 
         // Sign the user in
-        if (auth) {
+        let token;
+        try {
             // Get the auth token
-            console.log('authenticating user');
-            const token = await auth.signInUser(context, state);
-            if (token) {
-                this.setTokenInState(state, settingName, token);
-                return true;
-            } else {
-                return false;
-            }
+            token = await auth.signInUser(context, state);
+        } catch (e) {
+            status = 'error';
+            const reason = e instanceof AuthError ? e.reason : 'other';
+
+            return {
+                status: status,
+                errorReason: reason,
+                error: e
+            };
         }
 
-        return false;
+        if (token) {
+            this.setTokenInState(state, settingName, token);
+            status = 'complete';
+        } else {
+            status = 'pending';
+        }
+
+        return {
+            status
+        };
     }
 
     /**
@@ -234,23 +253,51 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
 }
 
 /**
- * The authentication settings.
- */
-export interface AuthenticationSettings {
-    /**
-     * Key uniquely identifies the connection string.
-     */
-    [key: string]: OAuthPromptSettings;
-}
-
-/**
  * The authentication options to configure the authentication manager
  */
 export interface AuthenticationOptions {
-    settings: AuthenticationSettings;
+    /**
+     * The authentication settings.
+     * Key uniquely identifies the connection string.
+     */
+    settings: { [key: string]: OAuthPromptSettings };
 
     /**
-     * Describes the default settings the bot should use if the user does not specify a setting name.
+     * Describes the setting the bot should use if the user does not specify a setting name.
      */
-    defaultSetting?: string;
+    default?: string;
+
+    /**
+     * Defaults to true.
+     * Indicates whether the bot should start the sign in flow the user sends a message to the bot or triggers a message extension.
+     * If set to false, the bot will not start the sign in flow before routing the activity to the bot logic.
+     *
+     * To set custom logic, set this property to the selector function.
+     */
+    startSignIn?: boolean | Selector;
 }
+
+export enum AuthenticationStatus {
+    NotStarted,
+    StartedSSOFlow,
+    StartedOAuthFlow,
+    SignInComplete
+}
+
+export type SignInResponse = {
+    status: 'pending' | 'complete' | 'error';
+    error?: unknown;
+    errorReason?: AuthErrorReason;
+};
+
+export class AuthError extends Error {
+    public readonly reason: AuthErrorReason;
+
+    constructor(reason: AuthErrorReason, message?: string) {
+        super(message);
+        this.reason = reason;
+    }
+}
+
+export type AuthErrorReason = 'invalidActivity' | 'invalidState' | 'other';
+export type SignInStatus = 'pending' | 'complete' | 'error';

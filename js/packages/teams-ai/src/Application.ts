@@ -152,11 +152,16 @@ export type ConversationUpdateEvents =
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
 /**
+ * A selector function for matching incoming activities.
+ */
+export type Selector = (context: TurnContext) => Promise<boolean>;
+
+/**
  * Function for selecting whether a route handler should be triggered.
  * @param context Context for the current turn of conversation with the user.
  * @returns A promise that resolves with a boolean indicating whether the route handler should be triggered.
  */
-export type RouteSelector = (context: TurnContext) => Promise<boolean>;
+export type RouteSelector = Selector;
 
 /**
  * Message reaction event types.
@@ -200,6 +205,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     private readonly _authentication?: AuthenticationManager<TState>;
     private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
+    private readonly _startSignIn?: Selector;
 
     /**
      * Creates a new Application instance.
@@ -229,6 +235,8 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         // Create OAuthPrompt if configured
         if (this._options.authentication) {
+            this._startSignIn = createSignInSelector(this._options.authentication.startSignIn);
+
             this._authentication = new AuthenticationManager(this, this._options.authentication, this._options.storage);
         }
 
@@ -511,11 +519,19 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 const state = await turnStateManager!.loadState(storage, context);
 
                 // Sign the user in
-                if (this._authentication) {
-                    const signedIn = await this._authentication.signUserIn(context, state);
+                if (this._authentication && this._startSignIn?.(context)) {
+                    const response = await this._authentication.signUserIn(context, state);
 
-                    if (!signedIn) {
+                    if (response.status == 'pending') {
+                        // Save turn state
+                        // - This lets the bot keep track of authentication state
+                        await turnStateManager!.saveState(storage, context, state);
                         return false;
+                    }
+
+                    // Activities for which auth cannot be initiated should be ignored
+                    if (response.status == 'error' && response.error != 'invalidActivity') {
+                        throw response.error;
                     }
                 }
 
@@ -948,6 +964,23 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
                 );
             };
     }
+}
+
+/**
+ * Returns a selector function that indicates whether the bot should initiate a sign in.
+ * @param {boolean | Selector} startSignIn A boolean or function that indicates whether the bot should initiate a sign in.
+ * @returns {Selector} A selector function that returns true if the bot should initiate a sign in.
+ */
+function createSignInSelector(startSignIn?: boolean | Selector): Selector {
+    return (context) => {
+        if (typeof startSignIn === 'function') {
+            return startSignIn(context);
+        } else if (typeof startSignIn === 'boolean') {
+            return Promise.resolve(startSignIn);
+        } else {
+            return Promise.resolve(true);
+        }
+    };
 }
 
 /**
