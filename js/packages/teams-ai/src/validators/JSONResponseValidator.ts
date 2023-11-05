@@ -17,9 +17,8 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
      * @param schema Optional. JSON schema to validate the response against.
      * @param missingJsonFeedback Optional. Custom feedback to give when no JSON is returned.
      * @param errorFeedback Optional. Custom feedback to give when an error is detected.
-     * @param instanceName Optional. Name of the instance to use in feedback messages.
      */
-    public constructor(schema?: Schema, missingJsonFeedback?: string, errorFeedback?: string, instanceName?: string) {
+    public constructor(schema?: Schema, missingJsonFeedback?: string, errorFeedback?: string) {
         this.schema = schema;
         this.missingJsonFeedback = missingJsonFeedback ?? 'No valid JSON objects were found in the response. Return a valid JSON object.';
         this.errorFeedback = errorFeedback ?? 'The JSON returned had errors. Apply these fixes:';
@@ -106,10 +105,10 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
                 return `convert "${error.property}" to one of the allowed types in the provided schema.`;
             case 'additionalProperties':
                 // field has an extra property
-                return `remove the "${arg}" property from "${error.property}"`;
+                return `remove the "${arg}" property from ${error.property == 'instance' ? 'the JSON object' : `"${error.property}"`}`;
             case 'required':
                 // field is missing a required property
-                return `add the "${arg}" property to "${error.property}"`;
+                return `add the "${arg}" property to ${error.property == 'instance' ? 'the JSON object' : `"${error.property}"`}`;
             case 'format':
                 // field is not in the correct format
                 return `change the "${error.property}" property to be a ${arg}`;
