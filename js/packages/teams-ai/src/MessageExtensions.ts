@@ -23,9 +23,9 @@ import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
 /**
- * @private
+ * @public
  */
-const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
+export const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
 
 /**
  * @public
@@ -43,14 +43,14 @@ export const QUERY_INVOKE_NAME = `composeExtension/query`;
 export const QUERY_LINK_INVOKE_NAME = `composeExtension/queryLink`;
 
 /**
- * @private
+ * @public
  */
-const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
+export const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
 
 /**
- * @private
+ * @public
  */
-const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
+export const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
 
 /**
  * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
