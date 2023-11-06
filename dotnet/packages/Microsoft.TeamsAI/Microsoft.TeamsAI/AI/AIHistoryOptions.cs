@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.AI
+namespace Microsoft.Teams.AI.AI
 {
     /// <summary>
     /// Options for the AI system.

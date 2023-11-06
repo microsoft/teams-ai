@@ -6,13 +6,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 
 // For Unit Tests - so the Moq framework can mock internal classes
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-namespace Microsoft.TeamsAI.AI.OpenAI
+namespace Microsoft.Teams.AI.AI.OpenAI
 {
     /// <summary>
     /// The client to make calls to OpenAI's API

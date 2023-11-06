@@ -1,15 +1,15 @@
 ﻿using AdaptiveCards;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
 
     internal class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>

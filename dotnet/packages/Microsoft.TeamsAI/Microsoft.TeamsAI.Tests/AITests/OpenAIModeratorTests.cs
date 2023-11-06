@@ -1,17 +1,17 @@
 ﻿using Castle.Core.Logging;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.AI.OpenAI;
+using Microsoft.Teams.AI.AI.OpenAI;
 
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class OpenAIModeratorTests
     {

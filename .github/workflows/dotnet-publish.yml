@@ -5,6 +5,7 @@
 name: DOTNET Publish
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
     paths: ['dotnet/**']
@@ -15,8 +16,7 @@ jobs:
   build-test-lint:
     name: Build/Test/Lint
     uses: ./.github/workflows/dotnet-build-test-lint.yml
-    permissions:
-      contents: read
+    permissions: read-all
   publish:
     name: Publish
     needs: build-test-lint
@@ -40,7 +40,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Pack
-        run: dotnet pack --output . --configuration Release Microsoft.TeamsAI/Microsoft.TeamsAI.csproj
+        run: dotnet pack --output . --configuration Release Microsoft.TeamsAI/Microsoft.Teams.AI.csproj
       - name: Publish
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/microsoft/index.json --skip-duplicate --no-symbols
       - name: Upload

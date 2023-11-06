@@ -1,4 +1,4 @@
-﻿namespace Microsoft.TeamsAI.AI.OpenAI
+﻿namespace Microsoft.Teams.AI.AI.OpenAI
 {
     /// <summary>
     /// Options for the OpenAI client.

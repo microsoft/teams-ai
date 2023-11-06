@@ -1,11 +1,11 @@
-﻿using Microsoft.TeamsAI.Tests.TestUtils;
+﻿using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.Tests.ActivityHandlerTests
+namespace Microsoft.Teams.AI.Tests.ActivityHandlerTests
 {
     public class InvokeActivityTests
     {

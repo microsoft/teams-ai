@@ -1,9 +1,9 @@
-﻿using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.AI.Moderator
+namespace Microsoft.Teams.AI.AI.Moderator
 {
     /// <summary>
     /// A moderator is responsible for reviewing and approving AI prompts and plans.

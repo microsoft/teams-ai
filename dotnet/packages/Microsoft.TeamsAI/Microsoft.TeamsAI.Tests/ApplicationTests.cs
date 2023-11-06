@@ -1,9 +1,9 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using System.Reflection;
 
-namespace Microsoft.TeamsAI.Tests
+namespace Microsoft.Teams.AI.Tests
 {
     public class ApplicationTests
     {

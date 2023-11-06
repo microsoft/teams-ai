@@ -1,8 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI.Planner;
 using QuestBot.Models;
 using QuestBot.State;
 using System.Text.Json;

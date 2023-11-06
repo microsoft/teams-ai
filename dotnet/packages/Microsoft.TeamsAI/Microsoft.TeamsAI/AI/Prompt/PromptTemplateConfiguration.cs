@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using static Microsoft.SemanticKernel.SemanticFunctions.PromptTemplateConfig;
 
-namespace Microsoft.TeamsAI.AI.Prompt
+namespace Microsoft.Teams.AI.AI.Prompt
 {
     /// <summary>
     /// Prompt template configuration.

@@ -1,9 +1,9 @@
-﻿using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.State
+namespace Microsoft.Teams.AI.State
 {
     /// <summary>
     /// Handles loading and saving of the configured turn state class.

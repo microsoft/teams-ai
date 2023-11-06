@@ -1,10 +1,10 @@
-﻿using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI.AI
+namespace Microsoft.Teams.AI.AI
 {
     /// <summary>
     /// Options for configuring the AI system.

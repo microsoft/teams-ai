@@ -18,7 +18,7 @@ In this folder you will find various examples showcasing the different capabilit
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
 <details open>
-    <summary><h3> Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
+    <summary><h3>Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
 
 #### Additional Prerequisites
 
@@ -51,7 +51,7 @@ There are a few ways to get the application up and running. The latest way is us
 
 > Note these instructions are for running the sample on your local machine, the tunnelling solution is required because the Teams service needs to call into the bot.
 
-#### Additional requirements
+#### Additional Requirements
 
 - [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 

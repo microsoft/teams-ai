@@ -53,6 +53,7 @@ steps:
 
 - task: Npm@1
   displayName: 'Publish'
+  continueOnError: true
   inputs:
     command: publish
     workingDir: '$(Build.ArtifactStagingDirectory)/js/packages/teams-ai'

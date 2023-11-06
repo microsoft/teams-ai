@@ -1,8 +1,8 @@
 ﻿using AdaptiveCards;
-using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planner;
 using System.Text.Json;
 
-namespace Microsoft.TeamsAI.AI
+namespace Microsoft.Teams.AI.AI
 {
     internal class ResponseParser
     {

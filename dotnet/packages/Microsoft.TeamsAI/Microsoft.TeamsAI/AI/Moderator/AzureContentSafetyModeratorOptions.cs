@@ -1,6 +1,6 @@
 ﻿using Azure.AI.ContentSafety;
 
-namespace Microsoft.TeamsAI.AI.Moderator
+namespace Microsoft.Teams.AI.AI.Moderator
 {
     /// <summary>
     /// Options for the Azure Content Safety moderator.

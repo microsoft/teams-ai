@@ -1,18 +1,18 @@
-﻿using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Moderator;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
+﻿using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Moderator;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 using Azure.AI.ContentSafety;
 using Azure;
 
 #pragma warning disable CS8604 // Possible null reference argument.
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class AzureContentSafetyModeratorTests
     {

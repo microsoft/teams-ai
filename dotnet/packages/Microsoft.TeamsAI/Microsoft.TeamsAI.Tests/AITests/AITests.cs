@@ -1,14 +1,14 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.AI.Action;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class AITests
     {
