@@ -1,4 +1,4 @@
-﻿namespace Microsoft.TeamsAI.Tests.IntegrationTests
+﻿namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {
     internal sealed class AzureContentSafetyConfiguration
     {

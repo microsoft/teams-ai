@@ -1,18 +1,18 @@
 ﻿using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
 using System.Net;
-using Microsoft.TeamsAI.Exceptions;
+using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.TeamsAI.AI;
+using Microsoft.Teams.AI.AI;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Teams;
-using Microsoft.TeamsAI.Utilities;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.Utilities;
+using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
 
 // TODO: As part of unifying the BF SDK, we should update it's classes to use System.Text.Json instead of Newtonsoft.Json
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Application class for routing and processing incoming requests.

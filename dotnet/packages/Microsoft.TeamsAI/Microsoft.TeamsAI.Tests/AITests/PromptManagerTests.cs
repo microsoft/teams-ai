@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
-using Microsoft.TeamsAI.AI.Prompt;
-using Microsoft.TeamsAI.Exceptions;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Bot.Schema;
 using Moq;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 using Microsoft.SemanticKernel.Diagnostics;
 
-namespace Microsoft.TeamsAI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class PromptManagerTests
     {

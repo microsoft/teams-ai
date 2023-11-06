@@ -138,9 +138,12 @@ export type ConversationUpdateEvents =
     | 'membersRemoved'
     | 'teamRenamed'
     | 'teamDeleted'
+    | 'teamHardDeleted'
     | 'teamArchived'
     | 'teamUnarchived'
-    | 'teamRestored';
+    | 'teamRestored'
+    | 'topicName'
+    | 'historyDisclosed';
 
 /**
  * Function for handling an incoming request.
@@ -387,6 +390,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
         event: ConversationUpdateEvents | ConversationUpdateEvents[],
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
+        if (typeof handler !== 'function') {
+            throw new Error(
+                `ConversationUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
+            );
+        }
         (Array.isArray(event) ? event : [event]).forEach((e) => {
             const selector = createConversationUpdateSelector(e);
             this.addRoute(selector, handler);
@@ -821,6 +829,114 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 }
 
 /**
+ * A builder class for simplifying the creation of an Application instance.
+ * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
+ */
+export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
+    private _options: Partial<ApplicationOptions<TState>> = {};
+
+    /**
+     * Configures the application to use long running messages.
+     * Default state for longRunningMessages is false
+     * @param {BotAdapter} adapter The adapter to use for routing incoming requests.
+     * @param {string} botAppId The Microsoft App ID for the bot.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withLongRunningMessages(adapter: BotAdapter, botAppId: string): this {
+        if (!botAppId) {
+            throw new Error(
+                `The Application.longRunningMessages property is unavailable because botAppId cannot be null or undefined.`
+            );
+        }
+
+        this._options.longRunningMessages = true;
+        this._options.adapter = adapter;
+        this._options.botAppId = botAppId;
+        return this;
+    }
+
+    /**
+     * Configures the storage system to use for storing the bot's state.
+     * @param {Storage} storage The storage system to use.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withStorage(storage: Storage): this {
+        this._options.storage = storage;
+        return this;
+    }
+
+    /**
+     * Configures the AI system to use for processing incoming messages.
+     * @param {AIOptions<TState>} aiOptions The options for the AI system.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withAIOptions(aiOptions: AIOptions<TState>): this {
+        this._options.ai = aiOptions;
+        return this;
+    }
+
+    /**
+     * Configures the turn state manager to use for managing the bot's turn state.
+     * @param {TurnStateManager<TState>} turnStateManager The turn state manager to use.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withTurnStateManager(turnStateManager: TurnStateManager<TState>): this {
+        this._options.turnStateManager = turnStateManager;
+        return this;
+    }
+
+    /**
+     * Configures the processing of Adaptive Card requests.
+     * @param {AdaptiveCardsOptions} adaptiveCardOptions The options for the Adaptive Cards.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withAdaptiveCardOptions(adaptiveCardOptions: AdaptiveCardsOptions): this {
+        this._options.adaptiveCards = adaptiveCardOptions;
+        return this;
+    }
+
+    /**
+     * Configures the processing of Task Module requests.
+     * @param {TaskModulesOptions} taskModuleOptions The options for the Task Modules.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withTaskModuleOptions(taskModuleOptions: TaskModulesOptions): this {
+        this._options.taskModules = taskModuleOptions;
+        return this;
+    }
+
+    /**
+     * Configures the removing of mentions of the bot's name from incoming messages.
+     * Default state for removeRecipientMention is true
+     * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public setRemoveRecipientMention(removeRecipientMention: boolean): this {
+        this._options.removeRecipientMention = removeRecipientMention;
+        return this;
+    }
+
+    /**
+     * Configures the typing timer when messages are received.
+     * Default state for startTypingTimer is true
+     * @param {boolean} startTypingTimer The boolean for starting the typing timer.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public setStartTypingTimer(startTypingTimer: boolean): this {
+        this._options.startTypingTimer = startTypingTimer;
+        return this;
+    }
+
+    /**
+     * Builds and returns a new Application instance.
+     * @returns {Application<TState>} The Application instance.
+     */
+    public build(): Application<TState> {
+        return new Application(this._options);
+    }
+}
+
+/**
  * @private
  */
 interface AppRoute<TState extends TurnState> {
@@ -861,6 +977,23 @@ function createActivitySelector(type: string | RegExp | RouteSelector): RouteSel
  */
 function createConversationUpdateSelector(event: ConversationUpdateEvents): RouteSelector {
     switch (event) {
+        case 'channelCreated':
+        case 'channelDeleted':
+        case 'channelRenamed':
+        case 'channelRestored':
+            /**
+             * @param {TurnContext} context The context object for the current turn of conversation.
+             * @returns {Promise<boolean>} A Promise that resolves to a boolean indicating whether the activity is a conversation update event related to channels.
+             */
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.channelId === 'msteams' &&
+                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        context?.activity?.channelData?.eventType == event &&
+                        context?.activity?.channelData?.channel &&
+                        context.activity.channelData?.team
+                );
+            };
         case 'membersAdded':
             /**
              * @param {TurnContext} context The context object for the current turn of conversation.
@@ -883,6 +1016,24 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
                     context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         Array.isArray(context?.activity?.membersRemoved) &&
                         context.activity.membersRemoved.length > 0
+                );
+            };
+        case 'teamRenamed':
+        case 'teamDeleted':
+        case 'teamHardDeleted':
+        case 'teamArchived':
+        case 'teamUnarchived':
+        case 'teamRestored':
+            /**
+             * @param {TurnContext} context The context object for the current turn of conversation.
+             * @returns {Promise<boolean>} A Promise that resolves to a boolean indicating whether the activity is a conversation update event related to teams.
+             */
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.channelId === 'msteams' &&
+                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                        context?.activity?.channelData?.eventType == event &&
+                        context?.activity?.channelData?.team
                 );
             };
         default:
@@ -965,6 +1116,7 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             };
     }
 }
+// channelData: eventype of editMessage
 
 /**
  * Returns a selector function that indicates whether the bot should initiate a sign in.

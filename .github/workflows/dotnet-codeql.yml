@@ -12,6 +12,7 @@
 name: DOTNET CodeQL
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
     paths: ['dotnet/**']
@@ -36,9 +37,9 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@ddccb873888234080b77e9bc2d4764d5ccaaccf9 # v2.21.9
+        uses: github/codeql-action/init@74483a38d39275f33fcff5f35b679b5ca4a26a99 # v2.22.5
         with:
           languages: csharp
       - name: Setup .NET
@@ -47,8 +48,8 @@ jobs:
           dotnet-version: 6.0
       - name: Build .NET
         working-directory: dotnet/packages/Microsoft.TeamsAI/
-        run: dotnet build Microsoft.TeamsAI.sln --configuration Release
+        run: dotnet build Microsoft.Teams.AI.sln --configuration Release
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@ddccb873888234080b77e9bc2d4764d5ccaaccf9 # v2.21.9
+        uses: github/codeql-action/analyze@74483a38d39275f33fcff5f35b679b5ca4a26a99 # v2.22.5
         with:
           category: "/language:csharp"

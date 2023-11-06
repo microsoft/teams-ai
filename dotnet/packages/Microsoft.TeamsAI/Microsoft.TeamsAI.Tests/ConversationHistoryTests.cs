@@ -1,7 +1,7 @@
-﻿using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.Tests
+namespace Microsoft.Teams.AI.Tests
 {
     public class ConversationHistoryTests
     {

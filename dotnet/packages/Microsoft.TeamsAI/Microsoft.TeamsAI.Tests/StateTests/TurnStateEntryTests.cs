@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.Tests.StateTests
+namespace Microsoft.Teams.AI.Tests.StateTests
 {
     public class TurnStateEntryTests
     {

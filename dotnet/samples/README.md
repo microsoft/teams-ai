@@ -18,17 +18,17 @@ In this folder you will find various examples showcasing the different capabilit
 There are a few ways to get the application up and running. The latest way is using Teams ToolKit with Visual Studio. However you can also set it up manually. You can find instructions for both below:
 
 <details open>
-    <summary><h3> Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
+    <summary><h3>Using Teams Toolkit for Visual Studio (Recommended)</h3></summary>
 
 #### Additional Prerequisites
 
 - Visual Studio 2022 17.7.0 (or a greater version)
-- [Teams Toolkit extension](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/toolkit-v4/install-teams-toolkit-vs?pivots=visual-studio-v17-7)
+- [Teams Toolkit extension](https://learn.microsoft.com/microsoftteams/platform/toolkit/toolkit-v4/install-teams-toolkit-vs?pivots=visual-studio-v17-7)
 
 #### Steps
 
 1. Open the solution in Visual Studio. (For example `EchoBot.sln`).
-   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section.  If you can't find this section, then it means that the bot does not need them.
+   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section. If you can't find this section, then it means that the bot does not need them.
 1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel.
 
    ![image](https://github.com/microsoft/teams-ai/assets/115390646/d7246d38-8276-4b2a-bc22-b72f36aa41b9)
@@ -38,7 +38,7 @@ There are a few ways to get the application up and running. The latest way is us
    to install the app to.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will
-> recommend creating and using a [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program) account -
+> recommend creating and using a [Microsoft 365 Developer Program](https://developer.microsoft.com/microsoft-365/dev-program) account -
 > a free program to get your own dev environment sandbox that includes Teams.
 
 4. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio
@@ -51,7 +51,7 @@ There are a few ways to get the application up and running. The latest way is us
 
 > Note these instructions are for running the sample on your local machine, the tunnelling solution is required because the Teams service needs to call into the bot.
 
-#### Additional requirements
+#### Additional Requirements
 
 - [ngrok](https://ngrok.com/) or equivalent tunnelling solution
 

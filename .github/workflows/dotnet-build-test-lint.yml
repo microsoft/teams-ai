@@ -6,10 +6,8 @@ name: DOTNET Build/Test/Lint
 
 on:
   workflow_call:
+  workflow_dispatch:
   push:
-    branches: ['**']
-    paths: ['dotnet/**']
-  pull_request:
     branches: ['**']
     paths: ['dotnet/**']
 
@@ -33,19 +31,19 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Setup .NET ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Restore
-        run: dotnet restore Microsoft.TeamsAI.sln
+        run: dotnet restore Microsoft.Teams.AI.sln
       - name: Build
-        run: dotnet build Microsoft.TeamsAI.sln --no-restore --configuration Release
+        run: dotnet build Microsoft.Teams.AI.sln --no-restore --configuration Release
       - name: Test
-        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.TeamsAI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@fe4d06899e0193645d37ce2b35b264a1140c37a2 # 5.1.25
+        uses: danielpalme/ReportGenerator-GitHub-Action@873ee34c88a6234bdab7fd264d3666fd1ab417f7 # 5.1.26
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
@@ -57,6 +55,6 @@ jobs:
           name: testresults-dotnet-${{ matrix.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
       - name: Harden Runner
-        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
         with:
           egress-policy: audit

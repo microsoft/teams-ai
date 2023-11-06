@@ -1,7 +1,7 @@
 ﻿using EchoBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 
 namespace EchoBot
 {

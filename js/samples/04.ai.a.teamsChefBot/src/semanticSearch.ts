@@ -2,18 +2,31 @@ import { Application } from '@microsoft/teams-ai';
 import { OpenAIEmbeddings, LocalDocumentIndex, GPT3Tokenizer } from 'vectra';
 import * as path from 'path';
 
-
-export function addSemanticSearch(app: Application, apiKey: string, maxTokens = 2000, maxDocuments = 5, maxChunks = 50): void {
+/**
+ *
+ * @param app
+ * @param apiKey
+ * @param maxTokens
+ * @param maxDocuments
+ * @param maxChunks
+ */
+export function addSemanticSearch(
+    app: Application,
+    apiKey: string,
+    maxTokens = 2000,
+    maxDocuments = 5,
+    maxChunks = 50
+): void {
     // Create embeddings model
     const embeddings = new OpenAIEmbeddings({
         model: 'text-embedding-ada-002',
-        apiKey,
+        apiKey
     });
 
     // Initialize local index
     const index = new LocalDocumentIndex({
         embeddings,
-        folderPath: path.join(__dirname, '../index/teams-ai'),
+        folderPath: path.join(__dirname, '../index/teams-ai')
     });
 
     // Add semantic search prompt function
@@ -23,7 +36,7 @@ export function addSemanticSearch(app: Application, apiKey: string, maxTokens = 
         const query = context.activity.text;
         const results = await index.queryDocuments(query, {
             maxDocuments,
-            maxChunks,
+            maxChunks
         });
 
         // Add documents until you run out of tokens

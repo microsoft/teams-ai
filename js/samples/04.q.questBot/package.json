@@ -19,8 +19,8 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "botbuilder": "^4.20.1",
-        "botbuilder-azure-blobs": "^4.20.1",
+        "botbuilder": "^4.21.0",
+        "botbuilder-azure-blobs": "^4.21.0",
         "@microsoft/teams-ai": "~0.1.0-preview.2",
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
@@ -28,7 +28,7 @@
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
-        "@types/restify": "8.5.8",
+        "@types/restify": "8.5.9",
         "nodemon": "~1.19.4",
         "typescript": "^5.2.2",
         "shx": "^0.3.4",

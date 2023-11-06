@@ -20,6 +20,7 @@ import {
 import { PromptTemplate } from './Prompts';
 import { Moderator } from './Moderator';
 import { ConfiguredAIOptions, AI } from './AI';
+import { AxiosError } from 'axios';
 
 /**
  * Options for the OpenAI based moderator.
@@ -93,8 +94,10 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
             case 'input':
             case 'both': {
                 const input = state?.temp?.value.input ?? context.activity.text;
-                const result = await this.createModeration(input, this._options.model);
-                if (result) {
+
+                try {
+                    const result = await this.createModeration(input, this._options.model);
+
                     if (result.flagged) {
                         // Input flagged
                         return {
@@ -108,13 +111,26 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
                             ]
                         };
                     }
-                } else {
-                    // Rate limited
-                    return {
-                        type: 'plan',
-                        commands: [{ type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand]
-                    };
+                } catch (err) {
+                    if (err instanceof AxiosError) {
+                        return {
+                            type: 'plan',
+                            commands: [
+                                {
+                                    type: 'DO',
+                                    action: AI.HttpErrorActionName,
+                                    entities: {
+                                        code: err.code,
+                                        message: err.message
+                                    }
+                                } as PredictedDoCommand
+                            ]
+                        };
+                    }
+
+                    throw err;
                 }
+
                 break;
             }
         }
@@ -136,8 +152,10 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
                     const cmd = plan.commands[i];
                     if (cmd.type == 'SAY') {
                         const output = (cmd as PredictedSayCommand).response;
-                        const result = await this.createModeration(output, this._options.model);
-                        if (result) {
+
+                        try {
+                            const result = await this.createModeration(output, this._options.model);
+
                             if (result.flagged) {
                                 // Output flagged
                                 return {
@@ -151,14 +169,24 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
                                     ]
                                 };
                             }
-                        } else {
-                            // Rate limited
-                            return {
-                                type: 'plan',
-                                commands: [
-                                    { type: 'DO', action: AI.RateLimitedActionName, entities: {} } as PredictedDoCommand
-                                ]
-                            };
+                        } catch (err) {
+                            if (err instanceof AxiosError) {
+                                return {
+                                    type: 'plan',
+                                    commands: [
+                                        {
+                                            type: 'DO',
+                                            action: AI.HttpErrorActionName,
+                                            entities: {
+                                                code: err.code,
+                                                message: err.message
+                                            }
+                                        } as PredictedDoCommand
+                                    ]
+                                };
+                            }
+
+                            throw err;
                         }
                     }
                 }
@@ -179,18 +207,16 @@ export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implem
         });
     }
 
-    protected async createModeration(
-        input: string,
-        model?: string
-    ): Promise<CreateModerationResponseResultsInner | undefined> {
+    protected async createModeration(input: string, model?: string): Promise<CreateModerationResponseResultsInner> {
         const response = (await this._client.createModeration({
             input,
             model
         })) as OpenAIClientResponse<CreateModerationResponse>;
+
         if (response.data?.results && Array.isArray(response.data.results) && response.data.results.length > 0) {
             return response.data.results[0];
-        } else {
-            return undefined;
         }
+
+        throw new AxiosError(response.statusText, response.status.toString());
     }
 }

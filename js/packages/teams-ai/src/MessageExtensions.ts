@@ -53,6 +53,21 @@ export const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
 export const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
 
 /**
+ * @private
+ */
+const QUERY_SETTING_URL = `composeExtension/querySettingUrl`;
+
+/**
+ * @private
+ */
+const CONFIGURE_SETTINGS = `composeExtension/setting`;
+
+/**
+ * @private
+ */
+const QUERY_CARD_BUTTON_CLICKED = `composeExtension/onCardButtonClicked`;
+
+/**
  * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
  * @template TState Type of the turn state object being persisted.
  */
@@ -69,7 +84,10 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler for a command that performs anonymous link unfurling.
-     * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} url - ID of the command(s) to register the handler for.
+     * @summary
+     * The `composeExtension/anonymousQueryLink` INVOKE activity does not contain any sort of command ID,
+     * so only a single select item handler can be registered.
+     * For more information visit https://learn.microsoft.com/microsoftteams/platform/messaging-extensions/how-to/link-unfurling?#enable-zero-install-link-unfurling
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received. The handler should return a `MessagingExtensionResult`.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.
@@ -77,42 +95,34 @@ export class MessageExtensions<TState extends TurnState> {
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public anonymousQueryLink(
-        url: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
-        (Array.isArray(url) ? url : [url]).forEach((url) => {
-            const selector = createQueryLinkSelector(url, ANONYMOUS_QUERY_LINK_INVOKE_NAME);
-            this._app.addRoute(
-                selector,
-                async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== ANONYMOUS_QUERY_LINK_INVOKE_NAME
-                    ) {
-                        throw new Error(
-                            `Unexpected MessageExtensions.anonymousQueryLink() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
-
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.url ?? '');
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        const response = {
-                            composeExtension: result
-                        };
-
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 },
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                },
-                true
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === ANONYMOUS_QUERY_LINK_INVOKE_NAME
             );
-        });
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state, context.activity.value?.url ?? '');
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Format invoke response
+                    const response = {
+                        composeExtension: result
+                    };
+                    // Queue up invoke response
+                    await context.sendActivity({
+                        value: { body: response, status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
         return this._app;
     }
 
@@ -143,20 +153,26 @@ export class MessageExtensions<TState extends TurnState> {
             this._app.addRoute(
                 selector,
                 async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
-                        context?.activity?.value?.botMessagePreviewAction !== 'edit'
-                    ) {
-                        throw new Error(
-                            `Unexpected MessageExtensions.botMessagePreviewEdit() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
+                    if (context?.activity?.channelId === 'msteams') {
+                        // Insure that we're in an invoke as expected
+                        if (
+                            context?.activity?.type !== ActivityTypes.Invoke ||
+                            context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
+                            context?.activity?.value?.botMessagePreviewAction !== 'edit'
+                        ) {
+                            throw new Error(
+                                `Unexpected MessageExtensions.botMessagePreviewEdit() triggered for activity type: ${context?.activity?.type}`
+                            );
+                        }
 
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.botActivityPreview[0] ?? {});
-                    await this.returnSubmitActionResponse(context, result);
+                        // Call handler and then check to see if an invoke response has already been added
+                        const result = await handler(
+                            context,
+                            state,
+                            context.activity.value?.botActivityPreview[0] ?? {}
+                        );
+                        await this.returnSubmitActionResponse(context, result);
+                    }
                 },
                 true
             );
@@ -189,6 +205,7 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
+                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
                         context?.activity?.value?.botMessagePreviewAction !== 'send'
@@ -236,6 +253,7 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
+                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== FETCH_TASK_INVOKE_NAME
                     ) {
@@ -292,6 +310,7 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
+                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== QUERY_INVOKE_NAME
                     ) {
@@ -338,7 +357,6 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Link Unfurling based Message Extension.
-     * @param {(string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[])} url - The url link to register the handler for.
      * @param {(context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
      * @param {TState} handler.state - Current state of the turn.
@@ -346,42 +364,36 @@ export class MessageExtensions<TState extends TurnState> {
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public queryLink(
-        url: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
-        (Array.isArray(url) ? url : [url]).forEach((url) => {
-            const selector = createQueryLinkSelector(url, QUERY_LINK_INVOKE_NAME);
-            this._app.addRoute(
-                selector,
-                async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== QUERY_LINK_INVOKE_NAME
-                    ) {
-                        throw new Error(
-                            `Unexpected MessageExtensions.queryLink() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
-
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.url);
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        const response: MessagingExtensionActionResponse = {
-                            composeExtension: result
-                        };
-
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
-                    }
-                },
-                true
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === QUERY_LINK_INVOKE_NAME
             );
-        });
+
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state, context.activity.value?.url);
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Format invoke response
+                    const response: MessagingExtensionActionResponse = {
+                        composeExtension: result
+                    };
+
+                    // Queue up invoke response
+                    await context.sendActivity({
+                        value: { body: response, status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
         return this._app;
     }
 
@@ -406,7 +418,9 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === SELECT_ITEM_INVOKE_NAME
+                context.activity.channelId === 'msteams' &&
+                    context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === SELECT_ITEM_INVOKE_NAME
             );
 
         // Add route
@@ -459,6 +473,7 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
+                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME
                     ) {
@@ -487,7 +502,7 @@ export class MessageExtensions<TState extends TurnState> {
         context: TurnContext,
         result: MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined
     ): Promise<void> {
-        if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+        if (context?.activity?.channelId === 'msteams' && !context.turnState.get(INVOKE_RESPONSE_KEY)) {
             // Format invoke response
             let response: MessagingExtensionActionResponse;
             if (typeof result == 'string') {
@@ -527,6 +542,134 @@ export class MessageExtensions<TState extends TurnState> {
             });
         }
     }
+
+    /**
+     * Registers a handler that invokes the fetch of the configuration settings for a Message Extension.
+     @summary
+     * The `composeExtension/querySettingUrl` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
+     * @param {(context: TurnContext, state: TState) => Promise<MessagingExtensionResult>} handler Function defined by the developer to call when the command is received.
+     * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
+     * @param {TState} handler.state Current state of the turn.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public queryUrlSetting(
+        handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult>
+    ): Application<TState> {
+        // Define static route selector
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === QUERY_SETTING_URL
+            );
+
+        // Add route
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                const result = await handler(context, state);
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    const response: MessagingExtensionActionResponse = {
+                        composeExtension: result
+                    };
+                    await context.sendActivity({
+                        value: { status: 200, body: response } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
+        return this._app;
+    }
+
+    /**
+     * Registers a handler that implements the logic to invoke configuring Message Extension settings
+     * @summary
+     * The `composeExtension/setting` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
+     * @template TData Message Extension settings to be configured.
+     * @param {(context: TurnContext, state: TState, settings: TData) => Promise<void>} handler Function defined by the developer to call when the command is received.
+     * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
+     * @param {TState} handler.state Current state of the turn.
+     * @param {TData} handler.settings The configuration settings that was submitted.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public configureSettings<TData extends Record<string, any>>(
+        handler: (context: TurnContext, state: TState, settings: TData) => Promise<void>
+    ): Application<TState> {
+        // Define static route selector
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === CONFIGURE_SETTINGS
+            );
+
+        // Add route
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                await handler(context, state, context.activity.value ?? {});
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
+                    await context.sendActivity({
+                        value: { status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
+        return this._app;
+    }
+
+    /**
+     * Registers a handler that implements the logic when a user has clicked on a button in a Message Extension card.
+     * @summary
+     * The `composeExtension/onCardButtonClicked` INVOKE activity does not contain any sort of command ID,
+     * so only a single select item handler can be registered. Developers will need to include a
+     * type name of some sort in the preview item they return if they need to support multiple select item handlers.
+     * @template TData Message Extension data passed on invoke.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<void>} handler Function defined by the developer to call when the command is received.
+     * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
+     * @param {TState} handler.state Current state of the turn.
+     * @param {TData} handler.data The data that was submitted.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public handleOnButtonClicked<TData extends Record<string, any>>(
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<void>
+    ): Application<TState> {
+        // Define static route selector
+        const selector = (context: TurnContext) =>
+            Promise.resolve(
+                context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.type == ActivityTypes.Invoke &&
+                    context?.activity.name === QUERY_CARD_BUTTON_CLICKED
+            );
+
+        // Add route
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                // Call handler and then check to see if an invoke response has already been added
+                await handler(context, state, context.activity.value ?? {});
+                if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                    // Queue up 'empty' invoke response with no body, as only a 200 status code is expected
+                    await context.sendActivity({
+                        value: { status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+                }
+            },
+            true
+        );
+
+        return this._app;
+    }
 }
 
 /**
@@ -550,6 +693,7 @@ function createTaskSelector(
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             if (
                 isInvoke &&
+                context?.activity?.channelId === 'msteams' &&
                 typeof context?.activity?.value?.commandId == 'string' &&
                 matchesPreviewAction(context.activity, botMessagePreviewAction)
             ) {
@@ -564,49 +708,8 @@ function createTaskSelector(
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             return Promise.resolve(
                 isInvoke &&
+                    context?.activity?.channelId === 'msteams' &&
                     context?.activity?.value?.commandId === commandId &&
-                    matchesPreviewAction(context.activity, botMessagePreviewAction)
-            );
-        };
-    }
-}
-
-/**
- * Creates a route selector function for an invoke query link activity type.
- * @param {string | RegExp | RouteSelector} url The url link register the handler for.
- * @param {string} invokeName The name of the invoke activity.
- * @param {'edit' | 'send'} botMessagePreviewAction The bot message preview action to match.
- * @returns {RouteSelector} The route selector function.
- */
-function createQueryLinkSelector(
-    url: string | RegExp | RouteSelector,
-    invokeName: string,
-    botMessagePreviewAction?: 'edit' | 'send'
-): RouteSelector {
-    if (typeof url == 'function') {
-        // Return the passed in selector function
-        return url;
-    } else if (url instanceof RegExp) {
-        // Return a function that matches the commandId using a RegExp
-        return (context: TurnContext) => {
-            const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
-            if (
-                isInvoke &&
-                typeof context?.activity?.value?.url == 'string' &&
-                matchesPreviewAction(context.activity, botMessagePreviewAction)
-            ) {
-                return Promise.resolve(url.test(context.activity.value.url));
-            } else {
-                return Promise.resolve(false);
-            }
-        };
-    } else {
-        // Return a function that attempts to match commandId
-        return (context: TurnContext) => {
-            const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
-            return Promise.resolve(
-                isInvoke &&
-                    context?.activity?.value?.url === url &&
                     matchesPreviewAction(context.activity, botMessagePreviewAction)
             );
         };
