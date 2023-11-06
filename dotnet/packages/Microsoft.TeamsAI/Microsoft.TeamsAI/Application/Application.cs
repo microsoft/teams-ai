@@ -4,6 +4,7 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI.AI;
+using Microsoft.TeamsAI.Application;
 using Microsoft.TeamsAI.State;
 using Microsoft.TeamsAI.Utilities;
 using System.Collections.Concurrent;
@@ -28,6 +29,9 @@ namespace Microsoft.TeamsAI
         where TState : ITurnState<StateBase, StateBase, TempState>
         where TTurnStateManager : ITurnStateManager<TState>, new()
     {
+        private static readonly string CONFIG_FETCH_INVOKE_NAME = "config/fetch";
+        private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
+
         private readonly AI<TState>? _ai;
         private readonly int _typingTimerDelay = 1000;
         private TypingTimer? _typingTimer;
@@ -523,6 +527,60 @@ namespace Microsoft.TeamsAI
                 && context.Activity.ReactionsRemoved.Count > 0
             );
             AddRoute(routeSelector, handler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles config fetch events for Microsoft Teams.
+        /// </summary>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnConfigFetch(ConfigHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) => Task.FromResult(
+                string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(turnContext.Activity.Name, CONFIG_FETCH_INVOKE_NAME)
+                && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams));
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                ConfigResponseBase result = await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles config submit events for Microsoft Teams.
+        /// </summary>
+        /// <param name="handler">Function to call when the event is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnConfigSubmit(ConfigHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (turnContext, cancellationToken) => Task.FromResult(
+                string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(turnContext.Activity.Name, CONFIG_SUBMIT_INVOKE_NAME)
+                && string.Equals(turnContext.Activity.ChannelId, Channels.Msteams));
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                ConfigResponseBase result = await handler(turnContext, turnState, turnContext.Activity.Value, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
             return this;
         }
 

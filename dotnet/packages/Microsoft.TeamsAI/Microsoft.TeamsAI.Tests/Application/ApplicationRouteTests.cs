@@ -3,6 +3,8 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.TeamsAI.Tests.TestUtils;
+using Moq;
+using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.TeamsAI.Tests.Application
@@ -1519,6 +1521,154 @@ namespace Microsoft.TeamsAI.Tests.Application
             // Assert
             Assert.Single(names);
             Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConfigFetch()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "config/fetch",
+                ChannelId = Channels.Msteams
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "config/fetch",
+                ChannelId = Channels.Outlook
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "config/submit",
+                ChannelId = Channels.Msteams
+            };
+            var activity4 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                ChannelId = Channels.Msteams
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var turnContext4 = new TurnContext(adapter, activity4);
+            var configResponseMock = new Mock<ConfigResponseBase>();
+            var expectedInvokeResponse = new InvokeResponse()
+            {
+                Status = 200,
+                Body = configResponseMock.Object
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConfigFetch((turnContext, _, _, _) =>
+            {
+                names.Add(turnContext.Activity.Name);
+                return Task.FromResult(configResponseMock.Object);
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+            await app.OnTurnAsync(turnContext4);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("config/fetch", names[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async Task Test_OnConfigSubmit()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            object data = new
+            {
+                testKey = "testValue"
+            };
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "config/submit",
+                ChannelId = Channels.Msteams,
+                Value = JObject.FromObject(data)
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "config/submit",
+                ChannelId = Channels.Outlook,
+                Value = JObject.FromObject(data)
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "config/fetch",
+                ChannelId = Channels.Msteams
+            };
+            var activity4 = new Activity
+            {
+                Type = ActivityTypes.Message,
+                ChannelId = Channels.Msteams
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var turnContext4 = new TurnContext(adapter, activity4);
+            var configResponseMock = new Mock<ConfigResponseBase>();
+            var expectedInvokeResponse = new InvokeResponse()
+            {
+                Status = 200,
+                Body = configResponseMock.Object
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnConfigSubmit((turnContext, _, configData, _) =>
+            {
+                Assert.NotNull(configData);
+                Assert.Equal(configData, configData as JObject);
+                names.Add(turnContext.Activity.Name);
+                return Task.FromResult(configResponseMock.Object);
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+            await app.OnTurnAsync(turnContext4);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("config/submit", names[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
     }
 }
