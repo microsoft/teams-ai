@@ -45,7 +45,8 @@ describe('OpenAIModerator', () => {
             temp: new TurnStateEntry({
                 history: '',
                 input: '',
-                output: ''
+                output: '',
+                authTokens: {}
             })
         };
 
@@ -260,7 +261,8 @@ describe('OpenAIModerator', () => {
             temp: new TurnStateEntry({
                 history: '',
                 input: '',
-                output: ''
+                output: '',
+                authTokens: {}
             })
         };
 

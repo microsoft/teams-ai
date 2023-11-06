@@ -244,7 +244,7 @@ export class MessageExtensions<TState extends TurnState> {
      */
     public fetchTask(
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
-        handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo>
+        handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
             const selector = createTaskSelector(cid, FETCH_TASK_INVOKE_NAME);
@@ -265,13 +265,25 @@ export class MessageExtensions<TState extends TurnState> {
                     // Call handler and then check to see if an invoke response has already been added
                     const result = await handler(context, state);
                     if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Return card
-                        const response: TaskModuleResponse = {
-                            task: {
-                                type: 'continue',
-                                value: result
-                            }
-                        };
+                        // Format invoke response
+                        let response: TaskModuleResponse;
+                        if (typeof result == 'string') {
+                            // Return message
+                            response = {
+                                task: {
+                                    type: 'message',
+                                    value: result
+                                }
+                            };
+                        } else {
+                            // Return card
+                            response = {
+                                task: {
+                                    type: 'continue',
+                                    value: result
+                                }
+                            };
+                        }
 
                         // Queue up invoke response
                         await context.sendActivity({

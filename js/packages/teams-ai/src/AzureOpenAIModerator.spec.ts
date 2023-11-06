@@ -52,7 +52,8 @@ describe('AzureOpenAIModerator', () => {
             temp: new TurnStateEntry({
                 history: '',
                 input: '',
-                output: ''
+                output: '',
+                authTokens: {}
             })
         };
 
@@ -279,7 +280,8 @@ describe('AzureOpenAIModerator', () => {
             temp: new TurnStateEntry({
                 history: '',
                 input: '',
-                output: ''
+                output: '',
+                authTokens: {}
             })
         };
 

@@ -906,6 +906,16 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
+     * Configures User authentication settings.
+     * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withAuthentication(authenticationOptions: AuthenticationOptions): this {
+        this._options.authentication = authenticationOptions;
+        return this;
+    }
+
+    /**
      * Configures the removing of mentions of the bot's name from incoming messages.
      * Default state for removeRecipientMention is true
      * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.

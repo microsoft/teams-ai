@@ -251,7 +251,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
 }
 
 /**
- * The authentication options to configure the authentication manager
+ * The options to configure the authentication manager
  */
 export interface AuthenticationOptions {
     /**
