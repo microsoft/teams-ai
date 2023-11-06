@@ -906,11 +906,13 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
-     * Configures User authentication settings.
+     * Configures user authentication settings.
+     * @param {BotAdapter} adapter The adapter to use for user authentication.
      * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withAuthentication(authenticationOptions: AuthenticationOptions): this {
+    public withAuthentication(adapter: BotAdapter, authenticationOptions: AuthenticationOptions): this {
+        this._options.adapter = adapter;
         this._options.authentication = authenticationOptions;
         return this;
     }

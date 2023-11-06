@@ -17,6 +17,14 @@ describe('Application', () => {
         promptManager: new TestPromptManager()
     };
     const botAppId = 'testBot';
+    const authenticationSettings = {
+        settings: {
+            testSetting: {
+                connectionName: 'testConnectionName',
+                title: 'testTitle'
+            }
+        }
+    };
     const longRunningMessages = true;
     const removeRecipientMention = false;
     const startTypingTimer = false;
@@ -75,6 +83,7 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.ai, undefined);
+            assert.equal(app.options.authentication, undefined);
             assert.notEqual(app.options.turnStateManager, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.taskModules, undefined);
@@ -91,6 +100,7 @@ describe('Application', () => {
                 .withLongRunningMessages(adapter, botAppId)
                 .withTurnStateManager(turnStateManager)
                 .withAdaptiveCardOptions(adaptiveCards)
+                .withAuthentication(adapter, authenticationSettings)
                 .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
                 .build();
@@ -101,6 +111,7 @@ describe('Application', () => {
             assert.equal(app.options.ai, ai);
             assert.equal(app.options.turnStateManager, turnStateManager);
             assert.equal(app.options.adaptiveCards, adaptiveCards);
+            assert.equal(app.options.authentication, authenticationSettings);
             assert.equal(app.options.taskModules, taskModules);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);
             assert.equal(app.options.startTypingTimer, startTypingTimer);
