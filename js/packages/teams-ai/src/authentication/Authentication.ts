@@ -36,13 +36,11 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      */
     constructor(
         app: Application<TState>,
-        name: string,
         settings: OAuthPromptSettings,
         storage?: Storage,
         messagingExtensionsAuth?: MessagingExtensionAuthentication,
         botAuth?: BotAuthentication<TState>
     ) {
-        this._name = name;
         this.settings = settings;
         this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
         this._botAuth = botAuth || new BotAuthentication(app, settings, storage);
@@ -65,7 +63,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
 
         if (this._messagingExtensionAuth.isValidActivity(context)) {
-            return await this._messagingExtensionAuth.authenticate(context, state);
+            return await this._messagingExtensionAuth.authenticate(context, this.settings);
         }
 
         if (this._botAuth.isValidActivity(context)) {
@@ -145,7 +143,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         for (const key in settings) {
             if (key in settings) {
                 const setting = settings[key];
-                const authentication = new Authentication(app, key, setting, storage);
+                const authentication = new Authentication(app, setting, storage);
 
                 this._authentications.set(key, authentication);
             }
@@ -269,12 +267,12 @@ export interface AuthenticationOptions {
 
     /**
      * Defaults to true.
-     * Indicates whether the bot should start the sign in flow the user sends a message to the bot or triggers a message extension.
+     * Indicates whether the bot should start the sign in flow when the user sends a message to the bot or triggers a message extension.
      * If set to false, the bot will not start the sign in flow before routing the activity to the bot logic.
      *
      * To set custom logic, set this property to the selector function.
      */
-    startSignIn?: boolean | Selector;
+    autoSignIn?: boolean | Selector;
 }
 
 export enum AuthenticationStatus {

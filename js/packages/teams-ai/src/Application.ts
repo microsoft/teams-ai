@@ -235,7 +235,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
         // Create OAuthPrompt if configured
         if (this._options.authentication) {
-            this._startSignIn = createSignInSelector(this._options.authentication.startSignIn);
+            this._startSignIn = createSignInSelector(this._options.authentication.autoSignIn);
 
             this._authentication = new AuthenticationManager(this, this._options.authentication, this._options.storage);
         }
@@ -519,7 +519,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 const state = await turnStateManager!.loadState(storage, context);
 
                 // Sign the user in
-                if (this._authentication && this._startSignIn?.(context)) {
+                if (this._authentication && (await this._startSignIn?.(context))) {
                     const response = await this._authentication.signUserIn(context, state);
 
                     if (response.status == 'pending') {
