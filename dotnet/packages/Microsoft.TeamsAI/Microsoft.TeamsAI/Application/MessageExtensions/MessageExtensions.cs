@@ -80,7 +80,7 @@ namespace Microsoft.TeamsAI
             {
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = InvokeActivityUtilities.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null)
+                    || (messagingExtensionAction = ActivityUtilities.GetTypedValue<MessagingExtensionAction>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnSubmitAction() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -90,7 +90,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -176,7 +176,7 @@ namespace Microsoft.TeamsAI
                 MessagingExtensionAction? messagingExtensionAction;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = InvokeActivityUtilities.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null
+                    || (messagingExtensionAction = ActivityUtilities.GetTypedValue<MessagingExtensionAction>(turnContext.Activity)) == null
                     || !string.Equals(messagingExtensionAction.BotMessagePreviewAction, "edit"))
                 {
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnBotMessagePreviewEdit() triggered for activity type: {turnContext.Activity.Type}");
@@ -187,7 +187,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -276,7 +276,7 @@ namespace Microsoft.TeamsAI
                 MessagingExtensionAction? messagingExtensionAction;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, SUBMIT_ACTION_INVOKE_NAME)
-                    || (messagingExtensionAction = InvokeActivityUtilities.GetInvokeValue<MessagingExtensionAction>(turnContext.Activity)) == null
+                    || (messagingExtensionAction = ActivityUtilities.GetTypedValue<MessagingExtensionAction>(turnContext.Activity)) == null
                     || !string.Equals(messagingExtensionAction.BotMessagePreviewAction, "send"))
                 {
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnBotMessagePreviewSend() triggered for activity type: {turnContext.Activity.Type}");
@@ -289,7 +289,7 @@ namespace Microsoft.TeamsAI
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
                     MessagingExtensionActionResponse response = new();
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -383,7 +383,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -468,7 +468,7 @@ namespace Microsoft.TeamsAI
                 MessagingExtensionQuery? messagingExtensionQuery;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(turnContext.Activity.Name, QUERY_INVOKE_NAME)
-                    || (messagingExtensionQuery = InvokeActivityUtilities.GetInvokeValue<MessagingExtensionQuery>(turnContext.Activity)) == null)
+                    || (messagingExtensionQuery = ActivityUtilities.GetTypedValue<MessagingExtensionQuery>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnQuery() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -488,7 +488,7 @@ namespace Microsoft.TeamsAI
                     {
                         ComposeExtension = result
                     };
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -561,7 +561,7 @@ namespace Microsoft.TeamsAI
                     {
                         ComposeExtension = result
                     };
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -584,7 +584,7 @@ namespace Microsoft.TeamsAI
             };
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
-                AppBasedLinkQuery? appBasedLinkQuery = InvokeActivityUtilities.GetInvokeValue<AppBasedLinkQuery>(turnContext.Activity);
+                AppBasedLinkQuery? appBasedLinkQuery = ActivityUtilities.GetTypedValue<AppBasedLinkQuery>(turnContext.Activity);
                 MessagingExtensionResult result = await handler(turnContext, turnState, appBasedLinkQuery!.Url, cancellationToken);
 
                 // Check to see if an invoke response has already been added
@@ -594,7 +594,7 @@ namespace Microsoft.TeamsAI
                     {
                         ComposeExtension = result
                     };
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -622,7 +622,7 @@ namespace Microsoft.TeamsAI
             };
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
-                AppBasedLinkQuery? appBasedLinkQuery = InvokeActivityUtilities.GetInvokeValue<AppBasedLinkQuery>(turnContext.Activity);
+                AppBasedLinkQuery? appBasedLinkQuery = ActivityUtilities.GetTypedValue<AppBasedLinkQuery>(turnContext.Activity);
                 MessagingExtensionResult result = await handler(turnContext, turnState, appBasedLinkQuery!.Url, cancellationToken);
 
                 // Check to see if an invoke response has already been added
@@ -632,7 +632,7 @@ namespace Microsoft.TeamsAI
                     {
                         ComposeExtension = result
                     };
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -667,7 +667,7 @@ namespace Microsoft.TeamsAI
                     {
                         ComposeExtension = result
                     };
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(response);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(response);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -698,7 +698,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity();
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -731,7 +731,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity();
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };

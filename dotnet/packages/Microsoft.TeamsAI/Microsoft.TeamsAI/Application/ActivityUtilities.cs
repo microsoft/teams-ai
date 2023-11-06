@@ -5,11 +5,11 @@ using System.Net;
 
 namespace Microsoft.TeamsAI
 {
-    internal static class InvokeActivityUtilities
+    internal static class ActivityUtilities
     {
-        public static T? GetInvokeValue<T>(IInvokeActivity activity)
+        public static T? GetTypedValue<T>(Activity activity)
         {
-            if (activity.Value == null)
+            if (activity?.Value == null)
             {
                 return default;
             }

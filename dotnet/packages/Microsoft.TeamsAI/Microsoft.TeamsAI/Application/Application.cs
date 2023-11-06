@@ -60,6 +60,7 @@ namespace Microsoft.TeamsAI
             }
 
             AdaptiveCards = new AdaptiveCards<TState, TTurnStateManager>(this);
+            Meetings = new Meetings<TState, TTurnStateManager>(this);
             MessageExtensions = new MessageExtensions<TState, TTurnStateManager>(this);
             TaskModules = new TaskModules<TState, TTurnStateManager>(this);
 
@@ -79,6 +80,11 @@ namespace Microsoft.TeamsAI
         /// Fluent interface for accessing Adaptive Card specific features.
         /// </summary>
         public AdaptiveCards<TState, TTurnStateManager> AdaptiveCards { get; }
+
+        /// <summary>
+        /// Fluent interface for accessing Meetings' specific features.
+        /// </summary>
+        public Meetings<TState, TTurnStateManager> Meetings { get; }
 
         /// <summary>
         /// Fluent interface for accessing Message Extensions' specific features.
