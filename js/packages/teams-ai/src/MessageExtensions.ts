@@ -236,7 +236,8 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the initial fetch task for an Action based message extension.
      * @summary
-     * Handlers should response with an initial TaskInfo object to display to the user.
+     * Handlers should response with either an initial TaskInfo object or a string containing
+     * a message to display to the user.
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
      * @param {(context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>} handler - Function to call when the command is received.
      * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
