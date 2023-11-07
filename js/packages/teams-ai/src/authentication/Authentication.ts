@@ -51,7 +51,6 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Signs in a user.
-     *
      * This method will be called automatically by the Application class.
      * @template TState
      * @param {TurnContext} context - Current turn context.
@@ -94,7 +93,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
-     * Check is the user is signed, if they are then returns the token.
+     * Check if the user is signed, if they are then return the token.
      * @param {TurnContext} context Current turn context.
      * @returns {string | undefined} The token string or undefined if the user is not signed in.
      */

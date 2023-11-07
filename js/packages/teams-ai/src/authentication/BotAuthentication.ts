@@ -12,7 +12,6 @@ import { TurnState } from '../TurnState';
 import { Application } from '../Application';
 import {
     ActivityTypes,
-    InvokeResponse,
     MemoryStorage,
     TeamsSSOTokenExchangeMiddleware,
     TurnContext,
