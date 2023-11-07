@@ -21,6 +21,7 @@ import {
     tokenExchangeOperationName
 } from 'botbuilder';
 import { TurnStateProperty } from '../TurnStateProperty';
+import { AuthError } from './Authentication';
 
 /**
  * @internal
@@ -44,13 +45,14 @@ interface UserAuthState {
 export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     private _oauthPrompt: OAuthPrompt;
     private _storage: Storage;
-    private _userSignInHandler?: (context: TurnContext, state: TState) => Promise<void>;
-    private _connectionName: string;
+    private _userSignInSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
+    private _userSignInFailureHandler?: (context: TurnContext, state: TState, error: AuthError) => Promise<void>;
+    private _settingName: string;
 
     public constructor(app: Application<TState>, oauthPromptSettings: OAuthPromptSettings, storage?: Storage) {
         // Create OAuthPrompt
         this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthPromptSettings);
-        this._connectionName = oauthPromptSettings.connectionName;
+        this._settingName = oauthPromptSettings.connectionName;
 
         this._storage = storage || new MemoryStorage();
 
@@ -125,32 +127,57 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
-    public async onUserSignIn(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
-        this._userSignInHandler = handler;
+    public async onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
+        this._userSignInSuccessHandler = handler;
+    }
+
+    /**
+     * The handler function is called when the user sign in flow fails
+     * @template TState
+     * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user failed to signed in
+     */
+    public async onUserSignInFailure(
+        handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>
+    ): Promise<void> {
+        this._userSignInFailureHandler = handler;
     }
 
     public async handleSignInActivity(context: TurnContext, state: TState): Promise<void> {
-        const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-        const result = await this.runDialog(context, state, userDialogStatePropertyName);
+        try {
+            const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+            const result = await this.runDialog(context, state, userDialogStatePropertyName);
 
-        if (result.status === DialogTurnStatus.complete) {
-            if (result.result?.token) {
-                // Populate the token in the temp state
-                state.temp.value.authToken = result.result.token;
+            if (result.status === DialogTurnStatus.complete) {
+                if (result.result?.token) {
+                    // Populate the token in the temp state
+                    state.temp.value.authTokens[this._settingName] = result.result.token;
 
-                await context.sendActivity({
-                    value: { status: 200 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
+                    await context.sendActivity({
+                        value: { status: 200 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
 
-                // Successful sign in
-                await this._userSignInHandler?.(context, state);
-            } else {
-                await context.sendActivity({
-                    value: { status: 400 } as InvokeResponse,
-                    type: ActivityTypes.InvokeResponse
-                });
+                    // Successful sign in
+                    await this._userSignInSuccessHandler?.(context, state);
+                } else {
+                    await context.sendActivity({
+                        value: { status: 400 } as InvokeResponse,
+                        type: ActivityTypes.InvokeResponse
+                    });
+
+                    await this._userSignInFailureHandler?.(
+                        context,
+                        state,
+                        new AuthError('Authentication flow completed without a token.')
+                    );
+                }
             }
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : JSON.stringify(e);
+            const message = `Unexpected error encountered while signing in: ${errorMessage}. 
+                Incomming activity details: type: ${context.activity.type}, name: ${context.activity.name}`;
+
+            await this._userSignInFailureHandler?.(context, state, new AuthError(message));
         }
     }
 
@@ -185,10 +212,10 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     }
 
     public getUserAuthStatePropertyName(context: TurnContext): string {
-        return `__${context.activity.from.id}:${this._connectionName}:Bot:AuthState__`;
+        return `__${context.activity.from.id}:${this._settingName}:Bot:AuthState__`;
     }
 
     public getUserDialogStatePropertyName(context: TurnContext): string {
-        return `__${context.activity.from.id}:${this._connectionName}:DialogState__`;
+        return `__${context.activity.from.id}:${this._settingName}:DialogState__`;
     }
 }

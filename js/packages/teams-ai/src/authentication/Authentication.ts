@@ -71,8 +71,8 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
         }
 
         throw new AuthError(
-            'invalidActivity',
-            `Incomming activity is not a valid activity to initiate authentication flow.`
+            'Incomming activity is not a valid activity to initiate authentication flow.',
+            'invalidActivity'
         );
     }
 
@@ -107,14 +107,26 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 
     /**
      * The handler function is called when the user has successfully signed in.
-     *
      * This only applies if sign in was initiated by the user sending a message to the bot.
      * This handler will not be triggered if a messaging extension triggered the authentication flow.
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
-    public async onUserSignIn(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
-        this._botAuth.onUserSignIn(handler);
+    public async onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
+        this._botAuth.onUserSignInSuccess(handler);
+    }
+
+    /**
+     * This handler function is called when the user sign in flow fails.
+     * This only applies if sign in was initiated by the user sending a message to the bot.
+     * This handler will not be triggered if a messaging extension triggered the authentication flow.
+     * @template TState
+     * @param {(context: TurnContext, state: TState, error: AuthError) => Promise<void>} handler The handler function to call when the user failed to signed in.
+     */
+    public async onUserSignInFailure(
+        handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>
+    ) {
+        this._botAuth.onUserSignInFailure(handler);
     }
 }
 
@@ -275,13 +287,6 @@ export interface AuthenticationOptions {
     autoSignIn?: boolean | Selector;
 }
 
-export enum AuthenticationStatus {
-    NotStarted,
-    StartedSSOFlow,
-    StartedOAuthFlow,
-    SignInComplete
-}
-
 export type SignInResponse = {
     status: 'pending' | 'complete' | 'error';
     error?: unknown;
@@ -291,11 +296,11 @@ export type SignInResponse = {
 export class AuthError extends Error {
     public readonly reason: AuthErrorReason;
 
-    constructor(reason: AuthErrorReason, message?: string) {
+    constructor(message?: string, reason: AuthErrorReason = 'other') {
         super(message);
         this.reason = reason;
     }
 }
 
-export type AuthErrorReason = 'invalidActivity' | 'invalidState' | 'other';
+export type AuthErrorReason = 'invalidActivity' | 'other';
 export type SignInStatus = 'pending' | 'complete' | 'error';
