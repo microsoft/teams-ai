@@ -7,12 +7,13 @@
  */
 
 import {
-    TurnContext,
-    TaskModuleTaskInfo,
     ActivityTypes,
-    InvokeResponse,
+    Channels,
     INVOKE_RESPONSE_KEY,
-    TaskModuleResponse
+    InvokeResponse,
+    TaskModuleResponse,
+    TaskModuleTaskInfo,
+    TurnContext
 } from 'botbuilder';
 import { Application, RouteSelector } from './Application';
 import { TurnState } from './TurnState';
@@ -74,44 +75,46 @@ export class TaskModules<TState extends TurnState> {
             this._app.addRoute(
                 selector,
                 async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== FETCH_INVOKE_NAME
-                    ) {
-                        throw new Error(
-                            `Unexpected TaskModules.fetch() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
-
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.data ?? {});
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        let response: TaskModuleResponse;
-                        if (typeof result == 'string') {
-                            // Return message
-                            response = {
-                                task: {
-                                    type: 'message',
-                                    value: result
-                                }
-                            };
-                        } else {
-                            // Return card
-                            response = {
-                                task: {
-                                    type: 'continue',
-                                    value: result
-                                }
-                            };
+                    if (context?.activity?.channelId === Channels.Msteams) {
+                        // Insure that we're in an invoke as expected
+                        if (
+                            context?.activity?.type !== ActivityTypes.Invoke ||
+                            context?.activity?.name !== FETCH_INVOKE_NAME
+                        ) {
+                            throw new Error(
+                                `Unexpected TaskModules.fetch() triggered for activity type: ${context?.activity?.type}`
+                            );
                         }
 
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
+                        // Call handler and then check to see if an invoke response has already been added
+                        const result = await handler(context, state, context.activity.value?.data ?? {});
+                        if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                            // Format invoke response
+                            let response: TaskModuleResponse;
+                            if (typeof result == 'string') {
+                                // Return message
+                                response = {
+                                    task: {
+                                        type: 'message',
+                                        value: result
+                                    }
+                                };
+                            } else {
+                                // Return card
+                                response = {
+                                    task: {
+                                        type: 'continue',
+                                        value: result
+                                    }
+                                };
+                            }
+
+                            // Queue up invoke response
+                            await context.sendActivity({
+                                value: { body: response, status: 200 } as InvokeResponse,
+                                type: ActivityTypes.InvokeResponse
+                            });
+                        }
                     }
                 },
                 true
@@ -147,44 +150,53 @@ export class TaskModules<TState extends TurnState> {
             this._app.addRoute(
                 selector,
                 async (context, state) => {
-                    // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== SUBMIT_INVOKE_NAME
-                    ) {
-                        throw new Error(
-                            `Unexpected TaskModules.submit() triggered for activity type: ${context?.activity?.type}`
-                        );
-                    }
-
-                    // Call handler and then check to see if an invoke response has already been added
-                    const result = await handler(context, state, context.activity.value?.data ?? {});
-                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
-                        // Format invoke response
-                        let response: TaskModuleResponse | undefined = undefined;
-                        if (typeof result == 'string') {
-                            // Return message
-                            response = {
-                                task: {
-                                    type: 'message',
-                                    value: result
-                                }
-                            };
-                        } else if (typeof result == 'object') {
-                            // Return card
-                            response = {
-                                task: {
-                                    type: 'continue',
-                                    value: result as TaskModuleTaskInfo
-                                }
-                            };
+                    if (context?.activity?.channelId === Channels.Msteams) {
+                        // Insure that we're in an invoke as expected
+                        if (
+                            context?.activity?.type !== ActivityTypes.Invoke ||
+                            context?.activity?.name !== SUBMIT_INVOKE_NAME
+                        ) {
+                            throw new Error(
+                                `Unexpected TaskModules.submit() triggered for activity type: ${context?.activity?.type}`
+                            );
                         }
 
-                        // Queue up invoke response
-                        await context.sendActivity({
-                            value: { body: response, status: 200 } as InvokeResponse,
-                            type: ActivityTypes.InvokeResponse
-                        });
+                        // Call handler and then check to see if an invoke response has already been added
+                        const result = await handler(context, state, context.activity.value?.data ?? {});
+
+                        if (!result) {
+                            await context.sendActivity({
+                                value: { status: 200 } as InvokeResponse,
+                                type: ActivityTypes.InvokeResponse
+                            });
+                        }
+                        if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                            // Format invoke response
+                            let response: TaskModuleResponse | undefined = undefined;
+                            if (typeof result == 'string') {
+                                // Return message
+                                response = {
+                                    task: {
+                                        type: 'message',
+                                        value: result
+                                    }
+                                };
+                            } else if (typeof result == 'object') {
+                                // Return card
+                                response = {
+                                    task: {
+                                        type: 'continue',
+                                        value: result as TaskModuleTaskInfo
+                                    }
+                                };
+                            }
+
+                            // Queue up invoke response
+                            await context.sendActivity({
+                                value: { body: response, status: 200 } as InvokeResponse,
+                                type: ActivityTypes.InvokeResponse
+                            });
+                        }
                     }
                 },
                 true
@@ -216,10 +228,12 @@ function createTaskSelector(
     } else if (verb instanceof RegExp) {
         // Return a function that matches the verb using a RegExp
         return (context: TurnContext) => {
+            const isTeams = context.activity.channelId == Channels.Msteams;
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             const data = context?.activity?.value?.data;
             if (
                 isInvoke &&
+                isTeams &&
                 typeof data == 'object' &&
                 // eslint-disable-next-line security/detect-object-injection
                 typeof data[filterField] == 'string'
