@@ -591,6 +591,81 @@ namespace Microsoft.TeamsAI
         }
 
         /// <summary>
+        /// Handles when a file consent card is accepted by the user.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnFileConsentAccept(FileConsentHandler<TState> handler)
+            => OnFileConsent(handler, "accept");
+
+        /// <summary>
+        /// Handles when a file consent card is declined by the user.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnFileConsentDecline(FileConsentHandler<TState> handler)
+            => OnFileConsent(handler, "decline");
+
+        private Application<TState, TTurnStateManager> OnFileConsent(FileConsentHandler<TState> handler, string fileConsentAction)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) =>
+            {
+                FileConsentCardResponse? fileConsentCardResponse;
+                return Task.FromResult
+                (
+                    string.Equals(context.Activity?.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(context.Activity?.Name, "fileConsent/invoke")
+                    && (fileConsentCardResponse = ActivityUtilities.GetTypedValue<FileConsentCardResponse>(context.Activity!)) != null
+                    && string.Equals(fileConsentCardResponse.Action, fileConsentAction)
+                );
+            };
+            RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
+            {
+                FileConsentCardResponse fileConsentCardResponse = ActivityUtilities.GetTypedValue<FileConsentCardResponse>(turnContext.Activity) ?? new();
+                await handler(turnContext, turnState, fileConsentCardResponse, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
+        /// Handles O365 Connector Card Action activities.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnO365ConnectorCardAction(O365ConnectorCardActionHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) => Task.FromResult
+            (
+                string.Equals(context.Activity?.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(context.Activity?.Name, "actionableMessage/executeAction")
+            );
+            RouteHandler<TState> routeHandler = async (turnContext, turnState, cancellationToken) =>
+            {
+                O365ConnectorCardActionQuery query = ActivityUtilities.GetTypedValue<O365ConnectorCardActionQuery>(turnContext.Activity) ?? new();
+                await handler(turnContext, turnState, query, cancellationToken);
+
+                // Check to see if an invoke response has already been added
+                if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
+                {
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity();
+                    await turnContext.SendActivityAsync(activity, cancellationToken);
+                }
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: true);
+            return this;
+        }
+
+        /// <summary>
         /// Add a handler that will execute before the turn's activity handler logic is processed.
         /// <br/>
         /// Handler returns true to continue execution of the current turn. Handler returning false
