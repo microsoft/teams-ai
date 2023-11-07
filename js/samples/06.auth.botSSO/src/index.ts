@@ -62,7 +62,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { ApplicationBuilder, DefaultTurnState } from '@microsoft/teams-ai';
+import { ApplicationBuilder, AuthError, DefaultTurnState } from '@microsoft/teams-ai';
 
 interface ConversationState {
     count: number;
@@ -76,7 +76,7 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
     .withAuthentication(adapter, {
         settings: {
             graph: {
-                connectionName: process.env.ConnectionName ?? '',
+                connectionName: process.env.SecondConnectionName ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true
@@ -116,6 +116,14 @@ app.authentication.get('graph').onUserSignInSuccess(async (context: TurnContext,
     await context.sendActivity(`Token string length: ${state.temp.value.authTokens['graph']!.length}`);
     await context.sendActivity(`This is what you said before the AuthFlow started: ${context.activity.text}`);
 });
+
+app.authentication
+    .get('graph')
+    .onUserSignInFailure(async (context: TurnContext, _state: ApplicationTurnState, error: AuthError) => {
+        // Failed to login
+        await context.sendActivity('Failed to login');
+        await context.sendActivity(`Error message: ${error.message}`);
+    });
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {

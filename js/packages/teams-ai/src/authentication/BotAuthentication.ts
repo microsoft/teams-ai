@@ -120,6 +120,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     }
 
     public isValidActivity(context: TurnContext): boolean {
+        // Should be a message activity with non-empty text property.
         return (
             context.activity.type === ActivityTypes.Message &&
             context.activity.text != null &&

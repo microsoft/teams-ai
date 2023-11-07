@@ -175,7 +175,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         const connection = this._authentications.get(name);
 
         if (!connection) {
-            throw new Error(`Could not find connection name ${name}`);
+            throw new Error(`Could not find setting name ${name}`);
         }
 
         return connection;
