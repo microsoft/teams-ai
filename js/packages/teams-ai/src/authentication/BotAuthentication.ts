@@ -155,16 +155,11 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
             const result = await this.runDialog(context, state, userDialogStatePropertyName);
 
             if (result.status === DialogTurnStatus.complete) {
+                // OAuthPrompt dialog should have sent an invoke response already.
+
                 if (result.result?.token) {
                     // Successful sign in
-
-                    // Populate the token in the temp state
                     setTokenInState(state, this._settingName, result.result.token);
-
-                    await context.sendActivity({
-                        value: { status: 200 } as InvokeResponse,
-                        type: ActivityTypes.InvokeResponse
-                    });
 
                     // Get user auth state
                     const userAuthState = state.conversation.value[
@@ -177,16 +172,10 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
                     await this._userSignInSuccessHandler?.(context, state);
                 } else {
                     // Failed sign in
-
-                    await context.sendActivity({
-                        value: { status: 400 } as InvokeResponse,
-                        type: ActivityTypes.InvokeResponse
-                    });
-
                     await this._userSignInFailureHandler?.(
                         context,
                         state,
-                        new AuthError('Authentication flow completed without a token.')
+                        new AuthError('Authentication flow completed without a token.', 'completionWithoutToken')
                     );
                 }
             }
