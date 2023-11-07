@@ -289,5 +289,5 @@ export class AuthError extends Error {
     }
 }
 
-export type AuthErrorReason = 'invalidActivity' | 'other';
+export type AuthErrorReason = 'invalidActivity' | 'completionWithoutToken' | 'other';
 export type SignInStatus = 'pending' | 'complete' | 'error';

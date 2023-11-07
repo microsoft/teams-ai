@@ -101,19 +101,31 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         }
 
         const results = await this.runDialog(context, state, userDialogStatePropertyName);
-        if (results.status === DialogTurnStatus.complete && results.result?.token) {
+        if (results.status === DialogTurnStatus.complete) {
             // Delete user auth state
             this.deleteAuthFlowState(context, state);
 
-            // Return token
-            return results.result?.token;
-        } else {
-            return undefined;
+            if (results.result?.token) {
+                // Return token
+                return results.result?.token;
+            } else {
+                // Completed dialog without a token.
+                // This could mean the user declined the consent prompt in the previous turn.
+                // Retry authentication flow again.
+                return await this.authenticate(context, state);
+            }
         }
+
+        return undefined;
     }
 
     public isValidActivity(context: TurnContext): boolean {
-        return context.activity.type === ActivityTypes.Message;
+        return (
+            context.activity.type === ActivityTypes.Message &&
+            context.activity.text != null &&
+            context.activity.text != undefined &&
+            context.activity.text.length > 0
+        );
     }
 
     /**
