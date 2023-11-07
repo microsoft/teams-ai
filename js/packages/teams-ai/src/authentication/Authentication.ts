@@ -13,7 +13,7 @@ import { TurnState } from '../TurnState';
 import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Application, Selector } from '../Application';
 import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
-import { BotAuthentication } from './BotAuthentication';
+import { BotAuthentication, deleteTokenFromState, setTokenInState } from './BotAuthentication';
 import * as UserTokenAccess from './UserTokenAccess';
 
 /**
@@ -22,6 +22,7 @@ import * as UserTokenAccess from './UserTokenAccess';
 export class Authentication<TState extends TurnState = DefaultTurnState> {
     private readonly _messagingExtensionAuth: MessagingExtensionAuthentication;
     private readonly _botAuth: BotAuthentication<TState>;
+    private readonly _name: string;
 
     public readonly settings: OAuthPromptSettings;
 
@@ -36,14 +37,16 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      */
     constructor(
         app: Application<TState>,
+        name: string,
         settings: OAuthPromptSettings,
         storage?: Storage,
         messagingExtensionsAuth?: MessagingExtensionAuthentication,
         botAuth?: BotAuthentication<TState>
     ) {
         this.settings = settings;
+        this._name = name;
         this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
-        this._botAuth = botAuth || new BotAuthentication(app, settings, storage);
+        this._botAuth = botAuth || new BotAuthentication(app, settings, this._name, storage);
     }
 
     /**
@@ -155,7 +158,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         for (const key in settings) {
             if (key in settings) {
                 const setting = settings[key];
-                const authentication = new Authentication(app, setting, storage);
+                const authentication = new Authentication(app, key, setting, storage);
 
                 this._authentications.set(key, authentication);
             }
@@ -212,7 +215,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         }
 
         if (token) {
-            this.setTokenInState(state, settingName, token);
+            setTokenInState(state, settingName, token);
             status = 'complete';
         } else {
             status = 'pending';
@@ -241,24 +244,8 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         // Sign the user out
         if (auth) {
             await auth.signOutUser(context, state);
-            this.deleteTokenFromState(state, settingName);
+            deleteTokenFromState(state, settingName);
         }
-    }
-
-    private setTokenInState(state: TState, settingName: string, token: string) {
-        if (!state.temp.value.authTokens) {
-            state.temp.value.authTokens = {};
-        }
-
-        state.temp.value.authTokens[settingName] = token;
-    }
-
-    private deleteTokenFromState(state: TState, settingName: string) {
-        if (!state.temp.value.authTokens || !state.temp.value.authTokens[settingName]) {
-            return;
-        }
-
-        delete state.temp.value.authTokens[settingName];
     }
 }
 
