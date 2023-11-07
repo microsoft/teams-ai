@@ -62,7 +62,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         this._storage = storage || new MemoryStorage();
 
         // Handles deduplication of token exchange event when using SSO with Bot Authentication
-        app.adapter.use(new TeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));
+        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));
 
         // Add application routes to handle OAuth callbacks
         app.addRoute(
@@ -255,4 +255,26 @@ export function deleteTokenFromState<TState extends TurnState = DefaultTurnState
     }
 
     delete state.temp.value.authTokens[settingName];
+}
+
+/**
+ * @internal
+ * SSO Token Exchange Middleware for Teams that filters based on the connection name.
+ */
+class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {
+    private readonly _oauthConnectionName: string;
+
+    public constructor(storage: Storage, oauthConnectionName: string) {
+        super(storage, oauthConnectionName);
+        this._oauthConnectionName = oauthConnectionName;
+    }
+
+    public async onTurn(context: TurnContext, next: () => Promise<void>): Promise<void> {
+        // If connection name matches then continue to the Teams SSO Token Exchange Middleware.
+        if (context.activity.value?.connectionName == this._oauthConnectionName) {
+            await super.onTurn(context, next);
+        } else {
+            await next();
+        }
+    }
 }
