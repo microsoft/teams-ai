@@ -537,6 +537,29 @@ namespace Microsoft.TeamsAI
         }
 
         /// <summary>
+        /// Handles read receipt events for messages sent by the bot in personal scope.
+        /// </summary>
+        /// <param name="handler">Function to call when the route is triggered.</param>
+        /// <returns>The application instance for chaining purposes.</returns>
+        public Application<TState, TTurnStateManager> OnTeamsReadReceipt(ReadReceiptHandler<TState> handler)
+        {
+            Verify.ParamNotNull(handler);
+            RouteSelector routeSelector = (context, _) => Task.FromResult
+            (
+                string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
+                && string.Equals(context.Activity?.Name, "application/vnd.microsoft.readReceipt")
+            );
+            RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
+            {
+                ReadReceiptInfo readReceiptInfo = ActivityUtilities.GetTypedValue<ReadReceiptInfo>(turnContext.Activity) ?? new();
+                await handler(turnContext, turnState, readReceiptInfo, cancellationToken);
+            };
+            AddRoute(routeSelector, routeHandler, isInvokeRoute: false);
+            return this;
+        }
+
+        /// <summary>
         /// Handles config fetch events for Microsoft Teams.
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
@@ -555,7 +578,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -582,7 +605,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
