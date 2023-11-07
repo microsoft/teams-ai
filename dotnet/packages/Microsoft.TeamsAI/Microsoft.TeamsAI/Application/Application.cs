@@ -555,7 +555,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
@@ -582,7 +582,7 @@ namespace Microsoft.TeamsAI
                 // Check to see if an invoke response has already been added
                 if (turnContext.TurnState.Get<object>(BotAdapter.InvokeResponseKey) == null)
                 {
-                    Activity activity = InvokeActivityUtilities.CreateInvokeResponseActivity(result);
+                    Activity activity = ActivityUtilities.CreateInvokeResponseActivity(result);
                     await turnContext.SendActivityAsync(activity, cancellationToken);
                 }
             };
