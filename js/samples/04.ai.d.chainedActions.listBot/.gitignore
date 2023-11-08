@@ -111,9 +111,5 @@ dist
 # Teams Toolkit
 env/.env.*.user
 env/.env.local
-env/.env.staging
 appPackage/build
 .deployment
-
-.env.*
-.env

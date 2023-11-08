@@ -12,7 +12,7 @@ import {
     ActivityTypes,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -22,7 +22,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -38,6 +43,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
@@ -65,12 +71,14 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { ApplicationBuilder, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
+import {
+    ApplicationBuilder,
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState
+} from '@microsoft/teams-ai';
 import * as responses from './responses';
-
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment OPENAI_API_KEY');
-}
 
 // Strongly type the applications turn state
 interface ConversationState {
@@ -78,36 +86,54 @@ interface ConversationState {
     guessCount: number;
     remainingGuesses: number;
 }
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type ApplicationTurnState = TurnState<ConversationState>;
+
+if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
+}
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY,
-    defaultModel: 'text-davinci-003',
+const model = new OpenAIModel({
+    // OpenAI Support
+    apiKey: process.env.OPENAI_KEY!,
+    defaultModel: 'gpt-3.5-turbo',
+
+    // Azure OpenAI Support
+    azureApiKey: process.env.AZURE_OPENAI_KEY!,
+    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+    azureApiVersion: '2023-03-15-preview',
+
+    // Request logging
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'monologue',
+});
 
 // Define storage and application
 // - Note that we're not passing a prompt in our AI options as we manually ask for hints.
 const storage = new MemoryStorage();
 const app = new ApplicationBuilder<ApplicationTurnState>()
     .withStorage(storage)
-    .withAIOptions({
-        planner,
-        promptManager
-    })
     .build();
 
 // List for /reset command and then delete the conversation state
 app.message('/quit', async (context: TurnContext, state: ApplicationTurnState) => {
-    const { secretWord } = state.conversation.value;
-    state.conversation.delete();
+    const { secretWord } = state.conversation;
+    state.deleteConversationState();
     await context.sendActivity(responses.quitGame(secretWord));
 });
 
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
-    let { secretWord, guessCount, remainingGuesses } = state.conversation.value;
+    let { secretWord, guessCount, remainingGuesses } = state.conversation;
     if (secretWord && secretWord.length < 1) {
         throw new Error('No secret word is assigned.');
     }
@@ -144,9 +170,9 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
     }
 
     // Save game state
-    state.conversation.value.secretWord = secretWord;
-    state.conversation.value.guessCount = guessCount;
-    state.conversation.value.remainingGuesses = remainingGuesses;
+    state.conversation.secretWord = secretWord;
+    state.conversation.guessCount = guessCount;
+    state.conversation.remainingGuesses = remainingGuesses;
 });
 
 // Listen for incoming server requests.
@@ -166,12 +192,12 @@ server.post('/api/messages', async (req, res) => {
  * @throws {Error} If the request to OpenAI was rate limited.
  */
 async function getHint(context: TurnContext, state: ApplicationTurnState): Promise<string> {
-    state.temp.value.input = context.activity.text;
-    const hint = await app.ai.completePrompt(context, state, 'hint');
+    state.temp.input = context.activity.text;
+    const result = await planner.completePrompt(context, state, 'hint');
 
-    if (!hint) {
-        throw new Error(`The request to OpenAI was rate limited. Please try again later.`);
+    if (result.status !== 'success') {
+        throw result.error!;
     }
 
-    return hint;
+    return result.message?.content!;
 }

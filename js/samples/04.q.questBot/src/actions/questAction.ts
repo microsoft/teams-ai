@@ -1,12 +1,12 @@
 /* eslint-disable security/detect-object-injection */
 import { TurnContext } from 'botbuilder';
-import { Application } from '@microsoft/teams-ai';
+import { ActionPlanner, Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, IQuest } from '../bot';
 
 /**
  * @param {Application<ApplicationTurnState>} app - The application instance.
  */
-export function questAction(app: Application<ApplicationTurnState>): void {
+export function questAction(app: Application<ApplicationTurnState>, planner: ActionPlanner<ApplicationTurnState>): void {
     app.ai.action('quest', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
@@ -21,7 +21,7 @@ export function questAction(app: Application<ApplicationTurnState>): void {
                 return await listQuest(context, state);
             default:
                 await context.sendActivity(`[quest.${action}]`);
-                return true;
+                return '';
         }
     });
 }
@@ -39,8 +39,8 @@ async function updateQuest(
     context: TurnContext,
     state: ApplicationTurnState,
     data: IDataEntities
-): Promise<boolean> {
-    const conversation = state.conversation.value;
+): Promise<string> {
+    const conversation = state.conversation;
     const quests = conversation.quests ?? {};
 
     // Create new quest
@@ -51,10 +51,10 @@ async function updateQuest(
     };
 
     // Expand quest details
-    const details = await app.ai.completePrompt(context, state, 'questDetails');
-    if (details) {
-        quest.description = details.trim();
-    }
+    // const details = await app.ai.completePrompt(context, state, 'questDetails');
+    // if (details) {
+    //     quest.description = details.trim();
+    // }
 
     // Add quest to collection of active quests
     quests[quest.title.toLowerCase()] = quest;
@@ -64,9 +64,9 @@ async function updateQuest(
 
     // Tell use they have a new/updated quest
     await context.sendActivity(printQuest(quest));
-    state.temp.value.playerAnswered = true;
+    state.temp.playerAnswered = true;
 
-    return true;
+    return '';
 }
 
 /**
@@ -75,8 +75,8 @@ async function updateQuest(
  * @param {IDataEntities} data - The data entities for the turn.
  * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the operation was successful.
  */
-async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
-    const conversation = state.conversation.value;
+async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Promise<string> {
+    const conversation = state.conversation;
 
     // Find quest and delete it
     const quests = conversation.quests ?? {};
@@ -86,7 +86,7 @@ async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Pr
         conversation.quests = quests;
     }
 
-    return true;
+    return '';
 }
 
 /**
@@ -95,8 +95,8 @@ async function removeQuest(state: ApplicationTurnState, data: IDataEntities): Pr
  * @param {IDataEntities} data The data entities for the current turn of conversation.
  * @returns {Promise<boolean>} A promise that resolves to true if the quest was finished successfully, or false otherwise.
  */
-async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
-    const conversation = state.conversation.value;
+async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Promise<string> {
+    const conversation = state.conversation;
 
     // Find quest and delete item
     const quests = conversation.quests ?? {};
@@ -119,7 +119,7 @@ async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Pr
         }
     }
 
-    return true;
+    return '';
 }
 
 /**
@@ -128,8 +128,8 @@ async function finishQuest(state: ApplicationTurnState, data: IDataEntities): Pr
  * @param {ApplicationTurnState} state - The state object for the turn.
  * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the operation was successful.
  */
-async function listQuest(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
-    const conversation = state.conversation.value;
+async function listQuest(context: TurnContext, state: ApplicationTurnState): Promise<string> {
+    const conversation = state.conversation;
     const quests = conversation.quests ?? {};
 
     let text = '';
@@ -145,8 +145,8 @@ async function listQuest(context: TurnContext, state: ApplicationTurnState): Pro
         await context.sendActivity(text);
     }
 
-    state.temp.value.playerAnswered = true;
-    return true;
+    state.temp.playerAnswered = true;
+    return '';
 }
 
 /**
