@@ -37,5 +37,33 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
             return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }
+
+        /// <inheritdoc />
+        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        {
+            RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
+
+            if (rendered.output.Count == 0)
+            {
+                return new("");
+            }
+
+            string text = string.Join(this.separator, rendered.output.Select(m => this.GetMessageText(m)));
+            int prefixLength = tokenizer.Encode(this.prefix).Count;
+            int separatorLength = tokenizer.Encode(this.separator).Count;
+            int length = prefixLength + rendered.length + ((rendered.output.Count - 1) * separatorLength);
+
+            text = this.prefix + text;
+
+            // truncate
+            if (this.tokens > 1 && length > this.tokens)
+            {
+                List<int> encoded = tokenizer.Encode(text);
+                text = tokenizer.Decode(encoded.Take(this.tokens).ToList());
+                length = this.tokens;
+            }
+
+            return new(text, length, length > maxTokens);
+        }
     }
 }
