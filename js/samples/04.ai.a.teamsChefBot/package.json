@@ -22,7 +22,7 @@
     "dependencies": {
         "@microsoft/teams-ai": "~1.0.0-preview",
         "@microsoft/teamsfx": "^2.3.0",
-        "botbuilder": "^4.20.1",
+        "botbuilder": "^4.21.0",
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
@@ -31,7 +31,7 @@
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.9",
-        "@types/node": "^20.8.7",
+        "@types/node": "^20.8.9",
         "ts-node": "^10.9.1",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
