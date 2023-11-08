@@ -7,6 +7,7 @@ import { AI } from '../AI';
 const DEFAULT_POLLING_INTERVAL = 1000;
 const DEFAULT_ASSISTANTS_STATE_VARIABLE = 'conversation.assistants_state';
 const SUBMIT_TOOL_OUTPUTS_VARIABLE = 'temp.submit_tool_outputs';
+const SUBMIT_TOOL_OUTPUTS_MAP = 'temp.submit_tool_map';
 
 export interface AssistantsPlannerOptions {
     apiKey: string;
@@ -42,14 +43,16 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         // Create a new thread if we don't have one already
         const thread_id = await this.ensureThreadCreated(state, context.activity.text);
 
-        // Wait for any current runs to complete since you can't add messages or start new runs
-        // if there's already one in progress
-        await this.blockOnInprogressRuns(state, thread_id);
-
         // Add the users input to the thread or send tool outputs
         if (state.getValue(SUBMIT_TOOL_OUTPUTS_VARIABLE) == true) {
+            // Send the tool output to the assistant
             return await this.submitActionResults(context, state, ai);
         } else {
+            // Wait for any current runs to complete since you can't add messages or start new runs
+            // if there's already one in progress
+            await this.blockOnInprogressRuns(thread_id);
+
+            // Submit user input
             return await this.submitUserInput(context, state, ai);
         }
     }
@@ -151,9 +154,11 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
         // Map the action outputs to tool outputs
         const actionOutputs = state.temp.actionOutputs;
+        const tool_map = state.getValue(SUBMIT_TOOL_OUTPUTS_MAP) as {[key: string]: string};
         const tool_outputs: OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams.ToolOutput[] = [];
-        for (const tool_call_id in actionOutputs) {
-            const output = actionOutputs[tool_call_id];
+        for (const action in actionOutputs) {
+            const output = actionOutputs[action];
+            const tool_call_id = tool_map[action];
             tool_outputs.push({ tool_call_id, output });
         }
 
@@ -167,7 +172,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         switch (results.status) {
             case 'requires_action':
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
-                return this.generatePlanFromTools(results.required_action!);
+                return this.generatePlanFromTools(state, results.required_action!);
             case 'completed':
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
                 return this.generatePlanFromMessages(assistants_state.thread_id!, assistants_state.last_message_id!);
@@ -199,7 +204,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         switch (results.status) {
             case 'requires_action':
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, true);
-                return this.generatePlanFromTools(results.required_action!);
+                return this.generatePlanFromTools(state, results.required_action!);
             case 'completed':
                 state.setValue(SUBMIT_TOOL_OUTPUTS_VARIABLE, false);
                 return this.generatePlanFromMessages(thread_id, message.id);
@@ -212,15 +217,18 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         }
     }
 
-    private generatePlanFromTools(required_action: OpenAI.Beta.Threads.Runs.Run.RequiredAction): Plan {
+    private generatePlanFromTools(state: TState, required_action: OpenAI.Beta.Threads.Runs.Run.RequiredAction): Plan {
         const plan: Plan = { type: 'plan', commands: [] };
+        const tool_map: {[key: string]: string} = {};
         required_action.submit_tool_outputs.tool_calls.forEach(tool_call => {
+            tool_map[tool_call.function.name] = tool_call.id;
             plan.commands.push({
                 type: 'DO',
                 action: tool_call.function.name,
                 parameters: JSON.parse(tool_call.function.arguments)
             } as PredictedDoCommand);
         });
+        state.setValue(SUBMIT_TOOL_OUTPUTS_MAP, tool_map);
         return plan;
     }
 
@@ -279,7 +287,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         return assistants_state.thread_id;
     }
 
-    private async blockOnInprogressRuns(state: TState, thread_id: string): Promise<void> {
+    private async blockOnInprogressRuns(thread_id: string): Promise<void> {
         // We loop until we're told the last run is completed
         while (true) {
             const run = await this.retrieveLastRun(thread_id);

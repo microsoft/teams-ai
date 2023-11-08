@@ -459,7 +459,7 @@ export class AI<TState extends TurnState = TurnState> {
         }
 
         // Initialize {{$allOutputs}}
-        if (typeof state.temp.actionOutputs == undefined) {
+        if (state.temp.actionOutputs == undefined) {
             state.temp.actionOutputs = {};
         }
 
@@ -520,12 +520,12 @@ export class AI<TState extends TurnState = TurnState> {
                             .get(AI.DoCommandActionName)!
                             .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                         should_loop = output.length > 0;
-                        } else {
+                        state.temp.actionOutputs[action] = output;
+                    } else {
                         // Redirect to UnknownAction handler
                         output = await this._actions
                             .get(AI.UnknownActionName)!
                             .handler(context, state, plan, action);
-                        state.temp.actionOutputs[action] = output;
                     }
                     break;
                 }
