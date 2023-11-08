@@ -7,20 +7,21 @@
  */
 
 import {
-    TurnContext,
-    Storage,
+    Activity,
     ActivityTypes,
     BotAdapter,
+    Channels,
     ConversationReference,
-    Activity,
-    ResourceResponse
+    ResourceResponse,
+    Storage,
+    TurnContext
 } from 'botbuilder';
-import { TurnState, TurnStateManager } from './TurnState';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
-import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
+import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
+import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
+import { TurnState, TurnStateManager } from './TurnState';
 
 /**
  * @private
@@ -914,7 +915,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.channelId === Channels.Msteams &&
                         context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.channel &&
@@ -957,7 +958,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === 'msteams' &&
+                    context?.activity?.channelId === Channels.Msteams &&
                         context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.team
@@ -977,6 +978,8 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
     }
 }
 
+// function createMessageUpdateActivitySelector()
+//
 /**
  * Creates a route selector function that matches a message based on a keyword.
  * @param {string | RegExp | RouteSelector} keyword The keyword to match against the message text. Can be a string, regular expression, or a custom selector function.
@@ -1043,7 +1046,6 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             };
     }
 }
-// channelData: eventype of editMessage
 
 /**
  * @private
