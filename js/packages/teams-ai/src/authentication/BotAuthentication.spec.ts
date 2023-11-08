@@ -10,7 +10,7 @@ import { TurnStateEntry } from '../TurnState';
 import { ConversationHistory } from '../ConversationHistory';
 import { AuthError } from './Authentication';
 
-describe.only('BotAuthentication', () => {
+describe('BotAuthentication', () => {
     const adapter = new TestAdapter();
 
     let app: Application;
