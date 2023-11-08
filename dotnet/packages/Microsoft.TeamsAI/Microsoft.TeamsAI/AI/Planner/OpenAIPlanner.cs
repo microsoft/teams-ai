@@ -323,6 +323,18 @@ namespace Microsoft.Teams.AI.AI.Planner
             }
         }
 
+        /// <inheritdoc/>
+        public async Task<Plan> BeginTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken)
+        {
+            return await ContinueTaskAsync(turnContext, turnState, ai, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken)
+        {
+            PromptTemplate promptTemplate = ai.Prompts.LoadPromptTemplate(ai.Options.Prompt!);
+            return await GeneratePlanAsync(turnContext, turnState, promptTemplate, ai.Options, cancellationToken);
+        }
     }
 
     /// <inheritdoc/>
