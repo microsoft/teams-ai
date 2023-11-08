@@ -10,7 +10,6 @@ import {
     Activity,
     ActivityTypes,
     BotAdapter,
-    Channels,
     ConversationReference,
     ResourceResponse,
     Storage,
@@ -138,6 +137,8 @@ export type ConversationUpdateEvents =
     | 'teamRestored'
     | 'topicName'
     | 'historyDisclosed';
+
+export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'editMessage';
 
 /**
  * Function for handling an incoming request.
@@ -325,14 +326,14 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Handles conversation update events.
-     * @param {ConversationUpdateEvents | ConversationUpdateEvents[]} event Name of the conversation update event(s) to handle.
+     * @param {ConversationUpdateEvents} event Name of the conversation update event to handle.
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler Function to call when the route is triggered.
      * @param {TurnContext} handler.context The context object for the turn.
      * @param {TState} handler.state The state object for the turn.
      * @returns {this} The application instance for chaining purposes.
      */
     public conversationUpdate(
-        event: ConversationUpdateEvents | ConversationUpdateEvents[],
+        event: ConversationUpdateEvents,
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
         if (typeof handler !== 'function') {
@@ -340,14 +341,28 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 `ConversationUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
             );
         }
-        (Array.isArray(event) ? event : [event]).forEach((e) => {
-            const selector = createConversationUpdateSelector(e);
-            this.addRoute(selector, handler);
-        });
+
+        const selector = createConversationUpdateSelector(event);
+        this.addRoute(selector, handler);
         return this;
     }
 
+    public messageEventUpdate(
+        event: TeamsMessageEvents,
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
+        if (typeof handler !== 'function') {
+            throw new Error(
+                `MessageUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
+            );
+        }
+
+        const selector = createMessageEventUpdateSelector(event);
+        this.addRoute(selector, handler);
+        return this;
+    }
     /**
+     * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      * @summary
      * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
@@ -355,19 +370,19 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bot's logic that should be run using the new proactive turn context.
      */
-    public continueConversationAsync(
+    private continueConversationAsync(
         context: TurnContext,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public continueConversationAsync(
+    private continueConversationAsync(
         conversationReference: Partial<ConversationReference>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public continueConversationAsync(
+    private continueConversationAsync(
         activity: Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public async continueConversationAsync(
+    private async continueConversationAsync(
         context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void> {
@@ -915,8 +930,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === Channels.Msteams &&
-                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.channel &&
                         context.activity.channelData?.team
@@ -958,8 +972,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === Channels.Msteams &&
-                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.team
                 );
@@ -1009,6 +1022,39 @@ function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteS
                 return Promise.resolve(false);
             }
         };
+    }
+}
+
+/**
+ * @private
+ * @param {TeamsMessageEvents} event The type of message event to create a selector for.
+ * @returns {RouteSelector} A selector function that matches the specified message event.
+ */
+function createMessageEventUpdateSelector(event: TeamsMessageEvents): RouteSelector {
+    switch (event) {
+        case 'editMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        case 'softDeleteMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageDelete &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        case 'undeleteMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        default:
+            throw new Error(`Invalid TeamsMessageEvent type: ${event}`);
     }
 }
 
