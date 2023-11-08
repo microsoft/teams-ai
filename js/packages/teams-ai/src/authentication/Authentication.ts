@@ -135,7 +135,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
  */
 export class AuthenticationManager<TState extends TurnState = DefaultTurnState> {
     private readonly _authentications: Map<string, Authentication<TState>> = new Map<string, Authentication<TState>>();
-    private readonly defaultSettingName: string;
+    public readonly default: string;
 
     /**
      * Creates a new instance of the `AuthenticationManager` class.
@@ -148,7 +148,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
             throw new Error('Authentication settings are required.');
         }
 
-        this.defaultSettingName = options.default || Object.keys(options.settings)[0];
+        this.default = options.default || Object.keys(options.settings)[0];
 
         const settings = options.settings;
 
@@ -172,7 +172,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
         const connection = this._authentications.get(name);
 
         if (!connection) {
-            throw new Error(`Could not find setting name ${name}`);
+            throw new Error(`Could not find setting name '${name}'`);
         }
 
         return connection;
@@ -188,7 +188,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
      */
     public async signUserIn(context: TurnContext, state: TState, settingName?: string): Promise<SignInResponse> {
         if (!settingName) {
-            settingName = this.defaultSettingName;
+            settingName = this.default;
         }
 
         // Get authentication instace
@@ -232,7 +232,7 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
      */
     public async signOutUser(context: TurnContext, state: TState, settingName?: string): Promise<void> {
         if (!settingName) {
-            settingName = this.defaultSettingName;
+            settingName = this.default;
         }
 
         // Get authentication instace
