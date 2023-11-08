@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
+import { ActivityTypes, Channels, MemoryStorage, TestAdapter } from 'botbuilder';
 import { Application, ApplicationBuilder, ConversationUpdateEvents } from './Application';
 import { TestPlanner } from './TestPlanner';
 import { TestPromptManager } from './TestPromptManager';
@@ -208,7 +208,7 @@ describe('Application', () => {
             });
 
             const activity = createTestConversationUpdate();
-            activity.channelId = 'msteams';
+            activity.channelId = Channels.Msteams;
             activity.membersAdded = [
                 { id: '123', name: 'Member One' },
                 { id: '42', name: "Don't Panic" }
@@ -276,7 +276,7 @@ describe('Application', () => {
                 });
 
                 const activity = createTestConversationUpdate(channelData);
-                activity.channelId = 'msteams';
+                activity.channelId = Channels.Msteams;
                 await adapter.processActivity(activity, async (context) => {
                     await mockApp.run(context);
                     assert.equal(handlerCalled, true);
@@ -289,7 +289,7 @@ describe('Application', () => {
             const team = { id: 'mockTeamId' };
             const channel = { id: 'mockChannelId' };
             const activity = createTestConversationUpdate({ channel, eventType: 'channelCreated', team });
-            activity.channelId = 'msteams';
+            activity.channelId = Channels.Msteams;
 
             mockApp.conversationUpdate('channelCreated', async (context, _state) => {
                 handlerCalled = true;
