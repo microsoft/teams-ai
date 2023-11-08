@@ -28,6 +28,7 @@
         "json-colorizer": "^2.2.2",
         "gpt-3-encoder": "^1.1.4",
         "jsonschema": "1.4.1",
+        "openai": "^4.16.0",
         "yaml": "^2.3.3"
     },
     "resolutions": {

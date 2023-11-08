@@ -458,6 +458,11 @@ export class AI<TState extends TurnState = TurnState> {
             state.temp.input = context.activity.text;
         }
 
+        // Initialize {{$allOutputs}}
+        if (typeof state.temp.actionOutputs == undefined) {
+            state.temp.actionOutputs = {};
+        }
+
         // Initialize start time and action count
         const { max_steps, max_time } = this._options;
         if (start_time === undefined) {
@@ -520,6 +525,7 @@ export class AI<TState extends TurnState = TurnState> {
                         output = await this._actions
                             .get(AI.UnknownActionName)!
                             .handler(context, state, plan, action);
+                        state.temp.actionOutputs[action] = output;
                     }
                     break;
                 }
@@ -540,6 +546,7 @@ export class AI<TState extends TurnState = TurnState> {
             }
 
             // Copy the actions output to the input
+            state.temp.lastOutput = output;
             state.temp.input = output;
         }
 
