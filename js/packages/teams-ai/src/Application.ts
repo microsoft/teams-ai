@@ -18,10 +18,9 @@ import {
 } from 'botbuilder';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
-import { TurnState, TurnStateManager } from './TurnState';
+import { TurnState } from './TurnState';
 
 /**
  * @private
