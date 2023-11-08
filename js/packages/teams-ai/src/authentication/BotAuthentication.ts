@@ -34,7 +34,6 @@ interface OAuthPromptResult {
  * @internal
  */
 interface UserAuthState {
-    signedIn: boolean;
     message?: string;
 }
 
@@ -133,7 +132,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
-    public async onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
+    public onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>): void {
         this._userSignInSuccessHandler = handler;
     }
 
@@ -142,9 +141,9 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user failed to signed in
      */
-    public async onUserSignInFailure(
+    public onUserSignInFailure(
         handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>
-    ): Promise<void> {
+    ): void {
         this._userSignInFailureHandler = handler;
     }
 

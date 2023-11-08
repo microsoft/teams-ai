@@ -114,7 +114,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
-    public async onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>): Promise<void> {
+    public onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>) {
         this._botAuth.onUserSignInSuccess(handler);
     }
 
@@ -125,9 +125,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
      * @template TState
      * @param {(context: TurnContext, state: TState, error: AuthError) => Promise<void>} handler The handler function to call when the user failed to signed in.
      */
-    public async onUserSignInFailure(
-        handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>
-    ) {
+    public onUserSignInFailure(handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>) {
         this._botAuth.onUserSignInFailure(handler);
     }
 }
