@@ -204,11 +204,11 @@ export class AuthenticationManager<TState extends TurnState = DefaultTurnState> 
             token = await auth.signInUser(context, state);
         } catch (e) {
             status = 'error';
-            const reason = e instanceof AuthError ? e.reason : 'other';
+            const cause = e instanceof AuthError ? e.cause : 'other';
 
             return {
                 status: status,
-                errorReason: reason,
+                cause: cause,
                 error: e
             };
         }
@@ -276,15 +276,15 @@ export interface AuthenticationOptions {
 export type SignInResponse = {
     status: 'pending' | 'complete' | 'error';
     error?: unknown;
-    errorReason?: AuthErrorReason;
+    cause?: AuthErrorReason;
 };
 
 export class AuthError extends Error {
-    public readonly reason: AuthErrorReason;
+    public readonly cause: AuthErrorReason;
 
     constructor(message?: string, reason: AuthErrorReason = 'other') {
         super(message);
-        this.reason = reason;
+        this.cause = reason;
     }
 }
 
