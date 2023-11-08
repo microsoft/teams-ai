@@ -6,7 +6,7 @@ using Moq;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
 {
-    internal class TestSection : PromptSection
+    internal sealed class TestSection : PromptSection
     {
         public TestSection(int tokens = -1, bool required = false, string separator = "\n", string prefix = "") : base(tokens, required, separator, prefix)
         {
@@ -22,7 +22,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
         }
     }
 
-    internal class TestFunctions : IPromptFunctions<List<string>>
+    internal sealed class TestFunctions : IPromptFunctions<List<string>>
     {
         private Dictionary<string, PromptFunction<List<string>>> _functions = new();
 
