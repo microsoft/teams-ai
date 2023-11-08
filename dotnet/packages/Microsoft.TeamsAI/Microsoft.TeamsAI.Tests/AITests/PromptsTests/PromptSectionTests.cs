@@ -59,12 +59,11 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
         [Fact]
         public async void Test_RenderAsTextAsync_ShouldRender()
         {
-            TestSection section = new(8);
+            TestSection section = new();
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
             TestFunctions functions = new();
-
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
 
             Assert.Equal("Hello World!", rendered.output);
@@ -79,7 +78,6 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
             TestFunctions functions = new();
-
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 2);
 
             Assert.Equal("Hello World", rendered.output);

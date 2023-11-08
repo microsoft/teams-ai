@@ -136,6 +136,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <returns></returns>
         protected RenderedPromptSection<List<ChatMessage>> TruncateMessages(List<ChatMessage> messages, ITokenizer tokenizer, int maxTokens)
         {
+            int budget = this.tokens > 1 ? Math.Min(this.tokens, maxTokens) : maxTokens;
             int len = 0;
             List<ChatMessage> output = new();
 
@@ -144,9 +145,9 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 string text = this.GetMessageText(message);
                 List<int> encoded = tokenizer.Encode(text);
 
-                if (len + encoded.Count > maxTokens)
+                if (len + encoded.Count > budget)
                 {
-                    int delta = maxTokens - len;
+                    int delta = budget - len;
                     string truncated = tokenizer.Decode(encoded.Take(delta).ToList());
                     output.Add(new(message.Role, truncated));
                     len += delta;
@@ -157,7 +158,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 output.Add(message);
             }
 
-            return new(output, len, len > maxTokens);
+            return new(output, len, len > budget);
         }
 
         /// <summary>
