@@ -23,7 +23,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             int budget = this.tokens > 1 ? Math.Min(this.tokens, maxTokens) : maxTokens;
             RenderedPromptSection<string> rendered = await this._source.RenderDataAsync(context, memory, tokenizer, budget);

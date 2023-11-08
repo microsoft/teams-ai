@@ -10,6 +10,14 @@ namespace Microsoft.Teams.AI.AI.Tokenizers
         private readonly GptEncoding _encoding;
 
         /// <summary>
+        /// Creates an instance of `GPTTokenizer` using the `cl100k_base` encoding by default
+        /// </summary>
+        public GPTTokenizer()
+        {
+            this._encoding = GptEncoding.GetEncoding("cl100k_base");
+        }
+
+        /// <summary>
         /// Creates an instance of `GPTTokenizer`
         /// </summary>
         /// <param name="encoding">encoding to use</param>

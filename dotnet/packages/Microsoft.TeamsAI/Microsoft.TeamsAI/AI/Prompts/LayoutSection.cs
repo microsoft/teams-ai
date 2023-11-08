@@ -44,7 +44,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             int length = 0;
             List<RenderedPromptSection<string>> renderedSections = new();
@@ -85,7 +85,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             int length = 0;
             List<RenderedPromptSection<List<ChatMessage>>> renderedSections = new();

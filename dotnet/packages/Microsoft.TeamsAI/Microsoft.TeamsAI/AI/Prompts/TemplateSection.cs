@@ -4,7 +4,7 @@ using Microsoft.Teams.AI.AI.Tokenizers;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
-    internal delegate Task<string> RenderFunction(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens);
+    internal delegate Task<string> RenderFunction(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
 
     internal enum ParamState
     {
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             List<string> rendered = this._renderers
                 .Select(async r => await r(context, memory, functions, tokenizer, maxTokens))
@@ -74,7 +74,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 messages.Add(new(this.role, text));
             }
 
-            return await Task.FromResult(this.Truncate(messages, length, tokenizer, maxTokens));
+            return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }
 
         private List<RenderFunction> Parse(string template)
@@ -260,14 +260,9 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
             return async (context, memory, functions, tokenizer, maxTokens) =>
             {
-                dynamic value = await functions.InvokeFunction(name, context, memory, tokenizer, args);
+                dynamic? value = await functions.InvokeFunctionAsync(name, context, memory, tokenizer, args);
                 return await Task.FromResult(Convert.ToString(value));
             };
-        }
-
-        private void SaveParam()
-        {
-
         }
     }
 }

@@ -89,7 +89,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
         /// <returns>prompt rendered as a list of messages</returns>
-        public abstract Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens);
+        public abstract Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
 
         /// <summary>
         /// Render As Text
@@ -100,7 +100,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
         /// <returns>prompt rendered as text</returns>
-        public virtual async Task<RenderedPromptSection<string>> RenderAsTextAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public virtual async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
 
@@ -131,30 +131,30 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// Truncate Messages
         /// </summary>
         /// <param name="messages">messages to be truncated</param>
-        /// <param name="length">fixed length or -1</param>
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
         /// <returns></returns>
-        protected RenderedPromptSection<List<ChatMessage>> Truncate(List<ChatMessage> messages, int length, ITokenizer tokenizer, int maxTokens)
+        protected RenderedPromptSection<List<ChatMessage>> TruncateMessages(List<ChatMessage> messages, ITokenizer tokenizer, int maxTokens)
         {
-            int len = length;
+            int len = 0;
             List<ChatMessage> output = new();
 
-            if (this.tokens > 1)
+            foreach (ChatMessage message in messages)
             {
-                foreach (ChatMessage message in messages)
-                {
-                    List<int> encoded = tokenizer.Encode(this.GetMessageText(message));
-                    len -= encoded.Count;
+                string text = this.GetMessageText(message);
+                List<int> encoded = tokenizer.Encode(text);
 
-                    if (len < this.tokens)
-                    {
-                        int delta = this.tokens - len;
-                        string text = tokenizer.Decode(encoded.Take(delta).ToList());
-                        output.Add(new(message.Role, text));
-                        len += delta;
-                    }
+                if (len + encoded.Count > maxTokens)
+                {
+                    int delta = maxTokens - len;
+                    string truncated = tokenizer.Decode(encoded.Take(delta).ToList());
+                    output.Add(new(message.Role, truncated));
+                    len += delta;
+                    break;
                 }
+
+                len += encoded.Count;
+                output.Add(message);
             }
 
             return new(output, len, len > maxTokens);

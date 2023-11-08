@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             // calculate and cache length
             if (this._length < 0)
@@ -52,7 +52,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 messages.Add(new(this.role, this.text));
             }
 
-            return await Task.FromResult(this.Truncate(messages, this._length, tokenizer, maxTokens));
+            return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }
     }
 }

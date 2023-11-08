@@ -29,13 +29,13 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(TurnContext context, Memory.Memory memory, IPromptFunctions functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             RenderedPromptSection<string> rendered = await base.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
             List<ChatMessage> messages = new()
             {new(this.role, rendered.output)};
 
-            return await Task.FromResult(this.Truncate(messages, rendered.length, tokenizer, maxTokens));
+            return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }
     }
 }
