@@ -2,7 +2,7 @@
 using Microsoft.Bot.Schema;
 using Moq;
 
-namespace Microsoft.TeamsAI.Tests
+namespace Microsoft.Teams.AI.Tests
 {
     public class TypingTimerTests
     {

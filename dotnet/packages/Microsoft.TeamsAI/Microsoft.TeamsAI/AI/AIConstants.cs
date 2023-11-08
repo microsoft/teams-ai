@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.TeamsAI.AI
+namespace Microsoft.Teams.AI.AI
 {
     /// <summary>
     /// The constants used by the AI system.

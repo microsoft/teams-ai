@@ -1,13 +1,13 @@
-﻿using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Diagnostics;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.TemplateEngine.Prompt;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI.AI.Prompt
+namespace Microsoft.Teams.AI.AI.Prompt
 {
     /// <summary>
     /// The prompt manager.

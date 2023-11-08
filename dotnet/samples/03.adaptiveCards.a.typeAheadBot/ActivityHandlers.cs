@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.State;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Specialized;

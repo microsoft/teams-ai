@@ -1,9 +1,9 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.Tests.TestUtils;
 
-namespace Microsoft.TeamsAI.Tests.Application
+namespace Microsoft.Teams.AI.Tests.Application
 {
     public class MeetingsTests
     {

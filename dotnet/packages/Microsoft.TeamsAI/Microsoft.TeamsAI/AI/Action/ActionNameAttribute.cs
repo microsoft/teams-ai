@@ -1,4 +1,4 @@
-﻿namespace Microsoft.TeamsAI.AI.Action
+﻿namespace Microsoft.Teams.AI.AI.Action
 {
     /// <summary>
     /// Attribute to represent the action name parameter of an action method.

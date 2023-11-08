@@ -1,9 +1,9 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// A builder class for simplifying the creation of an Application instance.

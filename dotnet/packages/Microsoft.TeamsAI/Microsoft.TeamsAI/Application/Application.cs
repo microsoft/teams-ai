@@ -3,14 +3,13 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.AI;
-using Microsoft.TeamsAI.Application;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Application class for routing and processing incoming requests.

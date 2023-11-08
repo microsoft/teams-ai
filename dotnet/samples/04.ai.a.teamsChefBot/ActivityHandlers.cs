@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI;
-using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.State;
 
 namespace TeamsChefBot
 {

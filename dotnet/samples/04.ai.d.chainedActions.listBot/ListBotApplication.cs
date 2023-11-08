@@ -1,5 +1,5 @@
 ﻿using ListBot.Model;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 using System.Text.Json;
 
 namespace ListBot

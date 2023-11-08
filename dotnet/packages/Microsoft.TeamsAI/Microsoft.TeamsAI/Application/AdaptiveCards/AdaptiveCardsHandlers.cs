@@ -1,9 +1,9 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 using Newtonsoft.Json;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Parameters passed to AdaptiveCards.OnSearch() handler.

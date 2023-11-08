@@ -2,12 +2,12 @@
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.Tests.TestUtils;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.TeamsAI.Tests.Application
+namespace Microsoft.Teams.AI.Tests.Application
 {
     public class ApplicationRouteTests
     {

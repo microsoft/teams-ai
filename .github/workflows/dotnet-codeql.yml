@@ -12,6 +12,7 @@
 name: DOTNET CodeQL
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
     paths: ['dotnet/**']
@@ -47,7 +48,7 @@ jobs:
           dotnet-version: 6.0
       - name: Build .NET
         working-directory: dotnet/packages/Microsoft.TeamsAI/
-        run: dotnet build Microsoft.TeamsAI.sln --configuration Release
+        run: dotnet build Microsoft.Teams.AI.sln --configuration Release
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@74483a38d39275f33fcff5f35b679b5ca4a26a99 # v2.22.5
         with:

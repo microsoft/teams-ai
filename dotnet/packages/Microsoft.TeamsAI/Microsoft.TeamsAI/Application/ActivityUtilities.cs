@@ -3,7 +3,7 @@ using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     internal static class ActivityUtilities
     {

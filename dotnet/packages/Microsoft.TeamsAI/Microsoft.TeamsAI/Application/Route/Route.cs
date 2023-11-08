@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Function for selecting whether a route handler should be triggered.

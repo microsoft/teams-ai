@@ -1,13 +1,13 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.Exceptions;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// TaskModules class to enable fluent style registration of handlers related to Task Modules.

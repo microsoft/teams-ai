@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Prompt
+namespace Microsoft.Teams.AI.AI.Prompt
 {
     /// <summary>
     /// Interface for a prompt manager.

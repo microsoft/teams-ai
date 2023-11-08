@@ -6,6 +6,7 @@ name: DOTNET Build/Test/Lint
 
 on:
   workflow_call:
+  workflow_dispatch:
   push:
     branches: ['**']
     paths: ['dotnet/**']
@@ -36,11 +37,11 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Restore
-        run: dotnet restore Microsoft.TeamsAI.sln
+        run: dotnet restore Microsoft.Teams.AI.sln
       - name: Build
-        run: dotnet build Microsoft.TeamsAI.sln --no-restore --configuration Release
+        run: dotnet build Microsoft.Teams.AI.sln --no-restore --configuration Release
       - name: Test
-        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.TeamsAI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --no-restore --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
         uses: danielpalme/ReportGenerator-GitHub-Action@873ee34c88a6234bdab7fd264d3666fd1ab417f7 # 5.1.26
         with:

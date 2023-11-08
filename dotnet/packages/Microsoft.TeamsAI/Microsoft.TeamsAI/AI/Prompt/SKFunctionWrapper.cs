@@ -2,9 +2,9 @@
 using Microsoft.SemanticKernel.AI.TextCompletion;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.SkillDefinition;
-using Microsoft.TeamsAI.State;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Prompt
+namespace Microsoft.Teams.AI.AI.Prompt
 {
     internal sealed class SKFunctionWrapper<TState> : ISKFunction where TState : ITurnState<StateBase, StateBase, TempState>
     {

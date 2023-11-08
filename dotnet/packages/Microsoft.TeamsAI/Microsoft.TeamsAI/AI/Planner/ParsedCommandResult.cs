@@ -1,4 +1,4 @@
-﻿namespace Microsoft.TeamsAI.AI.Planner
+﻿namespace Microsoft.Teams.AI.AI.Planner
 {
     internal sealed class ParsedCommandResult
     {

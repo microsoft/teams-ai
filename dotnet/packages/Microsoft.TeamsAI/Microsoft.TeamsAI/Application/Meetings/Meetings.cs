@@ -1,10 +1,10 @@
 ﻿using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
-using Microsoft.TeamsAI.State;
-using Microsoft.TeamsAI.Utilities;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Meetings class to enable fluent style registration of handlers related to Microsoft Teams Meetings.

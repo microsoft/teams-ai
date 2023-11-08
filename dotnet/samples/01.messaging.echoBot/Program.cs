@@ -4,7 +4,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,5 +1,5 @@
 ﻿using DevOpsBot.Model;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 using Newtonsoft.Json;
 
 namespace DevOpsBot

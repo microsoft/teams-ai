@@ -1,4 +1,4 @@
-﻿namespace Microsoft.TeamsAI
+﻿namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Query arguments for Message Extension query and Adaptive Card dynamic search.

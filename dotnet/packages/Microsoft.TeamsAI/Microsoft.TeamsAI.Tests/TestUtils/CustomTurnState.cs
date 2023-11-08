@@ -1,6 +1,6 @@
-﻿using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.Tests.TestUtils
+namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public class CustomTurnState : TurnState<CustomConversationState, CustomUserState, CustomTempState>
     {

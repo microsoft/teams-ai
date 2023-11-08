@@ -13,7 +13,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  projectPath: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.TeamsAI.csproj'
+  package: 'dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/Microsoft.Teams.AI.csproj'
 
 steps:
 - task: UseDotNet@2
@@ -24,22 +24,23 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'Restore'
   inputs:
-    command: 'restore'
-    projects: '$(projectPath)'
+    command: restore
+    projects: '$(package)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build'
   inputs:
-    command: 'build'
-    projects: '$(projectPath)'
+    command: build
+    projects: '$(package)'
     arguments: '--configuration $(buildConfiguration)'
 
-- task: NuGetCommand@2
-  displayName: 'NuGet Pack'
+- task: DotNetCoreCLI@2
+  displayName: 'Pack'
   inputs:
     command: pack
-    packagesToPack: '$(projectPath)'
+    packagesToPack: '$(package)'
     packDestination: '$(Build.ArtifactStagingDirectory)'
+    includeSymbols: true
   
 - task: EsrpCodeSigning@4
   displayName: 'Sign'

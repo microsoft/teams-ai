@@ -1,7 +1,7 @@
 ﻿using AdaptiveCards;
 using Microsoft.Bot.Schema;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Contains utility methods for creating various types of <see cref="AdaptiveCardInvokeResponse"/>.

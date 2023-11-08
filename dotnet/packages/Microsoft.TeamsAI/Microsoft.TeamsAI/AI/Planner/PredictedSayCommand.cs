@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Microsoft.TeamsAI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// A predicted SAY command is a response that the AI system should say.

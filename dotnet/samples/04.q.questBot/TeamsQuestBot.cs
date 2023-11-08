@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.TeamsAI;
+using Microsoft.Teams.AI;
 using QuestBot.Actions;
 using QuestBot.State;
 

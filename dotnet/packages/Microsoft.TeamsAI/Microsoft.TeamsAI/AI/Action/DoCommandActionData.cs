@@ -1,7 +1,7 @@
-﻿using Microsoft.TeamsAI.AI.Planner;
-using Microsoft.TeamsAI.State;
+﻿using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.State;
 
-namespace Microsoft.TeamsAI.AI.Action
+namespace Microsoft.Teams.AI.AI.Action
 {
     /// <summary>
     /// The data for default DO command action handler.

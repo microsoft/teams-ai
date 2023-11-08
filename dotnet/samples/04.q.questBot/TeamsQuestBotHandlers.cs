@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.TeamsAI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planner;
 using QuestBot.Models;
 using QuestBot.State;
 using System.Text.Json;

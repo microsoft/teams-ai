@@ -1,8 +1,8 @@
-﻿using Microsoft.TeamsAI.Utilities;
+﻿using Microsoft.Teams.AI.Utilities;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Builder;
 
-namespace Microsoft.TeamsAI
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Encapsulates the logic for sending "typing" activity to the user.
