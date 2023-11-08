@@ -39,7 +39,7 @@ describe("TestModel", () => {
         it("should create a TestModel with custom params", () => {
             const client = new TestModel('error', { role: 'assistant', content: 'Hello Error' });
             assert.equal(client.status, 'error');
-            assert.equal(client.response, { role: 'assistant', content: 'Hello Error' });
+            assert.deepEqual(client.response, { role: 'assistant', content: 'Hello Error' });
         });
     });
 

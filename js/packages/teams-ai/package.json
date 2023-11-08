@@ -22,9 +22,9 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "axios": "^1.5.1",
-        "botbuilder": "^4.20.1",
-        "botbuilder-dialogs": "^4.20.1",
+        "axios": "^1.6.0",
+        "botbuilder": "^4.21.0",
+        "botbuilder-dialogs": "^4.21.0",
         "json-colorizer": "^2.2.2",
         "gpt-3-encoder": "^1.1.4",
         "jsonschema": "1.4.1",
@@ -36,7 +36,7 @@
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.4",
-        "@types/node": "^20.8.7",
+        "@types/node": "^20.8.9",
         "eslint": "^8.52.0",
         "jsonwebtoken": "^9.0.2",
         "typescript": "^5.2.2",
