@@ -11,5 +11,12 @@
         /// <param name="text">text to encode</param>
         /// <returns>encoded bytes</returns>
         public List<int> Encode(string text);
+
+        /// <summary>
+        /// Decode
+        /// </summary>
+        /// <param name="tokens">tokens to decode</param>
+        /// <returns>decoded string</returns>
+        public string Decode(List<int> tokens);
     }
 }
