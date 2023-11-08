@@ -22,13 +22,13 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "axios": "^1.6.0",
+        "axios": "^1.6.1",
         "botbuilder": "^4.21.0",
         "botbuilder-dialogs": "^4.21.0",
         "json-colorizer": "^2.2.2",
         "gpt-3-encoder": "^1.1.4",
         "jsonschema": "1.4.1",
-        "yaml": "^2.3.3"
+        "yaml": "^2.3.4"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"

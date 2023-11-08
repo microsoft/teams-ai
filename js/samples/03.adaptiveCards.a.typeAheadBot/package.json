@@ -24,7 +24,7 @@
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "axios": "^1.6.0"
+        "axios": "^1.6.1"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
