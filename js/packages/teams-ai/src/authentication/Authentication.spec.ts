@@ -1,201 +1,239 @@
-// import * as sinon from 'sinon';
-// import { BotAuthentication } from './BotAuthentication';
-// import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
-// import { Application } from '../Application';
-// import { OAuthPromptSettings } from 'botbuilder-dialogs';
-// import { Authentication } from './Authentication';
-// import { TurnStateEntry } from '../TurnState';
-// import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
-// import { DefaultTurnState } from '../DefaultTurnStateManager';
-// import { ConversationHistory } from '../ConversationHistory';
-// import assert from 'assert';
-// import * as UserTokenAccess from './UserTokenAccess';
+import * as sinon from 'sinon';
+import { BotAuthentication } from './BotAuthentication';
+import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
+import { Application } from '../Application';
+import { OAuthPromptSettings } from 'botbuilder-dialogs';
+import { AuthError, Authentication } from './Authentication';
+import { TurnStateEntry } from '../TurnState';
+import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
+import { DefaultTurnState } from '../DefaultTurnStateManager';
+import { ConversationHistory } from '../ConversationHistory';
+import assert from 'assert';
+import * as UserTokenAccess from './UserTokenAccess';
 
-// describe('Authentication', () => {
-//     const adapter = new TestAdapter();
+describe('Authentication', () => {
+    const adapter = new TestAdapter();
 
-//     let botAuth: BotAuthentication;
-//     let botAuthMock: sinon.SinonMock;
-//     let messageExtensionsAuth: MessagingExtensionAuthentication;
-//     let messagingExtensionAuthMock: sinon.SinonMock;
-//     let app: Application;
-//     let appStub: sinon.SinonStubbedInstance<Application>;
-//     let settings: OAuthPromptSettings;
-//     let auth: Authentication;
+    let botAuth: BotAuthentication;
+    let botAuthenticateStub: sinon.SinonStub;
+    let messageExtensionsAuth: MessagingExtensionAuthentication;
+    let messagingExtensionAuthenticateStub: sinon.SinonStub;
+    let app: Application;
+    let appStub: sinon.SinonStubbedInstance<Application>;
+    let settings: OAuthPromptSettings;
+    let auth: Authentication;
+    const settingName = 'settingName';
 
-//     const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
-//         const context = new TurnContext(adapter, activity);
-//         const state: DefaultTurnState = {
-//             conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
-//             user: new TurnStateEntry(),
-//             dialog: new TurnStateEntry(),
-//             temp: new TurnStateEntry()
-//         };
-//         return [context, state];
-//     };
+    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
+        const context = new TurnContext(adapter, activity);
+        const state: DefaultTurnState = {
+            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
+            user: new TurnStateEntry(),
+            dialog: new TurnStateEntry(),
+            temp: new TurnStateEntry()
+        };
+        return [context, state];
+    };
 
-//     beforeEach(() => {
-//         app = new Application({ adapter });
-//         appStub = sinon.stub(app);
-//         settings = {
-//             title: 'test',
-//             connectionName: 'test'
-//         };
+    beforeEach(() => {
+        app = new Application({ adapter });
+        appStub = sinon.stub(app);
+        settings = {
+            title: 'test',
+            connectionName: 'test'
+        };
 
-//         messageExtensionsAuth = new MessagingExtensionAuthentication(settings);
-//         messagingExtensionAuthMock = sinon.mock(messageExtensionsAuth);
+        messageExtensionsAuth = new MessagingExtensionAuthentication();
+        messagingExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
+        botAuth = new BotAuthentication(appStub, settings, settingName);
+        botAuthenticateStub = sinon.stub(botAuth, 'authenticate');
 
-//         botAuth = new BotAuthentication(appStub, settings);
-//         botAuthMock = sinon.mock(botAuth);
+        auth = new Authentication(appStub, settingName, settings, undefined, messageExtensionsAuth, botAuth);
+    });
 
-//         auth = new Authentication(appStub, settings, undefined, messageExtensionsAuth, botAuth);
-//     });
+    describe('signInUser()', () => {
+        before(() => {
+            sinon.stub(UserTokenAccess, 'getUserToken');
+        });
 
-//     describe('signInUser()', () => {
-//         it('should call botAuth.authenticate() when activity type is message', async () => {
-//             botAuthMock.expects('authenticate').once();
-//             messagingExtensionAuthMock.expects('authenticate').never();
+        after(() => {
+            sinon.restore();
+        });
 
-//             const [context, state] = createTurnContextAndState({ type: ActivityTypes.Message });
+        it('should call botAuth.authenticate() when activity type is message and the text is a non-empty string', async () => {
+            const isUserSignedInStub = sinon.stub(auth, 'isUserSignedIn').returns(Promise.resolve(undefined));
 
-//             await auth.signInUser(context, state);
+            const [context, state] = createTurnContextAndState({ type: ActivityTypes.Message, text: 'non empty' });
 
-//             botAuthMock.verify();
-//             messagingExtensionAuthMock.verify();
-//         });
+            await auth.signInUser(context, state);
 
-//         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/query activity', async () => {
-//             messagingExtensionAuthMock.expects('authenticate').once();
-//             botAuthMock.expects('authenticate').never();
+            assert(isUserSignedInStub.calledOnce);
+            assert(botAuthenticateStub.calledOnce);
+        });
 
-//             const [context, state] = createTurnContextAndState({
-//                 type: ActivityTypes.Invoke,
-//                 name: 'composeExtension/query'
-//             });
+        it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/query activity', async () => {
+            const [context, state] = createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'composeExtension/query'
+            });
 
-//             await auth.signInUser(context, state);
+            await auth.signInUser(context, state);
 
-//             messagingExtensionAuthMock.verify();
-//             botAuthMock.verify();
-//         });
+            messagingExtensionAuthenticateStub.calledOnce;
+            botAuthenticateStub.notCalled;
+        });
 
-//         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/queryLink activity', async () => {
-//             messagingExtensionAuthMock.expects('authenticate').once();
-//             botAuthMock.expects('authenticate').never();
+        it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/queryLink activity', async () => {
+            const [context, state] = createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'composeExtension/queryLink'
+            });
 
-//             const [context, state] = createTurnContextAndState({
-//                 type: ActivityTypes.Invoke,
-//                 name: 'composeExtension/queryLink'
-//             });
+            await auth.signInUser(context, state);
 
-//             await auth.signInUser(context, state);
+            messagingExtensionAuthenticateStub.calledOnce;
+            botAuthenticateStub.notCalled;
+        });
 
-//             messagingExtensionAuthMock.verify();
-//             botAuthMock.verify();
-//         });
+        it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/fetchTask activity', async () => {
+            const [context, state] = createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'composeExtension/fetchTask'
+            });
 
-//         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/fetchTask activity', async () => {
-//             messagingExtensionAuthMock.expects('authenticate').once();
-//             botAuthMock.expects('authenticate').never();
+            await auth.signInUser(context, state);
 
-//             const [context, state] = createTurnContextAndState({
-//                 type: ActivityTypes.Invoke,
-//                 name: 'composeExtension/fetchTask'
-//             });
+            messagingExtensionAuthenticateStub.calledOnce;
+            botAuthenticateStub.notCalled;
+        });
 
-//             await auth.signInUser(context, state);
+        it('should throw error is activity type is not valid for botAuth or messagingExtensionAuth', async () => {
+            const [context, state] = createTurnContextAndState({
+                type: ActivityTypes.Event
+            });
 
-//             messagingExtensionAuthMock.verify();
-//             botAuthMock.verify();
-//         });
+            assert.rejects(
+                async () => await auth.signInUser(context, state),
+                new AuthError(
+                    'Incomming activity is not a valid activity to initiate authentication flow.',
+                    'invalidActivity'
+                )
+            );
+        });
+    });
 
-//         it('should throw error is activity type is not valid for botAuth or messagingExtensionAuth', async () => {
-//             const [context, state] = createTurnContextAndState({
-//                 type: ActivityTypes.Event
-//             });
+    describe('signOutUser()', () => {
+        let userTokenAccessStub: sinon.SinonStub;
+        let context: TurnContext;
+        let state: DefaultTurnState;
 
-//             // auth.signInUser throws and error.
-//             assert.rejects(
-//                 () => auth.signInUser(context, state),
-//                 new Error('signInUser() is not supported for this activity type.')
-//             );
-//         });
-//     });
+        before(() => {
+            userTokenAccessStub = sinon.stub(UserTokenAccess, 'signOutUser');
+        });
 
-//     describe('signOutUser()', () => {
-//         let userTokenAccessStub: sinon.SinonStub;
-//         let context: TurnContext;
-//         let state: DefaultTurnState;
+        beforeEach(() => {
+            [context, state] = createTurnContextAndState({
+                type: ActivityTypes.Message,
+                from: {
+                    id: 'test',
+                    name: 'test'
+                },
+                channelId: 'test'
+            });
+        });
 
-//         before(() => {
-//             userTokenAccessStub = sinon.stub(UserTokenAccess, 'signOutUser');
-//         });
+        it('should call botAuth.deleteAuthFlowState()', async () => {
+            const botAuthDeleteAuthFlowStateStub = sinon.stub(botAuth, 'deleteAuthFlowState');
 
-//         beforeEach(() => {
-//             [context, state] = createTurnContextAndState({
-//                 type: ActivityTypes.Message,
-//                 from: {
-//                     id: 'test',
-//                     name: 'test'
-//                 },
-//                 channelId: 'test'
-//             });
-//         });
+            await auth.signOutUser(context, state);
 
-//         it('should call botAuth.deleteAuthFlowState()', async () => {
-//             botAuthMock.expects('deleteAuthFlowState').once();
+            botAuthDeleteAuthFlowStateStub.calledOnce;
+        });
 
-//             await auth.signOutUser(context, state);
+        it('should call UserTokenAccess.signOutUser()', async () => {
+            await auth.signOutUser(context, state);
 
-//             botAuthMock.verify();
-//         });
+            userTokenAccessStub.calledOnce;
+        });
+    });
 
-//         it('should call UserTokenAccess.signOutUser()', async () => {
-//             await auth.signOutUser(context, state);
+    describe('onUserSignInSuccess()', () => {
+        it(`should call botAuth.onUserSignInSuccess()`, async () => {
+            const botAuthDeleteAuthFlowStateStub = sinon.stub(botAuth, 'onUserSignInSuccess');
 
-//             userTokenAccessStub.calledOnce;
-//         });
-//     });
+            auth.onUserSignInSuccess(() => Promise.resolve());
 
-//     describe('canSignInUser()', () => {
-//         const truthyCases = [
-//             [ActivityTypes.Message],
-//             [ActivityTypes.Invoke, 'composeExtension/query'],
-//             [ActivityTypes.Invoke, 'composeExtension/queryLink'],
-//             [ActivityTypes.Invoke, 'composeExtension/fetchTask']
-//         ];
+            botAuthDeleteAuthFlowStateStub.calledOnce;
+        });
+    });
 
-//         truthyCases.forEach(([activityType, activityName]) => {
-//             it(`should return true when activity type is '${activityType}' 
-//             and activity name: ${activityName || 'N/A'}`, async () => {
-//                 const [context, _state] = createTurnContextAndState({
-//                     type: ActivityTypes.Message
-//                 });
+    describe('onUserSignInFailure()', () => {
+        it(`should call botAuth.onUserSignInFailure()`, async () => {
+            const botAuthDeleteAuthFlowStateStub = sinon.stub(botAuth, 'onUserSignInFailure');
 
-//                 const result = auth.canSignInUser(context);
+            auth.onUserSignInSuccess(() => Promise.resolve());
 
-//                 assert(result);
-//             });
-//         });
+            botAuthDeleteAuthFlowStateStub.calledOnce;
+        });
+    });
 
-//         it(`should return false if activity type is not valid`, async () => {
-//             const [context, _state] = createTurnContextAndState({
-//                 type: ActivityTypes.Event
-//             });
+    describe('isUserSignedIn()', () => {
+        let context: TurnContext;
+        let getUserTokenStub: sinon.SinonStub;
 
-//             const result = auth.canSignInUser(context);
+        beforeEach(() => {
+            const obj = createTurnContextAndState({
+                type: ActivityTypes.Message,
+                from: {
+                    id: 'test',
+                    name: 'test'
+                },
+                channelId: 'test'
+            });
 
-//             assert.equal(result, false);
-//         });
-//     });
+            context = obj[0];
+        });
 
-//     describe('onUserSignIn()', () => {
-//         it(`should call botAuth.onUserSignIn()`, async () => {
-//             botAuthMock.expects('onUserSignIn').once();
+        afterEach(() => {
+            sinon.restore();
+        });
 
-//             auth.onUserSignIn(() => Promise.resolve());
+        it(`should call UserTokenAccess.getUserToken`, async () => {
+            getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken');
 
-//             botAuthMock.verify();
-//         });
-//     });
-// });
+            await auth.isUserSignedIn(context);
+
+            getUserTokenStub.calledOnce;
+        });
+
+        it(`should return token if UserTokenAccess.getUserToken returns token`, async () => {
+            getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
+                Promise.resolve({
+                    token: 'token',
+                    connectionName: 'connectionName',
+                    expiration: 'expiration'
+                })
+            );
+
+            const response = await auth.isUserSignedIn(context);
+
+            assert(response == 'token');
+            getUserTokenStub.calledOnce;
+        });
+
+        it(`should return undefined if UserTokenAccess.getUserToken returns empty string for token`, async () => {
+            getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
+                Promise.resolve({
+                    token: '',
+                    connectionName: 'connectionName',
+                    expiration: 'expiration'
+                })
+            );
+
+            const response = await auth.isUserSignedIn(context);
+
+            assert(response == undefined);
+            getUserTokenStub.calledOnce;
+        });
+    });
+});
