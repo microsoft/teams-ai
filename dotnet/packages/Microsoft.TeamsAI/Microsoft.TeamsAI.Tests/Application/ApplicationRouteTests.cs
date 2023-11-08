@@ -1672,6 +1672,200 @@ namespace Microsoft.TeamsAI.Tests.Application
         }
 
         [Fact]
+        public async Task Test_OnFileConsentAccept()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "fileConsent/invoke",
+                Value = JObject.FromObject(new
+                {
+                    action = "accept"
+                }),
+                Id = "test"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "fileConsent/invoke",
+                Value = JObject.FromObject(new
+                {
+                    action = "decline"
+                }),
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/queryLink"
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var expectedInvokeResponse = new InvokeResponse
+            {
+                Status = 200
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var ids = new List<string>();
+            app.OnFileConsentAccept((turnContext, _, _, _) =>
+            {
+                ids.Add(turnContext.Activity.Id);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(ids);
+            Assert.Equal("test", ids[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async Task Test_OnFileConsentDecline()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "fileConsent/invoke",
+                Value = JObject.FromObject(new
+                {
+                    action = "decline"
+                }),
+                Id = "test"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "fileConsent/invoke",
+                Value = JObject.FromObject(new
+                {
+                    action = "accept"
+                }),
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/queryLink"
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var expectedInvokeResponse = new InvokeResponse
+            {
+                Status = 200
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var ids = new List<string>();
+            app.OnFileConsentDecline((turnContext, _, _, _) =>
+            {
+                ids.Add(turnContext.Activity.Id);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(ids);
+            Assert.Equal("test", ids[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
+        public async Task Test_OnO365ConnectorCardAction()
+        {
+            // Arrange
+            Activity[]? activitiesToSend = null;
+            void CaptureSend(Activity[] arg)
+            {
+                activitiesToSend = arg;
+            }
+            var adapter = new SimpleAdapter(CaptureSend);
+            var activity1 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "actionableMessage/executeAction",
+                Value = new { },
+                Id = "test"
+            };
+            var activity2 = new Activity
+            {
+                Type = ActivityTypes.Event,
+                Name = "actionableMessage/executeAction"
+            };
+            var activity3 = new Activity
+            {
+                Type = ActivityTypes.Invoke,
+                Name = "composeExtension/queryLink"
+            };
+            var turnContext1 = new TurnContext(adapter, activity1);
+            var turnContext2 = new TurnContext(adapter, activity2);
+            var turnContext3 = new TurnContext(adapter, activity3);
+            var expectedInvokeResponse = new InvokeResponse
+            {
+                Status = 200
+            };
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var ids = new List<string>();
+            app.OnO365ConnectorCardAction((turnContext, _, _, _) =>
+            {
+                ids.Add(turnContext.Activity.Id);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext1);
+            await app.OnTurnAsync(turnContext2);
+            await app.OnTurnAsync(turnContext3);
+
+            // Assert
+            Assert.Single(ids);
+            Assert.Equal("test", ids[0]);
+            Assert.NotNull(activitiesToSend);
+            Assert.Equal(1, activitiesToSend.Length);
+            Assert.Equal("invokeResponse", activitiesToSend[0].Type);
+            Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
+        }
+
+        [Fact]
         public async Task Test_OnTeamsReadReceipt()
         {
             // Arrange
