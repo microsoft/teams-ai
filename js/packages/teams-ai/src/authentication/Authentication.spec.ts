@@ -3,13 +3,14 @@ import { BotAuthentication } from './BotAuthentication';
 import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
 import { Application } from '../Application';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
-import { AuthError, Authentication } from './Authentication';
+import { AuthError, Authentication, AuthenticationManager, AuthenticationOptions } from './Authentication';
 import { TurnStateEntry } from '../TurnState';
 import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
 import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { ConversationHistory } from '../ConversationHistory';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
+import * as BotAuth from './BotAuthentication';
 
 describe('Authentication', () => {
     const adapter = new TestAdapter();
@@ -234,6 +235,233 @@ describe('Authentication', () => {
 
             assert(response == undefined);
             getUserTokenStub.calledOnce;
+        });
+    });
+});
+
+describe('AuthenticationManager', () => {
+    const adapter = new TestAdapter();
+
+    let app: Application;
+    let appStub: sinon.SinonStubbedInstance<Application>;
+    //let auth: Authentication;
+    let authManager: AuthenticationManager;
+
+    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
+        const context = new TurnContext(adapter, activity);
+        const state: DefaultTurnState = {
+            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
+            user: new TurnStateEntry(),
+            dialog: new TurnStateEntry(),
+            temp: new TurnStateEntry()
+        };
+        return [context, state];
+    };
+
+    beforeEach(() => {
+        app = new Application({ adapter });
+        appStub = sinon.stub(app);
+    });
+
+    describe('constructor()', () => {
+        it('should use the first setting as default if settingName is not provided', () => {
+            const authOptions: AuthenticationOptions = {
+                settings: {
+                    firstSetting: {
+                        title: 'test',
+                        connectionName: 'test'
+                    }
+                }
+            };
+
+            authManager = new AuthenticationManager(appStub, authOptions);
+
+            assert(authManager.default == 'firstSetting');
+        });
+
+        it('should throw an error if the settings were not provided', () => {
+            const authOptions: AuthenticationOptions = {
+                settings: {}
+            };
+
+            assert.rejects(
+                () => Promise.resolve(new AuthenticationManager(appStub, authOptions)),
+                'Authentication settings are required'
+            );
+        });
+
+        it('should create a new authentication object for each setting provided', () => {
+            const authOptions: AuthenticationOptions = {
+                settings: {
+                    firstSetting: {
+                        title: 'test',
+                        connectionName: 'test'
+                    },
+                    secondSetting: {
+                        title: 'test',
+                        connectionName: 'test'
+                    }
+                }
+            };
+
+            authManager = new AuthenticationManager(appStub, authOptions);
+
+            assert(authManager.get('firstSetting') instanceof Authentication);
+            assert(authManager.get('secondSetting') instanceof Authentication);
+        });
+    });
+
+    describe('get', () => {
+        it('should get the connection', () => {
+            const authOptions: AuthenticationOptions = {
+                settings: {
+                    firstSetting: {
+                        title: 'test',
+                        connectionName: 'test'
+                    }
+                }
+            };
+
+            authManager = new AuthenticationManager(appStub, authOptions);
+
+            assert(authManager.get('firstSetting') instanceof Authentication);
+        });
+
+        it("should throw an error if the connection couldn't be found", () => {
+            const authOptions: AuthenticationOptions = {
+                settings: {
+                    firstSetting: {
+                        title: 'test',
+                        connectionName: 'test'
+                    }
+                }
+            };
+
+            authManager = new AuthenticationManager(appStub, authOptions);
+
+            assert.rejects(
+                () => Promise.resolve(authManager.get('invalidSettingName')),
+                "Could not find setting name 'invalidSettingName'"
+            );
+        });
+    });
+
+    describe('signInUser() & signOutUser()', () => {
+        const authOptions: AuthenticationOptions = {
+            settings: {
+                firstSetting: {
+                    title: 'test',
+                    connectionName: 'test'
+                }
+            }
+        };
+
+        let authManager: AuthenticationManager;
+        let auth: Authentication;
+        let authManagerGetStub: sinon.SinonStub;
+        let context: TurnContext;
+        let state: DefaultTurnState;
+
+        beforeEach(() => {
+            authManager = new AuthenticationManager(appStub, authOptions);
+            auth = new Authentication(appStub, 'firstSetting', authOptions.settings.firstSetting);
+            authManagerGetStub = sinon.stub(authManager, 'get').returns(auth);
+            [context, state] = createTurnContextAndState({
+                type: ActivityTypes.Message,
+                text: 'non empty'
+            });
+        });
+
+        describe('signInUser()', () => {
+            it('should use the default setting if settingName is not provided', async () => {
+                sinon.stub(auth, 'signInUser');
+
+                await authManager.signUserIn(context, state);
+
+                authManagerGetStub.calledWith('firstSetting');
+            });
+
+            it('should use provided settingName', async () => {
+                sinon.stub(auth, 'signInUser');
+
+                await authManager.signUserIn(context, state, 'providedSettingName');
+
+                authManagerGetStub.calledWith('providedSettingName');
+            });
+
+            it('should returns `error` response if signInUser() throws an error', async () => {
+                const e = new Error('test');
+                sinon.stub(auth, 'signInUser').throws(e);
+
+                const response = await authManager.signUserIn(context, state);
+
+                assert(response.error == e);
+                assert(response.cause == 'other');
+                assert(response.status == 'error');
+            });
+
+            it('should returns `error` response with specific `cause` if signInUser() throws an AuthError', async () => {
+                const e = new AuthError('test', 'completionWithoutToken');
+                sinon.stub(auth, 'signInUser').throws(e);
+
+                const response = await authManager.signUserIn(context, state);
+
+                assert(response.error == e);
+                assert(response.cause == 'completionWithoutToken');
+                assert(response.status == 'error');
+            });
+
+            it('should return `pending` response if signInUser() returns undefiend', async () => {
+                sinon.stub(auth, 'signInUser').returns(Promise.resolve(undefined));
+
+                const response = await authManager.signUserIn(context, state);
+
+                assert(response.status == 'pending');
+            });
+
+            it('should return `success` response if signInUser() returns a token', async () => {
+                sinon.stub(auth, 'signInUser').returns(Promise.resolve('token'));
+
+                const response = await authManager.signUserIn(context, state);
+
+                assert(response.status == 'complete');
+            });
+
+            it('should set the token to the state if signInUser() returns a token', async () => {
+                sinon.stub(auth, 'signInUser').returns(Promise.resolve('token'));
+                const setTokenInStateStub = sinon.stub(BotAuth, 'setTokenInState');
+
+                await authManager.signUserIn(context, state);
+
+                assert(setTokenInStateStub.calledOnce);
+            });
+        });
+
+        describe('signOutUser', () => {
+            it('should use the default setting if settingName is not provided', async () => {
+                sinon.stub(auth, 'signOutUser');
+
+                await authManager.signUserIn(context, state);
+
+                authManagerGetStub.calledWith('firstSetting');
+            });
+
+            it('should call signOutUser() on the authentication object', async () => {
+                const authSignOutUserStub = sinon.stub(auth, 'signOutUser');
+
+                await authManager.signOutUser(context, state);
+
+                assert(authSignOutUserStub.calledOnce);
+            });
+
+            it('should delete the token from the state', async () => {
+                sinon.stub(auth, 'signOutUser');
+                const deleteTokenFromStateStub = sinon.stub(BotAuth, 'deleteTokenFromState');
+
+                await authManager.signOutUser(context, state);
+
+                assert(deleteTokenFromStateStub.calledOnce);
+            });
         });
     });
 });
