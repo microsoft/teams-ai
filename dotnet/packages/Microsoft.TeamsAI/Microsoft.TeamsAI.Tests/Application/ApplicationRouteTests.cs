@@ -1864,5 +1864,76 @@ namespace Microsoft.TeamsAI.Tests.Application
             Assert.Equal("invokeResponse", activitiesToSend[0].Type);
             Assert.Equivalent(expectedInvokeResponse, activitiesToSend[0].Value);
         }
+
+        [Fact]
+        public async Task Test_OnTeamsReadReceipt()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.Event,
+                ChannelId = Channels.Msteams,
+                Name = "application/vnd.microsoft.readReceipt",
+                Value = JObject.FromObject(new
+                {
+                    lastReadMessageId = "10101010",
+                }),
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnTeamsReadReceipt((context, _, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Single(names);
+            Assert.Equal("application/vnd.microsoft.readReceipt", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnTeamsReadReceipt_IncorrectName()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.Event,
+                ChannelId = Channels.Msteams,
+                Name = "application/vnd.microsoft.meetingStart",
+                Value = JObject.FromObject(new
+                {
+                    lastReadMessageId = "10101010",
+                }),
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false
+            });
+            var names = new List<string>();
+            app.OnTeamsReadReceipt((context, _, _, _) =>
+            {
+                names.Add(context.Activity.Name);
+                return Task.CompletedTask;
+            });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Empty(names);
+        }
     }
 }
