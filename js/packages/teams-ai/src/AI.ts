@@ -6,27 +6,12 @@
  * Licensed under the MIT License.
  */
 
-import { CardFactory, Channels, MessageFactory, TurnContext } from 'botbuilder';
-import { ConversationHistory } from './ConversationHistory';
-import { DefaultModerator } from './DefaultModerator';
-import { DefaultTempState, DefaultTurnState } from './DefaultTurnStateManager';
-import { Moderator } from './Moderator';
-import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './Planner';
-import { PromptManager, PromptTemplate } from './Prompts';
-import { ResponseParser } from './ResponseParser';
+import { Channels, TurnContext } from 'botbuilder';
+import { DefaultModerator } from './moderators';
+import { Moderator } from './moderators/Moderator';
+import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
 import { TurnState } from './TurnState';
-
-/**
- * A function that can be used to select a prompt to use for the current turn.
- * @template TState Type of the turn state.
- * @param context The current turn context.
- * @param state The current turn state.
- * @returns A string or prompt template to use for the current turn.
- */
-export type PromptSelector<TState extends TurnState> = (
-    context: TurnContext,
-    state: TState
-) => Promise<string | PromptTemplate>;
+import { Schema } from 'jsonschema';
 
 /**
  * Entities argument passed to the action handler for AI.DoCommandActionName.
@@ -37,11 +22,11 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
      * The handler that should be called to execute the command.
      * @param context Current turn context.
      * @param state Current turn state.
-     * @param entities Entities predicted by the model.
-     * @param action Name of the command being executed.
+     * @param parameters Optional parameters for the action.
+     * @param action Name of the action being executed.
      * @returns Whether the AI system should continue executing the plan.
      */
-    handler: (context: TurnContext, state: TState, entities?: Record<string, any>, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, parameters?: Record<string, any>, action?: string) => Promise<string>;
 }
 
 /**
@@ -55,86 +40,38 @@ export interface AIOptions<TState extends TurnState> {
     planner: Planner<TState>;
 
     /**
-     * The prompt manager to use for generating prompts.
-     */
-    promptManager: PromptManager<TState>;
-
-    /**
      * Optional. The moderator to use for moderating input passed to the model and the output
      * returned by the model.
      */
     moderator?: Moderator<TState>;
 
     /**
-     * Optional. The prompt to use for the current turn.
-     * @summary
-     * This allows for the use of the AI system in a free standing mode. An exception will be
-     * thrown if the AI system is routed to by the Application object and a prompt has not been
-     * configured.
+     * Optional. Maximum number of actions to execute in a single turn.
+     * @remarks
+     * The default value is 25.
      */
-    prompt?: string | PromptTemplate | PromptSelector<TState>;
+    max_actions?: number;
 
     /**
-     * Optional. The history options to use for the AI system.
-     * @summary
-     * Defaults to tracking history with a maximum of 3 turns and 1000 tokens per turn.
+     * Optional. Maximum amount of time to spend executing a single turn in milliseconds.
+     * @remarks
+     * The default value is 300000 or 5 minutes.
      */
-    history?: Partial<AIHistoryOptions>;
-}
-
-/**
- * Options for configuring the AI systems history options.
- */
-export interface AIHistoryOptions {
-    /**
-     * Whether the AI system should track conversation history.
-     * @summary
-     * Defaults to true.
-     */
-    trackHistory: boolean;
+    max_time?: number;
 
     /**
-     * The maximum number of turns to remember.
-     * @summary
-     * Defaults to 3.
+     * Optional. If true, the AI system will allow the planner to loop.
+     * @remarks
+     * The default value is `true`.
+     *
+     * Looping is needed for augmentations like `functions` and `monologue` where the LLM needs to
+     * see the result of the last action that was performed. The AI system will attempt to autodetect
+     * if it needs to loop so you generally don't need to worry about this setting.
+     *
+     * If you're using an augmentation like `sequence` you can set this to `false` to guard against
+     * any accidental looping.
      */
-    maxTurns: number;
-
-    /**
-     * The maximum number of tokens worth of history to add to the prompt.
-     * @summary
-     * Defaults to 1000.
-     */
-    maxTokens: number;
-
-    /**
-     * The line separator to use when concatenating history.
-     * @summary
-     * Defaults to '\n'.
-     */
-    lineSeparator: string;
-
-    /**
-     * The prefix to use for user history.
-     * @summary
-     * Defaults to 'User:'.
-     */
-    userPrefix: string;
-
-    /**
-     * The prefix to use for assistant history.
-     * @summary
-     * Defaults to 'Assistant:'.
-     */
-    assistantPrefix: string;
-
-    /**
-     * Whether the conversation history should include the plan object returned by the model or
-     * just the text of any SAY commands.
-     * @summary
-     * Defaults to 'planObject'.
-     */
-    assistantHistoryType: 'text' | 'planObject';
+    allow_looping?: boolean;
 }
 
 /**
@@ -148,24 +85,31 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
     planner: Planner<TState>;
 
     /**
-     * The prompt manager being used for generating prompts.
-     */
-    promptManager: PromptManager<TState>;
-
-    /**
      * The moderator being used for moderating input passed to the model and the output
      */
     moderator: Moderator<TState>;
 
     /**
-     * Optional prompt to use by default.
+     * Maximum number of actions to execute in a single turn.
      */
-    prompt?: string | PromptTemplate | ((Context: TurnContext, state: TState) => Promise<string | PromptTemplate>);
+    max_steps: number;
 
     /**
-     * The history options being used by the AI system.
+     * Maximum amount of time to spend executing a single turn in milliseconds.
      */
-    history: AIHistoryOptions;
+    max_time: number;
+
+    /**
+     * If true, the AI system will allow the planner to loop.
+     */
+    allow_looping: boolean;
+}
+
+export interface TooManyStepsParameters {
+    max_steps: number;
+    max_time: number;
+    start_time: number;
+    step_count: number;
 }
 
 /**
@@ -175,9 +119,11 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
  * generating prompts. It can be used free standing or routed to by the Application object.
  * @template TState Optional. Type of the turn state.
  */
-export class AI<TState extends TurnState = DefaultTurnState> {
+export class AI<TState extends TurnState = TurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
+
+    public static readonly StopCommandName = 'STOP';
 
     /**
      * An action that will be called anytime an unknown action is predicted by the planner.
@@ -208,6 +154,11 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * status code >= `400`.
      */
     public static readonly HttpErrorActionName = '___HttpError___';
+
+    /**
+     * The task either executed too many steps or timed out.
+     */
+    public static readonly TooManyStepsActionName = '___TooManySteps___';
 
     /**
      * An action that will be called after the plan has been predicted by the planner and it has
@@ -253,108 +204,100 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * @param {ConfiguredAIOptions} options The options used to configure the AI system.
      */
     public constructor(options: AIOptions<TState>) {
-        this._options = Object.assign({}, options) as ConfiguredAIOptions<TState>;
+        this._options = Object.assign({
+            max_steps: 25,
+            max_time: 300000,
+            allow_looping: true
+        }, options) as ConfiguredAIOptions<TState>;
 
         // Create moderator if needed
         if (!this._options.moderator) {
             this._options.moderator = new DefaultModerator<TState>();
         }
 
-        // Initialize history options
-        this._options.history = Object.assign(
-            {
-                trackHistory: true,
-                maxTurns: 3,
-                maxTokens: 1000,
-                lineSeparator: '\n',
-                userPrefix: 'User:',
-                assistantPrefix: 'Assistant:',
-                assistantHistoryType: 'planObject'
-            } as AIHistoryOptions,
-            this._options.history
-        );
-
         // Register default UnknownAction handler
-        this.action(
+        this.defaultAction(
             AI.UnknownActionName,
             (context, state, data, action?) => {
                 console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
-                return Promise.resolve(true);
-            },
-            true
+                return Promise.resolve(AI.StopCommandName);
+            }
         );
 
         // Register default FlaggedInputAction handler
-        this.action(
+        this.defaultAction(
             AI.FlaggedInputActionName,
-            (context, state, data, action) => {
+            () => {
                 console.error(
                     `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
                 );
-                return Promise.resolve(true);
-            },
-            true
+                return Promise.resolve(AI.StopCommandName);
+            }
         );
 
         // Register default FlaggedOutputAction handler
-        this.action(
+        this.defaultAction(
             AI.FlaggedOutputActionName,
-            (context, state, data, action) => {
+            () => {
                 console.error(
                     `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
                 );
-                return Promise.resolve(true);
-            },
-            true
+                return Promise.resolve(AI.StopCommandName);
+            }
         );
 
         // Register default HttpErrorActionName
-        this.action(
+        this.defaultAction(
             AI.HttpErrorActionName,
             (context, state, data, action) => {
                 throw new Error(`An AI http request failed`);
-            },
-            true
+            }
         );
 
         // Register default PlanReadyActionName
-        this.action<Plan>(
+        this.defaultAction<Plan>(
             AI.PlanReadyActionName,
-            async (context, state, plan) => {
-                return Array.isArray(plan.commands) && plan.commands.length > 0;
-            },
-            true
+            (context, state, plan) => {
+                const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
+                return Promise.resolve(!isValid ? AI.StopCommandName : '');
+            }
         );
 
         // Register default DoCommandActionName
-        this.action<PredictedDoCommandAndHandler<TState>>(
+        this.defaultAction<PredictedDoCommandAndHandler<TState>>(
             AI.DoCommandActionName,
             async (context, state, data, action) => {
-                const { entities, handler } = data;
+                const { parameters: entities, handler } = data;
                 return await handler(context, state, entities, action);
-            },
-            true
+            }
         );
 
         // Register default SayCommandActionName
-        this.action<PredictedSayCommand>(
+        this.defaultAction<PredictedSayCommand>(
             AI.SayCommandActionName,
             async (context, state, data, action) => {
                 const response = data.response;
-                const card = ResponseParser.parseAdaptiveCard(response);
-                if (card) {
-                    const attachment = CardFactory.adaptiveCard(card);
-                    const activity = MessageFactory.attachment(attachment);
-                    await context.sendActivity(activity);
-                } else if (context.activity.channelId == Channels.Msteams) {
+                if (context.activity.channelId == Channels.Msteams) {
                     await context.sendActivity(response.split('\n').join('<br>'));
                 } else {
                     await context.sendActivity(response);
                 }
 
-                return true;
-            },
-            true
+                return '';
+            }
+        );
+
+        // Register default TooManyStepsActionName
+        this.defaultAction<TooManyStepsParameters>(
+            AI.TooManyStepsActionName,
+            async (context, state, data, action) => {
+                const { max_steps, step_count } = data;
+                if (step_count > max_steps) {
+                    throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
+                } else {
+                    throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
+                }
+            }
         );
     }
 
@@ -362,31 +305,17 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * Returns the moderator being used by the AI system.
      * @summary
      * The default moderator simply allows all messages and plans through without intercepting them.
-     * @returns {Moderator} The AI's moderator
+     * @returns The AI's moderator
      */
     public get moderator(): Moderator<TState> {
         return this._options.moderator;
     }
 
     /**
-     * @returns {ConfiguredAIOptions} Returns the configured options for the AI system.
-     */
-    public get options(): ConfiguredAIOptions<TState> {
-        return this._options;
-    }
-
-    /**
-     * @returns {Planner} Returns the planner being used by the AI system.
+     * @returns Returns the planner being used by the AI system.
      */
     public get planner(): Planner<TState> {
         return this._options.planner;
-    }
-
-    /**
-     * @returns {PromptManager} Returns the prompt manager being used by the AI system.
-     */
-    public get prompts(): PromptManager<TState> {
-        return this._options.promptManager;
     }
 
     /**
@@ -404,24 +333,28 @@ export class AI<TState extends TurnState = DefaultTurnState> {
      * flagged input, and flagged output. You can override these actions by registering your own
      * handler for them. The names of the built-in actions are available as static properties on
      * the AI class.
-     * @template TEntities (Optional) The type of entities that the action handler expects.
-     * @param {string | string[]} name Unique name of the action.
-     * @param {function(context, state, entities, action): Promise<boolean>} handler Function to call when the action is triggered.
-     * @param {boolean} allowOverrides Optional. If true, this handler is allowed to be overridden. Defaults to false.
-     * @returns {AI} The AI system instance for chaining purposes.
+     * @template TParameters Optional. The type of parameters that the action handler expects.
+     * @param name Unique name of the action.
+     * @param handler Function to call when the action is triggered.
+     * @param schema Optional. Schema for the actions parameters.
+     * @returns The AI system instance for chaining purposes.
      */
-    public action<TEntities extends Record<string, any> | undefined>(
+    public action<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, entities: TEntities, action?: string) => Promise<boolean>,
-        allowOverrides = false
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
+        schema?: Schema
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
-            if (!this._actions.has(n) || allowOverrides) {
-                this._actions.set(n, { handler, allowOverrides });
+            if (!this._actions.has(n)) {
+                this._actions.set(n, { handler, schema, allowOverrides: false });
             } else {
                 const entry = this._actions.get(n);
                 if (entry!.allowOverrides) {
                     entry!.handler = handler;
+                    entry!.allowOverrides = false;  // Only override once
+                    if (schema) {
+                        entry!.schema = schema;
+                    }
                 } else {
                     throw new Error(
                         `The AI.action() method was called with a previously registered action named "${n}".`
@@ -434,237 +367,188 @@ export class AI<TState extends TurnState = DefaultTurnState> {
     }
 
     /**
-     * Chains into another prompt and executes the plan that is returned.
+     * Registers the default handler for a named action.
      * @summary
-     * This method is used to chain into another prompt. It will call the prompt manager to
-     * get the plan for the prompt and then execute the plan. The return value indicates whether
-     * that plan was completely executed or not, and can be used to make decisions about whether the
-     * outer plan should continue executing.
-     * @param {TurnContext} context Current turn context.
-     * @param {TState} state Current turn state.
-     * @param {string | PromptTemplate} prompt Optional. Prompt name or prompt template to use. If omitted, the AI systems default prompt will be used.
-     * @param {Partial<AIOptions<TState>>} options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
-     * @returns {boolean} True if the plan was completely executed, otherwise false.
+     * Default handlers can be replaced by calling the action() method with the same name.
+     * @template TParameters Optional. The type of parameters that the action handler expects.
+     * @param name Unique name of the action.
+     * @param handler Function to call when the action is triggered.
+     * @param schema Optional. The schema for the actions parameters.
+     * @returns The AI system instance for chaining purposes.
      */
-    public async chain(
-        context: TurnContext,
-        state: TState,
-        prompt?: string | PromptTemplate,
-        options?: Partial<AIOptions<TState>>
-    ): Promise<boolean> {
-        // Configure options
-        const opts = this.configureOptions(options);
+    public defaultAction<TParameters extends (Record<string, any> | undefined)>(
+        name: string | string[],
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
+        schema?: Schema
+    ): this {
+        (Array.isArray(name) ? name : [name]).forEach((n) => {
+            this._actions.set(n, { handler, schema, allowOverrides: true });
+        });
 
-        // Select prompt
-        if (!prompt) {
-            if (opts.prompt == undefined) {
-                throw new Error(`AI.chain() was called without a prompt and no default prompt was configured.`);
-            } else if (typeof opts.prompt == 'function') {
-                prompt = await opts.prompt(context, state);
-            } else {
-                prompt = opts.prompt;
-            }
-        }
-
-        // Populate {{$temp.input}}
-        const temp = (state as any as DefaultTurnState)?.temp?.value ?? ({} as DefaultTempState);
-        if (typeof temp.input != 'string') {
-            // Use the received activity text
-            temp.input = context.activity.text;
-        }
-
-        // Populate {{$temp.history}}
-        if (typeof temp.history != 'string' && opts.history.trackHistory) {
-            temp.history = ConversationHistory.toString(state, opts.history.maxTokens, opts.history.lineSeparator);
-        }
-
-        // Render the prompt
-        const renderedPrompt = await opts.promptManager.renderPrompt(context, state, prompt);
-
-        // Generate plan
-        let plan = await opts.moderator.reviewPrompt(context, state, renderedPrompt, opts);
-        if (!plan) {
-            plan = await opts.planner.generatePlan(context, state, renderedPrompt, opts);
-            plan = await opts.moderator.reviewPlan(context, state, plan);
-        }
-
-        // Process generated plan
-        let continueChain = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, '');
-        if (continueChain) {
-            // Update conversation history
-            if (opts.history.trackHistory) {
-                ConversationHistory.addLine(
-                    state,
-                    `${opts.history.userPrefix.trim()} ${temp.input.trim()}`,
-                    opts.history.maxTurns * 2
-                );
-                switch (opts.history.assistantHistoryType) {
-                    case 'text': {
-                        // Extract only the things the assistant has said
-                        const text = plan.commands
-                            .filter((v) => v.type == 'SAY')
-                            .map((v) => (v as PredictedSayCommand).response)
-                            .join('\n');
-                        ConversationHistory.addLine(
-                            state,
-                            `${opts.history.assistantPrefix.trim()} ${text}`,
-                            opts.history.maxTurns * 2
-                        );
-                        break;
-                    }
-                    case 'planObject':
-                    default:
-                        // Embed the plan object to re-enforce the model
-                        // - TODO: add support for XML as well
-                        ConversationHistory.addLine(
-                            state,
-                            `${opts.history.assistantPrefix.trim()} ${JSON.stringify(plan)}`,
-                            opts.history.maxTurns * 2
-                        );
-                        break;
-                }
-            }
-
-            // Run predicted commands
-            for (let i = 0; i < plan.commands.length && continueChain; i++) {
-                // TODO
-                // eslint-disable-next-line security/detect-object-injection
-                const cmd = plan.commands[i];
-                switch (cmd.type) {
-                    case 'DO': {
-                        const { action } = cmd as PredictedDoCommand;
-                        if (this._actions.has(action)) {
-                            // Call action handler
-                            const handler = this._actions.get(action)!.handler;
-                            continueChain = await this._actions
-                                .get(AI.DoCommandActionName)!
-                                .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
-                        } else {
-                            // Redirect to UnknownAction handler
-                            continueChain = await this._actions
-                                .get(AI.UnknownActionName)!
-                                .handler(context, state, plan, action);
-                        }
-                        break;
-                    }
-                    case 'SAY':
-                        continueChain = await this._actions
-                            .get(AI.SayCommandActionName)!
-                            .handler(context, state, cmd, AI.SayCommandActionName);
-                        break;
-                    default:
-                        throw new Error(`Application.run(): unknown command of '${cmd.type}' predicted.`);
-                }
-            }
-        }
-
-        return continueChain;
-    }
-
-    /**
-     * A helper method to complete a prompt using the configured prompt manager.
-     * @param {TurnContext} context Current turn context.
-     * @param {TState} state Current turn state.
-     * @param {string | PromptTemplate} prompt Prompt name or prompt template to use.
-     * @param {Partial<AIOptions<TState>>} options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
-     * @returns {Promise<string | undefined>} The result of the prompt. If the prompt was not completed (typically due to rate limiting), the return value will be undefined.
-     */
-    public async completePrompt(
-        context: TurnContext,
-        state: TState,
-        prompt: string | PromptTemplate,
-        options?: Partial<AIOptions<TState>>
-    ): Promise<string | undefined> {
-        // Configure options
-        const opts = this.configureOptions(options);
-
-        // Render the prompt
-        const renderedPrompt = await opts.promptManager.renderPrompt(context, state, prompt);
-
-        // Complete the prompt
-        return await opts.planner.completePrompt(context, state, renderedPrompt, opts);
-    }
-
-    /**
-     * Creates a semantic function that can be registered with the apps prompt manager.
-     * @param {string} name The name of the semantic function.
-     * @param {PromptTemplate} template The prompt template to use.
-     * @param {Partial<AIOptions<TState>>} options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
-     * @summary
-     * Semantic functions are functions that make model calls and return their results as template
-     * parameters to other prompts. For example, you could define a semantic function called
-     * 'translator' that first translates the user's input to English before calling your main prompt:
-     *
-     * ```JavaScript
-     * app.ai.prompts.addFunction('translator', app.ai.createSemanticFunction('translator-prompt'));
-     * ```
-     *
-     * You would then create a prompt called "translator-prompt" that does the translation and then in
-     * your main prompt you can call it using the template expression `{{translator}}`.
-     * @returns {Promise<any>} A promise that resolves to the result of the semantic function.
-     */
-    public createSemanticFunction(
-        name: string,
-        template?: PromptTemplate,
-        options?: Partial<AIOptions<TState>>
-    ): (context: TurnContext, state: TState) => Promise<any> {
-        // Cache prompt template if being dynamically assigned
-        if (template) {
-            this._options.promptManager.addPromptTemplate(name, template);
-        }
-
-        return (context: TurnContext, state: TState) => this.completePrompt(context, state, name, options);
+        return this;
     }
 
     /**
      * Manually executes a named action.
-     * @template TEntities Optional. Type of entities expected to be passed to the action.
-     * @param {TurnContext} context Current turn context.
-     * @param {TState} state Current turn state.
-     * @param {string} action Name of the action to execute.
-     * @param {TEntities} entities Optional. Entities to pass to the action.
-     * @returns {Promise<boolean>} True if the action thinks other actions should be executed.
+     * @template TParameters Optional. Type of entities expected to be passed to the action.
+     * @param context Current turn context.
+     * @param state Current turn state.
+     * @param action Name of the action to execute.
+     * @param parameters Optional. Entities to pass to the action.
+     * @returns True if the action thinks other actions should be executed.
      */
-    public async doAction<TEntities = Record<string, any>>(
+    public async doAction<TParameters = Record<string, any>>(
         context: TurnContext,
         state: TState,
         action: string,
-        entities?: TEntities
-    ): Promise<boolean> {
+        parameters?: TParameters
+    ): Promise<string> {
         if (!this._actions.has(action)) {
             throw new Error(`Can't find an action named '${action}'.`);
         }
 
         const handler = this._actions.get(action)!.handler;
-        return await handler(context, state, entities, action);
+        return await handler(context, state, parameters, action);
     }
 
     /**
-     * Configures the AI options.
-     * @param {Partial<AIOptions<TState>>} options Optional. Override options for the AI. If omitted, the AI systems configured options will be used.
-     * @returns {ConfiguredAIOptions<TState>} The configured AI options.
-     * @private
+     * Gets the schema for a given action.
+     * @param action Name of the action to get the schema for.
+     * @returns The schema for the action or undefined if the action doesn't have a schema.
      */
-    private configureOptions(options?: Partial<AIOptions<TState>>): ConfiguredAIOptions<TState> {
-        /**
-         * The configured AI options.
-         * @type {ConfiguredAIOptions<TState>}
-         */
-        let configuredOptions: ConfiguredAIOptions<TState>;
-        if (options) {
-            configuredOptions = Object.assign({}, this._options, options) as ConfiguredAIOptions<TState>;
-            if (options.history) {
-                // Just inherit any missing history settings
-                options.history = Object.assign({}, this._options.history, options.history);
-            } else {
-                // Disable history tracking by default
-                options.history = Object.assign({}, this._options.history, { trackHistory: false });
-            }
-        } else {
-            configuredOptions = this._options;
+    public getActionSchema(action: string): Schema | undefined {
+        if (!this._actions.has(action)) {
+            throw new Error(`Can't find an action named '${action}'.`);
         }
 
-        return configuredOptions;
+        return this._actions.get(action)!.schema;
+    }
+
+    /**
+     * Checks to see if the AI system has a handler for a given action.
+     * @param action Name of the action to check.
+     * @returns True if the AI system has a handler for the given action.
+     */
+    public hasAction(action: string): boolean {
+        return this._actions.has(action);
+    }
+
+
+    /**
+     * Calls the configured planner to generate a plan and executes the plan that is returned.
+     * @summary
+     * The moderator is called to review the input and output of the plan. If the moderator flags
+     * the input or output then the appropriate action is called. If the moderator allows the input
+     * and output then the plan is executed.
+     * @param context Current turn context.
+     * @param state Current turn state.
+     * @param start_time Optional. Time the AI system started running
+     * @param step_count Optional. Number of steps that have been executed.
+     * @returns True if the plan was completely executed, otherwise false.
+     */
+    public async run(
+        context: TurnContext,
+        state: TState,
+        start_time?: number,
+        step_count?: number
+    ): Promise<boolean> {
+        // Populate {{$temp.input}}
+        if (typeof state.temp.input != 'string') {
+            // Use the received activity text
+            state.temp.input = context.activity.text;
+        }
+
+        // Initialize start time and action count
+        const { max_steps, max_time } = this._options;
+        if (start_time === undefined) {
+            start_time = Date.now();
+        }
+        if (step_count === undefined) {
+            step_count = 0;
+        }
+
+        // Review input on first loop
+        let plan: Plan|undefined = step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
+
+        // Generate plan
+        if (!plan) {
+            if (step_count == 0) {
+                plan = await this._options.planner.beginTask(context, state, this);
+            } else {
+                plan = await this._options.planner.continueTask(context, state, this);
+            }
+
+            // Review the plans output
+            plan = await this._options.moderator.reviewOutput(context, state, plan);
+        }
+
+        // Process generated plan
+        let completed = false;
+        let response = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, AI.PlanReadyActionName);
+        if (response == AI.StopCommandName) {
+            return false;
+        }
+
+        // Run predicted commands
+        // - If the plan ends on a SAY command then the plan is considered complete, otherwise we'll loop
+        completed = true;
+        let should_loop = false;
+        for (let i = 0; i < plan.commands.length; i++) {
+            // Check for timeout
+            if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
+                completed = false;
+                const parameters: TooManyStepsParameters = { max_steps, max_time, start_time: start_time!, step_count: step_count! };
+                await this._actions.get(AI.TooManyStepsActionName)!.handler(context, state, parameters, AI.TooManyStepsActionName);
+                break;
+            }
+
+            // eslint-disable-next-line security/detect-object-injection
+            let output: string;
+            const cmd = plan.commands[i];
+            switch (cmd.type) {
+                case 'DO': {
+                    const { action } = cmd as PredictedDoCommand;
+                    if (this._actions.has(action)) {
+                        // Call action handler
+                        const handler = this._actions.get(action)!.handler;
+                        output = await this._actions
+                            .get(AI.DoCommandActionName)!
+                            .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
+                        should_loop = output.length > 0;
+                        } else {
+                        // Redirect to UnknownAction handler
+                        output = await this._actions
+                            .get(AI.UnknownActionName)!
+                            .handler(context, state, plan, action);
+                    }
+                    break;
+                }
+                case 'SAY':
+                    should_loop = false;
+                    output = await this._actions
+                        .get(AI.SayCommandActionName)!
+                        .handler(context, state, cmd, AI.SayCommandActionName);
+                    break;
+                default:
+                    throw new Error(`AI.run(): unknown command of '${cmd.type}' predicted.`);
+            }
+
+            // Check for stop command
+            if (output == AI.StopCommandName) {
+                completed = false;
+                break;
+            }
+
+            // Copy the actions output to the input
+            state.temp.input = output;
+        }
+
+        // Check for looping
+        if (completed && should_loop && this._options.allow_looping) {
+            return await this.run(context, state, start_time, step_count);
+        } else {
+            return completed;
+        }
     }
 }
 
@@ -672,6 +556,7 @@ export class AI<TState extends TurnState = DefaultTurnState> {
  * @private
  */
 interface ActionEntry<TState> {
-    handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<string>;
+    schema?: Schema;
     allowOverrides: boolean;
 }

@@ -1,11 +1,11 @@
 import { TurnContext } from 'botbuilder';
-import { Application } from '@microsoft/teams-ai';
+import { ActionPlanner, Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities } from '../bot';
 
 /**
  * @param {Application<ApplicationTurnState>} app - The application instance.
  */
-export function storyAction(app: Application<ApplicationTurnState>): void {
+export function storyAction(app: Application<ApplicationTurnState>, planner: ActionPlanner<ApplicationTurnState>): void {
     app.ai.action('story', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
@@ -14,7 +14,7 @@ export function storyAction(app: Application<ApplicationTurnState>): void {
                 return await updateStory(context, state, data);
             default:
                 await context.sendActivity(`[story.${action}]`);
-                return true;
+                return '';
         }
     });
 }
@@ -26,12 +26,12 @@ export function storyAction(app: Application<ApplicationTurnState>): void {
  * @param {IDataEntities} data - The data object for the turn.
  * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the update was successful.
  */
-async function updateStory(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function updateStory(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<string> {
     const description = (data.description ?? '').trim();
     if (description.length > 0) {
         // Write story change to conversation state
-        state.conversation.value.story = description;
+        state.conversation.story = description;
     }
 
-    return true;
+    return '';
 }

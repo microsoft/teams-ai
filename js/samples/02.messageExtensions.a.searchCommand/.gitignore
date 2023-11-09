@@ -1,4 +1,5 @@
-*.zip
+.zip
+
 # Logs
 logs
 *.log
@@ -112,6 +113,3 @@ env/.env.*.user
 env/.env.local
 appPackage/build
 .deployment
-
-.env.*
-.env
