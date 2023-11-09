@@ -1,6 +1,12 @@
 import { strict as assert } from 'assert';
-import { ActivityTypes, Channels, MemoryStorage, TestAdapter } from 'botbuilder';
-import { Application, ApplicationBuilder, ConversationUpdateEvents } from './Application';
+import { Activity, ActivityTypes, Channels, MemoryStorage, MessageReactionTypes, TestAdapter } from 'botbuilder';
+import {
+    Application,
+    ApplicationBuilder,
+    ConversationUpdateEvents,
+    MessageReactionEvents,
+    TeamsMessageEvents
+} from './Application';
 import { TestPlanner } from './TestPlanner';
 import { TestPromptManager } from './TestPromptManager';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
@@ -313,5 +319,112 @@ describe('Application', () => {
                 )
             );
         });
+    });
+
+    describe('messageReactions', () => {
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+        const messageReactions: { event: MessageReactionEvents; testActivity: Partial<Activity> }[] = [
+            {
+                event: 'reactionsAdded',
+                testActivity: {
+                    type: ActivityTypes.MessageReaction,
+                    reactionsAdded: [{ type: MessageReactionTypes.Like }]
+                }
+            },
+            {
+                event: 'reactionsRemoved',
+                testActivity: {
+                    type: ActivityTypes.MessageReaction,
+                    reactionsRemoved: [{ type: MessageReactionTypes.Like }]
+                }
+            }
+        ];
+
+        for (const { event, testActivity } of messageReactions) {
+            it(`should route to correct handler for ${event}`, async () => {
+                let handlerCalled = false;
+                mockApp.messageReactions(event, async (context, _state) => {
+                    handlerCalled = true;
+                    assert.equal(context.activity.type, ActivityTypes.MessageReaction);
+                    switch (event) {
+                        case 'reactionsAdded':
+                            assert.deepEqual(context.activity?.reactionsAdded, testActivity.reactionsAdded);
+                            break;
+                        case 'reactionsRemoved':
+                            assert.deepEqual(context.activity?.reactionsRemoved, testActivity.reactionsRemoved);
+                            break;
+                        default:
+                            throw new Error(`Test setup error. Unknown event: ${event}`);
+                    }
+                });
+
+                await adapter.processActivity(testActivity, async (context) => {
+                    await mockApp.run(context);
+                    assert.equal(handlerCalled, true);
+                });
+            });
+        }
+    });
+
+    describe('messageUpdate', () => {
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+        const messageUpdateEvents: { event: TeamsMessageEvents; testActivity: Partial<Activity> }[] = [
+            {
+                event: 'editMessage',
+                testActivity: {
+                    type: ActivityTypes.MessageUpdate,
+                    channelData: { eventType: 'editMessage' }
+                }
+            },
+            {
+                event: 'softDeleteMessage',
+                testActivity: {
+                    type: ActivityTypes.MessageDelete,
+                    channelData: { eventType: 'softDeleteMessage' }
+                }
+            },
+            {
+                event: 'undeleteMessage',
+                testActivity: {
+                    type: ActivityTypes.MessageUpdate,
+                    channelData: { eventType: 'undeleteMessage' }
+                }
+            }
+        ];
+
+        for (const { event, testActivity } of messageUpdateEvents) {
+            it(`should route to correct handler for ${event}`, async () => {
+                let handlerCalled = false;
+                mockApp.messageEventUpdate(event, async (context, _state) => {
+                    handlerCalled = true;
+                    switch (event) {
+                        case 'editMessage':
+                        case 'undeleteMessage':
+                            assert.equal(context.activity.type, ActivityTypes.MessageUpdate);
+                            assert.deepEqual(context.activity?.channelData, testActivity.channelData);
+                            break;
+                        case 'softDeleteMessage':
+                            assert.equal(context.activity.type, ActivityTypes.MessageDelete);
+                            assert.deepEqual(context.activity?.channelData, testActivity.channelData);
+                            break;
+                        default:
+                            throw new Error(`Test setup error. Unknown event: ${event}`);
+                    }
+                });
+
+                await adapter.processActivity(testActivity, async (context) => {
+                    await mockApp.run(context);
+                    assert.equal(handlerCalled, true);
+                });
+            });
+        }
     });
 });

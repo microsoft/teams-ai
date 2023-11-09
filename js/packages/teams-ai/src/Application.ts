@@ -447,13 +447,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * @returns {this} The application instance for chaining purposes.
      */
     public messageReactions(
-        event: MessageReactionEvents | MessageReactionEvents[],
+        event: MessageReactionEvents,
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
-        (Array.isArray(event) ? event : [event]).forEach((e) => {
-            const selector = createMessageReactionSelector(e);
-            this.addRoute(selector, handler);
-        });
+        const selector = createMessageReactionSelector(event);
+        this.addRoute(selector, handler);
         return this;
     }
 
@@ -991,8 +989,6 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
     }
 }
 
-// function createMessageUpdateActivitySelector()
-//
 /**
  * Creates a route selector function that matches a message based on a keyword.
  * @param {string | RegExp | RouteSelector} keyword The keyword to match against the message text. Can be a string, regular expression, or a custom selector function.
