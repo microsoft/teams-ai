@@ -1,6 +1,6 @@
-﻿using Azure.AI.OpenAI;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.AI.Models;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {

@@ -1,4 +1,4 @@
-﻿using Azure.AI.OpenAI;
+﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using System.Text.Json;
