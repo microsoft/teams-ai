@@ -1,5 +1,10 @@
 import { ActivityTypes, InvokeResponse, TokenResponse, TurnContext } from 'botbuilder';
-import { FETCH_TASK_INVOKE_NAME, QUERY_INVOKE_NAME, QUERY_LINK_INVOKE_NAME } from '../MessageExtensions';
+import {
+    ANONYMOUS_QUERY_LINK_INVOKE_NAME,
+    FETCH_TASK_INVOKE_NAME,
+    QUERY_INVOKE_NAME,
+    QUERY_LINK_INVOKE_NAME
+} from '../MessageExtensions';
 import * as UserTokenAccess from './UserTokenAccess';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 
@@ -77,7 +82,8 @@ export class MessagingExtensionAuthentication {
             context.activity.type == ActivityTypes.Invoke &&
             (context.activity.name == QUERY_INVOKE_NAME ||
                 context.activity.name == FETCH_TASK_INVOKE_NAME ||
-                context.activity.name == QUERY_LINK_INVOKE_NAME)
+                context.activity.name == QUERY_LINK_INVOKE_NAME ||
+                context.activity.name == ANONYMOUS_QUERY_LINK_INVOKE_NAME)
         );
     }
 
