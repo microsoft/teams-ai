@@ -538,7 +538,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                         return false;
                     }
 
-                    // Activities for which auth cannot be initiated should be ignored
+                    // Invalid activities should be ignored for auth
                     if (response.status == 'error' && response.cause != 'invalidActivity') {
                         throw response.error;
                     }
