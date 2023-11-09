@@ -1,5 +1,6 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
@@ -23,8 +24,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
+            PromptManager manager = new();
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 10);
 
             Assert.Equal("Hello World\nhow can I help you?", rendered.Output);
             Assert.Equal(9, rendered.Length);
@@ -45,8 +46,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 4);
+            PromptManager manager = new();
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 4);
 
             Assert.Equal("Hello World\nhow", rendered.Output);
             Assert.Equal(4, rendered.Length);

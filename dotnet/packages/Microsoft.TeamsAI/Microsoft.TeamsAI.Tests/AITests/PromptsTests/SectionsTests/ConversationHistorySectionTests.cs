@@ -1,5 +1,6 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
@@ -15,7 +16,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
+            PromptManager manager = new();
 
             memory.SetValue("history", new List<ChatMessage>()
             {
@@ -24,7 +25,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
                 new(ChatRole.Assistant, "hi, how may I assist you?")
             });
 
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 50);
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 50);
             Assert.Equal("assistant: hi, how may I assist you?\nuser: hi\nyou are a unit test bot", rendered.Output);
             Assert.Equal(21, rendered.Length);
         }
@@ -36,9 +37,9 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
+            PromptManager manager = new();
 
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 50);
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 50);
             Assert.Equal("", rendered.Output);
             Assert.Equal(0, rendered.Length);
         }

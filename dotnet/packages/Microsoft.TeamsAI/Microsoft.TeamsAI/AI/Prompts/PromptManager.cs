@@ -36,6 +36,14 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Creates an instance of `PromptManager`.
         /// </summary>
+        public PromptManager()
+        {
+            this.Options = new();
+        }
+
+        /// <summary>
+        /// Creates an instance of `PromptManager`.
+        /// </summary>
         /// <param name="options">PromptManagerOptions</param>
         public PromptManager(PromptManagerOptions options)
         {

@@ -23,38 +23,6 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         }
     }
 
-    internal sealed class TestFunctions : IPromptFunctions<List<string>>
-    {
-        private Dictionary<string, PromptFunction<List<string>>> _functions = new();
-
-        public bool HasFunction(string name)
-        {
-            return this._functions.ContainsKey(name);
-        }
-
-        public PromptFunction<List<string>>? GetFunction(string name)
-        {
-            return this._functions[name];
-        }
-
-        public void AddFunction(string name, PromptFunction<List<string>> func)
-        {
-            this._functions[name] = func;
-        }
-
-        public async Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, Memory.Memory memory, ITokenizer tokenizer, List<string> args)
-        {
-            PromptFunction<List<string>>? func = this.GetFunction(name);
-
-            if (func != null)
-            {
-                return await func(context, memory, this, tokenizer, args);
-            }
-
-            return null;
-        }
-    }
-
     public class PromptSectionTests
     {
         [Fact]
@@ -64,8 +32,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
+            PromptManager manager = new();
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 10);
 
             Assert.Equal("Hello World!", rendered.Output);
             Assert.Equal(3, rendered.Length);
@@ -78,8 +46,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 2);
+            PromptManager manager = new();
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 2);
 
             Assert.Equal("Hello World", rendered.Output);
             Assert.Equal(2, rendered.Length);
