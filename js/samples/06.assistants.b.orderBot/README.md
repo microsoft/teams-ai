@@ -1,12 +1,12 @@
-# Chat Bot with Moderation Control
+# Food Ordering Assistant
 
-This sample shows how to incorporate Azure Open AI Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+This example shows how to create a conversational assistant that uses tools to call actions in your bots code. It's a food ordering assistant for a fictional restaurant called The Pub and is capable of complex interactions with the user as it takes their order.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
--   [Chat Moderation Bot](#chat-bot-with-moderation-control)
+-   [Food Ordering Assistant](#food-ordering-assistant)
     -   [Setting up the sample](#setting-up-the-sample)
     -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Multiple ways to test](#multiple-ways-to-test)
@@ -39,7 +39,7 @@ This sample shows how to incorporate Azure Open AI Content Safety control into a
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/05.chatModeration/
+    cd teams-ai/js/samples/06.assistants.b.orderBot/
     yarn start
     ```
 

@@ -109,6 +109,6 @@ It shows a broad range of Teams AI SDK capabilities like:
 
 This example shows how to create a basic conversational experience using OpenAI's Assistants API's. It leverages OpenAI's Code Interpreter tool to create an assistant that's an expert on math.
 
-### Assistant with Actions: [Math Tutor Assistant](06.ai.a.assistants.orderBot/)
+### Assistant with Actions: [Food Ordering Assistant](06.ai.a.assistants.orderBot/)
 
 This example shows how to create a conversational assistant that uses tools to call actions in your bots code. It's a food ordering assistant for a fictional restaurant called The Pub and is capable of complex interactions with the user as it takes their order.

@@ -1,12 +1,12 @@
-# Chat Bot with Moderation Control
+# Math Tutor Assistant
 
-This sample shows how to incorporate Azure Open AI Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+This example shows how to create a basic conversational experience using OpenAI's Assistants API's. It leverages OpenAI's Code Interpreter tool to create an assistant that's an expert on math.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
--   [Chat Moderation Bot](#chat-bot-with-moderation-control)
+-   [Math Tutor Assistant](#math-tutor-assistant)
     -   [Setting up the sample](#setting-up-the-sample)
     -   [Interacting with the bot](#interacting-with-the-bot)
     -   [Multiple ways to test](#multiple-ways-to-test)
@@ -39,7 +39,7 @@ This sample shows how to incorporate Azure Open AI Content Safety control into a
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/05.chatModeration/
+    cd teams-ai/js/samples/06.assistants.a.mathBot/
     yarn start
     ```
 
