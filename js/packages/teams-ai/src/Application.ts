@@ -533,7 +533,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
                     if (response.status == 'pending') {
                         // Save turn state
-                        // - This lets the bot keep track of authentication state
+                        // - Save authentication status in turn state 
                         await turnStateManager!.saveState(storage, context, state);
                         return false;
                     }
