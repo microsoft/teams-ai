@@ -11,16 +11,15 @@ import { TestPlanner } from './TestPlanner';
 import { TestPromptManager } from './TestPromptManager';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { TaskModulesOptions } from './TaskModules';
-import { createTestConversationUpdate } from './TestUtilities';
+import { TurnState } from './TurnState';
+import { createTestConversationUpdate } from './internals';
 
 describe('Application', () => {
     const adapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
-    const ai: AIOptions<DefaultTurnState> = {
-        planner: new TestPlanner(),
-        promptManager: new TestPromptManager()
+    const ai: AIOptions<TurnState> = {
+        planner: new TestPlanner()
     };
     const botAppId = 'testBot';
     const longRunningMessages = true;
@@ -28,7 +27,6 @@ describe('Application', () => {
     const startTypingTimer = false;
     const storage = new MemoryStorage();
     const taskModules: TaskModulesOptions = { taskDataFilter: 'taskFilter' };
-    const turnStateManager = new DefaultTurnStateManager();
 
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
@@ -43,7 +41,7 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, true);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.taskModules, undefined);
-            assert.notEqual(app.options.turnStateManager, undefined);
+            assert.notEqual(app.options.turnStateFactory, undefined);
         });
 
         it('should create an Application with custom options', () => {
@@ -56,8 +54,7 @@ describe('Application', () => {
                 removeRecipientMention,
                 startTypingTimer,
                 storage,
-                taskModules,
-                turnStateManager
+                taskModules
             });
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, adapter);
@@ -69,7 +66,6 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, startTypingTimer);
             assert.equal(app.options.storage, storage);
             assert.deepEqual(app.options.taskModules, taskModules);
-            assert.equal(app.options.turnStateManager, turnStateManager);
         });
     });
 
@@ -81,7 +77,6 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.ai, undefined);
-            assert.notEqual(app.options.turnStateManager, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.taskModules, undefined);
             assert.equal(app.options.removeRecipientMention, true);
@@ -95,7 +90,6 @@ describe('Application', () => {
                 .withStorage(storage)
                 .withAIOptions(ai)
                 .withLongRunningMessages(adapter, botAppId)
-                .withTurnStateManager(turnStateManager)
                 .withAdaptiveCardOptions(adaptiveCards)
                 .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
@@ -105,7 +99,6 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, botAppId);
             assert.equal(app.options.storage, storage);
             assert.equal(app.options.ai, ai);
-            assert.equal(app.options.turnStateManager, turnStateManager);
             assert.equal(app.options.adaptiveCards, adaptiveCards);
             assert.equal(app.options.taskModules, taskModules);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);

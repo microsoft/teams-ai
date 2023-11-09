@@ -1,5 +1,5 @@
 import { TurnContext } from 'botbuilder';
-import { Application } from '@microsoft/teams-ai';
+import { ActionPlanner, Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities } from '../bot';
 import { findMapLocation } from '../ShadowFalls';
 
@@ -7,7 +7,7 @@ import { findMapLocation } from '../ShadowFalls';
  * Registers the 'location' action with the given application object.
  * @param {Application<ApplicationTurnState>} app The application object to register the action with.
  */
-export function locationAction(app: Application<ApplicationTurnState>): void {
+export function locationAction(app: Application<ApplicationTurnState>, planner: ActionPlanner<ApplicationTurnState>): void {
     app.ai.action('location', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
@@ -16,7 +16,7 @@ export function locationAction(app: Application<ApplicationTurnState>): void {
                 return await updateLocation(context, state, data);
             default:
                 await context.sendActivity(`[location.${action}]`);
-                return true;
+                return '';
         }
     });
 }
@@ -32,8 +32,8 @@ async function updateLocation(
     context: TurnContext,
     state: ApplicationTurnState,
     data: IDataEntities
-): Promise<boolean> {
-    const conversation = state.conversation.value;
+): Promise<string> {
+    const conversation = state.conversation;
     const currentLocation = conversation.location;
 
     // Create new location object
@@ -55,8 +55,8 @@ async function updateLocation(
         );
     }
 
-    state.temp.value.playerAnswered = true;
-    return true;
+    state.temp.playerAnswered = true;
+    return '';
 }
 
 /**
