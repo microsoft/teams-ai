@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <summary>
         /// Sections To Be Rendered
         /// </summary>
-        public readonly List<PromptSection> Sections;
+        public List<PromptSection> Sections;
 
         private List<PromptSection> _fixedSections
         {

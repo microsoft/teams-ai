@@ -19,5 +19,14 @@ namespace Microsoft.Teams.AI.AI.Prompts
         public Prompt(List<PromptSection> sections, int tokens = -1, bool required = true, string separator = "\n\n") : base(sections, tokens, required, separator)
         {
         }
+
+        /// <summary>
+        /// Add Section
+        /// </summary>
+        /// <param name="section">section to add</param>
+        public void AddSection(PromptSection section)
+        {
+            this.Sections.Add(section);
+        }
     }
 }

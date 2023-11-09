@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
@@ -85,6 +87,23 @@ namespace Microsoft.Teams.AI.AI.Prompts
             [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             [Obsolete("Use `completion.model` instead.")]
             public List<string> DefaultBackends { get; set; } = new();
+
+            /// <summary>
+            /// Creates a prompt template configuration from JSON.
+            /// </summary>
+            /// <param name="json">JSON of the prompt template configuration.</param>
+            /// <returns>Prompt template configuration.</returns>
+            internal static PromptTemplateConfiguration FromJson(string json)
+            {
+                PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
+
+                if (result == null)
+                {
+                    throw new SerializationException("Failed to deserialize prompt configuration JSON string");
+                }
+
+                return result;
+            }
 
             /// <summary>
             /// completion configuration portion of a prompt template.
