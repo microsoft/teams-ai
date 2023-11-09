@@ -1,6 +1,6 @@
-﻿using Azure.AI.OpenAI;
+﻿using Microsoft.Teams.AI.AI.Models;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// A user message section.

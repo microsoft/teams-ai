@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Teams.AI.AI.Prompts
+﻿using Microsoft.Teams.AI.AI.Prompts.Sections;
+
+namespace Microsoft.Teams.AI.AI.Prompts
 {
     /// <summary>
     /// Top level prompt section.
@@ -16,6 +18,15 @@
         /// <param name="separator">Separator to use between sections when rendering as text. Defaults to `\n\n`</param>
         public Prompt(List<PromptSection> sections, int tokens = -1, bool required = true, string separator = "\n\n") : base(sections, tokens, required, separator)
         {
+        }
+
+        /// <summary>
+        /// Add Section
+        /// </summary>
+        /// <param name="section">section to add</param>
+        public void AddSection(PromptSection section)
+        {
+            this.Sections.Add(section);
         }
     }
 }

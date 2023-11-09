@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.AI.Prompts;
+using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 
 namespace Microsoft.Teams.AI.AI.DataSources

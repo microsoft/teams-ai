@@ -1,9 +1,9 @@
-﻿using Azure.AI.OpenAI;
+﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Tokenizers;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// A datasource section that will be rendered as a message
@@ -25,12 +25,12 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <inheritdoc />
         public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
-            int budget = this.tokens > 1 ? Math.Min(this.tokens, maxTokens) : maxTokens;
+            int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
             RenderedPromptSection<string> rendered = await this._source.RenderDataAsync(context, memory, tokenizer, budget);
             List<ChatMessage> messages = new()
-            {new(ChatRole.System, rendered.output)};
+            {new(ChatRole.System, rendered.Output)};
 
-            return new(messages, rendered.length, rendered.tooLong);
+            return new(messages, rendered.Length, rendered.TooLong);
         }
     }
 }
