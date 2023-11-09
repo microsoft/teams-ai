@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { Application } from './Application';
-import { createTestInvoke } from './TestUtilities';
+import { createTestInvoke } from './internals';
 import {
     ActivityTypes,
     Channels,

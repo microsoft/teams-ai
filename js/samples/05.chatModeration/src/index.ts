@@ -16,15 +16,10 @@ import {
     TurnContext
 } from 'botbuilder';
 
-// Load environment variables from .env file.
+// Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-if (!process.env.AZURE_OPENAI_API_KEY) {
-    throw new Error('Missing AZURE_OPENAI_API_KEY environment variable');
-}
-
-// Import required bot configuration.
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
     {},
     new ConfigurationServiceClientCredentialFactory({
@@ -39,11 +34,12 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: Error): Promise<any> => {
+const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(

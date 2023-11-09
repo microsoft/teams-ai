@@ -124,3 +124,6 @@ package-lock.json
 env/.env.*.user
 env/.env.local
 env/.env.staging
+
+// Ignore codepilot
+.codepilot/

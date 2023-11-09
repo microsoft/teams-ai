@@ -1,5 +1,5 @@
 import { TurnContext } from 'botbuilder';
-import { Application, ResponseParser } from '@microsoft/teams-ai';
+import { ActionPlanner, Application, AI } from '@microsoft/teams-ai';
 import {
     ApplicationTurnState,
     DEFAULT_BACKSTORY,
@@ -13,7 +13,7 @@ import * as responses from '../responses';
 /**
  * @param {Application<ApplicationTurnState>} app - The application.
  */
-export function playerAction(app: Application<ApplicationTurnState>): void {
+export function playerAction(app: Application<ApplicationTurnState>, planner: ActionPlanner<ApplicationTurnState>): void {
     app.ai.action('player', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
@@ -21,7 +21,7 @@ export function playerAction(app: Application<ApplicationTurnState>): void {
                 return await updatePlayer(app, context, state, data);
             default:
                 await context.sendActivity(`[player.${action}]`);
-                return true;
+                return '';
         }
     });
 }
@@ -39,13 +39,13 @@ async function updatePlayer(
     context: TurnContext,
     state: ApplicationTurnState,
     data: IDataEntities
-): Promise<boolean> {
+): Promise<string> {
     // Check for name change
-    const player = Object.assign({}, state.user.value);
+    const player = Object.assign({}, state.user);
     const newName = (data.name ?? '').trim();
     if (newName) {
         // Update players for current session
-        const conversation = state.conversation.value;
+        const conversation = state.conversation;
         if (Array.isArray(conversation.players)) {
             const pos = conversation.players.indexOf(player.name);
             if (pos >= 0) {
@@ -72,28 +72,28 @@ async function updatePlayer(
 
     // Update backstory and equipped
     if (backstoryChange.length > 0 || equippedChange.length > 0) {
-        state.temp.value.backstoryChange = backstoryChange ?? 'no change';
-        state.temp.value.equippedChange = equippedChange ?? 'no change';
-        const update = (await app.ai.completePrompt(context, state, 'updatePlayer')) as string;
-        const obj: UserState = ResponseParser.parseJSON(update) || ({} as UserState);
-        if (obj) {
-            if (obj.backstory?.length > 0) {
-                player.backstory = obj.backstory;
-            }
+        state.temp.backstoryChange = backstoryChange ?? 'no change';
+        state.temp.equippedChange = equippedChange ?? 'no change';
+        // const update = (await app.ai.completePrompt(context, state, 'updatePlayer')) as string;
+        // const obj: UserState = ResponseParser.parseJSON(update) || ({} as UserState);
+        // if (obj) {
+        //     if (obj.backstory?.length > 0) {
+        //         player.backstory = obj.backstory;
+        //     }
 
-            if (obj.equipped?.length > 0) {
-                player.equipped = obj.equipped;
-            }
-        } else {
-            await updateDMResponse(context, state, responses.dataError());
-            return false;
-        }
+        //     if (obj.equipped?.length > 0) {
+        //         player.equipped = obj.equipped;
+        //     }
+        // } else {
+        //     await updateDMResponse(context, state, responses.dataError());
+        //     return AI.StopCommandName;
+        // }
     }
 
     // Save player changes
-    state.user.value.name = player.name;
-    state.user.value.backstory = player.backstory;
-    state.user.value.equipped = player.equipped;
+    state.user.name = player.name;
+    state.user.backstory = player.backstory;
+    state.user.equipped = player.equipped;
 
     // Build message
     let message = `🤴 <strong>${player.name}</strong>`;
@@ -105,7 +105,7 @@ async function updatePlayer(
     }
 
     await context.sendActivity(message);
-    state.temp.value.playerAnswered = true;
+    state.temp.playerAnswered = true;
 
-    return true;
+    return '';
 }

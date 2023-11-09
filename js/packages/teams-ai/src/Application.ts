@@ -18,10 +18,9 @@ import {
 } from 'botbuilder';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
-import { TurnState, TurnStateManager } from './TurnState';
+import { TurnState } from './TurnState';
 
 /**
  * @private
@@ -81,12 +80,6 @@ export interface ApplicationOptions<TState extends TurnState> {
     ai?: AIOptions<TState>;
 
     /**
-     * Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
-     * be created.
-     */
-    turnStateManager: TurnStateManager<TState>;
-
-    /**
      * Optional. Options used to customize the processing of Adaptive Card requests.
      */
     adaptiveCards?: AdaptiveCardsOptions;
@@ -118,6 +111,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
      */
     longRunningMessages: boolean;
+
+    /**
+     * Optional. Factory used to create a custom turn state instance.
+     */
+    turnStateFactory: () => TState;
 }
 
 /**
@@ -184,7 +182,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
  * bots that leverage Large Language Models (LLM) and other AI capabilities.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
-export class Application<TState extends TurnState = DefaultTurnState> {
+export class Application<TState extends TurnState = TurnState> {
     private readonly _options: ApplicationOptions<TState>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
@@ -210,9 +208,9 @@ export class Application<TState extends TurnState = DefaultTurnState> {
             options
         ) as ApplicationOptions<TState>;
 
-        // Create default turn state manager if needed
-        if (!this._options.turnStateManager) {
-            this._options.turnStateManager = new DefaultTurnStateManager() as any;
+        // Create turn state factory
+        if (!this._options.turnStateFactory) {
+            this._options.turnStateFactory = () => new TurnState() as TState;
         }
 
         // Create AI component if configured with a planner
@@ -468,15 +466,16 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 }
 
                 // Load turn state
-                const { storage, turnStateManager } = this._options;
-                const state = await turnStateManager!.loadState(storage, context);
+                const { storage, turnStateFactory } = this._options;
+                const state = turnStateFactory();
+                await state.load(context, storage);
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
                     // Save turn state
                     // - This lets the bot keep track of why it ended the previous turn. It also
                     //   allows the dialog system to be used before the AI system is called.
-                    await turnStateManager!.saveState(storage, context, state);
+                    await state.save(context, storage);
                     return false;
                 }
 
@@ -494,7 +493,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                             // Call afterTurn event handlers
                             if (await this.callEventHandlers(context, state, this._afterTurn)) {
                                 // Save turn state
-                                await turnStateManager!.saveState(storage, context, state);
+                                await state.save(context, storage);
                             }
 
                             // End dispatch
@@ -515,7 +514,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                         // Call afterTurn event handlers
                         if (await this.callEventHandlers(context, state, this._afterTurn)) {
                             // Save turn state
-                            await turnStateManager!.saveState(storage, context, state);
+                            await state.save(context, storage);
                         }
 
                         // End dispatch
@@ -525,17 +524,22 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
                 // Call AI module if configured
                 if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
-                    // Begin a new chain of AI calls
-                    await this._ai.chain(context, state);
+                    await this._ai.run(context, state);
 
                     // Call afterTurn event handlers
                     if (await this.callEventHandlers(context, state, this._afterTurn)) {
                         // Save turn state
-                        await turnStateManager!.saveState(storage, context, state);
+                        await state.save(context, storage);
                     }
 
                     // End dispatch
                     return true;
+                }
+
+                // Call afterTurn event handlers
+                if (await this.callEventHandlers(context, state, this._afterTurn)) {
+                    // Save turn state
+                    await state.save(context, storage);
                 }
 
                 // activity wasn't handled
@@ -760,7 +764,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
  * A builder class for simplifying the creation of an Application instance.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
-export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
+export class ApplicationBuilder<TState extends TurnState = TurnState> {
     private _options: Partial<ApplicationOptions<TState>> = {};
 
     /**
@@ -800,16 +804,6 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      */
     public withAIOptions(aiOptions: AIOptions<TState>): this {
         this._options.ai = aiOptions;
-        return this;
-    }
-
-    /**
-     * Configures the turn state manager to use for managing the bot's turn state.
-     * @param {TurnStateManager<TState>} turnStateManager The turn state manager to use.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withTurnStateManager(turnStateManager: TurnStateManager<TState>): this {
-        this._options.turnStateManager = turnStateManager;
         return this;
     }
 
