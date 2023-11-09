@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
+using System.Reflection;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
 {
@@ -36,6 +37,47 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
 
             Assert.True(manager.HasPrompt("MyPrompt"));
             Assert.Equal("MyPrompt", manager.GetPrompt("MyPrompt").Name);
+        }
+
+        [Fact]
+        public void Test_Prompts_LoadFromFileSystem()
+        {
+            var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (string.IsNullOrWhiteSpace(currentAssemblyDirectory))
+            {
+                throw new InvalidOperationException("Unable to determine current assembly directory.");
+            }
+
+            PromptManager manager = new(new()
+            {
+                PromptFolder = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"))
+            });
+
+            PromptTemplate template = manager.GetPrompt("promptTemplateFolder");
+
+            Assert.NotNull(template);
+        }
+
+        [Fact]
+        public void Test_Prompts_LoadFromFileSystem_NotFound()
+        {
+            var currentAssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (string.IsNullOrWhiteSpace(currentAssemblyDirectory))
+            {
+                throw new InvalidOperationException("Unable to determine current assembly directory.");
+            }
+
+            var directory = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
+
+            PromptManager manager = new(new()
+            {
+                PromptFolder = directory
+            });
+
+            var exception = Assert.Throws<ArgumentException>(() => manager.GetPrompt("does_not_exist"));
+            Assert.Equal(exception.Message, $"Directory doesn't exist `{directory}\\does_not_exist`");
         }
     }
 }

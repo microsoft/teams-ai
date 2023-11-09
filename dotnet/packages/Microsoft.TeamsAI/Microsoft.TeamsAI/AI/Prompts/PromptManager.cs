@@ -59,7 +59,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <inheritdoc />
         public PromptFunction<List<string>>? GetFunction(string name)
         {
-            return this._functions[name];
+            return this.HasFunction(name) ? this._functions[name] : null;
         }
 
         /// <inheritdoc />
@@ -90,7 +90,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <inheritdoc />
         public IDataSource? GetDataSource(string name)
         {
-            return this._dataSources[name];
+            return this.HasDataSource(name) ? this._dataSources[name] : null;
         }
 
         /// <inheritdoc />
@@ -114,7 +114,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <inheritdoc />
         public PromptTemplate GetPrompt(string name)
         {
-            PromptTemplate? template = this._prompts[name];
+            PromptTemplate? template = this.HasPrompt(name) ? this._prompts[name] : null;
 
             if (template == null)
             {
