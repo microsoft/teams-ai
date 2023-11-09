@@ -7,13 +7,12 @@ import {
     MessageReactionEvents,
     TeamsMessageEvents
 } from './Application';
-import { TestPlanner } from './TestPlanner';
-import { TestPromptManager } from './TestPromptManager';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
 import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
 import { createTestConversationUpdate } from './internals';
+import { TestPlanner } from './planners/TestPlanner';
 
 describe('Application', () => {
     const adapter = new TestAdapter();
