@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Teams.AI.AI.Prompts
+﻿using Microsoft.Teams.AI.AI.Prompts.Sections;
+
+namespace Microsoft.Teams.AI.AI.Prompts
 {
     /// <summary>
     /// Top level prompt section.

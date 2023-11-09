@@ -3,7 +3,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Tokenizers;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// A datasource section that will be rendered as a message

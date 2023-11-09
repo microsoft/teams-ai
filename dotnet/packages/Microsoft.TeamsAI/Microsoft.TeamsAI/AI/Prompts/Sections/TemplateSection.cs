@@ -2,7 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     internal delegate Task<string> RenderFunction(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
 

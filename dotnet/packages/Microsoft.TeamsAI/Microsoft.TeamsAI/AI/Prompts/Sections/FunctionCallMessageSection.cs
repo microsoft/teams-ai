@@ -3,7 +3,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using System.Text.Json;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// An `assistant` message containing a function to call.

@@ -2,7 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// Base layout section that renders a set of `auto`, `fixed` or `proportional` length sections.

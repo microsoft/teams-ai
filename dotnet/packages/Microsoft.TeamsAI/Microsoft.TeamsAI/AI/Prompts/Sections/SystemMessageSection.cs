@@ -1,6 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// A system message section.

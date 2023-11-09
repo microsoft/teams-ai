@@ -1,10 +1,11 @@
 ﻿using Azure.AI.OpenAI;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompts;
+using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
 
-namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
+namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 {
     internal sealed class TestSection : PromptSection
     {

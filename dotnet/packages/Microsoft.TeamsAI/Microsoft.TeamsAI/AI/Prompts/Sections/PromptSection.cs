@@ -3,7 +3,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using System.Text.Json;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// Rendered Prompt Section
@@ -112,7 +112,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
             string text = string.Join(this.separator, rendered.output.Select(m => this.GetMessageText(m)));
             int prefixLength = tokenizer.Encode(this.prefix).Count;
             int separatorLength = tokenizer.Encode(this.separator).Count;
-            int length = prefixLength + rendered.length + ((rendered.output.Count - 1) * separatorLength);
+            int length = prefixLength + rendered.length + (rendered.output.Count - 1) * separatorLength;
 
             text = this.prefix + text;
 
