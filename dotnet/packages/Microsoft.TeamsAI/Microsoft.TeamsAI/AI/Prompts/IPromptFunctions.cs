@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// Add A Function
         /// </summary>
         /// <param name="name">function name</param>
-        /// <param name="func">function arguments</param>
+        /// <param name="func">function to add</param>
         public void AddFunction(string name, PromptFunction<TArgs> func);
 
         /// <summary>

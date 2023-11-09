@@ -1,8 +1,8 @@
-﻿using Azure.AI.OpenAI;
+﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// Base layout section that renders a set of `auto`, `fixed` or `proportional` length sections.
@@ -12,13 +12,13 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Sections To Be Rendered
         /// </summary>
-        public readonly List<PromptSection> sections;
+        public List<PromptSection> Sections;
 
         private List<PromptSection> _fixedSections
         {
             get
             {
-                return this.sections.Where(s => s.tokens < 0 || s.tokens > 1).OrderBy(s => s.required).ToList();
+                return this.Sections.Where(s => s.Tokens < 0 || s.Tokens > 1).OrderBy(s => s.Required).ToList();
             }
         }
 
@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         {
             get
             {
-                return this.sections.Where(s => s.tokens >= 0 || s.tokens <= 1).OrderBy(s => s.required).ToList();
+                return this.Sections.Where(s => s.Tokens >= 0 || s.Tokens <= 1).OrderBy(s => s.Required).ToList();
             }
         }
 
@@ -40,7 +40,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <param name="prefix">prefix</param>
         public LayoutSection(List<PromptSection> sections, int tokens = -1, bool required = false, string separator = "\n", string prefix = "") : base(tokens, required, separator, prefix)
         {
-            this.sections = sections;
+            this.Sections = sections;
         }
 
         /// <inheritdoc />
@@ -55,13 +55,13 @@ namespace Microsoft.Teams.AI.AI.Prompts
             {
                 RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
 
-                if (length + rendered.length >= maxTokens && !section.required)
+                if (length + rendered.Length >= maxTokens && !section.Required)
                 {
                     break;
                 }
 
                 renderedSections.Add(rendered);
-                length += rendered.length;
+                length += rendered.Length;
             }
 
             // render auto size
@@ -69,17 +69,17 @@ namespace Microsoft.Teams.AI.AI.Prompts
             {
                 RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
 
-                if (length + rendered.length >= maxTokens && !section.required)
+                if (length + rendered.Length >= maxTokens && !section.Required)
                 {
                     break;
                 }
 
                 renderedSections.Add(rendered);
-                length += rendered.length;
+                length += rendered.Length;
             }
 
-            List<string> output = renderedSections.Select(r => r.output).ToList();
-            string text = string.Join(this.separator, output);
+            List<string> output = renderedSections.Select(r => r.Output).ToList();
+            string text = string.Join(this.Separator, output);
 
             return new(text, length, length > maxTokens);
         }
@@ -96,13 +96,13 @@ namespace Microsoft.Teams.AI.AI.Prompts
             {
                 RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
 
-                if (length + rendered.length >= maxTokens && !section.required)
+                if (length + rendered.Length >= maxTokens && !section.Required)
                 {
                     break;
                 }
 
                 renderedSections.Add(rendered);
-                length += rendered.length;
+                length += rendered.Length;
             }
 
             // render auto size
@@ -110,20 +110,20 @@ namespace Microsoft.Teams.AI.AI.Prompts
             {
                 RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
 
-                if (length + rendered.length >= maxTokens && !section.required)
+                if (length + rendered.Length >= maxTokens && !section.Required)
                 {
                     break;
                 }
 
                 renderedSections.Add(rendered);
-                length += rendered.length;
+                length += rendered.Length;
             }
 
             List<ChatMessage> output = new();
 
             foreach (RenderedPromptSection<List<ChatMessage>> rendered in renderedSections)
             {
-                output.AddRange(rendered.output);
+                output.AddRange(rendered.Output);
             }
 
             return new(output, length, length > maxTokens);

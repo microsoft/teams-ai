@@ -1,10 +1,11 @@
-﻿using Azure.AI.OpenAI;
+﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompts;
+using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
 
-namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
+namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 {
     public class TemplateSectionTests
     {
@@ -15,17 +16,17 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
+            PromptManager manager = new();
 
-            functions.AddFunction("getMessage", async (context, memory, functions, tokenizer, args) =>
+            manager.AddFunction("getMessage", async (context, memory, functions, tokenizer, args) =>
             {
                 return await Task.FromResult("Hello World!");
             });
 
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 10);
 
-            Assert.Equal("this is a test message: Hello World!", rendered.output);
-            Assert.Equal(9, rendered.length);
+            Assert.Equal("this is a test message: Hello World!", rendered.Output);
+            Assert.Equal(9, rendered.Length);
         }
 
         [Fact]
@@ -35,17 +36,17 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
+            PromptManager manager = new();
 
-            functions.AddFunction("getMessage", async (context, memory, functions, tokenizer, args) =>
+            manager.AddFunction("getMessage", async (context, memory, functions, tokenizer, args) =>
             {
                 return await Task.FromResult($"your param is: {args.First()}");
             });
 
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 15);
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 15);
 
-            Assert.Equal("this is a test message: your param is: my param", rendered.output);
-            Assert.Equal(12, rendered.length);
+            Assert.Equal("this is a test message: your param is: my param", rendered.Output);
+            Assert.Equal(12, rendered.Length);
         }
 
         [Fact]
@@ -55,14 +56,14 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
             Mock<ITurnContext> context = new();
             Memory.Memory memory = new();
             GPTTokenizer tokenizer = new();
-            TestFunctions functions = new();
+            PromptManager manager = new();
 
             memory.SetValue("message", "Hello World!");
 
-            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 15);
+            RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 15);
 
-            Assert.Equal("this is a test message: Hello World!", rendered.output);
-            Assert.Equal(9, rendered.length);
+            Assert.Equal("this is a test message: Hello World!", rendered.Output);
+            Assert.Equal(9, rendered.Length);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using Azure.AI.OpenAI;
+﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using System.Text.Json;
 
-namespace Microsoft.Teams.AI.AI.Prompts
+namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
     /// <summary>
     /// An `assistant` message containing a function to call.
@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Chat Function Call
         /// </summary>
-        public readonly FunctionCall functionCall;
+        public readonly FunctionCall FunctionCall;
 
         private int _length = -1;
 
@@ -28,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <param name="prefix">Prefix to use for assistant messages when rendering as text. Defaults to `assistant: `.</param>
         public FunctionCallMessageSection(FunctionCall functionCall, int tokens = -1, string prefix = "assistant: ") : base(tokens, true, "\n", prefix)
         {
-            this.functionCall = functionCall;
+            this.FunctionCall = functionCall;
         }
 
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
             // calculate and cache length
             if (this._length < 0)
             {
-                string text = JsonSerializer.Serialize(this.functionCall);
+                string text = JsonSerializer.Serialize(this.FunctionCall);
                 this._length = tokenizer.Encode(text).Count;
             }
 
@@ -46,7 +46,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
             if (this._length > 0)
             {
                 ChatMessage message = new(ChatRole.Assistant, "");
-                message.FunctionCall = this.functionCall;
+                message.FunctionCall = this.FunctionCall;
                 messages.Add(message);
             }
 
