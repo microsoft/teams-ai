@@ -24,8 +24,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
 
-            Assert.Equal("this is a test message: Hello World!", rendered.output);
-            Assert.Equal(9, rendered.length);
+            Assert.Equal("this is a test message: Hello World!", rendered.Output);
+            Assert.Equal(9, rendered.Length);
         }
 
         [Fact]
@@ -44,8 +44,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 15);
 
-            Assert.Equal("this is a test message: your param is: my param", rendered.output);
-            Assert.Equal(12, rendered.length);
+            Assert.Equal("this is a test message: your param is: my param", rendered.Output);
+            Assert.Equal(12, rendered.Length);
         }
 
         [Fact]
@@ -61,8 +61,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 15);
 
-            Assert.Equal("this is a test message: Hello World!", rendered.output);
-            Assert.Equal(9, rendered.length);
+            Assert.Equal("this is a test message: Hello World!", rendered.Output);
+            Assert.Equal(9, rendered.Length);
         }
     }
 }

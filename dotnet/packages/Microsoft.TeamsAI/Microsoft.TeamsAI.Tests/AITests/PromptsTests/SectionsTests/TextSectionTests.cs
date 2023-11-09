@@ -18,8 +18,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             TestFunctions functions = new();
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
 
-            Assert.Equal("this is a test section", rendered.output);
-            Assert.Equal(5, rendered.length);
+            Assert.Equal("this is a test section", rendered.Output);
+            Assert.Equal(5, rendered.Length);
         }
 
         [Fact]
@@ -32,8 +32,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             TestFunctions functions = new();
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 3);
 
-            Assert.Equal("this is a", rendered.output);
-            Assert.Equal(3, rendered.length);
+            Assert.Equal("this is a", rendered.Output);
+            Assert.Equal(3, rendered.Length);
         }
     }
 }

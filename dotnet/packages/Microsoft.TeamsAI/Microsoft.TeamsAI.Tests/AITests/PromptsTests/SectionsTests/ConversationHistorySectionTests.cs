@@ -25,8 +25,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             });
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 50);
-            Assert.Equal("assistant: hi, how may I assist you?\nuser: hi\nyou are a unit test bot", rendered.output);
-            Assert.Equal(21, rendered.length);
+            Assert.Equal("assistant: hi, how may I assist you?\nuser: hi\nyou are a unit test bot", rendered.Output);
+            Assert.Equal(21, rendered.Length);
         }
 
         [Fact]
@@ -39,8 +39,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             TestFunctions functions = new();
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 50);
-            Assert.Equal("", rendered.output);
-            Assert.Equal(0, rendered.length);
+            Assert.Equal("", rendered.Output);
+            Assert.Equal(0, rendered.Length);
         }
     }
 }

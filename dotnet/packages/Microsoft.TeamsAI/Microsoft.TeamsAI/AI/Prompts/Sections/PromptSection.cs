@@ -14,17 +14,17 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <summary>
         /// The section that was rendered.
         /// </summary>
-        public TOutput output { get; set; }
+        public TOutput Output { get; set; }
 
         /// <summary>
         /// The number of tokens that were rendered.
         /// </summary>
-        public int length { get; set; }
+        public int Length { get; set; }
 
         /// <summary>
         /// If true the section was truncated because it exceeded the `maxTokens` budget.
         /// </summary>
-        public bool tooLong { get; set; }
+        public bool TooLong { get; set; }
 
         /// <summary>
         /// Creates an instance of `RenderedPromptSection`
@@ -34,9 +34,9 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="tooLong"></param>
         public RenderedPromptSection(TOutput output, int length = 0, bool tooLong = false)
         {
-            this.output = output;
-            this.length = length;
-            this.tooLong = tooLong;
+            this.Output = output;
+            this.Length = length;
+            this.TooLong = tooLong;
         }
     }
 
@@ -48,22 +48,22 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <summary>
         /// The requested token budget for this section.
         /// </summary>
-        public readonly int tokens;
+        public readonly int Tokens;
 
         /// <summary>
         /// If true the section is mandatory otherwise it can be safely dropped.
         /// </summary>
-        public readonly bool required;
+        public readonly bool Required;
 
         /// <summary>
         /// Separator to use between sections when rendering as text. Defaults to `\n`.
         /// </summary>
-        public readonly string separator;
+        public readonly string Separator;
 
         /// <summary>
         /// Prefix to use for text output. Defaults to ``.
         /// </summary>
-        public readonly string prefix;
+        public readonly string Prefix;
 
         /// <summary>
         /// Creates a new 'PromptSection' instance.
@@ -74,10 +74,10 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="prefix">Prefix to use for text output. Defaults to ``.</param>
         public PromptSection(int tokens = -1, bool required = true, string separator = "\n", string prefix = "")
         {
-            this.tokens = tokens;
-            this.required = required;
-            this.separator = separator;
-            this.prefix = prefix;
+            this.Tokens = tokens;
+            this.Required = required;
+            this.Separator = separator;
+            this.Prefix = prefix;
         }
 
         /// <summary>
@@ -104,24 +104,24 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
 
-            if (rendered.output.Count == 0)
+            if (rendered.Output.Count == 0)
             {
                 return new("");
             }
 
-            string text = string.Join(this.separator, rendered.output.Select(m => this.GetMessageText(m)));
-            int prefixLength = tokenizer.Encode(this.prefix).Count;
-            int separatorLength = tokenizer.Encode(this.separator).Count;
-            int length = prefixLength + rendered.length + (rendered.output.Count - 1) * separatorLength;
+            string text = string.Join(this.Separator, rendered.Output.Select(m => this.GetMessageText(m)));
+            int prefixLength = tokenizer.Encode(this.Prefix).Count;
+            int separatorLength = tokenizer.Encode(this.Separator).Count;
+            int length = prefixLength + rendered.Length + (rendered.Output.Count - 1) * separatorLength;
 
-            text = this.prefix + text;
+            text = this.Prefix + text;
 
             // truncate
-            if (this.tokens > 1 && length > this.tokens)
+            if (this.Tokens > 1 && length > this.Tokens)
             {
                 List<int> encoded = tokenizer.Encode(text);
-                text = tokenizer.Decode(encoded.Take(this.tokens).ToList());
-                length = this.tokens;
+                text = tokenizer.Decode(encoded.Take(this.Tokens).ToList());
+                length = this.Tokens;
             }
 
             return new(text, length, length > maxTokens);
@@ -136,7 +136,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <returns></returns>
         protected RenderedPromptSection<List<ChatMessage>> TruncateMessages(List<ChatMessage> messages, ITokenizer tokenizer, int maxTokens)
         {
-            int budget = this.tokens > 1 ? Math.Min(this.tokens, maxTokens) : maxTokens;
+            int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
             int len = 0;
             List<ChatMessage> output = new();
 

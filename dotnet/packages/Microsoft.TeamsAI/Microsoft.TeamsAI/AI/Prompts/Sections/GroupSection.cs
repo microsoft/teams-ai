@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <summary>
         /// Message Role
         /// </summary>
-        public readonly ChatRole role;
+        public readonly ChatRole Role;
 
         /// <summary>
         /// Creates instance of `GroupSection`
@@ -25,7 +25,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="prefix">prefix</param>
         public GroupSection(ChatRole role, List<PromptSection> sections, int tokens = -1, bool required = false, string separator = "\n", string prefix = "") : base(sections, tokens, required, separator, prefix)
         {
-            this.role = role;
+            this.Role = role;
         }
 
         /// <inheritdoc />
@@ -33,7 +33,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             RenderedPromptSection<string> rendered = await base.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
             List<ChatMessage> messages = new()
-            {new(this.role, rendered.output)};
+            {new(this.Role, rendered.Output)};
 
             return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }
@@ -43,24 +43,24 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
 
-            if (rendered.output.Count == 0)
+            if (rendered.Output.Count == 0)
             {
                 return new("");
             }
 
-            string text = string.Join(this.separator, rendered.output.Select(m => this.GetMessageText(m)));
-            int prefixLength = tokenizer.Encode(this.prefix).Count;
-            int separatorLength = tokenizer.Encode(this.separator).Count;
-            int length = prefixLength + rendered.length + (rendered.output.Count - 1) * separatorLength;
+            string text = string.Join(this.Separator, rendered.Output.Select(m => this.GetMessageText(m)));
+            int prefixLength = tokenizer.Encode(this.Prefix).Count;
+            int separatorLength = tokenizer.Encode(this.Separator).Count;
+            int length = prefixLength + rendered.Length + (rendered.Output.Count - 1) * separatorLength;
 
-            text = this.prefix + text;
+            text = this.Prefix + text;
 
             // truncate
-            if (this.tokens > 1 && length > this.tokens)
+            if (this.Tokens > 1 && length > this.Tokens)
             {
                 List<int> encoded = tokenizer.Encode(text);
-                text = tokenizer.Decode(encoded.Take(this.tokens).ToList());
-                length = this.tokens;
+                text = tokenizer.Decode(encoded.Take(this.Tokens).ToList());
+                length = this.Tokens;
             }
 
             return new(text, length, length > maxTokens);

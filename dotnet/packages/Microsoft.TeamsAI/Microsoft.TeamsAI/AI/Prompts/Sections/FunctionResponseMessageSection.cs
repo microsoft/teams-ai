@@ -12,12 +12,12 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <summary>
         /// Name of the function that was called.
         /// </summary>
-        public readonly string name;
+        public readonly string Name;
 
         /// <summary>
         /// The response returned by the called function.
         /// </summary>
-        public readonly dynamic response;
+        public readonly dynamic Response;
 
         private string _text = "";
         private int _length = -1;
@@ -31,8 +31,8 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="prefix">Prefix to use for function messages when rendering as text. Defaults to `user: ` to simulate the response coming from the user.</param>
         public FunctionResponseMessageSection(string name, dynamic response, int tokens = -1, string prefix = "user: ") : base(tokens, true, "\n", prefix)
         {
-            this.name = name;
-            this.response = response;
+            this.Name = name;
+            this.Response = response;
         }
 
         /// <inheritdoc />
@@ -41,12 +41,12 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // calculate and cache length
             if (this._length < 0)
             {
-                this._text = Convert.ToString(this.response);
-                this._length = tokenizer.Encode(this.name).Count + tokenizer.Encode(this._text).Count;
+                this._text = Convert.ToString(this.Response);
+                this._length = tokenizer.Encode(this.Name).Count + tokenizer.Encode(this._text).Count;
             }
 
             ChatMessage message = new(ChatRole.Function, this._text);
-            message.Name = this.name;
+            message.Name = this.Name;
 
             return await Task.FromResult(this.TruncateMessages(new() { message }, tokenizer, maxTokens));
         }

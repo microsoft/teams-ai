@@ -12,17 +12,17 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <summary>
         /// Name of memory variable used to store the histories.
         /// </summary>
-        public readonly string variable;
+        public readonly string Variable;
 
         /// <summary>
         /// Prefix to use for user messages when rendering as text. Defaults to `user: `.
         /// </summary>
-        public readonly string userPrefix;
+        public readonly string UserPrefix;
 
         /// <summary>
         /// Prefix to use for assistant messages when rendering as text. Defaults to `assistant: `.
         /// </summary>
-        public readonly string assistantPrefix;
+        public readonly string AssistantPrefix;
 
         /// <summary>
         /// Creates a new 'ConversationHistorySection' instance.
@@ -35,15 +35,15 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="separator">Separator to use between sections when rendering as text. Defaults to `\n`.</param>
         public ConversationHistorySection(string variable, int tokens = 1, bool required = false, string userPrefix = "user: ", string assistantPrefix = "assistant: ", string separator = "\n") : base(tokens, required, separator)
         {
-            this.variable = variable;
-            this.userPrefix = userPrefix;
-            this.assistantPrefix = assistantPrefix;
+            this.Variable = variable;
+            this.UserPrefix = userPrefix;
+            this.AssistantPrefix = assistantPrefix;
         }
 
         /// <inheritdoc />
         public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
-            List<ChatMessage>? messages = memory.GetValue<List<ChatMessage>>(this.variable);
+            List<ChatMessage>? messages = memory.GetValue<List<ChatMessage>>(this.Variable);
 
             if (messages == null)
             {
@@ -55,13 +55,13 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // Populate history and stay under the token budget
 
             int tokens = 0;
-            int budget = this.tokens > 1 ? Math.Min(this.tokens, maxTokens) : maxTokens;
-            int separatorLength = tokenizer.Encode(this.separator).Count;
+            int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
+            int separatorLength = tokenizer.Encode(this.Separator).Count;
             List<string> lines = new();
 
             foreach (ChatMessage message in messages)
             {
-                string prefix = message.Role == ChatRole.User ? userPrefix : message.Role == ChatRole.Assistant ? assistantPrefix : "";
+                string prefix = message.Role == ChatRole.User ? UserPrefix : message.Role == ChatRole.Assistant ? AssistantPrefix : "";
                 string line = prefix + message.Content;
                 int length = tokenizer.Encode(line).Count;
 
@@ -80,14 +80,14 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                 lines.Add(line);
             }
 
-            string text = string.Join(this.separator, lines);
+            string text = string.Join(this.Separator, lines);
             return await Task.FromResult(new RenderedPromptSection<string>(text, tokens, tokens > budget));
         }
 
         /// <inheritdoc />
         public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
-            List<ChatMessage>? messages = memory.GetValue<List<ChatMessage>>(this.variable);
+            List<ChatMessage>? messages = memory.GetValue<List<ChatMessage>>(this.Variable);
 
             if (messages == null)
             {
@@ -99,7 +99,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // Populate history and stay under the token budget
 
             int tokens = 0;
-            int budget = this.tokens > 1 ? Math.Min(this.tokens, maxTokens) : maxTokens;
+            int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
             List<ChatMessage> output = new();
 
             foreach (ChatMessage message in messages)

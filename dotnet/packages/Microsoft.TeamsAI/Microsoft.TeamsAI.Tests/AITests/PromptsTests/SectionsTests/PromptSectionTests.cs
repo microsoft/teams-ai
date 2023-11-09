@@ -67,8 +67,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             TestFunctions functions = new();
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
 
-            Assert.Equal("Hello World!", rendered.output);
-            Assert.Equal(3, rendered.length);
+            Assert.Equal("Hello World!", rendered.Output);
+            Assert.Equal(3, rendered.Length);
         }
 
         [Fact]
@@ -81,8 +81,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             TestFunctions functions = new();
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 2);
 
-            Assert.Equal("Hello World", rendered.output);
-            Assert.Equal(2, rendered.length);
+            Assert.Equal("Hello World", rendered.Output);
+            Assert.Equal(2, rendered.Length);
         }
     }
 }

@@ -17,8 +17,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
             TestFunctions functions = new();
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, functions, tokenizer, 10);
-            Assert.Equal("user: MyFunction returned 27", rendered.output);
-            Assert.Equal(8, rendered.length);
+            Assert.Equal("user: MyFunction returned 27", rendered.Output);
+            Assert.Equal(8, rendered.Length);
         }
     }
 }
