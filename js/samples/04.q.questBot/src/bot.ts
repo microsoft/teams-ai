@@ -4,14 +4,13 @@
 import {
     AI,
     Application,
-    ConversationHistory,
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
     DefaultConversationState,
-    DefaultPromptManager,
-    DefaultTempState,
-    DefaultTurnState,
     DefaultUserState,
-    OpenAIPlanner,
-    ResponseParser
+    DefaultTempState
 } from '@microsoft/teams-ai';
 import { ActivityTypes, TurnContext } from 'botbuilder';
 import * as path from 'path';
@@ -21,6 +20,7 @@ import { map } from './ShadowFalls';
 import { addActions } from './actions';
 import { LastWriterWinsMemoryStore } from './LastWriterWinsStore';
 import { describeConditions, describeSeason, generateTemperature, generateWeather } from './conditions';
+import { ICampaign, ICampaignObjective, campaignValidator } from './ICampaign';
 
 // Strongly type the applications turn state
 export interface ConversationState extends DefaultConversationState {
@@ -72,18 +72,6 @@ export interface IDataEntities {
     days: string;
 }
 
-export interface ICampaign {
-    title: string;
-    playerIntro: string;
-    objectives: ICampaignObjective[];
-}
-
-export interface ICampaignObjective {
-    title: string;
-    description: string;
-    completed: boolean;
-}
-
 export interface IQuest {
     title: string;
     description: string;
@@ -95,19 +83,37 @@ export interface ILocation {
     encounterChance: number;
 }
 
-export type ApplicationTurnState = DefaultTurnState<ConversationState, UserState, TempState>;
+export type ApplicationTurnState = TurnState<ConversationState, UserState, TempState>;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
 }
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY,
+const model = new OpenAIModel({
+    // OpenAI Support
+    apiKey: process.env.OPENAI_KEY!,
     defaultModel: 'gpt-3.5-turbo',
+
+    // Azure OpenAI Support
+    azureApiKey: process.env.AZURE_OPENAI_KEY!,
+    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+    azureApiVersion: '2023-03-15-preview',
+
+    // Request logging
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: (_context: TurnContext, state: ApplicationTurnState) => prompts.getPrompt(state.temp.prompt),
+});
 
 // Define storage and application
 // - Note that we're not passing a prompt in our AI options as we manually ask for hints.
@@ -115,15 +121,7 @@ const storage = new LastWriterWinsMemoryStore();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        promptManager,
-        prompt: async (_context: TurnContext, state: ApplicationTurnState) => state.temp.value.prompt,
-        history: {
-            userPrefix: 'Player:',
-            assistantPrefix: 'DM:',
-            maxTurns: 3,
-            maxTokens: 600
-        }
+        planner
     }
 });
 
@@ -136,14 +134,14 @@ export const CONVERSATION_STATE_VERSION = 1;
 
 app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState) => {
     if (context.activity.type == ActivityTypes.Message) {
-        let conversation = state.conversation.value;
-        const player = state.user.value;
-        const temp = state.temp.value;
+        let conversation = state.conversation;
+        const player = state.user;
+        const temp = state.temp;
 
         // Clear conversation state on version change
         if (conversation.version !== CONVERSATION_STATE_VERSION) {
-            state.conversation.delete();
-            conversation = state.conversation.value;
+            state.deleteConversationState();
+            conversation = state.conversation;
             conversation.version = CONVERSATION_STATE_VERSION;
         }
 
@@ -209,18 +207,18 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
             conversation.nextEncounterTurn = 5 + Math.floor(Math.random() * 15);
 
             // Create campaign
-            const response = await app.ai.completePrompt(context, state, 'createCampaign');
-            if (!response) {
+            const response = await planner.completePrompt<ICampaign>(context, state, 'createCampaign', campaignValidator);
+            if (response.status != 'success') {
                 throw new Error('Failed to create campaign');
             }
-            campaign = ResponseParser.parseJSON(response || '') as ICampaign;
+            campaign = response.message?.content!;
             if (campaign && campaign.title && Array.isArray(campaign.objectives)) {
                 // Send campaign title as a message
                 conversation.campaign = campaign;
                 await context.sendActivity(`🧙 <strong>${campaign.title}</b>`);
                 app.startTypingTimer(context);
             } else {
-                state.conversation.delete();
+                state.deleteConversationState();
                 await context.sendActivity(responses.dataError());
                 return false;
             }
@@ -315,55 +313,27 @@ app.turn('beforeTurn', async (context: TurnContext, state: ApplicationTurnState)
     return true;
 });
 
-app.turn('afterTurn', async (context: TurnContext, state) => {
-    const lastSay = ConversationHistory.getLastSay(state);
-    if (!lastSay) {
-        // We have a dangling `DM: ` so remove it
-        ConversationHistory.removeLastLine(state);
-
-        // Reply with the current story if we haven't answered player
-        if (!state.temp.value.playerAnswered) {
-            const story = state.conversation.value.story;
-            if (story) {
-                await context.sendActivity(story);
-            }
-        }
-    }
-
-    return true;
-});
-
 app.message('/state', async (context: TurnContext, state) => {
     await context.sendActivity(JSON.stringify(state));
 });
 
 app.message(['/reset-profile', '/reset-user'], async (context: TurnContext, state) => {
-    state.user.delete();
-    state.conversation.value.players = [];
+    state.deleteUserState();
+    state.conversation.players = [];
     await context.sendActivity(`I've reset your profile.`);
 });
 
 app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.delete();
+    state.deleteConversationState();
     await context.sendActivity(`Ok lets start this over.`);
 });
 
-app.message('/forget', async (context: TurnContext, state: ApplicationTurnState) => {
-    ConversationHistory.clear(state);
-    await context.sendActivity(`Ok forgot all conversation history.`);
-});
-
-app.message('/history', async (context: TurnContext, state: ApplicationTurnState) => {
-    const history = ConversationHistory.toString(state, 4000, `\n\n`);
-    await context.sendActivity(`<strong>Chat history:</strong><br>${history}`);
-});
-
 app.message('/story', async (context: TurnContext, state: ApplicationTurnState) => {
-    await context.sendActivity(`<strong>The story so far:</strong><br>${state.conversation.value.story ?? ''}`);
+    await context.sendActivity(`<strong>The story so far:</strong><br>${state.conversation.story ?? ''}`);
 });
 
 app.message('/profile', async (context: TurnContext, state: ApplicationTurnState) => {
-    const player = state.user.value;
+    const player = state.user;
     const backstory = player.backstory.split('\n').join('<br>');
     const equipped = player.equipped.split('\n').join('<br>');
     await context.sendActivity(
@@ -371,24 +341,17 @@ app.message('/profile', async (context: TurnContext, state: ApplicationTurnState
     );
 });
 
-app.ai.action(
-    AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: Record<string, any>, action = ' ') => {
-        await context.sendActivity(`<strong>${action}</strong> action missing`);
-        return true;
-    }
-);
-
-addActions(app);
+addActions(app, planner);
 
 // Register prompt functions
+/*
 app.ai.prompts.addFunction('describeGameState', async (_context: TurnContext, state: ApplicationTurnState) => {
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     return `\tTotalTurns: ${conversation.turn - 1}\n\tLocationTurns: ${conversation.locationTurn - 1}`;
 });
 
 app.ai.prompts.addFunction('describeCampaign', async (_context: TurnContext, state: ApplicationTurnState) => {
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     if (conversation.campaign) {
         return `"${conversation.campaign.title}" - ${conversation.campaign.playerIntro}`;
     } else {
@@ -397,7 +360,7 @@ app.ai.prompts.addFunction('describeCampaign', async (_context: TurnContext, sta
 });
 
 app.ai.prompts.addFunction('describeQuests', async (_context: TurnContext, state: ApplicationTurnState) => {
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     let text = '';
     let connector = '';
     for (const key in conversation.quests) {
@@ -411,14 +374,14 @@ app.ai.prompts.addFunction('describeQuests', async (_context: TurnContext, state
 });
 
 app.ai.prompts.addFunction('describePlayerInfo', async (_context: TurnContext, state: ApplicationTurnState) => {
-    const player = state.user.value;
+    const player = state.user;
     let text = `\tName: ${player.name}\n\tBackstory: ${player.backstory}\n\tEquipped: ${player.equipped}\n\tInventory:\n`;
     text += describeItemList(player.inventory, `\t\t`);
     return text;
 });
 
 app.ai.prompts.addFunction('describeLocation', async (_context: TurnContext, state: ApplicationTurnState) => {
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     if (conversation.location) {
         return `"${conversation.location.title}" - ${conversation.location.description}`;
     } else {
@@ -427,9 +390,10 @@ app.ai.prompts.addFunction('describeLocation', async (_context: TurnContext, sta
 });
 
 app.ai.prompts.addFunction('describeConditions', async (_context: TurnContext, state: ApplicationTurnState) => {
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     return describeConditions(conversation.time, conversation.day, conversation.temperature, conversation.weather);
 });
+*/
 
 /**
  * Returns a string representation of the given item list.
@@ -461,11 +425,11 @@ export async function updateDMResponse(
     state: ApplicationTurnState,
     newResponse: string
 ): Promise<void> {
-    if (ConversationHistory.getLastLine(state).startsWith('DM:')) {
-        ConversationHistory.replaceLastLine(state, `DM: ${newResponse}`);
-    } else {
-        ConversationHistory.addLine(state, `DM: ${newResponse}`);
-    }
+    // if (ConversationHistory.getLastLine(state).startsWith('DM:')) {
+    //     ConversationHistory.replaceLastLine(state, `DM: ${newResponse}`);
+    // } else {
+    //     ConversationHistory.addLine(state, `DM: ${newResponse}`);
+    // }
 
     await context.sendActivity(newResponse);
 }

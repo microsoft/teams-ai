@@ -67,7 +67,12 @@ builder.Services.AddTransient<IBot>(sp =>
         AI = aiOptions,
         LoggerFactory = loggerFactory,
     };
-    return new TeamsDevOpsBot(ApplicationOptions);
+    TeamsDevOpsBot app = new(ApplicationOptions);
+
+    // register turn and activity handlers
+    return app
+        .OnConversationUpdate(ConversationUpdateEvents.MembersAdded, TeamsDevOpsBotHandlers.OnMembersAddedAsync)
+        .OnMessage("/reset", TeamsDevOpsBotHandlers.OnResetMessageAsync);
 });
 #endregion
 
@@ -102,7 +107,12 @@ builder.Services.AddTransient<IBot>(sp =>
         AI = aiOptions,
         LoggerFactory = loggerFactory,
     };
-    return new TeamsDevOpsBot(ApplicationOptions);
+    TeamsDevOpsBot app = new(ApplicationOptions);
+
+    // register turn and activity handlers
+    return app
+        .OnConversationUpdate(ConversationUpdateEvents.MembersAdded, TeamsDevOpsBotHandlers.OnMembersAddedAsync)
+        .OnMessage("/reset", TeamsDevOpsBotHandlers.OnResetMessageAsync);
 });
 **/
 #endregion
