@@ -17,18 +17,11 @@ import {
     TurnContext,
     Storage,
     verifyStateOperationName,
-    tokenExchangeOperationName
+    tokenExchangeOperationName,
+    TokenResponse
 } from 'botbuilder';
 import { TurnStateProperty } from '../TurnStateProperty';
 import { AuthError } from './Authentication';
-
-/**
- * @internal
- */
-interface OAuthPromptResult {
-    connectionName: string;
-    token: string;
-}
 
 /**
  * @internal
@@ -190,7 +183,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         context: TurnContext,
         state: TState,
         dialogStateProperty: string
-    ): Promise<DialogTurnResult<OAuthPromptResult>> {
+    ): Promise<DialogTurnResult<TokenResponse>> {
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this._oauthPrompt);
