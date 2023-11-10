@@ -67,13 +67,13 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import axios from 'axios';
-import { ApplicationBuilder, DefaultTurnState } from '@microsoft/teams-ai';
+import { ApplicationBuilder, TurnState } from '@microsoft/teams-ai';
 import { createNpmPackageCard, createNpmSearchResultCard, createSignOutCard, createUserProfileCard } from './cards';
 import { GraphClient } from './graphClient';
 
 // Define storage and application
 const storage = new MemoryStorage();
-const app = new ApplicationBuilder<DefaultTurnState>()
+const app = new ApplicationBuilder()
     .withStorage(storage)
     .withAuthentication(adapter, {
         settings: {
@@ -85,7 +85,7 @@ const app = new ApplicationBuilder<DefaultTurnState>()
             }
         },
         autoSignIn: (context: TurnContext) => {
-            const signOutActivity = context.activity.value?.commandId === 'signOutCommand';
+            const signOutActivity = context.activity?.value.commandId === 'signOutCommand';
             if (signOutActivity) {
                 return Promise.resolve(false);
             }
@@ -96,14 +96,14 @@ const app = new ApplicationBuilder<DefaultTurnState>()
     .build();
 
 // Handles when the user makes a Messaging Extension query.
-app.messageExtensions.query('searchCmd', async (_context: TurnContext, state: DefaultTurnState, query) => {
+app.messageExtensions.query('searchCmd', async (_context: TurnContext, state: TurnState, query) => {
     const searchQuery = query.parameters.queryText ?? '';
     const count = query.count ?? 10;
 
     const results: MessagingExtensionAttachment[] = [];
 
     if (searchQuery == 'profile') {
-        const token = state.temp.value.authTokens['graph'];
+        const token = state.temp.authTokens['graph'];
         if (!token) {
             throw new Error('No auth token found in state. Authentication failed.');
         }
@@ -133,7 +133,7 @@ app.messageExtensions.query('searchCmd', async (_context: TurnContext, state: De
 });
 
 // Listen for item selection
-app.messageExtensions.selectItem(async (_context: TurnContext, _state: DefaultTurnState, item) => {
+app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState, item) => {
     // Generate detailed result
     const card = createNpmPackageCard(item);
 
@@ -146,7 +146,7 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: DefaultTu
 });
 
 // Handles when the user clicks the Messaging Extension "Sign Out" command.
-app.messageExtensions.fetchTask('signOutCommand', async (context: TurnContext, state: DefaultTurnState) => {
+app.messageExtensions.fetchTask('signOutCommand', async (context: TurnContext, state: TurnState) => {
     await app.authentication.signOutUser(context, state, 'graph');
 
     const signoutCard = createSignOutCard();
@@ -160,13 +160,13 @@ app.messageExtensions.fetchTask('signOutCommand', async (context: TurnContext, s
 });
 
 // Handles the 'Close' button on the confirmation Task Module after the user signs out.
-app.messageExtensions.submitAction('signOutCommand', async (_context: TurnContext, _state: DefaultTurnState) => {
+app.messageExtensions.submitAction('signOutCommand', async (_context: TurnContext, _state: TurnState) => {
     return null;
 });
 
 // Handles when the user clicks the Messaging Extension "Compose" command.
-app.messageExtensions.fetchTask('showProfile', async (_context: TurnContext, state: DefaultTurnState) => {
-    const token = state.temp.value.authTokens['graph'];
+app.messageExtensions.fetchTask('showProfile', async (_context: TurnContext, state: TurnState) => {
+    const token = state.temp.authTokens['graph'];
     if (!token) {
         throw new Error('No auth token found in state. Authentication failed.');
     }
@@ -182,8 +182,8 @@ app.messageExtensions.fetchTask('showProfile', async (_context: TurnContext, sta
     } as TaskModuleTaskInfo;
 });
 
-app.messageExtensions.queryLink(async (_context: TurnContext, state: DefaultTurnState, _url: string) => {
-    const token = state.temp.value.authTokens['graph'];
+app.messageExtensions.queryLink(async (_context: TurnContext, state: TurnState, _url: string) => {
+    const token = state.temp.authTokens['graph'];
     if (!token) {
         throw new Error('No auth token found in state. Authentication failed.');
     }
@@ -199,7 +199,7 @@ app.messageExtensions.queryLink(async (_context: TurnContext, state: DefaultTurn
 });
 
 // Listen for item tap
-app.messageExtensions.selectItem(async (_context: TurnContext, _state: DefaultTurnState, item) => {
+app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState, item) => {
     // Generate detailed result
     const card = createNpmPackageCard(item);
 

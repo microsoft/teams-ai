@@ -1,5 +1,5 @@
 {
-    "name": "BotSSO-demo",
+    "name": "botsso-demo",
     "version": "1.0.0",
     "description": "A simple bot sample that uses SSO to authenticate users",
     "author": "Microsoft",
@@ -11,7 +11,7 @@
         "lint": "eslint **/**/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "start": "tsc --build && node ./lib/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "watch": "nodemon --watch ./src -e ts --exec \"npm start\"",
+        "watch": "nodemon --watch ./src -e ts --exec \"yarn start\"",
         "dev:teamsfx": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts"
     },
     "repository": {
@@ -19,9 +19,9 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~0.1.0-preview.2",
-        "botbuilder": "^4.20.1",
-        "botbuilder-dialogs": "^4.20.1",
+        "@microsoft/teams-ai": "~1.0.0-preview.1",
+        "botbuilder": "^4.21.0",
+        "botbuilder-dialogs": "^4.21.0",
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0"

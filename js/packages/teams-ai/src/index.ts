@@ -14,6 +14,7 @@ export * from './moderators';
 export * from './planners';
 export * from './prompts';
 export * from './tokenizers';
+export * from './authentication';
 export * from './validators';
 export * from './AdaptiveCards';
 export * from './AI';

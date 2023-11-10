@@ -62,12 +62,12 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { ApplicationBuilder, AuthError, DefaultTurnState } from '@microsoft/teams-ai';
+import { ApplicationBuilder, AuthError, TurnState } from '@microsoft/teams-ai';
 
 interface ConversationState {
     count: number;
 }
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type ApplicationTurnState = TurnState<ConversationState>;
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -87,7 +87,7 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
 
 // Listen for user to say '/reset' and then delete conversation state
 app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.delete();
+    state.deleteConversationState();
     await context.sendActivity(`Ok I've deleted the current conversation state.`);
 });
 
@@ -101,10 +101,10 @@ app.message('/signout', async (context: TurnContext, state: ApplicationTurnState
 // Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     // Increment count state
-    let count = state.conversation.value.count ?? 0;
-    state.conversation.value.count = ++count;
+    let count = state.conversation.count ?? 0;
+    state.conversation.count = ++count;
 
-    console.log(state.temp.value.authTokens['graph']);
+    console.log(state.temp.authTokens['graph']);
 
     // Echo back users request
     await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
@@ -113,7 +113,7 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
 app.authentication.get('graph').onUserSignInSuccess(async (context: TurnContext, state: ApplicationTurnState) => {
     // Successfully logged in
     await context.sendActivity('Successfully logged in');
-    await context.sendActivity(`Token string length: ${state.temp.value.authTokens['graph']!.length}`);
+    await context.sendActivity(`Token string length: ${state.temp.authTokens['graph']!.length}`);
     await context.sendActivity(`This is what you said before the AuthFlow started: ${context.activity.text}`);
 });
 
