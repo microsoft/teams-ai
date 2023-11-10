@@ -4,10 +4,8 @@ import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentica
 import { Application } from '../Application';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthError, Authentication, AuthenticationManager, AuthenticationOptions } from './Authentication';
-import { TurnStateEntry } from '../TurnState';
+import { TurnState } from '../TurnState';
 import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
-import { ConversationHistory } from '../ConversationHistory';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
 import * as BotAuth from './BotAuthentication';
@@ -15,23 +13,24 @@ import * as BotAuth from './BotAuthentication';
 describe('Authentication', () => {
     const adapter = new TestAdapter();
 
-    let botAuth: BotAuthentication;
+    let botAuth: BotAuthentication<TurnState>;
     let botAuthenticateStub: sinon.SinonStub;
     let messageExtensionsAuth: MessagingExtensionAuthentication;
     let messagingExtensionAuthenticateStub: sinon.SinonStub;
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
     let settings: OAuthPromptSettings;
-    let auth: Authentication;
+    let auth: Authentication<TurnState>;
     const settingName = 'settingName';
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
+    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
         const context = new TurnContext(adapter, activity);
-        const state: DefaultTurnState = {
-            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
-            user: new TurnStateEntry(),
-            dialog: new TurnStateEntry(),
-            temp: new TurnStateEntry()
+        const state: TurnState = new TurnState();
+        state.temp = {
+            input: '',
+            history: '',
+            output: '',
+            authTokens: {}
         };
         return [context, state];
     };
@@ -126,7 +125,7 @@ describe('Authentication', () => {
     describe('signOutUser()', () => {
         let userTokenAccessStub: sinon.SinonStub;
         let context: TurnContext;
-        let state: DefaultTurnState;
+        let state: TurnState;
 
         before(() => {
             userTokenAccessStub = sinon.stub(UserTokenAccess, 'signOutUser');
@@ -245,15 +244,16 @@ describe('AuthenticationManager', () => {
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
     //let auth: Authentication;
-    let authManager: AuthenticationManager;
+    let authManager: AuthenticationManager<TurnState>;
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
+    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
         const context = new TurnContext(adapter, activity);
-        const state: DefaultTurnState = {
-            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
-            user: new TurnStateEntry(),
-            dialog: new TurnStateEntry(),
-            temp: new TurnStateEntry()
+        const state: TurnState = new TurnState();
+        state.temp = {
+            input: '',
+            history: '',
+            output: '',
+            authTokens: {}
         };
         return [context, state];
     };
@@ -356,11 +356,11 @@ describe('AuthenticationManager', () => {
             }
         };
 
-        let authManager: AuthenticationManager;
-        let auth: Authentication;
+        let authManager: AuthenticationManager<TurnState>;
+        let auth: Authentication<TurnState>;
         let authManagerGetStub: sinon.SinonStub;
         let context: TurnContext;
-        let state: DefaultTurnState;
+        let state: TurnState;
 
         beforeEach(() => {
             authManager = new AuthenticationManager(appStub, authOptions);

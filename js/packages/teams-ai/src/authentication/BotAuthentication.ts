@@ -7,7 +7,6 @@ import {
     OAuthPrompt,
     OAuthPromptSettings
 } from 'botbuilder-dialogs';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { TurnState } from '../TurnState';
 import { Application } from '../Application';
 import {
@@ -33,7 +32,7 @@ interface UserAuthState {
 /**
  * @internal
  */
-export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
+export class BotAuthentication<TState extends TurnState> {
     private _oauthPrompt: OAuthPrompt;
     private _storage: Storage;
     private _userSignInSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
@@ -85,8 +84,8 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
         const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
 
         // Save message if not signed in
-        if (!state.conversation.value[userAuthStatePropertyName]) {
-            state.conversation.value[userAuthStatePropertyName] = {
+        if (!this.getUserAuthState(context, state)) {
+            (state.conversation as any)[userAuthStatePropertyName] = {
                 message: context.activity.text
             };
         }
@@ -153,9 +152,7 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
                     setTokenInState(state, this._settingName, result.result.token);
 
                     // Get user auth state
-                    const userAuthState = state.conversation.value[
-                        this.getUserAuthStatePropertyName(context)
-                    ] as UserAuthState;
+                    const userAuthState = this.getUserAuthState(context, state);
 
                     // Restore previous user message
                     context.activity.text = userAuthState.message || '';
@@ -198,14 +195,14 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     public deleteAuthFlowState(context: TurnContext, state: TState) {
         // Delete user auth state
         const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
-        if (state.conversation.value[userAuthStatePropertyName]) {
-            delete state.conversation.value[userAuthStatePropertyName];
+        if (this.getUserAuthState(context, state)) {
+            delete (state.conversation as any)[userAuthStatePropertyName];
         }
 
         // Delete user dialog state
         const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-        if (state.conversation.value[userDialogStatePropertyName]) {
-            delete state.conversation.value[userDialogStatePropertyName];
+        if (this.getUserDialogState(context, state)) {
+            delete (state.conversation as any)[userDialogStatePropertyName];
         }
     }
 
@@ -216,6 +213,15 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
     public getUserDialogStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:${this._settingName}:DialogState__`;
     }
+
+    private getUserAuthState(context: TurnContext, state: TState): UserAuthState {
+        return (state.conversation as any)[this.getUserAuthStatePropertyName(context)] as UserAuthState;
+    }
+
+    private getUserDialogState(context: TurnContext, state: TState): DialogState {
+        const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
+        return (state.conversation as any)[userDialogStatePropertyName] as DialogState;
+    }
 }
 
 /**
@@ -225,29 +231,25 @@ export class BotAuthentication<TState extends TurnState = DefaultTurnState> {
  * @param {string} token The token to set
  * @internal
  */
-export function setTokenInState<TState extends TurnState = DefaultTurnState>(
-    state: TState,
-    settingName: string,
-    token: string
-) {
-    if (!state.temp.value.authTokens) {
-        state.temp.value.authTokens = {};
+export function setTokenInState<TState extends TurnState>(state: TState, settingName: string, token: string) {
+    if (!state.temp.authTokens) {
+        state.temp.authTokens = {};
     }
 
-    state.temp.value.authTokens[settingName] = token;
+    state.temp.authTokens[settingName] = token;
 }
 
 /**
  * Deletes the token from the turn state
- * @param {DefaultTurnState} state The turn state
+ * @param {TurnState} state The turn state
  * @param {string} settingName The name of the setting
  */
-export function deleteTokenFromState<TState extends TurnState = DefaultTurnState>(state: TState, settingName: string) {
-    if (!state.temp.value.authTokens || !state.temp.value.authTokens[settingName]) {
+export function deleteTokenFromState<TState extends TurnState>(state: TState, settingName: string) {
+    if (!state.temp.authTokens || !state.temp.authTokens[settingName]) {
         return;
     }
 
-    delete state.temp.value.authTokens[settingName];
+    delete state.temp.authTokens[settingName];
 }
 
 /**

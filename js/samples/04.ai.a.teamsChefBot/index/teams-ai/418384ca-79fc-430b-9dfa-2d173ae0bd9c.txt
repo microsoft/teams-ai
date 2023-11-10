@@ -1,0 +1,57 @@
+# Getting started with bots and AI
+
+<small>Getting started directory</small>
+
+1. [Migration](./00.MIGRATION.md)
+2. [**AI Setup**](./01.AI-SETUP.md)
+3. [Activity Routing](./02.ACTIVITY-ROUTING.md)
+4. [QNA](./03.QNA.md)
+5. [Other](../OTHER/README.md)
+
+This guide is intended to help you get started with bots and AI. It is not intended to be a comprehensive guide, but rather a conglamerate of tips that most bots moving to AI will require.
+
+**Please note, you will need to install node v16.x** or higher
+
+## AI Setup
+
+Once you have a basic bot setup, it is time to prepare the bot for AI usage.
+
+To use OpenAI, first create your OpenAI API key using the [OpenAI documentation](https://platform.openai.com/) and storing that key in your .env file:
+
+```sh
+MICROSOFT_APP_ID=app-id
+MICROSOFT_APP_PASSWORD=app-password
+OPENAI_API_KEY=new-OpenAI-Key
+```
+
+Next is to set up the planner, `AzureOpenAI` or `OpenAIPlanner` in this SDK.
+
+```js
+// Create prediction engine
+// Azure OpenAI service:
+const planner = new AzureOpenAIPlanner({
+      /* AI config settings */
+  });
+// Open AI service:
+const planner = new OpenAIPlanner({
+      /* AI config settings */
+  });
+
+// create the prompt manager
+// Prompt Manager directs to the prompts folder
+const promptManager = new PromptManager((path.join(__dirname, `../src/prompts`));
+```
+
+The `ai` object is passed into the Application, which should recieve the two components above, as well as the default prompt.
+
+```js
+const app = new Application({
+  storage,
+  ai: {
+    planner,
+    promptManager,
+    prompt: "defaultPrompt"
+    // ... other options
+  }
+});
+```

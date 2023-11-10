@@ -1,7 +1,5 @@
 import { Activity, ActivityTypes, InvokeResponse, TestAdapter, TurnContext } from 'botbuilder';
-import { TurnStateEntry } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
-import { ConversationHistory } from '../ConversationHistory';
+import { TurnState } from '../TurnState';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
 import * as sinon from 'sinon';
@@ -11,13 +9,14 @@ import * as UserTokenAccess from './UserTokenAccess';
 describe.only('MessagingExtensionAuthentication', () => {
     const adapter = new TestAdapter();
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
+    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
         const context = new TurnContext(adapter, activity);
-        const state: DefaultTurnState = {
-            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
-            user: new TurnStateEntry(),
-            dialog: new TurnStateEntry(),
-            temp: new TurnStateEntry()
+        const state: TurnState = new TurnState();
+        state.temp = {
+            input: '',
+            history: '',
+            output: '',
+            authTokens: {}
         };
         return [context, state];
     };

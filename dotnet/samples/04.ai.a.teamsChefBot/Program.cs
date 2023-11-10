@@ -43,20 +43,22 @@ if (config.Azure == null
     throw new Exception("Missing Azure configuration.");
 }
 
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new AzureOpenAIPlannerOptions(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
-builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new AzureContentSafetyModeratorOptions(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
+builder.Services.AddSingleton(_ => new AzureOpenAIPlannerOptions(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint)
+{
+    LogRequests = true
+});
+builder.Services.AddSingleton(_ => new AzureContentSafetyModeratorOptions(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
 
 // Create the Application.
-builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
+builder.Services.AddTransient<IBot>(sp =>
 {
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
     IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
-
     IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory);
     IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
-    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new ApplicationOptions<TurnState, TurnStateManager>()
+    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
     {
         AI = new AIOptions<TurnState>(planner, promptManager)
         {
@@ -68,10 +70,18 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
             }
         },
         Storage = sp.GetService<IStorage>(),
-        LoggerFactory = loggerFactory,
+        LoggerFactory = loggerFactory
     };
 
-    return new TeamsChefBotApplication(applicationOptions);
+    Application<TurnState, TurnStateManager> app = new(applicationOptions);
+
+    // Register AI actions
+    app.AI.ImportActions(new ActionHandlers());
+
+    // Listen for user to say "/history".
+    app.OnMessage("/history", ActivityHandlers.HistoryMessageHandler);
+
+    return app;
 });
 #endregion
 
@@ -82,16 +92,18 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
     throw new Exception("Missing OpenAI configuration.");
 }
 
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003"));
-builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new OpenAIModeratorOptions(config.OpenAI.ApiKey, ModerationType.Both));
+builder.Services.AddSingleton(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003")
+{
+    LogRequests = true
+});
+builder.Services.AddSingleton(_ => new OpenAIModeratorOptions(config.OpenAI.ApiKey, ModerationType.Both));
 
 // Create the Application.
-builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
+builder.Services.AddTransient<IBot>(sp =>
 {
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
     IPromptManager<TurnState> promptManager = new PromptManager<TurnState>("./Prompts");
-
     IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
     IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(sp.GetService<OpenAIModeratorOptions>()!, loggerFactory);
 
@@ -107,10 +119,18 @@ builder.Services.AddTransient<IBot, TeamsChefBotApplication>(sp =>
             }
         },
         Storage = sp.GetService<IStorage>(),
-        LoggerFactory = loggerFactory,
+        LoggerFactory = loggerFactory
     };
 
-    return new TeamsChefBotApplication(applicationOptions);
+    Application<TurnState, TurnStateManager> app = new(applicationOptions);
+
+    // Register AI actions
+    app.AI.ImportActions(new ActionHandlers());
+
+    // Listen for user to say "/history".
+    app.OnMessage("/history", ActivityHandlers.HistoryMessageHandler);
+
+    return app;
 });
 **/
 #endregion

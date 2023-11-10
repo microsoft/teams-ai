@@ -1,12 +1,12 @@
 import { TurnContext } from 'botbuilder';
-import { Application, OpenAIPlanner } from '@microsoft/teams-ai';
+import { ActionPlanner, Application } from '@microsoft/teams-ai';
 import { ApplicationTurnState, IDataEntities, parseNumber, updateDMResponse } from '../bot';
 import { describeConditions, describeSeason, generateTemperature, generateWeather } from '../conditions';
 /**
  * Registers the 'time' action with the given application.
  * @param {Application} app The application to register the action with.
  */
-export function timeAction(app: Application<ApplicationTurnState>): void {
+export function timeAction(app: Application<ApplicationTurnState>, planner: ActionPlanner<ApplicationTurnState>): void {
     app.ai.action('time', async (context: TurnContext, state: ApplicationTurnState, data: IDataEntities) => {
         const action = (data.operation ?? '').toLowerCase();
         switch (action) {
@@ -16,7 +16,7 @@ export function timeAction(app: Application<ApplicationTurnState>): void {
                 return await queryTime(context, state);
             default:
                 await context.sendActivity(`[time.${action}]`);
-                return true;
+                return '';
         }
     });
 }
@@ -28,10 +28,10 @@ export function timeAction(app: Application<ApplicationTurnState>): void {
  * @param {IDataEntities} data The data entities extracted from the user's input.
  * @returns {Promise<boolean>} A promise that resolves to true if the function handled the user's input, or false otherwise.
  */
-async function waitForTime(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<boolean> {
+async function waitForTime(context: TurnContext, state: ApplicationTurnState, data: IDataEntities): Promise<string> {
     const until = (data.until ?? '').toLowerCase();
     const days = parseNumber(data.days, 0);
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     if (until) {
         let notification = '';
         conversation.day += days;
@@ -97,7 +97,7 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
         // - We don't consider this answering the players query. We want the story to be included
         //   for added color.
         await context.sendActivity(notification ? notification : `⏳ ${days} days later`);
-        return true;
+        return '';
     } else {
         // If the model calls "time action='wait'"" without any options, just return the current time of day.
         return queryTime(context, state);
@@ -110,9 +110,9 @@ async function waitForTime(context: TurnContext, state: ApplicationTurnState, da
  * @param {ApplicationTurnState} state The application state for the turn.
  * @returns {Promise<boolean>} A promise that resolves to true if the function handled the user's input, or false otherwise.
  */
-async function queryTime(context: TurnContext, state: ApplicationTurnState): Promise<boolean> {
+async function queryTime(context: TurnContext, state: ApplicationTurnState): Promise<string> {
     // Render conditions
-    const conversation = state.conversation.value;
+    const conversation = state.conversation;
     const conditions = describeConditions(
         conversation.time,
         conversation.day,
@@ -122,6 +122,6 @@ async function queryTime(context: TurnContext, state: ApplicationTurnState): Pro
 
     // Say the current conditions to the player
     await updateDMResponse(context, state, `⏳ ${conditions}`);
-    state.temp.value.playerAnswered = true;
-    return false;
+    state.temp.playerAnswered = true;
+    return '';
 }

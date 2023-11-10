@@ -10,7 +10,6 @@
 import { Storage, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { TurnState } from '../TurnState';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
 import { Application, Selector } from '../Application';
 import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
 import { BotAuthentication, deleteTokenFromState, setTokenInState } from './BotAuthentication';
@@ -19,7 +18,7 @@ import * as UserTokenAccess from './UserTokenAccess';
 /**
  * User authentication service.
  */
-export class Authentication<TState extends TurnState = DefaultTurnState> {
+export class Authentication<TState extends TurnState> {
     private readonly _messagingExtensionAuth: MessagingExtensionAuthentication;
     private readonly _botAuth: BotAuthentication<TState>;
     private readonly _name: string;
@@ -133,7 +132,7 @@ export class Authentication<TState extends TurnState = DefaultTurnState> {
 /**
  * The user authentication manager.
  */
-export class AuthenticationManager<TState extends TurnState = DefaultTurnState> {
+export class AuthenticationManager<TState extends TurnState> {
     private readonly _authentications: Map<string, Authentication<TState>> = new Map<string, Authentication<TState>>();
     public readonly default: string;
 

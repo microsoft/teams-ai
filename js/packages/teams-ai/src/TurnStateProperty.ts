@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -15,7 +16,7 @@ import { TurnState, TurnStateEntry } from './TurnState';
  * @template T Optional. Type of the property being mapped. Defaults to any.
  */
 export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
-    private readonly _state: TurnStateEntry<any>;
+    private readonly _state: TurnStateEntry;
     private readonly _propertyName: string;
 
     /**
@@ -26,7 +27,7 @@ export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
      */
     public constructor(state: TurnState, scope: string, propertyName: string) {
         this._propertyName = propertyName;
-        this._state = state[scope];
+        this._state = (state as any)[scope];
         if (!this._state) {
             throw new Error(`TurnStateProperty: TurnState missing state scope named "${scope}".`);
         }
@@ -34,8 +35,9 @@ export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
 
     /**
      * Deletes the state property.
+     * @returns {Promise<void>} A promise that represents the work queued to execute.
      */
-    public delete(context: TurnContext): Promise<void> {
+    public delete(): Promise<void> {
         this._state.value[this._propertyName] = undefined;
         return Promise.resolve();
     }
@@ -45,20 +47,23 @@ export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
      */
     public get(context: TurnContext): Promise<T | undefined>;
     public get(context: TurnContext, defaultValue: T): Promise<T>;
-    public get(context: unknown, defaultValue?: unknown): Promise<T | undefined> | Promise<T> {
-        if (this._state.value[this._propertyName] == undefined)  {
+    public get(defaultValue?: unknown): Promise<T | undefined> | Promise<T> {
+        if (this._state.value[this._propertyName] == undefined) {
             this._state.value[this._propertyName] = defaultValue;
         }
 
-        return Promise.resolve(this._state.value[this._propertyName]);
+        return Promise.resolve((this._state as any)[this._propertyName]);
     }
 
     /**
      * Replace's the state property value.
+     * @template T
+     * @param {TurnContext} context The context object for the turn.
+     * @param {T} value The value to assign to the state property.
+     * @returns {Promise<void>} A promise that represents the work queued to execute.
      */
     public set(context: TurnContext, value: T): Promise<void> {
         this._state.value[this._propertyName] = value;
         return Promise.resolve();
     }
-
 }

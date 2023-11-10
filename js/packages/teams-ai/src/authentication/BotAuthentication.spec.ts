@@ -5,9 +5,7 @@ import { DialogTurnResult, DialogTurnStatus, OAuthPromptSettings } from 'botbuil
 import { BotAuthentication } from './BotAuthentication';
 import * as sinon from 'sinon';
 import assert from 'assert';
-import { DefaultTurnState } from '../DefaultTurnStateManager';
-import { TurnStateEntry } from '../TurnState';
-import { ConversationHistory } from '../ConversationHistory';
+import { TurnState } from '../TurnState';
 import { AuthError } from './Authentication';
 
 describe('BotAuthentication', () => {
@@ -17,13 +15,14 @@ describe('BotAuthentication', () => {
     let settings: OAuthPromptSettings;
     const settingName = 'settingName';
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, DefaultTurnState] => {
+    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
         const context = new TurnContext(adapter, activity);
-        const state: DefaultTurnState = {
-            conversation: new TurnStateEntry({ [ConversationHistory.StatePropertyName]: [] }),
-            user: new TurnStateEntry(),
-            dialog: new TurnStateEntry(),
-            temp: new TurnStateEntry()
+        const state: TurnState = new TurnState();
+        state.temp = {
+            input: '',
+            history: '',
+            output: '',
+            authTokens: {}
         };
         return [context, state];
     };
@@ -105,7 +104,7 @@ describe('BotAuthentication', () => {
             await botAuth.authenticate(context, state);
 
             const userAuthStatePropertyName = botAuth.getUserAuthStatePropertyName(context);
-            const authUserState = (state.conversation.value as any)[userAuthStatePropertyName];
+            const authUserState = (state.conversation as any)[userAuthStatePropertyName];
 
             assert(authUserState.message === context.activity.text);
         });
@@ -133,9 +132,9 @@ describe('BotAuthentication', () => {
         });
 
         describe('auth flow is completed', () => {
-            let state: DefaultTurnState;
+            let state: TurnState;
             let context: TurnContext;
-            let botAuth: BotAuthentication;
+            let botAuth: BotAuthentication<TurnState>;
             let runDialogStub: sinon.SinonStub;
             const tokenValue = 'testToken';
 
@@ -163,7 +162,7 @@ describe('BotAuthentication', () => {
             });
 
             it('should delete auth dialog state', async () => {
-                const stateConversationObj = state.conversation.value as any;
+                const stateConversationObj = state.conversation as any;
                 const userDialogStatePropertyName = botAuth.getUserDialogStatePropertyName(context);
 
                 await botAuth.authenticate(context, state);
@@ -203,9 +202,9 @@ describe('BotAuthentication', () => {
         });
 
         describe('auth flow is completed with token', () => {
-            let state: DefaultTurnState;
+            let state: TurnState;
             let context: TurnContext;
-            let botAuth: BotAuthentication;
+            let botAuth: BotAuthentication<TurnState>;
             let runDialogStub: sinon.SinonStub;
             const tokenValue = 'testToken';
 
@@ -233,13 +232,13 @@ describe('BotAuthentication', () => {
 
             it('should sign in success handler & restore previous user message', async () => {
                 const userAuthStatePropertyName = botAuth.getUserAuthStatePropertyName(context);
-                (state.conversation.value as any)[userAuthStatePropertyName] = {
+                (state.conversation as any)[userAuthStatePropertyName] = {
                     message: 'test'
                 };
 
                 let activityMessage = undefined;
                 let handlerCalled = false;
-                botAuth.onUserSignInSuccess(async (_context, _state) => {
+                botAuth.onUserSignInSuccess(async (_context: TurnContext, _state: TurnState) => {
                     handlerCalled = true;
                     activityMessage = context.activity.text;
                 });
@@ -252,7 +251,7 @@ describe('BotAuthentication', () => {
             it('should store token in state', async () => {
                 await botAuth.handleSignInActivity(context, state);
 
-                assert(state.temp.value.authTokens[settingName] === tokenValue);
+                assert(state.temp.authTokens[settingName] === tokenValue);
             });
         });
 
