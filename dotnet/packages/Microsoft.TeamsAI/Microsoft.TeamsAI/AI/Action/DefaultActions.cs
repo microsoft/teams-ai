@@ -42,10 +42,10 @@ namespace Microsoft.Teams.AI.AI.Action
             return Task.FromResult(true);
         }
 
-        [Action(AIConstants.RateLimitedActionName)]
-        public Task<bool> RateLimitedAction()
+        [Action(AIConstants.HttpErrorActionName)]
+        public Task<bool> HttpErrorAction()
         {
-            throw new TeamsAIException("An AI request failed because it was rate limited");
+            throw new TeamsAIException("An AI http request failed");
         }
 
         [Action(AIConstants.PlanReadyActionName)]
@@ -73,7 +73,7 @@ namespace Microsoft.Teams.AI.AI.Action
 
             IActionHandler<TState> handler = doCommandActionData.Handler;
 
-            return handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, doCommandActionData.PredictedDoCommand.Action);
+            return handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Parameters, doCommandActionData.PredictedDoCommand.Action);
         }
 
         [Action(AIConstants.SayCommandActionName)]

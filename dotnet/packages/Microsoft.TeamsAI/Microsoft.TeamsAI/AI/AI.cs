@@ -233,13 +233,13 @@ namespace Microsoft.Teams.AI.AI
             PromptTemplate renderedPrompt = await opts.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
 
             // Review prompt
-            Plan? plan = await opts.Moderator!.ReviewPrompt(turnContext, turnState, renderedPrompt);
+            Plan? plan = await opts.Moderator!.ReviewInput(turnContext, turnState);
 
             if (plan == null)
             {
                 // Generate plan
                 plan = await opts.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, opts, cancellationToken);
-                plan = await opts.Moderator.ReviewPlan(turnContext, turnState, plan);
+                plan = await opts.Moderator.ReviewOutput(turnContext, turnState, plan);
             }
 
             // Process generated plan

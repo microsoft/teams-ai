@@ -40,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.True(result);
             Assert.Equal(new string[] { "GeneratePlanAsync" }, planner.Record.ToArray());
             Assert.Equal(new string[] { "RenderPromptAsync", "RenderPromptAsync" }, promptManager.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewPrompt", "ReviewPlan" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
         }
@@ -74,7 +74,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.True(result);
             Assert.Equal(new string[] { "GeneratePlanAsync" }, planner.Record.ToArray());
             Assert.Equal(new string[] { "RenderPromptAsync" }, promptManager.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewPrompt", "ReviewPlan" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
         }

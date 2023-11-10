@@ -1,5 +1,4 @@
 ﻿using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Teams.AI.State;
 using Microsoft.Bot.Builder;
 using Azure.AI.ContentSafety;
@@ -27,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewPrompt(ITurnContext turnContext, TState turnState, PromptTemplate prompt)
+        public async Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
         {
             switch (_options.Moderate)
             {
@@ -46,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan> ReviewPlan(ITurnContext turnContext, TState turnState, Plan plan)
+        public async Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
         {
             switch (_options.Moderate)
             {
