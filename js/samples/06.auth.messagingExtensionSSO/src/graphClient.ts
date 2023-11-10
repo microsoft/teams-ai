@@ -19,7 +19,7 @@ export class GraphClient {
 
         this._token = token;
 
-        // Get an Authenticated Microsoft Graph client using the token issued to the user.
+        // Get an authenticated Microsoft Graph client using the token issued to the user.
         this.graphClient = Client.init({
             authProvider: (done) => {
                 done(null, this._token); // First parameter takes an error if you can't get an access token.
