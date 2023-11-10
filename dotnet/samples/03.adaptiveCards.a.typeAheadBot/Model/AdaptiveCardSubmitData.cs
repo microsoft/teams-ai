@@ -2,7 +2,7 @@
 
 namespace TypeAheadBot.Model
 {
-    public class AdaptiveCardSubmitResult
+    public class AdaptiveCardSubmitData
     {
         [JsonProperty("verb")]
         public string? Verb { get; set; }

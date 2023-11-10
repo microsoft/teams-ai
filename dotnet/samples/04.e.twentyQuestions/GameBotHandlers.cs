@@ -1,17 +1,18 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI;
 
 namespace TwentyQuestions
 {
-    public class GameBot : Application<GameState, GameStateManager>
+    public class GameBotHandlers
     {
-        public GameBot(ApplicationOptions<GameState, GameStateManager> options)
-            : base(options)
+        private readonly Application<GameState, GameStateManager> _app;
+
+        public GameBotHandlers(Application<GameState, GameStateManager> app)
         {
+            this._app = app;
         }
 
-        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, GameState turnState, CancellationToken cancellationToken)
+        public async Task OnMessageActivityAsync(ITurnContext turnContext, GameState turnState, CancellationToken cancellationToken)
         {
             string? input = turnContext.Activity.Text?.Trim();
             string? secretWord = turnState.Conversation!.SecretWord;
@@ -82,11 +83,11 @@ namespace TwentyQuestions
             turnState.Temp!.Input = turnContext.Activity.Text;
 
             // Set prompt variables
-            AI.Prompts.Variables.Add("guessCount", turnState.Conversation!.GuessCount.ToString());
-            AI.Prompts.Variables.Add("remainingGuesses", turnState.Conversation!.RemainingGuesses.ToString());
-            AI.Prompts.Variables.Add("secretWord", turnState.Conversation!.SecretWord!);
+            _app.AI.Prompts.Variables.Add("guessCount", turnState.Conversation!.GuessCount.ToString());
+            _app.AI.Prompts.Variables.Add("remainingGuesses", turnState.Conversation!.RemainingGuesses.ToString());
+            _app.AI.Prompts.Variables.Add("secretWord", turnState.Conversation!.SecretWord!);
 
-            string hint = await AI.CompletePromptAsync(turnContext, turnState, "Hint", null, cancellationToken);
+            string hint = await _app.AI.CompletePromptAsync(turnContext, turnState, "Hint", null, cancellationToken);
             return hint ?? throw new Exception("The request to OpenAI was rate limited. Please try again later.");
         }
     }

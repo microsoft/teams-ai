@@ -64,7 +64,13 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
         LoggerFactory = loggerFactory,
     };
 
-    return new ListBotApplication(applicationOptions);
+    ListBotApplication app = new(applicationOptions);
+
+    // register turn and activity handlers
+    app
+        .OnConversationUpdate(ConversationUpdateEvents.MembersAdded, ListBotHandlers.OnMembersAddedAsync)
+        .OnMessage("/reset", ListBotHandlers.OnResetMessageAsync);
+    return app;
 });
 #endregion
 
@@ -99,7 +105,13 @@ builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
         LoggerFactory = loggerFactory,
     };
 
-    return new ListBotApplication(applicationOptions);
+    ListBotApplication app = new(applicationOptions);
+
+    // register turn and activity handlers
+    app
+        .OnConversationUpdate(ConversationUpdateEvents.MembersAdded, ListBotHandlers.OnMembersAddedAsync)
+        .OnMessage("/reset", ListBotHandlers.OnResetMessageAsync);
+    return app;
 });
 **/
 #endregion
