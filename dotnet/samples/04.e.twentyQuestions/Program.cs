@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Moderator;
@@ -60,7 +61,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create AzureContentSafetyModerator
     IModerator<GameState> moderator = new AzureContentSafetyModerator<GameState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
 
-    // Create Application
+    // Setup Application
     AIHistoryOptions aiHistoryOptions = new()
     {
         AssistantHistoryType = AssistantHistoryType.Text
@@ -71,14 +72,27 @@ builder.Services.AddTransient<IBot>(sp =>
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
+    var applicationBuilder = new ApplicationBuilder<GameState, GameStateManager>()
+    .WithAIOptions(aiOptions)
+    .WithLoggerFactory(loggerFactory)
+    .WithTurnStateManager(new GameStateManager());
+
+    // Set storage options
+    IStorage? storage = sp.GetService<IStorage>();
+    if (storage != null)
     {
-        TurnStateManager = new GameStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
-    return new GameBot(ApplicationOptions);
+        applicationBuilder.WithStorage(storage);
+    }
+
+    // Create Application
+    Application<GameState, GameStateManager> app = applicationBuilder.Build();
+
+    GameBotHandlers handlers = new(app);
+
+    // register turn and activity handlers
+    app.OnActivity(ActivityTypes.Message, handlers.OnMessageActivityAsync);
+
+    return app;
 });
 #endregion
 
@@ -111,7 +125,7 @@ builder.Services.AddTransient<IBot>(sp =>
         loggerFactory,
         moderatorHttpClient);
 
-    // Create Application
+    // Setup Application
     AIHistoryOptions aiHistoryOptions = new()
     {
         AssistantHistoryType = AssistantHistoryType.Text
@@ -122,14 +136,27 @@ builder.Services.AddTransient<IBot>(sp =>
         moderator: moderator,
         prompt: "Chat",
         history: aiHistoryOptions);
-    ApplicationOptions<GameState, GameStateManager> ApplicationOptions = new()
+    var applicationBuilder = new ApplicationBuilder<GameState, GameStateManager>()
+    .WithAIOptions(aiOptions)
+    .WithLoggerFactory(loggerFactory)
+    .WithTurnStateManager(new GameStateManager());
+
+    // Set storage options
+    IStorage? storage = sp.GetService<IStorage>();
+    if (storage != null)
     {
-        TurnStateManager = new GameStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
-    return new GameBot(ApplicationOptions);
+        applicationBuilder.WithStorage(storage);
+    }
+
+    // Create Application
+    Application<GameState, GameStateManager> app = applicationBuilder.Build();
+
+    GameBotHandlers handlers = new(app);
+
+    // register turn and activity handlers
+    app.OnActivity(ActivityTypes.Message, handlers.OnMessageActivityAsync);
+
+    return app;
 });
 **/
 #endregion
