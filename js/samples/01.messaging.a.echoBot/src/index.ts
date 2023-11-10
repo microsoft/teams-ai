@@ -12,7 +12,7 @@ import {
     ActivityTypes,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -22,7 +22,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -30,24 +35,24 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
+const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error.toString()}`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
 
     // Send a message to the user
-    await context.sendActivity(
-        'The bot encountered an error or bug. To continue to run this bot, please fix the bot source code.'
-    );
+    await context.sendActivity('The bot encountered an error or bug.');
+    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 };
 
 // Set the onTurnError for the singleton CloudAdapter.
@@ -62,12 +67,12 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { Application, DefaultTurnState } from '@microsoft/teams-ai';
+import { Application, TurnState } from '@microsoft/teams-ai';
 
 interface ConversationState {
     count: number;
 }
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type ApplicationTurnState = TurnState<ConversationState>;
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -77,15 +82,15 @@ const app = new Application<ApplicationTurnState>({
 
 // Listen for user to say '/reset' and then delete conversation state
 app.message('/reset', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.delete();
+    state.deleteConversationState();
     await context.sendActivity(`Ok I've deleted the current conversation state.`);
 });
 
 // Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
 app.activity(ActivityTypes.Message, async (context: TurnContext, state: ApplicationTurnState) => {
     // Increment count state
-    let count = state.conversation.value.count ?? 0;
-    state.conversation.value.count = ++count;
+    let count = state.conversation.count ?? 0;
+    state.conversation.count = ++count;
 
     // Echo back users request
     await context.sendActivity(`[${count}] you said: ${context.activity.text}`);

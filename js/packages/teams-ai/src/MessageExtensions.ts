@@ -7,17 +7,17 @@
  */
 
 import {
-    TurnContext,
-    TaskModuleTaskInfo,
+    Activity,
     ActivityTypes,
-    InvokeResponse,
     INVOKE_RESPONSE_KEY,
-    TaskModuleResponse,
-    MessagingExtensionResult,
+    InvokeResponse,
     MessagingExtensionActionResponse,
     MessagingExtensionParameter,
     MessagingExtensionQuery,
-    Activity
+    MessagingExtensionResult,
+    TaskModuleResponse,
+    TaskModuleTaskInfo,
+    TurnContext
 } from 'botbuilder';
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
@@ -99,8 +99,7 @@ export class MessageExtensions<TState extends TurnState> {
     ): Application<TState> {
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.channelId === 'msteams' &&
-                    context?.activity?.type == ActivityTypes.Invoke &&
+                context?.activity?.type == ActivityTypes.Invoke &&
                     context?.activity.name === ANONYMOUS_QUERY_LINK_INVOKE_NAME
             );
         this._app.addRoute(
@@ -153,26 +152,20 @@ export class MessageExtensions<TState extends TurnState> {
             this._app.addRoute(
                 selector,
                 async (context, state) => {
-                    if (context?.activity?.channelId === 'msteams') {
-                        // Insure that we're in an invoke as expected
-                        if (
-                            context?.activity?.type !== ActivityTypes.Invoke ||
-                            context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
-                            context?.activity?.value?.botMessagePreviewAction !== 'edit'
-                        ) {
-                            throw new Error(
-                                `Unexpected MessageExtensions.botMessagePreviewEdit() triggered for activity type: ${context?.activity?.type}`
-                            );
-                        }
-
-                        // Call handler and then check to see if an invoke response has already been added
-                        const result = await handler(
-                            context,
-                            state,
-                            context.activity.value?.botActivityPreview[0] ?? {}
+                    // Insure that we're in an invoke as expected
+                    if (
+                        context?.activity?.type !== ActivityTypes.Invoke ||
+                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
+                        context?.activity?.value?.botMessagePreviewAction !== 'edit'
+                    ) {
+                        throw new Error(
+                            `Unexpected MessageExtensions.botMessagePreviewEdit() triggered for activity type: ${context?.activity?.type}`
                         );
-                        await this.returnSubmitActionResponse(context, result);
                     }
+
+                    // Call handler and then check to see if an invoke response has already been added
+                    const result = await handler(context, state, context.activity.value?.botActivityPreview[0] ?? {});
+                    await this.returnSubmitActionResponse(context, result);
                 },
                 true
             );
@@ -205,7 +198,6 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
                         context?.activity?.value?.botMessagePreviewAction !== 'send'
@@ -254,7 +246,6 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== FETCH_TASK_INVOKE_NAME
                     ) {
@@ -323,7 +314,6 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== QUERY_INVOKE_NAME
                     ) {
@@ -381,9 +371,7 @@ export class MessageExtensions<TState extends TurnState> {
     ): Application<TState> {
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.channelId === 'msteams' &&
-                    context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === QUERY_LINK_INVOKE_NAME
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_LINK_INVOKE_NAME
             );
 
         this._app.addRoute(
@@ -431,9 +419,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context.activity.channelId === 'msteams' &&
-                    context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === SELECT_ITEM_INVOKE_NAME
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === SELECT_ITEM_INVOKE_NAME
             );
 
         // Add route
@@ -486,7 +472,6 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.channelId !== 'msteams' ||
                         context?.activity?.type !== ActivityTypes.Invoke ||
                         context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME
                     ) {
@@ -515,7 +500,7 @@ export class MessageExtensions<TState extends TurnState> {
         context: TurnContext,
         result: MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined
     ): Promise<void> {
-        if (context?.activity?.channelId === 'msteams' && !context.turnState.get(INVOKE_RESPONSE_KEY)) {
+        if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
             // Format invoke response
             let response: MessagingExtensionActionResponse;
             if (typeof result == 'string') {
@@ -571,9 +556,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.channelId === 'msteams' &&
-                    context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === QUERY_SETTING_URL
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_SETTING_URL
             );
 
         // Add route
@@ -615,9 +598,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.channelId === 'msteams' &&
-                    context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === CONFIGURE_SETTINGS
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === CONFIGURE_SETTINGS
             );
 
         // Add route
@@ -659,9 +640,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.channelId === 'msteams' &&
-                    context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === QUERY_CARD_BUTTON_CLICKED
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_CARD_BUTTON_CLICKED
             );
 
         // Add route
@@ -706,7 +685,6 @@ function createTaskSelector(
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             if (
                 isInvoke &&
-                context?.activity?.channelId === 'msteams' &&
                 typeof context?.activity?.value?.commandId == 'string' &&
                 matchesPreviewAction(context.activity, botMessagePreviewAction)
             ) {
@@ -721,7 +699,6 @@ function createTaskSelector(
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             return Promise.resolve(
                 isInvoke &&
-                    context?.activity?.channelId === 'msteams' &&
                     context?.activity?.value?.commandId === commandId &&
                     matchesPreviewAction(context.activity, botMessagePreviewAction)
             );

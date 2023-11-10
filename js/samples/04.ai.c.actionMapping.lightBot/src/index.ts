@@ -11,7 +11,7 @@ import * as restify from 'restify';
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -21,7 +21,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -37,6 +42,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
     console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
@@ -64,71 +70,88 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import { AI, Application, DefaultPromptManager, DefaultTurnState, OpenAIPlanner } from '@microsoft/teams-ai';
-import * as responses from './responses';
+import {
+    Application,
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
+    Memory,
+    DefaultConversationState
+} from '@microsoft/teams-ai';
 
-interface ConversationState {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface ConversationState extends DefaultConversationState {
     lightsOn: boolean;
 }
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
-type TData = Record<string, any>;
+type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_API_KEY is set.');
+if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
+    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
 }
 
 // Create AI components
-const planner = new OpenAIPlanner<ApplicationTurnState>({
-    apiKey: process.env.OPENAI_API_KEY,
+const model = new OpenAIModel({
+    // OpenAI Support
+    apiKey: process.env.OPENAI_KEY!,
     defaultModel: 'gpt-3.5-turbo',
+
+    // Azure OpenAI Support
+    azureApiKey: process.env.AZURE_OPENAI_KEY!,
+    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+    azureApiVersion: '2023-03-15-preview',
+
+    // Request logging
     logRequests: true
 });
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+
+const prompts = new PromptManager({
+    promptsFolder: path.join(__dirname, '../src/prompts')
+});
+
+const planner = new ActionPlanner({
+    model,
+    prompts,
+    defaultPrompt: 'sequence',
+});
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        promptManager,
-        prompt: 'chatGPT'
+        planner
     }
 });
 
-// Add a prompt function for getting the current status of the lights
-app.ai.prompts.addFunction('getLightStatus', async (context: TurnContext, state: ApplicationTurnState) => {
-    return state.conversation.value.lightsOn ? 'on' : 'off';
+// Define a prompt function for getting the current status of the lights
+planner.prompts.addFunction('getLightStatus', async (context: TurnContext, memory: Memory) => {
+    return memory.getValue('conversation.lightsOn') ? 'on' : 'off';
 });
 
 // Register action handlers
 app.ai.action('LightsOn', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.value.lightsOn = true;
+    state.conversation.lightsOn = true;
     await context.sendActivity(`[lights on]`);
-    return true;
+    return `the lights are now on`;
 });
 
 app.ai.action('LightsOff', async (context: TurnContext, state: ApplicationTurnState) => {
-    state.conversation.value.lightsOn = false;
+    state.conversation.lightsOn = false;
     await context.sendActivity(`[lights off]`);
-    return true;
+    return `the lights are now off`;
 });
 
-app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, data: TData) => {
-    const time = data.time ? parseInt(data.time) : 1000;
-    await context.sendActivity(`[pausing for ${time / 1000} seconds]`);
-    await new Promise((resolve) => setTimeout(resolve, time));
-    return true;
-});
+interface PauseParameters {
+    time: number;
+}
 
-// Register a handler to handle unknown actions that might be predicted
-app.ai.action(
-    AI.UnknownActionName,
-    async (context: TurnContext, state: ApplicationTurnState, data: TData, action: string | undefined) => {
-        await context.sendActivity(responses.unknownAction(action || 'unknown'));
-        return false;
-    }
-);
+app.ai.action('Pause', async (context: TurnContext, state: ApplicationTurnState, parameters: PauseParameters) => {
+    await context.sendActivity(`[pausing for ${parameters.time / 1000} seconds]`);
+    await new Promise((resolve) => setTimeout(resolve, parameters.time));
+    return `done pausing`;
+});
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {

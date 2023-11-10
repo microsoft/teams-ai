@@ -11,7 +11,7 @@ import * as restify from 'restify';
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     MessagingExtensionAttachment,
     TurnContext
@@ -22,7 +22,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -30,16 +35,17 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
-const onTurnErrorHandler = async (context: any, error: any) => {
+const onTurnErrorHandler = async (context: TurnContext, error: any) => {
     // This check writes out errors to console log .vs. app insights.
     // NOTE: In production environment, you should consider logging this to Azure
     //       application insights.
-    console.error(`\n [onTurnError] unhandled error: ${error.toString()}`);
+    console.error(`\n [onTurnError] unhandled error: ${error}`);
+    console.log(error);
 
     // Send a trace activity, which will be displayed in Bot Framework Emulator
     await context.sendTraceActivity(
         'OnTurnError Trace',
-        `${error.toString()}`,
+        `${error}`,
         'https://www.botframework.com/schemas/error',
         'TurnError'
     );
@@ -63,7 +69,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import axios from 'axios';
-import { Application, DefaultTurnState } from '@microsoft/teams-ai';
+import { Application, TurnState } from '@microsoft/teams-ai';
 import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application
@@ -73,7 +79,7 @@ const app = new Application({
 });
 
 // Listen for search actions
-app.messageExtensions.query('searchCmd', async (context: TurnContext, state: DefaultTurnState, query) => {
+app.messageExtensions.query('searchCmd', async (context: TurnContext, state: TurnState, query) => {
     const searchQuery = query.parameters.queryText ?? '';
     const count = query.count ?? 10;
     const response = await axios.get(
@@ -96,7 +102,7 @@ app.messageExtensions.query('searchCmd', async (context: TurnContext, state: Def
 });
 
 // Listen for item tap
-app.messageExtensions.selectItem(async (context: TurnContext, state: DefaultTurnState, item) => {
+app.messageExtensions.selectItem(async (context: TurnContext, state: TurnState, item) => {
     // Generate detailed result
     const card = createNpmPackageCard(item);
 

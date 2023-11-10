@@ -1,6 +1,4 @@
 ﻿using ListBot.Model;
-using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI;
 using System.Text.Json;
 
@@ -23,34 +21,6 @@ namespace ListBot
             });
 
             AI.ImportActions(new ListBotActions(this));
-        }
-
-        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, ListState turnState, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(turnContext);
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            if (!turnState.Conversation!.Greeted)
-            {
-                turnState.Conversation.Greeted = true;
-                await turnContext.SendActivityAsync(MessageFactory.Text(ResponseBuilder.Greeting()), cancellationToken).ConfigureAwait(false);
-            }
-        }
-
-        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, ListState turnState, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(turnContext);
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            if (turnContext.Activity.Text.Equals("/reset", StringComparison.OrdinalIgnoreCase))
-            {
-                turnState.ConversationStateEntry?.Delete();
-                await turnContext.SendActivityAsync(MessageFactory.Text(ResponseBuilder.Reset()), cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                await base.OnMessageActivityAsync(turnContext, turnState, cancellationToken).ConfigureAwait(false);
-            }
         }
     }
 }

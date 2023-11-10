@@ -1,4 +1,4 @@
-import { Application, OpenAIPlanner } from '@microsoft/teams-ai';
+import { Application, ActionPlanner } from '@microsoft/teams-ai';
 import { ApplicationTurnState } from '../bot';
 import { inventoryAction } from './inventoryAction';
 import { locationAction } from './locationAction';
@@ -12,12 +12,12 @@ import { timeAction } from './timeAction';
  * Adds all the actions to the given application.
  * @param {Application<ApplicationTurnState>} app The application to add the actions to.
  */
-export function addActions(app: Application<ApplicationTurnState>): void {
-    inventoryAction(app);
-    locationAction(app);
-    mapAction(app);
-    playerAction(app);
-    questAction(app);
-    storyAction(app);
-    timeAction(app);
+export function addActions(app: Application<ApplicationTurnState>, planner: ActionPlanner<ApplicationTurnState>): void {
+    inventoryAction(app, planner);
+    locationAction(app, planner);
+    mapAction(app, planner);
+    playerAction(app, planner);
+    questAction(app, planner);
+    storyAction(app, planner);
+    timeAction(app, planner);
 }

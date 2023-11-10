@@ -1,20 +1,24 @@
 import { strict as assert } from 'assert';
-import { TestAdapter, MemoryStorage, ActivityTypes } from 'botbuilder';
-import { Application, ApplicationBuilder, ConversationUpdateEvents } from './Application';
-import { TestPlanner } from './TestPlanner';
-import { TestPromptManager } from './TestPromptManager';
+import { Activity, ActivityTypes, Channels, MemoryStorage, MessageReactionTypes, TestAdapter } from 'botbuilder';
+import {
+    Application,
+    ApplicationBuilder,
+    ConversationUpdateEvents,
+    MessageReactionEvents,
+    TeamsMessageEvents
+} from './Application';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { TaskModulesOptions } from './TaskModules';
-import { createTestConversationUpdate } from './TestUtilities';
+import { TurnState } from './TurnState';
+import { createTestConversationUpdate } from './internals';
+import { TestPlanner } from './planners/TestPlanner';
 
 describe('Application', () => {
     const adapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
-    const ai: AIOptions<DefaultTurnState> = {
-        planner: new TestPlanner(),
-        promptManager: new TestPromptManager()
+    const ai: AIOptions<TurnState> = {
+        planner: new TestPlanner()
     };
     const botAppId = 'testBot';
     const longRunningMessages = true;
@@ -22,7 +26,6 @@ describe('Application', () => {
     const startTypingTimer = false;
     const storage = new MemoryStorage();
     const taskModules: TaskModulesOptions = { taskDataFilter: 'taskFilter' };
-    const turnStateManager = new DefaultTurnStateManager();
 
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
@@ -37,7 +40,7 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, true);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.taskModules, undefined);
-            assert.notEqual(app.options.turnStateManager, undefined);
+            assert.notEqual(app.options.turnStateFactory, undefined);
         });
 
         it('should create an Application with custom options', () => {
@@ -50,8 +53,7 @@ describe('Application', () => {
                 removeRecipientMention,
                 startTypingTimer,
                 storage,
-                taskModules,
-                turnStateManager
+                taskModules
             });
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, adapter);
@@ -63,7 +65,6 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, startTypingTimer);
             assert.equal(app.options.storage, storage);
             assert.deepEqual(app.options.taskModules, taskModules);
-            assert.equal(app.options.turnStateManager, turnStateManager);
         });
     });
 
@@ -75,7 +76,6 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.ai, undefined);
-            assert.notEqual(app.options.turnStateManager, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.taskModules, undefined);
             assert.equal(app.options.removeRecipientMention, true);
@@ -89,7 +89,6 @@ describe('Application', () => {
                 .withStorage(storage)
                 .withAIOptions(ai)
                 .withLongRunningMessages(adapter, botAppId)
-                .withTurnStateManager(turnStateManager)
                 .withAdaptiveCardOptions(adaptiveCards)
                 .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
@@ -99,7 +98,6 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, botAppId);
             assert.equal(app.options.storage, storage);
             assert.equal(app.options.ai, ai);
-            assert.equal(app.options.turnStateManager, turnStateManager);
             assert.equal(app.options.adaptiveCards, adaptiveCards);
             assert.equal(app.options.taskModules, taskModules);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);
@@ -208,7 +206,7 @@ describe('Application', () => {
             });
 
             const activity = createTestConversationUpdate();
-            activity.channelId = 'msteams';
+            activity.channelId = Channels.Msteams;
             activity.membersAdded = [
                 { id: '123', name: 'Member One' },
                 { id: '42', name: "Don't Panic" }
@@ -276,7 +274,7 @@ describe('Application', () => {
                 });
 
                 const activity = createTestConversationUpdate(channelData);
-                activity.channelId = 'msteams';
+                activity.channelId = Channels.Msteams;
                 await adapter.processActivity(activity, async (context) => {
                     await mockApp.run(context);
                     assert.equal(handlerCalled, true);
@@ -289,7 +287,7 @@ describe('Application', () => {
             const team = { id: 'mockTeamId' };
             const channel = { id: 'mockChannelId' };
             const activity = createTestConversationUpdate({ channel, eventType: 'channelCreated', team });
-            activity.channelId = 'msteams';
+            activity.channelId = Channels.Msteams;
 
             mockApp.conversationUpdate('channelCreated', async (context, _state) => {
                 handlerCalled = true;
@@ -313,5 +311,112 @@ describe('Application', () => {
                 )
             );
         });
+    });
+
+    describe('messageReactions', () => {
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+        const messageReactions: { event: MessageReactionEvents; testActivity: Partial<Activity> }[] = [
+            {
+                event: 'reactionsAdded',
+                testActivity: {
+                    type: ActivityTypes.MessageReaction,
+                    reactionsAdded: [{ type: MessageReactionTypes.Like }]
+                }
+            },
+            {
+                event: 'reactionsRemoved',
+                testActivity: {
+                    type: ActivityTypes.MessageReaction,
+                    reactionsRemoved: [{ type: MessageReactionTypes.Like }]
+                }
+            }
+        ];
+
+        for (const { event, testActivity } of messageReactions) {
+            it(`should route to correct handler for ${event}`, async () => {
+                let handlerCalled = false;
+                mockApp.messageReactions(event, async (context, _state) => {
+                    handlerCalled = true;
+                    assert.equal(context.activity.type, ActivityTypes.MessageReaction);
+                    switch (event) {
+                        case 'reactionsAdded':
+                            assert.deepEqual(context.activity?.reactionsAdded, testActivity.reactionsAdded);
+                            break;
+                        case 'reactionsRemoved':
+                            assert.deepEqual(context.activity?.reactionsRemoved, testActivity.reactionsRemoved);
+                            break;
+                        default:
+                            throw new Error(`Test setup error. Unknown event: ${event}`);
+                    }
+                });
+
+                await adapter.processActivity(testActivity, async (context) => {
+                    await mockApp.run(context);
+                    assert.equal(handlerCalled, true);
+                });
+            });
+        }
+    });
+
+    describe('messageUpdate', () => {
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+        const messageUpdateEvents: { event: TeamsMessageEvents; testActivity: Partial<Activity> }[] = [
+            {
+                event: 'editMessage',
+                testActivity: {
+                    type: ActivityTypes.MessageUpdate,
+                    channelData: { eventType: 'editMessage' }
+                }
+            },
+            {
+                event: 'softDeleteMessage',
+                testActivity: {
+                    type: ActivityTypes.MessageDelete,
+                    channelData: { eventType: 'softDeleteMessage' }
+                }
+            },
+            {
+                event: 'undeleteMessage',
+                testActivity: {
+                    type: ActivityTypes.MessageUpdate,
+                    channelData: { eventType: 'undeleteMessage' }
+                }
+            }
+        ];
+
+        for (const { event, testActivity } of messageUpdateEvents) {
+            it(`should route to correct handler for ${event}`, async () => {
+                let handlerCalled = false;
+                mockApp.messageEventUpdate(event, async (context, _state) => {
+                    handlerCalled = true;
+                    switch (event) {
+                        case 'editMessage':
+                        case 'undeleteMessage':
+                            assert.equal(context.activity.type, ActivityTypes.MessageUpdate);
+                            assert.deepEqual(context.activity?.channelData, testActivity.channelData);
+                            break;
+                        case 'softDeleteMessage':
+                            assert.equal(context.activity.type, ActivityTypes.MessageDelete);
+                            assert.deepEqual(context.activity?.channelData, testActivity.channelData);
+                            break;
+                        default:
+                            throw new Error(`Test setup error. Unknown event: ${event}`);
+                    }
+                });
+
+                await adapter.processActivity(testActivity, async (context) => {
+                    await mockApp.run(context);
+                    assert.equal(handlerCalled, true);
+                });
+            });
+        }
     });
 });

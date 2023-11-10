@@ -35,6 +35,6 @@ export function addResponseFormatter(app: Application): void {
         const formattedResponse = output.join('\n');
         await context.sendActivity(formattedResponse);
 
-        return true;
+        return '';
     });
 }

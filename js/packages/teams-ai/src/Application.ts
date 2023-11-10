@@ -7,20 +7,19 @@
  */
 
 import {
-    TurnContext,
-    Storage,
+    Activity,
     ActivityTypes,
     BotAdapter,
     ConversationReference,
-    Activity,
-    ResourceResponse
+    ResourceResponse,
+    Storage,
+    TurnContext
 } from 'botbuilder';
-import { TurnState, TurnStateManager } from './TurnState';
-import { DefaultTurnState, DefaultTurnStateManager } from './DefaultTurnStateManager';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
-import { MessageExtensions } from './MessageExtensions';
 import { AI, AIOptions } from './AI';
+import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
+import { TurnState } from './TurnState';
 
 /**
  * @private
@@ -80,12 +79,6 @@ export interface ApplicationOptions<TState extends TurnState> {
     ai?: AIOptions<TState>;
 
     /**
-     * Optional. Turn state manager to use. If omitted, an instance of DefaultTurnStateManager will
-     * be created.
-     */
-    turnStateManager: TurnStateManager<TState>;
-
-    /**
      * Optional. Options used to customize the processing of Adaptive Card requests.
      */
     adaptiveCards?: AdaptiveCardsOptions;
@@ -117,6 +110,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
      */
     longRunningMessages: boolean;
+
+    /**
+     * Optional. Factory used to create a custom turn state instance.
+     */
+    turnStateFactory: () => TState;
 }
 
 /**
@@ -137,6 +135,8 @@ export type ConversationUpdateEvents =
     | 'teamRestored'
     | 'topicName'
     | 'historyDisclosed';
+
+export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'editMessage';
 
 /**
  * Function for handling an incoming request.
@@ -183,7 +183,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
  * bots that leverage Large Language Models (LLM) and other AI capabilities.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
-export class Application<TState extends TurnState = DefaultTurnState> {
+export class Application<TState extends TurnState = TurnState> {
     private readonly _options: ApplicationOptions<TState>;
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
@@ -209,9 +209,9 @@ export class Application<TState extends TurnState = DefaultTurnState> {
             options
         ) as ApplicationOptions<TState>;
 
-        // Create default turn state manager if needed
-        if (!this._options.turnStateManager) {
-            this._options.turnStateManager = new DefaultTurnStateManager() as any;
+        // Create turn state factory
+        if (!this._options.turnStateFactory) {
+            this._options.turnStateFactory = () => new TurnState() as TState;
         }
 
         // Create AI component if configured with a planner
@@ -324,14 +324,14 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
     /**
      * Handles conversation update events.
-     * @param {ConversationUpdateEvents | ConversationUpdateEvents[]} event Name of the conversation update event(s) to handle.
+     * @param {ConversationUpdateEvents} event Name of the conversation update event to handle.
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler Function to call when the route is triggered.
      * @param {TurnContext} handler.context The context object for the turn.
      * @param {TState} handler.state The state object for the turn.
      * @returns {this} The application instance for chaining purposes.
      */
     public conversationUpdate(
-        event: ConversationUpdateEvents | ConversationUpdateEvents[],
+        event: ConversationUpdateEvents,
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
         if (typeof handler !== 'function') {
@@ -339,14 +339,28 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 `ConversationUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
             );
         }
-        (Array.isArray(event) ? event : [event]).forEach((e) => {
-            const selector = createConversationUpdateSelector(e);
-            this.addRoute(selector, handler);
-        });
+
+        const selector = createConversationUpdateSelector(event);
+        this.addRoute(selector, handler);
         return this;
     }
 
+    public messageEventUpdate(
+        event: TeamsMessageEvents,
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
+        if (typeof handler !== 'function') {
+            throw new Error(
+                `MessageUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
+            );
+        }
+
+        const selector = createMessageEventUpdateSelector(event);
+        this.addRoute(selector, handler);
+        return this;
+    }
     /**
+     * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      * @summary
      * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
@@ -354,19 +368,19 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bot's logic that should be run using the new proactive turn context.
      */
-    public continueConversationAsync(
+    private continueConversationAsync(
         context: TurnContext,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public continueConversationAsync(
+    private continueConversationAsync(
         conversationReference: Partial<ConversationReference>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public continueConversationAsync(
+    private continueConversationAsync(
         activity: Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public async continueConversationAsync(
+    private async continueConversationAsync(
         context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void> {
@@ -431,13 +445,11 @@ export class Application<TState extends TurnState = DefaultTurnState> {
      * @returns {this} The application instance for chaining purposes.
      */
     public messageReactions(
-        event: MessageReactionEvents | MessageReactionEvents[],
+        event: MessageReactionEvents,
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
-        (Array.isArray(event) ? event : [event]).forEach((e) => {
-            const selector = createMessageReactionSelector(e);
-            this.addRoute(selector, handler);
-        });
+        const selector = createMessageReactionSelector(event);
+        this.addRoute(selector, handler);
         return this;
     }
 
@@ -467,15 +479,16 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                 }
 
                 // Load turn state
-                const { storage, turnStateManager } = this._options;
-                const state = await turnStateManager!.loadState(storage, context);
+                const { storage, turnStateFactory } = this._options;
+                const state = turnStateFactory();
+                await state.load(context, storage);
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
                     // Save turn state
                     // - This lets the bot keep track of why it ended the previous turn. It also
                     //   allows the dialog system to be used before the AI system is called.
-                    await turnStateManager!.saveState(storage, context, state);
+                    await state.save(context, storage);
                     return false;
                 }
 
@@ -493,7 +506,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                             // Call afterTurn event handlers
                             if (await this.callEventHandlers(context, state, this._afterTurn)) {
                                 // Save turn state
-                                await turnStateManager!.saveState(storage, context, state);
+                                await state.save(context, storage);
                             }
 
                             // End dispatch
@@ -514,7 +527,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                         // Call afterTurn event handlers
                         if (await this.callEventHandlers(context, state, this._afterTurn)) {
                             // Save turn state
-                            await turnStateManager!.saveState(storage, context, state);
+                            await state.save(context, storage);
                         }
 
                         // End dispatch
@@ -524,17 +537,22 @@ export class Application<TState extends TurnState = DefaultTurnState> {
 
                 // Call AI module if configured
                 if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
-                    // Begin a new chain of AI calls
-                    await this._ai.chain(context, state);
+                    await this._ai.run(context, state);
 
                     // Call afterTurn event handlers
                     if (await this.callEventHandlers(context, state, this._afterTurn)) {
                         // Save turn state
-                        await turnStateManager!.saveState(storage, context, state);
+                        await state.save(context, storage);
                     }
 
                     // End dispatch
                     return true;
+                }
+
+                // Call afterTurn event handlers
+                if (await this.callEventHandlers(context, state, this._afterTurn)) {
+                    // Save turn state
+                    await state.save(context, storage);
                 }
 
                 // activity wasn't handled
@@ -759,7 +777,7 @@ export class Application<TState extends TurnState = DefaultTurnState> {
  * A builder class for simplifying the creation of an Application instance.
  * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
  */
-export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
+export class ApplicationBuilder<TState extends TurnState = TurnState> {
     private _options: Partial<ApplicationOptions<TState>> = {};
 
     /**
@@ -799,16 +817,6 @@ export class ApplicationBuilder<TState extends TurnState = DefaultTurnState> {
      */
     public withAIOptions(aiOptions: AIOptions<TState>): this {
         this._options.ai = aiOptions;
-        return this;
-    }
-
-    /**
-     * Configures the turn state manager to use for managing the bot's turn state.
-     * @param {TurnStateManager<TState>} turnStateManager The turn state manager to use.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withTurnStateManager(turnStateManager: TurnStateManager<TState>): this {
-        this._options.turnStateManager = turnStateManager;
         return this;
     }
 
@@ -914,8 +922,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === 'msteams' &&
-                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.channel &&
                         context.activity.channelData?.team
@@ -957,8 +964,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === 'msteams' &&
-                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.team
                 );
@@ -1010,6 +1016,39 @@ function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteS
 }
 
 /**
+ * @private
+ * @param {TeamsMessageEvents} event The type of message event to create a selector for.
+ * @returns {RouteSelector} A selector function that matches the specified message event.
+ */
+function createMessageEventUpdateSelector(event: TeamsMessageEvents): RouteSelector {
+    switch (event) {
+        case 'editMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        case 'softDeleteMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageDelete &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        case 'undeleteMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        default:
+            throw new Error(`Invalid TeamsMessageEvent type: ${event}`);
+    }
+}
+
+/**
  * @param {MessageReactionEvents} event The type of message reaction event to create a selector for.
  * @returns {RouteSelector} A selector function that matches the specified message reaction event.
  * @private
@@ -1043,7 +1082,6 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             };
     }
 }
-// channelData: eventype of editMessage
 
 /**
  * @private
