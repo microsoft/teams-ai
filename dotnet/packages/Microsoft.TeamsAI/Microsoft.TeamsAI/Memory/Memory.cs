@@ -17,7 +17,7 @@
     ///
     /// A memory is a key-value store that can be used to store and retrieve values.
     /// </summary>
-    public class Memory
+    public class Memory : IMemory
     {
         private readonly Memory? _parent;
         private readonly Dictionary<string, Dictionary<string, dynamic>> _values;
