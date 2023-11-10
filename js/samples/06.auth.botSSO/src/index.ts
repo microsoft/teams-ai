@@ -76,7 +76,7 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
     .withAuthentication(adapter, {
         settings: {
             graph: {
-                connectionName: process.env.SecondConnectionName ?? '',
+                connectionName: process.env.ConnectionName ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true

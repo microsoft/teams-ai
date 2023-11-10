@@ -21,13 +21,19 @@ export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
 
     /**
      * Creates a new instance of the `TurnStateProperty` class.
-     * @param state Current application turn state.
-     * @param scope Name of properties the memory scope to use.
-     * @param propertyName Name of the property to use.
+     * @param {TurnState} state Current application turn state.
+     * @param {string} scopeName Name of properties the memory scope to use.
+     * @param {string} propertyName Name of the property to use.
      */
-    public constructor(state: TurnState, scope: string, propertyName: string) {
+    public constructor(state: TurnState, scopeName: string, propertyName: string) {
         this._propertyName = propertyName;
-        this._state = (state as any)[scope];
+
+        const scope = state.getScope(scopeName);
+        if (!scope) {
+            throw new Error(`TurnStateProperty: TurnState missing state scope named "${scope}".`);
+        }
+
+        this._state = scope;
         if (!this._state) {
             throw new Error(`TurnStateProperty: TurnState missing state scope named "${scope}".`);
         }
@@ -52,7 +58,7 @@ export class TurnStateProperty<T = any> implements StatePropertyAccessor<T> {
             this._state.value[this._propertyName] = defaultValue;
         }
 
-        return Promise.resolve((this._state as any)[this._propertyName]);
+        return Promise.resolve(this._state.value[this._propertyName] as T);
     }
 
     /**
