@@ -1,10 +1,5 @@
 import { ActivityTypes, InvokeResponse, TokenResponse, TurnContext } from 'botbuilder';
-import {
-    ANONYMOUS_QUERY_LINK_INVOKE_NAME,
-    FETCH_TASK_INVOKE_NAME,
-    QUERY_INVOKE_NAME,
-    QUERY_LINK_INVOKE_NAME
-} from '../MessageExtensions';
+import { MessagingExtensionsInvokeNames } from '../MessageExtensions';
 import * as UserTokenAccess from './UserTokenAccess';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 
@@ -48,7 +43,8 @@ export class MessagingExtensionAuthentication {
             const signInResource = await UserTokenAccess.getSignInResource(context, settings);
             const signInLink = signInResource.signInLink;
             // Do 'silentAuth' if this is a composeExtension/query request otherwise do normal `auth` flow.
-            const authType = context.activity.name === QUERY_INVOKE_NAME ? 'silentAuth' : 'auth';
+            const authType =
+                context.activity.name === MessagingExtensionsInvokeNames.QUERY_INVOKE ? 'silentAuth' : 'auth';
 
             const response = {
                 composeExtension: {
@@ -80,10 +76,10 @@ export class MessagingExtensionAuthentication {
     public isValidActivity(context: TurnContext): boolean {
         return (
             context.activity.type == ActivityTypes.Invoke &&
-            (context.activity.name == QUERY_INVOKE_NAME ||
-                context.activity.name == FETCH_TASK_INVOKE_NAME ||
-                context.activity.name == QUERY_LINK_INVOKE_NAME ||
-                context.activity.name == ANONYMOUS_QUERY_LINK_INVOKE_NAME)
+            (context.activity.name == MessagingExtensionsInvokeNames.QUERY_INVOKE ||
+                context.activity.name == MessagingExtensionsInvokeNames.FETCH_TASK_INVOKE ||
+                context.activity.name == MessagingExtensionsInvokeNames.QUERY_LINK_INVOKE ||
+                context.activity.name == MessagingExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE)
         );
     }
 

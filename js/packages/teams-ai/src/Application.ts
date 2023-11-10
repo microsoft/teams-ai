@@ -532,13 +532,12 @@ export class Application<TState extends TurnState = DefaultTurnState> {
                     const response = await this._authentication.signUserIn(context, state);
 
                     if (response.status == 'pending') {
-                        // Save turn state
                         // - This lets the bot keep track of authentication state
                         await turnStateManager!.saveState(storage, context, state);
                         return false;
                     }
 
-                    // Activities for which auth cannot be initiated should be ignored
+                    // Activities for which auth cannot be initiated should be ignored. Any other errors will be re thrown.
                     if (response.status == 'error' && response.cause != 'invalidActivity') {
                         throw response.error;
                     }

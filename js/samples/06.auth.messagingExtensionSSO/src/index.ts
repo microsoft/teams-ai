@@ -16,6 +16,8 @@ import {
     ConfigurationBotFrameworkAuthenticationOptions,
     MemoryStorage,
     MessagingExtensionAttachment,
+    MessagingExtensionResult,
+    TaskModuleTaskInfo,
     TurnContext
 } from 'botbuilder';
 
@@ -67,7 +69,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 import axios from 'axios';
 import { ApplicationBuilder, DefaultTurnState } from '@microsoft/teams-ai';
 import { createNpmPackageCard, createNpmSearchResultCard, createSignOutCard, createUserProfileCard } from './cards';
-import { SimpleGraphClient } from './simpleGraphClient';
+import { GraphClient } from './graphClient';
 
 // Define storage and application
 const storage = new MemoryStorage();
@@ -127,7 +129,7 @@ app.messageExtensions.query('searchCmd', async (_context: TurnContext, state: De
         attachmentLayout: 'list',
         attachments: results,
         type: 'result'
-    };
+    } as MessagingExtensionResult;
 });
 
 // Listen for item selection
@@ -140,7 +142,7 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: DefaultTu
         attachmentLayout: 'list',
         attachments: [card],
         type: 'result'
-    };
+    } as MessagingExtensionResult;
 });
 
 // Handles when the user clicks the Messaging Extension "Sign Out" command.
@@ -177,10 +179,9 @@ app.messageExtensions.fetchTask('showProfile', async (_context: TurnContext, sta
         heigth: 250,
         width: 400,
         title: 'Show Profile Card'
-    };
+    } as TaskModuleTaskInfo;
 });
 
-// Matches any link that ends in `.com`.
 app.messageExtensions.queryLink(async (_context: TurnContext, state: DefaultTurnState, _url: string) => {
     const token = state.temp.value.authTokens['graph'];
     if (!token) {
@@ -194,7 +195,7 @@ app.messageExtensions.queryLink(async (_context: TurnContext, state: DefaultTurn
         type: 'result',
         attachments: [profileCard],
         attachmentLayout: 'list'
-    };
+    } as MessagingExtensionResult;
 });
 
 // Listen for item tap
@@ -207,7 +208,7 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: DefaultTu
         attachmentLayout: 'list',
         attachments: [card],
         type: 'result'
-    };
+    } as MessagingExtensionResult;
 });
 
 /**
@@ -217,7 +218,7 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: DefaultTu
  */
 async function getUserDetailsFromGraph(token: string): Promise<{ displayName: string; profilePhoto: string }> {
     // The user is signed in, so use the token to create a Graph Clilent and show profile
-    const graphClient = new SimpleGraphClient(token);
+    const graphClient = new GraphClient(token);
     const profile = await graphClient.GetMyProfile();
     const profilePhoto = await graphClient.GetPhotoAsync();
     return { displayName: profile.displayName, profilePhoto: profilePhoto };

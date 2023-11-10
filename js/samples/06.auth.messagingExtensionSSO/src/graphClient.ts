@@ -8,13 +8,13 @@ import 'isomorphic-fetch';
  * This class is a wrapper for the Microsoft Graph API.
  * See: https://developer.microsoft.com/en-us/graph for more information.
  */
-export class SimpleGraphClient {
+export class GraphClient {
     graphClient: Client;
     _token: string;
 
     constructor(token: string) {
         if (!token || !token.trim()) {
-            throw new Error('SimpleGraphClient: Invalid token received.');
+            throw new Error('GraphClient: Invalid token received.');
         }
 
         this._token = token;
