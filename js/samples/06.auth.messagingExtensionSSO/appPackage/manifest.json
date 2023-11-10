@@ -97,6 +97,7 @@
     ],
     "validDomains": [
         "${{BOT_DOMAIN}}",
+        "*.botframework.com",
         "*.com"
     ],
     "webApplicationInfo": {
