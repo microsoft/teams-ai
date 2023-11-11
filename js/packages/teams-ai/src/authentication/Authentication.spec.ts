@@ -23,15 +23,34 @@ describe('Authentication', () => {
     let auth: Authentication<TurnState>;
     const settingName = 'settingName';
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
-        const context = new TurnContext(adapter, activity);
+    const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
+        const context = new TurnContext(adapter, {
+            channelId: 'msteams',
+            recipient: {
+                id: 'bot',
+                name: 'bot'
+            },
+            from: {
+                id: 'user',
+                name: 'user'
+            },
+            conversation: {
+                id: 'convo',
+                isGroup: false,
+                conversationType: 'personal',
+                name: 'convo'
+            },
+            ...activity
+        });
         const state: TurnState = new TurnState();
+        await state.load(context);
         state.temp = {
             input: '',
             history: '',
             output: '',
             authTokens: {}
         };
+
         return [context, state];
     };
 
@@ -63,7 +82,7 @@ describe('Authentication', () => {
         it('should call botAuth.authenticate() when activity type is message and the text is a non-empty string', async () => {
             const isUserSignedInStub = sinon.stub(auth, 'isUserSignedIn').returns(Promise.resolve(undefined));
 
-            const [context, state] = createTurnContextAndState({ type: ActivityTypes.Message, text: 'non empty' });
+            const [context, state] = await createTurnContextAndState({ type: ActivityTypes.Message, text: 'non empty' });
 
             await auth.signInUser(context, state);
 
@@ -72,7 +91,7 @@ describe('Authentication', () => {
         });
 
         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/query activity', async () => {
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
             });
@@ -84,7 +103,7 @@ describe('Authentication', () => {
         });
 
         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/queryLink activity', async () => {
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/queryLink'
             });
@@ -96,7 +115,7 @@ describe('Authentication', () => {
         });
 
         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/fetchTask activity', async () => {
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/fetchTask'
             });
@@ -108,7 +127,7 @@ describe('Authentication', () => {
         });
 
         it('should throw error is activity type is not valid for botAuth or messagingExtensionAuth', async () => {
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Event
             });
 
@@ -131,8 +150,8 @@ describe('Authentication', () => {
             userTokenAccessStub = sinon.stub(UserTokenAccess, 'signOutUser');
         });
 
-        beforeEach(() => {
-            [context, state] = createTurnContextAndState({
+        beforeEach(async () => {
+            [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Message,
                 from: {
                     id: 'test',
@@ -181,8 +200,8 @@ describe('Authentication', () => {
         let context: TurnContext;
         let getUserTokenStub: sinon.SinonStub;
 
-        beforeEach(() => {
-            const obj = createTurnContextAndState({
+        beforeEach(async () => {
+            const obj = await createTurnContextAndState({
                 type: ActivityTypes.Message,
                 from: {
                     id: 'test',
@@ -246,15 +265,34 @@ describe('AuthenticationManager', () => {
     //let auth: Authentication;
     let authManager: AuthenticationManager<TurnState>;
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
-        const context = new TurnContext(adapter, activity);
+    const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
+        const context = new TurnContext(adapter, {
+            channelId: 'msteams',
+            recipient: {
+                id: 'bot',
+                name: 'bot'
+            },
+            from: {
+                id: 'user',
+                name: 'user'
+            },
+            conversation: {
+                id: 'convo',
+                isGroup: false,
+                conversationType: 'personal',
+                name: 'convo'
+            },
+            ...activity
+        });
         const state: TurnState = new TurnState();
+        await state.load(context);
         state.temp = {
             input: '',
             history: '',
             output: '',
             authTokens: {}
         };
+
         return [context, state];
     };
 
@@ -362,11 +400,11 @@ describe('AuthenticationManager', () => {
         let context: TurnContext;
         let state: TurnState;
 
-        beforeEach(() => {
+        beforeEach(async () => {
             authManager = new AuthenticationManager(appStub, authOptions);
             auth = new Authentication(appStub, 'firstSetting', authOptions.settings.firstSetting);
             authManagerGetStub = sinon.stub(authManager, 'get').returns(auth);
-            [context, state] = createTurnContextAndState({
+            [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Message,
                 text: 'non empty'
             });

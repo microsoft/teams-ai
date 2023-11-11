@@ -15,15 +15,34 @@ describe('BotAuthentication', () => {
     let settings: OAuthPromptSettings;
     const settingName = 'settingName';
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
-        const context = new TurnContext(adapter, activity);
+    const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
+        const context = new TurnContext(adapter, {
+            channelId: 'msteams',
+            recipient: {
+                id: 'bot',
+                name: 'bot'
+            },
+            from: {
+                id: 'user',
+                name: 'user'
+            },
+            conversation: {
+                id: 'convo',
+                isGroup: false,
+                conversationType: 'personal',
+                name: 'convo'
+            },
+            ...activity
+        });
         const state: TurnState = new TurnState();
+        await state.load(context);
         state.temp = {
             input: '',
             history: '',
             output: '',
             authTokens: {}
         };
+
         return [context, state];
     };
 
@@ -93,7 +112,7 @@ describe('BotAuthentication', () => {
                 } as DialogTurnResult;
             });
 
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: 'message',
                 from: {
                     id: 'test',
@@ -118,7 +137,7 @@ describe('BotAuthentication', () => {
                 } as DialogTurnResult;
             });
 
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: 'message',
                 from: {
                     id: 'test',
@@ -151,7 +170,7 @@ describe('BotAuthentication', () => {
                     } as DialogTurnResult;
                 });
 
-                [context, state] = createTurnContextAndState({
+                [context, state] = await createTurnContextAndState({
                     type: 'message',
                     from: {
                         id: 'test',
@@ -188,7 +207,7 @@ describe('BotAuthentication', () => {
                 } as DialogTurnResult;
             });
 
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: 'message',
                 from: {
                     id: 'test',
@@ -221,7 +240,7 @@ describe('BotAuthentication', () => {
                     } as DialogTurnResult;
                 });
 
-                [context, state] = createTurnContextAndState({
+                [context, state] = await createTurnContextAndState({
                     type: 'message',
                     from: {
                         id: 'test',
@@ -266,7 +285,7 @@ describe('BotAuthentication', () => {
                 } as DialogTurnResult;
             });
 
-            const [context, state] = createTurnContextAndState({
+            const [context, state] = await createTurnContextAndState({
                 type: 'message',
                 from: {
                     id: 'test',

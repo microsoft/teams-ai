@@ -6,18 +6,37 @@ import * as sinon from 'sinon';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
 
-describe.only('MessagingExtensionAuthentication', () => {
+describe('MessagingExtensionAuthentication', () => {
     const adapter = new TestAdapter();
 
-    const createTurnContextAndState = (activity: Partial<Activity>): [TurnContext, TurnState] => {
-        const context = new TurnContext(adapter, activity);
+    const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
+        const context = new TurnContext(adapter, {
+            channelId: 'msteams',
+            recipient: {
+                id: 'bot',
+                name: 'bot'
+            },
+            from: {
+                id: 'user',
+                name: 'user'
+            },
+            conversation: {
+                id: 'convo',
+                isGroup: false,
+                conversationType: 'personal',
+                name: 'convo'
+            },
+            ...activity
+        });
         const state: TurnState = new TurnState();
+        await state.load(context);
         state.temp = {
             input: '',
             history: '',
             output: '',
             authTokens: {}
         };
+
         return [context, state];
     };
 
@@ -28,7 +47,7 @@ describe.only('MessagingExtensionAuthentication', () => {
 
     describe('authenticate()', () => {
         it('should send 412 invoke response if token is not exchangeable', async () => {
-            const [context, _] = createTurnContextAndState({
+            const [context, _] = await createTurnContextAndState({
                 value: {
                     authentication: {
                         token: 'token'
@@ -54,7 +73,7 @@ describe.only('MessagingExtensionAuthentication', () => {
         });
 
         it('should return `undefined` if token is not exchangeable', async () => {
-            const [context, _] = createTurnContextAndState({
+            const [context, _] = await createTurnContextAndState({
                 value: {
                     authentication: {
                         token: 'token'
@@ -73,7 +92,7 @@ describe.only('MessagingExtensionAuthentication', () => {
         });
 
         it('should return token if token is exchangeable', async () => {
-            const [context, _] = createTurnContextAndState({
+            const [context, _] = await createTurnContextAndState({
                 value: {
                     authentication: {
                         token: 'token'
@@ -112,7 +131,7 @@ describe.only('MessagingExtensionAuthentication', () => {
 
             it('should return token if successfully retrieved token from token store', async () => {
                 const magicCode = 'OAuth flow magic code';
-                const [context, _] = createTurnContextAndState({
+                const [context, _] = await createTurnContextAndState({
                     value: {
                         state: magicCode
                     }
@@ -143,7 +162,7 @@ describe.only('MessagingExtensionAuthentication', () => {
             testCases.forEach(([name, authType]) => {
                 it(`should send type '${authType}' suggestion action when couldn't retrieve token from token store for invoke name ${name}`, async () => {
                     const magicCode = 'OAuth flow magic code';
-                    const [context, _] = createTurnContextAndState({
+                    const [context, _] = await createTurnContextAndState({
                         type: ActivityTypes.Invoke,
                         name: name,
                         value: {
@@ -195,8 +214,8 @@ describe.only('MessagingExtensionAuthentication', () => {
         ];
 
         testCases.forEach(([name]) => {
-            it(`should return true if activity is of type Invoke and name is ${name}`, () => {
-                const [context, _] = createTurnContextAndState({
+            it(`should return true if activity is of type Invoke and name is ${name}`, async () => {
+                const [context, _] = await createTurnContextAndState({
                     type: ActivityTypes.Invoke,
                     name: name
                 });
@@ -209,8 +228,8 @@ describe.only('MessagingExtensionAuthentication', () => {
             });
         });
 
-        it('should return false if activity is not of type Invoke', () => {
-            const [context, _] = createTurnContextAndState({
+        it('should return false if activity is not of type Invoke', async () => {
+            const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Message,
                 name: 'composeExtension/query'
             });
@@ -227,10 +246,10 @@ describe.only('MessagingExtensionAuthentication', () => {
         let context: TurnContext;
         let meAuth: MessagingExtensionAuthentication;
 
-        beforeEach(() => {
+        beforeEach(async () => {
             sinon.restore();
             meAuth = new MessagingExtensionAuthentication();
-            context = createTurnContextAndState({})[0];
+            context = await (createTurnContextAndState({}) as any)[0];
         });
 
         it('should return false if token exchange returns an empty token', async () => {
@@ -279,7 +298,7 @@ describe.only('MessagingExtensionAuthentication', () => {
         });
 
         it('should return undefined if `context.activity.value.authentication` does not have a token.', async () => {
-            const [context, _] = createTurnContextAndState({
+            const [context, _] = await createTurnContextAndState({
                 value: {
                     authentication: {}
                 }
@@ -291,7 +310,7 @@ describe.only('MessagingExtensionAuthentication', () => {
         });
 
         it('should return undefined if `context.activity.value.authentication` is undefined.', async () => {
-            const [context, _] = createTurnContextAndState({
+            const [context, _] = await createTurnContextAndState({
                 value: {}
             });
 
@@ -311,7 +330,7 @@ describe.only('MessagingExtensionAuthentication', () => {
                 .stub(UserTokenAccess, 'exchangeToken')
                 .returns(Promise.resolve(tokenResponse));
 
-            const [context, _] = createTurnContextAndState({
+            const [context, _] = await createTurnContextAndState({
                 value: {
                     authentication: {
                         token: 'token'
