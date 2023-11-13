@@ -1,11 +1,13 @@
-﻿using Microsoft.Teams.AI.Utilities;
+﻿using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
     /// Options for the OpenAI planner.
     /// </summary>
-    public class OpenAIPlannerOptions
+    public class OpenAIPlannerOptions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// OpenAI API key.
@@ -60,17 +62,38 @@ namespace Microsoft.Teams.AI.AI.Planner
         public bool LogRequests { get; set; } = false;
 
         /// <summary>
+        /// The Prompt manager.
+        /// </summary>
+        public IPromptManager<TState> Prompts { get; set; }
+
+        /// <summary>
+        /// The default prompt.
+        /// </summary>
+        public string DefaultPrompt { get; set; }
+
+        /// <summary>
+        /// The history options.
+        /// </summary>
+        public OpenAIPlannerHistoryOptions? History { get; set; }
+
+        /// <summary>
         /// Create an instance of the OpenAIPlannerOptions class.
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
         /// <param name="defaultModel">The default model to use.</param>
-        public OpenAIPlannerOptions(string apiKey, string defaultModel)
+        /// <param name="prompts">The prompt manager.</param>
+        /// <param name="defaultPrompt">The default prompt.</param>
+        /// <param name="history">The history options.</param>
+        public OpenAIPlannerOptions(string apiKey, string defaultModel, IPromptManager<TState> prompts, string defaultPrompt, OpenAIPlannerHistoryOptions? history)
         {
             Verify.ParamNotNull(apiKey);
             Verify.ParamNotNull(defaultModel);
 
             ApiKey = apiKey;
             DefaultModel = defaultModel;
+            Prompts = prompts;
+            DefaultPrompt = defaultPrompt;
+            History = history;
         }
     }
 }
