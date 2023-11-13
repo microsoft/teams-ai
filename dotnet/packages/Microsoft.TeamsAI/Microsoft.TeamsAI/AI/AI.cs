@@ -172,6 +172,8 @@ namespace Microsoft.Teams.AI.AI
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
         public Task<bool> Run(ITurnContext turnContext, TState turnState, DateTime? startTime = null, int stepCount = 0)
         {
+            Verify.ParamNotNull(turnContext);
+            Verify.ParamNotNull(turnState);
             _SetTempStateValues(turnState, turnContext, Options);
             throw new NotImplementedException();
         }
