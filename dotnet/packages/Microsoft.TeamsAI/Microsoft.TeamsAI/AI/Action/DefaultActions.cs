@@ -49,7 +49,7 @@ namespace Microsoft.Teams.AI.AI.Action
         }
 
         [Action(AIConstants.PlanReadyActionName)]
-        public Task<bool> PlanReadyAction([ActionEntities] Plan plan)
+        public Task<bool> PlanReadyAction([ActionParameters] Plan plan)
         {
             Verify.ParamNotNull(plan);
 
@@ -57,7 +57,7 @@ namespace Microsoft.Teams.AI.AI.Action
         }
 
         [Action(AIConstants.DoCommandActionName)]
-        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData)
+        public Task<bool> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionParameters] DoCommandActionData<TState> doCommandActionData)
         {
             Verify.ParamNotNull(doCommandActionData);
 
@@ -77,7 +77,7 @@ namespace Microsoft.Teams.AI.AI.Action
         }
 
         [Action(AIConstants.SayCommandActionName)]
-        public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
+        public async Task<bool> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionParameters] PredictedSayCommand command)
         {
             Verify.ParamNotNull(command);
 

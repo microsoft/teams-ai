@@ -92,28 +92,47 @@ namespace Microsoft.Teams.AI.AI.Moderator
                 }
             }
 
-            Response<AnalyzeTextResult> response = await _client.AnalyzeTextAsync(analyzeTextOptions);
-
-            bool flagged = response.Value.BlocklistsMatchResults.Count > 0
-            || _ShouldBeFlagged(response.Value.HateResult)
-            || _ShouldBeFlagged(response.Value.SelfHarmResult)
-            || _ShouldBeFlagged(response.Value.SexualResult)
-            || _ShouldBeFlagged(response.Value.ViolenceResult);
-            if (flagged)
+            try
             {
-                string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
+                Response<AnalyzeTextResult> response = await _client.AnalyzeTextAsync(analyzeTextOptions);
 
-                // Flagged
-                return new Plan()
+                bool flagged = response.Value.BlocklistsMatchResults.Count > 0
+                || _ShouldBeFlagged(response.Value.HateResult)
+                || _ShouldBeFlagged(response.Value.SelfHarmResult)
+                || _ShouldBeFlagged(response.Value.SexualResult)
+                || _ShouldBeFlagged(response.Value.ViolenceResult);
+                if (flagged)
                 {
-                    Commands = new List<IPredictedCommand>
+                    string actionName = isModelInput ? AIConstants.FlaggedInputActionName : AIConstants.FlaggedOutputActionName;
+
+                    // Flagged
+                    return new Plan()
+                    {
+                        Commands = new List<IPredictedCommand>
                             {
                                 new PredictedDoCommand(actionName, new Dictionary<string, object?>
                                 {
                                     { "Result", response.Value }
                                 })
                             }
-                };
+                    };
+                }
+
+            }
+            catch (RequestFailedException e)
+            {
+                // Http error
+                if (e.Status == 429)
+                {
+                    return new Plan()
+                    {
+                        Commands = new List<IPredictedCommand>
+                        {
+                            new PredictedDoCommand(AIConstants.HttpErrorActionName)
+                        }
+                    };
+                }
+                throw;
             }
 
             return null;
