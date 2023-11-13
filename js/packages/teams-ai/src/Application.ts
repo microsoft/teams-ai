@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -19,6 +20,7 @@ import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
+import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
 
 /**
@@ -59,6 +61,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * this property is required.
      */
     adapter?: BotAdapter;
+
+    /**
+     * Optional. OAuth prompt settings to use for authentication.
+     */
+    authentication?: AuthenticationOptions;
 
     /**
      * Optional. Application ID of the bot.
@@ -148,11 +155,16 @@ export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'edit
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
 /**
+ * A selector function for matching incoming activities.
+ */
+export type Selector = (context: TurnContext) => Promise<boolean>;
+
+/**
  * Function for selecting whether a route handler should be triggered.
  * @param context Context for the current turn of conversation with the user.
  * @returns A promise that resolves with a boolean indicating whether the route handler should be triggered.
  */
-export type RouteSelector = (context: TurnContext) => Promise<boolean>;
+export type RouteSelector = Selector;
 
 /**
  * Message reaction event types.
@@ -193,7 +205,10 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
+    private readonly _authentication?: AuthenticationManager<TState>;
+    private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
+    private readonly _startSignIn?: Selector;
 
     /**
      * Creates a new Application instance.
@@ -209,6 +224,10 @@ export class Application<TState extends TurnState = TurnState> {
             options
         ) as ApplicationOptions<TState>;
 
+        this._adapter = this._options.adapter;
+
+        this._adapter = this._options.adapter;
+
         // Create turn state factory
         if (!this._options.turnStateFactory) {
             this._options.turnStateFactory = () => new TurnState() as TState;
@@ -217,6 +236,13 @@ export class Application<TState extends TurnState = TurnState> {
         // Create AI component if configured with a planner
         if (this._options.ai) {
             this._ai = new AI(this._options.ai);
+        }
+
+        // Create OAuthPrompt if configured
+        if (this._options.authentication) {
+            this._startSignIn = createSignInSelector(this._options.authentication.autoSignIn);
+
+            this._authentication = new AuthenticationManager(this, this._options.authentication, this._options.storage);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -240,6 +266,20 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
+     * The bot's adapter.
+     * @returns {BotAdapter} The bot's adapter that is configured for the application.
+     */
+    public get adapter(): BotAdapter {
+        if (!this._adapter) {
+            throw new Error(
+                `The Application.adapter property is unavailable because it was not configured when creating the Application.`
+            );
+        }
+
+        return this._adapter;
+    }
+
+    /**
      * Fluent interface for accessing AI specific features.
      * @summary
      * This property is only available if the Application was configured with `ai` options. An
@@ -252,6 +292,24 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         return this._ai;
+    }
+
+    /**
+     * @template TState
+     * Fluent interface for accessing Authentication specific features.
+     * @description
+     * This property is only available if the Application was configured with `authentication` options. An
+     * exception will be thrown if you attempt to access it otherwise.
+     * @returns {Authentication<TState>} The Authentication instance.
+     */
+    public get authentication(): AuthenticationManager<TState> {
+        if (!this._authentication) {
+            throw new Error(
+                `The Application.authentication property is unavailable because no authentication options were configured.`
+            );
+        }
+
+        return this._authentication;
     }
 
     /**
@@ -482,6 +540,23 @@ export class Application<TState extends TurnState = TurnState> {
                 const { storage, turnStateFactory } = this._options;
                 const state = turnStateFactory();
                 await state.load(context, storage);
+
+                // Sign the user in
+                if (this._authentication && (await this._startSignIn?.(context))) {
+                    const response = await this._authentication.signUserIn(context, state);
+
+                    if (response.status == 'pending') {
+                        // Save turn state
+                        // - Save authentication status in turn state
+                        await state.save(context, storage);
+                        return false;
+                    }
+
+                    // Invalid activities should be ignored for auth
+                    if (response.status == 'error' && response.cause != 'invalidActivity') {
+                        throw response.error;
+                    }
+                }
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
@@ -841,6 +916,18 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
     }
 
     /**
+     * Configures user authentication settings.
+     * @param {BotAdapter} adapter The adapter to use for user authentication.
+     * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withAuthentication(adapter: BotAdapter, authenticationOptions: AuthenticationOptions): this {
+        this._options.adapter = adapter;
+        this._options.authentication = authenticationOptions;
+        return this;
+    }
+
+    /**
      * Configures the removing of mentions of the bot's name from incoming messages.
      * Default state for removeRecipientMention is true
      * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
@@ -1081,6 +1168,23 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
                 );
             };
     }
+}
+
+/**
+ * Returns a selector function that indicates whether the bot should initiate a sign in.
+ * @param {boolean | Selector} startSignIn A boolean or function that indicates whether the bot should initiate a sign in.
+ * @returns {Selector} A selector function that returns true if the bot should initiate a sign in.
+ */
+function createSignInSelector(startSignIn?: boolean | Selector): Selector {
+    return (context) => {
+        if (typeof startSignIn === 'function') {
+            return startSignIn(context);
+        } else if (typeof startSignIn === 'boolean') {
+            return Promise.resolve(startSignIn);
+        } else {
+            return Promise.resolve(true);
+        }
+    };
 }
 
 /**
