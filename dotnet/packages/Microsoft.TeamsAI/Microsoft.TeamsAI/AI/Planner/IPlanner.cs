@@ -1,5 +1,4 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Planner
@@ -10,25 +9,38 @@ namespace Microsoft.Teams.AI.AI.Planner
     public interface IPlanner<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
-        /// Completes a prompt without returning a plan.
+        /// Starts a new task.
         /// </summary>
+        /// <remarks>
+        /// This method is called when the AI system is ready to start a new task. The planner should
+        /// generate a plan that the AI system will execute. Returning an empty plan signals that
+        /// there is no work to be performed.
+        ///
+        /// The planner should take the users input from `state.temp.input`.
+        /// </remarks>
         /// <param name="turnContext">Context for the current turn of conversation</param>
         /// <param name="turnState">Application state for the current turn of conversation</param>
-        /// <param name="promptTemplate">Prompt template to complete</param>
-        /// <param name="options">Configuration options for the AI system.</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns>The response from the prompt.</returns>
-        Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Completes a prompt and generates a plan for the AI system to execute.
-        /// </summary>
-        /// <param name="turnContext">Context for the current turn of conversation</param>
-        /// <param name="turnState">Application state for the current turn of conversation</param>
-        /// <param name="promptTemplate">Prompt template to complete</param>
-        /// <param name="options">Configuration options for the AI system.</param>
+        /// <param name="ai">The AI system that is generating the plan.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The plan that was generated.</returns>
-        Task<Plan> GeneratePlanAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState> options, CancellationToken cancellationToken);
+        Task<Plan> BeginTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Continues the current task.
+        /// </summary>
+        /// <remarks>
+        /// This method is called when the AI system has finished executing the previous plan and is
+        /// ready to continue the current task. The planner should generate a plan that the AI system
+        /// will execute. Returning an empty plan signals that the task is completed and there is no work
+        /// to be performed.
+        ///
+        /// The output from the last plan step that was executed is passed to the planner via `state.temp.input`.
+        /// </remarks>
+        /// <param name="turnContext">Context for the current turn of conversation</param>
+        /// <param name="turnState">Application state for the current turn of conversation</param>
+        /// <param name="ai">The AI system that is generating the plan.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The plan that was generated.</returns>
+        Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken);
     }
 }
