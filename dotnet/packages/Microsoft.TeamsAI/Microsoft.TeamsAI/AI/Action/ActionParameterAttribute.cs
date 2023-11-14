@@ -32,7 +32,7 @@
         /// <summary>
         /// The action parameter is data object
         /// </summary>
-        Entities,
+        Parameters,
         /// <summary>
         /// The action parameter is action name
         /// </summary>
