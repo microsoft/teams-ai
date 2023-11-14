@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile(path: settingsPath, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
-                .AddUserSecrets<AzureOpenAICompletionTests>()
+                .AddUserSecrets<AzureContentSafetyModeratorTests>()
                 .Build();
         }
 

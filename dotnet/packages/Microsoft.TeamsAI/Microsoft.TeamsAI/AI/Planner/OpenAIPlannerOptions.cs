@@ -84,7 +84,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// <param name="prompts">The prompt manager.</param>
         /// <param name="defaultPrompt">The default prompt.</param>
         /// <param name="history">The history options.</param>
-        public OpenAIPlannerOptions(string apiKey, string defaultModel, IPromptManager<TState> prompts, string defaultPrompt, OpenAIPlannerHistoryOptions? history)
+        public OpenAIPlannerOptions(string apiKey, string defaultModel, IPromptManager<TState> prompts, string defaultPrompt, OpenAIPlannerHistoryOptions? history = null)
         {
             Verify.ParamNotNull(apiKey);
             Verify.ParamNotNull(defaultModel);

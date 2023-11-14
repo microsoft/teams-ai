@@ -80,7 +80,7 @@ namespace Microsoft.Teams.AI.AI
         /// <param name="name">The name of the action.</param>
         /// <param name="handler">The action handler function.</param>
         /// <returns>The current instance object.</returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public AI<TState> RegisterAction(string name, IActionHandler<TState> handler)
         {
             Verify.ParamNotNull(name);
@@ -111,7 +111,7 @@ namespace Microsoft.Teams.AI.AI
         /// Registers the default handler for a named action.
         /// </summary>
         /// <remarks>
-        /// Default handlers can be replaced by calling the action() method with the same name.
+        /// Default handlers can be replaced by calling the RegisterAction() method with the same name.
         /// </remarks>
         /// <param name="name">The name of the action.</param>
         /// <param name="handler">The action handler function.</param>
@@ -141,6 +141,7 @@ namespace Microsoft.Teams.AI.AI
         /// </summary>
         /// <param name="instance">Instance of a class containing these functions.</param>
         /// <returns>The current instance object.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public AI<TState> ImportActions(object instance)
         {
             Verify.ParamNotNull(instance);
@@ -200,16 +201,16 @@ namespace Microsoft.Teams.AI.AI
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        public async Task<bool> Run(ITurnContext turnContext, TState turnState, DateTime? startTime = null, int stepCount = 0, CancellationToken cancellationToken = default)
+        public async Task<bool> RunAsync(ITurnContext turnContext, TState turnState, DateTime? startTime = null, int stepCount = 0, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
             Verify.ParamNotNull(turnState);
 
-            // Populate {{$temp.input}}
-            _SetTempStateValues(turnState, turnContext);
-
             // Initialize start time
             startTime = startTime ?? DateTime.UtcNow;
+
+            // Populate {{$temp.input}}
+            _SetTempStateValues(turnState, turnContext);
 
             Plan? plan = null;
 
@@ -291,7 +292,7 @@ namespace Microsoft.Teams.AI.AI
                     shouldLoop = false;
                     output = await this._actions[AIConstants.SayCommandActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState!, sayCommand, AIConstants.SayCommandActionName);
+                        .PerformAction(turnContext, turnState, sayCommand, AIConstants.SayCommandActionName);
                 }
                 else
                 {
@@ -312,7 +313,7 @@ namespace Microsoft.Teams.AI.AI
             // Check for looping
             if (completed && shouldLoop && Options.AllowLooping)
             {
-                return await Run(turnContext, turnState, startTime, stepCount, cancellationToken);
+                return await RunAsync(turnContext, turnState, startTime, stepCount, cancellationToken);
             }
             else
             {
