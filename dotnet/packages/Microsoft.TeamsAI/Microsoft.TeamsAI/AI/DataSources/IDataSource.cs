@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.DataSources
         /// <summary>
         /// Name of the data source.
         /// </summary>
-        public string name { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Renders the data source as a string of text.
