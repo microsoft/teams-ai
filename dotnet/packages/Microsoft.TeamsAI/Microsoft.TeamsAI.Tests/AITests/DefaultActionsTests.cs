@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.True(actions.ContainsAction(AIConstants.UnknownActionName));
             Assert.True(actions.ContainsAction(AIConstants.FlaggedInputActionName));
             Assert.True(actions.ContainsAction(AIConstants.FlaggedOutputActionName));
-            Assert.True(actions.ContainsAction(AIConstants.RateLimitedActionName));
+            Assert.True(actions.ContainsAction(AIConstants.HttpErrorActionName));
             Assert.True(actions.ContainsAction(AIConstants.PlanReadyActionName));
             Assert.True(actions.ContainsAction(AIConstants.DoCommandActionName));
             Assert.True(actions.ContainsAction(AIConstants.SayCommandActionName));
@@ -93,7 +93,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async Task Test_Execute_RateLimitedAction()
+        public async Task Test_Execute_HttpErrorAction()
         {
             // Arrange
             IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
@@ -102,12 +102,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnState = new TestTurnState();
 
             // Act
-            var rateLimitedAction = actions[AIConstants.RateLimitedActionName];
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await rateLimitedAction.Handler.PerformAction(turnContext, turnState, null, null));
+            var httpErrorAction = actions[AIConstants.HttpErrorActionName];
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await httpErrorAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
             Assert.NotNull(exception);
-            Assert.Equal("An AI request failed because it was rate limited", exception.Message);
+            Assert.Equal("An AI http request failed", exception.Message);
         }
 
         [Fact]
