@@ -22,50 +22,52 @@ import {
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
-/**
- * @private
- */
-const ANONYMOUS_QUERY_LINK_INVOKE_NAME = `composeExtension/anonymousQueryLink`;
+export enum MessagingExtensionsInvokeNames {
+    /**
+     * Name of the invoke activity for anonymous link unfurling.
+     */
+    ANONYMOUS_QUERY_LINK_INVOKE = `composeExtension/anonymousQueryLink`,
 
-/**
- * @private
- */
-const FETCH_TASK_INVOKE_NAME = `composeExtension/fetchTask`;
+    /**
+     * Name of the invoke activity for fetching task module.
+     */
+    FETCH_TASK_INVOKE = `composeExtension/fetchTask`,
 
-/**
- * @private
- */
-const QUERY_INVOKE_NAME = `composeExtension/query`;
+    /**
+     * Name of the invoke activity for query.
+     */
+    QUERY_INVOKE = `composeExtension/query`,
 
-/**
- * @private
- */
-const QUERY_LINK_INVOKE_NAME = `composeExtension/queryLink`;
+    /**
+     * Name of the invoke activity for query link.
+     */
+    QUERY_LINK_INVOKE = `composeExtension/queryLink`,
 
-/**
- * @private
- */
-const SELECT_ITEM_INVOKE_NAME = `composeExtension/selectItem`;
+    /**
+     * Name of the invoke activity for selecting an item.
+     */
+    SELECT_ITEM_INVOKE = `composeExtension/selectItem`,
 
-/**
- * @private
- */
-const SUBMIT_ACTION_INVOKE_NAME = `composeExtension/submitAction`;
+    /**
+     * Name of the invoke activity for submit action.
+     */
+    SUBMIT_ACTION_INVOKE = `composeExtension/submitAction`,
 
-/**
- * @private
- */
-const QUERY_SETTING_URL = `composeExtension/querySettingUrl`;
+    /**
+     * Name of the invoke activity for querying configuration settings.
+     */
+    QUERY_SETTING_URL = `composeExtension/querySettingUrl`,
 
-/**
- * @private
- */
-const CONFIGURE_SETTINGS = `composeExtension/setting`;
+    /**
+     * Name of the invoke activity for configuring settings.
+     */
+    CONFIGURE_SETTINGS = `composeExtension/setting`,
 
-/**
- * @private
- */
-const QUERY_CARD_BUTTON_CLICKED = `composeExtension/onCardButtonClicked`;
+    /**
+     * Name of the invoke activity for handling on card button clicked.
+     */
+    QUERY_CARD_BUTTON_CLICKED = `composeExtension/onCardButtonClicked`
+}
 
 /**
  * MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
@@ -100,7 +102,7 @@ export class MessageExtensions<TState extends TurnState> {
         const selector = (context: TurnContext) =>
             Promise.resolve(
                 context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === ANONYMOUS_QUERY_LINK_INVOKE_NAME
+                    context?.activity.name === MessagingExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE
             );
         this._app.addRoute(
             selector,
@@ -148,14 +150,14 @@ export class MessageExtensions<TState extends TurnState> {
         ) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME, 'edit');
+            const selector = createTaskSelector(cid, MessagingExtensionsInvokeNames.SUBMIT_ACTION_INVOKE, 'edit');
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
+                        context?.activity?.name !== MessagingExtensionsInvokeNames.SUBMIT_ACTION_INVOKE ||
                         context?.activity?.value?.botMessagePreviewAction !== 'edit'
                     ) {
                         throw new Error(
@@ -192,14 +194,14 @@ export class MessageExtensions<TState extends TurnState> {
         handler: (context: TurnContext, state: TState, previewActivity: Partial<Activity>) => Promise<void>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME, 'send');
+            const selector = createTaskSelector(cid, MessagingExtensionsInvokeNames.SUBMIT_ACTION_INVOKE, 'send');
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME ||
+                        context?.activity?.name !== MessagingExtensionsInvokeNames.SUBMIT_ACTION_INVOKE ||
                         context?.activity?.value?.botMessagePreviewAction !== 'send'
                     ) {
                         throw new Error(
@@ -240,14 +242,14 @@ export class MessageExtensions<TState extends TurnState> {
         handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, FETCH_TASK_INVOKE_NAME);
+            const selector = createTaskSelector(cid, MessagingExtensionsInvokeNames.FETCH_TASK_INVOKE);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== FETCH_TASK_INVOKE_NAME
+                        context?.activity?.name !== MessagingExtensionsInvokeNames.FETCH_TASK_INVOKE
                     ) {
                         throw new Error(
                             `Unexpected MessageExtensions.fetchTask() triggered for activity type: ${context?.activity?.type}`
@@ -308,14 +310,14 @@ export class MessageExtensions<TState extends TurnState> {
         handler: (context: TurnContext, state: TState, query: Query<TParams>) => Promise<MessagingExtensionResult>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, QUERY_INVOKE_NAME);
+            const selector = createTaskSelector(cid, MessagingExtensionsInvokeNames.QUERY_INVOKE);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== QUERY_INVOKE_NAME
+                        context?.activity?.name !== MessagingExtensionsInvokeNames.QUERY_INVOKE
                     ) {
                         throw new Error(
                             `Unexpected MessageExtensions.query() triggered for activity type: ${context?.activity?.type}`
@@ -371,7 +373,7 @@ export class MessageExtensions<TState extends TurnState> {
     ): Application<TState> {
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_LINK_INVOKE_NAME
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessagingExtensionsInvokeNames.QUERY_LINK_INVOKE
             );
 
         this._app.addRoute(
@@ -419,7 +421,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === SELECT_ITEM_INVOKE_NAME
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessagingExtensionsInvokeNames.SELECT_ITEM_INVOKE
             );
 
         // Add route
@@ -466,14 +468,14 @@ export class MessageExtensions<TState extends TurnState> {
         ) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>
     ): Application<TState> {
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE_NAME);
+            const selector = createTaskSelector(cid, MessagingExtensionsInvokeNames.SUBMIT_ACTION_INVOKE);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== SUBMIT_ACTION_INVOKE_NAME
+                        context?.activity?.name !== MessagingExtensionsInvokeNames.SUBMIT_ACTION_INVOKE
                     ) {
                         throw new Error(
                             `Unexpected MessageExtensions.submitAction() triggered for activity type: ${context?.activity?.type}`
@@ -511,7 +513,7 @@ export class MessageExtensions<TState extends TurnState> {
                         value: result
                     }
                 };
-            } else if (typeof result == 'object') {
+            } else if (typeof result == 'object' && result != null) {
                 if ((result as TaskModuleTaskInfo).card) {
                     // Return another task module
                     response = {
@@ -556,7 +558,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_SETTING_URL
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessagingExtensionsInvokeNames.QUERY_SETTING_URL
             );
 
         // Add route
@@ -598,7 +600,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === CONFIGURE_SETTINGS
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessagingExtensionsInvokeNames.CONFIGURE_SETTINGS
             );
 
         // Add route
@@ -640,7 +642,7 @@ export class MessageExtensions<TState extends TurnState> {
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_CARD_BUTTON_CLICKED
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessagingExtensionsInvokeNames.QUERY_CARD_BUTTON_CLICKED
             );
 
         // Add route

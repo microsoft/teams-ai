@@ -21,6 +21,14 @@ describe('Application', () => {
         planner: new TestPlanner()
     };
     const botAppId = 'testBot';
+    const authenticationSettings = {
+        settings: {
+            testSetting: {
+                connectionName: 'testConnectionName',
+                title: 'testTitle'
+            }
+        }
+    };
     const longRunningMessages = true;
     const removeRecipientMention = false;
     const startTypingTimer = false;
@@ -76,6 +84,7 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.ai, undefined);
+            assert.equal(app.options.authentication, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.taskModules, undefined);
             assert.equal(app.options.removeRecipientMention, true);
@@ -90,6 +99,7 @@ describe('Application', () => {
                 .withAIOptions(ai)
                 .withLongRunningMessages(adapter, botAppId)
                 .withAdaptiveCardOptions(adaptiveCards)
+                .withAuthentication(adapter, authenticationSettings)
                 .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
                 .build();
@@ -99,6 +109,7 @@ describe('Application', () => {
             assert.equal(app.options.storage, storage);
             assert.equal(app.options.ai, ai);
             assert.equal(app.options.adaptiveCards, adaptiveCards);
+            assert.equal(app.options.authentication, authenticationSettings);
             assert.equal(app.options.taskModules, taskModules);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);
             assert.equal(app.options.startTypingTimer, startTypingTimer);
