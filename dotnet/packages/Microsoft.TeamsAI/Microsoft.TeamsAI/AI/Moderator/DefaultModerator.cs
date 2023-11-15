@@ -1,6 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Moderator
@@ -12,15 +11,16 @@ namespace Microsoft.Teams.AI.AI.Moderator
     public class DefaultModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <inheritdoc />
-        public Task<Plan> ReviewPlan(ITurnContext turnContext, TState turnState, Plan plan)
+        public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
         {
             // Pass
             return Task.FromResult(plan);
         }
 
         /// <inheritdoc />
-        public Task<Plan?> ReviewPrompt(ITurnContext turnContext, TState turnState, PromptTemplate prompt)
+        public Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
         {
+            // Just allow input
             return Task.FromResult<Plan?>(null);
         }
     }
