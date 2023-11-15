@@ -4,6 +4,7 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
@@ -69,7 +70,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public async Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, Memory.Memory memory, ITokenizer tokenizer, List<string> args)
+        public async Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, IMemory memory, ITokenizer tokenizer, List<string> args)
         {
             PromptFunction<List<string>>? func = this.GetFunction(name);
 

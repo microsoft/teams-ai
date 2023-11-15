@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using System.Text.Json;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -32,7 +33,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             // calculate and cache length
             if (this._length < 0)

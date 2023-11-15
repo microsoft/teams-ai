@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using System.Text.Json;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -89,7 +90,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
         /// <returns>prompt rendered as a list of messages</returns>
-        public abstract Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
+        public abstract Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
 
         /// <summary>
         /// Render As Text
@@ -100,7 +101,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
         /// <returns>prompt rendered as text</returns>
-        public virtual async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public virtual async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
 

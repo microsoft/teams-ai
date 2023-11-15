@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.DataSources
 {
@@ -29,7 +30,7 @@ namespace Microsoft.Teams.AI.AI.DataSources
         }
 
         /// <inheritdoc />
-        public async Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, Memory.Memory memory, ITokenizer tokenizer, int maxTokens)
+        public async Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int maxTokens)
         {
             if (this._tokens.Count == 0)
             {

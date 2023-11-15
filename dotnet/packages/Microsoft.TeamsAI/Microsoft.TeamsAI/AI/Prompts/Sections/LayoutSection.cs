@@ -1,6 +1,7 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -44,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             int length = 0;
             List<RenderedPromptSection<string>> renderedSections = new();
@@ -85,7 +86,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             int length = 0;
             List<RenderedPromptSection<List<ChatMessage>>> renderedSections = new();

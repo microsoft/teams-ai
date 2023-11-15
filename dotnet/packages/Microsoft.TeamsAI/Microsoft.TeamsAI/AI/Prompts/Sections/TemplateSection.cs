@@ -1,10 +1,11 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Models;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
-    internal delegate Task<string> RenderFunction(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
+    internal delegate Task<string> RenderFunction(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
 
     internal enum ParamState
     {
@@ -58,7 +59,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             List<string> rendered = this._renderers
                 .Select(async r => await r(context, memory, functions, tokenizer, maxTokens))
