@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Memory;
 
