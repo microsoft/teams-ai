@@ -7,12 +7,6 @@
     public class Validation<TValue>
     {
         /// <summary>
-        /// Type of the validation object.
-        /// This is used for type checking.
-        /// </summary>
-        public string Type = "Validation";
-
-        /// <summary>
         /// Whether the validation is valid.
         /// If this is `false` the `Feedback` property will be set, otherwise the `Value` property MAY be set.
         /// </summary>

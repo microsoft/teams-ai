@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Memory;
 
@@ -19,6 +19,6 @@ namespace Microsoft.Teams.AI.AI.Validators
         /// <param name="response">Response to validate.</param>
         /// <param name="remainingAttempts">Number of remaining attempts to validate the response.</param>
         /// <returns></returns>
-        public Task<Validation<TValue>> ValidateResponse(TurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts);
+        public Task<Validation<TValue>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts);
     }
 }

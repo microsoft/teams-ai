@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing.Template;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Microsoft.Teams.AI.Memory
+﻿namespace Microsoft.Teams.AI.Memory
 {
     /// <summary>
     /// Represents a memory.
