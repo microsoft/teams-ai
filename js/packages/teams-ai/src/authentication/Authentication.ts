@@ -7,23 +7,30 @@
  * Licensed under the MIT License.
  */
 
-import { Storage, TurnContext } from 'botbuilder';
+import { Storage, TeamsChannelAccount, TeamsInfo, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
+import { AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
 import { TurnState } from '../TurnState';
 import { Application, Selector } from '../Application';
-import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
-import { BotAuthentication, deleteTokenFromState, setTokenInState } from './BotAuthentication';
+import { MessagingExtensionAuthenticationBase } from './MessagingExtensionAuthenticationBase';
+import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
+import { TeamsSsoPromptSettings } from './TeamsBotSsoPrompt';
+import { OAuthPromptMessagingExtensionAuthentication } from './OAuthPromptMessagingExtensionAuthentication';
+import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
+import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
+import { TeamsSsoMessagingExtensionAuthentication } from './TeamsSsoMessagingExtensionAuthentication';
 
 /**
  * User authentication service.
  */
 export class Authentication<TState extends TurnState> {
-    private readonly _messagingExtensionAuth: MessagingExtensionAuthentication;
-    private readonly _botAuth: BotAuthentication<TState>;
+    private readonly _messagingExtensionAuth: MessagingExtensionAuthenticationBase;
+    private readonly _botAuth: BotAuthenticationBase<TState>;
     private readonly _name: string;
+    private readonly _msal?: ConfidentialClientApplication;
 
-    public readonly settings: OAuthPromptSettings;
+    public readonly settings: OAuthPromptSettings | TeamsSsoPromptSettings;
 
     /**
      * Creates a new instance of the `Authentication` class.
@@ -31,21 +38,29 @@ export class Authentication<TState extends TurnState> {
      * @param {string} name - The name of the connection.
      * @param {OAuthPromptSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
-     * @param {MessagingExtensionAuthentication} messagingExtensionsAuth - Handles messaging extension flow authentication.
-     * @param {BotAuthentication} botAuth - Handles bot-flow authentication.
+     * @param {MessagingExtensionAuthenticationBase} messagingExtensionsAuth - Handles messaging extension flow authentication.
+     * @param {BotAuthenticationBase} botAuth - Handles bot-flow authentication.
      */
     constructor(
         app: Application<TState>,
         name: string,
-        settings: OAuthPromptSettings,
+        settings: OAuthPromptSettings | TeamsSsoPromptSettings,
         storage?: Storage,
-        messagingExtensionsAuth?: MessagingExtensionAuthentication,
-        botAuth?: BotAuthentication<TState>
+        messagingExtensionsAuth?: MessagingExtensionAuthenticationBase,
+        botAuth?: BotAuthenticationBase<TState>
     ) {
         this.settings = settings;
         this._name = name;
-        this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
-        this._botAuth = botAuth || new BotAuthentication(app, settings, this._name, storage);
+
+        if (this.isOAuthPromptSettings(settings)) {
+            this._messagingExtensionAuth = messagingExtensionsAuth || new OAuthPromptMessagingExtensionAuthentication(settings);
+            this._botAuth = botAuth || new OAuthPromptBotAuthentication(app, settings, this._name, storage);
+        } else {
+            this._msal = new ConfidentialClientApplication(settings.msalConfig);
+            this._botAuth = botAuth || new TeamsSsoBotAuthentication(app, settings, this._name, this._msal, storage);
+            this._messagingExtensionAuth = messagingExtensionsAuth || new TeamsSsoMessagingExtensionAuthentication(settings, this._msal);
+        }
+
     }
 
     /**
@@ -64,7 +79,7 @@ export class Authentication<TState extends TurnState> {
         }
 
         if (this._messagingExtensionAuth.isValidActivity(context)) {
-            return await this._messagingExtensionAuth.authenticate(context, this.settings);
+            return await this._messagingExtensionAuth.authenticate(context);
         }
 
         if (this._botAuth.isValidActivity(context)) {
@@ -84,11 +99,18 @@ export class Authentication<TState extends TurnState> {
      * @param {TState} state - Application state.
      * @returns {Promise<void>} A Promise representing the asynchronous operation.
      */
-    public signOutUser(context: TurnContext, state: TState): Promise<void> {
+    public async signOutUser(context: TurnContext, state: TState): Promise<void> {
         this._botAuth.deleteAuthFlowState(context, state);
 
         // Signout flow is agnostic of the activity type.
-        return UserTokenAccess.signOutUser(context, this.settings);
+        if (this.isOAuthPromptSettings(this.settings)) {
+            return UserTokenAccess.signOutUser(context, this.settings);
+        } else {
+            const loginHint = await this.getLoginHint(context);
+            if (loginHint) {
+                return this.removeTokenFromMsalCache(loginHint);
+            }
+        }
     }
 
     /**
@@ -97,13 +119,24 @@ export class Authentication<TState extends TurnState> {
      * @returns {string | undefined} The token string or undefined if the user is not signed in.
      */
     public async isUserSignedIn(context: TurnContext): Promise<string | undefined> {
-        const tokenResponse = await UserTokenAccess.getUserToken(context, this.settings, '');
+        if (this.isOAuthPromptSettings(this.settings)) {
+            const tokenResponse = await UserTokenAccess.getUserToken(context, this.settings, '');
 
-        if (tokenResponse && tokenResponse.token) {
-            return tokenResponse.token;
+            if (tokenResponse && tokenResponse.token) {
+                return tokenResponse.token;
+            }
+
+            return undefined;
+        } else {
+            const loginHint = await this.getLoginHint(context);
+            if (loginHint) {
+                const tokenResponse = await this.acquireTokenFromMsalCache(loginHint ?? '');
+
+                if (tokenResponse && tokenResponse.accessToken) {
+                    return tokenResponse.accessToken;
+                }
+            }
         }
-
-        return undefined;
     }
 
     /**
@@ -126,6 +159,53 @@ export class Authentication<TState extends TurnState> {
      */
     public onUserSignInFailure(handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>) {
         this._botAuth.onUserSignInFailure(handler);
+    }
+
+    private isOAuthPromptSettings(settings: OAuthPromptSettings | TeamsSsoPromptSettings): settings is OAuthPromptSettings {
+        return (settings as OAuthPromptSettings).connectionName !== undefined;
+    }
+
+    private async getLoginHint(context: TurnContext): Promise<string | undefined> {
+        const account: TeamsChannelAccount = await TeamsInfo.getMember(
+            context,
+            context.activity.from.id
+        );
+        return account.userPrincipalName;
+    }
+
+    private async acquireTokenFromMsalCache(
+        loginHint: string
+    ): Promise<AuthenticationResult | null> {
+        try {
+            const settings = this.settings as TeamsSsoPromptSettings;
+            const accounts = await this._msal!.getTokenCache().getAllAccounts();
+            const account = accounts.find((account) => account.username === loginHint);
+            if (account) {
+                const silentRequest = {
+                    account: account,
+                    scopes: settings.scopes,
+                };
+                return await this._msal!.acquireTokenSilent(silentRequest);
+            }
+        } catch (error) {
+            return null;
+        }
+        return null;
+    }
+
+    private async removeTokenFromMsalCache(
+        loginHint: string
+    ): Promise<void> {
+        try {
+            const accounts = await this._msal!.getTokenCache().getAllAccounts();
+            const account = accounts.find((account) => account.username === loginHint);
+            if (account) {
+                await this._msal!.getTokenCache().removeAccount(account);
+            }
+        } catch (error) {
+            return;
+        }
+        return;
     }
 }
 

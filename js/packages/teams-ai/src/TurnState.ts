@@ -57,6 +57,11 @@ export interface DefaultTempState {
      * User authentication tokens
      */
     authTokens: { [key: string]: string };
+
+    /**
+     * Flag indicating whether a token exchange event has already been processed
+     */
+    duplicateTokenExchange?: boolean
 }
 
 /**

@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
-import { BotAuthentication } from './BotAuthentication';
-import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
+import { BotAuthenticationBase } from './BotAuthenticationBase';
+import { MessagingExtensionAuthenticationBase } from './MessagingExtensionAuthenticationBase';
 import { Application } from '../Application';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthError, Authentication, AuthenticationManager, AuthenticationOptions } from './Authentication';
@@ -8,14 +8,16 @@ import { TurnState } from '../TurnState';
 import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
-import * as BotAuth from './BotAuthentication';
+import * as BotAuth from './BotAuthenticationBase';
+import { OAuthPromptMessagingExtensionAuthentication } from './OAuthPromptMessagingExtensionAuthentication';
+import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
 
 describe('Authentication', () => {
     const adapter = new TestAdapter();
 
-    let botAuth: BotAuthentication<TurnState>;
+    let botAuth: BotAuthenticationBase<TurnState>;
     let botAuthenticateStub: sinon.SinonStub;
-    let messageExtensionsAuth: MessagingExtensionAuthentication;
+    let messageExtensionsAuth: MessagingExtensionAuthenticationBase;
     let messagingExtensionAuthenticateStub: sinon.SinonStub;
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
@@ -62,9 +64,9 @@ describe('Authentication', () => {
             connectionName: 'test'
         };
 
-        messageExtensionsAuth = new MessagingExtensionAuthentication();
+        messageExtensionsAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
         messagingExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
-        botAuth = new BotAuthentication(appStub, settings, settingName);
+        botAuth = new OAuthPromptBotAuthentication(appStub, settings, settingName);
         botAuthenticateStub = sinon.stub(botAuth, 'authenticate');
 
         auth = new Authentication(appStub, settingName, settings, undefined, messageExtensionsAuth, botAuth);
