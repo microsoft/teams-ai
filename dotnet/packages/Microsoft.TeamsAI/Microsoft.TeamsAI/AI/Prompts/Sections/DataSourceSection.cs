@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -23,7 +24,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, Memory.Memory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
             RenderedPromptSection<string> rendered = await this._source.RenderDataAsync(context, memory, tokenizer, budget);

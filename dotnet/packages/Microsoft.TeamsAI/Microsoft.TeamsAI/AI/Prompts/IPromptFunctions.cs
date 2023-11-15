@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
@@ -12,7 +13,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
     /// <param name="tokenizer">tokenizer</param>
     /// <param name="args">args</param>
     /// <returns></returns>
-    public delegate Task<dynamic> PromptFunction<TArgs>(ITurnContext context, Memory.Memory memory, IPromptFunctions<TArgs> functions, ITokenizer tokenizer, TArgs args);
+    public delegate Task<dynamic> PromptFunction<TArgs>(ITurnContext context, IMemory memory, IPromptFunctions<TArgs> functions, ITokenizer tokenizer, TArgs args);
 
     /// <summary>
     /// Prompt Functions
@@ -49,6 +50,6 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="args">args</param>
         /// <returns></returns>
-        public Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, Memory.Memory memory, ITokenizer tokenizer, TArgs args);
+        public Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, IMemory memory, ITokenizer tokenizer, TArgs args);
     }
 }

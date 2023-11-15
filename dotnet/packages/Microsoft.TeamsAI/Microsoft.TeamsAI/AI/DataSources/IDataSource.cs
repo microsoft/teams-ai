@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.Memory;
 
 namespace Microsoft.Teams.AI.AI.DataSources
 {
@@ -22,6 +23,6 @@ namespace Microsoft.Teams.AI.AI.DataSources
         /// <param name="tokenizer">Tokenizer to use when rendering the data source.</param>
         /// <param name="maxTokens">Maximum number of tokens allowed to be rendered.</param>
         /// <returns></returns>
-        public Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, Memory.Memory memory, ITokenizer tokenizer, int maxTokens);
+        public Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int maxTokens);
     }
 }
