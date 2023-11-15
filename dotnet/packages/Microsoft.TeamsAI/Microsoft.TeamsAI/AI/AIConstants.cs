@@ -22,6 +22,11 @@ namespace Microsoft.Teams.AI.AI
         public const string SayCommand = "SAY";
 
         /// <summary>
+        /// The type of command that will stop the running.
+        /// </summary>
+        public const string StopCommand = "STOP";
+
+        /// <summary>
         /// An action that will be called anytime an unknown action is predicted by the planner.
         /// </summary>
         /// <remarks>
@@ -94,5 +99,10 @@ namespace Microsoft.Teams.AI.AI
         /// will need to handle that yourself.
         /// </remarks>
         public const string SayCommandActionName = "___SAY___";
+
+        /// <summary>
+        /// The task either executed too many steps or timed out.
+        /// </summary>
+        public const string TooManyStepsActionName = "___TooManySteps___";
     }
 }
