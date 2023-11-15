@@ -1,7 +1,6 @@
 ﻿using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI.Planner;
 using System.Reflection;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.Utilities;
@@ -39,8 +38,6 @@ namespace Microsoft.Teams.AI.AI
                 Options.Moderator = new DefaultModerator<TState>();
             }
 
-            Options.History ??= new AIHistoryOptions();
-
             // Import default actions
             ImportActions(new DefaultActions<TState>(loggerFactory));
         }
@@ -64,11 +61,6 @@ namespace Microsoft.Teams.AI.AI
         public IPlanner<TState> Planner => Options.Planner;
 
         /// <summary>
-        /// Returns the prompt manager being used by the AI system.
-        /// </summary>
-        public IPromptManager<TState> Prompts => Options.PromptManager;
-
-        /// <summary>
         /// Registers a handler for a named action.
         /// </summary>
         /// <remarks>
@@ -87,17 +79,16 @@ namespace Microsoft.Teams.AI.AI
         /// </remarks>
         /// <param name="name">The name of the action.</param>
         /// <param name="handler">The action handler function.</param>
-        /// <param name="allowOverrides">Whether or not this action's properties can be overriden.</param>
         /// <returns>The current instance object.</returns>
-        /// <exception cref="Exception"></exception>
-        public AI<TState> RegisterAction(string name, IActionHandler<TState> handler, bool allowOverrides = false)
+        /// <exception cref="InvalidOperationException"></exception>
+        public AI<TState> RegisterAction(string name, IActionHandler<TState> handler)
         {
             Verify.ParamNotNull(name);
             Verify.ParamNotNull(handler);
 
-            if (!_actions.ContainsAction(name) || allowOverrides)
+            if (!_actions.ContainsAction(name))
             {
-                _actions.AddAction(name, handler, allowOverrides);
+                _actions.AddAction(name, handler, allowOverrides: false);
             }
             else
             {
@@ -105,6 +96,7 @@ namespace Microsoft.Teams.AI.AI
                 if (entry.AllowOverrides)
                 {
                     entry.Handler = handler;
+                    entry.AllowOverrides = false; // Only override once
                 }
                 else
                 {
@@ -116,15 +108,31 @@ namespace Microsoft.Teams.AI.AI
         }
 
         /// <summary>
-        /// Register an action into the AI module.
+        /// Registers the default handler for a named action.
         /// </summary>
-        /// <param name="action"></param>
+        /// <remarks>
+        /// Default handlers can be replaced by calling the RegisterAction() method with the same name.
+        /// </remarks>
+        /// <param name="name">The name of the action.</param>
+        /// <param name="handler">The action handler function.</param>
         /// <returns>The current instance object.</returns>
-        public AI<TState> RegisterAction(ActionEntry<TState> action)
+        public AI<TState> RegisterDefaultAction(string name, IActionHandler<TState> handler)
         {
-            Verify.ParamNotNull(action);
+            Verify.ParamNotNull(name);
+            Verify.ParamNotNull(handler);
 
-            return RegisterAction(action.Name, action.Handler, action.AllowOverrides);
+            if (!_actions.ContainsAction(name))
+            {
+                _actions.AddAction(name, handler, allowOverrides: true);
+            }
+            else
+            {
+                ActionEntry<TState> entry = _actions[name];
+                entry.Handler = handler;
+                entry.AllowOverrides = true;
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -133,6 +141,7 @@ namespace Microsoft.Teams.AI.AI
         /// </summary>
         /// <param name="instance">Instance of a class containing these functions.</param>
         /// <returns>The current instance object.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public AI<TState> ImportActions(object instance)
         {
             Verify.ParamNotNull(instance);
@@ -152,9 +161,29 @@ namespace Microsoft.Teams.AI.AI
             }
 
             // Register the actions
-            result.ForEach(action => RegisterAction(action));
+            result.ForEach(action =>
+            {
+                if (action.AllowOverrides)
+                {
+                    RegisterDefaultAction(action.Name, action.Handler);
+                }
+                else
+                {
+                    RegisterAction(action.Name, action.Handler);
+                }
+            });
 
             return this;
+        }
+
+        /// <summary>
+        /// Checks to see if the AI system has a handler for a given action.
+        /// </summary>
+        /// <param name="action">Name of the action to check.</param>
+        /// <returns>True if the AI system has a handler for the given action.</returns>
+        public bool ContainsAction(string action)
+        {
+            return _actions.ContainsAction(action);
         }
 
         /// <summary>
@@ -168,17 +197,129 @@ namespace Microsoft.Teams.AI.AI
         /// <param name="turnContext">Current turn context.</param>
         /// <param name="turnState">Current turn state.</param>
         /// <param name="startTime">Optional. Time the AI system started running.</param>
-        /// <param name="stepCount">Optional. Number of steps that have been executed.</param>
+        /// <param name="stepCount">Number of steps that have been executed.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        public Task<bool> Run(ITurnContext turnContext, TState turnState, DateTime? startTime = null, int stepCount = 0)
+        public async Task<bool> RunAsync(ITurnContext turnContext, TState turnState, DateTime? startTime = null, int stepCount = 0, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
             Verify.ParamNotNull(turnState);
-            _SetTempStateValues(turnState, turnContext, Options);
-            throw new NotImplementedException();
+
+            // Initialize start time
+            startTime = startTime ?? DateTime.UtcNow;
+
+            // Populate {{$temp.input}}
+            _SetTempStateValues(turnState, turnContext);
+
+            Plan? plan = null;
+
+            // Review input on first loop
+            if (stepCount == 0)
+            {
+                plan = await Options.Moderator.ReviewInput(turnContext, turnState);
+            }
+
+            // Generate plan
+            if (plan == null)
+            {
+                if (stepCount == 0)
+                {
+                    plan = await Options.Planner.BeginTaskAsync(turnContext, turnState, this, cancellationToken);
+                }
+                else
+                {
+                    plan = await Options.Planner.ContinueTaskAsync(turnContext, turnState, this, cancellationToken);
+                }
+
+                // Review the plans output
+                plan = await Options.Moderator.ReviewOutput(turnContext, turnState, plan);
+            }
+
+            // Process generated plan
+            string response = await _actions[AIConstants.PlanReadyActionName].Handler.PerformAction(turnContext, turnState, plan, AIConstants.PlanReadyActionName);
+            if (string.Equals(response, AIConstants.StopCommand))
+            {
+                return false;
+            }
+
+            // Run predicted commands
+            // - If the plan ends on a SAY command then the plan is considered complete, otherwise we'll loop
+            bool completed = true;
+            bool shouldLoop = false;
+            foreach (IPredictedCommand command in plan.Commands)
+            {
+                // Check for timeout
+                if (DateTime.UtcNow - startTime > Options.MaxTime || ++stepCount > Options.MaxSteps)
+                {
+                    completed = false;
+                    TooManyStepsParameters parameters = new(Options.MaxSteps, Options.MaxTime, startTime.Value, stepCount);
+                    await _actions[AIConstants.TooManyStepsActionName]
+                        .Handler
+                        .PerformAction(turnContext, turnState, parameters, AIConstants.TooManyStepsActionName);
+                    break;
+                }
+
+                string output;
+                if (command is PredictedDoCommand doCommand)
+                {
+                    if (_actions.ContainsAction(doCommand.Action))
+                    {
+                        DoCommandActionData<TState> data = new()
+                        {
+                            PredictedDoCommand = doCommand,
+                            Handler = _actions[doCommand.Action].Handler
+                        };
+
+                        // Call action handler
+                        output = await this._actions[AIConstants.DoCommandActionName]
+                            .Handler
+                            .PerformAction(turnContext, turnState, data, doCommand.Action);
+                        shouldLoop = output.Length > 0;
+                    }
+                    else
+                    {
+                        // Redirect to UnknownAction handler
+                        output = await this._actions[AIConstants.UnknownActionName]
+                            .Handler
+                            .PerformAction(turnContext, turnState, plan, doCommand.Action);
+                    }
+                }
+                else if (command is PredictedSayCommand sayCommand)
+                {
+                    shouldLoop = false;
+                    output = await this._actions[AIConstants.SayCommandActionName]
+                        .Handler
+                        .PerformAction(turnContext, turnState, sayCommand, AIConstants.SayCommandActionName);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unknown command of {command.Type} predicted");
+                }
+
+                // Check for stop command
+                if (string.Equals(output, AIConstants.StopCommand))
+                {
+                    completed = false;
+                    break;
+                }
+
+                // Copy the actions output to the input
+                turnState.Temp!.Input = output;
+            }
+
+            // Check for looping
+            if (completed && shouldLoop && Options.AllowLooping)
+            {
+                return await RunAsync(turnContext, turnState, startTime, stepCount, cancellationToken);
+            }
+            else
+            {
+                return completed;
+            }
         }
 
-        private void _SetTempStateValues(TState turnState, ITurnContext turnContext, AIOptions<TState>? options)
+        private void _SetTempStateValues(TState turnState, ITurnContext turnContext)
         {
             TempState? tempState = turnState.Temp;
 
@@ -187,11 +328,6 @@ namespace Microsoft.Teams.AI.AI
                 if (string.IsNullOrEmpty(tempState.Input))
                 {
                     tempState.Input = turnContext.Activity.Text ?? string.Empty;
-                }
-
-                if (string.IsNullOrEmpty(tempState.History) && options?.History != null && options.History.TrackHistory)
-                {
-                    tempState.History = ConversationHistory.ToString(turnState, options.History.MaxTokens, options.History.LineSeparator);
                 }
             }
         }
