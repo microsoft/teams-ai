@@ -161,11 +161,11 @@ namespace Microsoft.Teams.AI.AI.Planner
             }
             catch (HttpOperationException ex)
             {
-                // Ensure we weren't rate limited
-                if (ex.isRateLimitedStatusCode())
+                // Ensure we don't have an http error
+                if (ex.isHttpErrorStatusCode())
                 {
                     Plan plan = new();
-                    plan.Commands.Add(new PredictedDoCommand(AIConstants.RateLimitedActionName));
+                    plan.Commands.Add(new PredictedDoCommand(AIConstants.HttpErrorActionName));
                     return plan;
                 }
 

@@ -39,14 +39,14 @@ namespace Microsoft.Teams.AI.AI.Action
             return Task.FromResult(AIConstants.StopCommand);
         }
 
-        [Action(AIConstants.RateLimitedActionName, isDefault: true)]
-        public Task<string> RateLimitedAction()
+        [Action(AIConstants.HttpErrorActionName, isDefault: true)]
+        public Task<string> HttpErrorAction()
         {
-            throw new TeamsAIException("An AI request failed because it was rate limited");
+            throw new TeamsAIException("An AI http request failed");
         }
 
         [Action(AIConstants.PlanReadyActionName, isDefault: true)]
-        public Task<string> PlanReadyAction([ActionEntities] Plan plan)
+        public Task<string> PlanReadyAction([ActionParameters] Plan plan)
         {
             Verify.ParamNotNull(plan);
 
@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Action
         }
 
         [Action(AIConstants.DoCommandActionName, isDefault: true)]
-        public async Task<string> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionEntities] DoCommandActionData<TState> doCommandActionData)
+        public async Task<string> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionParameters] DoCommandActionData<TState> doCommandActionData)
         {
             Verify.ParamNotNull(doCommandActionData);
 
@@ -70,11 +70,11 @@ namespace Microsoft.Teams.AI.AI.Action
 
             IActionHandler<TState> handler = doCommandActionData.Handler;
 
-            return await handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Entities, doCommandActionData.PredictedDoCommand.Action);
+            return await handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Parameters, doCommandActionData.PredictedDoCommand.Action);
         }
 
         [Action(AIConstants.SayCommandActionName, isDefault: true)]
-        public async Task<string> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionEntities] PredictedSayCommand command)
+        public async Task<string> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionParameters] PredictedSayCommand command)
         {
             Verify.ParamNotNull(command);
 
@@ -92,7 +92,7 @@ namespace Microsoft.Teams.AI.AI.Action
         }
 
         [Action(AIConstants.TooManyStepsActionName, isDefault: true)]
-        public Task<string> TooManyStepsAction([ActionEntities] TooManyStepsParameters parameters)
+        public Task<string> TooManyStepsAction([ActionParameters] TooManyStepsParameters parameters)
         {
             if (parameters.StepCount > parameters.MaxSteps)
             {

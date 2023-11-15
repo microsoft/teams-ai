@@ -161,14 +161,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             public List<object?[]> Calls { get; set; } = new List<object?[]>();
 
             [Action("action1")]
-            public string Action1([ActionTurnContext] ITurnContext context, [ActionTurnState] TState state, [ActionEntities] object entities, [ActionName] string name)
+            public string Action1([ActionTurnContext] ITurnContext context, [ActionTurnState] TState state, [ActionParameters] object entities, [ActionName] string name)
             {
                 Calls.Add(new[] { context, state, entities, name });
                 return string.Empty;
             }
 
             [Action("action2")]
-            public string Action2([ActionName] string name, [ActionEntities] object entities, [ActionTurnState] TState state, [ActionTurnContext] ITurnContext context)
+            public string Action2([ActionName] string name, [ActionParameters] object entities, [ActionTurnState] TState state, [ActionTurnContext] ITurnContext context)
             {
                 Calls.Add(new[] { name, entities, state, context });
                 return string.Empty;
@@ -206,7 +206,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         private sealed class TestActions<TContext, TState, TEntities, TName>
         {
             [Action("action")]
-            public static string Action([ActionTurnContext] TContext _0, [ActionTurnState] TState _1, [ActionEntities] TEntities _2, [ActionName] TName _3)
+            public static string Action([ActionTurnContext] TContext _0, [ActionTurnState] TState _1, [ActionParameters] TEntities _2, [ActionName] TName _3)
             {
                 return string.Empty;
             }

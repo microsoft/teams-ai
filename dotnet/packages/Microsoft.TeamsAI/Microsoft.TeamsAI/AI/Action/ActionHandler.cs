@@ -69,7 +69,7 @@ namespace Microsoft.Teams.AI.AI.Action
                         CheckParameterAssignment(_method, turnState.GetType(), parameterType.Item2!);
                         parameters.Add(turnState);
                         break;
-                    case ActionParameterType.Entities:
+                    case ActionParameterType.Parameters:
                         if (entities != null)
                         {
                             CheckParameterAssignment(_method, entities.GetType(), parameterType.Item2!);

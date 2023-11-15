@@ -21,7 +21,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
     public class OpenAIPlannerTests
     {
         [Fact]
-        public async void Test_GeneratePlan_PromptCompletionRateLimited_ShouldRedirectToRateLimitedAction()
+        public async void Test_GeneratePlan_PromptCompletionHttpError_ShouldRedirectToHttpErrorAction()
         {
             // Arrange
             var apiKey = "randomApiKey";
@@ -45,8 +45,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 }
             );
 
-            static string rateLimitedFunc() => throw new HttpOperationException("", (HttpStatusCode)429);
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, rateLimitedFunc);
+            static string httpErrorFunc() => throw new HttpOperationException("", (HttpStatusCode)429);
+            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, httpErrorFunc);
             var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
 
             // Act
@@ -57,8 +57,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
 
             var doCommand = (PredictedDoCommand)result.Commands[0];
-            Assert.Equal(AIConstants.RateLimitedActionName, doCommand.Action);
-            Assert.Empty(doCommand.Entities!);
+            Assert.Equal(AIConstants.HttpErrorActionName, doCommand.Action);
+            Assert.Empty(doCommand.Parameters!);
 
         }
 

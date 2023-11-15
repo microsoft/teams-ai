@@ -217,8 +217,7 @@ namespace Microsoft.Teams.AI.AI
             // Review input on first loop
             if (stepCount == 0)
             {
-                // TODO: uncomment
-                // plan = await Options.Moderator.ReviewInput(turnContext, turnState);
+                plan = await Options.Moderator.ReviewInput(turnContext, turnState);
             }
 
             // Generate plan
@@ -234,8 +233,7 @@ namespace Microsoft.Teams.AI.AI
                 }
 
                 // Review the plans output
-                // TODO: uncomment
-                // plan = await Options.Moderator.ReviewOutput(turnContext, turnState, plan);
+                plan = await Options.Moderator.ReviewOutput(turnContext, turnState, plan);
             }
 
             // Process generated plan

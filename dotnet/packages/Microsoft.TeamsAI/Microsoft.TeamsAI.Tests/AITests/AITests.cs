@@ -80,8 +80,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.True(result);
             Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
-            // TODO: uncomment
-            // Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
         }
@@ -109,8 +108,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.False(result);
             Assert.Equal(new string[] { "ContinueTaskAsync" }, planner.Record.ToArray());
-            // TODO: uncomment
-            // Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewOutput" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
@@ -138,8 +136,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.False(result);
             Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
-            // TODO: uncomment
-            // Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
@@ -161,7 +158,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
 
             [Action(AIConstants.SayCommandActionName)]
-            public string SayCommand([ActionEntities] PredictedSayCommand command)
+            public string SayCommand([ActionParameters] PredictedSayCommand command)
             {
                 SayActionRecord.Add(command.Response);
                 return string.Empty;

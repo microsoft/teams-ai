@@ -54,9 +54,9 @@ namespace Microsoft.Teams.AI.AI
         public const string FlaggedOutputActionName = "___FlaggedOutput___";
 
         /// <summary>
-        /// An action that will be called anytime the planner is rate limited.
+        /// An action that will be called anytime the planner experiences an http error.
         /// </summary>
-        public const string RateLimitedActionName = "___RateLimited___";
+        public const string HttpErrorActionName = "___HttpError___";
 
         /// <summary>
         /// An action that will be called after the plan has been predicted by the planner and it has
