@@ -2,7 +2,17 @@
 
 namespace Microsoft.Teams.AI.AI.OpenAI.Models
 {
-    internal class AssistantFunction
+    internal class Tool
+    {
+        [JsonPropertyName("type")]
+        public string Type { get; set; } = string.Empty;
+
+        [JsonPropertyName("function")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Function? Function { get; set; }
+    }
+
+    internal class Function
     {
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;

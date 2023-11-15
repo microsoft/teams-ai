@@ -30,7 +30,34 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Instructions = "Your are a test bot",
                 Model = "gpt-3.5-turbo"
+            }, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("asst_test", result.Id);
+            Assert.Equal(10000, result.CreatedAt);
+        }
+
+        [Fact]
+        public async Task Test_OpenAIClient_RetrieveAssistant()
+        {
+            // Arrange
+            var response = new TestHttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(@"{
+  ""id"": ""asst_test"",
+  ""created_at"": 10000
+}")
+            };
+            var httpClient = new HttpClient(new TestHttpMessageHandler
+            {
+                Response = response
             });
+            DefaultHttpClient.Instance = httpClient;
+            var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
+
+            // Action
+            var result = await openAIClient.RetrieveAssistant("asst_test", CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);

@@ -22,9 +22,11 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// Create an OpenAI Assistant.
         /// </summary>
         /// <param name="assistantCreateParams">The params to create the Assistant.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>The created Assistant.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Assistant> CreateAssistant(AssistantCreateParams assistantCreateParams)
+        public virtual async Task<Assistant> CreateAssistant(AssistantCreateParams assistantCreateParams, CancellationToken cancellationToken)
         {
             try
             {
@@ -34,7 +36,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIAssistantEndpoint, content, OpenAIBetaHeaders);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIAssistantEndpoint, content, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Assistant result = JsonSerializer.Deserialize<Assistant>(responseJson) ?? throw new SerializationException($"Failed to deserialize assistant result response json: {responseJson}");
@@ -55,13 +57,15 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// Retrieve an OpenAI Assistant.
         /// </summary>
         /// <param name="assistantId">The Assistant ID.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>The Assistant.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Assistant> RetrieveAssistant(string assistantId)
+        public virtual async Task<Assistant> RetrieveAssistant(string assistantId, CancellationToken cancellationToken)
         {
             try
             {
-                using HttpResponseMessage httpResponse = await _ExecuteGetRequest($"{OpenAIAssistantEndpoint}/{assistantId}", null, OpenAIBetaHeaders);
+                using HttpResponseMessage httpResponse = await _ExecuteGetRequest($"{OpenAIAssistantEndpoint}/{assistantId}", null, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Assistant result = JsonSerializer.Deserialize<Assistant>(responseJson) ?? throw new SerializationException($"Failed to deserialize assistant result response json: {responseJson}");
