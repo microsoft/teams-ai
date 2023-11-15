@@ -1,5 +1,4 @@
-﻿using Json.More;
-using Microsoft.Teams.AI.Utilities;
+﻿using Microsoft.Teams.AI.Utilities;
 using System.Text.Json;
 
 namespace Microsoft.Teams.AI.Tests.UtilitiesTests
