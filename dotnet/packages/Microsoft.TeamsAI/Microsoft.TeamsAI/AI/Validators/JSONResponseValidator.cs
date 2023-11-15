@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Json.More;
 using Json.Schema;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -34,7 +35,7 @@ namespace Microsoft.Teams.AI.AI.Validators
         /// <param name="schema">JSON schema to validate the response against.</param>
         /// <param name="missingJsonFeedback">Custom feedback to give when no JSON is returned.</param>
         /// <param name="errorFeedback">Custom feedback to give when an error is detected.</param>
-        public JsonResponseValidator(JsonSchema? schema, string? missingJsonFeedback, string? errorFeedback)
+        public JsonResponseValidator(JsonSchema? schema = null, string? missingJsonFeedback = null, string? errorFeedback = null)
         {
             this.Schema = schema;
             this.MissingJsonFeedback = missingJsonFeedback ?? "No valid JSON objects were found in the response. Return a valid JSON object.";
@@ -62,27 +63,30 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                 foreach (Dictionary<string, JsonElement> jsonObject in jsonObjects)
                 {
-                    foreach (string key in jsonObject.Keys)
-                    {
-                        EvaluationResults res = this.Schema.Evaluate(jsonObject[key]);
+                    EvaluationResults res = this.Schema.Evaluate(jsonObject.AsJsonElement());
 
-                        if (res.HasErrors && res.Errors != null)
+                    if (res.IsValid)
+                    {
+                        return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
                         {
-                            errors.AddRange(res.Errors.AsEnumerable().ToList());
-                        }
+                            Valid = true,
+                            Value = jsonObject
+                        });
+                    }
+
+                    if (res.HasErrors && res.Errors != null)
+                    {
+                        errors.AddRange(res.Errors.AsEnumerable().ToList());
                     }
                 }
 
-                if (errors.Count > 0)
-                {
-                    string errorText = string.Join("\n", errors.Select(e => $" - [{e.Key}]: {e.Value}"));
+                string errorText = string.Join("\n", errors.Select(e => $" - [{e.Key}]: {e.Value}"));
 
-                    return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
-                    {
-                        Valid = false,
-                        Feedback = $"{this.ErrorFeedback}\n{errorText}"
-                    });
-                }
+                return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
+                {
+                    Valid = false,
+                    Feedback = $"{this.ErrorFeedback}\n{errorText}"
+                });
             }
 
             return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
