@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.AI.Action
         /// <param name="turnState">Current turn state.</param>
         /// <param name="entities">Optional enti to be used to perform the action.</param>
         /// <param name="action">The actual action name.</param>
-        /// <returns>True if continue executing, otherwise false.</returns>
-        Task<bool> PerformAction(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null);
+        /// <returns>The result of the action handler.</returns>
+        Task<string> PerformAction(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null);
     }
 }
