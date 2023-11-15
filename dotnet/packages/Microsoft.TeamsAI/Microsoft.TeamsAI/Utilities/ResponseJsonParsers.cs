@@ -1,23 +1,44 @@
-﻿using Newtonsoft.Json.Schema;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.Utilities
 {
+    /// <summary>
+    /// LLM Response JSON Parsing Utilities
+    /// </summary>
     public class ResponseJsonParsers
     {
-
-        public static Dictionary<string, object> ParseAllObject(string text)
+        /// <summary>
+        /// Parse all objects from a response string.
+        /// </summary>
+        /// <param name="text">Response text to parse.</param>
+        /// <returns>Array of parsed objects.</returns>
+        public static List<Dictionary<string, JsonElement>> ParseAllObjects(string text)
         {
-            Dictionary<string, object> objects = new Dictionary<string, object>();
+            List<Dictionary<string, JsonElement>> objects = new();
             string[] lines = text.Split('\n');
 
             foreach (string line in lines)
             {
-                //TODO
+                Dictionary<string, JsonElement>? jsonObject = ParseJSON(line);
+
+                if (jsonObject != null)
+                {
+                    objects.Add(jsonObject);
+                }
             }
+
+            if (objects.Count == 0)
+            {
+                Dictionary<string, JsonElement>? jsonObject = ParseJSON(text);
+
+                if (jsonObject != null)
+                {
+                    objects.Add(jsonObject);
+                }
+            }
+
             return objects;
         }
 
@@ -26,24 +47,34 @@ namespace Microsoft.Teams.AI.Utilities
         /// </summary>
         /// <param name="text">text to parse.</param>
         /// <returns>The parsed object or null if the object could not be parsed.</returns>
-        public static Dictionary<string, object>? ParseJSON(string text)
+        public static Dictionary<string, JsonElement>? ParseJSON(string text)
         {
             int startBrace = text.IndexOf("{");
+
             if (startBrace >= 0)
             {
                 string objText = text.Substring(startBrace);
                 List<char> nesting = new() { '}' };
                 string cleaned = "{";
                 bool inString = false;
-                for (int i = 1; i < objText.Length && nesting.Count() > 0; i++)
+
+                for (int i = 1; i < objText.Length && nesting.Count > 0; i++)
                 {
                     char ch = objText[i];
+
                     if (inString)
                     {
                         cleaned += ch;
-                        if (ch == '\\' && i < objText.Length - 1 && objText[i + 1] == '\\')
+
+                        if (ch == '\\')
                         {
-                            i += 2;
+                            // skip escape chars
+                            while (ch == '\\')
+                            {
+                                i++;
+                                ch = objText[i];
+                            }
+
                             if (i < objText.Length)
                             {
                                 cleaned += objText[i];
@@ -62,6 +93,7 @@ namespace Microsoft.Teams.AI.Utilities
                     {
                         bool addPreCh = false;
                         bool addPostCh = false;
+
                         switch (ch)
                         {
                             case '"':
@@ -76,6 +108,7 @@ namespace Microsoft.Teams.AI.Utilities
                             case '}':
                                 char closeObject = nesting.Last();
                                 nesting.RemoveAt(nesting.Count - 1);
+
                                 if (closeObject != '}')
                                 {
                                     return null;
@@ -84,6 +117,7 @@ namespace Microsoft.Teams.AI.Utilities
                             case ']':
                                 char closeArray = nesting.Last();
                                 nesting.RemoveAt(nesting.Count - 1);
+
                                 if (closeArray != ']')
                                 {
                                     return null;
@@ -96,6 +130,7 @@ namespace Microsoft.Teams.AI.Utilities
                                 addPostCh = true;
                                 break;
                         }
+
                         string chStr = ch.ToString();
 
                         cleaned += addPreCh ? ("\"" + chStr) : (addPostCh ? (chStr + "\"") : chStr);
@@ -110,18 +145,25 @@ namespace Microsoft.Teams.AI.Utilities
 
                 try
                 {
-                    Dictionary<string, object>? obj = JsonSerializer.Deserialize<Dictionary<string, object>>(cleaned);
-                    return obj.Count() > 0 ? obj : null;
+                    Dictionary<string, JsonElement>? obj = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(cleaned, new JsonSerializerOptions()
+                    {
+                        WriteIndented = true,
+                        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                        NumberHandling = JsonNumberHandling.AllowReadingFromString
+                    });
+
+                    if (obj?.Count > 0)
+                    {
+                        return obj;
+                    }
                 }
                 catch (Exception)
                 {
                     return null;
                 }
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }
