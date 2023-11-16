@@ -43,7 +43,7 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 
 ## Interacting with the bot
 
-![Bot interaction image](https://github.com/OfficeDev/Microsoft-Teams-Samples/raw/main/samples/msgext-search-auth-config/csharp/Images/msgext-search-auth-config.gif)
+Once the bot is successfully sideloaded and installed, send any message to it. The bot will respond with an adaptive card with a sign in button. Clicking on it will initiate the sign in flow. Once that is done, the card should update to show the users profile picture and name. 
 
 ## Multiple ways to test
 
@@ -90,7 +90,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
     teamsfx provision --env local
 
     ```
@@ -111,10 +111,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.adaptiveCardSSO/`
+1. In a terminal, navigate to `teams-ai/js/samples/06.auth.adaptiveCardSSO/`
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
     ```
 
 1. Run ngrok tunneling service - point to port 3978
