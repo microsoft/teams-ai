@@ -222,7 +222,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             }));
 
             this._monologueValidator = new(InnerMonologue.Schema(), "No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.");
-            this._actionValidator = new(actions, true);
+            this._actionValidator = new(_actions, true);
         }
 
         /// <inheritdoc />
