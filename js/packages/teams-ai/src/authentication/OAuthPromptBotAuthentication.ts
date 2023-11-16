@@ -13,7 +13,7 @@ export class OAuthPromptBotAuthentication<TState extends TurnState> extends BotA
 
     public constructor(
         app: Application<TState>,
-        oauthPromptSettings: OAuthPromptSettings, // Child classes will have different types for this
+        oAuthPromptSettings: OAuthPromptSettings, // Child classes will have different types for this
         settingName: string,
         storage?: Storage
     ) {
