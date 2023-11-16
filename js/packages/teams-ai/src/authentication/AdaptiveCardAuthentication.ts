@@ -1,8 +1,8 @@
 import { ActivityTypes, InvokeResponse, TokenResponse, TurnContext } from 'botbuilder';
 import * as UserTokenAccess from './UserTokenAccess';
-import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthError, OAuthSettings } from './Authentication';
 import { ACTION_INVOKE_NAME } from '../AdaptiveCards';
+import { OAuthPromptSettings } from 'botbuilder-dialogs';
 
 /**
  * @internal
@@ -85,7 +85,7 @@ export class AdaptiveCardAuthentication {
                 statusCode: 401,
                 type: 'application/vnd.microsoft.activity.loginRequest',
                 value: {
-                    text: 'Please sign in',
+                    text: settings.title,
                     connectionName: settings.connectionName,
                     buttons: [
                         {
