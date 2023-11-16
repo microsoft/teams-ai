@@ -5,7 +5,7 @@ using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
-    public class OpenAIClientTests
+    public partial class OpenAIClientTests
     {
         [Fact]
         public async Task Test_OpenAIClient_Uses_DefaultHttpClient()
