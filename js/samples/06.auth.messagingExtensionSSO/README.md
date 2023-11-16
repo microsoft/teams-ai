@@ -1,4 +1,4 @@
-# Teams Messaging Extension SSO Bot
+# Teams Message Extension SSO Bot
 
 This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
@@ -6,7 +6,7 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 
 <!-- code_chunk_output -->
 
-- [Teams Messaging Extension SSO Bot](#teams-messaging-extension-sso-bot)
+- [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Interacting with the bot](#interacting-with-the-bot)
   - [Multiple ways to test](#multiple-ways-to-test)
@@ -37,7 +37,7 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/06.auth.messagingExtensionSSO/
+    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
     yarn start
     ```
 
@@ -90,7 +90,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echoBot/
+    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
     teamsfx provision --env local
 
     ```
@@ -111,10 +111,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.echoBot/`
+1. In a terminal, navigate to `teams-ai/js/samples/06.auth.messageExtensionSSO/`
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.echoBot/
+    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
     ```
 
 1. Run ngrok tunneling service - point to port 3978
