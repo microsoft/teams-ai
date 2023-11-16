@@ -184,7 +184,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         private readonly JsonResponseValidator _monologueValidator;
         private readonly ActionResponseValidator _actionValidator;
         private const string _missingActionFeedback = "The JSON returned had errors. Apply these fixes:\nadd the \"action\" property to \"instance\"";
-        private const string _sayRedirectFeedback = "`The JSON returned was missing an action. Return a valid JSON object that contains your thoughts and uses the SAY action.";
+        private const string _sayRedirectFeedback = "The JSON returned was missing an action. Return a valid JSON object that contains your thoughts and uses the SAY action.";
 
         /// <summary>
         /// Creates an instance of `MonologueAugmentation`
