@@ -78,10 +78,3 @@ server.post('/api/messages', async (req, res) => {
         await bot.run(context);
     });
 });
-
-server.get(
-    '/auth-:name(start|end).html',
-    restify.plugins.serveStatic({
-        directory: path.join(__dirname, 'public')
-    })
-);
