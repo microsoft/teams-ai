@@ -72,7 +72,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
 
             if (length > 0)
             {
-                messages.Add(new(this.role, text));
+                messages.Add(new(this.role) { Content = text });
             }
 
             return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
