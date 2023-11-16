@@ -8,7 +8,9 @@ using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
 using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.Utilities.JsonConverters;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.Augmentations
 {
@@ -20,11 +22,13 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         /// <summary>
         /// Thoughts
         /// </summary>
+        [JsonPropertyName("thoughts")]
         public InnerMonologueThoughts Thoughts { get; set; }
 
         /// <summary>
         /// Action
         /// </summary>
+        [JsonPropertyName("action")]
         public InnerMonologueAction Action { get; set; }
 
         /// <summary>
@@ -46,16 +50,19 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             /// <summary>
             /// Thought
             /// </summary>
+            [JsonPropertyName("thought")]
             public string Thought { get; set; }
 
             /// <summary>
             /// Reasoning
             /// </summary>
+            [JsonPropertyName("reasoning")]
             public string Reasoning { get; set; }
 
             /// <summary>
             /// Plan
             /// </summary>
+            [JsonPropertyName("plan")]
             public string Plan { get; set; }
 
             /// <summary>
@@ -109,11 +116,14 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             /// <summary>
             /// Name
             /// </summary>
+            [JsonPropertyName("name")]
             public string Name { get; set; }
 
             /// <summary>
             /// Parameters
             /// </summary>
+            [JsonPropertyName("parameters")]
+            [JsonConverter(typeof(DictionaryJsonConverter))]
             public Dictionary<string, object?> Parameters { get; set; }
 
             /// <summary>
