@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -10,7 +11,6 @@ import {
     Activity,
     ActivityTypes,
     BotAdapter,
-    Channels,
     ConversationReference,
     ResourceResponse,
     Storage,
@@ -20,6 +20,7 @@ import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
+import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
 
 /**
@@ -60,6 +61,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * this property is required.
      */
     adapter?: BotAdapter;
+
+    /**
+     * Optional. OAuth prompt settings to use for authentication.
+     */
+    authentication?: AuthenticationOptions;
 
     /**
      * Optional. Application ID of the bot.
@@ -137,6 +143,8 @@ export type ConversationUpdateEvents =
     | 'topicName'
     | 'historyDisclosed';
 
+export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'editMessage';
+
 /**
  * Function for handling an incoming request.
  * @template TState Type of the turn state.
@@ -147,11 +155,16 @@ export type ConversationUpdateEvents =
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
 /**
+ * A selector function for matching incoming activities.
+ */
+export type Selector = (context: TurnContext) => Promise<boolean>;
+
+/**
  * Function for selecting whether a route handler should be triggered.
  * @param context Context for the current turn of conversation with the user.
  * @returns A promise that resolves with a boolean indicating whether the route handler should be triggered.
  */
-export type RouteSelector = (context: TurnContext) => Promise<boolean>;
+export type RouteSelector = Selector;
 
 /**
  * Message reaction event types.
@@ -192,7 +205,10 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
+    private readonly _authentication?: AuthenticationManager<TState>;
+    private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
+    private readonly _startSignIn?: Selector;
 
     /**
      * Creates a new Application instance.
@@ -208,6 +224,10 @@ export class Application<TState extends TurnState = TurnState> {
             options
         ) as ApplicationOptions<TState>;
 
+        this._adapter = this._options.adapter;
+
+        this._adapter = this._options.adapter;
+
         // Create turn state factory
         if (!this._options.turnStateFactory) {
             this._options.turnStateFactory = () => new TurnState() as TState;
@@ -216,6 +236,13 @@ export class Application<TState extends TurnState = TurnState> {
         // Create AI component if configured with a planner
         if (this._options.ai) {
             this._ai = new AI(this._options.ai);
+        }
+
+        // Create OAuthPrompt if configured
+        if (this._options.authentication) {
+            this._startSignIn = createSignInSelector(this._options.authentication.autoSignIn);
+
+            this._authentication = new AuthenticationManager(this, this._options.authentication, this._options.storage);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -239,6 +266,20 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
+     * The bot's adapter.
+     * @returns {BotAdapter} The bot's adapter that is configured for the application.
+     */
+    public get adapter(): BotAdapter {
+        if (!this._adapter) {
+            throw new Error(
+                `The Application.adapter property is unavailable because it was not configured when creating the Application.`
+            );
+        }
+
+        return this._adapter;
+    }
+
+    /**
      * Fluent interface for accessing AI specific features.
      * @summary
      * This property is only available if the Application was configured with `ai` options. An
@@ -251,6 +292,24 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         return this._ai;
+    }
+
+    /**
+     * @template TState
+     * Fluent interface for accessing Authentication specific features.
+     * @description
+     * This property is only available if the Application was configured with `authentication` options. An
+     * exception will be thrown if you attempt to access it otherwise.
+     * @returns {Authentication<TState>} The Authentication instance.
+     */
+    public get authentication(): AuthenticationManager<TState> {
+        if (!this._authentication) {
+            throw new Error(
+                `The Application.authentication property is unavailable because no authentication options were configured.`
+            );
+        }
+
+        return this._authentication;
     }
 
     /**
@@ -323,14 +382,14 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Handles conversation update events.
-     * @param {ConversationUpdateEvents | ConversationUpdateEvents[]} event Name of the conversation update event(s) to handle.
+     * @param {ConversationUpdateEvents} event Name of the conversation update event to handle.
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler Function to call when the route is triggered.
      * @param {TurnContext} handler.context The context object for the turn.
      * @param {TState} handler.state The state object for the turn.
      * @returns {this} The application instance for chaining purposes.
      */
     public conversationUpdate(
-        event: ConversationUpdateEvents | ConversationUpdateEvents[],
+        event: ConversationUpdateEvents,
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
         if (typeof handler !== 'function') {
@@ -338,14 +397,28 @@ export class Application<TState extends TurnState = TurnState> {
                 `ConversationUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
             );
         }
-        (Array.isArray(event) ? event : [event]).forEach((e) => {
-            const selector = createConversationUpdateSelector(e);
-            this.addRoute(selector, handler);
-        });
+
+        const selector = createConversationUpdateSelector(event);
+        this.addRoute(selector, handler);
         return this;
     }
 
+    public messageEventUpdate(
+        event: TeamsMessageEvents,
+        handler: (context: TurnContext, state: TState) => Promise<void>
+    ): this {
+        if (typeof handler !== 'function') {
+            throw new Error(
+                `MessageUpdate 'handler' for ${event} is ${typeof handler}. Type of 'handler' must be a function.`
+            );
+        }
+
+        const selector = createMessageEventUpdateSelector(event);
+        this.addRoute(selector, handler);
+        return this;
+    }
     /**
+     * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      * @summary
      * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
@@ -353,19 +426,19 @@ export class Application<TState extends TurnState = TurnState> {
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bot's logic that should be run using the new proactive turn context.
      */
-    public continueConversationAsync(
+    private continueConversationAsync(
         context: TurnContext,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public continueConversationAsync(
+    private continueConversationAsync(
         conversationReference: Partial<ConversationReference>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public continueConversationAsync(
+    private continueConversationAsync(
         activity: Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void>;
-    public async continueConversationAsync(
+    private async continueConversationAsync(
         context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void> {
@@ -430,13 +503,11 @@ export class Application<TState extends TurnState = TurnState> {
      * @returns {this} The application instance for chaining purposes.
      */
     public messageReactions(
-        event: MessageReactionEvents | MessageReactionEvents[],
+        event: MessageReactionEvents,
         handler: (context: TurnContext, state: TState) => Promise<void>
     ): this {
-        (Array.isArray(event) ? event : [event]).forEach((e) => {
-            const selector = createMessageReactionSelector(e);
-            this.addRoute(selector, handler);
-        });
+        const selector = createMessageReactionSelector(event);
+        this.addRoute(selector, handler);
         return this;
     }
 
@@ -469,6 +540,23 @@ export class Application<TState extends TurnState = TurnState> {
                 const { storage, turnStateFactory } = this._options;
                 const state = turnStateFactory();
                 await state.load(context, storage);
+
+                // Sign the user in
+                if (this._authentication && (await this._startSignIn?.(context))) {
+                    const response = await this._authentication.signUserIn(context, state);
+
+                    if (response.status == 'pending') {
+                        // Save turn state
+                        // - Save authentication status in turn state
+                        await state.save(context, storage);
+                        return false;
+                    }
+
+                    // Invalid activities should be ignored for auth
+                    if (response.status == 'error' && response.cause != 'invalidActivity') {
+                        throw response.error;
+                    }
+                }
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
@@ -828,6 +916,18 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
     }
 
     /**
+     * Configures user authentication settings.
+     * @param {BotAdapter} adapter The adapter to use for user authentication.
+     * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withAuthentication(adapter: BotAdapter, authenticationOptions: AuthenticationOptions): this {
+        this._options.adapter = adapter;
+        this._options.authentication = authenticationOptions;
+        return this;
+    }
+
+    /**
      * Configures the removing of mentions of the bot's name from incoming messages.
      * Default state for removeRecipientMention is true
      * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
@@ -909,8 +1009,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === Channels.Msteams &&
-                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.channel &&
                         context.activity.channelData?.team
@@ -952,8 +1051,7 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
              */
             return (context: TurnContext) => {
                 return Promise.resolve(
-                    context?.activity?.channelId === Channels.Msteams &&
-                        context?.activity?.type == ActivityTypes.ConversationUpdate &&
+                    context?.activity?.type == ActivityTypes.ConversationUpdate &&
                         context?.activity?.channelData?.eventType == event &&
                         context?.activity?.channelData?.team
                 );
@@ -972,8 +1070,6 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
     }
 }
 
-// function createMessageUpdateActivitySelector()
-//
 /**
  * Creates a route selector function that matches a message based on a keyword.
  * @param {string | RegExp | RouteSelector} keyword The keyword to match against the message text. Can be a string, regular expression, or a custom selector function.
@@ -1003,6 +1099,39 @@ function createMessageSelector(keyword: string | RegExp | RouteSelector): RouteS
                 return Promise.resolve(false);
             }
         };
+    }
+}
+
+/**
+ * @private
+ * @param {TeamsMessageEvents} event The type of message event to create a selector for.
+ * @returns {RouteSelector} A selector function that matches the specified message event.
+ */
+function createMessageEventUpdateSelector(event: TeamsMessageEvents): RouteSelector {
+    switch (event) {
+        case 'editMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        case 'softDeleteMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageDelete &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        case 'undeleteMessage':
+            return (context: TurnContext) => {
+                return Promise.resolve(
+                    context?.activity?.type == ActivityTypes.MessageUpdate &&
+                        context?.activity?.channelData?.eventType == event
+                );
+            };
+        default:
+            throw new Error(`Invalid TeamsMessageEvent type: ${event}`);
     }
 }
 
@@ -1039,6 +1168,23 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
                 );
             };
     }
+}
+
+/**
+ * Returns a selector function that indicates whether the bot should initiate a sign in.
+ * @param {boolean | Selector} startSignIn A boolean or function that indicates whether the bot should initiate a sign in.
+ * @returns {Selector} A selector function that returns true if the bot should initiate a sign in.
+ */
+function createSignInSelector(startSignIn?: boolean | Selector): Selector {
+    return (context) => {
+        if (typeof startSignIn === 'function') {
+            return startSignIn(context);
+        } else if (typeof startSignIn === 'boolean') {
+            return Promise.resolve(startSignIn);
+        } else {
+            return Promise.resolve(true);
+        }
+    };
 }
 
 /**

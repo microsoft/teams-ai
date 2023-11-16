@@ -3,7 +3,8 @@
     "compilerOptions": {
         "lib": ["ESNext", "DOM"],
         "outDir": "lib",
-        "rootDir": "src"
+        "rootDir": "src",
+        "sourceMap": true
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "lib"]
