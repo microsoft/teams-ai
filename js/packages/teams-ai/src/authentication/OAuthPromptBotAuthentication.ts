@@ -20,10 +20,10 @@ export class OAuthPromptBotAuthentication<TState extends TurnState> extends BotA
         super(app, settingName, storage);
 
         // Create OAuthPrompt
-        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthPromptSettings);
+        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oAuthPromptSettings);
 
         // Handles deduplication of token exchange event when using SSO with Bot Authentication
-        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));
+        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oAuthPromptSettings.connectionName));
     }
 
     public async runDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<TokenResponse>> {
