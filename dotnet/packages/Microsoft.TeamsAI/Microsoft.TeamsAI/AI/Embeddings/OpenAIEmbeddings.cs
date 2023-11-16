@@ -11,9 +11,6 @@ namespace Microsoft.Teams.AI.AI.Embeddings
     /// <summary>
     /// Embeddings class that uses OpenAI's embeddings API.
     /// </summary>
-    /// <typeparam name="TState">The turn state class.</typeparam>
-    ///
-    /// <summary>
     public class OpenAIEmbeddings<TState, TOptions> : IEmbeddings<TState>
         where TState : ITurnState<StateBase, StateBase, TempState>
         where TOptions : OpenAIEmbeddingsOptions
