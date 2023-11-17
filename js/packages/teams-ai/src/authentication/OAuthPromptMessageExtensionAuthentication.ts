@@ -3,10 +3,10 @@
 
 import { TokenResponse, TurnContext } from "botbuilder";
 import { OAuthPromptSettings } from "botbuilder-dialogs";
-import { MessagingExtensionAuthenticationBase } from "./MessagingExtensionAuthenticationBase";
+import { MessageExtensionAuthenticationBase } from "./MessageExtensionAuthenticationBase";
 import * as UserTokenAccess from './UserTokenAccess';
 
-export class OAuthPromptMessagingExtensionAuthentication extends MessagingExtensionAuthenticationBase {
+export class OAuthPromptMessageExtensionAuthentication extends MessageExtensionAuthenticationBase {
 
     public constructor(private readonly settings: OAuthPromptSettings) {
         super();

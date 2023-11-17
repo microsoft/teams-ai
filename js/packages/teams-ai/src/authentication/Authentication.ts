@@ -12,20 +12,20 @@ import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
 import { TurnState } from '../TurnState';
 import { Application, Selector } from '../Application';
-import { MessagingExtensionAuthenticationBase } from './MessagingExtensionAuthenticationBase';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
 import { TeamsSsoPromptSettings } from './TeamsBotSsoPrompt';
-import { OAuthPromptMessagingExtensionAuthentication } from './OAuthPromptMessagingExtensionAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
 import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
 import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
-import { TeamsSsoMessagingExtensionAuthentication } from './TeamsSsoMessagingExtensionAuthentication';
+import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensionAuthentication';
 
 /**
  * User authentication service.
  */
 export class Authentication<TState extends TurnState> {
-    private readonly _messagingExtensionAuth: MessagingExtensionAuthenticationBase;
+    private readonly _messagingExtensionAuth: MessageExtensionAuthenticationBase;
     private readonly _botAuth: BotAuthenticationBase<TState>;
     private readonly _name: string;
     private readonly _msal?: ConfidentialClientApplication;
@@ -38,7 +38,7 @@ export class Authentication<TState extends TurnState> {
      * @param {string} name - The name of the connection.
      * @param {OAuthPromptSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
-     * @param {MessagingExtensionAuthenticationBase} messagingExtensionsAuth - Handles messaging extension flow authentication.
+     * @param {MessageExtensionAuthenticationBase} messagingExtensionsAuth - Handles messaging extension flow authentication.
      * @param {BotAuthenticationBase} botAuth - Handles bot-flow authentication.
      */
     constructor(
@@ -46,19 +46,19 @@ export class Authentication<TState extends TurnState> {
         name: string,
         settings: OAuthPromptSettings | TeamsSsoPromptSettings,
         storage?: Storage,
-        messagingExtensionsAuth?: MessagingExtensionAuthenticationBase,
+        messagingExtensionsAuth?: MessageExtensionAuthenticationBase,
         botAuth?: BotAuthenticationBase<TState>
     ) {
         this.settings = settings;
         this._name = name;
 
         if (this.isOAuthPromptSettings(settings)) {
-            this._messagingExtensionAuth = messagingExtensionsAuth || new OAuthPromptMessagingExtensionAuthentication(settings);
+            this._messagingExtensionAuth = messagingExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
             this._botAuth = botAuth || new OAuthPromptBotAuthentication(app, settings, this._name, storage);
         } else {
             this._msal = new ConfidentialClientApplication(settings.msalConfig);
             this._botAuth = botAuth || new TeamsSsoBotAuthentication(app, settings, this._name, this._msal, storage);
-            this._messagingExtensionAuth = messagingExtensionsAuth || new TeamsSsoMessagingExtensionAuthentication(settings, this._msal);
+            this._messagingExtensionAuth = messagingExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
         }
 
     }

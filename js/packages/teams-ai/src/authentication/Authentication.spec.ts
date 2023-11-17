@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
-import { MessagingExtensionAuthenticationBase } from './MessagingExtensionAuthenticationBase';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import { Application } from '../Application';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthError, Authentication, AuthenticationManager, AuthenticationOptions } from './Authentication';
@@ -9,7 +9,7 @@ import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
 import * as BotAuth from './BotAuthenticationBase';
-import { OAuthPromptMessagingExtensionAuthentication } from './OAuthPromptMessagingExtensionAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
 import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
 
 describe('Authentication', () => {
@@ -17,7 +17,7 @@ describe('Authentication', () => {
 
     let botAuth: BotAuthenticationBase<TurnState>;
     let botAuthenticateStub: sinon.SinonStub;
-    let messageExtensionsAuth: MessagingExtensionAuthenticationBase;
+    let messageExtensionsAuth: MessageExtensionAuthenticationBase;
     let messagingExtensionAuthenticateStub: sinon.SinonStub;
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
@@ -64,7 +64,7 @@ describe('Authentication', () => {
             connectionName: 'test'
         };
 
-        messageExtensionsAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+        messageExtensionsAuth = new OAuthPromptMessageExtensionAuthentication(settings);
         messagingExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
         botAuth = new OAuthPromptBotAuthentication(appStub, settings, settingName);
         botAuthenticateStub = sinon.stub(botAuth, 'authenticate');

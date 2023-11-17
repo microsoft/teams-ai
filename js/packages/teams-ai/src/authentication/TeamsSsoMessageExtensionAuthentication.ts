@@ -3,21 +3,21 @@
 
 import { TurnContext } from "botbuilder-core";
 import { TeamsChannelAccount, TokenResponse } from "botframework-schema";
-import { MessagingExtensionAuthenticationBase } from "./MessagingExtensionAuthenticationBase";
+import { MessageExtensionAuthenticationBase } from "./MessageExtensionAuthenticationBase";
 import { TeamsSsoPromptSettings } from "./TeamsBotSsoPrompt";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import { TeamsInfo } from "botbuilder";
-import { MessagingExtensionsInvokeNames } from '../MessageExtensions';
+import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
-export class TeamsSsoMessagingExtensionAuthentication extends MessagingExtensionAuthenticationBase {
+export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuthenticationBase {
 
     public constructor(private readonly settings: TeamsSsoPromptSettings, private readonly msal: ConfidentialClientApplication) {
         super();
     }
 
     public override isValidActivity(context: TurnContext): boolean {
-        // Currently only search based messaging extensions has SSO
-        return super.isValidActivity(context) && context.activity.name == MessagingExtensionsInvokeNames.QUERY_INVOKE;
+        // Currently only search based message extensions has SSO
+        return super.isValidActivity(context) && context.activity.name == MessageExtensionsInvokeNames.QUERY_INVOKE;
     }
 
     public async handleSsoTokenExchange(context: TurnContext): Promise<TokenResponse | undefined> {

@@ -1,10 +1,10 @@
 import { ActivityTypes, InvokeResponse, TokenResponse, TurnContext } from 'botbuilder';
-import { MessagingExtensionsInvokeNames } from '../MessageExtensions';
+import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
 /**
  * @internal
  */
-export abstract class MessagingExtensionAuthenticationBase {
+export abstract class MessageExtensionAuthenticationBase {
     public async authenticate(context: TurnContext): Promise<string | undefined> {
         const value = context.activity.value;
         const tokenExchangeRequest = value.authentication;
@@ -45,11 +45,11 @@ export abstract class MessagingExtensionAuthenticationBase {
         }
 
         // No auth/silentAuth action sent to Teams yet
-        // Retrieve the OAuth Sign in Link to use in the MessagingExtensionResult Suggested Actions
+        // Retrieve the OAuth Sign in Link to use in the MessageExtensionResult Suggested Actions
 
         const signInLink = await this.getSignInLink(context);
         // Do 'silentAuth' if this is a composeExtension/query request otherwise do normal `auth` flow.
-        const authType = context.activity.name === MessagingExtensionsInvokeNames.QUERY_INVOKE ? 'silentAuth' : 'auth';
+        const authType = context.activity.name === MessageExtensionsInvokeNames.QUERY_INVOKE ? 'silentAuth' : 'auth';
 
         const response = {
             composeExtension: {
@@ -78,10 +78,10 @@ export abstract class MessagingExtensionAuthenticationBase {
     public isValidActivity(context: TurnContext): boolean {
         return (
             context.activity.type == ActivityTypes.Invoke &&
-            (context.activity.name == MessagingExtensionsInvokeNames.QUERY_INVOKE ||
-                context.activity.name == MessagingExtensionsInvokeNames.FETCH_TASK_INVOKE ||
-                context.activity.name == MessagingExtensionsInvokeNames.QUERY_LINK_INVOKE ||
-                context.activity.name == MessagingExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE)
+            (context.activity.name == MessageExtensionsInvokeNames.QUERY_INVOKE ||
+                context.activity.name == MessageExtensionsInvokeNames.FETCH_TASK_INVOKE ||
+                context.activity.name == MessageExtensionsInvokeNames.QUERY_LINK_INVOKE ||
+                context.activity.name == MessageExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE)
         );
     }
 

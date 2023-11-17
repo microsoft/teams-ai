@@ -3,12 +3,12 @@
 
 import { Activity, ActivityTypes, TeamsInfo, TestAdapter, TurnContext } from "botbuilder";
 import { TurnState } from "../TurnState";
-import { TeamsSsoMessagingExtensionAuthentication } from "./TeamsSsoMessagingExtensionAuthentication";
+import { TeamsSsoMessageExtensionAuthentication } from "./TeamsSsoMessageExtensionAuthentication";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import assert from 'assert';
 import * as sinon from 'sinon';
 
-describe('TeamsSsoMessagingExtensionAuthentication', () => {
+describe('TeamsSsoMessageExtensionAuthentication', () => {
     const adapter = new TestAdapter();
 
     const settings = {
@@ -62,7 +62,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             assert.equal(auth.isValidActivity(context), true);
         });
@@ -81,7 +81,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
                 });
 
                 const msal = new ConfidentialClientApplication(settings.msalConfig);
-                const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+                const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
                 assert.equal(auth.isValidActivity(context), false);
             });
@@ -102,7 +102,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.handleSsoTokenExchange(context);
             assert.equal(result, undefined);
@@ -118,7 +118,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.handleSsoTokenExchange(context);
             assert.equal(result, undefined);
@@ -136,7 +136,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.handleSsoTokenExchange(context);
             assert.equal(result, undefined);
@@ -154,7 +154,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             sinon.stub(msal, 'acquireTokenOnBehalfOf').resolves(null);
 
@@ -174,7 +174,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const date = new Date();
             sinon.stub(msal, 'acquireTokenOnBehalfOf').resolves({
@@ -210,7 +210,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.handleUserSignIn(context, '');
             assert.equal(result, undefined);
@@ -236,7 +236,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             });
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
             assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read&clientId=test&tenantId=common&loginHint=user@example.com');
@@ -267,7 +267,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             };
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
             assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common&loginHint=user@example.com');
@@ -297,7 +297,7 @@ describe('TeamsSsoMessagingExtensionAuthentication', () => {
             };
 
             const msal = new ConfidentialClientApplication(settings.msalConfig);
-            const auth = new TeamsSsoMessagingExtensionAuthentication(settings, msal);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
             assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common&loginHint=user@example.com');

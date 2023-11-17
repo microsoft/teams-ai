@@ -1,13 +1,13 @@
 import { Activity, ActivityTypes, InvokeResponse, TestAdapter, TurnContext } from 'botbuilder';
 import { TurnState } from '../TurnState';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
-import { MessagingExtensionAuthenticationBase } from './MessagingExtensionAuthenticationBase';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import * as sinon from 'sinon';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
-import { OAuthPromptMessagingExtensionAuthentication } from './OAuthPromptMessagingExtensionAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
 
-describe('MessagingExtensionAuthentication', () => {
+describe('OAuthPromptMessageExtensionAuthentication', () => {
     const adapter = new TestAdapter();
 
     const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
@@ -58,7 +58,7 @@ describe('MessagingExtensionAuthentication', () => {
 
             const contextStub = sinon.stub(context, 'sendActivity');
 
-            const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
             const isTokenExchangableStub = sinon.stub(meAuth, 'handleSsoTokenExchange').throws();
 
             await meAuth.authenticate(context);
@@ -84,7 +84,7 @@ describe('MessagingExtensionAuthentication', () => {
 
             const contextStub = sinon.stub(context, 'sendActivity');
 
-            const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
             const isTokenExchangableStub = sinon.stub(meAuth, 'handleSsoTokenExchange').returns(
                 Promise.resolve({
                     token: '',
@@ -114,7 +114,7 @@ describe('MessagingExtensionAuthentication', () => {
                 }
             });
 
-            const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
             const isTokenExchangableStub = sinon.stub(meAuth, 'handleSsoTokenExchange').throws();
 
             const result = await meAuth.authenticate(context);
@@ -133,7 +133,7 @@ describe('MessagingExtensionAuthentication', () => {
                 }
             });
 
-            const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
             const isTokenExchangableStub = sinon.stub(meAuth, 'handleSsoTokenExchange').returns(
                 Promise.resolve({
                     token: '',
@@ -158,7 +158,7 @@ describe('MessagingExtensionAuthentication', () => {
                 }
             });
 
-            const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
             const exchangeTokenStub = sinon.stub(meAuth, 'handleSsoTokenExchange').returns(
                 Promise.resolve({
                     token: 'token',
@@ -193,7 +193,7 @@ describe('MessagingExtensionAuthentication', () => {
                     }
                 });
 
-                const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+                const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
 
                 const getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
                     Promise.resolve({
@@ -234,7 +234,7 @@ describe('MessagingExtensionAuthentication', () => {
                         })
                     );
 
-                    const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+                    const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
 
                     const signInResourceStub = sinon.stub(UserTokenAccess, 'getSignInResource').returns(
                         Promise.resolve({
@@ -276,7 +276,7 @@ describe('MessagingExtensionAuthentication', () => {
                     name: name
                 });
 
-                const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+                const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
 
                 const result = meAuth.isValidActivity(context);
 
@@ -290,7 +290,7 @@ describe('MessagingExtensionAuthentication', () => {
                 name: 'composeExtension/query'
             });
 
-            const meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
 
             const result = meAuth.isValidActivity(context);
 
@@ -299,11 +299,11 @@ describe('MessagingExtensionAuthentication', () => {
     });
 
     describe('exchangeToken()', () => {
-        let meAuth: MessagingExtensionAuthenticationBase;
+        let meAuth: MessageExtensionAuthenticationBase;
 
         beforeEach(() => {
             sinon.restore();
-            meAuth = new OAuthPromptMessagingExtensionAuthentication(settings);
+            meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
         });
 
         it('should return undefined if `context.activity.value.authentication` does not have a token.', async () => {
