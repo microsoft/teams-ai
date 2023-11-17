@@ -12,8 +12,9 @@
         /// <returns>A <see cref="ChatMessage"/>.</returns>
         public static ChatMessage ToChatMessage(this Azure.AI.OpenAI.ChatMessage chatMessage)
         {
-            ChatMessage message = new(new ChatRole(chatMessage.Role.ToString()), chatMessage.Content)
+            ChatMessage message = new(new ChatRole(chatMessage.Role.ToString()))
             {
+                Content = chatMessage.Content,
                 Name = chatMessage.Name,
                 FunctionCall = new FunctionCall(chatMessage.FunctionCall.Name, chatMessage.FunctionCall.Arguments)
             };
