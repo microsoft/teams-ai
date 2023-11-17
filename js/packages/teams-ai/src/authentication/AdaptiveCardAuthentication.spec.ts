@@ -34,7 +34,8 @@ describe('AdaptiveCardAuthenticaion', () => {
         state.temp = {
             input: '',
             history: '',
-            output: '',
+            lastOutput: '',
+            actionOutputs: {},
             authTokens: {}
         };
 
