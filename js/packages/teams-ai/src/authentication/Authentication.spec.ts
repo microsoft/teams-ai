@@ -49,7 +49,8 @@ describe('Authentication', () => {
         state.temp = {
             input: '',
             history: '',
-            output: '',
+            lastOutput: '',
+            actionOutputs: {},
             authTokens: {}
         };
 
@@ -291,7 +292,8 @@ describe('AuthenticationManager', () => {
         state.temp = {
             input: '',
             history: '',
-            output: '',
+            lastOutput: '',
+            actionOutputs: {},
             authTokens: {}
         };
 

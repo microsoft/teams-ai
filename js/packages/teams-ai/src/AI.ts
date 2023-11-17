@@ -458,6 +458,11 @@ export class AI<TState extends TurnState = TurnState> {
             state.temp.input = context.activity.text;
         }
 
+        // Initialize {{$allOutputs}}
+        if (state.temp.actionOutputs == undefined) {
+            state.temp.actionOutputs = {};
+        }
+
         // Initialize start time and action count
         const { max_steps, max_time } = this._options;
         if (start_time === undefined) {
@@ -515,7 +520,8 @@ export class AI<TState extends TurnState = TurnState> {
                             .get(AI.DoCommandActionName)!
                             .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                         should_loop = output.length > 0;
-                        } else {
+                        state.temp.actionOutputs[action] = output;
+                    } else {
                         // Redirect to UnknownAction handler
                         output = await this._actions
                             .get(AI.UnknownActionName)!
@@ -540,6 +546,7 @@ export class AI<TState extends TurnState = TurnState> {
             }
 
             // Copy the actions output to the input
+            state.temp.lastOutput = output;
             state.temp.input = output;
         }
 

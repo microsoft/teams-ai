@@ -34,7 +34,8 @@ describe('OAuthPromptMessageExtensionAuthentication', () => {
         state.temp = {
             input: '',
             history: '',
-            output: '',
+            lastOutput: '',
+            actionOutputs: {},
             authTokens: {}
         };
 
