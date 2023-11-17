@@ -23,10 +23,8 @@ namespace Microsoft.Teams.AI
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
     /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <typeparam name="TTurnStateManager">Type of the turn state manager.</typeparam>
-    public class Application<TState, TTurnStateManager> : IBot
-        where TState : ITurnState<StateBase, StateBase, TempState>
-        where TTurnStateManager : ITurnStateManager<TState>, new()
+    public class Application<TState> : IBot
+        where TState : TurnState<Record, Record, TempState>, new()
     {
         private static readonly string CONFIG_FETCH_INVOKE_NAME = "config/fetch";
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
@@ -45,23 +43,26 @@ namespace Microsoft.Teams.AI
         /// Creates a new Application instance.
         /// </summary>
         /// <param name="options">Optional. Options used to configure the application.</param>
-        public Application(ApplicationOptions<TState, TTurnStateManager> options)
+        public Application(ApplicationOptions<TState> options)
         {
             Verify.ParamNotNull(options);
 
             Options = options;
 
-            Options.TurnStateManager ??= new TTurnStateManager();
+            if (Options.TurnStateFactory == null)
+            {
+                this.Options.TurnStateFactory = () => new TState();
+            }
 
             if (Options.AI != null)
             {
                 _ai = new AI<TState>(Options.AI, Options.LoggerFactory);
             }
 
-            AdaptiveCards = new AdaptiveCards<TState, TTurnStateManager>(this);
-            Meetings = new Meetings<TState, TTurnStateManager>(this);
-            MessageExtensions = new MessageExtensions<TState, TTurnStateManager>(this);
-            TaskModules = new TaskModules<TState, TTurnStateManager>(this);
+            AdaptiveCards = new AdaptiveCards<TState>(this);
+            Meetings = new Meetings<TState>(this);
+            MessageExtensions = new MessageExtensions<TState>(this);
+            TaskModules = new TaskModules<TState>(this);
 
             // Validate long running messages configuration
             if (Options.LongRunningMessages && (Options.Adapter == null || Options.BotAppId == null))
@@ -78,22 +79,22 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Fluent interface for accessing Adaptive Card specific features.
         /// </summary>
-        public AdaptiveCards<TState, TTurnStateManager> AdaptiveCards { get; }
+        public AdaptiveCards<TState> AdaptiveCards { get; }
 
         /// <summary>
         /// Fluent interface for accessing Meetings' specific features.
         /// </summary>
-        public Meetings<TState, TTurnStateManager> Meetings { get; }
+        public Meetings<TState> Meetings { get; }
 
         /// <summary>
         /// Fluent interface for accessing Message Extensions' specific features.
         /// </summary>
-        public MessageExtensions<TState, TTurnStateManager> MessageExtensions { get; }
+        public MessageExtensions<TState> MessageExtensions { get; }
 
         /// <summary>
         /// Fluent interface for accessing Task Modules' specific features.
         /// </summary>
-        public TaskModules<TState, TTurnStateManager> TaskModules { get; }
+        public TaskModules<TState> TaskModules { get; }
 
         /// <summary>
         /// Fluent interface for accessing AI specific features.
@@ -118,7 +119,7 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// The application's configured options.
         /// </summary>
-        public ApplicationOptions<TState, TTurnStateManager> Options { get; }
+        public ApplicationOptions<TState> Options { get; }
 
         /// <summary>
         /// Adds a new route to the application.
@@ -136,7 +137,7 @@ namespace Microsoft.Teams.AI
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <param name="isInvokeRoute">Boolean indicating if the RouteSelector is for an activity that uses "invoke" which require special handling. Defaults to `false`.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> AddRoute(RouteSelector selector, RouteHandler<TState> handler, bool isInvokeRoute = false)
+        public Application<TState> AddRoute(RouteSelector selector, RouteHandler<TState> handler, bool isInvokeRoute = false)
         {
             Verify.ParamNotNull(selector);
             Verify.ParamNotNull(handler);
@@ -158,7 +159,7 @@ namespace Microsoft.Teams.AI
         /// <param name="type">Name of the activity type to match.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActivity(string type, RouteHandler<TState> handler)
+        public Application<TState> OnActivity(string type, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(type);
             Verify.ParamNotNull(handler);
@@ -173,7 +174,7 @@ namespace Microsoft.Teams.AI
         /// <param name="typePattern">Regular expression to match against the incoming activity type.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActivity(Regex typePattern, RouteHandler<TState> handler)
+        public Application<TState> OnActivity(Regex typePattern, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(typePattern);
             Verify.ParamNotNull(handler);
@@ -188,7 +189,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActivity(RouteSelector routeSelector, RouteHandler<TState> handler)
+        public Application<TState> OnActivity(RouteSelector routeSelector, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -202,7 +203,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActivity(MultipleRouteSelector routeSelectors, RouteHandler<TState> handler)
+        public Application<TState> OnActivity(MultipleRouteSelector routeSelectors, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -236,7 +237,7 @@ namespace Microsoft.Teams.AI
         /// <param name="conversationUpdateEvent">Name of the conversation update event to handle, can use <see cref="ConversationUpdateEvents"/>.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnConversationUpdate(string conversationUpdateEvent, RouteHandler<TState> handler)
+        public Application<TState> OnConversationUpdate(string conversationUpdateEvent, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(conversationUpdateEvent);
             Verify.ParamNotNull(handler);
@@ -315,7 +316,7 @@ namespace Microsoft.Teams.AI
         /// <param name="conversationUpdateEvents">Name of the conversation update events to handle, can use <see cref="ConversationUpdateEvents"/> as array item.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnConversationUpdate(string[] conversationUpdateEvents, RouteHandler<TState> handler)
+        public Application<TState> OnConversationUpdate(string[] conversationUpdateEvents, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(conversationUpdateEvents);
             Verify.ParamNotNull(handler);
@@ -339,7 +340,7 @@ namespace Microsoft.Teams.AI
         /// <param name="text">Substring of the incoming message text.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessage(string text, RouteHandler<TState> handler)
+        public Application<TState> OnMessage(string text, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(text);
             Verify.ParamNotNull(handler);
@@ -367,7 +368,7 @@ namespace Microsoft.Teams.AI
         /// <param name="textPattern">Regular expression to match against the text of an incoming message.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessage(Regex textPattern, RouteHandler<TState> handler)
+        public Application<TState> OnMessage(Regex textPattern, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(textPattern);
             Verify.ParamNotNull(handler);
@@ -391,7 +392,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessage(RouteSelector routeSelector, RouteHandler<TState> handler)
+        public Application<TState> OnMessage(RouteSelector routeSelector, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -408,7 +409,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessage(MultipleRouteSelector routeSelectors, RouteHandler<TState> handler)
+        public Application<TState> OnMessage(MultipleRouteSelector routeSelectors, RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -441,7 +442,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessageEdit(RouteHandler<TState> handler)
+        public Application<TState> OnMessageEdit(RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
@@ -462,7 +463,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessageUndelete(RouteHandler<TState> handler)
+        public Application<TState> OnMessageUndelete(RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
@@ -483,7 +484,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessageDelete(RouteHandler<TState> handler)
+        public Application<TState> OnMessageDelete(RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
@@ -504,7 +505,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessageReactionsAdded(RouteHandler<TState> handler)
+        public Application<TState> OnMessageReactionsAdded(RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (context, _) => Task.FromResult
@@ -522,7 +523,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnMessageReactionsRemoved(RouteHandler<TState> handler)
+        public Application<TState> OnMessageReactionsRemoved(RouteHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (context, _) => Task.FromResult
@@ -540,7 +541,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnTeamsReadReceipt(ReadReceiptHandler<TState> handler)
+        public Application<TState> OnTeamsReadReceipt(ReadReceiptHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (context, _) => Task.FromResult
@@ -563,7 +564,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnConfigFetch(ConfigHandler<TState> handler)
+        public Application<TState> OnConfigFetch(ConfigHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) => Task.FromResult(
@@ -590,7 +591,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the event is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnConfigSubmit(ConfigHandler<TState> handler)
+        public Application<TState> OnConfigSubmit(ConfigHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (turnContext, cancellationToken) => Task.FromResult(
@@ -617,7 +618,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFileConsentAccept(FileConsentHandler<TState> handler)
+        public Application<TState> OnFileConsentAccept(FileConsentHandler<TState> handler)
             => OnFileConsent(handler, "accept");
 
         /// <summary>
@@ -625,10 +626,10 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFileConsentDecline(FileConsentHandler<TState> handler)
+        public Application<TState> OnFileConsentDecline(FileConsentHandler<TState> handler)
             => OnFileConsent(handler, "decline");
 
-        private Application<TState, TTurnStateManager> OnFileConsent(FileConsentHandler<TState> handler, string fileConsentAction)
+        private Application<TState> OnFileConsent(FileConsentHandler<TState> handler, string fileConsentAction)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (context, _) =>
@@ -663,7 +664,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnO365ConnectorCardAction(O365ConnectorCardActionHandler<TState> handler)
+        public Application<TState> OnO365ConnectorCardAction(O365ConnectorCardActionHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             RouteSelector routeSelector = (context, _) => Task.FromResult
@@ -698,7 +699,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call before turn execution.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnBeforeTurn(TurnEventHandler<TState> handler)
+        public Application<TState> OnBeforeTurn(TurnEventHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             _beforeTurn.Enqueue(handler);
@@ -713,7 +714,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call after turn execution.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnAfterTurn(TurnEventHandler<TState> handler)
+        public Application<TState> OnAfterTurn(TurnEventHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
             _afterTurn.Enqueue(handler);
@@ -809,20 +810,21 @@ namespace Microsoft.Teams.AI
                     turnContext.Activity.Text = turnContext.Activity.RemoveRecipientMention();
                 }
 
-                ITurnStateManager<TState>? turnStateManager = Options.TurnStateManager;
+                // Load turn state
+                TState state = Options.TurnStateFactory!();
                 IStorage? storage = Options.Storage;
 
-                TState turnState = await turnStateManager!.LoadStateAsync(storage, turnContext);
+                await state!.LoadStateAsync(storage, turnContext);
 
                 // Call before turn handler
                 foreach (TurnEventHandler<TState> beforeTurnHandler in _beforeTurn)
                 {
-                    if (!await beforeTurnHandler(turnContext, turnState, cancellationToken))
+                    if (!await beforeTurnHandler(turnContext, state, cancellationToken))
                     {
                         // Save turn state
                         // - This lets the bot keep track of why it ended the previous turn. It also
                         //   allows the dialog system to be used before the AI system is called.
-                        await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
+                        await state!.SaveStateAsync(storage, turnContext);
 
                         return;
                     }
@@ -838,7 +840,7 @@ namespace Microsoft.Teams.AI
                     {
                         if (await route.Selector(turnContext, cancellationToken))
                         {
-                            await route.Handler(turnContext, turnState, cancellationToken);
+                            await route.Handler(turnContext, state, cancellationToken);
                             eventHandlerCalled = true;
                             break;
                         }
@@ -852,7 +854,7 @@ namespace Microsoft.Teams.AI
                     {
                         if (await route.Selector(turnContext, cancellationToken))
                         {
-                            await route.Handler(turnContext, turnState, cancellationToken);
+                            await route.Handler(turnContext, state, cancellationToken);
                             eventHandlerCalled = true;
                             break;
                         }
@@ -862,18 +864,18 @@ namespace Microsoft.Teams.AI
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.Run(turnContext, turnState);
+                    await _ai.Run(turnContext, state);
                 }
 
                 // Call after turn handler
                 foreach (TurnEventHandler<TState> afterTurnHandler in _afterTurn)
                 {
-                    if (!await afterTurnHandler(turnContext, turnState, cancellationToken))
+                    if (!await afterTurnHandler(turnContext, state, cancellationToken))
                     {
                         return;
                     }
                 }
-                await turnStateManager!.SaveStateAsync(storage, turnContext, turnState);
+                await state!.SaveStateAsync(storage, turnContext);
 
             }
             finally

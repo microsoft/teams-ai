@@ -6,10 +6,11 @@ using System.Text.Json;
 namespace Microsoft.Teams.AI.State
 {
     /// <summary>
-    /// The turn state entry.
+    /// Accessor class for managing an individual state scope.
     /// </summary>
-    /// <typeparam name="TValue">The type of value.</typeparam>
-    public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue> where TValue : class
+    /// <typeparam name="TValue">Strongly typed value of the state scope.</typeparam>
+    public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue>
+        where TValue : class, new()
     {
         private TValue _value;
         private string _hash;
@@ -18,12 +19,11 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Constructs the turn state entry.
         /// </summary>
-        /// <param name="value">The entry value</param>
-        /// <param name="storageKey">The storage key used to store object entry</param>
+        /// <param name="value">Value to initialize the state scope with. The default is an {} object.</param>
+        /// <param name="storageKey">Storage key to use when persisting the state scope.</param>
         public TurnStateEntry(TValue value, string? storageKey = null)
         {
             Verify.ParamNotNull(value);
-
             _value = value;
             StorageKey = storageKey;
             _hash = ComputeHash(value);
@@ -32,19 +32,20 @@ namespace Microsoft.Teams.AI.State
         /// <inheritdoc />
         public bool HasChanged
         {
-            get { return ComputeHash(_value) != _hash; }
+            get { return ComputeHash(_value!) != _hash; }
         }
 
         /// <inheritdoc />
         public bool IsDeleted { get; private set; } = false;
 
         /// <inheritdoc />
-        public TValue Value
+        public TValue? Value
         {
             get
             {
                 if (IsDeleted)
                 {
+                    _value = new();
                     IsDeleted = false;
                 }
 
@@ -56,7 +57,7 @@ namespace Microsoft.Teams.AI.State
         public string? StorageKey { get; }
 
         /// <summary>
-        ///  Deletes the entry.
+        /// Clears the state scope.
         /// </summary>
         public void Delete()
         {
@@ -64,13 +65,12 @@ namespace Microsoft.Teams.AI.State
         }
 
         /// <summary>
-        /// Replaces the value in the entry.
+        /// Replaces the state scope with a new value.
         /// </summary>
-        /// <param name="value">The entry value.</param>
+        /// <param name="value">New value to replace the state scope with.</param>
         public void Replace(TValue value)
         {
             Verify.ParamNotNull(value);
-
             _value = value;
         }
 

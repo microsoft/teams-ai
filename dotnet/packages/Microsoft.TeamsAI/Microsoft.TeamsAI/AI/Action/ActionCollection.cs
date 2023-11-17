@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI.AI.Action
 {
-    internal class ActionCollection<TState> : IActionCollection<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal class ActionCollection<TState> : IActionCollection<TState> where TState : ITurnState<Record, Record, TempState>
     {
         private readonly Dictionary<string, ActionEntry<TState>> _actions;
 

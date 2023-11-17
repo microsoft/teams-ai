@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.AI.Action
     /// Handler to perform the action.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state.</typeparam>
-    public interface IActionHandler<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    public interface IActionHandler<TState> where TState : ITurnState<Record, Record, TempState>
     {
         /// <summary>
         /// Perform the action.
