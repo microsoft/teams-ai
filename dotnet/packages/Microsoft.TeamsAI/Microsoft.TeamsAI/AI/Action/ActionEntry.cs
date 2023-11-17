@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.AI.Action
     /// Represents an action.
     /// </summary>
     /// <typeparam name="TState"></typeparam>
-    public sealed class ActionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal sealed class ActionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// The action name.
@@ -72,7 +72,7 @@ namespace Microsoft.Teams.AI.AI.Action
 
             string name = actionAttribute.Name;
             IActionHandler<TState> handler = new ActionHandler<TState>(methodSignature, methodContainerInstance);
-            bool allowOverrides = actionAttribute.AllowOverrides;
+            bool allowOverrides = actionAttribute.IsDefault;
 
             return new ActionEntry<TState>(name, handler, allowOverrides);
         }

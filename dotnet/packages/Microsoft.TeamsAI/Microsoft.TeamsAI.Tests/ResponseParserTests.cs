@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.Tests
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
-            Assert.Empty(predictedDoCommand.Entities!);
+            Assert.Empty(predictedDoCommand.Parameters!);
             Assert.Equal("actionValue", predictedDoCommand.Action);
         }
 
@@ -88,15 +88,15 @@ namespace Microsoft.Teams.AI.Tests
             Assert.Single(responsePlan.Commands);
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
-            Assert.NotNull(predictedDoCommand.Entities);
+            Assert.NotNull(predictedDoCommand.Parameters);
             Assert.Equal("actionValue", predictedDoCommand.Action);
         }
 
         [Fact]
-        public void Test_ParsePlan_One_DoCommand_One_Entity()
+        public void Test_ParsePlan_One_DoCommand_One_Parameter()
         {
             // Arrange 
-            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"entities\":{ \"entityName\": \"entityValue\" }}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"parameters\":{ \"parameterName\": \"parameterValue\" }}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -108,15 +108,15 @@ namespace Microsoft.Teams.AI.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Single(predictedDoCommand.Entities!);
-            Assert.Equal("entityValue", predictedDoCommand.Entities!["entityName"]);
+            Assert.Single(predictedDoCommand.Parameters!);
+            Assert.Equal("parameterValue", predictedDoCommand.Parameters!["parameterName"]);
         }
 
         [Fact]
-        public void Test_ParsePlan_One_DoCommand_Multiple_Entities()
+        public void Test_ParsePlan_One_DoCommand_Multiple_Parameters()
         {
             // Arrange 
-            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"entities\":{ \"entityNameA\": \"entityValueA\", \"entityNameB\": \"entityValueB\" }}]}";
+            var planJSON = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"DO\",\"action\":\"actionValue\",\"parameters\":{ \"parameterNameA\": \"parameterValueA\", \"parameterNameB\": \"parameterValueB\" }}]}";
 
             // Act
             Plan responsePlan = ResponseParser.ParseResponse(planJSON);
@@ -127,9 +127,9 @@ namespace Microsoft.Teams.AI.Tests
 
             PredictedDoCommand predictedDoCommand = (PredictedDoCommand)responsePlan.Commands.First();
             Assert.Equal("actionValue", predictedDoCommand.Action);
-            Assert.Equal(2, predictedDoCommand.Entities!.Count);
-            Assert.Equal("entityValueA", predictedDoCommand.Entities["entityNameA"]);
-            Assert.Equal("entityValueB", predictedDoCommand.Entities["entityNameB"]);
+            Assert.Equal(2, predictedDoCommand.Parameters!.Count);
+            Assert.Equal("parameterValueA", predictedDoCommand.Parameters["parameterNameA"]);
+            Assert.Equal("parameterValueB", predictedDoCommand.Parameters["parameterNameB"]);
         }
 
         [Fact]

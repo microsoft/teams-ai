@@ -29,7 +29,7 @@ namespace Microsoft.Teams.AI.AI.Planner
     /// </remarks>
     public class OpenAIPlanner<TState, TOptions> : IPlanner<TState>
         where TState : ITurnState<StateBase, StateBase, TempState>
-        where TOptions : OpenAIPlannerOptions
+        where TOptions : OpenAIPlannerOptions<TState>
     {
         private TOptions _options { get; }
         private protected readonly IKernel _kernel;
@@ -161,11 +161,11 @@ namespace Microsoft.Teams.AI.AI.Planner
             }
             catch (HttpOperationException ex)
             {
-                // Ensure we weren't rate limited
-                if (ex.isRateLimitedStatusCode())
+                // Ensure we don't have an http error
+                if (ex.isHttpErrorStatusCode())
                 {
                     Plan plan = new();
-                    plan.Commands.Add(new PredictedDoCommand(AIConstants.RateLimitedActionName));
+                    plan.Commands.Add(new PredictedDoCommand(AIConstants.HttpErrorActionName));
                     return plan;
                 }
 
@@ -182,7 +182,7 @@ namespace Microsoft.Teams.AI.AI.Planner
                     result = result.Substring(5);
                 }
 
-                string? assistantPrefix = options.History?.AssistantPrefix;
+                string? assistantPrefix = _options.History?.AssistantPrefix;
 
                 if (assistantPrefix != null)
                 {
@@ -277,11 +277,11 @@ namespace Microsoft.Teams.AI.AI.Planner
             }
 
             // Populate Conversation History
-            if (aiOptions.History != null && aiOptions.History.TrackHistory)
+            if (_options.History != null && _options.History.TrackHistory)
             {
-                string userPrefix = aiOptions.History.UserPrefix;
-                string assistantPrefix = aiOptions.History.AssistantPrefix;
-                string[] history = ConversationHistory.ToArray(turnState, aiOptions.History.MaxTokens);
+                string userPrefix = _options.History.UserPrefix;
+                string assistantPrefix = _options.History.AssistantPrefix;
+                string[] history = ConversationHistory.ToArray(turnState, _options.History.MaxTokens);
 
                 for (int i = 0; i < history.Length; i++)
                 {
@@ -323,17 +323,35 @@ namespace Microsoft.Teams.AI.AI.Planner
             }
         }
 
+        /// <inheritdoc/>
+        public async Task<Plan> BeginTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken)
+        {
+            Verify.ParamNotNull(turnContext);
+            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(ai);
+            return await ContinueTaskAsync(turnContext, turnState, ai, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken)
+        {
+            Verify.ParamNotNull(turnContext);
+            Verify.ParamNotNull(turnState);
+            Verify.ParamNotNull(ai);
+            PromptTemplate promptTemplate = _options.Prompts.LoadPromptTemplate(_options.DefaultPrompt);
+            return await GeneratePlanAsync(turnContext, turnState, promptTemplate, ai.Options, cancellationToken);
+        }
     }
 
     /// <inheritdoc/>
-    public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions> where TState : ITurnState<StateBase, StateBase, TempState>
+    public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions<TState>> where TState : ITurnState<StateBase, StateBase, TempState>
     {
         /// <summary>
         /// Creates a new <see cref="OpenAIPlanner{TState}"/> instance.
         /// </summary>
         /// <param name="options">The options to configure the planner.</param>
         /// <param name="loggerFactory">The logger factory instance.</param>
-        public OpenAIPlanner(OpenAIPlannerOptions options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
+        public OpenAIPlanner(OpenAIPlannerOptions<TState> options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
         {
         }
     }

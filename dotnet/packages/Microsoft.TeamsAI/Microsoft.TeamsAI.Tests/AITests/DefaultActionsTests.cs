@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
-using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -11,6 +9,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.AI.Moderator;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -26,10 +25,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.True(actions.ContainsAction(AIConstants.UnknownActionName));
             Assert.True(actions.ContainsAction(AIConstants.FlaggedInputActionName));
             Assert.True(actions.ContainsAction(AIConstants.FlaggedOutputActionName));
-            Assert.True(actions.ContainsAction(AIConstants.RateLimitedActionName));
+            Assert.True(actions.ContainsAction(AIConstants.HttpErrorActionName));
             Assert.True(actions.ContainsAction(AIConstants.PlanReadyActionName));
             Assert.True(actions.ContainsAction(AIConstants.DoCommandActionName));
             Assert.True(actions.ContainsAction(AIConstants.SayCommandActionName));
+            Assert.True(actions.ContainsAction(AIConstants.TooManyStepsActionName));
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var result = await unknownAction.Handler.PerformAction(turnContext, turnState, null, "test-action");
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(AIConstants.StopCommand, result);
             Assert.Equal(1, logs.Count);
             Assert.Equal("An AI action named \"test-action\" was predicted but no handler was registered", logs[0]);
         }
@@ -67,7 +67,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var result = await flaggedInputAction.Handler.PerformAction(turnContext, turnState, null, null);
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(AIConstants.StopCommand, result);
             Assert.Equal(1, logs.Count);
             Assert.Equal("The users input has been moderated but no handler was registered for ___FlaggedInput___", logs[0]);
         }
@@ -87,13 +87,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var result = await flaggedOutputAction.Handler.PerformAction(turnContext, turnState, null, null);
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(AIConstants.StopCommand, result);
             Assert.Equal(1, logs.Count);
             Assert.Equal("The bots output has been moderated but no handler was registered for ___FlaggedOutput___", logs[0]);
         }
 
         [Fact]
-        public async Task Test_Execute_RateLimitedAction()
+        public async Task Test_Execute_HttpErrorAction()
         {
             // Arrange
             IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
@@ -102,12 +102,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnState = new TestTurnState();
 
             // Act
-            var rateLimitedAction = actions[AIConstants.RateLimitedActionName];
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await rateLimitedAction.Handler.PerformAction(turnContext, turnState, null, null));
+            var httpErrorAction = actions[AIConstants.HttpErrorActionName];
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await httpErrorAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
             Assert.NotNull(exception);
-            Assert.Equal("An AI request failed because it was rate limited", exception.Message);
+            Assert.Equal("An AI http request failed", exception.Message);
         }
 
         [Fact]
@@ -131,8 +131,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await planReadyAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
-            Assert.False(result0);
-            Assert.True(result1);
+            Assert.Equal(AIConstants.StopCommand, result0);
+            Assert.Equal(string.Empty, result1);
             Assert.NotNull(exception);
             Assert.Equal("Value cannot be null. (Parameter 'plan')", exception.Message);
         }
@@ -158,7 +158,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await doCommandAction.Handler.PerformAction(turnContext, turnState, null, null));
 
             // Assert
-            Assert.True(result);
+            Assert.Equal("test-result", result);
             Assert.Equal("test-action", handler.ActionName);
             Assert.NotNull(exception);
             Assert.Equal("Value cannot be null. (Parameter 'doCommandActionData')", exception.Message);
@@ -181,10 +181,32 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, null, null));
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(string.Empty, result);
             turnContextMock.Verify(tc => tc.SendActivityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.NotNull(exception);
             Assert.Equal("Value cannot be null. (Parameter 'command')", exception.Message);
+        }
+
+        [Fact]
+        public async Task Test_Execute_TooManyStepsAction()
+        {
+            // Arrange
+            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnState = new TestTurnState();
+            var tooManyStepsParameters1 = new TooManyStepsParameters(25, TimeSpan.Zero, DateTime.UtcNow, 30);
+            var tooManyStepsParameters2 = new TooManyStepsParameters(25, TimeSpan.Zero, DateTime.UtcNow, 20);
+
+            // Act
+            var tooManyStepsAction = actions[AIConstants.TooManyStepsActionName];
+            var exception1 = await Assert.ThrowsAsync<TeamsAIException>(async () => await tooManyStepsAction.Handler.PerformAction(turnContextMock.Object, turnState, tooManyStepsParameters1, null));
+            var exception2 = await Assert.ThrowsAsync<TeamsAIException>(async () => await tooManyStepsAction.Handler.PerformAction(turnContextMock.Object, turnState, tooManyStepsParameters2, null));
+
+            // Assert
+            Assert.NotNull(exception1);
+            Assert.Equal("The AI system has exceeded the maximum number of steps allowed.", exception1.Message);
+            Assert.NotNull(exception1);
+            Assert.Equal("The AI system has exceeded the maximum amount of time allowed.", exception2.Message);
         }
 
         private static IActionCollection<TState> ImportDefaultActions<TState>(List<string>? logs = null) where TState : ITurnState<StateBase, StateBase, TempState>
@@ -213,23 +235,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             AIOptions<TState> options = new(
                 new Mock<IPlanner<TState>>().Object,
-                new PromptManager<TState>(),
                 new Mock<IModerator<TState>>().Object);
             AI<TState> ai = new(options, loggerFactory);
             // get _actions field from AI class
             FieldInfo actionsField = typeof(AI<TState>).GetField("_actions", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance)!;
             return (IActionCollection<TState>)actionsField!.GetValue(ai)!;
-        }
-
-        private sealed class TestActionHandler : IActionHandler<TestTurnState>
-        {
-            public string? ActionName { get; set; }
-
-            public Task<bool> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
-            {
-                ActionName = action;
-                return Task.FromResult(true);
-            }
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using System.Reflection;
-
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using System.Reflection;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
@@ -11,9 +9,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
     {
         public IList<string> Record { get; } = new List<string>();
 
-        public string CompletePromptResult { get; set; } = "Default";
-
-        public Plan GeneratePlanResult { get; set; } = new Plan
+        public Plan BeginPlan { get; set; } = new Plan
         {
             Commands = new List<IPredictedCommand>
             {
@@ -22,16 +18,25 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             }
         };
 
-        public Task<string> CompletePromptAsync(ITurnContext turnContext, TestTurnState turnState, PromptTemplate promptTemplate, AIOptions<TestTurnState> options, CancellationToken cancellationToken)
+        public Plan ContinuePlan { get; set; } = new Plan
+        {
+            Commands = new List<IPredictedCommand>
+            {
+                new PredictedDoCommand("Test-DO"),
+                new PredictedSayCommand("Test-SAY")
+            }
+        };
+
+        public Task<Plan> BeginTaskAsync(ITurnContext turnContext, TestTurnState turnState, AI<TestTurnState> ai, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
-            return Task.FromResult(CompletePromptResult);
+            return Task.FromResult(BeginPlan);
         }
 
-        public Task<Plan> GeneratePlanAsync(ITurnContext turnContext, TestTurnState turnState, PromptTemplate promptTemplate, AIOptions<TestTurnState> options, CancellationToken cancellationToken)
+        public Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TestTurnState turnState, AI<TestTurnState> ai, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
-            return Task.FromResult(GeneratePlanResult);
+            return Task.FromResult(ContinuePlan);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI.Planner;
 using System.Reflection;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.Utilities;
@@ -39,8 +38,6 @@ namespace Microsoft.Teams.AI.AI
                 Options.Moderator = new DefaultModerator<TState>();
             }
 
-            Options.History ??= new AIHistoryOptions();
-
             // Import default actions
             ImportActions(new DefaultActions<TState>(loggerFactory));
         }
@@ -64,11 +61,6 @@ namespace Microsoft.Teams.AI.AI
         public IPlanner<TState> Planner => Options.Planner;
 
         /// <summary>
-        /// Returns the prompt manager being used by the AI system.
-        /// </summary>
-        public IPromptManager<TState> Prompts => Options.PromptManager;
-
-        /// <summary>
         /// Registers a handler for a named action.
         /// </summary>
         /// <remarks>
@@ -87,17 +79,16 @@ namespace Microsoft.Teams.AI.AI
         /// </remarks>
         /// <param name="name">The name of the action.</param>
         /// <param name="handler">The action handler function.</param>
-        /// <param name="allowOverrides">Whether or not this action's properties can be overriden.</param>
         /// <returns>The current instance object.</returns>
-        /// <exception cref="Exception"></exception>
-        public AI<TState> RegisterAction(string name, IActionHandler<TState> handler, bool allowOverrides = false)
+        /// <exception cref="InvalidOperationException"></exception>
+        public AI<TState> RegisterAction(string name, IActionHandler<TState> handler)
         {
             Verify.ParamNotNull(name);
             Verify.ParamNotNull(handler);
 
-            if (!_actions.ContainsAction(name) || allowOverrides)
+            if (!_actions.ContainsAction(name))
             {
-                _actions.AddAction(name, handler, allowOverrides);
+                _actions.AddAction(name, handler, allowOverrides: false);
             }
             else
             {
@@ -105,6 +96,7 @@ namespace Microsoft.Teams.AI.AI
                 if (entry.AllowOverrides)
                 {
                     entry.Handler = handler;
+                    entry.AllowOverrides = false; // Only override once
                 }
                 else
                 {
@@ -116,15 +108,31 @@ namespace Microsoft.Teams.AI.AI
         }
 
         /// <summary>
-        /// Register an action into the AI module.
+        /// Registers the default handler for a named action.
         /// </summary>
-        /// <param name="action"></param>
+        /// <remarks>
+        /// Default handlers can be replaced by calling the RegisterAction() method with the same name.
+        /// </remarks>
+        /// <param name="name">The name of the action.</param>
+        /// <param name="handler">The action handler function.</param>
         /// <returns>The current instance object.</returns>
-        public AI<TState> RegisterAction(ActionEntry<TState> action)
+        public AI<TState> RegisterDefaultAction(string name, IActionHandler<TState> handler)
         {
-            Verify.ParamNotNull(action);
+            Verify.ParamNotNull(name);
+            Verify.ParamNotNull(handler);
 
-            return RegisterAction(action.Name, action.Handler, action.AllowOverrides);
+            if (!_actions.ContainsAction(name))
+            {
+                _actions.AddAction(name, handler, allowOverrides: true);
+            }
+            else
+            {
+                ActionEntry<TState> entry = _actions[name];
+                entry.Handler = handler;
+                entry.AllowOverrides = true;
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -133,6 +141,7 @@ namespace Microsoft.Teams.AI.AI
         /// </summary>
         /// <param name="instance">Instance of a class containing these functions.</param>
         /// <returns>The current instance object.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public AI<TState> ImportActions(object instance)
         {
             Verify.ParamNotNull(instance);
@@ -152,137 +161,106 @@ namespace Microsoft.Teams.AI.AI
             }
 
             // Register the actions
-            result.ForEach(action => RegisterAction(action));
+            result.ForEach(action =>
+            {
+                if (action.AllowOverrides)
+                {
+                    RegisterDefaultAction(action.Name, action.Handler);
+                }
+                else
+                {
+                    RegisterAction(action.Name, action.Handler);
+                }
+            });
 
             return this;
         }
 
         /// <summary>
-        /// Chains into another prompt and executes the plan that is returned.
+        /// Checks to see if the AI system has a handler for a given action.
         /// </summary>
-        /// <remarks>
-        /// This method is used to chain into another prompt. It will call the prompt manager to
-        /// get the plan for the prompt and then execute the plan. The return value indicates whether
-        /// that plan was completely executed or not, and can be used to make decisions about whether the
-        /// outer plan should continue executing.
-        /// </remarks>
-        /// <param name="turnContext">Current turn context.</param>
-        /// <param name="turnState">Current turn state.</param>
-        /// <param name="prompt">Optional. Prompt name or prompt template to use. If omitted, the AI systems default prompt will be used.</param>
-        /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        /// <exception cref="InvalidOperationException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
-        public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, string? prompt = null, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
+        /// <param name="action">Name of the action to check.</param>
+        /// <returns>True if the AI system has a handler for the given action.</returns>
+        public bool ContainsAction(string action)
         {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
-
-            AIOptions<TState> aIOptions = _ConfigureOptions(options);
-
-            // Select prompt
-            if (prompt == null)
-            {
-                if (aIOptions.Prompt == null)
-                {
-                    throw new InvalidOperationException("AI.ChainAsync() was called without a prompt and no default prompt was configured.");
-                }
-                else
-                {
-                    prompt = aIOptions.Prompt;
-                }
-            }
-
-            _SetTempStateValues(turnState, turnContext, aIOptions);
-
-            // Render the prompt
-            PromptTemplate renderedPrompt = await aIOptions.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
-
-            return await ChainAsync(turnContext, turnState, renderedPrompt, aIOptions, cancellationToken);
+            return _actions.ContainsAction(action);
         }
 
         /// <summary>
-        /// Chains into another prompt and executes the plan that is returned.
+        /// Calls the configured planner to generate a plan and executes the plan that is returned.
         /// </summary>
         /// <remarks>
-        /// This method is used to chain into another prompt. It will call the prompt manager to
-        /// get the plan for the prompt and then execute the plan. The return value indicates whether
-        /// that plan was completely executed or not, and can be used to make decisions about whether the
-        /// outer plan should continue executing.
+        /// The moderator is called to review the input and output of the plan. If the moderator flags
+        /// the input or output then the appropriate action is called. If the moderator allows the input
+        /// and output then the plan is executed.
         /// </remarks>
         /// <param name="turnContext">Current turn context.</param>
         /// <param name="turnState">Current turn state.</param>
-        /// <param name="prompt">Optional. Prompt template to use.</param>
-        /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
+        /// <param name="startTime">Optional. Time the AI system started running.</param>
+        /// <param name="stepCount">Number of steps that have been executed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects
         /// or threads to receive notice of cancellation.</param>
         /// <returns>True if the plan was completely executed, otherwise false.</returns>
-        /// <exception cref="InvalidOperationException">This exception is thrown when an unknown (not  DO or SAY) command is predicted.</exception>
-        public async Task<bool> ChainAsync(ITurnContext turnContext, TState turnState, PromptTemplate prompt, AIOptions<TState>? options = null, CancellationToken cancellationToken = default)
+        public async Task<bool> RunAsync(ITurnContext turnContext, TState turnState, DateTime? startTime = null, int stepCount = 0, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(turnContext);
             Verify.ParamNotNull(turnState);
-            Verify.ParamNotNull(prompt);
 
-            AIOptions<TState> opts = _ConfigureOptions(options);
+            // Initialize start time
+            startTime = startTime ?? DateTime.UtcNow;
 
-            _SetTempStateValues(turnState, turnContext, opts);
+            // Populate {{$temp.input}}
+            _SetTempStateValues(turnState, turnContext);
 
-            // Render the prompt
-            PromptTemplate renderedPrompt = await opts.PromptManager.RenderPromptAsync(turnContext, turnState, prompt);
+            Plan? plan = null;
 
-            // Review prompt
-            Plan? plan = await opts.Moderator!.ReviewPrompt(turnContext, turnState, renderedPrompt);
+            // Review input on first loop
+            if (stepCount == 0)
+            {
+                plan = await Options.Moderator.ReviewInput(turnContext, turnState);
+            }
 
+            // Generate plan
             if (plan == null)
             {
-                // Generate plan
-                plan = await opts.Planner.GeneratePlanAsync(turnContext, turnState, renderedPrompt, opts, cancellationToken);
-                plan = await opts.Moderator.ReviewPlan(turnContext, turnState, plan);
+                if (stepCount == 0)
+                {
+                    plan = await Options.Planner.BeginTaskAsync(turnContext, turnState, this, cancellationToken);
+                }
+                else
+                {
+                    plan = await Options.Planner.ContinueTaskAsync(turnContext, turnState, this, cancellationToken);
+                }
+
+                // Review the plans output
+                plan = await Options.Moderator.ReviewOutput(turnContext, turnState, plan);
             }
 
             // Process generated plan
-            bool continueChain = await this._actions[AIConstants.PlanReadyActionName]!.Handler.PerformAction(turnContext, turnState, plan);
-            if (continueChain)
+            string response = await _actions[AIConstants.PlanReadyActionName].Handler.PerformAction(turnContext, turnState, plan, AIConstants.PlanReadyActionName);
+            if (string.Equals(response, AIConstants.StopCommand))
             {
-                // Update conversation history
-                if (turnState != null && opts?.History != null && opts.History.TrackHistory)
-                {
-                    string userPrefix = opts.History!.UserPrefix.Trim();
-                    string userInput = turnState.Temp!.Input.Trim();
-                    int doubleMaxTurns = opts.History.MaxTurns * 2;
-
-                    ConversationHistory.AddLine(turnState, $"{userPrefix} {userInput}", doubleMaxTurns);
-                    string assistantPrefix = Options.History!.AssistantPrefix.Trim();
-
-                    switch (opts?.History.AssistantHistoryType)
-                    {
-                        case AssistantHistoryType.Text:
-                            // Extract only the things the assistant has said
-                            string text = string.Join("\n", plan.Commands
-                                .OfType<PredictedSayCommand>()
-                                .Select(c => c.Response));
-
-                            ConversationHistory.AddLine(turnState, $"{assistantPrefix}, {text}");
-
-                            break;
-
-                        case AssistantHistoryType.PlanObject:
-                        default:
-                            // Embed the plan object to re-enforce the model
-                            // TODO: Add support for XML as well
-                            ConversationHistory.AddLine(turnState, $"{assistantPrefix} {plan.ToJsonString()}");
-                            break;
-                    }
-
-                }
+                return false;
             }
 
-            for (int i = 0; i < plan.Commands.Count && continueChain; i++)
+            // Run predicted commands
+            // - If the plan ends on a SAY command then the plan is considered complete, otherwise we'll loop
+            bool completed = true;
+            bool shouldLoop = false;
+            foreach (IPredictedCommand command in plan.Commands)
             {
-                IPredictedCommand command = plan.Commands[i];
+                // Check for timeout
+                if (DateTime.UtcNow - startTime > Options.MaxTime || ++stepCount > Options.MaxSteps)
+                {
+                    completed = false;
+                    TooManyStepsParameters parameters = new(Options.MaxSteps, Options.MaxTime, startTime.Value, stepCount);
+                    await _actions[AIConstants.TooManyStepsActionName]
+                        .Handler
+                        .PerformAction(turnContext, turnState, parameters, AIConstants.TooManyStepsActionName);
+                    break;
+                }
 
+                string output;
                 if (command is PredictedDoCommand doCommand)
                 {
                     if (_actions.ContainsAction(doCommand.Action))
@@ -294,136 +272,54 @@ namespace Microsoft.Teams.AI.AI
                         };
 
                         // Call action handler
-                        continueChain = await this._actions[AIConstants.DoCommandActionName]
+                        output = await this._actions[AIConstants.DoCommandActionName]
                             .Handler
-                            .PerformAction(turnContext, turnState!, data, doCommand.Action);
+                            .PerformAction(turnContext, turnState, data, doCommand.Action);
+                        shouldLoop = output.Length > 0;
                     }
                     else
                     {
                         // Redirect to UnknownAction handler
-                        continueChain = await this._actions[AIConstants.UnknownActionName]
+                        output = await this._actions[AIConstants.UnknownActionName]
                             .Handler
-                            .PerformAction(turnContext, turnState!, plan, doCommand.Action);
+                            .PerformAction(turnContext, turnState, plan, doCommand.Action);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
                 {
-                    continueChain = await this._actions[AIConstants.SayCommandActionName]
+                    shouldLoop = false;
+                    output = await this._actions[AIConstants.SayCommandActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState!, sayCommand, AIConstants.SayCommandActionName);
+                        .PerformAction(turnContext, turnState, sayCommand, AIConstants.SayCommandActionName);
                 }
                 else
                 {
                     throw new InvalidOperationException($"Unknown command of {command.Type} predicted");
                 }
+
+                // Check for stop command
+                if (string.Equals(output, AIConstants.StopCommand))
+                {
+                    completed = false;
+                    break;
+                }
+
+                // Copy the actions output to the input
+                turnState.Temp!.Input = output;
             }
 
-            return continueChain;
-        }
-
-        /// <summary>
-        /// A helper method to complete a prompt using the configured prompt manager.
-        /// </summary>
-        /// <param name="turnContext">Current turn context.</param>
-        /// <param name="turnState">Current turn state.</param>
-        /// <param name="promptTemplate">Prompt template to use.</param>
-        /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, PromptTemplate promptTemplate, AIOptions<TState>? options, CancellationToken cancellationToken)
-        {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
-            Verify.ParamNotNull(promptTemplate);
-
-            // Configure options
-            AIOptions<TState> aiOptions = _ConfigureOptions(options);
-            _SetTempStateValues(turnState, turnContext, aiOptions);
-
-            // Render the prompt
-            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPromptAsync(turnContext, turnState, promptTemplate);
-
-            // Complete the prompt
-            return await aiOptions.Planner.CompletePromptAsync(turnContext, turnState, renderedPrompt, aiOptions, cancellationToken);
-        }
-
-        /// <summary>
-        /// A helper method to complete a prompt using the configured prompt manager.
-        /// </summary>
-        /// <param name="turnContext">Current turn context.</param>
-        /// <param name="turnState">Current turn state.</param>
-        /// <param name="name">Prompt name to use</param>
-        /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects
-        /// or threads to receive notice of cancellation.</param>
-        public async Task<string> CompletePromptAsync(ITurnContext turnContext, TState turnState, string name, AIOptions<TState>? options, CancellationToken cancellationToken)
-        {
-            Verify.ParamNotNull(turnContext);
-            Verify.ParamNotNull(turnState);
-            Verify.ParamNotNull(name);
-
-            // Configure options
-            AIOptions<TState> aiOptions = _ConfigureOptions(options);
-            _SetTempStateValues(turnState, turnContext, aiOptions);
-
-            // Render the prompt
-            PromptTemplate renderedPrompt = await aiOptions.PromptManager.RenderPromptAsync(turnContext, turnState, name);
-
-            // Complete the prompt
-            return await aiOptions.Planner.CompletePromptAsync(turnContext, turnState, renderedPrompt, aiOptions, cancellationToken);
-        }
-
-        /// <summary>
-        /// Creates a semantic function that can be registered with the app's prompt manager.
-        /// </summary>
-        /// <remarks>
-        /// Semantic functions are functions that make model calls and return their results as template
-        /// parameters to other prompts. For example, you could define a semantic function called
-        /// 'translator' that first translates the user's input to English before calling your main prompt:
-        /// <br/><br/>
-        /// <c>
-        /// app.AI.Prompts.AddFunction('translator', app.AI.CreateSemanticFunction('translator-prompt'));
-        /// </c>
-        /// <br/><br/>
-        /// You would then create a prompt called "translator-prompt" that does the translation and then in
-        /// your main prompt you can call it using the template expression `{{translator}}`.
-        /// </remarks>
-        /// <param name="name">Prompt to use. If template is provided then this name will be assigned to it in the prompt manager.</param>
-        /// <param name="template">Optional. Prompt template to use.</param>
-        /// <param name="options">Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.</param>
-        /// <returns>A prompt function.</returns>
-        public PromptFunction<TState> CreateSemanticFunction(string name, PromptTemplate? template, AIOptions<TState>? options)
-        {
-            Verify.ParamNotNull(name);
-
-            if (template != null)
+            // Check for looping
+            if (completed && shouldLoop && Options.AllowLooping)
             {
-                Options.PromptManager.AddPromptTemplate(name, template);
-            }
-
-            return (ITurnContext turnContext, TState turnState) => CompletePromptAsync(turnContext, turnState, name, options, default);
-        }
-
-        private AIOptions<TState> _ConfigureOptions(AIOptions<TState>? options)
-        {
-            AIOptions<TState> configuredOptions;
-
-            if (options != null)
-            {
-                configuredOptions = options;
-
-                // Disable history tracking by default
-                options.History ??= new AIHistoryOptions() { TrackHistory = false };
+                return await RunAsync(turnContext, turnState, startTime, stepCount, cancellationToken);
             }
             else
             {
-                configuredOptions = Options;
+                return completed;
             }
-
-            return configuredOptions;
         }
 
-        private void _SetTempStateValues(TState turnState, ITurnContext turnContext, AIOptions<TState>? options)
+        private void _SetTempStateValues(TState turnState, ITurnContext turnContext)
         {
             TempState? tempState = turnState.Temp;
 
@@ -432,11 +328,6 @@ namespace Microsoft.Teams.AI.AI
                 if (string.IsNullOrEmpty(tempState.Input))
                 {
                     tempState.Input = turnContext.Activity.Text ?? string.Empty;
-                }
-
-                if (string.IsNullOrEmpty(tempState.History) && options?.History != null && options.History.TrackHistory)
-                {
-                    tempState.History = ConversationHistory.ToString(turnState, options.History.MaxTokens, options.History.LineSeparator);
                 }
             }
         }

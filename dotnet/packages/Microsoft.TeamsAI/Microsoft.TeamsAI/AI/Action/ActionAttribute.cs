@@ -13,19 +13,19 @@ namespace Microsoft.Teams.AI.AI.Action
         public string Name { get; private set; }
 
         /// <summary>
-        /// Whether or not this action's properties can be overridden.
+        /// Whether this action is default.
         /// </summary>
-        public bool AllowOverrides { get; private set; }
+        public bool IsDefault { get; private set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="ActionAttribute"/> class.
         /// </summary>
         /// <param name="name">The name of the action.</param>
-        /// <param name="allowOverrides">Whether this action can override an existing one.</param>
-        public ActionAttribute(string name, bool allowOverrides = true)
+        /// <param name="isDefault">Whether this action is default.</param>
+        public ActionAttribute(string name, bool isDefault = false)
         {
             Name = name;
-            AllowOverrides = allowOverrides;
+            IsDefault = isDefault;
         }
     }
 }
