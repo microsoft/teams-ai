@@ -12,7 +12,7 @@ import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingR
 import { Colorize } from "../internals";
 
 /**
- * Base configuration options for configuring an `OpenAIEmbeddings` instance.
+ * Base model options common to both OpenAI and Azure OpenAI services.
  */
 export interface BaseOpenAIEmbeddingsOptions {
     /**
@@ -94,7 +94,6 @@ export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOption
 
 /**
  * A `EmbeddingsModel` for calling OpenAI and Azure OpenAI hosted models.
- * @remarks
  */
 export class OpenAIEmbeddings implements EmbeddingsModel {
     private readonly _httpClient: AxiosInstance;
