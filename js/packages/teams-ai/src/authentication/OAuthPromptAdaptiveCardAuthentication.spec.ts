@@ -3,9 +3,10 @@ import { TurnState } from '../TurnState';
 import * as sinon from 'sinon';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
-import { AdaptiveCardAuthentication } from './AdaptiveCardAuthentication';
+import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
 import { OAuthSettings } from './Authentication';
 import { ACTION_INVOKE_NAME } from '../AdaptiveCards';
+import { OAuthPromptAdaptiveCardAuthentication } from './OAuthPromptAdaptiveCardAuthentication';
 
 describe('AdaptiveCardAuthenticaion', () => {
     const adapter = new TestAdapter();
@@ -58,10 +59,10 @@ describe('AdaptiveCardAuthenticaion', () => {
 
             const contextStub = sinon.stub(context, 'sendActivity');
 
-            const acAuth = new AdaptiveCardAuthentication();
-            const isTokenExchangableStub = sinon.stub(acAuth, 'isTokenExchangeable').returns(Promise.resolve(false));
+            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const isTokenExchangableStub = sinon.stub(acAuth, 'handleSsoTokenExchange').throws();
 
-            await acAuth.authenticate(context, settings);
+            await acAuth.authenticate(context);
 
             assert(isTokenExchangableStub.calledOnce);
 
@@ -92,10 +93,10 @@ describe('AdaptiveCardAuthenticaion', () => {
                 }
             });
 
-            const acAuth = new AdaptiveCardAuthentication();
-            const isTokenExchangableStub = sinon.stub(acAuth, 'isTokenExchangeable').returns(Promise.resolve(false));
+            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const isTokenExchangableStub = sinon.stub(acAuth, 'handleSsoTokenExchange').throws();
 
-            const result = await acAuth.authenticate(context, settings);
+            const result = await acAuth.authenticate(context);
 
             assert(isTokenExchangableStub.calledOnce);
 
@@ -113,18 +114,16 @@ describe('AdaptiveCardAuthenticaion', () => {
                 }
             });
 
-            const acAuth = new AdaptiveCardAuthentication();
-            const isTokenExchangableStub = sinon.stub(acAuth, 'isTokenExchangeable').returns(Promise.resolve(true));
-            const exchangeTokenStub = sinon.stub(acAuth, 'exchangeToken').returns(
+            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const exchangeTokenStub = sinon.stub(acAuth, 'handleSsoTokenExchange').returns(
                 Promise.resolve({
                     token: 'token',
                     expiration: 'expiration',
                     connectionName: 'connectionName'
                 })
             );
-            const result = await acAuth.authenticate(context, settings);
+            const result = await acAuth.authenticate(context);
 
-            assert(isTokenExchangableStub.calledOnce);
             assert(exchangeTokenStub.calledOnce);
             assert(result === 'token');
         });
@@ -143,14 +142,14 @@ describe('AdaptiveCardAuthenticaion', () => {
             });
 
             it('should return token if successfully retrieved token from token store', async () => {
-                const magicCode = 'OAuth flow magic code';
+                const magicCode = '123456'; // Magic code is a random number
                 const [context, _] = await createTurnContextAndState({
                     value: {
                         state: magicCode
                     }
                 });
 
-                const acAuth = new AdaptiveCardAuthentication();
+                const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
 
                 const getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
                     Promise.resolve({
@@ -159,14 +158,14 @@ describe('AdaptiveCardAuthenticaion', () => {
                         connectionName: 'connectionName'
                     })
                 );
-                const result = await acAuth.authenticate(context, settings);
+                const result = await acAuth.authenticate(context);
 
                 assert(getUserTokenStub.calledOnce);
                 assert(result === 'token');
             });
 
             describe(`should send login card when couldn't retrieve token from token`, () => {
-                let acAuth: AdaptiveCardAuthentication;
+                let acAuth: AdaptiveCardAuthenticationBase;
                 let context: TurnContext;
                 let contextStub: sinon.SinonStub;
                 let signInResourceStub: sinon.SinonStub;
@@ -191,7 +190,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                         })
                     );
 
-                    acAuth = new AdaptiveCardAuthentication();
+                    acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
 
                     signInResourceStub = sinon.stub(UserTokenAccess, 'getSignInResource').returns(
                         Promise.resolve({
@@ -212,7 +211,9 @@ describe('AdaptiveCardAuthenticaion', () => {
                         title: 'title'
                     };
 
-                    const result = await acAuth.authenticate(context, settings);
+                    acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+
+                    const result = await acAuth.authenticate(context);
 
                     assert(
                         contextStub.calledOnceWith({
@@ -250,7 +251,9 @@ describe('AdaptiveCardAuthenticaion', () => {
                         tokenExchangeUri: 'tokenExchangeUri'
                     };
 
-                    const result = await acAuth.authenticate(context, settings);
+                    acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+
+                    const result = await acAuth.authenticate(context);
 
                     assert(
                         contextStub.calledOnceWith({
@@ -295,7 +298,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                 name: 'adaptiveCard/action'
             });
 
-            const acAuth = new AdaptiveCardAuthentication();
+            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
 
             const result = acAuth.isValidActivity(context);
 
@@ -308,7 +311,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                 name: 'composeExtension/query'
             });
 
-            const acAuth = new AdaptiveCardAuthentication();
+            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
 
             const result = acAuth.isValidActivity(context);
 

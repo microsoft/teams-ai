@@ -15,18 +15,20 @@ import { Application, Selector } from '../Application';
 import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
-import { AdaptiveCardAuthentication } from './AdaptiveCardAuthentication';
+import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
 import { TeamsSsoPromptSettings } from './TeamsBotSsoPrompt';
 import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
 import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
 import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
 import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensionAuthentication';
+import { OAuthPromptAdaptiveCardAuthentication } from './OAuthPromptAdaptiveCardAuthentication';
+import { TeamsSsoAdaptiveCardAuthentication } from './TeamsSsoAdaptiveCardAuthentication';
 
 /**
  * User authentication service.
  */
 export class Authentication<TState extends TurnState> {
-    private readonly _adaptiveCardAuth: AdaptiveCardAuthentication;
+    private readonly _adaptiveCardAuth: AdaptiveCardAuthenticationBase;
     private readonly _messagingExtensionAuth: MessageExtensionAuthenticationBase;
     private readonly _botAuth: BotAuthenticationBase<TState>;
     private readonly _name: string;
@@ -42,7 +44,7 @@ export class Authentication<TState extends TurnState> {
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
      * @param {MessageExtensionAuthenticationBase} messagingExtensionsAuth - Handles messaging extension flow authentication.
      * @param {BotAuthenticationBase} botAuth - Handles bot-flow authentication.
-     * @param {AdaptiveCardAuthentication} adaptiveCardAuth - Handles adaptive card authentication.
+     * @param {AdaptiveCardAuthenticationBase} adaptiveCardAuth - Handles adaptive card authentication.
      */
     constructor(
         app: Application<TState>,
@@ -51,21 +53,23 @@ export class Authentication<TState extends TurnState> {
         storage?: Storage,
         messagingExtensionsAuth?: MessageExtensionAuthenticationBase,
         botAuth?: BotAuthenticationBase<TState>,
-        adaptiveCardAuth?: AdaptiveCardAuthentication
+        adaptiveCardAuth?: AdaptiveCardAuthenticationBase
     ) {
         this.settings = settings;
         this._name = name;
 
-        if (this.isOAuthPromptSettings(settings)) {
+        if (this.isOAuthSettings(settings)) {
             this._messagingExtensionAuth = messagingExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
             this._botAuth = botAuth || new OAuthPromptBotAuthentication(app, settings, this._name, storage);
+            this._adaptiveCardAuth = adaptiveCardAuth || new OAuthPromptAdaptiveCardAuthentication(settings);
         } else {
             this._msal = new ConfidentialClientApplication(settings.msalConfig);
             this._botAuth = botAuth || new TeamsSsoBotAuthentication(app, settings, this._name, this._msal, storage);
             this._messagingExtensionAuth = messagingExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
+            this._adaptiveCardAuth = adaptiveCardAuth || new TeamsSsoAdaptiveCardAuthentication();
         }
 
-        this._adaptiveCardAuth = adaptiveCardAuth || new AdaptiveCardAuthentication();
+        
     }
 
     /**
@@ -92,7 +96,7 @@ export class Authentication<TState extends TurnState> {
         }
 
         if (this._adaptiveCardAuth.isValidActivity(context)) {
-            return await this._adaptiveCardAuth.authenticate(context, this.settings);
+            return await this._adaptiveCardAuth.authenticate(context);
         }
 
         throw new AuthError(
@@ -112,7 +116,7 @@ export class Authentication<TState extends TurnState> {
         this._botAuth.deleteAuthFlowState(context, state);
 
         // Signout flow is agnostic of the activity type.
-        if (this.isOAuthPromptSettings(this.settings)) {
+        if (this.isOAuthSettings(this.settings)) {
             return UserTokenAccess.signOutUser(context, this.settings);
         } else {
             const loginHint = await this.getLoginHint(context);
@@ -128,7 +132,7 @@ export class Authentication<TState extends TurnState> {
      * @returns {string | undefined} The token string or undefined if the user is not signed in.
      */
     public async isUserSignedIn(context: TurnContext): Promise<string | undefined> {
-        if (this.isOAuthPromptSettings(this.settings)) {
+        if (this.isOAuthSettings(this.settings)) {
             const tokenResponse = await UserTokenAccess.getUserToken(context, this.settings, '');
 
             if (tokenResponse && tokenResponse.token) {
@@ -170,8 +174,8 @@ export class Authentication<TState extends TurnState> {
         this._botAuth.onUserSignInFailure(handler);
     }
 
-    private isOAuthPromptSettings(settings: OAuthPromptSettings | TeamsSsoPromptSettings): settings is OAuthPromptSettings {
-        return (settings as OAuthPromptSettings).connectionName !== undefined;
+    private isOAuthSettings(settings: OAuthSettings | TeamsSsoPromptSettings): settings is OAuthSettings {
+        return (settings as OAuthSettings).connectionName !== undefined;
     }
 
     private async getLoginHint(context: TurnContext): Promise<string | undefined> {
