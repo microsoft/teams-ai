@@ -118,7 +118,10 @@ namespace Microsoft.Teams.AI.AI.Models
                     completionsResponse = await _openAIClient.GetCompletionsAsync(completionsOptions, cancellationToken);
                     rawResponse = completionsResponse.GetRawResponse();
                     promptResponse.Status = PromptResponseStatus.Success;
-                    promptResponse.Message = new ChatMessage(ChatRole.Assistant, completionsResponse.Value.Choices[0].Text);
+                    promptResponse.Message = new ChatMessage(ChatRole.Assistant)
+                    {
+                        Content = completionsResponse.Value.Choices[0].Text
+                    };
                 }
                 catch (RequestFailedException e)
                 {
