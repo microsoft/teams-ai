@@ -21,17 +21,17 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
 
     public constructor(
         app: Application<TState>,
-        oAuthPromptSettings: OAuthPromptSettings, // Child classes will have different types for this
+        oauthPromptSettings: OAuthPromptSettings, // Child classes will have different types for this
         settingName: string,
         storage?: Storage
     ) {
         super(app, settingName, storage);
 
         // Create OAuthPrompt
-        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oAuthPromptSettings);
+        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthPromptSettings);
 
         // Handles deduplication of token exchange event when using SSO with Bot Authentication
-        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oAuthPromptSettings.connectionName));
+        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));
     }
 
     public async runDialog(
