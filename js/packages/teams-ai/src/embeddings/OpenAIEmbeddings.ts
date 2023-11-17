@@ -11,6 +11,9 @@ import { EmbeddingsModel, EmbeddingsResponse } from "./EmbeddingsModel";
 import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "../internals";
 import { Colorize } from "../internals";
 
+/**
+ * Base model options common to both OpenAI and Azure OpenAI services.
+ */
 export interface BaseOpenAIEmbeddingsOptions {
     /**
      * Optional. Whether to log requests to the console.
@@ -90,14 +93,13 @@ export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOption
 }
 
 /**
- * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
- * @remarks
+ * A `EmbeddingsModel` for calling OpenAI and Azure OpenAI hosted models.
  */
 export class OpenAIEmbeddings implements EmbeddingsModel {
     private readonly _httpClient: AxiosInstance;
     private readonly _useAzure: boolean;
 
-    private readonly UserAgent = 'AlphaWave';
+    private readonly UserAgent = '@microsoft/teams-ai-v1';
 
     /**
      * Options the client was configured with.
@@ -105,8 +107,8 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     public readonly options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions;
 
     /**
-     * Creates a new `OpenAIClient` instance.
-     * @param options Options for configuring an `OpenAIClient`.
+     * Creates a new `OpenAIEmbeddings` instance.
+     * @param options Options for configuring the embeddings client.
      */
     public constructor(options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions) {
         // Check for azure config

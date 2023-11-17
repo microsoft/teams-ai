@@ -38,6 +38,9 @@ export class FunctionResponseMessage extends PromptSectionBase {
         this.response = response;
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache response text and length
         if (this._length < 0) {

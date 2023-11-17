@@ -19,20 +19,91 @@ import { Tokenizer } from '../tokenizers';
 import { Utilities } from '../Utilities';
 import { DefaultAugmentation } from '../augmentations';
 
+/**
+ * Factory function used to create a prompt template.
+ * @template TState Optional. Type of application state.
+ * @param context Context for the current turn of conversation.
+ * @param state Application state for the current turn of conversation.
+ * @param planner The action planner that is generating the prompt.
+ * @returns A promise that resolves to the prompt template to use.
+ */
+export type ActionPlannerPromptFactory<TState extends TurnState = TurnState> = (context: TurnContext, state: TState, planner: ActionPlanner<TState>) => Promise<PromptTemplate>;
+
+/**
+ * Options used to configure an `ActionPlanner` instance.
+ * @template TState Optional. Type of application state.
+ */
 export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
+    /**
+     * Model instance to use.
+     */
     model: PromptCompletionModel;
+
+    /**
+     * Prompt manager used to manage prompts.
+     */
     prompts: PromptManager;
-    defaultPrompt: string|((context: TurnContext, state: TState, planner: ActionPlanner<TState>) => Promise<PromptTemplate>);
+
+    /**
+     * The default prompt to use.
+     * @remarks
+     * This can either be the name of a prompt template or a function that returns a prompt template.
+     */
+    defaultPrompt: string|ActionPlannerPromptFactory<TState>;
+
+    /**
+     * Maximum number of repair attempts to make.
+     * @remarks
+     * The ActionPlanner uses validators and a feedback loop to repair invalid responses returned
+     * by the model. This value controls the maximum number of repair attempts that will be made
+     * before returning an error. The default value is 3.
+     */
     max_repair_attempts?: number;
+
+    /**
+     * Optional tokenizer to use.
+     * @remarks
+     * If not specified, a new `GPT3Tokenizer` instance will be created.
+     */
     tokenizer?: Tokenizer;
+
+    /**
+     * If true, repair attempts will be logged to the console.
+     * @remarks
+     * The default value is false.
+     */
     logRepairs?: boolean;
 }
 
+/**
+ * A planner that uses a Large Language Model (LLM) to generate plans.
+ * @remarks
+ * The ActionPlanner is a powerful planner that uses a LLM to generate plans. The planner can
+ * trigger parameterized actions and send text based responses to the user. The ActionPlanner
+ * supports the following advanced features:
+ * - **Augmentations:** Augmentations virtually eliminate the need for prompt engineering. Prompts
+ *   can be configured to use a named augmentation which will be automatically appended to the outgoing
+ *   prompt. Augmentations let the developer specify whether they want to support multi-step plans (sequence),
+ *   use OpenAI's functions support (functions), or create an AutoGPT style agent (monologue).
+ * - **Validations:** Validators are used to validate the response returned by the LLM and can guarantee
+ *   that the parameters passed to an action mach a supplied schema. The validator used is automatically
+ *   selected based on the augmentation being used. Validators also prevent hallucinated action names
+ *   making it impossible for the LLM to trigger an action that doesn't exist.
+ * - **Repair:** The ActionPlanner will automatically attempt to repair invalid responses returned by the
+ *   LLM using a feedback loop. When a validation fails, the ActionPlanner sends the error back to the
+ *   model, along with an instruction asking it to fix its mistake. This feedback technique leads to a
+ *   dramatic reduction in the number of invalid responses returned by the model.
+ * @template TState Optional. Type of application state.
+ */
 export class ActionPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
     private readonly _options: ActionPlannerOptions<TState>;
-    private readonly _promptFactory: (context: TurnContext, state: TState, planner: ActionPlanner<TState>) => Promise<PromptTemplate>;
+    private readonly _promptFactory: ActionPlannerPromptFactory<TState>;
     private readonly _defaultPrompt?: string;
 
+    /**
+     * Creates a new `ActionPlanner` instance.
+     * @param options Options used to configure the planner.
+     */
     public constructor(options: ActionPlannerOptions<TState>) {
         this._options = Object.assign({
             max_repair_attempts: 3,
@@ -42,9 +113,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
             this._promptFactory = this._options.defaultPrompt;
         } else {
             this._defaultPrompt = this._options.defaultPrompt;
-            this._promptFactory = (planner) => {
-                return this.prompts.getPrompt(this._defaultPrompt!);
-            };
+            this._promptFactory = () => this.prompts.getPrompt(this._defaultPrompt!);
         }
     }
 
@@ -116,7 +185,23 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         return await augmentation.createPlanFromResponse(context, state, result);
     }
 
-    public async completePrompt<TResult = string>(context: TurnContext, memory: Memory, prompt: string|PromptTemplate, validator?: PromptResponseValidator<TResult>): Promise<PromptResponse<TResult>> {
+    /**
+     * Completes a prompt using an optional validator.
+     * @remarks
+     * This method allows the developer to manually complete a prompt and access the models
+     * response. If a validator is specified, the response will be validated and repaired if
+     * necessary. If no validator is specified, the response will be returned as-is.
+     *
+     * If a validator like the `JSONResponseValidator` is used, the response returned will be
+     * a message containing a JSON object. If no validator is used, the response will be a
+     * message containing the response text as a string.
+     * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `string`.     * @param context Context for the current turn of conversation.
+     * @param memory A memory interface used to access state variables (the turn state object implements this interface.)
+     * @param prompt Name of the prompt to use or a prompt template.
+     * @param validator Optional. A validator to use to validate the response returned by the model.
+     * @returns The result of the LLM call.
+     */
+    public async completePrompt<TContent = string>(context: TurnContext, memory: Memory, prompt: string|PromptTemplate, validator?: PromptResponseValidator<TContent>): Promise<PromptResponse<TContent>> {
         // Cache prompt template if being dynamically assigned
         let name = '';
         if (typeof prompt == 'object') {
@@ -144,7 +229,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         const input_variable = `temp.input`;
 
         // Create LLM client
-        const client = new LLMClient<TResult>({
+        const client = new LLMClient<TContent>({
             model,
             template,
             history_variable,
@@ -165,7 +250,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
      * @param {string} name The name of the semantic function.
      * @param {PromptTemplate} template The prompt template to use.
      * @param {Partial<AIOptions<TState>>} options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
-     * @summary
+     * @remarks
      * Semantic functions are functions that make model calls and return their results as template
      * parameters to other prompts. For example, you could define a semantic function called
      * 'translator' that first translates the user's input to English before calling your main prompt:
@@ -210,5 +295,4 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
         });
         return this;
     }
-
 }

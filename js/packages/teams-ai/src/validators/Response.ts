@@ -1,4 +1,13 @@
 /**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+
+/**
  * Utilities for working with Large Language Model responses.
  */
 export class Response {

@@ -12,7 +12,11 @@ import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "
  * A test model that can be used to test the prompt completion system.
  */
 export class TestEmbeddings implements EmbeddingsModel {
+    /**
+     * Default output to return for test embeddings.
+     */
     public static TEST_OUTPUT = [[1,2,3,4,5]];
+
     /**
      *
      * @param status Optional. Status of the embeddings response. Defaults to `success`.
@@ -42,6 +46,7 @@ export class TestEmbeddings implements EmbeddingsModel {
     /**
      * Returns a generated set of test embeddings
      * @param inputs Input to generate embeddings for.
+     * @returns The generated embeddings.
      */
     public createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
         // Validate inputs

@@ -12,6 +12,7 @@ import { AI } from '../AI';
 
 /**
  * A planner is responsible for generating a plan that the AI system will execute.
+ * @template TState Optional. Type of application state.
  */
 export interface Planner<TState extends TurnState = TurnState> {
     /**
@@ -75,7 +76,7 @@ export interface Plan {
 export interface PredictedCommand {
     /**
      * Type of command to execute.
-     * @summary
+     * @remarks
      * DO commands are actions that the AI system should perform. SAY commands are responses that
      * the AI system should say.
      */
