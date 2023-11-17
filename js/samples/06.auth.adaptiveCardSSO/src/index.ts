@@ -10,6 +10,7 @@ import * as restify from 'restify';
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
+    ActivityTypes,
     CardFactory,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
@@ -66,9 +67,8 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import axios from 'axios';
 import { ApplicationBuilder, TurnState } from '@microsoft/teams-ai';
-import { createNpmPackageCard, createNpmSearchResultCard, createSignOutCard, createUserProfileCard } from './cards';
+import { createUserProfileCard, createViewProfileCard } from './cards';
 import { GraphClient } from './graphClient';
 
 // Define storage and application
@@ -81,91 +81,29 @@ const app = new ApplicationBuilder()
                 connectionName: process.env.ConnectionName ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
-                endOnInvalidMessage: true
+                endOnInvalidMessage: true,
+                tokenExchangeUri: process.env.TokenExchangeUri ?? ''
             }
         },
         autoSignIn: (context: TurnContext) => {
-            const signOutActivity = context.activity?.value.commandId === 'signOutCommand';
-            if (signOutActivity) {
+            // Disable auto sign in for message activities
+            if (context.activity.type == ActivityTypes.Message) {
                 return Promise.resolve(false);
             }
-
             return Promise.resolve(true);
         }
     })
     .build();
 
-// Handles when the user makes a Messaging Extension query.
-app.messageExtensions.query('searchCmd', async (_context: TurnContext, state: TurnState, query) => {
-    const searchQuery = query.parameters.queryText ?? '';
-    const count = query.count ?? 10;
+// Handle message activities
+app.activity(ActivityTypes.Message, async (context: TurnContext, _state: TurnState) => {
+    const initialCard = createViewProfileCard();
 
-    const results: MessagingExtensionAttachment[] = [];
-
-    if (searchQuery == 'profile') {
-        const token = state.temp.authTokens['graph'];
-        if (!token) {
-            throw new Error('No auth token found in state. Authentication failed.');
-        }
-
-        const user = await getUserDetailsFromGraph(token);
-        const profileCard = CardFactory.thumbnailCard(user.displayName, CardFactory.images([user.profilePhoto]));
-
-        results.push(profileCard);
-    } else {
-        const response = await axios.get(
-            `http://registry.npmjs.com/-/v1/search?${new URLSearchParams({
-                size: count.toString(),
-                text: searchQuery
-            }).toString()}`
-        );
-
-        // Format search results
-        response?.data?.objects?.forEach((obj: any) => results.push(createNpmSearchResultCard(obj.package)));
-    }
-
-    // Return results as a list
-    return {
-        attachmentLayout: 'list',
-        attachments: results,
-        type: 'result'
-    } as MessagingExtensionResult;
+    await context.sendActivity({ attachments: [initialCard] });
 });
 
-// Listen for item selection
-app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState, item) => {
-    // Generate detailed result
-    const card = createNpmPackageCard(item);
-
-    // Return results
-    return {
-        attachmentLayout: 'list',
-        attachments: [card],
-        type: 'result'
-    } as MessagingExtensionResult;
-});
-
-// Handles when the user clicks the Messaging Extension "Sign Out" command.
-app.messageExtensions.fetchTask('signOutCommand', async (context: TurnContext, state: TurnState) => {
-    await app.authentication.signOutUser(context, state, 'graph');
-
-    const signoutCard = createSignOutCard();
-
-    return {
-        card: signoutCard,
-        heigth: 100,
-        width: 400,
-        title: 'Adaptive Card: Inputs'
-    };
-});
-
-// Handles the 'Close' button on the confirmation Task Module after the user signs out.
-app.messageExtensions.submitAction('signOutCommand', async (_context: TurnContext, _state: TurnState) => {
-    return null;
-});
-
-// Handles when the user clicks the Messaging Extension "Compose" command.
-app.messageExtensions.fetchTask('showProfile', async (_context: TurnContext, state: TurnState) => {
+// Handle sign in adaptive card button click
+app.adaptiveCards.actionExecute('signin', async (_context: TurnContext, state: TurnState) => {
     const token = state.temp.authTokens['graph'];
     if (!token) {
         throw new Error('No auth token found in state. Authentication failed.');
@@ -174,41 +112,16 @@ app.messageExtensions.fetchTask('showProfile', async (_context: TurnContext, sta
     const user = await getUserDetailsFromGraph(token);
     const profileCard = createUserProfileCard(user.displayName, user.profilePhoto);
 
-    return {
-        card: profileCard,
-        heigth: 250,
-        width: 400,
-        title: 'Show Profile Card'
-    } as TaskModuleTaskInfo;
+    return profileCard.content;
 });
 
-app.messageExtensions.queryLink(async (_context: TurnContext, state: TurnState, _url: string) => {
-    const token = state.temp.authTokens['graph'];
-    if (!token) {
-        throw new Error('No auth token found in state. Authentication failed.');
-    }
+// Handle sign out adaptive card button click
+app.adaptiveCards.actionExecute('signout', async (context: TurnContext, state: TurnState) => {
+    await app.authentication.signOutUser(context, state);
 
-    const user = await getUserDetailsFromGraph(token);
-    const profileCard = CardFactory.thumbnailCard(user.displayName, CardFactory.images([user.profilePhoto]));
+    const initialCard = createViewProfileCard();
 
-    return {
-        type: 'result',
-        attachments: [profileCard],
-        attachmentLayout: 'list'
-    } as MessagingExtensionResult;
-});
-
-// Listen for item tap
-app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState, item) => {
-    // Generate detailed result
-    const card = createNpmPackageCard(item);
-
-    // Return results
-    return {
-        attachmentLayout: 'list',
-        attachments: [card],
-        type: 'result'
-    } as MessagingExtensionResult;
+    return initialCard.content;
 });
 
 /**
@@ -219,8 +132,8 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState
 async function getUserDetailsFromGraph(token: string): Promise<{ displayName: string; profilePhoto: string }> {
     // The user is signed in, so use the token to create a Graph Clilent and show profile
     const graphClient = new GraphClient(token);
-    const profile = await graphClient.getMyProfile();
-    const profilePhoto = await graphClient.getProfilePhotoAsync ();
+    const profile = await graphClient.GetMyProfile();
+    const profilePhoto = await graphClient.GetPhotoAsync();
     return { displayName: profile.displayName, profilePhoto: profilePhoto };
 }
 
