@@ -34,7 +34,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             RenderedPromptSection<string> rendered = await base.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
             List<ChatMessage> messages = new()
-            {new(this.Role, rendered.Output)};
+            {new(this.Role) { Content = rendered.Output }};
 
             return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }

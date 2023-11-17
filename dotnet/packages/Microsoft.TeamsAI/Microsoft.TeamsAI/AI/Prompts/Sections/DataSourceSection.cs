@@ -29,7 +29,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             int budget = this.Tokens > 1 ? Math.Min(this.Tokens, maxTokens) : maxTokens;
             RenderedPromptSection<string> rendered = await this._source.RenderDataAsync(context, memory, tokenizer, budget);
             List<ChatMessage> messages = new()
-            {new(ChatRole.System, rendered.Output)};
+            {new(ChatRole.System) { Content = rendered.Output } };
 
             return new(messages, rendered.Length, rendered.TooLong);
         }

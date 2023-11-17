@@ -46,7 +46,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                 this._length = tokenizer.Encode(this.Name).Count + tokenizer.Encode(this._text).Count;
             }
 
-            ChatMessage message = new(ChatRole.Function, this._text);
+            ChatMessage message = new(ChatRole.Function) { Content = this._text };
             message.Name = this.Name;
 
             return await Task.FromResult(this.TruncateMessages(new() { message }, tokenizer, maxTokens));

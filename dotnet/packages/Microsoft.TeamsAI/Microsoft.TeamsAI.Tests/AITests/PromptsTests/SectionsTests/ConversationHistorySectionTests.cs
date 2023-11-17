@@ -20,9 +20,9 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
             memory.SetValue("history", new List<ChatMessage>()
             {
-                new(ChatRole.System, "you are a unit test bot"),
-                new(ChatRole.User, "hi"),
-                new(ChatRole.Assistant, "hi, how may I assist you?")
+                new(ChatRole.System) { Content = "you are a unit test bot" },
+                new(ChatRole.User) { Content = "hi" },
+                new(ChatRole.Assistant) { Content = "hi, how may I assist you?" }
             });
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 50);
