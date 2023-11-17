@@ -76,7 +76,7 @@ export interface Plan {
 export interface PredictedCommand {
     /**
      * Type of command to execute.
-     * @summary
+     * @remarks
      * DO commands are actions that the AI system should perform. SAY commands are responses that
      * the AI system should say.
      */

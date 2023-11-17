@@ -250,7 +250,7 @@ export class ActionPlanner<TState extends TurnState = TurnState> implements Plan
      * @param {string} name The name of the semantic function.
      * @param {PromptTemplate} template The prompt template to use.
      * @param {Partial<AIOptions<TState>>} options Optional. Override options for the prompt. If omitted, the AI systems configured options will be used.
-     * @summary
+     * @remarks
      * Semantic functions are functions that make model calls and return their results as template
      * parameters to other prompts. For example, you could define a semantic function called
      * 'translator' that first translates the user's input to English before calling your main prompt:

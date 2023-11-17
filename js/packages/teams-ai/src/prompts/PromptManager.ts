@@ -100,7 +100,7 @@ export interface ConfiguredPromptManagerOptions {
 
 /**
  * A filesystem based prompt manager.
- * @summary
+ * @remarks
  * The default prompt manager uses the file system to define prompts that are compatible with
  * Microsoft's Semantic Kernel SDK (see: https://github.com/microsoft/semantic-kernel)
  *
@@ -252,7 +252,7 @@ export class PromptManager implements PromptFunctions {
 
     /**
      * Loads a named prompt template from the filesystem.
-     * @summary
+     * @remarks
      * The template will be pre-parsed and cached for use when the template is rendered by name.
      *
      * Any augmentations will also be added to the template.
