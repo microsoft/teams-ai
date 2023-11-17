@@ -12,6 +12,7 @@ import { AI } from '../AI';
 
 /**
  * A planner is responsible for generating a plan that the AI system will execute.
+ * @template TState Optional. Type of application state.
  */
 export interface Planner<TState extends TurnState = TurnState> {
     /**
