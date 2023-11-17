@@ -49,9 +49,19 @@ export interface DefaultTempState {
     history: string;
 
     /**
-     * Output returned from an AI prompt or function
+     * Output returned from the last executed action
      */
-    output: string;
+    lastOutput: string;
+
+    /**
+     * All outputs returned from the action sequence that was executed
+     */
+    actionOutputs: Record<string, string>;
+
+    /**
+     * User authentication tokens
+     */
+    authTokens: { [key: string]: string };
 }
 
 /**
@@ -84,8 +94,11 @@ export interface DefaultTempState {
  * }
  * ```
  */
-export class TurnState<TConversationState = DefaultConversationState, TUserState = DefaultUserState, TTempState = DefaultTempState>
-    implements Memory
+export class TurnState<
+    TConversationState = DefaultConversationState,
+    TUserState = DefaultUserState,
+    TTempState = DefaultTempState
+> implements Memory
 {
     private _scopes: Record<string, TurnStateEntry> = {};
     private _isLoaded = false;
@@ -176,7 +189,7 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
      * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
      */
     public deleteValue(path: string): void {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         if (scope.value.hasOwnProperty(name)) {
             delete scope.value[name];
         }
@@ -188,7 +201,7 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
      * @returns True if the value exists, false otherwise.
      */
     public hasValue(path: string): boolean {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         return scope.value.hasOwnProperty(name);
     }
 
@@ -364,6 +377,7 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
     }
 
     /**
+     * @param path
      * @private
      */
     private getScopeAndName(path: string): { scope: TurnStateEntry; name: string } {

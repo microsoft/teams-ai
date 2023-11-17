@@ -28,6 +28,7 @@
         "json-colorizer": "^2.2.2",
         "gpt-3-encoder": "^1.1.4",
         "jsonschema": "1.4.1",
+        "openai": "^4.16.0",
         "yaml": "^2.3.4"
     },
     "resolutions": {
@@ -35,7 +36,7 @@
     },
     "devDependencies": {
         "@types/jsonwebtoken": "^9.0.4",
-        "@types/node": "^20.8.10",
+        "@types/node": "^20.9.0",
         "eslint": "^8.53.0",
         "jsonwebtoken": "^9.0.2",
         "typescript": "^5.2.2",
