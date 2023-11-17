@@ -14,6 +14,7 @@ import { Application, Selector } from '../Application';
 import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
 import { BotAuthentication, deleteTokenFromState, setTokenInState } from './BotAuthentication';
 import * as UserTokenAccess from './UserTokenAccess';
+import { AdaptiveCardAuthentication } from './AdaptiveCardAuthentication';
 
 /**
  * User authentication service.
@@ -21,31 +22,35 @@ import * as UserTokenAccess from './UserTokenAccess';
 export class Authentication<TState extends TurnState> {
     private readonly _messagingExtensionAuth: MessagingExtensionAuthentication;
     private readonly _botAuth: BotAuthentication<TState>;
+    private readonly _adaptiveCardAuth: AdaptiveCardAuthentication;
     private readonly _name: string;
 
-    public readonly settings: OAuthPromptSettings;
+    public readonly settings: OAuthSettings;
 
     /**
      * Creates a new instance of the `Authentication` class.
      * @param {Application} app - The application instance.
      * @param {string} name - The name of the connection.
-     * @param {OAuthPromptSettings} settings - Authentication settings.
+     * @param {OAuthSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
      * @param {MessagingExtensionAuthentication} messagingExtensionsAuth - Handles messaging extension flow authentication.
      * @param {BotAuthentication} botAuth - Handles bot-flow authentication.
+     * @param {AdaptiveCardAuthentication} adaptiveCardAuth - Handles adaptive card authentication.
      */
     constructor(
         app: Application<TState>,
         name: string,
-        settings: OAuthPromptSettings,
+        settings: OAuthSettings,
         storage?: Storage,
         messagingExtensionsAuth?: MessagingExtensionAuthentication,
-        botAuth?: BotAuthentication<TState>
+        botAuth?: BotAuthentication<TState>,
+        adaptiveCardAuth?: AdaptiveCardAuthentication
     ) {
         this.settings = settings;
         this._name = name;
         this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
         this._botAuth = botAuth || new BotAuthentication(app, settings, this._name, storage);
+        this._adaptiveCardAuth = adaptiveCardAuth || new AdaptiveCardAuthentication();
     }
 
     /**
@@ -69,6 +74,10 @@ export class Authentication<TState extends TurnState> {
 
         if (this._botAuth.isValidActivity(context)) {
             return await this._botAuth.authenticate(context, state);
+        }
+
+        if (this._adaptiveCardAuth.isValidActivity(context)) {
+            return await this._adaptiveCardAuth.authenticate(context, this.settings);
         }
 
         throw new AuthError(
@@ -246,6 +255,16 @@ export class AuthenticationManager<TState extends TurnState> {
 }
 
 /**
+ * Settings used to configure user authentication through the OAuthPrompt.
+ */
+export type OAuthSettings = OAuthPromptSettings & {
+    /**
+     * Optional. Set this to enable SSO when authentication user using adaptive cards.
+     */
+    tokenExchangeUri?: string;
+};
+
+/**
  * The options to configure the authentication manager
  */
 export interface AuthenticationOptions {
@@ -253,7 +272,7 @@ export interface AuthenticationOptions {
      * The authentication settings.
      * Key uniquely identifies the connection string.
      */
-    settings: { [key: string]: OAuthPromptSettings };
+    settings: { [key: string]: OAuthSettings };
 
     /**
      * Describes the setting the bot should use if the user does not specify a setting name.
