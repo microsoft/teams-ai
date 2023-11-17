@@ -289,7 +289,7 @@ export type CreateEmbeddingRequestInput = Array<any> | Array<number> | Array<str
 export type AzureOpenAIModeratorCategory = 'Hate' | 'Sexual' | 'SelfHarm' | 'Violence';
 
 /**
- * @private
+ * The moderation severity level.
  */
 export enum ModerationSeverity {
     Safe = 0,
