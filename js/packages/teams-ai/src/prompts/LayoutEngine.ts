@@ -24,6 +24,13 @@ export class LayoutEngine implements PromptSection {
     public readonly tokens: number;
     public readonly separator: string;
 
+    /**
+     *
+     * @param sections List of sections to layout.
+     * @param tokens Sizing strategy for this section.
+     * @param required Indicates if this section is required.
+     * @param separator Separator to use between sections when rendering as text.
+     */
     public constructor(sections: PromptSection[], tokens: number, required: boolean, separator: string) {
         this.sections = sections;
         this.required = required;
@@ -31,6 +38,9 @@ export class LayoutEngine implements PromptSection {
         this.separator = separator;
     }
 
+    /**
+     * @private
+     */
     public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
         // Start a new layout
         // - Adds all sections from the current LayoutEngine hierarchy to a flat array
@@ -60,6 +70,9 @@ export class LayoutEngine implements PromptSection {
         return { output: text, length: tokenizer.encode(text).length, tooLong: remaining < 0 };
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Start a new layout
         // - Adds all sections from the current LayoutEngine hierarchy to a flat array
@@ -86,6 +99,9 @@ export class LayoutEngine implements PromptSection {
         return { output: output, length: this.getLayoutLength(layout), tooLong: remaining < 0 };
     }
 
+    /**
+     * @private
+     */
     private addSectionsToLayout<T>(sections: PromptSection[], layout: PromptSectionLayout<T>[]): void {
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
@@ -97,6 +113,9 @@ export class LayoutEngine implements PromptSection {
         }
     }
 
+    /**
+     * @private
+     */
     private async layoutSections<T>(
         layout: PromptSectionLayout<T>[],
         maxTokens: number,
@@ -129,6 +148,9 @@ export class LayoutEngine implements PromptSection {
         return remaining;
     }
 
+    /**
+     * @private
+     */
     private async layoutFixedSections<T>(layout: PromptSectionLayout<T>[], callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>): Promise<void> {
         const promises: Promise<RenderedPromptSection<T>>[] = [];
         for (let i = 0; i < layout.length; i++) {
@@ -141,6 +163,9 @@ export class LayoutEngine implements PromptSection {
         await Promise.all(promises);
     }
 
+    /**
+     * @private
+     */
     private async layoutProportionalSections<T>(layout: PromptSectionLayout<T>[], callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>): Promise<void> {
         const promises: Promise<RenderedPromptSection<T>>[] = [];
         for (let i = 0; i < layout.length; i++) {
@@ -153,6 +178,9 @@ export class LayoutEngine implements PromptSection {
         await Promise.all(promises);
     }
 
+    /**
+     * @private
+     */
     private getLayoutLength<T>(layout: PromptSectionLayout<T>[], textLayout: boolean = false, tokenizer?: Tokenizer): number {
         if (textLayout && tokenizer) {
             const output: string[] = [];
@@ -176,6 +204,9 @@ export class LayoutEngine implements PromptSection {
         }
     }
 
+    /**
+     * @private
+     */
     private dropLastOptionalSection<T>(layout: PromptSectionLayout<T>[]): boolean {
         for (let i = layout.length - 1; i >= 0; i--) {
             const section = layout[i];
@@ -188,6 +219,9 @@ export class LayoutEngine implements PromptSection {
         return false;
     }
 
+    /**
+     * @private
+     */
     private needsMoreLayout<T>(layout: PromptSectionLayout<T>[]): boolean {
         for (let i = 0; i < layout.length; i++) {
             const section = layout[i];
@@ -200,6 +234,9 @@ export class LayoutEngine implements PromptSection {
     }
 }
 
+/**
+ * @private
+ */
 interface PromptSectionLayout<T> {
     section: PromptSection;
     layout?: RenderedPromptSection<T>;

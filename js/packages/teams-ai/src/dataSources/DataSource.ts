@@ -26,6 +26,7 @@ export interface DataSource {
      * @param memory An interface for accessing state values.
      * @param tokenizer Tokenizer to use when rendering the data source.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
+     * @returns The text to inject into the prompt as a `RenderedPromptSection` object.
      */
     renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
 }

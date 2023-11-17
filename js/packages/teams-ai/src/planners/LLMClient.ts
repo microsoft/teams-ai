@@ -1,3 +1,11 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from "../prompts";
 import { PromptResponse, PromptCompletionModel } from "../models";
 import { Validation, PromptResponseValidator, DefaultResponseValidator } from "../validators";
@@ -8,6 +16,7 @@ import { GPT3Tokenizer, Tokenizer } from "../tokenizers";
 
 /**
  * Options for an LLMClient instance.
+ * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
  */
 export interface LLMClientOptions<TContent = any> {
     /**
@@ -169,6 +178,7 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
  * validators configured list of functions with the request. There's no need to separately
  * configure the models `functions` list, but if you do, the models functions list will be sent
  * instead.
+ * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
  */
 export class LLMClient<TContent = any> {
     /**
@@ -258,8 +268,11 @@ export class LLMClient<TContent = any> {
      * the validator feedback message.  There are other status codes for various errors and in all
      * cases except `success` the `response.message` will be of type `string`.
      * @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.
-     * @param input Optional. Input text to use for the user message.
-     * @returns A strongly typed response object.
+     * @param context Current turn context.
+     * @param memory An interface for accessing state values.
+     * @param functions Functions to use when rendering the prompt.
+     * @param input Optional. Input to use when completing the prompt.
+     * @returns A `PromptResponse` with the status and message.
      */
     public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, input?: string): Promise<PromptResponse<TContent>> {
         const { model, template, tokenizer, validator, max_repair_attempts, history_variable, input_variable } = this.options;

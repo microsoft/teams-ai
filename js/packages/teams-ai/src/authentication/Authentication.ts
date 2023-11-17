@@ -25,6 +25,9 @@ export class Authentication<TState extends TurnState> {
     private readonly _adaptiveCardAuth: AdaptiveCardAuthentication;
     private readonly _name: string;
 
+    /**
+     * The authentication settings.
+     */
     public readonly settings: OAuthSettings;
 
     /**
@@ -289,20 +292,60 @@ export interface AuthenticationOptions {
     autoSignIn?: boolean | Selector;
 }
 
+/**
+ * The sign in response.
+ */
 export type SignInResponse = {
-    status: 'pending' | 'complete' | 'error';
+    /**
+     * The sign in status.
+     */
+    status: SignInStatus;
+
+    /**
+     * The error returned.
+     */
     error?: unknown;
+
+    /**
+     * The cause of the error.
+     */
     cause?: AuthErrorReason;
 };
 
+/**
+ * An error thrown when an authentication error occurs.
+ */
 export class AuthError extends Error {
+    /**
+     * The cause of the error.
+     */
     public readonly cause: AuthErrorReason;
 
+    /**
+     * Creates a new instance of the `AuthError` class.
+     * @param message The error message.
+     * @param reason Optional. Cause of the error. Defaults to `other`.
+     */
     constructor(message?: string, reason: AuthErrorReason = 'other') {
         super(message);
         this.cause = reason;
     }
 }
 
+/**
+ * Cause of an authentication error.
+     * @remarks
+     * `invalidActivity` - The activity is not a valid activity to initiate authentication flow.
+     * `completionWithoutToken` - The authentication flow completed without a token.
+     * `other` - Other error.
+ */
 export type AuthErrorReason = 'invalidActivity' | 'completionWithoutToken' | 'other';
+
+/**
+ * The sign in status.
+ * @remarks
+ * `pending` - The user is not signed in and the bot has initiated the sign in flow.
+ * `complete` - The user has successfully signed in.
+ * `error` - An error occurred while signing the user in.
+ */
 export type SignInStatus = 'pending' | 'complete' | 'error';

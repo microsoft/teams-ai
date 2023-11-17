@@ -24,6 +24,7 @@ import { AuthError } from './Authentication';
 
 /**
  * @internal
+ * @private
  */
 interface UserAuthState {
     message?: string;
@@ -31,6 +32,7 @@ interface UserAuthState {
 
 /**
  * @internal
+ * @private
  */
 export class BotAuthentication<TState extends TurnState> {
     private _oauthPrompt: OAuthPrompt;
@@ -169,7 +171,7 @@ export class BotAuthentication<TState extends TurnState> {
             }
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : JSON.stringify(e);
-            const message = `Unexpected error encountered while signing in: ${errorMessage}. 
+            const message = `Unexpected error encountered while signing in: ${errorMessage}.
                 Incoming activity details: type: ${context.activity.type}, name: ${context.activity.name}`;
 
             await this._userSignInFailureHandler?.(context, state, new AuthError(message));
@@ -230,6 +232,7 @@ export class BotAuthentication<TState extends TurnState> {
  * @param {string} settingName The name of the setting
  * @param {string} token The token to set
  * @internal
+ * @private
  */
 export function setTokenInState<TState extends TurnState>(state: TState, settingName: string, token: string) {
     if (!state.temp.authTokens) {
@@ -243,6 +246,8 @@ export function setTokenInState<TState extends TurnState>(state: TState, setting
  * Deletes the token from the turn state
  * @param {TurnState} state The turn state
  * @param {string} settingName The name of the setting
+ * @internal
+ * @private
  */
 export function deleteTokenFromState<TState extends TurnState>(state: TState, settingName: string) {
     if (!state.temp.authTokens || !state.temp.authTokens[settingName]) {
@@ -254,6 +259,7 @@ export function deleteTokenFromState<TState extends TurnState>(state: TState, se
 
 /**
  * @internal
+ * @private
  * SSO Token Exchange Middleware for Teams that filters based on the connection name.
  */
 class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {

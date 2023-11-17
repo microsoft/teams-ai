@@ -6,6 +6,7 @@ import { OAuthPromptSettings } from 'botbuilder-dialogs';
 
 /**
  * @internal
+ * @private
  */
 interface AdaptiveCardLoginInRequest {
     statusCode: number;
@@ -29,6 +30,7 @@ interface AdaptiveCardLoginInRequest {
 
 /**
  * @internal
+ * @private
  */
 export class AdaptiveCardAuthentication {
     public async authenticate(context: TurnContext, settings: OAuthSettings): Promise<string | undefined> {

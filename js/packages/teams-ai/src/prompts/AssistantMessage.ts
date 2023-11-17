@@ -7,12 +7,11 @@
  */
 
 import { TemplateSection } from "./TemplateSection";
-import { TurnState } from '../TurnState';
 
 /**
  * A message sent by the assistant.
  */
-export class AssistantMessage<TState extends TurnState = TurnState> extends TemplateSection {
+export class AssistantMessage extends TemplateSection {
     /**
      * Creates a new 'AssistantMessage' instance.
      * @param template Template to use for this section.

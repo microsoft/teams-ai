@@ -5,6 +5,7 @@ import { OAuthPromptSettings } from 'botbuilder-dialogs';
 
 /**
  * @internal
+ * @private
  */
 export class MessagingExtensionAuthentication {
     public async authenticate(context: TurnContext, settings: OAuthPromptSettings): Promise<string | undefined> {
