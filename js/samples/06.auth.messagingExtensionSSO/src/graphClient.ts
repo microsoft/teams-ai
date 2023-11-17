@@ -27,12 +27,12 @@ export class GraphClient {
         });
     }
 
-    public async GetMyProfile() {
+    public async getMyProfile() {
         return await this.graphClient.api('/me').get();
     }
 
     // Gets the user's photo
-    public async GetPhotoAsync(): Promise<string> {
+    public async getProfilePhotoAsync(): Promise<string> {
         const graphPhotoEndpoint = 'https://graph.microsoft.com/v1.0/me/photos/240x240/$value';
         const graphRequestParams = {
             method: 'GET',

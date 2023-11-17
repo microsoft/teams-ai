@@ -49,9 +49,14 @@ export interface DefaultTempState {
     history: string;
 
     /**
-     * Output returned from an AI prompt or function
+     * Output returned from the last executed action
      */
-    output: string;
+    lastOutput: string;
+
+    /**
+     * All outputs returned from the action sequence that was executed
+     */
+    actionOutputs: Record<string, string>;
 
     /**
      * User authentication tokens

@@ -20,7 +20,7 @@ import { TurnState } from './TurnState';
 /**
  * @private
  */
-const ACTION_INVOKE_NAME = `adaptiveCard/action`;
+export const ACTION_INVOKE_NAME = `adaptiveCard/action`;
 
 /**
  * @private
