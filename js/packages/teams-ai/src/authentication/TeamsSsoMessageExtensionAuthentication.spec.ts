@@ -47,7 +47,8 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
         state.temp = {
             input: '',
             history: '',
-            output: '',
+            lastOutput: '',
+            actionOutputs: {},
             authTokens: {}
         };
 
