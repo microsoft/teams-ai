@@ -18,7 +18,7 @@ namespace Microsoft.Teams.AI.AI.Models
         protected override TimeSpan GetNextDelayCore(Response? response, int retryNumber)
         {
             int sum = 0;
-            for (int i = 0; i < _delays.Count; i++)
+            for (int i = 0; i < retryNumber; i++)
             {
                 sum += _delays[i];
             }
