@@ -1,7 +1,7 @@
 {
-    "name": "messageextensionsso-demo",
+    "name": "adaptivecardsso-demo",
     "version": "1.0.0",
-    "description": "A simple echo bot sample",
+    "description": "A simple bot sample that showcases using adaptive cards for user authentication",
     "author": "Microsoft",
     "license": "MIT",
     "main": "./lib/index.js",

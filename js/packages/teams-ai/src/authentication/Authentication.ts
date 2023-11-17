@@ -15,6 +15,7 @@ import { Application, Selector } from '../Application';
 import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
+import { AdaptiveCardAuthentication } from './AdaptiveCardAuthentication';
 import { TeamsSsoPromptSettings } from './TeamsBotSsoPrompt';
 import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
 import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
@@ -25,29 +26,32 @@ import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensi
  * User authentication service.
  */
 export class Authentication<TState extends TurnState> {
+    private readonly _adaptiveCardAuth: AdaptiveCardAuthentication;
     private readonly _messagingExtensionAuth: MessageExtensionAuthenticationBase;
     private readonly _botAuth: BotAuthenticationBase<TState>;
     private readonly _name: string;
     private readonly _msal?: ConfidentialClientApplication;
 
-    public readonly settings: OAuthPromptSettings | TeamsSsoPromptSettings;
+    public readonly settings: OAuthSettings | TeamsSsoPromptSettings;
 
     /**
      * Creates a new instance of the `Authentication` class.
      * @param {Application} app - The application instance.
      * @param {string} name - The name of the connection.
-     * @param {OAuthPromptSettings} settings - Authentication settings.
+     * @param {OAuthSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
      * @param {MessageExtensionAuthenticationBase} messagingExtensionsAuth - Handles messaging extension flow authentication.
      * @param {BotAuthenticationBase} botAuth - Handles bot-flow authentication.
+     * @param {AdaptiveCardAuthentication} adaptiveCardAuth - Handles adaptive card authentication.
      */
     constructor(
         app: Application<TState>,
         name: string,
-        settings: OAuthPromptSettings | TeamsSsoPromptSettings,
+        settings: OAuthSettings | TeamsSsoPromptSettings,
         storage?: Storage,
         messagingExtensionsAuth?: MessageExtensionAuthenticationBase,
-        botAuth?: BotAuthenticationBase<TState>
+        botAuth?: BotAuthenticationBase<TState>,
+        adaptiveCardAuth?: AdaptiveCardAuthentication
     ) {
         this.settings = settings;
         this._name = name;
@@ -61,6 +65,7 @@ export class Authentication<TState extends TurnState> {
             this._messagingExtensionAuth = messagingExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
         }
 
+        this._adaptiveCardAuth = adaptiveCardAuth || new AdaptiveCardAuthentication();
     }
 
     /**
@@ -84,6 +89,10 @@ export class Authentication<TState extends TurnState> {
 
         if (this._botAuth.isValidActivity(context)) {
             return await this._botAuth.authenticate(context, state);
+        }
+
+        if (this._adaptiveCardAuth.isValidActivity(context)) {
+            return await this._adaptiveCardAuth.authenticate(context, this.settings);
         }
 
         throw new AuthError(
@@ -326,6 +335,16 @@ export class AuthenticationManager<TState extends TurnState> {
 }
 
 /**
+ * Settings used to configure user authentication through the OAuthPrompt.
+ */
+export type OAuthSettings = OAuthPromptSettings & {
+    /**
+     * Optional. Set this to enable SSO when authentication user using adaptive cards.
+     */
+    tokenExchangeUri?: string;
+};
+
+/**
  * The options to configure the authentication manager
  */
 export interface AuthenticationOptions {
@@ -333,7 +352,7 @@ export interface AuthenticationOptions {
      * The authentication settings.
      * Key uniquely identifies the connection string.
      */
-    settings: { [key: string]: OAuthPromptSettings };
+    settings: { [key: string]: OAuthSettings };
 
     /**
      * Describes the setting the bot should use if the user does not specify a setting name.
