@@ -26,7 +26,7 @@ const TEMP_SCOPE = 'temp';
 
 /**
  * Default conversation state
- * @summary
+ * @remarks
  * Inherit a new interface from this base interface to strongly type the applications conversation
  * state.
  */
@@ -35,7 +35,7 @@ export interface DefaultConversationState {}
 
 /**
  * Default user state
- * @summary
+ * @remarks
  * Inherit a new interface from this base interface to strongly type the applications user
  * state.
  */
@@ -44,7 +44,7 @@ export interface DefaultUserState {}
 
 /**
  * Default temp state
- * @summary
+ * @remarks
  * Inherit a new interface from this base interface to strongly type the applications temp
  * state.
  */
