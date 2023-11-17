@@ -1,14 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { DialogContext, DialogSet, DialogState, DialogTurnResult, DialogTurnStatus, OAuthPrompt, OAuthPromptSettings } from "botbuilder-dialogs";
-import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse } from "botbuilder";
-import { BotAuthenticationBase } from "./BotAuthenticationBase";
-import { Application } from "../Application";
-import { TurnState } from "../TurnState";
-import { TurnStateProperty } from "../TurnStateProperty";
+import {
+    DialogContext,
+    DialogSet,
+    DialogState,
+    DialogTurnResult,
+    DialogTurnStatus,
+    OAuthPrompt,
+    OAuthPromptSettings
+} from 'botbuilder-dialogs';
+import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse } from 'botbuilder';
+import { BotAuthenticationBase } from './BotAuthenticationBase';
+import { Application } from '../Application';
+import { TurnState } from '../TurnState';
+import { TurnStateProperty } from '../TurnStateProperty';
 
-export class OAuthPromptBotAuthentication<TState extends TurnState> extends BotAuthenticationBase<TState> {
+export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthenticationBase<TState> {
     private _oauthPrompt: OAuthPrompt;
 
     public constructor(
@@ -26,7 +34,11 @@ export class OAuthPromptBotAuthentication<TState extends TurnState> extends BotA
         app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oAuthPromptSettings.connectionName));
     }
 
-    public async runDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<TokenResponse>> {
+    public async runDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<TokenResponse>> {
         const dialogContext = await this.createDialogContext(context, state, dialogStateProperty);
         let results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
@@ -35,19 +47,26 @@ export class OAuthPromptBotAuthentication<TState extends TurnState> extends BotA
         return results;
     }
 
-    public async continueDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<TokenResponse>> {
+    public async continueDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<TokenResponse>> {
         const dialogContext = await this.createDialogContext(context, state, dialogStateProperty);
         return await dialogContext.continueDialog();
     }
 
-    private async createDialogContext(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogContext> {
+    private async createDialogContext(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogContext> {
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this._oauthPrompt);
         return await dialogSet.createContext(context);
     }
 }
-
 
 /**
  * @internal

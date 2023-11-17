@@ -1,19 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { TokenResponse, TurnContext } from "botbuilder-core";
-import { AdaptiveCardAuthenticationBase, AdaptiveCardLoginRequest } from "./AdaptiveCardAuthenticationBase";
-import { AuthError, OAuthSettings } from "./Authentication";
+import { TokenResponse, TurnContext } from 'botbuilder-core';
+import { AdaptiveCardAuthenticationBase, AdaptiveCardLoginRequest } from './AdaptiveCardAuthenticationBase';
+import { AuthError, OAuthSettings } from './Authentication';
 import * as UserTokenAccess from './UserTokenAccess';
 
-export class OAuthPromptAdaptiveCardAuthentication extends AdaptiveCardAuthenticationBase {
+export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationBase {
     public constructor(private readonly settings: OAuthSettings) {
         super();
     }
 
-    public async handleSsoTokenExchange(
-        context: TurnContext
-    ): Promise<TokenResponse | undefined> {
+    public async handleSsoTokenExchange(context: TurnContext): Promise<TokenResponse | undefined> {
         const tokenExchangeRequest = context.activity.value.authentication;
 
         if (!tokenExchangeRequest || !tokenExchangeRequest.token) {
@@ -22,7 +20,7 @@ export class OAuthPromptAdaptiveCardAuthentication extends AdaptiveCardAuthentic
 
         return await UserTokenAccess.exchangeToken(context, this.settings, tokenExchangeRequest);
     }
-    
+
     public async handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined> {
         return await UserTokenAccess.getUserToken(context, this.settings, magicCode);
     }

@@ -17,11 +17,11 @@ import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './
 import * as UserTokenAccess from './UserTokenAccess';
 import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
 import { TeamsSsoSettings } from './TeamsBotSsoPrompt';
-import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
-import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
+import { OAuthBotAuthentication } from './OAuthBotAuthentication';
 import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
 import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensionAuthentication';
-import { OAuthPromptAdaptiveCardAuthentication } from './OAuthPromptAdaptiveCardAuthentication';
+import { OAuthAdaptiveCardAuthentication } from './OAuthAdaptiveCardAuthentication';
 import { TeamsSsoAdaptiveCardAuthentication } from './TeamsSsoAdaptiveCardAuthentication';
 
 /**
@@ -59,17 +59,17 @@ export class Authentication<TState extends TurnState> {
         this._name = name;
 
         if (this.isOAuthSettings(settings)) {
-            this._messageExtensionAuth = messageExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
-            this._botAuth = botAuth || new OAuthPromptBotAuthentication(app, settings, this._name, storage);
-            this._adaptiveCardAuth = adaptiveCardAuth || new OAuthPromptAdaptiveCardAuthentication(settings);
+            this._messageExtensionAuth =
+                messageExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
+            this._botAuth = botAuth || new OAuthBotAuthentication(app, settings, this._name, storage);
+            this._adaptiveCardAuth = adaptiveCardAuth || new OAuthAdaptiveCardAuthentication(settings);
         } else {
             this._msal = new ConfidentialClientApplication(settings.msalConfig);
             this._botAuth = botAuth || new TeamsSsoBotAuthentication(app, settings, this._name, this._msal, storage);
-            this._messageExtensionAuth = messageExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
+            this._messageExtensionAuth =
+                messageExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
             this._adaptiveCardAuth = adaptiveCardAuth || new TeamsSsoAdaptiveCardAuthentication();
         }
-
-
     }
 
     /**
@@ -144,7 +144,7 @@ export class Authentication<TState extends TurnState> {
                 return tokenResponse.accessToken;
             }
 
-            return undefined
+            return undefined;
         }
     }
 
@@ -174,17 +174,17 @@ export class Authentication<TState extends TurnState> {
         return (settings as OAuthSettings).connectionName !== undefined;
     }
 
-    private async acquireTokenFromMsalCache(
-        context: TurnContext
-    ): Promise<AuthenticationResult | null> {
+    private async acquireTokenFromMsalCache(context: TurnContext): Promise<AuthenticationResult | null> {
         try {
             if (context.activity.from.aadObjectId) {
                 const settings = this.settings as TeamsSsoSettings;
-                const account = await this._msal!.getTokenCache().getAccountByLocalId(context.activity.from.aadObjectId);
+                const account = await this._msal!.getTokenCache().getAccountByLocalId(
+                    context.activity.from.aadObjectId
+                );
                 if (account) {
                     const silentRequest = {
                         account: account,
-                        scopes: settings.scopes,
+                        scopes: settings.scopes
                     };
                     return await this._msal!.acquireTokenSilent(silentRequest);
                 }
@@ -195,12 +195,12 @@ export class Authentication<TState extends TurnState> {
         return null;
     }
 
-    private async removeTokenFromMsalCache(
-        context: TurnContext
-    ): Promise<void> {
+    private async removeTokenFromMsalCache(context: TurnContext): Promise<void> {
         if (context.activity.from.aadObjectId) {
             try {
-                const account = await this._msal!.getTokenCache().getAccountByLocalId(context.activity.from.aadObjectId);
+                const account = await this._msal!.getTokenCache().getAccountByLocalId(
+                    context.activity.from.aadObjectId
+                );
                 if (account) {
                     await this._msal!.getTokenCache().removeAccount(account);
                 }

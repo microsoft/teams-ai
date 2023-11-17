@@ -5,7 +5,7 @@ import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthentica
 import * as sinon from 'sinon';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
-import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
 
 describe('OAuthPromptMessageExtensionAuthentication', () => {
     const adapter = new TestAdapter();
@@ -141,7 +141,7 @@ describe('OAuthPromptMessageExtensionAuthentication', () => {
                     expiration: 'expiration',
                     connectionName: 'connectionName'
                 })
-            );;
+            );
 
             const result = await meAuth.authenticate(context);
 

@@ -9,8 +9,8 @@ import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
 import * as BotAuth from './BotAuthenticationBase';
-import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
-import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
+import { OAuthBotAuthentication } from './OAuthBotAuthentication';
 
 describe('Authentication', () => {
     const adapter = new TestAdapter();
@@ -67,7 +67,7 @@ describe('Authentication', () => {
 
         messageExtensionsAuth = new OAuthPromptMessageExtensionAuthentication(settings);
         messageExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
-        botAuth = new OAuthPromptBotAuthentication(appStub, settings, settingName);
+        botAuth = new OAuthBotAuthentication(appStub, settings, settingName);
         botAuthenticateStub = sinon.stub(botAuth, 'authenticate');
 
         auth = new Authentication(appStub, settingName, settings, undefined, messageExtensionsAuth, botAuth);

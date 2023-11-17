@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import assert from 'assert';
 import { TurnState } from '../TurnState';
 import { AuthError } from './Authentication';
-import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
+import { OAuthBotAuthentication } from './OAuthBotAuthentication';
 
 describe('BotAuthentication', () => {
     const adapter = new TestAdapter();
@@ -69,7 +69,7 @@ describe('BotAuthentication', () => {
             });
 
             // Act
-            new OAuthPromptBotAuthentication(app, settings, settingName);
+            new OAuthBotAuthentication(app, settings, settingName);
 
             assert(adapterSpy.calledOnce);
             assert(middlewareUsed);
@@ -96,7 +96,7 @@ describe('BotAuthentication', () => {
                     return app;
                 });
 
-                new OAuthPromptBotAuthentication(app, settings, settingName);
+                new OAuthBotAuthentication(app, settings, settingName);
 
                 assert(await selectorFunctionsUsed![routeIndex](context));
             });
@@ -105,7 +105,7 @@ describe('BotAuthentication', () => {
 
     describe('authenticate()', () => {
         it('should save incomming message if not signed in yet', async () => {
-            const botAuth = new OAuthPromptBotAuthentication(app, settings, settingName);
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
 
             const runDialogStub = sinon.stub(botAuth, 'runDialog');
             runDialogStub.callsFake(async () => {
@@ -131,7 +131,7 @@ describe('BotAuthentication', () => {
         });
 
         it('should call runDialog()', async () => {
-            const botAuth = new OAuthPromptBotAuthentication(app, settings, settingName);
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
             const runDialogStub = sinon.stub(botAuth, 'runDialog');
             runDialogStub.callsFake(async () => {
                 return {
@@ -161,7 +161,7 @@ describe('BotAuthentication', () => {
 
             beforeEach(async () => {
                 // Setup
-                botAuth = new OAuthPromptBotAuthentication(app, settings, settingName);
+                botAuth = new OAuthBotAuthentication(app, settings, settingName);
                 runDialogStub = sinon.stub(botAuth, 'runDialog');
                 runDialogStub.callsFake(async () => {
                     return {
@@ -201,7 +201,7 @@ describe('BotAuthentication', () => {
 
     describe('handleSignInActivity()', () => {
         it('should call continueDialog()', async () => {
-            const botAuth = new OAuthPromptBotAuthentication(app, settings, settingName);
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
             const continueDialogStub = sinon.stub(botAuth, 'continueDialog');
             continueDialogStub.callsFake(async () => {
                 return {
@@ -231,7 +231,7 @@ describe('BotAuthentication', () => {
 
             beforeEach(async () => {
                 // Setup
-                botAuth = new OAuthPromptBotAuthentication(app, settings, settingName);
+                botAuth = new OAuthBotAuthentication(app, settings, settingName);
                 continueDialogStub = sinon.stub(botAuth, 'continueDialog');
                 continueDialogStub.callsFake(async () => {
                     return {
@@ -278,7 +278,7 @@ describe('BotAuthentication', () => {
 
         it('should call the failure handler if auth flow completed but failed to retreive token', async () => {
             // Setup
-            const botAuth = new OAuthPromptBotAuthentication(app, settings, settingName);
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
             const continueDialogStub = sinon.stub(botAuth, 'continueDialog');
             continueDialogStub.callsFake(async () => {
                 return {

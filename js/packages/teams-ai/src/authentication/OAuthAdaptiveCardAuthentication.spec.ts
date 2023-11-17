@@ -6,7 +6,7 @@ import * as UserTokenAccess from './UserTokenAccess';
 import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
 import { OAuthSettings } from './Authentication';
 import { ACTION_INVOKE_NAME } from '../AdaptiveCards';
-import { OAuthPromptAdaptiveCardAuthentication } from './OAuthPromptAdaptiveCardAuthentication';
+import { OAuthAdaptiveCardAuthentication } from './OAuthAdaptiveCardAuthentication';
 
 describe('AdaptiveCardAuthenticaion', () => {
     const adapter = new TestAdapter();
@@ -60,7 +60,7 @@ describe('AdaptiveCardAuthenticaion', () => {
 
             const contextStub = sinon.stub(context, 'sendActivity');
 
-            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
             const isTokenExchangableStub = sinon.stub(acAuth, 'handleSsoTokenExchange').throws();
 
             await acAuth.authenticate(context);
@@ -94,7 +94,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                 }
             });
 
-            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
             const isTokenExchangableStub = sinon.stub(acAuth, 'handleSsoTokenExchange').throws();
 
             const result = await acAuth.authenticate(context);
@@ -115,7 +115,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                 }
             });
 
-            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
             const exchangeTokenStub = sinon.stub(acAuth, 'handleSsoTokenExchange').returns(
                 Promise.resolve({
                     token: 'token',
@@ -150,7 +150,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                     }
                 });
 
-                const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+                const acAuth = new OAuthAdaptiveCardAuthentication(settings);
 
                 const getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
                     Promise.resolve({
@@ -191,7 +191,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                         })
                     );
 
-                    acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+                    acAuth = new OAuthAdaptiveCardAuthentication(settings);
 
                     signInResourceStub = sinon.stub(UserTokenAccess, 'getSignInResource').returns(
                         Promise.resolve({
@@ -212,7 +212,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                         title: 'title'
                     };
 
-                    acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+                    acAuth = new OAuthAdaptiveCardAuthentication(settings);
 
                     const result = await acAuth.authenticate(context);
 
@@ -252,7 +252,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                         tokenExchangeUri: 'tokenExchangeUri'
                     };
 
-                    acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+                    acAuth = new OAuthAdaptiveCardAuthentication(settings);
 
                     const result = await acAuth.authenticate(context);
 
@@ -299,7 +299,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                 name: 'adaptiveCard/action'
             });
 
-            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
 
             const result = acAuth.isValidActivity(context);
 
@@ -312,7 +312,7 @@ describe('AdaptiveCardAuthenticaion', () => {
                 name: 'composeExtension/query'
             });
 
-            const acAuth = new OAuthPromptAdaptiveCardAuthentication(settings);
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
 
             const result = acAuth.isValidActivity(context);
 

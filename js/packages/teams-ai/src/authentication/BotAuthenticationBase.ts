@@ -1,9 +1,5 @@
 /* eslint-disable security/detect-object-injection */
-import {
-    DialogState,
-    DialogTurnResult,
-    DialogTurnStatus,
-} from 'botbuilder-dialogs';
+import { DialogState, DialogTurnResult, DialogTurnStatus } from 'botbuilder-dialogs';
 import { TurnState } from '../TurnState';
 import { Application } from '../Application';
 import {
@@ -33,11 +29,7 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
     private _userSignInSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
     private _userSignInFailureHandler?: (context: TurnContext, state: TState, error: AuthError) => Promise<void>;
 
-    public constructor(
-        app: Application<TState>,
-        settingName: string,
-        storage?: Storage
-    ) {
+    public constructor(app: Application<TState>, settingName: string, storage?: Storage) {
         this._settingName = settingName;
 
         this._storage = storage || new MemoryStorage();
@@ -193,8 +185,7 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
     }
 
     protected async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
-        return context.activity.type === ActivityTypes.Invoke &&
-        context.activity.name === tokenExchangeOperationName;
+        return context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName;
     }
 
     public abstract runDialog(
@@ -212,7 +203,7 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
 
 /**
  * Sets the token in the turn state
- * @param {DefaultTurnState} state The turn state
+ * @param {TurnState} state The turn state
  * @param {string} settingName The name of the setting
  * @param {string} token The token to set
  * @internal
