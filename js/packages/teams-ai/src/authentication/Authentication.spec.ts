@@ -18,7 +18,7 @@ describe('Authentication', () => {
     let botAuth: BotAuthenticationBase<TurnState>;
     let botAuthenticateStub: sinon.SinonStub;
     let messageExtensionsAuth: MessageExtensionAuthenticationBase;
-    let messagingExtensionAuthenticateStub: sinon.SinonStub;
+    let messageExtensionAuthenticateStub: sinon.SinonStub;
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
     let settings: OAuthPromptSettings;
@@ -65,7 +65,7 @@ describe('Authentication', () => {
         };
 
         messageExtensionsAuth = new OAuthPromptMessageExtensionAuthentication(settings);
-        messagingExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
+        messageExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
         botAuth = new OAuthPromptBotAuthentication(appStub, settings, settingName);
         botAuthenticateStub = sinon.stub(botAuth, 'authenticate');
 
@@ -100,7 +100,7 @@ describe('Authentication', () => {
 
             await auth.signInUser(context, state);
 
-            messagingExtensionAuthenticateStub.calledOnce;
+            messageExtensionAuthenticateStub.calledOnce;
             botAuthenticateStub.notCalled;
         });
 
@@ -112,7 +112,7 @@ describe('Authentication', () => {
 
             await auth.signInUser(context, state);
 
-            messagingExtensionAuthenticateStub.calledOnce;
+            messageExtensionAuthenticateStub.calledOnce;
             botAuthenticateStub.notCalled;
         });
 
@@ -124,11 +124,11 @@ describe('Authentication', () => {
 
             await auth.signInUser(context, state);
 
-            messagingExtensionAuthenticateStub.calledOnce;
+            messageExtensionAuthenticateStub.calledOnce;
             botAuthenticateStub.notCalled;
         });
 
-        it('should throw error is activity type is not valid for botAuth or messagingExtensionAuth', async () => {
+        it('should throw error is activity type is not valid for botAuth or messageExtensionAuth', async () => {
             const [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Event
             });

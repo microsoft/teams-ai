@@ -29,7 +29,7 @@ import { TeamsSsoAdaptiveCardAuthentication } from './TeamsSsoAdaptiveCardAuthen
  */
 export class Authentication<TState extends TurnState> {
     private readonly _adaptiveCardAuth: AdaptiveCardAuthenticationBase;
-    private readonly _messagingExtensionAuth: MessageExtensionAuthenticationBase;
+    private readonly _messageExtensionAuth: MessageExtensionAuthenticationBase;
     private readonly _botAuth: BotAuthenticationBase<TState>;
     private readonly _name: string;
     private readonly _msal?: ConfidentialClientApplication;
@@ -42,7 +42,7 @@ export class Authentication<TState extends TurnState> {
      * @param {string} name - The name of the connection.
      * @param {OAuthSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
-     * @param {MessageExtensionAuthenticationBase} messagingExtensionsAuth - Handles messaging extension flow authentication.
+     * @param {MessageExtensionAuthenticationBase} messageExtensionsAuth - Handles message extension flow authentication.
      * @param {BotAuthenticationBase} botAuth - Handles bot-flow authentication.
      * @param {AdaptiveCardAuthenticationBase} adaptiveCardAuth - Handles adaptive card authentication.
      */
@@ -51,7 +51,7 @@ export class Authentication<TState extends TurnState> {
         name: string,
         settings: OAuthSettings | TeamsSsoPromptSettings,
         storage?: Storage,
-        messagingExtensionsAuth?: MessageExtensionAuthenticationBase,
+        messageExtensionsAuth?: MessageExtensionAuthenticationBase,
         botAuth?: BotAuthenticationBase<TState>,
         adaptiveCardAuth?: AdaptiveCardAuthenticationBase
     ) {
@@ -59,13 +59,13 @@ export class Authentication<TState extends TurnState> {
         this._name = name;
 
         if (this.isOAuthSettings(settings)) {
-            this._messagingExtensionAuth = messagingExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
+            this._messageExtensionAuth = messageExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
             this._botAuth = botAuth || new OAuthPromptBotAuthentication(app, settings, this._name, storage);
             this._adaptiveCardAuth = adaptiveCardAuth || new OAuthPromptAdaptiveCardAuthentication(settings);
         } else {
             this._msal = new ConfidentialClientApplication(settings.msalConfig);
             this._botAuth = botAuth || new TeamsSsoBotAuthentication(app, settings, this._name, this._msal, storage);
-            this._messagingExtensionAuth = messagingExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
+            this._messageExtensionAuth = messageExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
             this._adaptiveCardAuth = adaptiveCardAuth || new TeamsSsoAdaptiveCardAuthentication();
         }
 
@@ -87,8 +87,8 @@ export class Authentication<TState extends TurnState> {
             return token;
         }
 
-        if (this._messagingExtensionAuth.isValidActivity(context)) {
-            return await this._messagingExtensionAuth.authenticate(context);
+        if (this._messageExtensionAuth.isValidActivity(context)) {
+            return await this._messageExtensionAuth.authenticate(context);
         }
 
         if (this._botAuth.isValidActivity(context)) {
@@ -155,7 +155,7 @@ export class Authentication<TState extends TurnState> {
     /**
      * The handler function is called when the user has successfully signed in.
      * This only applies if sign in was initiated by the user sending a message to the bot.
-     * This handler will not be triggered if a messaging extension triggered the authentication flow.
+     * This handler will not be triggered if a message extension triggered the authentication flow.
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
@@ -166,7 +166,7 @@ export class Authentication<TState extends TurnState> {
     /**
      * This handler function is called when the user sign in flow fails.
      * This only applies if sign in was initiated by the user sending a message to the bot.
-     * This handler will not be triggered if a messaging extension triggered the authentication flow.
+     * This handler will not be triggered if a message extension triggered the authentication flow.
      * @template TState
      * @param {(context: TurnContext, state: TState, error: AuthError) => Promise<void>} handler The handler function to call when the user failed to signed in.
      */
