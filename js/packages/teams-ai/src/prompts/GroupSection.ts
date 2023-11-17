@@ -40,6 +40,9 @@ export class GroupSection extends PromptSectionBase {
         this.role = role;
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Render sections to text
         const { output, length } = await this._layoutEngine.renderAsText(context, memory, functions, tokenizer, maxTokens);

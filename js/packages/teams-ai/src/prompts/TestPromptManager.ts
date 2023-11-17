@@ -9,9 +9,12 @@
 import { PromptManager, PromptManagerOptions } from './PromptManager';
 import { PromptTemplate } from './PromptTemplate';
 
+/**
+ * Options used to configure a `TestPromptManager` instance.
+ */
 export interface TestPromptManagerOptions extends PromptManagerOptions {
     /**
-     * Optional. List of prompts to load.
+     * Optional. List of prompts to pre-load.
      */
     prompts?: PromptTemplate[];
 }
@@ -20,6 +23,10 @@ export interface TestPromptManagerOptions extends PromptManagerOptions {
  * A prompt manager used for testing.
  */
 export class TestPromptManager extends PromptManager {
+    /**
+     * Creates a new `TestPromptManager` instance.
+     * @param options Optional. Options used to configure the prompt manager.
+     */
     public constructor(options: Partial<TestPromptManagerOptions> = {}) {
         super(Object.assign({
             promptsFolder: 'test',
@@ -31,6 +38,9 @@ export class TestPromptManager extends PromptManager {
         }
     }
 
+    /**
+     * @private
+     */
     public override getPrompt(name: string): Promise<PromptTemplate> {
         if (!this.hasPrompt(name)) {
             throw new Error(`Prompt '${name}' not found.`);

@@ -219,8 +219,8 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState
 async function getUserDetailsFromGraph(token: string): Promise<{ displayName: string; profilePhoto: string }> {
     // The user is signed in, so use the token to create a Graph Clilent and show profile
     const graphClient = new GraphClient(token);
-    const profile = await graphClient.GetMyProfile();
-    const profilePhoto = await graphClient.GetPhotoAsync();
+    const profile = await graphClient.getMyProfile();
+    const profilePhoto = await graphClient.getProfilePhotoAsync ();
     return { displayName: profile.displayName, profilePhoto: profilePhoto };
 }
 

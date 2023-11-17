@@ -51,6 +51,9 @@ export class TemplateSection extends PromptSectionBase {
         this.parseTemplate();
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Render parts in parallel
         const renderedParts = await Promise.all(this._parts.map((part) => part(context, memory, functions, tokenizer, maxTokens)));
@@ -64,6 +67,9 @@ export class TemplateSection extends PromptSectionBase {
         return this.returnMessages(messages, length, tokenizer, maxTokens);
     }
 
+    /**
+     * @private
+     */
     private parseTemplate(): void {
         // Parse template
         let part = '';
@@ -126,12 +132,18 @@ export class TemplateSection extends PromptSectionBase {
         }
     }
 
+    /**
+     * @private
+     */
     private createTextRenderer(text: string): PartRenderer {
         return (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
             return Promise.resolve(text);
         };
     }
 
+    /**
+     * @private
+     */
     private createVariableRenderer(name: string): PartRenderer {
         return (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
             const value = memory.getValue(name);
@@ -139,6 +151,9 @@ export class TemplateSection extends PromptSectionBase {
         };
     }
 
+    /**
+     * @private
+     */
     private createFunctionRenderer(param: string): PartRenderer {
         let name = '';
         let args: string[] = [];
@@ -193,8 +208,14 @@ export class TemplateSection extends PromptSectionBase {
     }
 }
 
+/**
+ * @private
+ */
 type PartRenderer = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number) => Promise<string>;
 
+/**
+ * @private
+ */
 enum ParseState {
     inText,
     inParameter,

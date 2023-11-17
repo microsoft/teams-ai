@@ -9,7 +9,7 @@
 import { Schema } from "jsonschema";
 
 /**
- * An action that can be called from the chat.
+ * An action that can be called by an LLM.
  */
 export interface ChatCompletionAction {
     /**
