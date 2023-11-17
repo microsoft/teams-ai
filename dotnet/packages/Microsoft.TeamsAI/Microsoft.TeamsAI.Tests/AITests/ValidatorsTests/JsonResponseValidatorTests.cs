@@ -20,7 +20,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "{\"foo\":\"bar\"}")
+                Message = new(ChatRole.Assistant) { Content = "{\"foo\":\"bar\"}" }
             };
 
             var res = await validator.ValidateResponseAsync(context.Object, memory, tokenizer, promptResponse, 0);
@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "{\"foo\":\"bar\"}")
+                Message = new(ChatRole.Assistant) { Content = "{\"foo\":\"bar\"}" }
             };
 
             var res = await validator.ValidateResponseAsync(context.Object, memory, tokenizer, promptResponse, 0);
@@ -76,7 +76,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "{\"hello\":1}")
+                Message = new(ChatRole.Assistant) { Content = "{\"hello\":1}" }
             };
 
             var res = await validator.ValidateResponseAsync(context.Object, memory, tokenizer, promptResponse, 0);
@@ -104,7 +104,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "{\"foo\":1}")
+                Message = new(ChatRole.Assistant) { Content = "{\"foo\":1}" }
             };
 
             var res = await validator.ValidateResponseAsync(context.Object, memory, tokenizer, promptResponse, 0);

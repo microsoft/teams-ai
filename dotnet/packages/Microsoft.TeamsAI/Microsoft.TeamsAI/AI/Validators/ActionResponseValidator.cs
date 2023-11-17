@@ -103,7 +103,7 @@ namespace Microsoft.Teams.AI.AI.Validators
                     );
 
                     string args = func.Arguments == "{}" ? "" : func.Arguments;
-                    ChatMessage message = new(ChatRole.Assistant, args);
+                    ChatMessage message = new(ChatRole.Assistant) { Content = args };
                     Validation<Dictionary<string, JsonElement>> result = await validator.ValidateResponseAsync(
                         context, memory, tokenizer, new() { Status = PromptResponseStatus.Success, Message = message }, remainingAttempts);
 

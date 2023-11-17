@@ -49,6 +49,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SharpToken" Version="1.2.12" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>

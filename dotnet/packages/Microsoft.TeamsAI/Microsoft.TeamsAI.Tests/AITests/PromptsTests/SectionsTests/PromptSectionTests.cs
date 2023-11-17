@@ -18,7 +18,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
         {
             List<ChatMessage> messages = new()
-            {new(ChatRole.System, "Hello World!")};
+            {new(ChatRole.System) { Content = "Hello World!" }};
 
             return await Task.FromResult(this.TruncateMessages(messages, tokenizer, maxTokens));
         }
