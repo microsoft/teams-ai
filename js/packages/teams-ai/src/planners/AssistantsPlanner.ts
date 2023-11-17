@@ -50,7 +50,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         } else {
             // Wait for any current runs to complete since you can't add messages or start new runs
             // if there's already one in progress
-            await this.blockOnInprogressRuns(thread_id);
+            await this.blockOnInProgressRuns(thread_id);
 
             // Submit user input
             return await this.submitUserInput(context, state, ai);
@@ -287,7 +287,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         return assistants_state.thread_id;
     }
 
-    private async blockOnInprogressRuns(thread_id: string): Promise<void> {
+    private async blockOnInProgressRuns(thread_id: string): Promise<void> {
         // We loop until we're told the last run is completed
         while (true) {
             const run = await this.retrieveLastRun(thread_id);
