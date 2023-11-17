@@ -5,7 +5,7 @@ import { Activity, MemoryStorage, TestAdapter, TurnContext } from "botbuilder"
 import * as sinon from 'sinon';
 import assert from 'assert';
 import { Application, RouteSelector } from "../Application";
-import { TeamsSsoPrompt, TeamsSsoPromptSettings } from "./TeamsBotSsoPrompt";
+import { TeamsSsoPrompt, TeamsSsoSettings } from "./TeamsBotSsoPrompt";
 import { TurnState } from "../TurnState";
 import { TeamsSsoBotAuthentication } from "./TeamsSsoBotAuthentication";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -15,7 +15,7 @@ describe('TeamsSsoBotAuthentication', () => {
     const adapter = new TestAdapter();
 
     let app: Application;
-    let settings: TeamsSsoPromptSettings;
+    let settings: TeamsSsoSettings;
     const settingName = 'settingName';
 
     const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {

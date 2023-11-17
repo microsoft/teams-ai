@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Activity, ActivityTypes, TeamsInfo, TestAdapter, TurnContext } from "botbuilder";
+import { Activity, ActivityTypes, TestAdapter, TurnContext } from "botbuilder";
 import { TurnState } from "../TurnState";
 import { TeamsSsoMessageExtensionAuthentication } from "./TeamsSsoMessageExtensionAuthentication";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -229,29 +229,17 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
                 name: 'composeExtension/query'
             });
 
-            sinon.stub(TeamsInfo, 'getMember').resolves({
-                userPrincipalName: 'user@example.com',
-                id: '',
-                name: '',
-            });
-
             const msal = new ConfidentialClientApplication(settings.msalConfig);
             const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
-            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read&clientId=test&tenantId=common&loginHint=user@example.com');
+            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read&clientId=test&tenantId=common');
         });
 
         it("should concat scope with space", async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
-            });
-
-            sinon.stub(TeamsInfo, 'getMember').resolves({
-                userPrincipalName: 'user@example.com',
-                id: '',
-                name: '',
             });
 
             const settings = {
@@ -270,19 +258,13 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
-            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common&loginHint=user@example.com');
+            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common');
         });
 
         it("should use default authority if not specified", async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
-            });
-
-            sinon.stub(TeamsInfo, 'getMember').resolves({
-                userPrincipalName: 'user@example.com',
-                id: '',
-                name: '',
             });
 
             const settings = {
@@ -300,7 +282,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
-            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common&loginHint=user@example.com');
+            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common');
         });
     });
 });

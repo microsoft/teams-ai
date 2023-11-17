@@ -6,7 +6,7 @@ import { Dialog, DialogContext, DialogTurnStatus } from "botbuilder-dialogs";
 import { Application } from "../Application";
 import { TurnState } from "../TurnState";
 import { BotAuthenticationBase } from "./BotAuthenticationBase";
-import { TeamsSsoPrompt, TeamsSsoPromptSettings } from "./TeamsBotSsoPrompt";
+import { TeamsSsoPrompt, TeamsSsoSettings } from "./TeamsBotSsoPrompt";
 import { DialogSet, DialogState, DialogTurnResult, WaterfallDialog } from "botbuilder-dialogs";
 import { TurnStateProperty } from "../TurnStateProperty";
 import { ConfidentialClientApplication } from "@azure/msal-node";
@@ -19,7 +19,7 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     public constructor(
         app: Application<TState>,
-        promptSettings: TeamsSsoPromptSettings, // Child classes will have different types for this
+        promptSettings: TeamsSsoSettings, // Child classes will have different types for this
         settingName: string,
         msal: ConfidentialClientApplication,
         storage?: Storage

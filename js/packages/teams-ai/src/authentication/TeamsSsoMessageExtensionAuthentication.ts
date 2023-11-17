@@ -2,16 +2,15 @@
 // Licensed under the MIT License.
 
 import { TurnContext } from "botbuilder-core";
-import { TeamsChannelAccount, TokenResponse } from "botframework-schema";
+import { TokenResponse } from "botframework-schema";
 import { MessageExtensionAuthenticationBase } from "./MessageExtensionAuthenticationBase";
-import { TeamsSsoPromptSettings } from "./TeamsBotSsoPrompt";
+import { TeamsSsoSettings } from "./TeamsBotSsoPrompt";
 import { ConfidentialClientApplication } from "@azure/msal-node";
-import { TeamsInfo } from "botbuilder";
 import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
 export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuthenticationBase {
 
-    public constructor(private readonly settings: TeamsSsoPromptSettings, private readonly msal: ConfidentialClientApplication) {
+    public constructor(private readonly settings: TeamsSsoSettings, private readonly msal: ConfidentialClientApplication) {
         super();
     }
 
@@ -50,18 +49,10 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
         const scope = encodeURI(this.settings.scopes.join(" "));
         const authority = this.settings.msalConfig.auth.authority ?? "https://login.microsoftonline.com/common/";
         const tenantId = authority.match(/https:\/\/[^\/]+\/([^\/]+)\/?/)?.[1];
-        const loginHint = await this.getLoginHint(context);
 
-        const signInLink = `${this.settings.signInLink}?scope=${scope}&clientId=${clientId}&tenantId=${tenantId}&loginHint=${loginHint}`;
+        const signInLink = `${this.settings.signInLink}?scope=${scope}&clientId=${clientId}&tenantId=${tenantId}`;
 
         return signInLink;
     }
 
-    private async getLoginHint(context: TurnContext): Promise<string | undefined> {
-        const account: TeamsChannelAccount = await TeamsInfo.getMember(
-            context,
-            context.activity.from.id
-        );
-        return account.userPrincipalName;
-    }
 }

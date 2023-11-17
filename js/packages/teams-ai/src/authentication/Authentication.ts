@@ -7,7 +7,7 @@
  * Licensed under the MIT License.
  */
 
-import { Storage, TeamsChannelAccount, TeamsInfo, TurnContext } from 'botbuilder';
+import { Storage, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
 import { TurnState } from '../TurnState';
@@ -16,7 +16,7 @@ import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthentica
 import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
 import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
-import { TeamsSsoPromptSettings } from './TeamsBotSsoPrompt';
+import { TeamsSsoSettings } from './TeamsBotSsoPrompt';
 import { OAuthPromptMessageExtensionAuthentication } from './OAuthPromptMessageExtensionAuthentication';
 import { OAuthPromptBotAuthentication } from './OAuthPromptBotAuthentication';
 import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
@@ -34,7 +34,7 @@ export class Authentication<TState extends TurnState> {
     private readonly _name: string;
     private readonly _msal?: ConfidentialClientApplication;
 
-    public readonly settings: OAuthSettings | TeamsSsoPromptSettings;
+    public readonly settings: OAuthSettings | TeamsSsoSettings;
 
     /**
      * Creates a new instance of the `Authentication` class.
@@ -49,7 +49,7 @@ export class Authentication<TState extends TurnState> {
     constructor(
         app: Application<TState>,
         name: string,
-        settings: OAuthSettings | TeamsSsoPromptSettings,
+        settings: OAuthSettings | TeamsSsoSettings,
         storage?: Storage,
         messageExtensionsAuth?: MessageExtensionAuthenticationBase,
         botAuth?: BotAuthenticationBase<TState>,
@@ -69,7 +69,7 @@ export class Authentication<TState extends TurnState> {
             this._adaptiveCardAuth = adaptiveCardAuth || new TeamsSsoAdaptiveCardAuthentication();
         }
 
-        
+
     }
 
     /**
@@ -119,10 +119,7 @@ export class Authentication<TState extends TurnState> {
         if (this.isOAuthSettings(this.settings)) {
             return UserTokenAccess.signOutUser(context, this.settings);
         } else {
-            const loginHint = await this.getLoginHint(context);
-            if (loginHint) {
-                return this.removeTokenFromMsalCache(loginHint);
-            }
+            return this.removeTokenFromMsalCache(context);
         }
     }
 
@@ -141,14 +138,13 @@ export class Authentication<TState extends TurnState> {
 
             return undefined;
         } else {
-            const loginHint = await this.getLoginHint(context);
-            if (loginHint) {
-                const tokenResponse = await this.acquireTokenFromMsalCache(loginHint ?? '');
+            const tokenResponse = await this.acquireTokenFromMsalCache(context);
 
-                if (tokenResponse && tokenResponse.accessToken) {
-                    return tokenResponse.accessToken;
-                }
+            if (tokenResponse && tokenResponse.accessToken) {
+                return tokenResponse.accessToken;
             }
+
+            return undefined
         }
     }
 
@@ -174,31 +170,24 @@ export class Authentication<TState extends TurnState> {
         this._botAuth.onUserSignInFailure(handler);
     }
 
-    private isOAuthSettings(settings: OAuthSettings | TeamsSsoPromptSettings): settings is OAuthSettings {
+    private isOAuthSettings(settings: OAuthSettings | TeamsSsoSettings): settings is OAuthSettings {
         return (settings as OAuthSettings).connectionName !== undefined;
     }
 
-    private async getLoginHint(context: TurnContext): Promise<string | undefined> {
-        const account: TeamsChannelAccount = await TeamsInfo.getMember(
-            context,
-            context.activity.from.id
-        );
-        return account.userPrincipalName;
-    }
-
     private async acquireTokenFromMsalCache(
-        loginHint: string
+        context: TurnContext
     ): Promise<AuthenticationResult | null> {
         try {
-            const settings = this.settings as TeamsSsoPromptSettings;
-            const accounts = await this._msal!.getTokenCache().getAllAccounts();
-            const account = accounts.find((account) => account.username === loginHint);
-            if (account) {
-                const silentRequest = {
-                    account: account,
-                    scopes: settings.scopes,
-                };
-                return await this._msal!.acquireTokenSilent(silentRequest);
+            if (context.activity.from.aadObjectId) {
+                const settings = this.settings as TeamsSsoSettings;
+                const account = await this._msal!.getTokenCache().getAccountByLocalId(context.activity.from.aadObjectId);
+                if (account) {
+                    const silentRequest = {
+                        account: account,
+                        scopes: settings.scopes,
+                    };
+                    return await this._msal!.acquireTokenSilent(silentRequest);
+                }
             }
         } catch (error) {
             return null;
@@ -207,16 +196,17 @@ export class Authentication<TState extends TurnState> {
     }
 
     private async removeTokenFromMsalCache(
-        loginHint: string
+        context: TurnContext
     ): Promise<void> {
-        try {
-            const accounts = await this._msal!.getTokenCache().getAllAccounts();
-            const account = accounts.find((account) => account.username === loginHint);
-            if (account) {
-                await this._msal!.getTokenCache().removeAccount(account);
+        if (context.activity.from.aadObjectId) {
+            try {
+                const account = await this._msal!.getTokenCache().getAccountByLocalId(context.activity.from.aadObjectId);
+                if (account) {
+                    await this._msal!.getTokenCache().removeAccount(account);
+                }
+            } catch (error) {
+                return;
             }
-        } catch (error) {
-            return;
         }
         return;
     }
@@ -356,7 +346,7 @@ export interface AuthenticationOptions {
      * The authentication settings.
      * Key uniquely identifies the connection string.
      */
-    settings: { [key: string]: OAuthSettings };
+    settings: { [key: string]: OAuthSettings | TeamsSsoSettings };
 
     /**
      * Describes the setting the bot should use if the user does not specify a setting name.

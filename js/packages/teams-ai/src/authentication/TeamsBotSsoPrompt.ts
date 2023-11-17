@@ -2,13 +2,13 @@
 // Licensed under the MIT License.
 
 import { Dialog, DialogContext, PromptRecognizerResult } from "botbuilder-dialogs";
-import { ActionTypes, Activity, ActivityTypes, CardFactory, MessageFactory, OAuthCard, StatusCodes, TeamsChannelAccount, TeamsInfo, TokenExchangeInvokeRequest, TokenExchangeResource, TokenResponse, TurnContext, tokenExchangeOperationName, verifyStateOperationName } from "botbuilder";
+import { ActionTypes, Activity, ActivityTypes, CardFactory, MessageFactory, OAuthCard, StatusCodes, TokenExchangeInvokeRequest, TokenExchangeResource, TokenResponse, TurnContext, tokenExchangeOperationName, verifyStateOperationName } from "botbuilder";
 import { v4 as uuidv4 } from "uuid";
 import { AuthenticationResult, ConfidentialClientApplication, Configuration } from "@azure/msal-node";
 
 const invokeResponseType = "invokeResponse";
 
-export interface TeamsSsoPromptSettings {
+export interface TeamsSsoSettings {
     scopes: string[];
     msalConfig: Configuration;
     signInLink: string;
@@ -35,13 +35,13 @@ class TokenExchangeInvokeResponse {
 
 export class TeamsSsoPrompt extends Dialog {
     private settingName: string;
-    private settings: TeamsSsoPromptSettings;
+    private settings: TeamsSsoSettings;
     private msal: ConfidentialClientApplication;
 
     constructor(
         dialogId: string,
         settingName: string,
-        settings: TeamsSsoPromptSettings,
+        settings: TeamsSsoSettings,
         msal: ConfidentialClientApplication
     ) {
         super(dialogId);
@@ -76,21 +76,18 @@ export class TeamsSsoPrompt extends Dialog {
         state.options = {};
         state.expires = new Date().getTime() + timeout;
 
-        const loginHint = await this.getLoginHint(dc.context);
-        if (loginHint) {
-            const token = await this.acquireTokenFromCache(loginHint);
-            if (token) {
-                const tokenResponse: TokenResponse = {
-                    connectionName: "", // No connection name is avaiable in this implementation
-                    token: token.accessToken,
-                    expiration: token.expiresOn?.toISOString() ?? "",
-                };
-                return await dc.endDialog(tokenResponse);
-            }
+        const token = await this.acquireTokenFromCache(dc.context);
+        if (token) {
+            const tokenResponse: TokenResponse = {
+                connectionName: "", // No connection name is avaiable in this implementation
+                token: token.accessToken,
+                expiration: token.expiresOn?.toISOString() ?? "",
+            };
+            return await dc.endDialog(tokenResponse);
         }
 
         // Cannot get token from cache, send OAuth card to get SSO token
-        await this.sendOAuthCardAsync(dc.context, loginHint);
+        await this.sendOAuthCardAsync(dc.context);
         return Dialog.EndOfTurn;
     }
 
@@ -171,8 +168,7 @@ export class TeamsSsoPrompt extends Dialog {
                 }
             }
         } else if (this.isTeamsVerificationInvoke(context)) {
-            const loginHint = await this.getLoginHint(context);
-            await this.sendOAuthCardAsync(dc.context, loginHint);
+            await this.sendOAuthCardAsync(dc.context);
             await context.sendActivity({ type: invokeResponseType, value: { status: StatusCodes.OK } });
         }
 
@@ -181,29 +177,23 @@ export class TeamsSsoPrompt extends Dialog {
             : { succeeded: false };
     }
 
-    private async getLoginHint(context: TurnContext): Promise<string | undefined> {
-        const account: TeamsChannelAccount = await TeamsInfo.getMember(
-            context,
-            context.activity.from.id
-        );
-        return account.userPrincipalName;
-    }
 
     private async acquireTokenFromCache(
-        loginHint: string
+        context: TurnContext
     ): Promise<AuthenticationResult | null> {
-        try {
-            const accounts = await this.msal.getTokenCache().getAllAccounts();
-            const account = accounts.find((account) => account.username === loginHint);
-            if (account) {
-                const silentRequest = {
-                    account: account,
-                    scopes: this.settings.scopes,
-                };
-                return await this.msal.acquireTokenSilent(silentRequest);
+        if (context.activity.from.aadObjectId) {
+            try {
+                const account = await this.msal.getTokenCache().getAccountByLocalId(context.activity.from.aadObjectId);
+                if (account) {
+                    const silentRequest = {
+                        account: account,
+                        scopes: this.settings.scopes,
+                    };
+                    return await this.msal.acquireTokenSilent(silentRequest);
+                }
+            } catch (error) {
+                return null;
             }
-        } catch (error) {
-            return null;
         }
         return null;
     }
@@ -220,8 +210,8 @@ export class TeamsSsoPrompt extends Dialog {
         return invokeResponse as Activity;
     }
 
-    private async sendOAuthCardAsync(context: TurnContext, loginHint?: string): Promise<void> {
-        const signInResource = await this.getSignInResource(loginHint);
+    private async sendOAuthCardAsync(context: TurnContext): Promise<void> {
+        const signInResource = await this.getSignInResource();
         const card = CardFactory.oauthCard(
             "",
             "Teams SSO Sign In",
@@ -236,13 +226,13 @@ export class TeamsSsoPrompt extends Dialog {
         await context.sendActivity(msg);
     }
 
-    private async getSignInResource(loginHint?: string) {
+    private async getSignInResource() {
         const clientId = this.settings.msalConfig.auth.clientId;
         const scope = encodeURI(this.settings.scopes.join(" "));
         const authority = this.settings.msalConfig.auth.authority ?? "https://login.microsoftonline.com/common/";
         const tenantId = authority.match(/https:\/\/[^\/]+\/([^\/]+)\/?/)?.[1];
 
-        const signInLink = `${this.settings.signInLink}?scope=${scope}&clientId=${clientId}&tenantId=${tenantId}&loginHint=${loginHint}`;
+        const signInLink = `${this.settings.signInLink}?scope=${scope}&clientId=${clientId}&tenantId=${tenantId}`;
 
         const tokenExchangeResource: TokenExchangeResource = {
             id: `${uuidv4()}-${this.settingName}`,
