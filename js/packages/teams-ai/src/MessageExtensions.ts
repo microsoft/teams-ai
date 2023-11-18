@@ -25,7 +25,7 @@ import { TurnState } from './TurnState';
 /**
  * Names of the invoke activities for Message Extensions.
  */
-export enum MessagingExtensionsInvokeNames {
+export enum MessageExtensionsInvokeNames {
     /**
      * Name of the invoke activity for anonymous link unfurling.
      */
