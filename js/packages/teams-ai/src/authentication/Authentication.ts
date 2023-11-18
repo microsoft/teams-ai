@@ -9,26 +9,35 @@
 
 import { Storage, TurnContext } from 'botbuilder';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
+import { AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
 import { TurnState } from '../TurnState';
 import { Application, Selector } from '../Application';
-import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
-import { BotAuthentication, deleteTokenFromState, setTokenInState } from './BotAuthentication';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
+import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
-import { AdaptiveCardAuthentication } from './AdaptiveCardAuthentication';
+import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
+import { TeamsSsoSettings } from './TeamsBotSsoPrompt';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
+import { OAuthBotAuthentication } from './OAuthBotAuthentication';
+import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
+import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensionAuthentication';
+import { OAuthAdaptiveCardAuthentication } from './OAuthAdaptiveCardAuthentication';
+import { TeamsSsoAdaptiveCardAuthentication } from './TeamsSsoAdaptiveCardAuthentication';
 
 /**
  * User authentication service.
  */
 export class Authentication<TState extends TurnState> {
-    private readonly _messagingExtensionAuth: MessagingExtensionAuthentication;
-    private readonly _botAuth: BotAuthentication<TState>;
-    private readonly _adaptiveCardAuth: AdaptiveCardAuthentication;
+    private readonly _adaptiveCardAuth: AdaptiveCardAuthenticationBase;
+    private readonly _messageExtensionAuth: MessageExtensionAuthenticationBase;
+    private readonly _botAuth: BotAuthenticationBase<TState>;
     private readonly _name: string;
+    private readonly _msal?: ConfidentialClientApplication;
 
     /**
      * The authentication settings.
      */
-    public readonly settings: OAuthSettings;
+    public readonly settings: OAuthSettings | TeamsSsoSettings;
 
     /**
      * Creates a new instance of the `Authentication` class.
@@ -36,24 +45,34 @@ export class Authentication<TState extends TurnState> {
      * @param {string} name - The name of the connection.
      * @param {OAuthSettings} settings - Authentication settings.
      * @param {Storage} storage - A storage instance otherwise Memory Storage is used.
-     * @param {MessagingExtensionAuthentication} messagingExtensionsAuth - Handles messaging extension flow authentication.
-     * @param {BotAuthentication} botAuth - Handles bot-flow authentication.
-     * @param {AdaptiveCardAuthentication} adaptiveCardAuth - Handles adaptive card authentication.
+     * @param {MessageExtensionAuthenticationBase} messageExtensionsAuth - Handles message extension flow authentication.
+     * @param {BotAuthenticationBase} botAuth - Handles bot-flow authentication.
+     * @param {AdaptiveCardAuthenticationBase} adaptiveCardAuth - Handles adaptive card authentication.
      */
     constructor(
         app: Application<TState>,
         name: string,
-        settings: OAuthSettings,
+        settings: OAuthSettings | TeamsSsoSettings,
         storage?: Storage,
-        messagingExtensionsAuth?: MessagingExtensionAuthentication,
-        botAuth?: BotAuthentication<TState>,
-        adaptiveCardAuth?: AdaptiveCardAuthentication
+        messageExtensionsAuth?: MessageExtensionAuthenticationBase,
+        botAuth?: BotAuthenticationBase<TState>,
+        adaptiveCardAuth?: AdaptiveCardAuthenticationBase
     ) {
         this.settings = settings;
         this._name = name;
-        this._messagingExtensionAuth = messagingExtensionsAuth || new MessagingExtensionAuthentication();
-        this._botAuth = botAuth || new BotAuthentication(app, settings, this._name, storage);
-        this._adaptiveCardAuth = adaptiveCardAuth || new AdaptiveCardAuthentication();
+
+        if (this.isOAuthSettings(settings)) {
+            this._messageExtensionAuth =
+                messageExtensionsAuth || new OAuthPromptMessageExtensionAuthentication(settings);
+            this._botAuth = botAuth || new OAuthBotAuthentication(app, settings, this._name, storage);
+            this._adaptiveCardAuth = adaptiveCardAuth || new OAuthAdaptiveCardAuthentication(settings);
+        } else {
+            this._msal = new ConfidentialClientApplication(settings.msalConfig);
+            this._botAuth = botAuth || new TeamsSsoBotAuthentication(app, settings, this._name, this._msal, storage);
+            this._messageExtensionAuth =
+                messageExtensionsAuth || new TeamsSsoMessageExtensionAuthentication(settings, this._msal);
+            this._adaptiveCardAuth = adaptiveCardAuth || new TeamsSsoAdaptiveCardAuthentication();
+        }
     }
 
     /**
@@ -71,8 +90,8 @@ export class Authentication<TState extends TurnState> {
             return token;
         }
 
-        if (this._messagingExtensionAuth.isValidActivity(context)) {
-            return await this._messagingExtensionAuth.authenticate(context, this.settings);
+        if (this._messageExtensionAuth.isValidActivity(context)) {
+            return await this._messageExtensionAuth.authenticate(context);
         }
 
         if (this._botAuth.isValidActivity(context)) {
@@ -80,7 +99,7 @@ export class Authentication<TState extends TurnState> {
         }
 
         if (this._adaptiveCardAuth.isValidActivity(context)) {
-            return await this._adaptiveCardAuth.authenticate(context, this.settings);
+            return await this._adaptiveCardAuth.authenticate(context);
         }
 
         throw new AuthError(
@@ -96,11 +115,15 @@ export class Authentication<TState extends TurnState> {
      * @param {TState} state - Application state.
      * @returns {Promise<void>} A Promise representing the asynchronous operation.
      */
-    public signOutUser(context: TurnContext, state: TState): Promise<void> {
+    public async signOutUser(context: TurnContext, state: TState): Promise<void> {
         this._botAuth.deleteAuthFlowState(context, state);
 
         // Signout flow is agnostic of the activity type.
-        return UserTokenAccess.signOutUser(context, this.settings);
+        if (this.isOAuthSettings(this.settings)) {
+            return UserTokenAccess.signOutUser(context, this.settings);
+        } else {
+            return this.removeTokenFromMsalCache(context);
+        }
     }
 
     /**
@@ -109,19 +132,29 @@ export class Authentication<TState extends TurnState> {
      * @returns {string | undefined} The token string or undefined if the user is not signed in.
      */
     public async isUserSignedIn(context: TurnContext): Promise<string | undefined> {
-        const tokenResponse = await UserTokenAccess.getUserToken(context, this.settings, '');
+        if (this.isOAuthSettings(this.settings)) {
+            const tokenResponse = await UserTokenAccess.getUserToken(context, this.settings, '');
 
-        if (tokenResponse && tokenResponse.token) {
-            return tokenResponse.token;
+            if (tokenResponse && tokenResponse.token) {
+                return tokenResponse.token;
+            }
+
+            return undefined;
+        } else {
+            const tokenResponse = await this.acquireTokenFromMsalCache(context);
+
+            if (tokenResponse && tokenResponse.accessToken) {
+                return tokenResponse.accessToken;
+            }
+
+            return undefined;
         }
-
-        return undefined;
     }
 
     /**
      * The handler function is called when the user has successfully signed in.
      * This only applies if sign in was initiated by the user sending a message to the bot.
-     * This handler will not be triggered if a messaging extension triggered the authentication flow.
+     * This handler will not be triggered if a message extension triggered the authentication flow.
      * @template TState
      * @param {(context: TurnContext, state: TState) => Promise<void>} handler The handler function to call when the user has successfully signed in
      */
@@ -132,12 +165,53 @@ export class Authentication<TState extends TurnState> {
     /**
      * This handler function is called when the user sign in flow fails.
      * This only applies if sign in was initiated by the user sending a message to the bot.
-     * This handler will not be triggered if a messaging extension triggered the authentication flow.
+     * This handler will not be triggered if a message extension triggered the authentication flow.
      * @template TState
      * @param {(context: TurnContext, state: TState, error: AuthError) => Promise<void>} handler The handler function to call when the user failed to signed in.
      */
     public onUserSignInFailure(handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>) {
         this._botAuth.onUserSignInFailure(handler);
+    }
+
+    private isOAuthSettings(settings: OAuthSettings | TeamsSsoSettings): settings is OAuthSettings {
+        return (settings as OAuthSettings).connectionName !== undefined;
+    }
+
+    private async acquireTokenFromMsalCache(context: TurnContext): Promise<AuthenticationResult | null> {
+        try {
+            if (context.activity.from.aadObjectId) {
+                const settings = this.settings as TeamsSsoSettings;
+                const account = await this._msal!.getTokenCache().getAccountByLocalId(
+                    context.activity.from.aadObjectId
+                );
+                if (account) {
+                    const silentRequest = {
+                        account: account,
+                        scopes: settings.scopes
+                    };
+                    return await this._msal!.acquireTokenSilent(silentRequest);
+                }
+            }
+        } catch (error) {
+            return null;
+        }
+        return null;
+    }
+
+    private async removeTokenFromMsalCache(context: TurnContext): Promise<void> {
+        if (context.activity.from.aadObjectId) {
+            try {
+                const account = await this._msal!.getTokenCache().getAccountByLocalId(
+                    context.activity.from.aadObjectId
+                );
+                if (account) {
+                    await this._msal!.getTokenCache().removeAccount(account);
+                }
+            } catch (error) {
+                return;
+            }
+        }
+        return;
     }
 }
 
@@ -275,7 +349,7 @@ export interface AuthenticationOptions {
      * The authentication settings.
      * Key uniquely identifies the connection string.
      */
-    settings: { [key: string]: OAuthSettings };
+    settings: { [key: string]: OAuthSettings | TeamsSsoSettings };
 
     /**
      * Describes the setting the bot should use if the user does not specify a setting name.

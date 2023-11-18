@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
-import { BotAuthentication } from './BotAuthentication';
-import { MessagingExtensionAuthentication } from './MessagingExtensionAuthentication';
+import { BotAuthenticationBase } from './BotAuthenticationBase';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import { Application } from '../Application';
 import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { AuthError, Authentication, AuthenticationManager, AuthenticationOptions } from './Authentication';
@@ -8,15 +8,17 @@ import { TurnState } from '../TurnState';
 import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
 import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
-import * as BotAuth from './BotAuthentication';
+import * as BotAuth from './BotAuthenticationBase';
+import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
+import { OAuthBotAuthentication } from './OAuthBotAuthentication';
 
 describe('Authentication', () => {
     const adapter = new TestAdapter();
 
-    let botAuth: BotAuthentication<TurnState>;
+    let botAuth: BotAuthenticationBase<TurnState>;
     let botAuthenticateStub: sinon.SinonStub;
-    let messageExtensionsAuth: MessagingExtensionAuthentication;
-    let messagingExtensionAuthenticateStub: sinon.SinonStub;
+    let messageExtensionsAuth: MessageExtensionAuthenticationBase;
+    let messageExtensionAuthenticateStub: sinon.SinonStub;
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
     let settings: OAuthPromptSettings;
@@ -63,9 +65,9 @@ describe('Authentication', () => {
             connectionName: 'test'
         };
 
-        messageExtensionsAuth = new MessagingExtensionAuthentication();
-        messagingExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
-        botAuth = new BotAuthentication(appStub, settings, settingName);
+        messageExtensionsAuth = new OAuthPromptMessageExtensionAuthentication(settings);
+        messageExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
+        botAuth = new OAuthBotAuthentication(appStub, settings, settingName);
         botAuthenticateStub = sinon.stub(botAuth, 'authenticate');
 
         auth = new Authentication(appStub, settingName, settings, undefined, messageExtensionsAuth, botAuth);
@@ -99,7 +101,7 @@ describe('Authentication', () => {
 
             await auth.signInUser(context, state);
 
-            messagingExtensionAuthenticateStub.calledOnce;
+            messageExtensionAuthenticateStub.calledOnce;
             botAuthenticateStub.notCalled;
         });
 
@@ -111,7 +113,7 @@ describe('Authentication', () => {
 
             await auth.signInUser(context, state);
 
-            messagingExtensionAuthenticateStub.calledOnce;
+            messageExtensionAuthenticateStub.calledOnce;
             botAuthenticateStub.notCalled;
         });
 
@@ -123,11 +125,11 @@ describe('Authentication', () => {
 
             await auth.signInUser(context, state);
 
-            messagingExtensionAuthenticateStub.calledOnce;
+            messageExtensionAuthenticateStub.calledOnce;
             botAuthenticateStub.notCalled;
         });
 
-        it('should throw error is activity type is not valid for botAuth or messagingExtensionAuth', async () => {
+        it('should throw error is activity type is not valid for botAuth or messageExtensionAuth', async () => {
             const [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Event
             });

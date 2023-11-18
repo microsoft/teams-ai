@@ -25,3 +25,4 @@ export * from './TaskModules';
 export * from './TestTurnState';
 export * from './TurnState';
 export * from './Utilities';
+export * from './authentication/TeamsBotSsoPrompt';
