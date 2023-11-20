@@ -75,14 +75,9 @@ import { ApplicationBuilder, AuthError, TurnState } from '@microsoft/teams-ai';
 import { createNpmPackageCard, createNpmSearchResultCard, createSignOutCard } from './cards';
 import { GraphClient } from './graphClient';
 
-interface ConversationState {
-    count: number;
-}
-type ApplicationTurnState = TurnState<ConversationState>;
-
 // Define storage and application
 const storage = new MemoryStorage();
-const app = new ApplicationBuilder<ApplicationTurnState>()
+const app = new ApplicationBuilder()
     .withStorage(storage)
     .withAuthentication(adapter, {
         settings: {
@@ -98,6 +93,14 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
                 signInLink: `https://${process.env.BOT_DOMAIN}/auth-start.html`,
                 endOnInvalidMessage: true
             }
+        },
+        autoSignIn: (context: TurnContext) => {
+            const signOutActivity = context.activity?.value.commandId === 'signOutCommand';
+            if (signOutActivity) {
+                return Promise.resolve(false);
+            }
+
+            return Promise.resolve(true);
         }
     })
     .build();
@@ -153,7 +156,7 @@ app.messageExtensions.selectItem(async (_context: TurnContext, _state: TurnState
 });
 
 // Handles when the user clicks the Messaging Extension "Sign Out" command.
-app.messageExtensions.fetchTask('signOutCommand', async (context: TurnContext, state: ApplicationTurnState) => {
+app.messageExtensions.fetchTask('signOutCommand', async (context: TurnContext, state: TurnState) => {
     await app.authentication.signOutUser(context, state, 'graph');
 
     const signoutCard = createSignOutCard();
@@ -171,22 +174,6 @@ app.messageExtensions.submitAction('signOutCommand', async (_context: TurnContex
     return null;
 });
 
-app.authentication.get('graph').onUserSignInSuccess(async (context: TurnContext, state: ApplicationTurnState) => {
-    // Successfully logged in
-    await context.sendActivity('Successfully logged in');
-    await context.sendActivity(`Token string length: ${state.temp.authTokens['graph']!.length}`);
-    await context.sendActivity(`This is what you said before the AuthFlow started: ${context.activity.text}`);
-});
-
-app.authentication
-    .get('graph')
-    .onUserSignInFailure(async (context: TurnContext, _state: ApplicationTurnState, error: AuthError) => {
-        // Failed to login
-        await context.sendActivity('Failed to login');
-        await context.sendActivity(`Error message: ${error.message}`);
-    });
-
-
 /**
  * Get the user details from Graph
  * @param {string} token The token to use to get the user details
@@ -196,7 +183,7 @@ async function getUserDetailsFromGraph(token: string): Promise<{ displayName: st
     // The user is signed in, so use the token to create a Graph Clilent and show profile
     const graphClient = new GraphClient(token);
     const profile = await graphClient.getMyProfile();
-    const profilePhoto = await graphClient.getProfilePhotoAsync ();
+    const profilePhoto = await graphClient.getProfilePhotoAsync();
     return { displayName: profile.displayName, profilePhoto: profilePhoto };
 }
 
@@ -212,6 +199,6 @@ server.post('/api/messages', async (req, res) => {
 server.get(
     "/auth-:name(start|end).html",
     restify.plugins.serveStatic({
-      directory: path.join(__dirname, "public"),
+        directory: path.join(__dirname, "public"),
     })
-  );
+);
