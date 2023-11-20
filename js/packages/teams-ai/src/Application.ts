@@ -949,6 +949,16 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
     }
 
     /**
+     * Configures the turn state factory for managing the bot's turn state.
+     * @param turnStateFactory
+     * @returns
+     */
+    public withTurnStateFactory(turnStateFactory: () => TState): this {
+        this._options.turnStateFactory = turnStateFactory;
+        return this;
+    }
+
+    /**
      * Configures the removing of mentions of the bot's name from incoming messages.
      * Default state for removeRecipientMention is true
      * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
