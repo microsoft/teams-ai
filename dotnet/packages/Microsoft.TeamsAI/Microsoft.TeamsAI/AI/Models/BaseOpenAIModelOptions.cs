@@ -24,8 +24,8 @@ namespace Microsoft.Teams.AI.AI.Models
         /// Retry policy to use when calling the OpenAI API.
         /// </summary>
         /// <remarks>
-        /// The default retry policy is `[2000, 5000]` which means that the first retry will be after
-        /// 2 seconds and the second retry will be after 5 seconds.
+        /// The default retry policy is `{ TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) }`
+        /// which means that the first retry will be after 2 seconds and the second retry will be after 5 seconds.
         /// </remarks>
         public List<TimeSpan> RetryPolicy { get; set; }
 
