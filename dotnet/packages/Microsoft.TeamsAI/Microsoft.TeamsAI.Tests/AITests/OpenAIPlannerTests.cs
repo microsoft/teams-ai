@@ -15,6 +15,10 @@ using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Net;
+using Microsoft.Teams.AI.State;
+using Record = Microsoft.Teams.AI.State.Record;
+using Microsoft.Bot.Schema;
+using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -278,9 +282,18 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var model = "gpt-model";
 
             var optionsMock = new Mock<OpenAIPlannerOptions>(apiKey, model);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var moderatorMock = new Mock<IModerator<TurnState<Record, Record, TempState>>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -295,8 +308,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 }
             );
 
-            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(optionsMock.Object);
-            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>(), moderatorMock.Object);
+            var planner = new CustomCompletionOpenAIPlannerWithTurnState<TurnState<Record, Record, TempState>>(optionsMock.Object);
+            var aiOptions = new AIOptions<TurnState<Record, Record, TempState>>(planner, new PromptManager<TurnState<Record, Record, TempState>>(), moderatorMock.Object);
             var exceptionMessage = "Exception Message";
             var thrownException = new SemanticKernel.Diagnostics.HttpOperationException(exceptionMessage)
             {
@@ -310,7 +323,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             planner.ChatCompletionMock.Setup(chatCompletion => chatCompletion.GetChatCompletionsAsync(It.IsAny<ChatHistory>(), It.IsAny<ChatRequestSettings>(), It.IsAny<CancellationToken>())).ThrowsAsync(thrownException);
 
             // Act
-            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await planner.CompletePromptAsync(turnContextMock, turnState.Result, promptTemplate, aiOptions));
 
             // Assert
             Assert.NotNull(exception);
@@ -349,16 +362,25 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var model = "gpt-randomModelId";
 
             var options = new OpenAIPlannerOptions(apiKey, model);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var promptTemplate = new PromptTemplate("Test", new());
 
-            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
-            var aiOptions = new AIOptions<TestTurnState>(planner, new PromptManager<TestTurnState>());
+            var planner = new CustomCompletionOpenAIPlannerWithTurnState<TurnState<Record, Record, TempState>>(options);
+            var aiOptions = new AIOptions<TurnState<Record, Record, TempState>>(planner, new PromptManager<TurnState<Record, Record, TempState>>());
             MockChatCompletion(planner.ChatCompletionMock, "chat-completion");
 
             // Act
-            var result = await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
+            var result = await planner.CompletePromptAsync(turnContextMock, turnState.Result, promptTemplate, aiOptions);
 
             // Assert
             Assert.Equal("chat-completion", result);
@@ -389,6 +411,28 @@ namespace Microsoft.Teams.AI.Tests.AITests
             public Mock<IChatCompletion> ChatCompletionMock { get; } = new Mock<IChatCompletion>();
 
             public CustomCompletionOpenAIPlanner(OpenAIPlannerOptions options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
+            {
+            }
+
+            private protected override ITextCompletion _CreateTextCompletionService(OpenAIPlannerOptions options)
+            {
+                return TextCompletionMock.Object;
+            }
+
+            private protected override IChatCompletion _CreateChatCompletionService(OpenAIPlannerOptions options)
+            {
+                return ChatCompletionMock.Object;
+            }
+        }
+
+        private sealed class CustomCompletionOpenAIPlannerWithTurnState<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions>
+            where TState : TurnState<Record, Record, TempState>
+        {
+            public Mock<ITextCompletion> TextCompletionMock { get; } = new Mock<ITextCompletion>();
+
+            public Mock<IChatCompletion> ChatCompletionMock { get; } = new Mock<IChatCompletion>();
+
+            public CustomCompletionOpenAIPlannerWithTurnState(OpenAIPlannerOptions options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
             {
             }
 

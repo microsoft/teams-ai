@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         public void Test_ApplicationBuilder_DefaultSetup()
         {
             // Act
-            var app = new ApplicationBuilder<TestTurnState, TestTurnStateManager>().Build();
+            var app = new ApplicationBuilder<TestTurnState>().Build();
 
             // Assert
             Assert.NotEqual(null, app.Options);
@@ -19,7 +19,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Null(app.Options.BotAppId);
             Assert.Null(app.Options.Storage);
             Assert.Null(app.Options.AI);
-            Assert.NotEqual(null, app.Options.TurnStateManager);
+            Assert.NotEqual(null, app.Options.TurnStateFactory);
             Assert.Null(app.Options.AdaptiveCards);
             Assert.Null(app.Options.TaskModules);
             Assert.Null(app.Options.LoggerFactory);
@@ -39,7 +39,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             IStorage storage = new MemoryStorage();
             BotAdapter adapter = new SimpleAdapter();
             TestLoggerFactory loggerFactory = new();
-            TestTurnStateManager turnStateManager = new();
+            Func<TestTurnState> turnStateFactory = () => new TestTurnState();
             AdaptiveCardsOptions adaptiveCards = new()
             {
                 ActionSubmitFilter = "cardFilter"
@@ -55,13 +55,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             );
 
             // Act
-            var app = new ApplicationBuilder<TestTurnState, TestTurnStateManager>()
+            var app = new ApplicationBuilder<TestTurnState>()
                 .SetRemoveRecipientMention(removeRecipientMention)
                 .WithStorage(storage)
                 .WithAIOptions(aiOptions)
-                .WithTurnStateManager(turnStateManager)
+                .WithTurnStateFactory(turnStateFactory)
                 .WithLongRunningMessages(adapter, botAppId)
-                .WithTurnStateManager(turnStateManager)
                 .WithAdaptiveCardOptions(adaptiveCards)
                 .WithTaskModuleOptions(taskModules)
                 .WithLoggerFactory(loggerFactory)
@@ -74,7 +73,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Equal(botAppId, app.Options.BotAppId);
             Assert.Equal(storage, app.Options.Storage);
             Assert.Equal(aiOptions, app.Options.AI);
-            Assert.Equal(turnStateManager, app.Options.TurnStateManager);
+            Assert.Equal(turnStateFactory, app.Options.TurnStateFactory);
             Assert.Equal(adaptiveCards, app.Options.AdaptiveCards);
             Assert.Equal(taskModules, app.Options.TaskModules);
             Assert.Equal(loggerFactory, app.Options.LoggerFactory);
@@ -92,7 +91,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Act
             var func = () =>
             {
-                new ApplicationBuilder<TestTurnState, TestTurnStateManager>()
+                new ApplicationBuilder<TestTurnState>()
                .WithLongRunningMessages(adapter, "").Build();
             };
 

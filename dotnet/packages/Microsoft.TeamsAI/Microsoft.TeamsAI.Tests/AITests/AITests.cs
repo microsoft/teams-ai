@@ -2,9 +2,13 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -14,10 +18,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void Test_Run_NotImplemented()
         {
             // Arrange
-            var planner = new TestPlanner();
-            var promptManager = new TestPromptManager();
-            var moderator = new TestModerator();
-            var options = new AIOptions<TestTurnState>(planner, promptManager, moderator)
+            var planner = new TestTurnStatePlanner<TurnState>();
+            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var moderator = new DefaultModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, promptManager, moderator)
             {
                 Prompt = "Test",
                 History = new AIHistoryOptions
@@ -25,12 +29,21 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     TrackHistory = false
                 }
             };
-            var ai = new AI<TestTurnState>(options);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnState = new TestTurnState();
+            var ai = new AI<TurnState<Record, Record, TempState>>(options);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
 
             // Act
-            var exception = await Assert.ThrowsAsync<NotImplementedException>(async () => await ai.Run(turnContextMock.Object, turnState));
+            var exception = await Assert.ThrowsAsync<NotImplementedException>(async () => await ai.Run(turnContextMock, turnState.Result));
 
             // Assert
             Assert.NotNull(exception);
@@ -58,6 +71,28 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 SayActionRecord.Add(command.Response);
                 return true;
             }
+        }
+    }
+
+    internal class TestTurnStatePlanner<T> : IPlanner<TurnState<Record, Record, TempState>>
+    {
+
+        public Plan BeginPlan { get; set; } = new Plan
+        {
+            Commands = new List<IPredictedCommand>
+            {
+                new PredictedSayCommand("Test-SAY")
+            }
+        };
+        public Plan ContinuePlan { get; set; } = new Plan();
+        public Task<Plan> BeginTaskAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, AI<TurnState<Record, Record, TempState>> ai, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(BeginPlan);
+        }
+
+        public Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, AI<TurnState<Record, Record, TempState>> ai, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(ContinuePlan);
         }
     }
 }
