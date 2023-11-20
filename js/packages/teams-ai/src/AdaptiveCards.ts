@@ -20,7 +20,7 @@ import { TurnState } from './TurnState';
 /**
  * @private
  */
-const ACTION_INVOKE_NAME = `adaptiveCard/action`;
+export const ACTION_INVOKE_NAME = `adaptiveCard/action`;
 
 /**
  * @private
@@ -39,7 +39,7 @@ const SEARCH_INvOKE_NAME = `application/search`;
 
 /**
  * Strongly typed Adaptive Card.
- * @summary
+ * @remarks
  * see https://adaptivecards.io/explorer/ for schema details.
  */
 export interface AdaptiveCard {
@@ -60,7 +60,7 @@ export interface AdaptiveCard {
 export interface AdaptiveCardsOptions {
     /**
      * Data field used to identify the Action.Submit handler to trigger.
-     * @summary
+     * @remarks
      * When an Action.Submit is triggered, the field name specified here will be used to determine
      * the handler to route the request to.
      *
@@ -182,7 +182,7 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Adds a route to the application for handling Adaptive Card Action.Submit events.
-     * @summary
+     * @remarks
      * The route will be added for the specified verb(s) and will be filtered using the
      * `actionSubmitFilter` option. The default filter is to use the `verb` field.
      *
@@ -224,6 +224,12 @@ export class AdaptiveCards<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Adds a route to the application for handling the `Data.Query` request for an `Input.ChoiceSet`.
+     * @param dataset The named dataset(s) to be handled.
+     * @param handler The code to execute when the query is triggered.
+     * @returns The application for chaining purposes.
+     */
     public search(
         dataset: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (

@@ -50,7 +50,6 @@ namespace Microsoft.Teams.AI.Tests.Application
             };
             AIOptions<TestTurnState> aiOptions = new(
                 planner: new TestPlanner(),
-                promptManager: new TestPromptManager(),
                 moderator: new TestModerator()
             );
 

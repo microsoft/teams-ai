@@ -38,7 +38,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile(path: settingsPath, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
-                .AddUserSecrets<AzureOpenAICompletionTests>()
+                .AddUserSecrets<OpenAIModeratorTests>()
                 .Build();
         }
 
@@ -63,7 +63,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             var promptTemplateMock = new Mock<PromptTemplate>(string.Empty, new PromptTemplateConfiguration());
 
             // Act
-            var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplateMock.Object);
+            var result = await moderator.ReviewInput(turnContext, turnStateMock.Object);
 
             // Assert
             if (flagged)
@@ -95,7 +95,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             });
 
             // Act
-            var result = await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan);
+            var result = await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan);
 
             // Assert
             if (flagged)

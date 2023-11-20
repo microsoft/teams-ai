@@ -105,16 +105,34 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
     allow_looping: boolean;
 }
 
+/**
+ * Parameters passed to the AI.TooManyStepsActionName action.
+ */
 export interface TooManyStepsParameters {
+    /**
+     * Configured maximum number of steps allowed.
+     */
     max_steps: number;
+
+    /**
+     * Configured maximum amount of time allowed.
+     */
     max_time: number;
+
+    /**
+     * Time the AI system started processing the current activity.
+     */
     start_time: number;
+
+    /**
+     * Number of steps that have been executed.
+     */
     step_count: number;
 }
 
 /**
  * AI System.
- * @summary
+ * @remarks
  * The AI system is responsible for generating plans, moderating input and output, and
  * generating prompts. It can be used free standing or routed to by the Application object.
  * @template TState Optional. Type of the turn state.
@@ -123,11 +141,15 @@ export class AI<TState extends TurnState = TurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
 
+    /**
+     * A text string that can be returned from an action to stop the AI system from continuing
+     * to execute the current plan.
+     */
     public static readonly StopCommandName = 'STOP';
 
     /**
      * An action that will be called anytime an unknown action is predicted by the planner.
-     * @summary
+     * @remarks
      * The default behavior is to simply log an error to the console. The plan is allowed to
      * continue execution by default.
      */
@@ -135,7 +157,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that will be called anytime an input is flagged by the moderator.
-     * @summary
+     * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
      */
@@ -143,7 +165,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that will be called anytime an output is flagged by the moderator.
-     * @summary
+     * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
      */
@@ -163,7 +185,7 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * An action that will be called after the plan has been predicted by the planner and it has
      * passed moderation.
-     * @summary
+     * @remarks
      * Overriding this action lets you customize the decision to execute a plan separately from the
      * moderator. The default behavior is to proceed with the plans execution only with a plan
      * contains one or more commands. Returning false from this action can be used to prevent the plan
@@ -173,7 +195,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that is called to DO an action.
-     * @summary
+     * @remarks
      * The action system is used to do other actions. Overriding this action lets you customize the
      * execution of an individual action. You can use it to log actions being used or to prevent
      * certain actions from being executed based on policy.
@@ -185,7 +207,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that is called to SAY something.
-     * @summary
+     * @remarks
      * Overriding this action lets you customize the execution of the SAY command. You can use it
      * to log the output being generated or to add support for sending certain types of output as
      * message attachments.
@@ -303,7 +325,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Returns the moderator being used by the AI system.
-     * @summary
+     * @remarks
      * The default moderator simply allows all messages and plans through without intercepting them.
      * @returns The AI's moderator
      */
@@ -320,7 +342,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Registers a handler for a named action.
-     * @summary
+     * @remarks
      * The AI systems planner returns plans that are made up of a series of commands or actions
      * that should be performed. Registering a handler lets you provide code that should be run in
      * response to one of the predicted actions.
@@ -368,7 +390,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Registers the default handler for a named action.
-     * @summary
+     * @remarks
      * Default handlers can be replaced by calling the action() method with the same name.
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
@@ -436,7 +458,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Calls the configured planner to generate a plan and executes the plan that is returned.
-     * @summary
+     * @remarks
      * The moderator is called to review the input and output of the plan. If the moderator flags
      * the input or output then the appropriate action is called. If the moderator allows the input
      * and output then the plan is executed.
@@ -456,6 +478,11 @@ export class AI<TState extends TurnState = TurnState> {
         if (typeof state.temp.input != 'string') {
             // Use the received activity text
             state.temp.input = context.activity.text;
+        }
+
+        // Initialize {{$allOutputs}}
+        if (state.temp.actionOutputs == undefined) {
+            state.temp.actionOutputs = {};
         }
 
         // Initialize start time and action count
@@ -515,7 +542,8 @@ export class AI<TState extends TurnState = TurnState> {
                             .get(AI.DoCommandActionName)!
                             .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                         should_loop = output.length > 0;
-                        } else {
+                        state.temp.actionOutputs[action] = output;
+                    } else {
                         // Redirect to UnknownAction handler
                         output = await this._actions
                             .get(AI.UnknownActionName)!
@@ -540,6 +568,7 @@ export class AI<TState extends TurnState = TurnState> {
             }
 
             // Copy the actions output to the input
+            state.temp.lastOutput = output;
             state.temp.input = output;
         }
 

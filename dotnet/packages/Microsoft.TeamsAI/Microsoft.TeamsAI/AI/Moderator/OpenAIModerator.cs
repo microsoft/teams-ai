@@ -1,5 +1,4 @@
 ﻿using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.State;
@@ -36,7 +35,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewPrompt(ITurnContext turnContext, TState turnState, PromptTemplate prompt)
+        public async Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
         {
             switch (_options.Moderate)
             {
@@ -55,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan> ReviewPlan(ITurnContext turnContext, TState turnState, Plan plan)
+        public async Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
         {
             switch (_options.Moderate)
             {
@@ -116,14 +115,14 @@ namespace Microsoft.Teams.AI.AI.Moderator
             }
             catch (HttpOperationException e)
             {
-                // Rate limited
+                // Http error
                 if (e.StatusCode != null && (int)e.StatusCode == 429)
                 {
                     return new Plan()
                     {
                         Commands = new List<IPredictedCommand>
                         {
-                            new PredictedDoCommand(AIConstants.RateLimitedActionName)
+                            new PredictedDoCommand(AIConstants.HttpErrorActionName)
                         }
                     };
 

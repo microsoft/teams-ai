@@ -4,31 +4,71 @@ using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
+using System.Reflection;
+using Plan = Microsoft.Teams.AI.AI.Planner.Plan;
 using Record = Microsoft.Teams.AI.State.Record;
+using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
     public class AITests
     {
         [Fact]
-        public async void Test_Run_NotImplemented()
+        public void Test_RegisterAction_RegisterSameActionTwice()
+        {
+            // Arrange
+            var planner = new TestPlanner();
+            var moderator = new TestModerator();
+            var options = new AIOptions<TestTurnState>(planner, moderator);
+            var ai = new AI<TestTurnState>(options);
+            var handler = new TestActionHandler();
+
+            // Act
+            ai.RegisterAction("test-action", handler);
+            var containsAction = ai.ContainsAction("test-action");
+            var exception = Assert.Throws<InvalidOperationException>(() => ai.RegisterAction("test-action", handler));
+
+            // Assert
+            Assert.True(containsAction);
+            Assert.NotNull(exception);
+            Assert.Equal("Attempting to register an already existing action `test-action` that does not allow overrides.", exception.Message);
+        }
+
+        [Fact]
+        public async void Test_RegisterAction_OverrideDefaultAction()
+        {
+            // Arrange
+            var planner = new TestPlanner();
+            var moderator = new TestModerator();
+            var options = new AIOptions<TestTurnState>(planner, moderator);
+            var ai = new AI<TestTurnState>(options);
+            var handler = new TestActionHandler();
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnState = new TestTurnState();
+
+            // Act
+            ai.RegisterAction(AIConstants.UnknownActionName, handler);
+            FieldInfo actionsField = typeof(AI<TestTurnState>).GetField("_actions", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance)!;
+            IActionCollection<TestTurnState> actions = (IActionCollection<TestTurnState>)actionsField!.GetValue(ai)!;
+            var result = await actions[AIConstants.UnknownActionName].Handler.PerformAction(turnContextMock.Object, turnState, null, null);
+            var exception = Assert.Throws<InvalidOperationException>(() => ai.RegisterAction(AIConstants.UnknownActionName, handler));
+
+            // Assert
+            Assert.Equal("test-result", result);
+            Assert.NotNull(exception);
+            Assert.Equal($"Attempting to register an already existing action `{AIConstants.UnknownActionName}` that does not allow overrides.", exception.Message);
+        }
+
+        [Fact]
+        public async void Test_RunAsync()
         {
             // Arrange
             var planner = new TestTurnStatePlanner<TurnState>();
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
-            var moderator = new DefaultModerator<TurnState<Record, Record, TempState>>();
-            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, promptManager, moderator)
-            {
-                Prompt = "Test",
-                History = new AIHistoryOptions
-                {
-                    TrackHistory = false
-                }
-            };
+            var moderator = new TestTurnStateModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, moderator);
             var ai = new AI<TurnState<Record, Record, TempState>>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
@@ -41,12 +81,86 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     ChannelId = "channelId"
                 });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var actions = new TestActions();
+            ai.ImportActions(actions);
 
             // Act
-            var exception = await Assert.ThrowsAsync<NotImplementedException>(async () => await ai.Run(turnContextMock, turnState.Result));
+            var result = await ai.RunAsync(turnContextMock, turnState.Result);
 
             // Assert
-            Assert.NotNull(exception);
+            Assert.True(result);
+            Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
+            Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
+        }
+
+        [Fact]
+        public async void Test_RunAsync_ExceedStepLimit()
+        {
+            var planner = new TestTurnStatePlanner<TurnState>();
+            var moderator = new TestTurnStateModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, moderator);
+            var ai = new AI<TurnState<Record, Record, TempState>>(options);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var actions = new TestActions();
+            ai.ImportActions(actions);
+            var actionHandler = new TestTurnStateActionHandler();
+            ai.RegisterAction(AIConstants.TooManyStepsActionName, actionHandler);
+
+            // Act
+            var result = await ai.RunAsync(turnContextMock, turnState.Result, stepCount: 30);
+
+            // Assert
+            Assert.False(result);
+            Assert.Equal(new string[] { "ContinueTaskAsync" }, planner.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
+            Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
+        }
+
+        [Fact]
+        public async void Test_RunAsync_ExceedTimeLimit()
+        {
+            // Arrange
+            var planner = new TestTurnStatePlanner<TurnState>();
+            var moderator = new TestTurnStateModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, moderator, maxTime: TimeSpan.Zero);
+            var ai = new AI<TurnState<Record, Record, TempState>>(options);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var actions = new TestActions();
+            ai.ImportActions(actions);
+            ai.RegisterAction(AIConstants.TooManyStepsActionName, new TestTurnStateActionHandler());
+
+            // Act
+            var result = await ai.RunAsync(turnContextMock, turnState.Result);
+
+            // Assert
+            Assert.False(result);
+            Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
+            Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
 
         /// <summary>
@@ -59,39 +173,79 @@ namespace Microsoft.Teams.AI.Tests.AITests
             public IList<string> SayActionRecord { get; } = new List<string>();
 
             [Action("Test-DO")]
-            public bool DoCommand([ActionName] string action)
+            public string DoCommand([ActionName] string action)
             {
                 DoActionRecord.Add(action);
-                return true;
+                return string.Empty;
             }
 
             [Action(AIConstants.SayCommandActionName)]
-            public bool SayCommand([ActionEntities] PredictedSayCommand command)
+            public string SayCommand([ActionParameters] PredictedSayCommand command)
             {
                 SayActionRecord.Add(command.Response);
-                return true;
+                return string.Empty;
             }
+        }
+    }
+
+    internal class TestTurnStateActionHandler : IActionHandler<TurnState<Record, Record, TempState>>
+    {
+        public string? ActionName { get; set; }
+        public Task<string> PerformAction(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, object? entities = null, string? action = null)
+        {
+            ActionName = action;
+            return Task.FromResult("test-result");
+        }
+    }
+
+    internal class TestTurnStateModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
+    {
+        public IList<string> Record { get; } = new List<string>();
+
+        public Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return Task.FromResult<Plan?>(null);
+        }
+
+        public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return Task.FromResult(plan);
         }
     }
 
     internal class TestTurnStatePlanner<T> : IPlanner<TurnState<Record, Record, TempState>>
     {
+        public IList<string> Record { get; } = new List<string>();
 
         public Plan BeginPlan { get; set; } = new Plan
         {
             Commands = new List<IPredictedCommand>
             {
+                new PredictedDoCommand("Test-DO"),
                 new PredictedSayCommand("Test-SAY")
             }
         };
-        public Plan ContinuePlan { get; set; } = new Plan();
+
+        public Plan ContinuePlan { get; set; } = new Plan
+        {
+            Commands = new List<IPredictedCommand>
+            {
+                new PredictedDoCommand("Test-DO"),
+                new PredictedSayCommand("Test-SAY")
+            }
+        };
+
         public Task<Plan> BeginTaskAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, AI<TurnState<Record, Record, TempState>> ai, CancellationToken cancellationToken)
         {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(BeginPlan);
         }
 
         public Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, AI<TurnState<Record, Record, TempState>> ai, CancellationToken cancellationToken)
         {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(ContinuePlan);
         }
     }

@@ -66,9 +66,7 @@ export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
     apiKey: string;
 
     /**
-     * Default model to use for completion.
-     * @remarks
-     * For Azure OpenAI this is the name of the deployment to use.
+     * Default model to use for completions.
      */
     defaultModel: string;
 
@@ -112,13 +110,12 @@ export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
 
 /**
  * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
- * @remarks
  */
 export class OpenAIModel implements PromptCompletionModel {
     private readonly _httpClient: AxiosInstance;
     private readonly _useAzure: boolean;
 
-    private readonly UserAgent = 'AlphaWave';
+    private readonly UserAgent = '@microsoft/teams-ai-v1';
 
     /**
      * Options the client was configured with.
@@ -126,8 +123,8 @@ export class OpenAIModel implements PromptCompletionModel {
     public readonly options: OpenAIModelOptions|AzureOpenAIModelOptions;
 
     /**
-     * Creates a new `OpenAIClient` instance.
-     * @param options Options for configuring an `OpenAIClient`.
+     * Creates a new `OpenAIModel` instance.
+     * @param options Options for configuring the model client.
      */
     public constructor(options: OpenAIModelOptions|AzureOpenAIModelOptions) {
         // Check for azure config
@@ -164,15 +161,6 @@ export class OpenAIModel implements PromptCompletionModel {
         this._httpClient = axios.create({
             validateStatus: (status) => status < 400 || status == 429
         });
-    }
-
-    /**
-     * Creates a new `OpenAIModel` instance with the specified options merged with the current options.
-     * @param options New options to merge with the current options.
-     * @returns Cloned `OpenAIModel` instance.
-     */
-    public clone(options: Partial<OpenAIModelOptions|AzureOpenAIModelOptions>): OpenAIModel {
-        return new OpenAIModel(Object.assign({}, this.options, options));
     }
 
     /**

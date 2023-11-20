@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewPrompt(turnContext, turnStateMock.Result, promptTemplate));
+            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Result));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -101,7 +101,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Result, promptTemplate);
+            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
 
             // Assert
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
@@ -109,9 +109,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Assert.NotNull(result);
                 Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
                 Assert.Equal(AIConstants.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
-                Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
-                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
-                Assert.StrictEqual(analyzeTextResult, ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
+                Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Parameters);
+                Assert.True(((PredictedDoCommand)result.Commands[0]).Parameters!.ContainsKey("Result"));
+                Assert.StrictEqual(analyzeTextResult, ((PredictedDoCommand)result.Commands[0]).Parameters!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -160,7 +160,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Result, promptTemplate);
+            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
 
             // Assert
             Assert.Null(result);
@@ -190,7 +190,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewPlan(turnContext, turnStateMock.Result, plan));
+            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -224,7 +224,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewPlan(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
 
             // Assert
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
@@ -232,9 +232,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Assert.NotNull(result);
                 Assert.Equal(AIConstants.DoCommand, result.Commands[0].Type);
                 Assert.Equal(AIConstants.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
-                Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Entities);
-                Assert.True(((PredictedDoCommand)result.Commands[0]).Entities!.ContainsKey("Result"));
-                Assert.StrictEqual(analyzeTextResult, ((PredictedDoCommand)result.Commands[0]).Entities!.GetValueOrDefault("Result"));
+                Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Parameters);
+                Assert.True(((PredictedDoCommand)result.Commands[0]).Parameters!.ContainsKey("Result"));
+                Assert.StrictEqual(analyzeTextResult, ((PredictedDoCommand)result.Commands[0]).Parameters!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -270,7 +270,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewPlan(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
 
             // Assert
             Assert.StrictEqual(plan, result);

@@ -22,21 +22,21 @@ namespace Microsoft.Teams.AI.AI.Planner
         public string Action { get; private set; }
 
         /// <summary>
-        /// Any entities that the AI system should use to perform the action.
+        /// Any parameters that the AI system should use to perform the action.
         /// </summary>
-        [JsonPropertyName("entities")]
+        [JsonPropertyName("parameters")]
         [JsonConverter(typeof(DictionaryJsonConverter))]
-        public Dictionary<string, object?>? Entities { get; set; }
+        public Dictionary<string, object?>? Parameters { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="PredictedDoCommand"/> class.
         /// </summary>
         /// <param name="action">The action name.</param>
-        /// <param name="entities">The entities to be passed on to action handler.</param>
-        public PredictedDoCommand(string action, Dictionary<string, object?> entities)
+        /// <param name="parameters">The parameters to be passed on to action handler.</param>
+        public PredictedDoCommand(string action, Dictionary<string, object?> parameters)
         {
             Action = action;
-            Entities = entities;
+            Parameters = parameters;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         public PredictedDoCommand(string action)
         {
             Action = action;
-            Entities = new Dictionary<string, object?>();
+            Parameters = new Dictionary<string, object?>();
         }
     }
 }

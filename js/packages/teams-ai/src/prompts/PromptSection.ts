@@ -12,6 +12,9 @@ import { PromptFunctions } from './PromptFunctions';
 import { Message } from './Message';
 import { Memory } from '../MemoryFork';
 
+/**
+ * A section that can be rendered to a prompt as either text or an array of `Message` objects.
+ */
 export interface PromptSection {
     /**
      * If true the section is mandatory otherwise it can be safely dropped.
@@ -46,6 +49,9 @@ export interface PromptSection {
     renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
 }
 
+/**
+ * The result of rendering a section.
+ */
 export interface RenderedPromptSection<T> {
     /**
      * The section that was rendered.

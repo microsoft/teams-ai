@@ -864,7 +864,7 @@ namespace Microsoft.Teams.AI
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.Run(turnContext, state);
+                    await _ai.RunAsync(turnContext, state);
                 }
 
                 // Call after turn handler

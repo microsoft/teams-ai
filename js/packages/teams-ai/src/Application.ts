@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -19,6 +20,7 @@ import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
+import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
 
 /**
@@ -54,15 +56,20 @@ export interface Query<TParams extends Record<string, any>> {
 export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. Bot adapter being used.
-     * @summary
+     * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
      */
     adapter?: BotAdapter;
 
     /**
+     * Optional. OAuth prompt settings to use for authentication.
+     */
+    authentication?: AuthenticationOptions;
+
+    /**
      * Optional. Application ID of the bot.
-     * @summary
+     * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
      */
@@ -104,7 +111,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. If true, the bot supports long running messages that can take longer then the 10 - 15
      * second timeout imposed by most channels. Defaults to false.
-     * @summary
+     * @remarks
      * This works by immediately converting the incoming request to a proactive conversation. Care should
      * be used for bots that operate in a shared hosting environment. The incoming request is immediately
      * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
@@ -136,6 +143,9 @@ export type ConversationUpdateEvents =
     | 'topicName'
     | 'historyDisclosed';
 
+/**
+ * Message related events.
+ */
 export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'editMessage';
 
 /**
@@ -148,11 +158,16 @@ export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'edit
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
 /**
+ * A selector function for matching incoming activities.
+ */
+export type Selector = (context: TurnContext) => Promise<boolean>;
+
+/**
  * Function for selecting whether a route handler should be triggered.
  * @param context Context for the current turn of conversation with the user.
  * @returns A promise that resolves with a boolean indicating whether the route handler should be triggered.
  */
-export type RouteSelector = (context: TurnContext) => Promise<boolean>;
+export type RouteSelector = Selector;
 
 /**
  * Message reaction event types.
@@ -161,7 +176,7 @@ export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 
 /**
  * Turn event types.
- * @summary
+ * @remarks
  * The `beforeTurn` event is triggered before the turn is processed. This allows for the turn state to be
  * modified before the turn is processed. Returning false from the event handler will prevent the turn from
  * being processed.
@@ -174,7 +189,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
 /**
  * Application class for routing and processing incoming requests.
- * @summary
+ * @remarks
  * The Application object replaces the traditional ActivityHandler that a bot would use. It supports
  * a simpler fluent style of authoring bots versus the inheritance based approach used by the
  * ActivityHandler class.
@@ -193,7 +208,10 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
+    private readonly _authentication?: AuthenticationManager<TState>;
+    private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
+    private readonly _startSignIn?: Selector;
 
     /**
      * Creates a new Application instance.
@@ -209,6 +227,10 @@ export class Application<TState extends TurnState = TurnState> {
             options
         ) as ApplicationOptions<TState>;
 
+        this._adapter = this._options.adapter;
+
+        this._adapter = this._options.adapter;
+
         // Create turn state factory
         if (!this._options.turnStateFactory) {
             this._options.turnStateFactory = () => new TurnState() as TState;
@@ -217,6 +239,13 @@ export class Application<TState extends TurnState = TurnState> {
         // Create AI component if configured with a planner
         if (this._options.ai) {
             this._ai = new AI(this._options.ai);
+        }
+
+        // Create OAuthPrompt if configured
+        if (this._options.authentication) {
+            this._startSignIn = createSignInSelector(this._options.authentication.autoSignIn);
+
+            this._authentication = new AuthenticationManager(this, this._options.authentication, this._options.storage);
         }
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
@@ -240,8 +269,22 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
+     * The bot's adapter.
+     * @returns {BotAdapter} The bot's adapter that is configured for the application.
+     */
+    public get adapter(): BotAdapter {
+        if (!this._adapter) {
+            throw new Error(
+                `The Application.adapter property is unavailable because it was not configured when creating the Application.`
+            );
+        }
+
+        return this._adapter;
+    }
+
+    /**
      * Fluent interface for accessing AI specific features.
-     * @summary
+     * @remarks
      * This property is only available if the Application was configured with `ai` options. An
      * exception will be thrown if you attempt to access it otherwise.
      * @returns {AI<TState>} The AI instance.
@@ -252,6 +295,24 @@ export class Application<TState extends TurnState = TurnState> {
         }
 
         return this._ai;
+    }
+
+    /**
+     * @template TState
+     * Fluent interface for accessing Authentication specific features.
+     * @description
+     * This property is only available if the Application was configured with `authentication` options. An
+     * exception will be thrown if you attempt to access it otherwise.
+     * @returns {Authentication<TState>} The Authentication instance.
+     */
+    public get authentication(): AuthenticationManager<TState> {
+        if (!this._authentication) {
+            throw new Error(
+                `The Application.authentication property is unavailable because no authentication options were configured.`
+            );
+        }
+
+        return this._authentication;
     }
 
     /**
@@ -280,7 +341,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Adds a new route to the application.
-     * @summary
+     * @remarks
      * Developers won't typically need to call this method directly as it's used internally by all
      * of the fluent interfaces to register routes for their specific activity types.
      *
@@ -362,7 +423,7 @@ export class Application<TState extends TurnState = TurnState> {
     /**
      * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
-     * @summary
+     * @remarks
      * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
@@ -411,7 +472,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Handles incoming messages with a given keyword.
-     * @summary
+     * @remarks
      * This method provides a simple way to have a bot respond anytime a user sends your bot a
      * message with a specific word or phrase.
      *
@@ -455,7 +516,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Dispatches an incoming activity to a handler registered with the application.
-     * @summary
+     * @remarks
      * This method should be called from your bot's "turn handler" (its primary message handler)
      *
      * ```JavaScript
@@ -482,6 +543,23 @@ export class Application<TState extends TurnState = TurnState> {
                 const { storage, turnStateFactory } = this._options;
                 const state = turnStateFactory();
                 await state.load(context, storage);
+
+                // Sign the user in
+                if (this._authentication && (await this._startSignIn?.(context))) {
+                    const response = await this._authentication.signUserIn(context, state);
+
+                    if (response.status == 'pending') {
+                        // Save turn state
+                        // - Save authentication status in turn state
+                        await state.save(context, storage);
+                        return false;
+                    }
+
+                    // Invalid activities should be ignored for auth
+                    if (response.status == 'error' && response.cause != 'invalidActivity') {
+                        throw response.error;
+                    }
+                }
 
                 // Call beforeTurn event handlers
                 if (!(await this.callEventHandlers(context, state, this._beforeTurn))) {
@@ -565,7 +643,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Sends a proactive activity to an existing conversation the bot is a member of.
-     * @summary
+     * @remarks
      * This method provides a simple way to send a proactive message to a conversation the bot is a member of.
      *
      * Use of the method requires you configure the Application with the `adapter` and `botAppId`
@@ -610,7 +688,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Manually start a timer to periodically send "typing" activities.
-     * @summary
+     * @remarks
      * The timer waits 1000ms to send its initial "typing" activity and then send an additional
      * "typing" activity every 1000ms. The timer will automatically end once an outgoing activity
      * has been sent. If the timer is already running or the current activity, is not a "message"
@@ -663,7 +741,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Manually stop the typing timer.
-     * @summary
+     * @remarks
      * If the timer isn't running nothing happens.
      */
     public stopTypingTimer(): void {
@@ -675,7 +753,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Registers a turn event handler.
-     * @summary
+     * @remarks
      * Turn events let you do something before or after a turn is run. Returning false from
      * `beforeTurn` lets you prevent the turn from running and returning false from `afterTurn`
      * lets you prevent the bots state from being saved.
@@ -837,6 +915,18 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
      */
     public withTaskModuleOptions(taskModuleOptions: TaskModulesOptions): this {
         this._options.taskModules = taskModuleOptions;
+        return this;
+    }
+
+    /**
+     * Configures user authentication settings.
+     * @param {BotAdapter} adapter The adapter to use for user authentication.
+     * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
+     * @returns {this} The ApplicationBuilder instance.
+     */
+    public withAuthentication(adapter: BotAdapter, authenticationOptions: AuthenticationOptions): this {
+        this._options.adapter = adapter;
+        this._options.authentication = authenticationOptions;
         return this;
     }
 
@@ -1081,6 +1171,23 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
                 );
             };
     }
+}
+
+/**
+ * Returns a selector function that indicates whether the bot should initiate a sign in.
+ * @param {boolean | Selector} startSignIn A boolean or function that indicates whether the bot should initiate a sign in.
+ * @returns {Selector} A selector function that returns true if the bot should initiate a sign in.
+ */
+function createSignInSelector(startSignIn?: boolean | Selector): Selector {
+    return (context) => {
+        if (typeof startSignIn === 'function') {
+            return startSignIn(context);
+        } else if (typeof startSignIn === 'boolean') {
+            return Promise.resolve(startSignIn);
+        } else {
+            return Promise.resolve(true);
+        }
+    };
 }
 
 /**
