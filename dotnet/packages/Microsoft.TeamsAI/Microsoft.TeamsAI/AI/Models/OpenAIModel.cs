@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.AI.Models
             _useAzure = options is AzureOpenAIModelOptions;
             OpenAIClientOptions openAIClientOptions = new()
             {
-                RetryPolicy = new RetryPolicy(_options.RetryPolicy.Count, new ConfiguredDelayStrategy(_options.RetryPolicy))
+                RetryPolicy = new RetryPolicy(_options.RetryPolicy.Count, new SequentialDelayStrategy(_options.RetryPolicy))
             };
             openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), HttpPipelinePosition.PerCall);
             if (_httpClient != null)

@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Models
             string? organization = null,
             CompletionType completionType = CompletionType.Chat,
             bool logRequests = false,
-            List<int>? retryPolicy = null,
+            List<TimeSpan>? retryPolicy = null,
             bool useSystemMessages = false) : base(completionType, logRequests, retryPolicy, useSystemMessages)
         {
             Verify.ParamNotNull(apiKey);
