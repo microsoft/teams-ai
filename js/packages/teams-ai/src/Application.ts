@@ -16,6 +16,8 @@ import {
     Storage,
     TurnContext
 } from 'botbuilder';
+import { ReadReceiptInfo } from 'botframework-connector';
+
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { MessageExtensions } from './MessageExtensions';
@@ -785,6 +787,26 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
+     * Adds a handler for Teams' readReceiptInfo event
+     * @param {(context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<boolean>} handler Function to call when the event is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public teamsReadReceipt(handler: (context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<void>): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(context.activity.type === ActivityTypes.Event && context.activity.channelId === 'msteams' && context.activity.name === 'application/vnd.microsoft/readReceipt');
+        };
+
+        const handlerWrapper = (context: TurnContext, state: TState): Promise<void> => {
+            const readReceiptInfo = context.activity.value as ReadReceiptInfo;
+            return handler(context, state, readReceiptInfo);
+        }
+
+        this.addRoute(selector, handlerWrapper);
+
+        return this;
+     }
+
+    /**
      * Calls the given event handlers with the given context and state.
      * @param {TurnContext} context - The context for the current turn with the user.
      * @param {TState} state - The current state of the conversation.
@@ -927,6 +949,16 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
     public withAuthentication(adapter: BotAdapter, authenticationOptions: AuthenticationOptions): this {
         this._options.adapter = adapter;
         this._options.authentication = authenticationOptions;
+        return this;
+    }
+
+    /**
+     * Configures the turn state factory for managing the bot's turn state.
+     * @param turnStateFactory
+     * @returns
+     */
+    public withTurnStateFactory(turnStateFactory: () => TState): this {
+        this._options.turnStateFactory = turnStateFactory;
         return this;
     }
 
