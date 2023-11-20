@@ -206,7 +206,7 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.type !== ActivityTypes.Invoke || SUBMIT_ACTION_INVOKE ||
+                        context?.activity?.type !== ActivityTypes.Invoke || context?.activity?.name !== SUBMIT_ACTION_INVOKE ||
                         context?.activity?.value?.botMessagePreviewAction !== 'send'
                     ) {
                         throw new Error(
@@ -322,10 +322,7 @@ export class MessageExtensions<TState extends TurnState> {
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
-                    if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== QUERY_INVOKE
-                    ) {
+                    if (context?.activity?.type !== ActivityTypes.Invoke || context?.activity?.name !== QUERY_INVOKE) {
                         throw new Error(
                             `Unexpected MessageExtensions.query() triggered for activity type: ${context?.activity?.type}`
                         );
