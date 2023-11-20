@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.AI.Models
             string azureApiVersion = "2023-05-15",
             CompletionType completionType = CompletionType.Chat,
             bool logRequests = false,
-            List<int>? retryPolicy = null,
+            List<TimeSpan>? retryPolicy = null,
             bool useSystemMessages = false) : base(completionType, logRequests, retryPolicy, useSystemMessages)
         {
             Verify.ParamNotNull(azureApiKey);
