@@ -112,6 +112,7 @@ dist
 env/.env.*.user
 env/.env.local
 appPackage/build
+build
 .deployment
 
 .env.*

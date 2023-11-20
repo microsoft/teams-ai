@@ -7,8 +7,6 @@
 # You can customize this file. Visit https://aka.ms/teamsfx-v5.0-guide for more info about Teams Toolkit project files.
 version: 1.0.0
 
-environmentFolderPath: ./env
-
 # Defines what the `provision` lifecycle step does with Teams Toolkit.
 # Runs first during Start Debugging (F5) or run manually using `teamsfx provision --env local`.
 provision:

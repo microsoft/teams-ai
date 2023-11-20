@@ -1,6 +1,6 @@
 # Teams Message Extension SSO Bot
 
-This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search npmjs for packages.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -9,10 +9,7 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 - [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Interacting with the bot](#interacting-with-the-bot)
-  - [Multiple ways to test](#multiple-ways-to-test)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
-    - [Using Teams Toolkit CLI](#using-teams-toolkit-cli)
-    - [Manually upload the app to a Teams desktop client](#manually-upload-the-app-to-a-teams-desktop-client)
+  - [Test using Teams Toolkit for Visual Studio Code](#test-using-teams-toolkit-for-visual-studio-code)
   - [Deploy the bot to Azure](#deploy-the-bot-to-azure)
   - [Further reading](#further-reading)
 
@@ -26,32 +23,31 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
     git clone https://github.com/Microsoft/teams-ai.git
     ```
 
-2. In the root JavaScript folder, install and build all dependencies
+1. If you do not have `yarn` installed, install it globally
+
+    ```bash
+    npm install -g yarn@1.21.1
+    ```
+
+1. In the root JavaScript folder, install and build all dependencies
 
     ```bash
     cd teams-ai/js
-    yarn install
+    yarn install #only needs to be run once, after clone or remote pull
     yarn build
     ```
 
-3. In a terminal, navigate to the sample root.
+1. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
-    yarn start
+    cd samples/<this-sample-folder>/
     ```
 
 ## Interacting with the bot
 
-![Bot interaction image](https://github.com/OfficeDev/Microsoft-Teams-Samples/raw/main/samples/msgext-search-auth-config/csharp/Images/msgext-search-auth-config.gif)
+Type `profile` in the Message Extension's search box to show the current user's profile information.
 
-## Multiple ways to test
-
-The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below.
-
-Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
-
-### Using Teams Toolkit for Visual Studio Code
+## Test using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
@@ -63,51 +59,6 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
-
-### Using Teams Toolkit CLI
-
-You can also use the Teams Toolkit CLI to run this sample.
-
-1. Install the CLI
-
-    ```bash
-    npm install -g @microsoft/teamsfx-cli
-    ```
-
-1. Open a second shell instance and run ngrok tunneling service - point to port 3978
-
-    ```bash
-    ngrok http --host-header=rewrite 3978
-    ```
-
-1. Copy the ngrok URL and put the URL and domain in the `/env/env.local` file
-
-    ```bash
-    BOT_ENDPOINT=https://{ngrok-url}.ngrok.io
-    BOT_DOMAIN={ngrok-url}.ngrok.io
-    ```
-
-1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
-
-    ```bash
-    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
-    teamsfx provision --env local
-
-    ```
-
-1. Next, use the CLI to validate and create an app package
-
-    ```bash
-    teamsfx deploy --env local
-    ```
-
-1. Finally, use the CLI to preview the app in Teams
-
-    ```bash
-    teamsfx preview --env local
-    ```
-
-### Manually upload the app to a Teams desktop client
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
