@@ -88,7 +88,7 @@ namespace Microsoft.Teams.AI.Tests
             var turnState = new TurnState();
 
             // Act and Assert
-            Assert.Throws<ArgumentException>(() => ConversationHistory.Clear(turnState));
+            Assert.Throws<KeyNotFoundException>(() => ConversationHistory.Clear(turnState));
         }
 
         [Fact]
@@ -525,7 +525,7 @@ namespace Microsoft.Teams.AI.Tests
         {
             // Arrange
             var state = new TurnState<Record, Record, TempState>();
-            var turnContext = _createConfiguredTurnContext();
+            var turnContext = _CreateConfiguredTurnContext();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
@@ -550,7 +550,7 @@ namespace Microsoft.Teams.AI.Tests
             await state.LoadStateAsync(storage.Object, turnContext);
             return state;
         }
-        public static TurnContext CreateConfiguredTurnContext()
+        public static TurnContext _CreateConfiguredTurnContext()
         {
             return new TurnContext(new NotImplementedAdapter(), new Activity(
                 text: "hello",
