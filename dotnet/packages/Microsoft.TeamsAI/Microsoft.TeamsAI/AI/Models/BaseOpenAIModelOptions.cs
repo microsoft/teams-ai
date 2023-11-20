@@ -24,10 +24,10 @@ namespace Microsoft.Teams.AI.AI.Models
         /// Retry policy to use when calling the OpenAI API.
         /// </summary>
         /// <remarks>
-        /// The default retry policy is `[2000, 5000]` which means that the first retry will be after
-        /// 2 seconds and the second retry will be after 5 seconds.
+        /// The default retry policy is `{ TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) }`
+        /// which means that the first retry will be after 2 seconds and the second retry will be after 5 seconds.
         /// </remarks>
-        public List<int> RetryPolicy { get; set; }
+        public List<TimeSpan> RetryPolicy { get; set; }
 
         /// <summary>
         /// Whether to use `system` messages when calling the OpenAI API.
@@ -49,12 +49,12 @@ namespace Microsoft.Teams.AI.AI.Models
         protected BaseOpenAIModelOptions(
             CompletionType completionType = CompletionType.Chat,
             bool logRequests = false,
-            List<int>? retryPolicy = null,
+            List<TimeSpan>? retryPolicy = null,
             bool useSystemMessages = false)
         {
             this.CompletionType = completionType;
             this.LogRequests = logRequests;
-            this.RetryPolicy = retryPolicy ?? new List<int> { 2000, 5000 };
+            this.RetryPolicy = retryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
             this.UseSystemMessages = useSystemMessages;
         }
     }
