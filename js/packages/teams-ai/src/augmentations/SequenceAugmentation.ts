@@ -17,6 +17,9 @@ import { Memory } from "../MemoryFork";
 import { ActionAugmentationSection } from "./ActionAugmentationSection";
 import { Schema } from "jsonschema";
 
+/**
+ * JSON schema for a `Plan`.
+ */
 export const PlanSchema: Schema = {
     "type": "object",
     "properties": {
@@ -51,6 +54,11 @@ export const PlanSchema: Schema = {
     "required": ["type", "commands"]
 }
 
+/**
+ * The 'sequence' augmentation.
+ * @remarks
+ * This augmentation allows the model to return a sequence of actions to perform.
+ */
 export class SequenceAugmentation implements Augmentation<Plan|undefined> {
     private readonly _section: ActionAugmentationSection;
     private readonly _planValidator: JSONResponseValidator<Plan> = new JSONResponseValidator(PlanSchema,  `Return a JSON object that uses the SAY command to say what you're thinking.`);
@@ -64,10 +72,22 @@ export class SequenceAugmentation implements Augmentation<Plan|undefined> {
         this._actionValidator = new ActionResponseValidator(actions, true);
     }
 
+    /**
+     * Creates an optional prompt section for the augmentation.
+     */
     public createPromptSection(): PromptSection|undefined {
         return this._section;
     }
 
+    /**
+     * Validates a response to a prompt.
+     * @param context Context for the current turn of conversation with the user.
+     * @param memory An interface for accessing state values.
+     * @param tokenizer Tokenizer to use for encoding and decoding text.
+     * @param response Response to validate.
+     * @param remaining_attempts Number of remaining attempts to validate the response.
+     * @returns A `Validation` object.
+     */
     public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<Plan|undefined>> {
         // Validate that we got a well-formed plan
         const validationResult = await this._planValidator.validateResponse(context, memory, tokenizer, response, remaining_attempts);
@@ -122,6 +142,13 @@ export class SequenceAugmentation implements Augmentation<Plan|undefined> {
         return validationResult;
     }
 
+    /**
+     * Creates a plan given validated response value.
+     * @param context Context for the current turn of conversation.
+     * @param memory An interface for accessing state variables.
+     * @param response The validated and transformed response for the prompt.
+     * @returns The created plan.
+     */
     public createPlanFromResponse(context: TurnContext, memory: Memory, response: PromptResponse<Plan|undefined>): Promise<Plan> {
         return Promise.resolve(response.message?.content!);
     }

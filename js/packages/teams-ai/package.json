@@ -22,31 +22,34 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
+        "@azure/msal-node": "^2.5.1",
         "axios": "^1.6.1",
         "botbuilder": "^4.21.0",
         "botbuilder-dialogs": "^4.21.0",
-        "json-colorizer": "^2.2.2",
         "gpt-3-encoder": "^1.1.4",
+        "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "openai": "^4.16.0",
+        "uuid": "^9.0.1",
         "yaml": "^2.3.4"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
     },
     "devDependencies": {
+        "@types/assert": "^1.5.8",
         "@types/jsonwebtoken": "^9.0.4",
+        "@types/mocha": "^10.0.3",
         "@types/node": "^20.9.0",
+        "@types/uuid": "^9.0.7",
         "eslint": "^8.53.0",
         "jsonwebtoken": "^9.0.2",
-        "typescript": "^5.2.2",
-        "@types/mocha": "^10.0.3",
-        "@types/assert": "^1.5.8",
         "mocha": "10.2.0",
         "nyc": "^15.1.0",
         "rimraf": "5.0.5",
         "shx": "^0.3.4",
-        "ts-mocha": "10.0.0"
+        "ts-mocha": "10.0.0",
+        "typescript": "^5.2.2"
     },
     "scripts": {
         "build": "tsc -b",

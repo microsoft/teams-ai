@@ -23,6 +23,9 @@ import { Memory } from "../MemoryFork";
 export class FunctionCallMessage extends PromptSectionBase {
     private _length: number = -1;
 
+    /**
+     * Name and arguments of the function to call.
+     */
     public readonly function_call: FunctionCall;
 
     /**
@@ -36,6 +39,9 @@ export class FunctionCallMessage extends PromptSectionBase {
         this.function_call = function_call;
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache response text and length
         if (this._length < 0) {

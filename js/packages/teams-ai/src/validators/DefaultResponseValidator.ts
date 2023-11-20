@@ -14,8 +14,9 @@ import { Memory } from "../MemoryFork";
 
 /**
  * Default response validator that always returns true.
+ * @template TValue Optional. Type of the validation value returned. Defaults to `any`.
  */
-export class DefaultResponseValidator<TContent = any> implements PromptResponseValidator<TContent> {
+export class DefaultResponseValidator<TValue = any> implements PromptResponseValidator<TValue> {
     /**
      * Validates a response to a prompt.
      * @param context Context for the current turn of conversation with the user.
@@ -25,7 +26,7 @@ export class DefaultResponseValidator<TContent = any> implements PromptResponseV
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TContent>> {
+    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>> {
         return Promise.resolve({
             type: 'Validation',
             valid: true

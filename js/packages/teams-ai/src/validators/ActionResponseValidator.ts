@@ -6,16 +6,23 @@ import { Tokenizer } from "../tokenizers";
 import { Message } from "../prompts";
 import { Memory } from "../MemoryFork";
 
+/**
+ * A validated action call.
+ */
 export interface ValidatedChatCompletionAction {
+    /**
+     * Name of the action to call.
+     */
     name: string;
+
+    /**
+     * Arguments to pass to the action.
+     */
     parameters: Record<string, any>;
 }
 
 /**
  * Validates action calls returned by the model.
- *
- * @remarks
- *
  */
 export class ActionResponseValidator implements PromptResponseValidator<ValidatedChatCompletionAction> {
     private readonly _actions: Map<string, ChatCompletionAction> = new Map();
