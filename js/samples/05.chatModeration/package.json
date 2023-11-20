@@ -20,8 +20,8 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~1.0.0-preview.1",
-        "axios": "^1.6.1",
-        "botbuilder": "^4.21.0",
+        "axios": "^1.6.2",
+        "botbuilder": "^4.21.1",
         "dotenv": "^16.3.1",
         "jsonwebtoken": "^9.0.2",
         "replace": "~1.2.0",
