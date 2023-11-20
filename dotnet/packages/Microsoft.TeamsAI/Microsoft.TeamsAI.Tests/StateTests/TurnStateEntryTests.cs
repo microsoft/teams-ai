@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             object temp = new();
             record.Add("key", temp);
             // Arrange
-            TurnStateEntry<Record> entry = new(record, new string("string"));
+            TurnStateEntry entry = new(record, new string("string"));
 
             // Act
             entry.Delete();
@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             record["key1"] = val;
 
             // Act
-            string hash = TurnStateEntry<Record>.ComputeHash(record);
+            string hash = TurnStateEntry.ComputeHash(record);
 
             // Assert
             Assert.Equal("{\"key1\":{}}", hash);
@@ -42,7 +42,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             Record map = new();
             map["key1"] = new object();
-            TurnStateEntry<Record> entry = new(map);
+            TurnStateEntry entry = new(map);
 
             // Act
             map["key1"] = new List<string>();
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             Record map = new();
             object val = new();
             map["key1"] = val;
-            TurnStateEntry<Record> entry = new(map);
+            TurnStateEntry entry = new(map);
 
             // Act
             map["key1"] = val;
@@ -72,10 +72,10 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         {
             // Arrange
             Record map = new();
-            TurnStateEntry<Record> entry = new(map);
+            TurnStateEntry entry = new(map);
 
             // Act
-            Record value = entry.Value;
+            Record value = entry.Value!;
 
             // Assert
             Assert.Equal(value, map);
@@ -86,11 +86,11 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         {
             // Arrange
             Record map = new();
-            TurnStateEntry<Record> entry = new(map);
+            TurnStateEntry entry = new(map);
             entry.Delete(); // Should be deleted
 
             // Act - accessing deleted entry value should undelete entry
-            Record _ = entry.Value;
+            Record _ = entry.Value!;
 
             // Assert
             Assert.False(entry.IsDeleted);
@@ -102,7 +102,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             // Arrange
             Record record = new();
             record.Set("key 1", "string 1");
-            TurnStateEntry<Record> entry = new(record);
+            TurnStateEntry entry = new(record);
             entry.Delete(); // Should be deleted
 
             // Act - accessing deleted entry value should undelete entry

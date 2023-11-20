@@ -22,7 +22,7 @@ namespace Microsoft.Teams.AI
     /// Additionally, it has built-in support for calling into the SDK's AI system and can be used to create
     /// bots that leverage Large Language Models (LLM) and other AI capabilities.
     /// </remarks>
-    /// <typeparam name="TState">Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
+    /// <typeparam name="TState">Type of the turnState. This allows for strongly typed access to the turn turnState.</typeparam>
     public class Application<TState> : IBot
         where TState : TurnState<Record, Record, TempState>, new()
     {
@@ -335,7 +335,7 @@ namespace Microsoft.Teams.AI
         /// <br/>
         /// For example, you can easily clear the current conversation anytime a user sends "/reset":
         /// <br/>
-        /// <code>application.OnMessage("/reset", (context, state, _) => ...);</code>
+        /// <code>application.OnMessage("/reset", (context, turnState, _) => ...);</code>
         /// </summary>
         /// <param name="text">Substring of the incoming message text.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
@@ -363,7 +363,7 @@ namespace Microsoft.Teams.AI
         /// <br/>
         /// For example, you can easily clear the current conversation anytime a user sends "/reset":
         /// <br/>
-        /// <code>application.OnMessage(new Regex("reset"), (context, state, _) => ...);</code>
+        /// <code>application.OnMessage(new Regex("reset"), (context, turnState, _) => ...);</code>
         /// </summary>
         /// <param name="textPattern">Regular expression to match against the text of an incoming message.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
@@ -811,20 +811,20 @@ namespace Microsoft.Teams.AI
                 }
 
                 // Load turn state
-                TState state = Options.TurnStateFactory!();
+                TState turnState = Options.TurnStateFactory!();
                 IStorage? storage = Options.Storage;
 
-                await state!.LoadStateAsync(storage, turnContext);
+                await turnState!.LoadStateAsync(storage, turnContext);
 
                 // Call before turn handler
                 foreach (TurnEventHandler<TState> beforeTurnHandler in _beforeTurn)
                 {
-                    if (!await beforeTurnHandler(turnContext, state, cancellationToken))
+                    if (!await beforeTurnHandler(turnContext, turnState, cancellationToken))
                     {
                         // Save turn state
                         // - This lets the bot keep track of why it ended the previous turn. It also
                         //   allows the dialog system to be used before the AI system is called.
-                        await state!.SaveStateAsync(storage, turnContext);
+                        await turnState!.SaveStateAsync(storage, turnContext);
 
                         return;
                     }
@@ -840,7 +840,7 @@ namespace Microsoft.Teams.AI
                     {
                         if (await route.Selector(turnContext, cancellationToken))
                         {
-                            await route.Handler(turnContext, state, cancellationToken);
+                            await route.Handler(turnContext, turnState, cancellationToken);
                             eventHandlerCalled = true;
                             break;
                         }
@@ -854,7 +854,7 @@ namespace Microsoft.Teams.AI
                     {
                         if (await route.Selector(turnContext, cancellationToken))
                         {
-                            await route.Handler(turnContext, state, cancellationToken);
+                            await route.Handler(turnContext, turnState, cancellationToken);
                             eventHandlerCalled = true;
                             break;
                         }
@@ -864,18 +864,18 @@ namespace Microsoft.Teams.AI
                 if (!eventHandlerCalled && _ai != null && ActivityTypes.Message.Equals(turnContext.Activity.Type, StringComparison.OrdinalIgnoreCase) && turnContext.Activity.Text != null)
                 {
                     // Begin a new chain of AI calls
-                    await _ai.RunAsync(turnContext, state);
+                    await _ai.RunAsync(turnContext, turnState);
                 }
 
                 // Call after turn handler
                 foreach (TurnEventHandler<TState> afterTurnHandler in _afterTurn)
                 {
-                    if (!await afterTurnHandler(turnContext, state, cancellationToken))
+                    if (!await afterTurnHandler(turnContext, turnState, cancellationToken))
                     {
                         return;
                     }
                 }
-                await state!.SaveStateAsync(storage, turnContext);
+                await turnState!.SaveStateAsync(storage, turnContext);
 
             }
             finally

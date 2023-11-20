@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI.State
         where TUserState : Record, new()
         where TTempState : TempState, new()
     {
-        private Dictionary<string, TurnStateEntry<Record>> _scopes = new();
+        private Dictionary<string, TurnStateEntry> _scopes = new();
         private bool _isLoaded = false;
         private Task<bool>? _loadingTask = Task.FromResult(false);
 
@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         /// <param name="scope">The specified currScope.</param>
         /// <returns>The state saved for the currScope.</returns>
-        public TurnStateEntry<Record> GetScope(string scope)
+        public TurnStateEntry GetScope(string scope)
         {
             return _scopes[scope];
         }
@@ -59,16 +59,16 @@ namespace Microsoft.Teams.AI.State
         {
             get
             {
-                TurnStateEntry<Record> scope = GetScope(CONVERSATION_SCOPE);
+                TurnStateEntry scope = GetScope(CONVERSATION_SCOPE);
                 Verify.ParamNotNull(scope);
                 return scope.Value as TConversationState;
             }
             set
             {
                 Verify.ParamNotNull(value);
-                TurnStateEntry<Record> scope = GetScope(CONVERSATION_SCOPE);
+                TurnStateEntry scope = GetScope(CONVERSATION_SCOPE);
                 Verify.ParamNotNull(scope);
-                scope.Replace(value);
+                scope.Replace(value!);
             }
         }
 
@@ -79,16 +79,16 @@ namespace Microsoft.Teams.AI.State
         {
             get
             {
-                TurnStateEntry<Record> scope = GetScope(USER_SCOPE);
+                TurnStateEntry scope = GetScope(USER_SCOPE);
                 Verify.ParamNotNull(scope);
                 return scope.Value as TUserState;
             }
             set
             {
                 Verify.ParamNotNull(value);
-                TurnStateEntry<Record> scope = GetScope(USER_SCOPE);
+                TurnStateEntry scope = GetScope(USER_SCOPE);
                 Verify.ParamNotNull(scope);
-                scope.Replace(value);
+                scope.Replace(value!);
             }
         }
 
@@ -99,16 +99,16 @@ namespace Microsoft.Teams.AI.State
         {
             get
             {
-                TurnStateEntry<Record> scope = GetScope(TEMP_SCOPE);
+                TurnStateEntry scope = GetScope(TEMP_SCOPE);
                 Verify.ParamNotNull(scope);
                 return scope.Value as TTempState;
             }
             set
             {
                 Verify.ParamNotNull(value);
-                TurnStateEntry<Record> scope = GetScope(TEMP_SCOPE);
+                TurnStateEntry scope = GetScope(TEMP_SCOPE);
                 Verify.ParamNotNull(scope);
-                scope.Replace(value);
+                scope.Replace(value!);
             }
         }
 
@@ -117,7 +117,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public void DeleteConversationState()
         {
-            TurnStateEntry<Record> scope = GetScope(CONVERSATION_SCOPE);
+            TurnStateEntry scope = GetScope(CONVERSATION_SCOPE);
             Verify.ParamNotNull(scope);
             scope.Delete();
         }
@@ -127,7 +127,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public void DeleteTempState()
         {
-            TurnStateEntry<Record> scope = GetScope(TEMP_SCOPE);
+            TurnStateEntry scope = GetScope(TEMP_SCOPE);
             Verify.ParamNotNull(scope);
             scope.Delete();
         }
@@ -137,7 +137,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public void DeleteUserState()
         {
-            TurnStateEntry<Record> scope = GetScope(USER_SCOPE);
+            TurnStateEntry scope = GetScope(USER_SCOPE);
             Verify.ParamNotNull(scope);
             scope.Delete();
         }
@@ -149,8 +149,8 @@ namespace Microsoft.Teams.AI.State
         /// If currScope is omitted, the value is deleted from the temporary currScope.</param>
         public void DeleteValue(string path)
         {
-            (TurnStateEntry<Record> scope, string name) = GetScopeAndName(path);
-            if (scope.Value.ContainsKey(name))
+            (TurnStateEntry scope, string name) = GetScopeAndName(path);
+            if (scope.Value!.ContainsKey(name))
             {
                 scope.Value.Remove(name);
             }
@@ -164,8 +164,8 @@ namespace Microsoft.Teams.AI.State
         /// <returns>True if the value exists, false otherwise.</returns>
         public bool HasValue(string path)
         {
-            (TurnStateEntry<Record> scope, string name) = GetScopeAndName(path);
-            return scope.Value.ContainsKey(name);
+            (TurnStateEntry scope, string name) = GetScopeAndName(path);
+            return scope.Value!.ContainsKey(name);
         }
 
         /// <summary>
@@ -176,8 +176,8 @@ namespace Microsoft.Teams.AI.State
         /// <returns>The value or undefined if not found.</returns>
         public object GetValue(string path)
         {
-            (TurnStateEntry<Record> scope, string name) = GetScopeAndName(path);
-            return scope.Value[name];
+            (TurnStateEntry scope, string name) = GetScopeAndName(path);
+            return scope.Value![name];
         }
 
         /// <summary>
@@ -188,8 +188,8 @@ namespace Microsoft.Teams.AI.State
         /// <param name="value">Value to assign.</param>
         public void SetValue(string path, object value)
         {
-            (TurnStateEntry<Record> scope, string name) = GetScopeAndName(path);
-            scope.Value[name] = value;
+            (TurnStateEntry scope, string name) = GetScopeAndName(path);
+            scope.Value![name] = value;
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Microsoft.Teams.AI.State
             }
 
             // Check for existing load operation
-            if (!(await this._loadingTask))
+            if (!(await this._loadingTask!))
             {
                 this._loadingTask = Task.Run(async () =>
                 {
@@ -245,12 +245,12 @@ namespace Microsoft.Teams.AI.State
                             {
                                 string storageKey = scopes[currScope.Key];
                                 object value = items[storageKey];
-                                this._scopes[currScope.Key] = new TurnStateEntry<Record>(value as Record, storageKey);
+                                this._scopes[currScope.Key] = new TurnStateEntry((value as Record)!, storageKey);
                             }
                         }
 
                         // Add the temp currScope
-                        this._scopes[TEMP_SCOPE] = new TurnStateEntry<Record>(new TempState());
+                        this._scopes[TEMP_SCOPE] = new TurnStateEntry(new TempState());
 
                         // Clear loading task
                         this._isLoaded = true;
@@ -276,7 +276,7 @@ namespace Microsoft.Teams.AI.State
         public async Task SaveStateAsync(IStorage? storage, ITurnContext turnContext)
         {
             // Check for existing load operation
-            if (!this._isLoaded && this._loadingTask.Result)
+            if (!this._isLoaded && this._loadingTask!.Result)
             {
                 // Wait for load to finish
                 await this._loadingTask;
@@ -292,13 +292,13 @@ namespace Microsoft.Teams.AI.State
             Record changes = new();
             List<string> deletions = new();
 
-            foreach (KeyValuePair<string, TurnStateEntry<Record>> scope in this._scopes)
+            foreach (KeyValuePair<string, TurnStateEntry> scope in this._scopes)
             {
                 if (!this._scopes.ContainsKey(scope.Key))
                 {
                     continue;
                 }
-                TurnStateEntry<Record> entry = this._scopes[scope.Key];
+                TurnStateEntry entry = this._scopes[scope.Key];
                 if (entry.StorageKey != null)
                 {
                     if (entry.IsDeleted)
@@ -320,7 +320,7 @@ namespace Microsoft.Teams.AI.State
                         {
                             changes = new();
                         }
-                        changes[entry.StorageKey] = entry.Value;
+                        changes[entry.StorageKey] = entry.Value!;
                     }
                 }
             }
@@ -377,7 +377,7 @@ namespace Microsoft.Teams.AI.State
             return keys;
         }
 
-        private (TurnStateEntry<Record>, string) GetScopeAndName(string path)
+        private (TurnStateEntry, string) GetScopeAndName(string path)
         {
             // Get variable currScope and name
             string[] parts = path.Split('.');
@@ -391,7 +391,7 @@ namespace Microsoft.Teams.AI.State
             }
 
             // Validate currScope
-            TurnStateEntry<Record> scope = GetScope(parts[0]);
+            TurnStateEntry scope = GetScope(parts[0]);
             if (scope == null)
             {
                 throw new ArgumentNullException($"Invalid state currScope: ${parts[0]}");

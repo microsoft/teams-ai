@@ -8,11 +8,9 @@ namespace Microsoft.Teams.AI.State
     /// <summary>
     /// Accessor class for managing an individual state scope.
     /// </summary>
-    /// <typeparam name="TValue">Strongly typed value of the state scope.</typeparam>
-    public class TurnStateEntry<TValue> : IReadOnlyEntry<TValue>
-        where TValue : class, new()
+    public class TurnStateEntry
     {
-        private TValue _value;
+        private Record _value;
         private string _hash;
         private static readonly JsonSerializerOptions _serializerOptions = new() { MaxDepth = 64 };
 
@@ -21,7 +19,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         /// <param name="value">Value to initialize the state scope with. The default is an {} object.</param>
         /// <param name="storageKey">Storage key to use when persisting the state scope.</param>
-        public TurnStateEntry(TValue value, string? storageKey = null)
+        public TurnStateEntry(Record value, string? storageKey = null)
         {
             Verify.ParamNotNull(value);
             _value = value;
@@ -39,7 +37,7 @@ namespace Microsoft.Teams.AI.State
         public bool IsDeleted { get; private set; } = false;
 
         /// <inheritdoc />
-        public TValue? Value
+        public Record? Value
         {
             get
             {
@@ -68,7 +66,7 @@ namespace Microsoft.Teams.AI.State
         /// Replaces the state scope with a new value.
         /// </summary>
         /// <param name="value">New value to replace the state scope with.</param>
-        public void Replace(TValue value)
+        public void Replace(Record value)
         {
             Verify.ParamNotNull(value);
             _value = value;
