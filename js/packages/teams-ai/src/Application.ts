@@ -786,7 +786,12 @@ export class Application<TState extends TurnState = TurnState> {
         return this;
     }
 
-    public teamsReadReceipt(handler: (context: TurnContext, state: TState, receiptInfo: ReadReceiptInfo) => Promise<void>): this {
+    /**
+     * Adds a handler for Teams' readReceiptInfo event
+     * @param {(context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<boolean>} handler Function to call when the event is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public teamsReadReceipt(handler: (context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<void>): this {
         const selector = (context: TurnContext): Promise<boolean> => {
             return Promise.resolve(context.activity.type === ActivityTypes.Event && context.activity.channelId === 'msteams' && context.activity.name === 'application/vnd.microsoft/readReceipt');
         };
@@ -800,7 +805,6 @@ export class Application<TState extends TurnState = TurnState> {
 
         return this;
      }
-
 
     /**
      * Calls the given event handlers with the given context and state.
