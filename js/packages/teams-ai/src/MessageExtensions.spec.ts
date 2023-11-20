@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { Application, Query } from './Application';
 import { createTestInvoke } from './internals/TestUtilities';
-import { MessageExtensions, MessageExtensionInvokeNames } from './MessageExtensions';
+import { MessageExtensions, MessageExtensionsInvokeNames } from './MessageExtensions';
 import {
     Channels,
     INVOKE_RESPONSE_KEY,
@@ -21,7 +21,8 @@ const {
     QUERY_SETTING_URL,
     CONFIGURE_SETTINGS,
     QUERY_CARD_BUTTON_CLICKED
-} = MessageExtensionInvokeNames;
+} = MessageExtensionsInvokeNames;
+
 describe('MessageExtensions', () => {
     const adapter = new TestAdapter();
     let mockApp: Application;

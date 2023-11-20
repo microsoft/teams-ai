@@ -22,7 +22,10 @@ import {
 import { Application, RouteSelector, Query } from './Application';
 import { TurnState } from './TurnState';
 
-export enum MessageExtensionInvokeNames {
+/**
+ * Names of the invoke activities for Message Extensions.
+ */
+export enum MessageExtensionsInvokeNames {
     /**
      * Name of the invoke activity for anonymous link unfurling.
      */
@@ -86,7 +89,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler for a command that performs anonymous link unfurling.
-     * @summary
+     * @remarks
      * The `composeExtension/anonymousQueryLink` INVOKE activity does not contain any sort of command ID,
      * so only a single select item handler can be registered.
      * For more information visit https://learn.microsoft.com/microsoftteams/platform/messaging-extensions/how-to/link-unfurling?#enable-zero-install-link-unfurling
@@ -99,10 +102,11 @@ export class MessageExtensions<TState extends TurnState> {
     public anonymousQueryLink(
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
+        const { ANONYMOUS_QUERY_LINK_INVOKE } = MessageExtensionsInvokeNames;
         const selector = (context: TurnContext) =>
             Promise.resolve(
                 context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === MessageExtensionInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE
+                    context?.activity.name === ANONYMOUS_QUERY_LINK_INVOKE
             );
         this._app.addRoute(
             selector,
@@ -130,7 +134,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the 'edit' action of a message that's being previewed by the
      * user prior to sending.
-     * @summary
+     * @remarks
      * This handler is called when the user clicks the 'Edit' button on a message that's being
      * previewed prior to insertion into the current chat. The handler should return a new
      * view that allows the user to edit the message.
@@ -149,15 +153,16 @@ export class MessageExtensions<TState extends TurnState> {
             previewActivity: Partial<Activity>
         ) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>
     ): Application<TState> {
+        const { SUBMIT_ACTION_INVOKE } = MessageExtensionsInvokeNames;
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, MessageExtensionInvokeNames.SUBMIT_ACTION_INVOKE, 'edit');
+            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE, 'edit');
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== MessageExtensionInvokeNames.SUBMIT_ACTION_INVOKE ||
+                        context?.activity?.name !== SUBMIT_ACTION_INVOKE ||
                         context?.activity?.value?.botMessagePreviewAction !== 'edit'
                     ) {
                         throw new Error(
@@ -178,7 +183,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler to process the 'send' action of a message that's being previewed by the
      * user prior to sending.
-     * @summary
+     * @remarks
      * This handler is called when the user clicks the 'Send' button on a message that's being
      * previewed prior to insertion into the current chat. The handler should complete the flow
      * by sending the message to the current chat.
@@ -193,15 +198,15 @@ export class MessageExtensions<TState extends TurnState> {
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, previewActivity: Partial<Activity>) => Promise<void>
     ): Application<TState> {
+        const { SUBMIT_ACTION_INVOKE } = MessageExtensionsInvokeNames;
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, MessageExtensionInvokeNames.SUBMIT_ACTION_INVOKE, 'send');
+            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE, 'send');
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== MessageExtensionInvokeNames.SUBMIT_ACTION_INVOKE ||
+                        context?.activity?.type !== ActivityTypes.Invoke || SUBMIT_ACTION_INVOKE ||
                         context?.activity?.value?.botMessagePreviewAction !== 'send'
                     ) {
                         throw new Error(
@@ -228,7 +233,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch task for an Action based message extension.
-     * @summary
+     * @remarks
      * Handlers should response with either an initial TaskInfo object or a string containing
      * a message to display to the user.
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
@@ -241,15 +246,16 @@ export class MessageExtensions<TState extends TurnState> {
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>
     ): Application<TState> {
+        const { FETCH_TASK_INVOKE } = MessageExtensionsInvokeNames;
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, MessageExtensionInvokeNames.FETCH_TASK_INVOKE);
+            const selector = createTaskSelector(cid, FETCH_TASK_INVOKE);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== MessageExtensionInvokeNames.FETCH_TASK_INVOKE
+                        context?.activity?.name !== FETCH_TASK_INVOKE
                     ) {
                         throw new Error(
                             `Unexpected MessageExtensions.fetchTask() triggered for activity type: ${context?.activity?.type}`
@@ -294,7 +300,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements a Search based Message Extension.
-     * @summary
+     * @remarks
      * This handler is called when the user submits a query to a Search based Message Extension.
      * The handler should return a MessagingExtensionResult containing the results of the query.
      * @param {string | RegExp | RouteSelector | string[] | RegExp[] | RouteSelector[]} commandId - ID of the command(s) to register the handler for.
@@ -309,15 +315,16 @@ export class MessageExtensions<TState extends TurnState> {
         commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (context: TurnContext, state: TState, query: Query<TParams>) => Promise<MessagingExtensionResult>
     ): Application<TState> {
+        const { QUERY_INVOKE } = MessageExtensionsInvokeNames;
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, MessageExtensionInvokeNames.QUERY_INVOKE);
+            const selector = createTaskSelector(cid, QUERY_INVOKE);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== MessageExtensionInvokeNames.QUERY_INVOKE
+                        context?.activity?.name !== QUERY_INVOKE
                     ) {
                         throw new Error(
                             `Unexpected MessageExtensions.query() triggered for activity type: ${context?.activity?.type}`
@@ -371,9 +378,10 @@ export class MessageExtensions<TState extends TurnState> {
     public queryLink(
         handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>
     ): Application<TState> {
+        const { QUERY_LINK_INVOKE } = MessageExtensionsInvokeNames;
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessageExtensionInvokeNames.QUERY_LINK_INVOKE
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_LINK_INVOKE
             );
 
         this._app.addRoute(
@@ -403,7 +411,7 @@ export class MessageExtensions<TState extends TurnState> {
     /**
      * Registers a handler that implements the logic to handle the tap actions for items returned
      * by a Search based message extension.
-     * @summary
+     * @remarks
      * The `composeExtension/selectItem` INVOKE activity does not contain any sort of command ID,
      * so only a single select item handler can be registered. Developers will need to include a
      * type name of some sort in the preview item they return if they need to support multiple
@@ -418,10 +426,11 @@ export class MessageExtensions<TState extends TurnState> {
     public selectItem<TItem extends Record<string, any> = Record<string, any>>(
         handler: (context: TurnContext, state: TState, item: TItem) => Promise<MessagingExtensionResult>
     ): Application<TState> {
+        const { SELECT_ITEM_INVOKE } = MessageExtensionsInvokeNames;
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessageExtensionInvokeNames.SELECT_ITEM_INVOKE
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === SELECT_ITEM_INVOKE
             );
 
         // Add route
@@ -467,15 +476,16 @@ export class MessageExtensions<TState extends TurnState> {
             data: TData
         ) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>
     ): Application<TState> {
+        const { SUBMIT_ACTION_INVOKE } = MessageExtensionsInvokeNames;
         (Array.isArray(commandId) ? commandId : [commandId]).forEach((cid) => {
-            const selector = createTaskSelector(cid, MessageExtensionInvokeNames.SUBMIT_ACTION_INVOKE);
+            const selector = createTaskSelector(cid, SUBMIT_ACTION_INVOKE);
             this._app.addRoute(
                 selector,
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
                         context?.activity?.type !== ActivityTypes.Invoke ||
-                        context?.activity?.name !== MessageExtensionInvokeNames.SUBMIT_ACTION_INVOKE
+                        context?.activity?.name !== SUBMIT_ACTION_INVOKE
                     ) {
                         throw new Error(
                             `Unexpected MessageExtensions.submitAction() triggered for activity type: ${context?.activity?.type}`
@@ -545,7 +555,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that invokes the fetch of the configuration settings for a Message Extension.
-     @summary
+     @remarks
      * The `composeExtension/querySettingUrl` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
      * @param {(context: TurnContext, state: TState) => Promise<MessagingExtensionResult>} handler Function defined by the developer to call when the command is received.
      * @param {TurnContext} handler.context Context for the current turn of conversation with the user.
@@ -555,11 +565,11 @@ export class MessageExtensions<TState extends TurnState> {
     public queryUrlSetting(
         handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult>
     ): Application<TState> {
+        const { QUERY_SETTING_URL } = MessageExtensionsInvokeNames;
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === MessageExtensionInvokeNames.QUERY_SETTING_URL
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_SETTING_URL
             );
 
         // Add route
@@ -586,7 +596,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements the logic to invoke configuring Message Extension settings
-     * @summary
+     * @remarks
      * The `composeExtension/setting` INVOKE activity does not contain a command ID, so only a single select item handler can be registered.
      * @template TData Message Extension settings to be configured.
      * @param {(context: TurnContext, state: TState, settings: TData) => Promise<void>} handler Function defined by the developer to call when the command is received.
@@ -598,11 +608,11 @@ export class MessageExtensions<TState extends TurnState> {
     public configureSettings<TData extends Record<string, any>>(
         handler: (context: TurnContext, state: TState, settings: TData) => Promise<void>
     ): Application<TState> {
+        const { CONFIGURE_SETTINGS } = MessageExtensionsInvokeNames;
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke &&
-                    context?.activity.name === MessageExtensionInvokeNames.CONFIGURE_SETTINGS
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === CONFIGURE_SETTINGS
             );
 
         // Add route
@@ -627,7 +637,7 @@ export class MessageExtensions<TState extends TurnState> {
 
     /**
      * Registers a handler that implements the logic when a user has clicked on a button in a Message Extension card.
-     * @summary
+     * @remarks
      * The `composeExtension/onCardButtonClicked` INVOKE activity does not contain any sort of command ID,
      * so only a single select item handler can be registered. Developers will need to include a
      * type name of some sort in the preview item they return if they need to support multiple select item handlers.
@@ -641,10 +651,11 @@ export class MessageExtensions<TState extends TurnState> {
     public handleOnButtonClicked<TData extends Record<string, any>>(
         handler: (context: TurnContext, state: TState, data: TData) => Promise<void>
     ): Application<TState> {
+        const { QUERY_CARD_BUTTON_CLICKED } = MessageExtensionsInvokeNames;
         // Define static route selector
         const selector = (context: TurnContext) =>
             Promise.resolve(
-                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === MessageExtensionInvokeNames.QUERY_CARD_BUTTON_CLICKED
+                context?.activity?.type == ActivityTypes.Invoke && context?.activity.name === QUERY_CARD_BUTTON_CLICKED
             );
 
         // Add route
@@ -669,6 +680,7 @@ export class MessageExtensions<TState extends TurnState> {
 }
 
 /**
+ * @private
  * Creates a route selector function for a task module command.
  * @param {string | RegExp | RouteSelector} commandId The ID of the command to register the handler for.
  * @param {string} invokeName The name of the invoke activity.
@@ -711,6 +723,7 @@ function createTaskSelector(
 }
 
 /**
+ * @private
  * Checks if the bot message preview action matches the specified action.
  * @param {Activity} activity The activity to check.
  * @param {'edit' | 'send'} botMessagePreviewAction The bot message preview action to match.

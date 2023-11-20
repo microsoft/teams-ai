@@ -58,7 +58,7 @@ export interface Query<TParams extends Record<string, any>> {
 export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. Bot adapter being used.
-     * @summary
+     * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
      */
@@ -71,7 +71,7 @@ export interface ApplicationOptions<TState extends TurnState> {
 
     /**
      * Optional. Application ID of the bot.
-     * @summary
+     * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
      */
@@ -113,7 +113,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. If true, the bot supports long running messages that can take longer then the 10 - 15
      * second timeout imposed by most channels. Defaults to false.
-     * @summary
+     * @remarks
      * This works by immediately converting the incoming request to a proactive conversation. Care should
      * be used for bots that operate in a shared hosting environment. The incoming request is immediately
      * completed and many shared hosting environments will mark the bot's process as idle and shut it down.
@@ -145,6 +145,9 @@ export type ConversationUpdateEvents =
     | 'topicName'
     | 'historyDisclosed';
 
+/**
+ * Message related events.
+ */
 export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'editMessage';
 
 /**
@@ -175,7 +178,7 @@ export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 
 /**
  * Turn event types.
- * @summary
+ * @remarks
  * The `beforeTurn` event is triggered before the turn is processed. This allows for the turn state to be
  * modified before the turn is processed. Returning false from the event handler will prevent the turn from
  * being processed.
@@ -188,7 +191,7 @@ export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
 /**
  * Application class for routing and processing incoming requests.
- * @summary
+ * @remarks
  * The Application object replaces the traditional ActivityHandler that a bot would use. It supports
  * a simpler fluent style of authoring bots versus the inheritance based approach used by the
  * ActivityHandler class.
@@ -283,7 +286,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Fluent interface for accessing AI specific features.
-     * @summary
+     * @remarks
      * This property is only available if the Application was configured with `ai` options. An
      * exception will be thrown if you attempt to access it otherwise.
      * @returns {AI<TState>} The AI instance.
@@ -340,7 +343,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Adds a new route to the application.
-     * @summary
+     * @remarks
      * Developers won't typically need to call this method directly as it's used internally by all
      * of the fluent interfaces to register routes for their specific activity types.
      *
@@ -422,7 +425,7 @@ export class Application<TState extends TurnState = TurnState> {
     /**
      * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
-     * @summary
+     * @remarks
      * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
@@ -471,7 +474,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Handles incoming messages with a given keyword.
-     * @summary
+     * @remarks
      * This method provides a simple way to have a bot respond anytime a user sends your bot a
      * message with a specific word or phrase.
      *
@@ -580,7 +583,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Dispatches an incoming activity to a handler registered with the application.
-     * @summary
+     * @remarks
      * This method should be called from your bot's "turn handler" (its primary message handler)
      *
      * ```JavaScript
@@ -707,7 +710,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Sends a proactive activity to an existing conversation the bot is a member of.
-     * @summary
+     * @remarks
      * This method provides a simple way to send a proactive message to a conversation the bot is a member of.
      *
      * Use of the method requires you configure the Application with the `adapter` and `botAppId`
@@ -752,7 +755,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Manually start a timer to periodically send "typing" activities.
-     * @summary
+     * @remarks
      * The timer waits 1000ms to send its initial "typing" activity and then send an additional
      * "typing" activity every 1000ms. The timer will automatically end once an outgoing activity
      * has been sent. If the timer is already running or the current activity, is not a "message"
@@ -805,7 +808,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Manually stop the typing timer.
-     * @summary
+     * @remarks
      * If the timer isn't running nothing happens.
      */
     public stopTypingTimer(): void {
@@ -817,7 +820,7 @@ export class Application<TState extends TurnState = TurnState> {
 
     /**
      * Registers a turn event handler.
-     * @summary
+     * @remarks
      * Turn events let you do something before or after a turn is run. Returning false from
      * `beforeTurn` lets you prevent the turn from running and returning false from `afterTurn`
      * lets you prevent the bots state from being saved.

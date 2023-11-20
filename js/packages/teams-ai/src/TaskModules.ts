@@ -52,7 +52,7 @@ export type ConfigResponseConfig = BotConfigAuth | TaskModuleResponse;
 export interface TaskModulesOptions {
     /**
      * Data field to use to identify the verb of the handler to trigger.
-     * @summary
+     * @remarks
      * When a task module is triggered, the field name specified here will be used to determine
      * the name of the verb for the handler to route the request to.
      *
@@ -78,7 +78,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch of the task module.
-     * @summary
+     * @remarks
      * Handlers should respond with either an initial TaskInfo object or a string containing
      * a message to display to the user.
      * @template TData Optional. Type of the data object being passed to the handler.
@@ -150,7 +150,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the submission of a task module.
-     * @summary
+     * @remarks
      * Handlers should respond with another TaskInfo object, message string, or `null` to indicate
      * the task is completed.
      * @template TData Optional. Type of the data object being passed to the handler.
@@ -337,7 +337,7 @@ export class TaskModules<TState extends TurnState> {
  * @param {string} invokeName - The name of the invoke action.
  * @returns {RouteSelector} The route selector function.
  * @private
- * @summary
+ * @remarks
  * This function is used to create a route selector function for a given verb, filter field, and invoke name.
  * The route selector function is used to match incoming requests to the appropriate handler function.
  */
