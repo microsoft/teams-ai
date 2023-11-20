@@ -7,8 +7,7 @@
         "**/coverage/**",
         "**/*.d.ts",
         "**/*.spec.ts",
-        "packages/teams-ai/src/index.ts",
-        "packages/teams-ai/src/**/index.ts"
+        "packages/**/src/index.ts"
     ],
     "reporter": ["html", "text"],
     "all": true,
