@@ -16,6 +16,8 @@ import {
     Storage,
     TurnContext
 } from 'botbuilder';
+import { ReadReceiptInfo } from 'botframework-connector';
+
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { MessageExtensions } from './MessageExtensions';
@@ -783,6 +785,22 @@ export class Application<TState extends TurnState = TurnState> {
         });
         return this;
     }
+
+    public teamsReadReceipt(handler: (context: TurnContext, state: TState, receiptInfo: ReadReceiptInfo) => Promise<void>): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(context.activity.type === ActivityTypes.Event && context.activity.channelId === 'msteams' && context.activity.name === 'application/vnd.microsoft/readReceipt');
+        };
+
+        const handlerWrapper = (context: TurnContext, state: TState): Promise<void> => {
+            const readReceiptInfo = context.activity.value as ReadReceiptInfo;
+            return handler(context, state, readReceiptInfo);
+        }
+
+        this.addRoute(selector, handlerWrapper);
+
+        return this;
+     }
+
 
     /**
      * Calls the given event handlers with the given context and state.
