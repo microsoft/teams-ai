@@ -46,7 +46,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
 
             if (this._length > 0)
             {
-                ChatMessage message = new(ChatRole.Assistant, "");
+                ChatMessage message = new(ChatRole.Assistant);
                 message.FunctionCall = this.FunctionCall;
                 messages.Add(message);
             }

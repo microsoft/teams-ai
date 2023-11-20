@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using Microsoft.Teams.AI.AI.Augmentations;
+using Microsoft.Teams.AI.AI.Models;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -22,7 +24,28 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Configuration settings for the prompt template.
         /// </summary>
-        public PromptTemplateConfiguration Configuration { get; set; }
+        public PromptTemplateConfiguration Configuration { get; set; } = new();
+
+        /// <summary>
+        /// Optional list of actions the model may generate JSON inputs for.
+        /// </summary>
+        public List<ChatCompletionAction> Actions { get; set; } = new();
+
+        /// <summary>
+        /// Optional augmentation for the prompt template.
+        /// </summary>
+        public IAugmentation? Augmentation { get; set; }
+
+        /// <summary>
+        /// Creates an instance of `PromptTemplate`
+        /// </summary>
+        /// <param name="name">Name of the prompt template.</param>
+        /// <param name="prompt">Prompt that should be rendered</param>
+        public PromptTemplate(string name, Prompt prompt)
+        {
+            this.Name = name;
+            this.Prompt = prompt;
+        }
 
         /// <summary>
         /// Creates an instance of `PromptTemplate`
@@ -240,32 +263,6 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 [JsonPropertyOrder(2)]
                 [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
                 public Dictionary<string, int> DataSources { get; set; } = new();
-
-                /// <summary>
-                /// Augmentation Types
-                /// </summary>
-                public enum AugmentationType
-                {
-                    /// <summary>
-                    /// None
-                    /// </summary>
-                    None,
-
-                    /// <summary>
-                    /// Functions
-                    /// </summary>
-                    Functions,
-
-                    /// <summary>
-                    /// Sequence
-                    /// </summary>
-                    Sequence,
-
-                    /// <summary>
-                    /// Monologue
-                    /// </summary>
-                    Monologue
-                }
             }
         }
     }

@@ -1,13 +1,12 @@
-﻿
-namespace Microsoft.Teams.AI.AI
+﻿namespace Microsoft.Teams.AI.AI.Planner
 {
     /// <summary>
-    /// Options for the AI system.
+    /// Options for the OpenAI Planner.
     /// </summary>
-    public sealed class AIHistoryOptions
+    public sealed class OpenAIPlannerHistoryOptions
     {
         /// <summary>
-        /// Whether the AI system should track conversation history.
+        /// Whether the OpenAI Planner should track conversation history.
         /// </summary>
         /// <remarks>
         /// Defaults to true

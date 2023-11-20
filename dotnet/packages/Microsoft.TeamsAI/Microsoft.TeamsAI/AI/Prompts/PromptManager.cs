@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.AI.Augmentations;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
@@ -119,7 +120,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
             if (template == null)
             {
-                template = this._LoadPromptTemplateFromFile(name);
+                template = this.AppendAugmentations(this._LoadPromptTemplateFromFile(name));
 
                 if (template.Configuration.Completion.IncludeHistory)
                 {
@@ -138,6 +139,49 @@ namespace Microsoft.Teams.AI.AI.Prompts
                 }
 
                 this._prompts[name] = template;
+            }
+
+            return template;
+        }
+
+        private PromptTemplate AppendAugmentations(PromptTemplate template)
+        {
+            Dictionary<string, int> dataSources = template.Configuration.Augmentation.DataSources;
+
+            foreach (string name in dataSources.Keys)
+            {
+                IDataSource? dataSource = this.GetDataSource(name);
+
+                if (dataSource == null)
+                {
+                    throw new ApplicationException($"DataSource '{name}' not found for prompt '{template.Name}'.");
+                }
+
+                int tokens = Math.Max(dataSources[name], 2);
+                template.Prompt.AddSection(new DataSourceSection(dataSource, tokens));
+            }
+
+            switch (template.Configuration.Augmentation.Type)
+            {
+                case AugmentationType.Functions:
+                    template.Augmentation = new FunctionsAugmentation();
+                    break;
+                case AugmentationType.Monologue:
+                    template.Augmentation = new MonologueAugmentation(template.Actions);
+                    break;
+                case AugmentationType.Sequence:
+                    template.Augmentation = new SequenceAugmentation(template.Actions);
+                    break;
+            }
+
+            if (template.Augmentation != null)
+            {
+                PromptSection? section = template.Augmentation.CreatePromptSection();
+
+                if (section != null)
+                {
+                    template.Prompt.AddSection(section);
+                }
             }
 
             return template;

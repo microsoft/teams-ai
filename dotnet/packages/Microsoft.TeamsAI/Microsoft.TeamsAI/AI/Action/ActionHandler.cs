@@ -25,14 +25,11 @@ namespace Microsoft.Teams.AI.AI.Action
             _containerInstance = containerInstance;
 
             _returnType = _method.ReturnType;
-            if (_returnType != typeof(void)
-                && _returnType != typeof(bool)
-                && _returnType != typeof(Task)
-                && _returnType != typeof(Task<bool>)
-                && _returnType != typeof(ValueTask)
-                && _returnType != typeof(ValueTask<bool>))
+            if (_returnType != typeof(string)
+                && _returnType != typeof(Task<string>)
+                && _returnType != typeof(ValueTask<string>))
             {
-                throw new InvalidOperationException($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
+                throw new InvalidOperationException($"Action method return type should be one of [string, Task<string>, ValueTask<string>]. Method name: {_method.Name}.");
             }
 
             ParameterInfo[] parameters = _method.GetParameters();
@@ -57,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Action
             _parameterTypes = parameterTypes.ToArray();
         }
 
-        public async Task<bool> PerformAction(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null)
+        public async Task<string> PerformAction(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null)
         {
             List<object?> parameters = new();
             foreach (Tuple<ActionParameterType, Type> parameterType in _parameterTypes)
@@ -72,7 +69,7 @@ namespace Microsoft.Teams.AI.AI.Action
                         CheckParameterAssignment(_method, turnState.GetType(), parameterType.Item2!);
                         parameters.Add(turnState);
                         break;
-                    case ActionParameterType.Entities:
+                    case ActionParameterType.Parameters:
                         if (entities != null)
                         {
                             CheckParameterAssignment(_method, entities.GetType(), parameterType.Item2!);
@@ -96,35 +93,21 @@ namespace Microsoft.Teams.AI.AI.Action
             try
             {
                 object result = _method.Invoke(_containerInstance, parameters.ToArray());
-                if (_returnType == typeof(void))
+                if (_returnType == typeof(string))
                 {
-                    return true;
+                    return (string)result;
                 }
-                else if (_returnType == typeof(bool))
+                else if (_returnType == typeof(Task<string>))
                 {
-                    return (bool)result;
+                    return await ((Task<string>)result).ConfigureAwait(false);
                 }
-                else if (_returnType == typeof(Task))
+                else if (_returnType == typeof(ValueTask<string>))
                 {
-                    await ((Task)result).ConfigureAwait(false);
-                    return true;
-                }
-                else if (_returnType == typeof(Task<bool>))
-                {
-                    return await ((Task<bool>)result).ConfigureAwait(false);
-                }
-                else if (_returnType == typeof(ValueTask))
-                {
-                    await ((ValueTask)result).ConfigureAwait(false);
-                    return true;
-                }
-                else if (_returnType == typeof(ValueTask<bool>))
-                {
-                    return await ((ValueTask<bool>)result).ConfigureAwait(false);
+                    return await ((ValueTask<string>)result).ConfigureAwait(false);
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Action method return type should be one of [void, bool, Task, Task<bool>, ValueTask, ValueTask<bool>]. Method name: {_method.Name}.");
+                    throw new InvalidOperationException($"Action method return type should be one of [string, Task<string>, ValueTask<string>]. Method name: {_method.Name}.");
                 }
             }
             catch (TargetInvocationException ex)

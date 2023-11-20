@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "")
+                Message = new(ChatRole.Assistant)
                 {
                     FunctionCall = new("test", "{ \"foo\": \"bar\" }")
                 }
@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "")
+                Message = new(ChatRole.Assistant)
                 {
                     FunctionCall = new("test", "{ \"hello\": \"world\" }")
                 }
@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "")
+                Message = new(ChatRole.Assistant)
                 {
                     FunctionCall = new("test", "{ \"foo\": 1 }")
                 }
@@ -143,7 +143,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "")
+                Message = new(ChatRole.Assistant)
                 {
                     FunctionCall = new("empty", "{ \"foo\": \"bar\" }")
                 }
@@ -179,7 +179,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             PromptResponse promptResponse = new()
             {
                 Status = PromptResponseStatus.Success,
-                Message = new(ChatRole.Assistant, "test")
+                Message = new(ChatRole.Assistant) { Content = "test" }
             };
 
             var res = await validator.ValidateResponseAsync(context.Object, memory, tokenizer, promptResponse, 0);

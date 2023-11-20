@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.Utilities.JsonConverters
 
                 writer.WritePropertyName(_entitiesPropertyName);
 
-                JsonSerializer.Serialize(writer, ((PredictedDoCommand)value).Entities, options);
+                JsonSerializer.Serialize(writer, ((PredictedDoCommand)value).Parameters, options);
             }
             else if (command == typeof(PredictedSayCommand))
             {

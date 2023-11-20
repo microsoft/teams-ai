@@ -150,7 +150,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                 {
                     int delta = budget - len;
                     string truncated = tokenizer.Decode(encoded.Take(delta).ToList());
-                    output.Add(new(message.Role, truncated));
+                    output.Add(new(message.Role) { Content = truncated });
                     len += delta;
                     break;
                 }
@@ -169,7 +169,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <returns>the parsed message text</returns>
         protected string GetMessageText(ChatMessage message)
         {
-            string text = message.Content;
+            string text = message.Content ?? "";
 
             if (message.FunctionCall != null)
             {
