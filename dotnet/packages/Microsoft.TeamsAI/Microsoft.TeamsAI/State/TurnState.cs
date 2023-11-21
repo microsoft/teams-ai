@@ -310,7 +310,7 @@ namespace Microsoft.Teams.AI.State
                         }
                         else
                         {
-                            deletions = [entry.StorageKey];
+                            deletions = new() { entry.StorageKey };
                         }
                     }
                     else if (entry.HasChanged)
