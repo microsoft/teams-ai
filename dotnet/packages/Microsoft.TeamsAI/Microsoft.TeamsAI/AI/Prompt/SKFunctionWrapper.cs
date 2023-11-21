@@ -6,7 +6,7 @@ using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompt
 {
-    internal sealed class SKFunctionWrapper<TState> : ISKFunction where TState : ITurnState<StateBase, StateBase, TempState>
+    internal sealed class SKFunctionWrapper<TState> : ISKFunction where TState : ITurnState<Record, Record, TempState>
     {
         // TODO: This is a hack around to get the default skill name from SK's internal implementation. We need to fix this.
         public const string DefaultSkill = "_GLOBAL_FUNCTIONS_";

@@ -2,11 +2,15 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planner;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Reflection;
+using Plan = Microsoft.Teams.AI.AI.Planner.Plan;
+using Record = Microsoft.Teams.AI.State.Record;
+using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -62,20 +66,26 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void Test_RunAsync()
         {
             // Arrange
-            var planner = new TestPlanner();
-            var moderator = new TestModerator();
-            var options = new AIOptions<TestTurnState>(planner, moderator);
-            var ai = new AI<TestTurnState>(options);
-            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState()
-            {
-                TempStateEntry = new TurnStateEntry<TempState>(new())
-            };
+            var planner = new TestTurnStatePlanner<TurnState>();
+            var moderator = new TestTurnStateModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, moderator);
+            var ai = new AI<TurnState<Record, Record, TempState>>(options);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var actions = new TestActions();
             ai.ImportActions(actions);
 
             // Act
-            var result = await ai.RunAsync(turnContext, turnState);
+            var result = await ai.RunAsync(turnContextMock, turnState.Result);
 
             // Assert
             Assert.True(result);
@@ -88,22 +98,28 @@ namespace Microsoft.Teams.AI.Tests.AITests
         [Fact]
         public async void Test_RunAsync_ExceedStepLimit()
         {
-            // Arrange
-            var planner = new TestPlanner();
-            var moderator = new TestModerator();
-            var options = new AIOptions<TestTurnState>(planner, moderator);
-            var ai = new AI<TestTurnState>(options);
-            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState()
-            {
-                TempStateEntry = new TurnStateEntry<TempState>(new())
-            };
+            var planner = new TestTurnStatePlanner<TurnState>();
+            var moderator = new TestTurnStateModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, moderator);
+            var ai = new AI<TurnState<Record, Record, TempState>>(options);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var actions = new TestActions();
             ai.ImportActions(actions);
-            ai.RegisterAction(AIConstants.TooManyStepsActionName, new TestActionHandler());
+            var actionHandler = new TestTurnStateActionHandler();
+            ai.RegisterAction(AIConstants.TooManyStepsActionName, actionHandler);
 
             // Act
-            var result = await ai.RunAsync(turnContext, turnState, stepCount: 30);
+            var result = await ai.RunAsync(turnContextMock, turnState.Result, stepCount: 30);
 
             // Assert
             Assert.False(result);
@@ -117,21 +133,27 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void Test_RunAsync_ExceedTimeLimit()
         {
             // Arrange
-            var planner = new TestPlanner();
-            var moderator = new TestModerator();
-            var options = new AIOptions<TestTurnState>(planner, moderator, maxTime: TimeSpan.Zero);
-            var ai = new AI<TestTurnState>(options);
-            var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState()
-            {
-                TempStateEntry = new TurnStateEntry<TempState>(new())
-            };
+            var planner = new TestTurnStatePlanner<TurnState>();
+            var moderator = new TestTurnStateModerator<TurnState<Record, Record, TempState>>();
+            var options = new AIOptions<TurnState<Record, Record, TempState>>(planner, moderator, maxTime: TimeSpan.Zero);
+            var ai = new AI<TurnState<Record, Record, TempState>>(options);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var actions = new TestActions();
             ai.ImportActions(actions);
-            ai.RegisterAction(AIConstants.TooManyStepsActionName, new TestActionHandler());
+            ai.RegisterAction(AIConstants.TooManyStepsActionName, new TestTurnStateActionHandler());
 
             // Act
-            var result = await ai.RunAsync(turnContext, turnState);
+            var result = await ai.RunAsync(turnContextMock, turnState.Result);
 
             // Assert
             Assert.False(result);
@@ -163,6 +185,68 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 SayActionRecord.Add(command.Response);
                 return string.Empty;
             }
+        }
+    }
+
+    internal class TestTurnStateActionHandler : IActionHandler<TurnState<Record, Record, TempState>>
+    {
+        public string? ActionName { get; set; }
+        public Task<string> PerformAction(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, object? entities = null, string? action = null)
+        {
+            ActionName = action;
+            return Task.FromResult("test-result");
+        }
+    }
+
+    internal class TestTurnStateModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
+    {
+        public IList<string> Record { get; } = new List<string>();
+
+        public Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return Task.FromResult<Plan?>(null);
+        }
+
+        public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return Task.FromResult(plan);
+        }
+    }
+
+    internal class TestTurnStatePlanner<T> : IPlanner<TurnState<Record, Record, TempState>>
+    {
+        public IList<string> Record { get; } = new List<string>();
+
+        public Plan BeginPlan { get; set; } = new Plan
+        {
+            Commands = new List<IPredictedCommand>
+            {
+                new PredictedDoCommand("Test-DO"),
+                new PredictedSayCommand("Test-SAY")
+            }
+        };
+
+        public Plan ContinuePlan { get; set; } = new Plan
+        {
+            Commands = new List<IPredictedCommand>
+            {
+                new PredictedDoCommand("Test-DO"),
+                new PredictedSayCommand("Test-SAY")
+            }
+        };
+
+        public Task<Plan> BeginTaskAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, AI<TurnState<Record, Record, TempState>> ai, CancellationToken cancellationToken)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return Task.FromResult(BeginPlan);
+        }
+
+        public Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, AI<TurnState<Record, Record, TempState>> ai, CancellationToken cancellationToken)
+        {
+            Record.Add(MethodBase.GetCurrentMethod()!.Name);
+            return Task.FromResult(ContinuePlan);
         }
     }
 }

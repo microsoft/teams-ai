@@ -1,10 +1,12 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -32,19 +34,26 @@ namespace Microsoft.Teams.AI.Tests.Application
                         verb = "test-verb",
                         data = new { testKey = "test-value" }
                     }
-                })
+                }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
             var expectedInvokeResponse = new InvokeResponse()
             {
                 Status = 200,
-                Body = adaptiveCardInvokeResponseMock.Object
+                Body = adaptiveCardInvokeResponseMock.Object,
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
                 Assert.Equal("test-value", actionData.TestKey);
@@ -83,7 +92,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                         type = "Action.Execute",
                         verb = "not-test-verb"
                     }
-                })
+                }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var turnContext2 = new TurnContext(adapter, new Activity()
             {
@@ -91,11 +104,14 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Name = "application/search"
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
@@ -116,18 +132,25 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext = new TurnContext(adapter, new Activity()
             {
                 Type = ActivityTypes.Invoke,
-                Name = "application/search"
+                Name = "application/search",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var adaptiveCardInvokeResponseMock = new Mock<AdaptiveCardInvokeResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            ActionExecuteHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
@@ -153,14 +176,20 @@ namespace Microsoft.Teams.AI.Tests.Application
                     verb = "test-verb",
                     testKey = "test-value"
                 }),
-                Recipient = new("test-id")
+                Recipient = new("test-id"),
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var called = false;
-            ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionSubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 called = true;
                 TestAdaptiveCardSubmitData submitData = Cast<TestAdaptiveCardSubmitData>(data);
@@ -190,14 +219,19 @@ namespace Microsoft.Teams.AI.Tests.Application
                     verb = "test-verb",
                     testKey = "test-value"
                 }),
-                Recipient = new("test-id")
+                Recipient = new("test-id"),
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var called = false;
-            ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionSubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 called = true;
                 TestAdaptiveCardSubmitData submitData = Cast<TestAdaptiveCardSubmitData>(data);
@@ -223,17 +257,23 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Message,
                 Text = "test-text",
-                Recipient = new("test-id")
+                Recipient = new("test-id"),
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            ActionSubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionSubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.CompletedTask;
             };
@@ -270,7 +310,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                         top = 15
                     },
                     dataset = "test-dataset"
-                })
+                }),
+                Recipient = new("test-id"),
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             IList<AdaptiveCardsSearchResult> searchResults = new List<AdaptiveCardsSearchResult>
             {
@@ -289,11 +333,14 @@ namespace Microsoft.Teams.AI.Tests.Application
                     }
                 }
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            SearchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
                 Assert.Equal("test-dataset", query.Parameters.Dataset);
@@ -335,17 +382,24 @@ namespace Microsoft.Teams.AI.Tests.Application
                         top = 15
                     },
                     dataset = "test-dataset"
-                })
+                }),
+                Recipient = new("test-id"),
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             IList<AdaptiveCardsSearchResult> searchResults = new List<AdaptiveCardsSearchResult>
             {
                 new("test-title", "test-value")
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            SearchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
                 Assert.Equal("test-dataset", query.Parameters.Dataset);
@@ -368,21 +422,28 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext = new TurnContext(adapter, new Activity()
             {
                 Type = ActivityTypes.Invoke,
-                Name = "adaptiveCard/action"
+                Name = "adaptiveCard/action",
+                Recipient = new("test-id"),
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             IList<AdaptiveCardsSearchResult> searchResults = new List<AdaptiveCardsSearchResult>
             {
                 new("test-title", "test-value")
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            var app = new Application<TurnState<Record, Record, TempState>>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             RouteSelector routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            SearchHandler<TestTurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            SearchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
                 Assert.Equal("test-dataset", query.Parameters.Dataset);

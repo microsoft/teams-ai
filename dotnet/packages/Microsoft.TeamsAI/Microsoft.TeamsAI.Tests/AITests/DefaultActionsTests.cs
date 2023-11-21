@@ -9,6 +9,8 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.Bot.Builder;
+using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
+using Record = Microsoft.Teams.AI.State.Record;
 using Microsoft.Teams.AI.AI.Moderator;
 
 namespace Microsoft.Teams.AI.Tests.AITests
@@ -209,7 +211,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal("The AI system has exceeded the maximum amount of time allowed.", exception2.Message);
         }
 
-        private static IActionCollection<TState> ImportDefaultActions<TState>(List<string>? logs = null) where TState : ITurnState<StateBase, StateBase, TempState>
+        private static IActionCollection<TState> ImportDefaultActions<TState>(List<string>? logs = null) where TState : ITurnState<Record, Record, TempState>
         {
             ILogger? logger = null;
             if (logs != null)

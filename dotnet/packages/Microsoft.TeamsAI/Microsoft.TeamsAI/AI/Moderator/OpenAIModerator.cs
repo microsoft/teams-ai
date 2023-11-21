@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
     /// An moderator that uses OpenAI's moderation API.
     /// </summary>
     /// <typeparam name="TState">The turn state class.</typeparam>
-    public class OpenAIModerator<TState> : IModerator<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    public class OpenAIModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
     {
         private readonly OpenAIModeratorOptions _options;
         private readonly OpenAIClient _client;

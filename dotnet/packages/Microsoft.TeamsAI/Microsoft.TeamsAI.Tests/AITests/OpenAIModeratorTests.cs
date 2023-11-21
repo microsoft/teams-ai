@@ -8,8 +8,9 @@ using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.Tests.TestUtils;
-using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.OpenAI;
+using Microsoft.Teams.AI.State;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -20,14 +21,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var apiKey = "randomApiKey";
-
-            var botAdapterMock = new Mock<BotAdapter>();
-            var activity = new Activity()
-            {
-                Text = "input",
-            };
-            var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -46,11 +41,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
-            var moderator = new OpenAIModerator<TestTurnState>(options);
+            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Object));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Result));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -64,15 +59,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var apiKey = "randomApiKey";
-
-            var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TestTurnState is implemented, get the user input
-            var activity = new Activity()
-            {
-                Text = "input",
-            };
-            var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -122,11 +110,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
-            var moderator = new OpenAIModerator<TestTurnState>(options);
+            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Object);
+            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
 
             // Assert
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
@@ -150,8 +138,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var apiKey = "randomApiKey";
 
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -163,11 +151,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
-            var moderator = new OpenAIModerator<TestTurnState>(options);
+            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -182,8 +170,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var apiKey = "randomApiKey";
 
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -226,11 +214,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
-            var moderator = new OpenAIModerator<TestTurnState>(options);
+            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan);
+            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
 
             // Assert
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
