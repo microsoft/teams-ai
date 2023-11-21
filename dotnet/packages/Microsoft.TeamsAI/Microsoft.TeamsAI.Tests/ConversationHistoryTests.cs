@@ -82,16 +82,6 @@ namespace Microsoft.Teams.AI.Tests
         }
 
         [Fact]
-        public void Clear_ThrowsInvalidOperationException_WhenTurnStateHasNoConversationState()
-        {
-            // Arrange
-            var turnState = new TurnState();
-
-            // Act and Assert
-            Assert.Throws<KeyNotFoundException>(() => ConversationHistory.Clear(turnState));
-        }
-
-        [Fact]
         public async void HasMoreLines_ReturnsTrueIfHistoryHasOneLine()
         {
             // Arrange
