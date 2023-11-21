@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
+using Microsoft.Teams.AI.State;
 using Moq;
 
 namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
@@ -12,7 +13,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             DefaultResponseValidator<bool> validator = new();
             PromptResponse promptResponse = new();

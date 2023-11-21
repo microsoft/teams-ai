@@ -7,7 +7,7 @@ using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities.JsonConverters;
 using System.Text.Json;
 using System.Text.Json.Serialization;

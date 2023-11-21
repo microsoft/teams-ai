@@ -2,7 +2,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Tokenizers;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 

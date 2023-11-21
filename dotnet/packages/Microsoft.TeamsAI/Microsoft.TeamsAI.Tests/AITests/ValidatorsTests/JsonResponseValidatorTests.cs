@@ -4,6 +4,7 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
+using Microsoft.Teams.AI.State;
 using Moq;
 
 namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
@@ -14,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_NoSchema_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             JsonResponseValidator validator = new();
             PromptResponse promptResponse = new()
@@ -42,7 +43,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
                 .Required(new string[] { "foo" });
 
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             JsonResponseValidator validator = new(schema.Build());
             PromptResponse promptResponse = new()
@@ -70,7 +71,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
                 .Required(new string[] { "foo" });
 
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             JsonResponseValidator validator = new(schema.Build());
             PromptResponse promptResponse = new()
@@ -98,7 +99,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
                 .Required(new string[] { "foo" });
 
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             JsonResponseValidator validator = new(schema.Build());
             PromptResponse promptResponse = new()

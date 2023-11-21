@@ -2,7 +2,7 @@
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Augmentations
 {

@@ -5,7 +5,7 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Exceptions;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
