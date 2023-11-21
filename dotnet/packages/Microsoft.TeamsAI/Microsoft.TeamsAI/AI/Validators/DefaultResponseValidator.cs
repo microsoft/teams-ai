@@ -8,7 +8,7 @@ namespace Microsoft.Teams.AI.AI.Validators
     /// <summary>
     /// Default response validator that always returns true.
     /// </summary>
-    public class DefaultResponseValidator<TValue> : IPromptResponseValidator<TValue>
+    public class DefaultResponseValidator : IPromptResponseValidator
     {
         /// <summary>
         /// Creates instance of `DefaultResponseValidator`
@@ -16,9 +16,9 @@ namespace Microsoft.Teams.AI.AI.Validators
         public DefaultResponseValidator() : base() { }
 
         /// <inheritdoc />
-        public async Task<Validation<TValue>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
         {
-            return await Task.FromResult(new Validation<TValue>()
+            return await Task.FromResult(new Validation()
             {
                 Valid = true
             });

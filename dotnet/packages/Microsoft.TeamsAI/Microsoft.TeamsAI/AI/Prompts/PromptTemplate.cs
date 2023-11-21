@@ -34,7 +34,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Optional augmentation for the prompt template.
         /// </summary>
-        public IAugmentation? Augmentation { get; set; }
+        public IAugmentation Augmentation { get; set; } = new DefaultAugmentation();
 
         /// <summary>
         /// Creates an instance of `PromptTemplate`
