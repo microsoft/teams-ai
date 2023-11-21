@@ -12,6 +12,8 @@ import {
     ActivityTypes,
     BotAdapter,
     ConversationReference,
+    FileConsentCardResponse,
+    O365ConnectorCardActionQuery,
     ResourceResponse,
     Storage,
     TurnContext
@@ -513,6 +515,71 @@ export class Application<TState extends TurnState = TurnState> {
     ): this {
         const selector = createMessageReactionSelector(event);
         this.addRoute(selector, handler);
+        return this;
+    }
+
+    /**
+     * Registers a handler to process when a file consent card is accepted by the user.
+     * @param {(context: TurnContext, state: TState, fileConsentResponse: FileConsentCardResponse) => Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public fileConsentAccept(
+        handler: (context: TurnContext, state: TState, fileConsentResponse: FileConsentCardResponse) => Promise<void>
+    ): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(
+                context.activity.type === ActivityTypes.Invoke &&
+                    context.activity.name === 'fileConsent/invoke' &&
+                    context.activity.value?.action === 'accept'
+            );
+        };
+        const handlerWrapper = (context: TurnContext, state: TState) => {
+            return handler(context, state, context.activity.value as FileConsentCardResponse);
+        };
+        this.addRoute(selector, handlerWrapper);
+        return this;
+    }
+
+    /**
+     * Registers a handler to process when a file consent card is declined by the user.
+     * @param {(context: TurnContext, state: TState, fileConsentResponse: FileConsentCardResponse) => Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public fileConsentDecline(
+        handler: (context: TurnContext, state: TState, fileConsentResponse: FileConsentCardResponse) => Promise<void>
+    ): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(
+                context.activity.type === ActivityTypes.Invoke &&
+                    context.activity.name === 'fileConsent/invoke' &&
+                    context.activity.value?.action === 'decline'
+            );
+        };
+        const handlerWrapper = (context: TurnContext, state: TState) => {
+            return handler(context, state, context.activity.value as FileConsentCardResponse);
+        };
+        this.addRoute(selector, handlerWrapper);
+        return this;
+    }
+
+    /**
+     * Registers a handler to process when a O365 Connector Card Action activity is received from the user.
+     * @param {(context: TurnContext, state: TState, query: O365ConnectorCardActionQuery) => Promise<void>} handler Function to call when the route is triggered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public O365ConnectorCardAction(
+        handler: (context: TurnContext, state: TState, query: O365ConnectorCardActionQuery) => Promise<void>
+    ): this {
+        const selector = (context: TurnContext): Promise<boolean> => {
+            return Promise.resolve(
+                context.activity.type === ActivityTypes.Invoke &&
+                    context.activity.name === 'actionableMessage/executeAction'
+            );
+        };
+        const handlerWrapper = (context: TurnContext, state: TState) => {
+            return handler(context, state, context.activity.value as O365ConnectorCardActionQuery);
+        };
+        this.addRoute(selector, handlerWrapper);
         return this;
     }
 
@@ -1045,9 +1112,9 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
             return (context: TurnContext) => {
                 return Promise.resolve(
                     context?.activity?.type == ActivityTypes.ConversationUpdate &&
-                        context?.activity?.channelData?.eventType == event &&
-                        context?.activity?.channelData?.channel &&
-                        context.activity.channelData?.team
+                    context?.activity?.channelData?.eventType == event &&
+                    context?.activity?.channelData?.channel &&
+                    context.activity.channelData?.team
                 );
             };
         case 'membersAdded':
@@ -1198,8 +1265,8 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             return (context: TurnContext) => {
                 return Promise.resolve(
                     context?.activity?.type == ActivityTypes.MessageReaction &&
-                        Array.isArray(context?.activity?.reactionsRemoved) &&
-                        context.activity.reactionsRemoved.length > 0
+                    Array.isArray(context?.activity?.reactionsRemoved) &&
+                    context.activity.reactionsRemoved.length > 0
                 );
             };
     }
