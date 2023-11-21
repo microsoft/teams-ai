@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
             Mock<ITurnContext> context = new();
             MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
-            DefaultResponseValidator<bool> validator = new();
+            DefaultResponseValidator validator = new();
             PromptResponse promptResponse = new();
 
             var res = await validator.ValidateResponseAsync(context.Object, memory, tokenizer, promptResponse, 0);

@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.Validators
     /// <summary>
     /// Validates action calls returned by the model.
     /// </summary>
-    public class ActionResponseValidator : IPromptResponseValidator<ValidatedChatCompletionAction>
+    public class ActionResponseValidator : IPromptResponseValidator
     {
         /// <summary>
         /// List of supported actions.
@@ -59,11 +59,11 @@ namespace Microsoft.Teams.AI.AI.Validators
         }
 
         /// <inheritdoc />
-        public async Task<Validation<ValidatedChatCompletionAction>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
         {
             if (response.Message?.FunctionCall == null && this._required == false)
             {
-                return await Task.FromResult(new Validation<ValidatedChatCompletionAction>()
+                return await Task.FromResult(new Validation()
                 {
                     Valid = true
                 });
@@ -75,7 +75,7 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                 if (func.Name == string.Empty)
                 {
-                    return await Task.FromResult(new Validation<ValidatedChatCompletionAction>()
+                    return await Task.FromResult(new Validation()
                     {
                         Valid = false,
                         Feedback = $"{this.Noun} name missing. Specify a valid {this.Noun} name."
@@ -84,7 +84,7 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                 if (!this.Actions.ContainsKey(func.Name))
                 {
-                    return await Task.FromResult(new Validation<ValidatedChatCompletionAction>()
+                    return await Task.FromResult(new Validation()
                     {
                         Valid = false,
                         Feedback = $"Unknown {this.Noun} named \"{func.Name}\". Specify a valid {this.Noun} name."
@@ -104,12 +104,12 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                     string args = func.Arguments == "{}" ? "" : func.Arguments;
                     ChatMessage message = new(ChatRole.Assistant) { Content = args };
-                    Validation<Dictionary<string, JsonElement>> result = await validator.ValidateResponseAsync(
+                    Validation result = await validator.ValidateResponseAsync(
                         context, memory, tokenizer, new() { Status = PromptResponseStatus.Success, Message = message }, remainingAttempts);
 
                     if (!result.Valid)
                     {
-                        return await Task.FromResult(new Validation<ValidatedChatCompletionAction>()
+                        return await Task.FromResult(new Validation()
                         {
                             Valid = false,
                             Feedback = result.Feedback
@@ -118,14 +118,14 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                     if (result.Value != null)
                     {
-                        parameters = result.Value;
+                        parameters = (Dictionary<string, JsonElement>)result.Value;
                     }
                 }
 
-                return await Task.FromResult(new Validation<ValidatedChatCompletionAction>()
+                return await Task.FromResult(new Validation()
                 {
                     Valid = true,
-                    Value = new()
+                    Value = new ValidatedChatCompletionAction()
                     {
                         Name = func.Name,
                         Parameters = parameters
@@ -133,7 +133,7 @@ namespace Microsoft.Teams.AI.AI.Validators
                 });
             }
 
-            return await Task.FromResult(new Validation<ValidatedChatCompletionAction>()
+            return await Task.FromResult(new Validation()
             {
                 Valid = false,
                 Feedback = $"No {this.Noun} was specified. Call a {this.Noun} with valid arguments."
