@@ -23,10 +23,10 @@ namespace Microsoft.Teams.AI.AI.Planner
         public string? Organization { get; set; }
 
         /// <summary>
-        /// Optional. The polling interval while waiting for the run to complete, in milliseconds.
-        /// If not provide, the default value is 1000.
+        /// Optional. The polling interval while waiting for the run to complete.
+        /// If not provide, the default value is 1 second.
         /// </summary>
-        public int? PollingInterval { get; set; }
+        public TimeSpan? PollingInterval { get; set; }
 
         /// <summary>
         /// Optional. The state path when access Assistants state in TurnState.
