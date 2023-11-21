@@ -15,6 +15,10 @@ using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Net;
+using Microsoft.Teams.AI.State;
+using Record = Microsoft.Teams.AI.State.Record;
+using Microsoft.Bot.Schema;
+using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -277,10 +281,19 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "gpt-model";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var options = new OpenAIPlannerOptions<TurnState<Record, Record, TempState>>(apiKey, model, new PromptManager<TurnState<Record, Record, TempState>>(), string.Empty);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
+            var moderatorMock = new Mock<IModerator<TurnState<Record, Record, TempState>>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -295,8 +308,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 }
             );
 
-            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var planner = new CustomCompletionOpenAIPlannerWithTurnState<TurnState<Record, Record, TempState>>(options);
+            var aiOptions = new AIOptions<TurnState<Record, Record, TempState>> (planner, moderatorMock.Object);
             var exceptionMessage = "Exception Message";
             var thrownException = new SemanticKernel.Diagnostics.HttpOperationException(exceptionMessage)
             {
@@ -310,7 +323,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             planner.ChatCompletionMock.Setup(chatCompletion => chatCompletion.GetChatCompletionsAsync(It.IsAny<ChatHistory>(), It.IsAny<ChatRequestSettings>(), It.IsAny<CancellationToken>())).ThrowsAsync(thrownException);
 
             // Act
-            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await planner.CompletePromptAsync(turnContextMock, turnState.Result, promptTemplate, aiOptions));
 
             // Assert
             Assert.NotNull(exception);
@@ -348,17 +361,26 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "gpt-randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var options = new OpenAIPlannerOptions<TurnState<Record, Record, TempState>>(apiKey, model, new PromptManager<TurnState<Record, Record, TempState>>(), string.Empty);
+            var botAdapterStub = Mock.Of<BotAdapter>();
+            var turnContextMock = new TurnContext(botAdapterStub,
+                new Activity
+                {
+                    Text = "user message",
+                    Recipient = new() { Id = "recipientId" },
+                    Conversation = new() { Id = "conversationId" },
+                    From = new() { Id = "fromId" },
+                    ChannelId = "channelId"
+                });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var promptTemplate = new PromptTemplate("Test", new());
 
-            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
-            var aiOptions = new AIOptions<TestTurnState>(planner);
+            var planner = new CustomCompletionOpenAIPlannerWithTurnState<TurnState<Record, Record, TempState>>(options);
+            var aiOptions = new AIOptions<TurnState<Record, Record, TempState>>(planner);
             MockChatCompletion(planner.ChatCompletionMock, "chat-completion");
 
             // Act
-            var result = await planner.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
+            var result = await planner.CompletePromptAsync(turnContextMock, turnState.Result, promptTemplate, aiOptions);
 
             // Assert
             Assert.Equal("chat-completion", result);
@@ -398,6 +420,27 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
 
             private protected override IChatCompletion _CreateChatCompletionService(OpenAIPlannerOptions<TState> options)
+            {
+                return ChatCompletionMock.Object;
+            }
+        }
+
+        private sealed class CustomCompletionOpenAIPlannerWithTurnState<TurnState> : OpenAIPlanner<TurnState<Record, Record, TempState>>
+        {
+            public Mock<ITextCompletion> TextCompletionMock { get; } = new Mock<ITextCompletion>();
+
+            public Mock<IChatCompletion> ChatCompletionMock { get; } = new Mock<IChatCompletion>();
+
+            public CustomCompletionOpenAIPlannerWithTurnState(OpenAIPlannerOptions<TurnState<Record, Record, TempState>> options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
+            {
+            }
+
+            private protected override ITextCompletion _CreateTextCompletionService(OpenAIPlannerOptions<TurnState<Record, Record, TempState>> options)
+            {
+                return TextCompletionMock.Object;
+            }
+
+            private protected override IChatCompletion _CreateChatCompletionService(OpenAIPlannerOptions<TurnState<Record, Record, TempState>> options)
             {
                 return ChatCompletionMock.Object;
             }

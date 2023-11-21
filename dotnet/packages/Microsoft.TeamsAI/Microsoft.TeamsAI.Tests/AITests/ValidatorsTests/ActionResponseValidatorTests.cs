@@ -4,6 +4,7 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
+using Microsoft.Teams.AI.State;
 using Moq;
 
 namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
@@ -14,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_FunctionWithParams_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             ActionResponseValidator validator = new(new()
             {
@@ -50,7 +51,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_FunctionWithMissingParams_ShouldFail()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             ActionResponseValidator validator = new(new()
             {
@@ -86,7 +87,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_FunctionWithInvalidParams_ShouldFail()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             ActionResponseValidator validator = new(new()
             {
@@ -122,7 +123,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_MissingAction_ShouldFail()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             ActionResponseValidator validator = new(new()
             {
@@ -158,7 +159,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.ValidatorsTests
         public async void Test_TextMessageRequired_ShouldFail()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             ActionResponseValidator validator = new(new()
             {

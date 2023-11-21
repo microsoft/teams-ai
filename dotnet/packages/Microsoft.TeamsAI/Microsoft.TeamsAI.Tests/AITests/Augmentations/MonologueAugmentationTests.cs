@@ -5,6 +5,7 @@ using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.State;
 using Moq;
 using System.Text.Json;
 
@@ -16,7 +17,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         public async void Test_ValidateResponseAsync_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             MonologueAugmentation augmentation = new(new()
             {
@@ -60,7 +61,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         public async void Test_ValidateResponseAsync_InvalidThoughts_ShouldFail()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             MonologueAugmentation augmentation = new(new()
             {
@@ -128,7 +129,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         public async void Test_ValidateResponseAsync_InvalidAction_ShouldFail()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             MonologueAugmentation augmentation = new(new()
             {
@@ -197,7 +198,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         public async void Test_CreatePlanFromResponseAsync_SayCommand_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             MonologueAugmentation augmentation = new(new()
             {
@@ -273,7 +274,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
         public async void Test_CreatePlanFromResponseAsync_DoCommand_ShouldSucceed()
         {
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             MonologueAugmentation augmentation = new(new()
             {

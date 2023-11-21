@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.State;
 using Moq;
 using System.Reflection;
 
@@ -13,7 +14,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests
         {
             PromptManager manager = new();
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
 
             manager.AddFunction("getMessage", async (context, memory, functions, tokenizer, args) =>

@@ -21,7 +21,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// <param name="turnState">Applications turn state.</param>
         /// <param name="line">Line of text to add to history.</param>
         /// <param name="maxLines">Optional. Maximum number of lines to store. Defaults to 10.</param>
-        public static void AddLine(ITurnState<StateBase, StateBase, TempState> turnState, string line, int maxLines = 10)
+        public static void AddLine(ITurnState<Record, Record, TempState> turnState, string line, int maxLines = 10)
         {
             Verify.ParamNotNull(turnState);
             Verify.ParamNotNull(line);
@@ -49,7 +49,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">The turn state.</param>
         /// <param name="text">The input text.</param>
-        public static void AppendToLastLine(ITurnState<StateBase, StateBase, TempState> turnState, string text)
+        public static void AppendToLastLine(ITurnState<Record, Record, TempState> turnState, string text)
         {
             string line = GetLastLine(turnState);
             ReplaceLastLine(turnState, line + text);
@@ -59,7 +59,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// Clears all conversation history for the current conversation.
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
-        public static void Clear(ITurnState<StateBase, StateBase, TempState> turnState)
+        public static void Clear(ITurnState<Record, Record, TempState> turnState)
         {
             Verify.ParamNotNull(turnState);
             _VerifyConversationState(turnState);
@@ -72,7 +72,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>True if there are 1 or more lines of history.</returns>
-        public static bool HasMoreLines(ITurnState<StateBase, StateBase, TempState> turnState)
+        public static bool HasMoreLines(ITurnState<Record, Record, TempState> turnState)
         {
             Verify.ParamNotNull(turnState);
             _VerifyConversationState(turnState);
@@ -86,7 +86,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>The last line of history or an empty string.</returns>
-        public static string GetLastLine(ITurnState<StateBase, StateBase, TempState> turnState)
+        public static string GetLastLine(ITurnState<Record, Record, TempState> turnState)
         {
             Verify.ParamNotNull(turnState);
             _VerifyConversationState(turnState);
@@ -100,7 +100,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>Last thing said by the assistant. Defaults to an empty string.</returns>
-        public static string GetLastSay(ITurnState<StateBase, StateBase, TempState> turnState)
+        public static string GetLastSay(ITurnState<Record, Record, TempState> turnState)
         {
             // Find start of text
             string lastLine = GetLastLine(turnState);
@@ -148,7 +148,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <returns>The removed line or null.</returns>
-        public static string? RemoveLastLine(ITurnState<StateBase, StateBase, TempState> turnState)
+        public static string? RemoveLastLine(ITurnState<Record, Record, TempState> turnState)
         {
             Verify.ParamNotNull(turnState);
 
@@ -176,7 +176,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">Applications turn state.</param>
         /// <param name="line">New line of history.</param>
-        public static void ReplaceLastLine(ITurnState<StateBase, StateBase, TempState> turnState, string line)
+        public static void ReplaceLastLine(ITurnState<Record, Record, TempState> turnState, string line)
         {
             Verify.ParamNotNull(turnState);
             Verify.ParamNotNull(line);
@@ -205,7 +205,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// <param name="turnState">Applications turn state.</param>
         /// <param name="newResponse">New response from the assistant.</param>
         /// <param name="assistantPrefix">Prefix for when a new line needs to be inserted. Defaults to 'Assistant:'.</param>
-        public static void ReplaceLastSay(ITurnState<StateBase, StateBase, TempState> turnState, string newResponse, string assistantPrefix = "Assistant:")
+        public static void ReplaceLastSay(ITurnState<Record, Record, TempState> turnState, string newResponse, string assistantPrefix = "Assistant:")
         {
             Verify.ParamNotNull(turnState);
             Verify.ParamNotNull(newResponse);
@@ -255,7 +255,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// <param name="maxTokens">Optional. Maximum length of the text returned. Defaults to 1000 tokens.</param>
         /// <param name="lineSeparator">Optional. Separator used between lines. Defaults to '\n'.</param>
         /// <returns>The most recent lines of conversation history as a text string.</returns>
-        public static string ToString(ITurnState<StateBase, StateBase, TempState> turnState, int maxTokens = 1000, string lineSeparator = "\n")
+        public static string ToString(ITurnState<Record, Record, TempState> turnState, int maxTokens = 1000, string lineSeparator = "\n")
         {
             Verify.ParamNotNull(turnState);
 
@@ -291,7 +291,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// <param name="turnState">The Application's turn state.</param>
         /// <param name="maxTokens">Optional. Maximum length of the text to include. Defaults to 1000 tokens.</param>
         /// <returns>The most recent lines of conversation history as an array.</returns>
-        public static string[] ToArray(ITurnState<StateBase, StateBase, TempState> turnState, int maxTokens = 1000)
+        public static string[] ToArray(ITurnState<Record, Record, TempState> turnState, int maxTokens = 1000)
         {
             Verify.ParamNotNull(turnState);
 
@@ -325,7 +325,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// </summary>
         /// <param name="turnState">The application turn state</param>
         /// <returns>The conversation history</returns>
-        public static List<string> GetHistory(ITurnState<StateBase, StateBase, TempState> turnState)
+        public static List<string> GetHistory(ITurnState<Record, Record, TempState> turnState)
         {
             if (turnState.Conversation != null && turnState.Conversation.TryGetValue(StatePropertyName, out object history))
             {
@@ -339,7 +339,7 @@ namespace Microsoft.Teams.AI.AI.Planner
         }
 
 
-        private static void _VerifyConversationState(ITurnState<StateBase, StateBase, TempState> turnState)
+        private static void _VerifyConversationState(ITurnState<Record, Record, TempState> turnState)
         {
             if (turnState.Conversation == null)
             {
@@ -347,7 +347,7 @@ namespace Microsoft.Teams.AI.AI.Planner
             }
         }
 
-        private static void _SetHistory(ITurnState<StateBase, StateBase, TempState> turnState, List<string> newHistory)
+        private static void _SetHistory(ITurnState<Record, Record, TempState> turnState, List<string> newHistory)
         {
             turnState.Conversation?.Set(StatePropertyName, newHistory);
         }

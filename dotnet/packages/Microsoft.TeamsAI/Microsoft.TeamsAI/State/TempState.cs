@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.State
     /// <remarks>
     /// Inherit a new class from this base abstract class to strongly type the applications temp state.
     /// </remarks>
-    public class TempState : StateBase
+    public class TempState : Record
     {
         /// <summary>
         /// Name of the input property.

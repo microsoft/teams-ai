@@ -1,7 +1,7 @@
 ﻿using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {

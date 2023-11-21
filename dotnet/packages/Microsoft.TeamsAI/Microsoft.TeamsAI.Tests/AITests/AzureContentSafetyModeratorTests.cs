@@ -9,6 +9,8 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 using Azure.AI.ContentSafety;
 using Azure;
+using Microsoft.Teams.AI.State;
+using Record = Microsoft.Teams.AI.State.Record;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests
@@ -27,8 +29,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Text = "input",
             };
-            var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TestTurnState>();
+
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -47,11 +50,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Object));
+            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Result));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -73,8 +76,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Text = "input",
             };
-            var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -94,11 +97,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Object);
+            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
 
             // Assert
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
@@ -132,8 +135,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             {
                 Text = "input",
             };
-            var turnContext = new TurnContext(botAdapterMock.Object, activity);
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
                 new PromptTemplateConfiguration
@@ -153,11 +156,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Object);
+            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
 
             // Assert
             Assert.Null(result);
@@ -170,8 +173,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var endpoint = "https://test.cognitiveservices.azure.com";
 
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -183,11 +186,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan));
+            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -203,8 +206,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var endpoint = "https://test.cognitiveservices.azure.com";
 
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -217,11 +220,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan);
+            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
 
             // Assert
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
@@ -249,8 +252,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var endpoint = "https://test.cognitiveservices.azure.com";
 
-            var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var plan = new Plan(new List<IPredictedCommand>()
             {
                 new PredictedDoCommand("action"),
@@ -263,11 +266,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TestTurnState>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan);
+            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
 
             // Assert
             Assert.StrictEqual(plan, result);

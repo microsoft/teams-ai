@@ -4,6 +4,7 @@ using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 {
@@ -14,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         {
             ConversationHistorySection section = new("history");
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             PromptManager manager = new();
 
@@ -35,7 +36,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         {
             ConversationHistorySection section = new("history");
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             PromptManager manager = new();
 

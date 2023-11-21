@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionActionResponse.</returns>
-    public delegate Task<MessagingExtensionActionResponse> SubmitActionHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<MessagingExtensionActionResponse> SubmitActionHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension botMessagePreview edit events.
@@ -27,7 +27,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionActionResponse.</returns>
-    public delegate Task<MessagingExtensionActionResponse> BotMessagePreviewEditHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<MessagingExtensionActionResponse> BotMessagePreviewEditHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension botMessagePreview send events.
@@ -39,7 +39,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task BotMessagePreviewSendHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task BotMessagePreviewSendHandler<TState>(ITurnContext turnContext, TState turnState, Activity activityPreview, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension fetchTask events.
@@ -50,7 +50,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of TaskModuleResponse.</returns>
-    public delegate Task<TaskModuleResponse> FetchTaskHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<TaskModuleResponse> FetchTaskHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension query events.
@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionResult.</returns>
-    public delegate Task<MessagingExtensionResult> QueryHandler<TState>(ITurnContext turnContext, TState turnState, Query<Dictionary<string, object>> query, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<MessagingExtensionResult> QueryHandler<TState>(ITurnContext turnContext, TState turnState, Query<Dictionary<string, object>> query, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension selecting item events.
@@ -74,7 +74,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionResult.</returns>
-    public delegate Task<MessagingExtensionResult> SelectItemHandler<TState>(ITurnContext turnContext, TState turnState, object item, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<MessagingExtensionResult> SelectItemHandler<TState>(ITurnContext turnContext, TState turnState, object item, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension link unfurling events.
@@ -86,7 +86,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionResult.</returns>
-    public delegate Task<MessagingExtensionResult> QueryLinkHandler<TState>(ITurnContext turnContext, TState turnState, string url, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<MessagingExtensionResult> QueryLinkHandler<TState>(ITurnContext turnContext, TState turnState, string url, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension configuring query setting url events.
@@ -97,7 +97,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of MessagingExtensionResult.</returns>
-    public delegate Task<MessagingExtensionResult> QueryUrlSettingHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<MessagingExtensionResult> QueryUrlSettingHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension configuring settings events.
@@ -109,7 +109,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task ConfigureSettingsHandler<TState>(ITurnContext turnContext, TState turnState, object settings, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task ConfigureSettingsHandler<TState>(ITurnContext turnContext, TState turnState, object settings, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 
     /// <summary>
     /// Function for handling Message Extension clicking card button events.
@@ -121,5 +121,5 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task CardButtonClickedHandler<TState>(ITurnContext turnContext, TState turnState, object cardData, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task CardButtonClickedHandler<TState>(ITurnContext turnContext, TState turnState, object cardData, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 }

@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.Planner
     /// </summary>
     /// <typeparam name="TState">Type of the applications turn state</typeparam>
     public class AzureOpenAIPlanner<TState> : OpenAIPlanner<TState, AzureOpenAIPlannerOptions<TState>>
-        where TState : ITurnState<StateBase, StateBase, TempState>
+        where TState : ITurnState<Record, Record, TempState>
     {
         /// <summary>
         /// Creates a new instance of the <see cref="AzureOpenAIPlanner{TState}"/> class.

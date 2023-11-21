@@ -371,6 +371,16 @@ describe('Application', () => {
                 });
             });
         }
+
+        it(`should throw an error when event is not known case`, () => {
+            assert.throws(
+                () =>
+                    mockApp.messageEventUpdate('test' as any, async (_context, _state) => {
+                        assert.fail('should not be called');
+                    }),
+                new Error(`Invalid TeamsMessageEvent type: test`)
+            );
+        });
     });
 
     describe('messageUpdate', () => {
@@ -429,5 +439,12 @@ describe('Application', () => {
                 });
             });
         }
+
+        it('should throw an error when handler is not a function', () => {
+            assert.throws(
+                () => mockApp.messageEventUpdate('editMessage', 1 as any),
+                new Error(`MessageUpdate 'handler' for editMessage is number. Type of 'handler' must be a function.`)
+            );
+        });
     });
 });

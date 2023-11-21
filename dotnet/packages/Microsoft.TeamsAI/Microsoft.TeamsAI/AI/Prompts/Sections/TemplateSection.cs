@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Models;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -179,7 +179,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             return (context, memory, functions, tokenizer, maxTokens) =>
             {
-                dynamic? value = memory.GetValue<dynamic>(name);
+                dynamic? value = memory.GetValue(name);
                 return Task.FromResult(Convert.ToString(value));
             };
         }
