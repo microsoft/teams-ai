@@ -7,7 +7,6 @@
     /// </summary>
     public class MemoryFork : IMemory
     {
-        private static readonly string TEMP_SCOPE = "temp";
         private readonly Dictionary<string, Record> _fork = new();
         private readonly IMemory? _memory;
 
