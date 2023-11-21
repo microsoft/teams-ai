@@ -3,8 +3,15 @@ import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
 /**
  * @internal
+ * Base class to handle authentication for Teams Message Extension.
  */
 export abstract class MessageExtensionAuthenticationBase {
+
+    /**
+     * Authenticates the user.
+     * @param {TurnContext} context - The turn context.
+     * @returns {Promise<string | undefined>} - The authentication token, or undefined if authentication failed. Teams will ask user to sign-in if authentication failed.
+     */
     public async authenticate(context: TurnContext): Promise<string | undefined> {
         const value = context.activity.value;
         const tokenExchangeRequest = value.authentication;
@@ -75,6 +82,11 @@ export abstract class MessageExtensionAuthenticationBase {
         return;
     }
 
+    /**
+     * Checks if the activity is a valid Message Extension activity that supports authentication.
+     * @param {TurnContext} context - The turn context.
+     * @returns {boolean} - A boolean indicating if the activity is valid.
+     */
     public isValidActivity(context: TurnContext): boolean {
         return (
             context.activity.type == ActivityTypes.Invoke &&
@@ -85,11 +97,27 @@ export abstract class MessageExtensionAuthenticationBase {
         );
     }
 
+    /**
+     * Handles the SSO token exchange.
+     * @param {TurnContext} context - The turn context.
+     * @returns {Promise<TokenResponse | undefined>} - A promise that resolves to the token response or undefined if token exchange failed.
+     */
     public abstract handleSsoTokenExchange(
         context: TurnContext
     ): Promise<TokenResponse | undefined>
 
+    /**
+     * Handles the user sign-in.
+     * @param {TurnContext} context - The turn context.
+     * @param {string} magicCode - The magic code from user sign-in.
+     * @returns {Promise<TokenResponse | undefined>} - A promise that resolves to the token response or undefined if failed to verify the magic code.
+     */
     public abstract handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined>
 
+    /**
+     * Gets the sign-in link for the user.
+     * @param {TurnContext} context - The turn context.
+     * @returns {Promise<string | undefined>} - A promise that resolves to the sign-in link or undefined if no sign-in link available.
+     */
     public abstract getSignInLink(context: TurnContext): Promise<string | undefined>
 }
