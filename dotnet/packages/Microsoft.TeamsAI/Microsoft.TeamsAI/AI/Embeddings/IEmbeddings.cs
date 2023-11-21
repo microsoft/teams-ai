@@ -5,7 +5,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
     /// <summary>
     /// Interface for Embeddings.
     /// </summary>
-    public interface IEmbeddings<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    public interface IEmbeddings<TState> where TState : ITurnState<Record, Record, TempState>
     {
         /// <summary>
         ///     Creates embeddings for the given inputs using the OpenAI API.

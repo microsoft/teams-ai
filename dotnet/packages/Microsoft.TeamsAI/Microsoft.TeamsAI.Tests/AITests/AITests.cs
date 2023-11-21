@@ -188,7 +188,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
     }
 
-    internal class TestTurnStateActionHandler : IActionHandler<TurnState<Record, Record, TempState>>
+    internal sealed class TestTurnStateActionHandler : IActionHandler<TurnState<Record, Record, TempState>>
     {
         public string? ActionName { get; set; }
         public Task<string> PerformAction(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, object? entities = null, string? action = null)
@@ -198,7 +198,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
     }
 
-    internal class TestTurnStateModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
+    internal sealed class TestTurnStateModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
     {
         public IList<string> Record { get; } = new List<string>();
 
@@ -215,7 +215,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
     }
 
-    internal class TestTurnStatePlanner<T> : IPlanner<TurnState<Record, Record, TempState>>
+    internal sealed class TestTurnStatePlanner<T> : IPlanner<TurnState<Record, Record, TempState>>
     {
         public IList<string> Record { get; } = new List<string>();
 
