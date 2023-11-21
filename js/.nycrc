@@ -1,7 +1,14 @@
 {
     "extension": [".ts"],
     "include": ["packages/**/src/**/*.ts", "lib/**/*.js"],
-    "exclude": ["**/node_modules/**", "**/tests/**", "**/coverage/**", "**/*.d.ts", "**/*.spec.ts"],
+    "exclude": [
+        "**/node_modules/**",
+        "**/tests/**",
+        "**/coverage/**",
+        "**/*.d.ts",
+        "**/*.spec.ts",
+        "packages/**/src/index.ts"
+    ],
     "reporter": ["html", "text"],
     "all": true,
     "cache": true

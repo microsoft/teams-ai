@@ -11,7 +11,6 @@ import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
 import { TurnState } from './TurnState';
-import { Schema } from 'jsonschema';
 
 /**
  * Entities argument passed to the action handler for AI.DoCommandActionName.
@@ -358,25 +357,20 @@ export class AI<TState extends TurnState = TurnState> {
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
-     * @param schema Optional. Schema for the actions parameters.
      * @returns The AI system instance for chaining purposes.
      */
     public action<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
-        schema?: Schema
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
             if (!this._actions.has(n)) {
-                this._actions.set(n, { handler, schema, allowOverrides: false });
+                this._actions.set(n, { handler, allowOverrides: false });
             } else {
                 const entry = this._actions.get(n);
                 if (entry!.allowOverrides) {
                     entry!.handler = handler;
                     entry!.allowOverrides = false;  // Only override once
-                    if (schema) {
-                        entry!.schema = schema;
-                    }
                 } else {
                     throw new Error(
                         `The AI.action() method was called with a previously registered action named "${n}".`
@@ -395,16 +389,14 @@ export class AI<TState extends TurnState = TurnState> {
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
-     * @param schema Optional. The schema for the actions parameters.
      * @returns The AI system instance for chaining purposes.
      */
     public defaultAction<TParameters extends (Record<string, any> | undefined)>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
-        schema?: Schema
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
-            this._actions.set(n, { handler, schema, allowOverrides: true });
+            this._actions.set(n, { handler, allowOverrides: true });
         });
 
         return this;
@@ -431,19 +423,6 @@ export class AI<TState extends TurnState = TurnState> {
 
         const handler = this._actions.get(action)!.handler;
         return await handler(context, state, parameters, action);
-    }
-
-    /**
-     * Gets the schema for a given action.
-     * @param action Name of the action to get the schema for.
-     * @returns The schema for the action or undefined if the action doesn't have a schema.
-     */
-    public getActionSchema(action: string): Schema | undefined {
-        if (!this._actions.has(action)) {
-            throw new Error(`Can't find an action named '${action}'.`);
-        }
-
-        return this._actions.get(action)!.schema;
     }
 
     /**
@@ -586,6 +565,5 @@ export class AI<TState extends TurnState = TurnState> {
  */
 interface ActionEntry<TState> {
     handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<string>;
-    schema?: Schema;
     allowOverrides: boolean;
 }
