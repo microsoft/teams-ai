@@ -217,7 +217,7 @@ namespace Microsoft.Teams.AI.State
                         this._isLoaded = true;
 
                         // Compute state keys
-                        List<string> keys = [];
+                        List<string> keys = new();
                         Dictionary<string, string> scopes = OnComputeStorageKeys(turnContext);
                         foreach (KeyValuePair<string, string> currScope in scopes)
                         {
@@ -329,7 +329,7 @@ namespace Microsoft.Teams.AI.State
             if (storage != null)
             {
                 // Apply changes
-                List<Task> tasks = [];
+                List<Task> tasks = new();
                 if (changes.Keys.Count > 0)
                 {
                     tasks.Add(storage.WriteAsync(changes));

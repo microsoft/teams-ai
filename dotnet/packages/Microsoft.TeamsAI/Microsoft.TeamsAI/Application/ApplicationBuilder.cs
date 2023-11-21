@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI
     /// </summary>
     /// <typeparam name="TState">Optional. Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
     public class ApplicationBuilder<TState>
-        where TState : TurnState<Record, Record, TempState>, new()
+        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
     {
         /// <summary>
         /// The application's configured options.

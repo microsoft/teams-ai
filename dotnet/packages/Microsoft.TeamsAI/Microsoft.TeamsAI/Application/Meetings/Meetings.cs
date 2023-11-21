@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
     public class Meetings<TState>
-        where TState : TurnState<Record, Record, TempState>, new()
+        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
     {
         private readonly Application<TState> _app;
 

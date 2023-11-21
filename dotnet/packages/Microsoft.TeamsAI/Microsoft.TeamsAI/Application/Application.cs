@@ -24,7 +24,7 @@ namespace Microsoft.Teams.AI
     /// </remarks>
     /// <typeparam name="TState">Type of the turnState. This allows for strongly typed access to the turn turnState.</typeparam>
     public class Application<TState> : IBot
-        where TState : TurnState<Record, Record, TempState>, new()
+        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
     {
         private static readonly string CONFIG_FETCH_INVOKE_NAME = "config/fetch";
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
