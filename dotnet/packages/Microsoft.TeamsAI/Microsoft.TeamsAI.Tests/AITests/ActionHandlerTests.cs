@@ -8,6 +8,8 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Schema;
 using Moq;
 using Microsoft.Bot.Builder;
+using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -90,7 +92,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal($"Cannot assign {from} to {to} of action method Action", exception.Message);
         }
 
-        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : ITurnState<StateBase, StateBase, TempState>
+        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : ITurnState<Record, Record, TempState>
         {
             AIOptions<TState> options = new(
                 new Mock<IPlanner<TState>>().Object,
@@ -156,7 +158,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
         }
 
-        private sealed class DifferentParameterAttributesActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+        private sealed class DifferentParameterAttributesActions<TState> where TState : ITurnState<Record, Record, TempState>
         {
             public List<object?[]> Calls { get; set; } = new List<object?[]>();
 

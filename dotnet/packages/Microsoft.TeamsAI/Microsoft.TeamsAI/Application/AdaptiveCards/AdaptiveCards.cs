@@ -14,23 +14,21 @@ namespace Microsoft.Teams.AI
     /// AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
-    /// <typeparam name="TTurnStateManager">The type of the turn state manager object used by the application.</typeparam>
-    public class AdaptiveCards<TState, TTurnStateManager>
-        where TState : ITurnState<StateBase, StateBase, TempState>
-        where TTurnStateManager : ITurnStateManager<TState>, new()
+    public class AdaptiveCards<TState>
+        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
     {
         private static readonly string ACTION_INVOKE_NAME = "adaptiveCard/action";
         private static readonly string ACTION_EXECUTE_TYPE = "Action.Execute";
         private static readonly string SEARCH_INVOKE_NAME = "application/search";
         private static readonly string DEFAULT_ACTION_SUBMIT_FILTER = "verb";
 
-        private readonly Application<TState, TTurnStateManager> _app;
+        private readonly Application<TState> _app;
 
         /// <summary>
         /// Creates a new instance of the AdaptiveCards class.
         /// </summary>
         /// <param name="app"></param> The top level application class to register handlers with.
-        public AdaptiveCards(Application<TState, TTurnStateManager> app)
+        public AdaptiveCards(Application<TState> app)
         {
             this._app = app;
         }
@@ -41,7 +39,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verb">The named action to be handled.</param>
         /// <param name="handler">Function to call when the action is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(string verb, ActionExecuteHandler<TState> handler)
+        public Application<TState> OnActionExecute(string verb, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
@@ -55,7 +53,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verbPattern">Regular expression to match against the named action to be handled.</param>
         /// <param name="handler">Function to call when the action is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(Regex verbPattern, ActionExecuteHandler<TState> handler)
+        public Application<TState> OnActionExecute(Regex verbPattern, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
@@ -69,7 +67,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(RouteSelector routeSelector, ActionExecuteHandler<TState> handler)
+        public Application<TState> OnActionExecute(RouteSelector routeSelector, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -99,7 +97,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionExecute(MultipleRouteSelector routeSelectors, ActionExecuteHandler<TState> handler)
+        public Application<TState> OnActionExecute(MultipleRouteSelector routeSelectors, ActionExecuteHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -150,7 +148,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verb">The named action to be handled.</param>
         /// <param name="handler">Function to call when the action is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionSubmit(string verb, ActionSubmitHandler<TState> handler)
+        public Application<TState> OnActionSubmit(string verb, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
@@ -182,7 +180,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verbPattern">Regular expression to match against the named action to be handled.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionSubmit(Regex verbPattern, ActionSubmitHandler<TState> handler)
+        public Application<TState> OnActionSubmit(Regex verbPattern, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
@@ -214,7 +212,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionSubmit(RouteSelector routeSelector, ActionSubmitHandler<TState> handler)
+        public Application<TState> OnActionSubmit(RouteSelector routeSelector, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -256,7 +254,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnActionSubmit(MultipleRouteSelector routeSelectors, ActionSubmitHandler<TState> handler)
+        public Application<TState> OnActionSubmit(MultipleRouteSelector routeSelectors, ActionSubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -290,7 +288,7 @@ namespace Microsoft.Teams.AI
         /// <param name="dataset">The dataset to be searched.</param>
         /// <param name="handler">Function to call when the search is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSearch(string dataset, SearchHandler<TState> handler)
+        public Application<TState> OnSearch(string dataset, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(dataset);
             Verify.ParamNotNull(handler);
@@ -304,7 +302,7 @@ namespace Microsoft.Teams.AI
         /// <param name="datasetPattern">Regular expression to match against the dataset to be searched.</param>
         /// <param name="handler">Function to call when the search is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSearch(Regex datasetPattern, SearchHandler<TState> handler)
+        public Application<TState> OnSearch(Regex datasetPattern, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(datasetPattern);
             Verify.ParamNotNull(handler);
@@ -318,7 +316,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSearch(RouteSelector routeSelector, SearchHandler<TState> handler)
+        public Application<TState> OnSearch(RouteSelector routeSelector, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -362,7 +360,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSearch(MultipleRouteSelector routeSelectors, SearchHandler<TState> handler)
+        public Application<TState> OnSearch(MultipleRouteSelector routeSelectors, SearchHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);

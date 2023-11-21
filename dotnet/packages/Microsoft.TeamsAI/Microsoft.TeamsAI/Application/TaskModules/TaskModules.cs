@@ -13,22 +13,20 @@ namespace Microsoft.Teams.AI
     /// TaskModules class to enable fluent style registration of handlers related to Task Modules.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
-    /// <typeparam name="TTurnStateManager">The type of the turn state manager object used by the application.</typeparam>
-    public class TaskModules<TState, TTurnStateManager>
-       where TState : ITurnState<StateBase, StateBase, TempState>
-       where TTurnStateManager : ITurnStateManager<TState>, new()
+    public class TaskModules<TState>
+       where TState : ITurnState<Record, Record, TempState>, IMemory, new()
     {
         private static readonly string FETCH_INVOKE_NAME = "task/fetch";
         private static readonly string SUBMIT_INVOKE_NAME = "task/submit";
         private static readonly string DEFAULT_TASK_DATA_FILTER = "verb";
 
-        private readonly Application<TState, TTurnStateManager> _app;
+        private readonly Application<TState> _app;
 
         /// <summary>
         /// Creates a new instance of the TaskModules class.
         /// </summary>
         /// <param name="app"> The top level application class to register handlers with.</param>
-        public TaskModules(Application<TState, TTurnStateManager> app)
+        public TaskModules(Application<TState> app)
         {
             this._app = app;
         }
@@ -39,7 +37,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verb">Name of the verb to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetch(string verb, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(string verb, FetchHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
@@ -54,7 +52,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verbPattern">Regular expression to match against the verbs to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetch(Regex verbPattern, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(Regex verbPattern, FetchHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
@@ -69,7 +67,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetch(RouteSelector routeSelector, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(RouteSelector routeSelector, FetchHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -103,7 +101,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnFetch(MultipleRouteSelector routeSelectors, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(MultipleRouteSelector routeSelectors, FetchHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -139,7 +137,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verb">Name of the verb to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmit(string verb, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(string verb, SubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
@@ -155,7 +153,7 @@ namespace Microsoft.Teams.AI
         /// <param name="verbPattern">Regular expression to match against the verbs to register the handler for</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmit(Regex verbPattern, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(Regex verbPattern, SubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
@@ -170,7 +168,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmit(RouteSelector routeSelector, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(RouteSelector routeSelector, SubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -204,7 +202,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector verb(s) to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnSubmit(MultipleRouteSelector routeSelectors, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(MultipleRouteSelector routeSelectors, SubmitHandler<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);

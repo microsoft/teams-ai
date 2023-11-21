@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.Bot.Builder;
+
 namespace Microsoft.Teams.AI.State
 {
     /// <summary>
@@ -26,5 +28,20 @@ namespace Microsoft.Teams.AI.State
         /// Gets the temp state.
         /// </summary>
         public TTempState? Temp { get; }
+
+        /// <summary>
+        /// Loads all of the state scopes for the current turn.
+        /// </summary>
+        /// <param name="storage">Optional. Storage provider to load state scopes from.</param>
+        /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
+        /// <returns>True if the states need to be loaded.</returns>
+        public Task<bool> LoadStateAsync(IStorage? storage, ITurnContext turnContext);
+
+        /// <summary>
+        /// Saves all of the state scopes for the current turn.
+        /// </summary>
+        /// <param name="storage">Optional. Storage provider to save state scopes to.</param>
+        /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
+        public Task SaveStateAsync(IStorage? storage, ITurnContext turnContext);
     }
 }

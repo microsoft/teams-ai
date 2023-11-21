@@ -14,5 +14,5 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task FileConsentHandler<TState>(ITurnContext turnContext, TState turnState, FileConsentCardResponse fileConsentCardResponse, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task FileConsentHandler<TState>(ITurnContext turnContext, TState turnState, FileConsentCardResponse fileConsentCardResponse, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
 }

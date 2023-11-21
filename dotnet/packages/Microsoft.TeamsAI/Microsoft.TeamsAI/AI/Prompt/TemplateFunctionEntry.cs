@@ -10,9 +10,9 @@ namespace Microsoft.Teams.AI.AI.Prompt
     /// <param name="turnContext">The turn context.</param>
     /// <param name="turnState">The turn state.</param>
     /// <returns>A string that is injected in the prompt template.</returns>
-    public delegate Task<string> PromptFunction<TState>(ITurnContext turnContext, TState turnState) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task<string> PromptFunction<TState>(ITurnContext turnContext, TState turnState) where TState : ITurnState<Record, Record, TempState>;
 
-    internal sealed class TemplateFunctionEntry<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal sealed class TemplateFunctionEntry<TState> where TState : ITurnState<Record, Record, TempState>
     {
         internal PromptFunction<TState> Handler;
 

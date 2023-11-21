@@ -9,15 +9,13 @@ namespace Microsoft.Teams.AI
     /// A builder class for simplifying the creation of an Application instance.
     /// </summary>
     /// <typeparam name="TState">Optional. Type of the turn state. This allows for strongly typed access to the turn state.</typeparam>
-    /// <typeparam name="TTurnStateManager">Type of the turn state manager.</typeparam>
-    public class ApplicationBuilder<TState, TTurnStateManager>
-        where TState : ITurnState<StateBase, StateBase, TempState>
-        where TTurnStateManager : ITurnStateManager<TState>, new()
+    public class ApplicationBuilder<TState>
+        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
     {
         /// <summary>
         /// The application's configured options.
         /// </summary>
-        public ApplicationOptions<TState, TTurnStateManager> Options { get; } = new();
+        public ApplicationOptions<TState> Options { get; } = new();
 
         /// <summary>
         /// Configures the application to use long running messages.
@@ -26,7 +24,7 @@ namespace Microsoft.Teams.AI
         /// <param name="adapter">The adapter to use for routing incoming requests.</param>
         /// <param name="botAppId">The Microsoft App ID for the bot.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithLongRunningMessages(BotAdapter adapter, string botAppId)
+        public ApplicationBuilder<TState> WithLongRunningMessages(BotAdapter adapter, string botAppId)
         {
             if (string.IsNullOrEmpty(botAppId))
             {
@@ -44,7 +42,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="storage">The storage system to use.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithStorage(IStorage storage)
+        public ApplicationBuilder<TState> WithStorage(IStorage storage)
         {
             Options.Storage = storage;
             return this;
@@ -55,20 +53,20 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="aiOptions">The options for the AI system.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithAIOptions(AIOptions<TState> aiOptions)
+        public ApplicationBuilder<TState> WithAIOptions(AIOptions<TState> aiOptions)
         {
             Options.AI = aiOptions;
             return this;
         }
 
         /// <summary>
-        /// Configures the turn state manager to use for managing the bot's turn state.
+        /// Configures the turn state factory to use for managing the bot's turn state.
         /// </summary>
-        /// <param name="turnStateManager">The turn state manager to use.</param>
+        /// <param name="turnStateFactory">The turn state factory to use.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithTurnStateManager(TTurnStateManager turnStateManager)
+        public ApplicationBuilder<TState> WithTurnStateFactory(Func<TState> turnStateFactory)
         {
-            Options.TurnStateManager = turnStateManager;
+            Options.TurnStateFactory = turnStateFactory;
             return this;
         }
 
@@ -77,7 +75,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="loggerFactory">The Logger factory</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithLoggerFactory(ILoggerFactory loggerFactory)
+        public ApplicationBuilder<TState> WithLoggerFactory(ILoggerFactory loggerFactory)
         {
             Options.LoggerFactory = loggerFactory;
             return this;
@@ -88,7 +86,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="adaptiveCardOptions">The options for Adaptive Cards.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithAdaptiveCardOptions(AdaptiveCardsOptions adaptiveCardOptions)
+        public ApplicationBuilder<TState> WithAdaptiveCardOptions(AdaptiveCardsOptions adaptiveCardOptions)
         {
             Options.AdaptiveCards = adaptiveCardOptions;
             return this;
@@ -99,7 +97,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="taskModulesOptions">The options for Task Modules.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> WithTaskModuleOptions(TaskModulesOptions taskModulesOptions)
+        public ApplicationBuilder<TState> WithTaskModuleOptions(TaskModulesOptions taskModulesOptions)
         {
             Options.TaskModules = taskModulesOptions;
             return this;
@@ -111,7 +109,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="removeRecipientMention">The boolean for removing recipient mentions.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> SetRemoveRecipientMention(bool removeRecipientMention)
+        public ApplicationBuilder<TState> SetRemoveRecipientMention(bool removeRecipientMention)
         {
             Options.RemoveRecipientMention = removeRecipientMention;
             return this;
@@ -123,7 +121,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="startTypingTimer">The boolean for starting the typing timer.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState, TTurnStateManager> SetStartTypingTimer(bool startTypingTimer)
+        public ApplicationBuilder<TState> SetStartTypingTimer(bool startTypingTimer)
         {
             Options.StartTypingTimer = startTypingTimer;
             return this;
@@ -133,9 +131,9 @@ namespace Microsoft.Teams.AI
         /// Builds and returns a new Application instance.
         /// </summary>
         /// <returns>The Application instance.</returns>
-        public Application<TState, TTurnStateManager> Build()
+        public Application<TState> Build()
         {
-            return new Application<TState, TTurnStateManager>(Options);
+            return new Application<TState>(Options);
         }
     }
 }

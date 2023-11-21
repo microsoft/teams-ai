@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace Microsoft.Teams.AI.Utilities
 {
     /// <summary>
-    /// Utility class for verifying arguments.
+    /// Utility class for verifying arguments and local variables.
     /// </summary>
     internal class Verify
     {
@@ -19,6 +19,19 @@ namespace Microsoft.Teams.AI.Utilities
             if (argument == null)
             {
                 throw new ArgumentNullException(parameterName);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that the local variable is not null.
+        /// </summary>
+        /// <param name="variable">An arbitrary object.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static void NotNull(object? variable)
+        {
+            if (variable == null)
+            {
+                throw new ArgumentNullException(nameof(variable));
             }
         }
     }
