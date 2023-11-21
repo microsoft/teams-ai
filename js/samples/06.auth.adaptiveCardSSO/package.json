@@ -21,7 +21,7 @@
     "dependencies": {
         "@microsoft/microsoft-graph-client": "^3.0.7",
         "@microsoft/teams-ai": "~1.0.0-preview.1",
-        "botbuilder": "^4.21.0",
+        "botbuilder": "^4.21.1",
         "dotenv": "^16.3.1",
         "isomorphic-fetch": "^3.0.0",
         "replace": "~1.2.0",
@@ -29,13 +29,13 @@
     },
     "devDependencies": {
         "@types/dotenv": "8.2.0",
-        "@types/isomorphic-fetch": "^0.0.38",
+        "@types/isomorphic-fetch": "^0.0.39",
         "@types/jsonwebtoken": "^8.5.4",
-        "@types/restify": "8.5.7",
+        "@types/restify": "8.5.10",
         "nodemon": "~3.0.1",
         "rimraf": "^5.0.5",
         "ts-node": "^10.9.1",
         "tsc-watch": "^6.0.4",
-        "typescript": "^5.2.2"
+        "typescript": "^5.3.2"
     }
 }
