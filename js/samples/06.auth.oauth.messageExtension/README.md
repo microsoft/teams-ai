@@ -1,12 +1,14 @@
-# Teams Adaptive Card SSO Bot
+# Teams Message Extension SSO Bot
 
 This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+
+This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Teams Adaptive Card SSO Bot](#teams-adaptive-card-sso-bot)
+- [Teams Message Extension SSO Bot](#teams-message-extension-sso-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Interacting with the bot](#interacting-with-the-bot)
   - [Multiple ways to test](#multiple-ways-to-test)
@@ -37,13 +39,13 @@ This sample shows how to incorporate a basic conversational flow into a Microsof
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
     yarn start
     ```
 
 ## Interacting with the bot
 
-Once the bot is successfully sideloaded and installed, send any message to it. The bot will respond with an adaptive card with a sign in button. Clicking on it will initiate the sign in flow. Once that is done, the card should update to show the users profile picture and name. 
+![Bot interaction image](https://github.com/OfficeDev/Microsoft-Teams-Samples/raw/main/samples/msgext-search-auth-config/csharp/Images/msgext-search-auth-config.gif)
 
 ## Multiple ways to test
 
@@ -90,7 +92,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
     teamsfx provision --env local
 
     ```
@@ -111,10 +113,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/06.auth.adaptiveCardSSO/`
+1. In a terminal, navigate to `teams-ai/js/samples/06.auth.messageExtensionSSO/`
 
     ```bash
-    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.messageExtensionSSO/
     ```
 
 1. Run ngrok tunneling service - point to port 3978
