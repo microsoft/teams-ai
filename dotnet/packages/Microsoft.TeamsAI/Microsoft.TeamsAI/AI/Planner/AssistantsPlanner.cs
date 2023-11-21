@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.OpenAI;
 using Microsoft.Teams.AI.AI.OpenAI.Models;
 using Microsoft.Teams.AI.Exceptions;
@@ -45,7 +46,9 @@ namespace Microsoft.Teams.AI.AI.Planner
         /// Create new AssistantsPlanner.
         /// </summary>
         /// <param name="options">Options for configuring the AssistantsPlanner.</param>
-        public AssistantsPlanner(AssistantsPlannerOptions options)
+        /// <param name="loggerFactory">The logger factory instance.</param>
+        /// <param name="httpClient">HTTP client.</param>
+        public AssistantsPlanner(AssistantsPlannerOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
             Verify.ParamNotNull(options);
             Verify.ParamNotNull(options.ApiKey, "AssistantsPlannerOptions.ApiKey");
@@ -59,7 +62,9 @@ namespace Microsoft.Teams.AI.AI.Planner
             _openAIClient = new OpenAIClient(new OpenAIClientOptions(_options.ApiKey)
             {
                 Organization = _options.Organization
-            });
+            },
+            loggerFactory,
+            httpClient);
         }
 
         /// <inheritdoc/>
