@@ -4,17 +4,10 @@
 import { Dialog, DialogContext, PromptRecognizerResult } from "botbuilder-dialogs";
 import { ActionTypes, Activity, ActivityTypes, CardFactory, MessageFactory, OAuthCard, StatusCodes, TokenExchangeInvokeRequest, TokenExchangeResource, TokenResponse, TurnContext, tokenExchangeOperationName, verifyStateOperationName } from "botbuilder";
 import { v4 as uuidv4 } from "uuid";
-import { AuthenticationResult, ConfidentialClientApplication, Configuration } from "@azure/msal-node";
+import { AuthenticationResult, ConfidentialClientApplication } from "@azure/msal-node";
+import { TeamsSsoSettings } from "./TeamsSsoSettings";
 
 const invokeResponseType = "invokeResponse";
-
-export interface TeamsSsoSettings {
-    scopes: string[];
-    msalConfig: Configuration;
-    signInLink: string;
-    timeout?: number;
-    endOnInvalidMessage?: boolean;
-}
 
 class TokenExchangeInvokeResponse {
     /**
@@ -33,11 +26,24 @@ class TokenExchangeInvokeResponse {
     }
 }
 
+/**
+ * @internal
+ * 
+ * Creates a new prompt that leverage Teams Single Sign On (SSO) support for bot to automatically sign in user and
+ * help receive oauth token, asks the user to consent if needed.
+ */
 export class TeamsSsoPrompt extends Dialog {
     private settingName: string;
     private settings: TeamsSsoSettings;
     private msal: ConfidentialClientApplication;
 
+    /**
+     * Creates a new instance of TeamsSsoPrompt.
+     * @param dialogId The ID of the dialog.
+     * @param settingName The name of the setting.
+     * @param settings The settings for Teams SSO.
+     * @param msal The MSAL (Microsoft Authentication Library) object.
+     */
     constructor(
         dialogId: string,
         settingName: string,
@@ -52,6 +58,17 @@ export class TeamsSsoPrompt extends Dialog {
         this.validateScopesType(settings.scopes);
     }
 
+
+    /**
+     * Called when a prompt dialog is pushed onto the dialog stack and is being activated.
+     * @remarks
+     * If the task is successful, the result indicates whether the prompt is still
+     * active after the turn has been processed by the prompt.
+     *
+     * @param dc The DialogContext for the current turn of the conversation.
+     *
+     * @returns A `Promise` representing the result of current turn.
+     */
     public async beginDialog(dc: any, options: any): Promise<any> {
         const default_timeout = 900000;
         let timeout: number = default_timeout;
@@ -91,6 +108,17 @@ export class TeamsSsoPrompt extends Dialog {
         return Dialog.EndOfTurn;
     }
 
+
+    /**
+     * Called when a prompt dialog is the active dialog and the user replied with a new activity.
+     * @remarks
+     * If the task is successful, the result indicates whether the dialog is still
+     * active after the turn has been processed by the dialog.
+     *
+     * @param dc The DialogContext for the current turn of the conversation.
+     *
+     * @returns A `Promise` representing the result of the turn after the dialog has processed the activity.
+     */
     public async continueDialog(dc: any): Promise<any> {
         const state = dc.activeDialog?.state;
         const isMessage: boolean = dc.context.activity.type === ActivityTypes.Message;

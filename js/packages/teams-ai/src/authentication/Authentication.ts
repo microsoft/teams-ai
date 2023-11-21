@@ -16,7 +16,7 @@ import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthentica
 import { BotAuthenticationBase, deleteTokenFromState, setTokenInState } from './BotAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
 import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
-import { TeamsSsoSettings } from './TeamsBotSsoPrompt';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
 import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
 import { OAuthBotAuthentication } from './OAuthBotAuthentication';
 import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
