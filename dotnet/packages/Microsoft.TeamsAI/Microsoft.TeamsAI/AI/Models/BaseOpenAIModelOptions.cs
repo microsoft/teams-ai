@@ -1,4 +1,4 @@
-﻿using static Microsoft.Teams.AI.AI.Prompts.PromptTemplate.PromptTemplateConfiguration.CompletionConfiguration;
+﻿using Microsoft.Teams.AI.AI.Prompts;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// Type of completion to use for the default model.
         /// </summary>
-        public CompletionType CompletionType { get; set; }
+        public CompletionConfiguration.CompletionType CompletionType { get; set; }
 
         /// <summary>
         /// Whether to log requests to the console.
@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <param name="retryPolicy">Retry policy to use when calling the OpenAI API.</param>
         /// <param name="useSystemMessages"></param>
         protected BaseOpenAIModelOptions(
-            CompletionType completionType = CompletionType.Chat,
+            CompletionConfiguration.CompletionType completionType = CompletionConfiguration.CompletionType.Chat,
             bool logRequests = false,
             List<TimeSpan>? retryPolicy = null,
             bool useSystemMessages = false)
