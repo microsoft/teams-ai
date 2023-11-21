@@ -25,6 +25,11 @@ namespace Microsoft.Teams.AI.State
         public const string HistoryKey = "history";
 
         /// <summary>
+        /// Name of the action outputs property.
+        /// </summary>
+        public const string ActionOutputsKey = "actionOutputs";
+
+        /// <summary>
         /// Creates a new instance of the <see cref="TempState"/> class.
         /// </summary>
         public TempState() : base()
@@ -32,6 +37,7 @@ namespace Microsoft.Teams.AI.State
             this[InputKey] = string.Empty;
             this[OutputKey] = string.Empty;
             this[HistoryKey] = string.Empty;
+            this[ActionOutputsKey] = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -61,6 +67,15 @@ namespace Microsoft.Teams.AI.State
         {
             get => Get<string>(HistoryKey)!;
             set => Set(HistoryKey, value);
+        }
+
+        /// <summary>
+        /// All outputs returned from the action sequence that was executed.
+        /// </summary>
+        public Dictionary<string, string> ActionOutputs
+        {
+            get => Get<Dictionary<string, string>>(ActionOutputsKey)!;
+            set => Set(ActionOutputsKey, value);
         }
     }
 }

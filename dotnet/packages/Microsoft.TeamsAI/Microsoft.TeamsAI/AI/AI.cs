@@ -276,6 +276,11 @@ namespace Microsoft.Teams.AI.AI
                             .Handler
                             .PerformAction(turnContext, turnState, data, doCommand.Action);
                         shouldLoop = output.Length > 0;
+
+                        if (turnState.Temp != null)
+                        {
+                            turnState.Temp.ActionOutputs[doCommand.Action] = output;
+                        }
                     }
                     else
                     {

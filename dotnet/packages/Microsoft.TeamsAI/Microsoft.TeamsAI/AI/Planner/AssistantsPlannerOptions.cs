@@ -29,12 +29,6 @@ namespace Microsoft.Teams.AI.AI.Planner
         public TimeSpan? PollingInterval { get; set; }
 
         /// <summary>
-        /// Optional. The state path when access Assistants state in TurnState.
-        /// If not provide, the default value is "conversation.assistants_state", which means Assistants state is stored in ConversationState, with sub-key "assistants_state".
-        /// </summary>
-        public string? AssistantsStateVariable { get; set; }
-
-        /// <summary>
         /// Create an instance of the AssistantsPlannerOptions class.
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
