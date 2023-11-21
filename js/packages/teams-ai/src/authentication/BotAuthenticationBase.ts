@@ -1,25 +1,16 @@
 /* eslint-disable security/detect-object-injection */
-import {
-    DialogSet,
-    DialogState,
-    DialogTurnResult,
-    DialogTurnStatus,
-    OAuthPrompt,
-    OAuthPromptSettings
-} from 'botbuilder-dialogs';
+import { DialogState, DialogTurnResult, DialogTurnStatus } from 'botbuilder-dialogs';
 import { TurnState } from '../TurnState';
 import { Application } from '../Application';
 import {
     ActivityTypes,
     MemoryStorage,
-    TeamsSSOTokenExchangeMiddleware,
     TurnContext,
     Storage,
     verifyStateOperationName,
     tokenExchangeOperationName,
     TokenResponse
 } from 'botbuilder';
-import { TurnStateProperty } from '../TurnStateProperty';
 import { AuthError } from './Authentication';
 
 /**
@@ -32,45 +23,27 @@ interface UserAuthState {
 /**
  * @internal
  */
-export class BotAuthentication<TState extends TurnState> {
-    private _oauthPrompt: OAuthPrompt;
-    private _storage: Storage;
+export abstract class BotAuthenticationBase<TState extends TurnState> {
+    protected _storage: Storage;
+    protected _settingName: string;
     private _userSignInSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
     private _userSignInFailureHandler?: (context: TurnContext, state: TState, error: AuthError) => Promise<void>;
-    private _settingName: string;
 
-    public constructor(
-        app: Application<TState>,
-        oauthPromptSettings: OAuthPromptSettings,
-        settingName: string,
-        storage?: Storage
-    ) {
-        // Create OAuthPrompt
-        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthPromptSettings);
+    public constructor(app: Application<TState>, settingName: string, storage?: Storage) {
         this._settingName = settingName;
 
         this._storage = storage || new MemoryStorage();
 
-        // Handles deduplication of token exchange event when using SSO with Bot Authentication
-        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));
-
         // Add application routes to handle OAuth callbacks
         app.addRoute(
-            (context) =>
-                Promise.resolve(
-                    context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName
-                ),
+            this.verifyStateRouteSelector.bind(this),
             async (context, state) => {
                 await this.handleSignInActivity(context, state);
             },
             true
         );
         app.addRoute(
-            (context) =>
-                Promise.resolve(
-                    context.activity.type === ActivityTypes.Invoke &&
-                        context.activity.name === tokenExchangeOperationName
-                ),
+            this.tokenExchangeRouteSelector.bind(this),
             async (context, state) => {
                 await this.handleSignInActivity(context, state);
             },
@@ -142,7 +115,7 @@ export class BotAuthentication<TState extends TurnState> {
     public async handleSignInActivity(context: TurnContext, state: TState): Promise<void> {
         try {
             const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
-            const result = await this.runDialog(context, state, userDialogStatePropertyName);
+            const result = await this.continueDialog(context, state, userDialogStatePropertyName);
 
             if (result.status === DialogTurnStatus.complete) {
                 // OAuthPrompt dialog should have sent an invoke response already.
@@ -176,22 +149,6 @@ export class BotAuthentication<TState extends TurnState> {
         }
     }
 
-    public async runDialog(
-        context: TurnContext,
-        state: TState,
-        dialogStateProperty: string
-    ): Promise<DialogTurnResult<TokenResponse>> {
-        const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
-        const dialogSet = new DialogSet(accessor);
-        dialogSet.add(this._oauthPrompt);
-        const dialogContext = await dialogSet.createContext(context);
-        let results = await dialogContext.continueDialog();
-        if (results.status === DialogTurnStatus.empty) {
-            results = await dialogContext.beginDialog(this._oauthPrompt.id);
-        }
-        return results;
-    }
-
     public deleteAuthFlowState(context: TurnContext, state: TState) {
         // Delete user auth state
         const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
@@ -222,11 +179,31 @@ export class BotAuthentication<TState extends TurnState> {
         const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
         return (state.conversation as any)[userDialogStatePropertyName] as DialogState;
     }
+
+    protected async verifyStateRouteSelector(context: TurnContext): Promise<boolean> {
+        return context.activity.type === ActivityTypes.Invoke && context.activity.name === verifyStateOperationName;
+    }
+
+    protected async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
+        return context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName;
+    }
+
+    public abstract runDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<TokenResponse>>;
+
+    public abstract continueDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<TokenResponse>>;
 }
 
 /**
  * Sets the token in the turn state
- * @param {DefaultTurnState} state The turn state
+ * @param {TurnState} state The turn state
  * @param {string} settingName The name of the setting
  * @param {string} token The token to set
  * @internal
@@ -250,26 +227,4 @@ export function deleteTokenFromState<TState extends TurnState>(state: TState, se
     }
 
     delete state.temp.authTokens[settingName];
-}
-
-/**
- * @internal
- * SSO Token Exchange Middleware for Teams that filters based on the connection name.
- */
-class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {
-    private readonly _oauthConnectionName: string;
-
-    public constructor(storage: Storage, oauthConnectionName: string) {
-        super(storage, oauthConnectionName);
-        this._oauthConnectionName = oauthConnectionName;
-    }
-
-    public async onTurn(context: TurnContext, next: () => Promise<void>): Promise<void> {
-        // If connection name matches then continue to the Teams SSO Token Exchange Middleware.
-        if (context.activity.value?.connectionName == this._oauthConnectionName) {
-            await super.onTurn(context, next);
-        } else {
-            await next();
-        }
-    }
 }

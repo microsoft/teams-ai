@@ -7,6 +7,7 @@ import { SignInUrlResponse, TokenExchangeRequest, UserTokenClient } from 'botfra
 
 /**
  * @internal
+ * @private
  * Retrieves the user token for a given connection name and magic code.
  * @param {TurnContext} context The context object for the current turn of conversation.
  * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
@@ -35,6 +36,7 @@ export async function getUserToken(
 
 /**
  * @internal
+ * @private
  * @param {TurnContext} context The context object for the current turn of conversation.
  * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
  * @returns {Promise<SignInUrlResponse>} A SignInUrlResponse object containing the sign-in URL.
@@ -55,6 +57,7 @@ export async function getSignInResource(
 
 /**
  * @internal
+ * @private
  * @param {TurnContext} context The context object for the current turn of conversation.
  * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
  */
@@ -75,6 +78,7 @@ export async function signOutUser(context: TurnContext, settings: OAuthPromptSet
 
 /**
  * @internal
+ * @private
  * @param {TurnContext} context The context object for the current turn of conversation.
  * @param {OAuthPromptSettings} settings The settings for the OAuth prompt.
  * @param {TokenExchangeRequest} tokenExchangeRequest The token exchange request details to be sent to the Bot Framework Token Service.

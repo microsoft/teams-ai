@@ -74,7 +74,7 @@ export interface PromptTemplateConfig {
     /**
      * @deprecated Use `completion.model` instead.
      * Optional. Array of backends (models) to use for the prompt.
-     * @summary
+     * @remarks
      * Passing the name of a model to use here will override the default model used by a planner.
      */
     default_backends?: string[];

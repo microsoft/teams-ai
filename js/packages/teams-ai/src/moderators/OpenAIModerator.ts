@@ -55,8 +55,8 @@ export interface OpenAIModeratorOptions {
 }
 
 /**
- * A moderator tha users OpenAI's moderation API to review prompts and plans for safety.
- * @summary
+ * A moderator that uses OpenAI's moderation API to review prompts and plans for safety.
+ * @remarks
  * This moderation can be configure to review the input from the user, output from the model, or both.
  * @template TState Optional. Type of the applications turn state.
  */

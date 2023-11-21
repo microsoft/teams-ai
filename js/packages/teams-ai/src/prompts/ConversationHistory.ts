@@ -38,6 +38,9 @@ export class ConversationHistory extends PromptSectionBase {
         this.assistantPrefix = assistantPrefix;
     }
 
+    /**
+     * @private
+     */
     public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
       // Get messages from memory
       const history: Message[] = (memory.getValue<Message[]>(this.variable) ?? []).slice();
@@ -74,6 +77,9 @@ export class ConversationHistory extends PromptSectionBase {
       return { output: lines.join(this.separator), length: tokens, tooLong: tokens > maxTokens };
    }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Get messages from memory
         const history: Message[] = (memory.getValue<Message[]>(this.variable) ?? []).slice();

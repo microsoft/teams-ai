@@ -15,13 +15,18 @@ import { stringify } from "yaml";
 import { Memory } from "../MemoryFork";
 
 /**
- * Base class for all prompt augmentations.
+ * A prompt section that renders a list of actions to the prompt.
  */
 export class ActionAugmentationSection extends PromptSectionBase {
     private readonly _text: string;
     private _tokens?: number[];
     private readonly _actions: Map<string, ChatCompletionAction> = new Map();
 
+    /**
+     * Creates a new `ActionAugmentationSection` instance.
+     * @param actions List of actions to render.
+     * @param callToAction Text to display after the list of actions.
+     */
     public constructor(actions: ChatCompletionAction[], callToAction: string) {
         super(-1, true, '\n\n');
 
@@ -44,10 +49,22 @@ export class ActionAugmentationSection extends PromptSectionBase {
         this._text = `${stringify(actionList)}\n\n${callToAction}`;
     }
 
+    /**
+     * Map of action names to actions.
+     */
     public get actions(): Map<string, ChatCompletionAction> {
         return this._actions;
     }
 
+    /**
+     * Renders the prompt section as a list of `Message` objects.
+     * @param context Context for the current turn of conversation.
+     * @param memory Interface for accessing state variables.
+     * @param functions Functions for rendering prompts.
+     * @param tokenizer Tokenizer to use for encoding/decoding text.
+     * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
+     * @returns The rendered prompt section.
+     */
     public renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>> {
         // Tokenize text on first use
         if (!this._tokens) {
