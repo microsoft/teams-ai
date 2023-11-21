@@ -1,7 +1,7 @@
 ﻿
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    public class TestApplication : Application<TestTurnState, TestTurnStateManager>
+    public class TestApplication : Application<TestTurnState>
     {
         public TestApplication(TestApplicationOptions options) : base(options)
         {
@@ -11,5 +11,5 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         }
     }
 
-    public class TestApplicationOptions : ApplicationOptions<TestTurnState, TestTurnStateManager> { }
+    public class TestApplicationOptions : ApplicationOptions<TestTurnState> { }
 }

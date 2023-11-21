@@ -1,4 +1,5 @@
 ﻿using Microsoft.Teams.AI.State;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
@@ -6,11 +7,11 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
     {
     }
 
-    public class CustomConversationState : StateBase
+    public class CustomConversationState : Record
     {
     }
 
-    public class CustomUserState : StateBase
+    public class CustomUserState : Record
     {
     }
 

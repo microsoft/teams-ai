@@ -28,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Planner
     /// use the chatCompletion API, otherwise the textCompletion API will be used.
     /// </remarks>
     public class OpenAIPlanner<TState, TOptions> : IPlanner<TState>
-        where TState : ITurnState<StateBase, StateBase, TempState>
+        where TState : ITurnState<Record, Record, TempState>
         where TOptions : OpenAIPlannerOptions<TState>
     {
         private TOptions _options { get; }
@@ -344,7 +344,7 @@ namespace Microsoft.Teams.AI.AI.Planner
     }
 
     /// <inheritdoc/>
-    public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions<TState>> where TState : ITurnState<StateBase, StateBase, TempState>
+    public class OpenAIPlanner<TState> : OpenAIPlanner<TState, OpenAIPlannerOptions<TState>> where TState : ITurnState<Record, Record, TempState>
     {
         /// <summary>
         /// Creates a new <see cref="OpenAIPlanner{TState}"/> instance.

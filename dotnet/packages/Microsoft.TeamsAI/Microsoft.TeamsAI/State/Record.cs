@@ -3,9 +3,9 @@
 namespace Microsoft.Teams.AI.State
 {
     /// <summary>
-    /// The base state class.
+    /// The class representing a record.
     /// </summary>
-    public class StateBase : Dictionary<string, object>
+    public class Record : Dictionary<string, object>
     {
         /// <summary>
         /// Tries to get the value from the dictionary.

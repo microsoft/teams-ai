@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microsoft.Teams.AI.AI.Action
 {
-    internal class DefaultActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal class DefaultActions<TState> where TState : ITurnState<Record, Record, TempState>
     {
         private readonly ILogger _logger;
 
