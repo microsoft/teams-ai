@@ -10,7 +10,7 @@ using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Exceptions;
-using Microsoft.Teams.AI.Memory;
+using Microsoft.Teams.AI.State;
 using System.Net;
 using System.Text.Json;
 using static Microsoft.Teams.AI.AI.Prompts.PromptTemplate.PromptTemplateConfiguration.CompletionConfiguration;

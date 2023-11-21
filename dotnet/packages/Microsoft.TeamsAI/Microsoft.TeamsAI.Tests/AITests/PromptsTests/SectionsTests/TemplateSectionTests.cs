@@ -4,6 +4,7 @@ using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Moq;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 {
@@ -14,7 +15,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         {
             TemplateSection section = new("this is a test message: {{getMessage}}", ChatRole.User);
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             PromptManager manager = new();
 
@@ -34,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         {
             TemplateSection section = new("this is a test message: {{getMessage 'my param'}}", ChatRole.User);
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             PromptManager manager = new();
 
@@ -54,7 +55,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         {
             TemplateSection section = new("this is a test message: {{$message}}", ChatRole.User);
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             PromptManager manager = new();
 

@@ -9,13 +9,13 @@
     {
         private static readonly string TEMP_SCOPE = "temp";
         private readonly Dictionary<string, Record> _fork = new();
-        private readonly IMemory _memory;
+        private readonly IMemory? _memory;
 
         /// <summary>
         /// Creates a new `MemoryFork` instance.
         /// </summary>
         /// <param name="memory">Memory to fork.</param>
-        public MemoryFork(IMemory memory)
+        public MemoryFork(IMemory? memory = null)
         {
             _memory = memory;
         }
@@ -51,7 +51,7 @@
                 }
             }
 
-            return _memory.GetValue(path);
+            return _memory?.GetValue(path);
         }
 
         /// <summary>
@@ -67,10 +67,13 @@
             {
                 return _fork[scope].ContainsKey(name);
             }
-            else
+
+            if (_memory != null)
             {
                 return _memory.HasValue(path);
             }
+
+            return false;
         }
 
         /// <summary>
@@ -92,17 +95,16 @@
 
         private (string, string) GetScopeAndName(string path)
         {
-            // Get variable scope and name
-            string[] parts = path.Split('.');
-            if (parts.Length > 2)
-            {
-                throw new ArgumentException($"Invalid state path: ${path}");
-            }
-            else if (parts.Length == 1)
-            {
-                parts.Prepend(TEMP_SCOPE);
-            }
+            List<string> parts = path.Split('.').ToList();
 
+            if (parts.Count > 2)
+            {
+                throw new InvalidOperationException($"Invalid state path: {path}");
+            }
+            if (parts.Count == 1)
+            {
+                parts.Insert(0, "temp");
+            }
             return (parts[0], parts[1]);
         }
     }

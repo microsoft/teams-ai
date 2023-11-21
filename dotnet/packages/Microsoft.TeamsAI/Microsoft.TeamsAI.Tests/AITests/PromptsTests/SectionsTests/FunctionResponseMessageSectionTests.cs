@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
+using Microsoft.Teams.AI.State;
 using Moq;
 
 namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
@@ -13,7 +14,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
         {
             FunctionResponseMessageSection section = new("MyFunction", 27);
             Mock<ITurnContext> context = new();
-            Memory.Memory memory = new();
+            MemoryFork memory = new();
             GPTTokenizer tokenizer = new();
             PromptManager manager = new();
 

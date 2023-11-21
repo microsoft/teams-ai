@@ -24,7 +24,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             var func = async () =>
             {
                 await state.LoadStateAsync(storage, turnContext);
-             };
+            };
 
             // Assert
             Exception ex = await Assert.ThrowsAsync<AggregateException>(() => func());
