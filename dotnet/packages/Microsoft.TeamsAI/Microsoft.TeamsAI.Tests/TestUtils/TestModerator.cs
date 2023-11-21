@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {

@@ -13,7 +13,6 @@ using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using System.Net;
 using System.Text.Json;
-using static Microsoft.Teams.AI.AI.Prompts.PromptTemplate.PromptTemplateConfiguration.CompletionConfiguration;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -79,7 +78,7 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             DateTime startTime = DateTime.UtcNow;
             int maxInputTokens = promptTemplate.Configuration.Completion.MaxInputTokens;
-            if (_options.CompletionType == CompletionType.Text)
+            if (_options.CompletionType == CompletionConfiguration.CompletionType.Text)
             {
                 // Render prompt
                 RenderedPromptSection<string> prompt = await promptTemplate.Prompt.RenderAsTextAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens);

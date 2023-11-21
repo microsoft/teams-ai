@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using System.Reflection;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils

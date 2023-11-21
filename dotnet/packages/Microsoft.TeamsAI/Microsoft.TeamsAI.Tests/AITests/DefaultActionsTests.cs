@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async Task Test_Execute_UnkownAction()
+        public async Task Test_Execute_UnknownAction()
         {
             // Arrange
             var logs = new List<string>();

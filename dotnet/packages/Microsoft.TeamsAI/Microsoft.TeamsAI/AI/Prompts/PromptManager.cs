@@ -204,13 +204,13 @@ namespace Microsoft.Teams.AI.AI.Prompts
             Prompt prompt = new(new() { new TemplateSection(text, this.Options.Role) });
 
             // Load prompt configuration. Note: the configuration is optional.
-            PromptTemplate.PromptTemplateConfiguration? config;
+            PromptTemplateConfiguration? config;
             string configPath = Path.Combine(promptFolder, CONFIG_FILE);
             if (!File.Exists(configPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
 
             try
             {
-                config = PromptTemplate.PromptTemplateConfiguration.FromJson(File.ReadAllText(configPath));
+                config = PromptTemplateConfiguration.FromJson(File.ReadAllText(configPath));
             }
             catch (Exception ex)
             {

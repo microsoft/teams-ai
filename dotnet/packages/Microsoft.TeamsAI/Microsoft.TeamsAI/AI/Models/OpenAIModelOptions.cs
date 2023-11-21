@@ -1,5 +1,5 @@
 ﻿using Microsoft.Teams.AI.Utilities;
-using static Microsoft.Teams.AI.AI.Prompts.PromptTemplate.PromptTemplateConfiguration.CompletionConfiguration;
+using Microsoft.Teams.AI.AI.Prompts;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -43,7 +43,7 @@ namespace Microsoft.Teams.AI.AI.Models
             string apiKey,
             string defaultModel,
             string? organization = null,
-            CompletionType completionType = CompletionType.Chat,
+            CompletionConfiguration.CompletionType completionType = CompletionConfiguration.CompletionType.Chat,
             bool logRequests = false,
             List<TimeSpan>? retryPolicy = null,
             bool useSystemMessages = false) : base(completionType, logRequests, retryPolicy, useSystemMessages)

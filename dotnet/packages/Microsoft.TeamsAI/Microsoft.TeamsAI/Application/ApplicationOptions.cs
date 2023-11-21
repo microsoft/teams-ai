@@ -57,7 +57,6 @@ namespace Microsoft.Teams.AI
         /// Optional. Logger factory that will be used in this application.
         /// </summary>
         /// <remarks>
-        /// <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}"/> and <see cref="AI.Planner.AzureOpenAIPlanner{TState}"/> prompt completion data will is logged at the <see cref="LogLevel.Information"/> level.
         /// </remarks>
         public ILoggerFactory? LoggerFactory { get; set; }
 
