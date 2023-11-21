@@ -16,9 +16,7 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Net;
 using Microsoft.Teams.AI.State;
-using Record = Microsoft.Teams.AI.State.Record;
 using Microsoft.Bot.Schema;
-using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -31,10 +29,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var turnStateMock = new Mock<TurnState>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -50,8 +48,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             );
 
             static string httpErrorFunc() => throw new HttpOperationException("", (HttpStatusCode)429);
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, httpErrorFunc);
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var planner = new CustomCompletePromptOpenAIPlanner<TurnState>(options, httpErrorFunc);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
 
             // Act
             var result = await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
@@ -73,10 +71,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var turnStateMock = new Mock<TurnState>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -92,8 +90,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             );
 
             static string throwsExceptionFunc() => throw new TeamsAIException("Exception Message");
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, throwsExceptionFunc);
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var planner = new CustomCompletePromptOpenAIPlanner<TurnState>(options, throwsExceptionFunc);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
 
             // Act
             var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions));
@@ -110,10 +108,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var turnStateMock = new Mock<TurnState>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -129,8 +127,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             );
 
             static string emptyStringFunc() => string.Empty;
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, emptyStringFunc);
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var planner = new CustomCompletePromptOpenAIPlanner<TurnState>(options, emptyStringFunc);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
 
             // Act
             var result = await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
@@ -147,12 +145,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             options.OneSayPerTurn = true;
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var turnStateMock = new Mock<TurnState>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -169,8 +167,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             string multipleSayCommands = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValueA\"}, {\"type\":\"SAY\",\"response\":\"responseValueB\"}]}";
             string multipleSayCommandsFunc() => multipleSayCommands;
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, multipleSayCommandsFunc);
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var planner = new CustomCompletePromptOpenAIPlanner<TurnState>(options, multipleSayCommandsFunc);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
 
 
             // Act
@@ -191,11 +189,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var turnStateMock = new Mock<TurnState>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -212,9 +210,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             string simplePlan = "{ \"type\":\"plan\",\"commands\":[{\"type\":\"SAY\",\"response\":\"responseValueA\"}, {\"type\":\"DO\", \"action\": \"actionName\"}]}";
             string multipleSayCommandsFunc() => simplePlan;
-            var planner = new CustomCompletePromptOpenAIPlanner<TestTurnState>(options, multipleSayCommandsFunc);
+            var planner = new CustomCompletePromptOpenAIPlanner<TurnState>(options, multipleSayCommandsFunc);
 
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
 
             // Act
             var result = await planner.GeneratePlanAsync(turnContextMock.Object, turnStateMock.Object, promptTemplate, aiOptions);
@@ -237,10 +235,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "text-model";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var turnStateMock = new Mock<TurnState>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -255,8 +253,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 }
             );
 
-            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var planner = new CustomCompletionOpenAIPlanner<TurnState>(options);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
             var exceptionMessage = "Exception Message";
             var thrownException = new SemanticKernel.Diagnostics.HttpOperationException(exceptionMessage)
             {
@@ -281,7 +279,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "gpt-model";
 
-            var options = new OpenAIPlannerOptions<TurnState<Record, Record, TempState>>(apiKey, model, new PromptManager<TurnState<Record, Record, TempState>>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
                 new Activity
@@ -293,7 +291,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     ChannelId = "channelId"
                 });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
-            var moderatorMock = new Mock<IModerator<TurnState<Record, Record, TempState>>>();
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -308,8 +306,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 }
             );
 
-            var planner = new CustomCompletionOpenAIPlannerWithTurnState<TurnState<Record, Record, TempState>>(options);
-            var aiOptions = new AIOptions<TurnState<Record, Record, TempState>> (planner, moderatorMock.Object);
+            var planner = new CustomCompletionOpenAIPlannerWithTurnState(options);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
             var exceptionMessage = "Exception Message";
             var thrownException = new SemanticKernel.Diagnostics.HttpOperationException(exceptionMessage)
             {
@@ -338,13 +336,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "randomModelId";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(apiKey, model, new PromptManager<TestTurnState>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
             var promptTemplate = new PromptTemplate("Test", new());
 
-            var planner = new CustomCompletionOpenAIPlanner<TestTurnState>(options);
-            var aiOptions = new AIOptions<TestTurnState>(planner);
+            var planner = new CustomCompletionOpenAIPlanner<TurnState>(options);
+            var aiOptions = new AIOptions<TurnState>(planner);
             MockTextCompletion(planner.TextCompletionMock, "text-completion");
 
             // Act
@@ -361,7 +359,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var apiKey = "randomApiKey";
             var model = "gpt-randomModelId";
 
-            var options = new OpenAIPlannerOptions<TurnState<Record, Record, TempState>>(apiKey, model, new PromptManager<TurnState<Record, Record, TempState>>(), string.Empty);
+            var options = new OpenAIPlannerOptions<TurnState>(apiKey, model, new PromptManager<TurnState>(), string.Empty);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
                 new Activity
@@ -375,8 +373,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContextMock);
             var promptTemplate = new PromptTemplate("Test", new());
 
-            var planner = new CustomCompletionOpenAIPlannerWithTurnState<TurnState<Record, Record, TempState>>(options);
-            var aiOptions = new AIOptions<TurnState<Record, Record, TempState>>(planner);
+            var planner = new CustomCompletionOpenAIPlannerWithTurnState(options);
+            var aiOptions = new AIOptions<TurnState>(planner);
             MockChatCompletion(planner.ChatCompletionMock, "chat-completion");
 
             // Act
@@ -387,7 +385,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         private sealed class CustomCompletePromptOpenAIPlanner<TState> : OpenAIPlanner<TState>
-            where TState : TestTurnState
+            where TState : TurnState
         {
             private Func<string> customFunction;
 
@@ -404,7 +402,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         private sealed class CustomCompletionOpenAIPlanner<TState> : OpenAIPlanner<TState>
-            where TState : TestTurnState
+            where TState : TurnState
         {
             public Mock<ITextCompletion> TextCompletionMock { get; } = new Mock<ITextCompletion>();
 
@@ -425,22 +423,22 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
         }
 
-        private sealed class CustomCompletionOpenAIPlannerWithTurnState<TurnState> : OpenAIPlanner<TurnState<Record, Record, TempState>>
+        private sealed class CustomCompletionOpenAIPlannerWithTurnState : OpenAIPlanner<TurnState>
         {
             public Mock<ITextCompletion> TextCompletionMock { get; } = new Mock<ITextCompletion>();
 
             public Mock<IChatCompletion> ChatCompletionMock { get; } = new Mock<IChatCompletion>();
 
-            public CustomCompletionOpenAIPlannerWithTurnState(OpenAIPlannerOptions<TurnState<Record, Record, TempState>> options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
+            public CustomCompletionOpenAIPlannerWithTurnState(OpenAIPlannerOptions<TurnState> options, ILoggerFactory? loggerFactory = null) : base(options, loggerFactory)
             {
             }
 
-            private protected override ITextCompletion _CreateTextCompletionService(OpenAIPlannerOptions<TurnState<Record, Record, TempState>> options)
+            private protected override ITextCompletion _CreateTextCompletionService(OpenAIPlannerOptions<TurnState> options)
             {
                 return TextCompletionMock.Object;
             }
 
-            private protected override IChatCompletion _CreateChatCompletionService(OpenAIPlannerOptions<TurnState<Record, Record, TempState>> options)
+            private protected override IChatCompletion _CreateChatCompletionService(OpenAIPlannerOptions<TurnState> options)
             {
                 return ChatCompletionMock.Object;
             }

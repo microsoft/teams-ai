@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
     public class AdaptiveCards<TState>
-        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
+        where TState : TurnState, new()
     {
         private static readonly string ACTION_INVOKE_NAME = "adaptiveCard/action";
         private static readonly string ACTION_EXECUTE_TYPE = "Action.Execute";

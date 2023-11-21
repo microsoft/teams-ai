@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public async void Test_LoadState_NoStorageProvided_ShouldThrow()
         {
             // Arrange
-            var state = new TurnState<Record, Record, TempState>();
+            var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             IStorage? storage = null;
 
@@ -34,7 +34,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public async void Test_LoadState_MockStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
-            var state = new TurnState<Record, Record, TempState>();
+            var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
@@ -73,7 +73,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public async void Test_LoadState_MemoryStorageProvided_ShouldPopulateTurnState()
         {
             // Arrange
-            var state = new TurnState<Record, Record, TempState>();
+            var state = new TurnState();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;

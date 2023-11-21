@@ -511,10 +511,10 @@ namespace Microsoft.Teams.AI.Tests
             Assert.Single(array);
             Assert.Equal(shortLine, array[0]);
         }
-        private static async Task<TurnState<Record, Record, TempState>> _GetTurnStateAndTurnContextWithConversationStateAsync()
+        private static async Task<TurnState> _GetTurnStateAndTurnContextWithConversationStateAsync()
         {
             // Arrange
-            var state = new TurnState<Record, Record, TempState>();
+            var state = new TurnState();
             var turnContext = _CreateConfiguredTurnContext();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;

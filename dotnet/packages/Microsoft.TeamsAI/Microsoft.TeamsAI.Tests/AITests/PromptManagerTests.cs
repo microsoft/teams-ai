@@ -7,8 +7,6 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 using Microsoft.SemanticKernel.Diagnostics;
-using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
-using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -18,11 +16,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void AddFunction_Simple()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            var promptManager = new PromptManager<TurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
             var name = "promptFunctionName";
-            PromptFunction<TestTurnState> promptFunction = (turnContext, turnState) => Task.FromResult(name);
+            PromptFunction<TurnState> promptFunction = (turnContext, turnState) => Task.FromResult(name);
 
             // Act
             promptManager.AddFunction(name, promptFunction);
@@ -35,13 +33,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void AddFunction_AlreadyExists_AllowOverride()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            var promptManager = new PromptManager<TurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
             var name = "promptFunctionName";
             var nameOverride = "promptFunctionNameOverride";
-            PromptFunction<TestTurnState> promptFunction = (turnContext, turnState) => Task.FromResult(name);
-            PromptFunction<TestTurnState> promptFunctionOverride = (turnContext, turnState) => Task.FromResult(nameOverride);
+            PromptFunction<TurnState> promptFunction = (turnContext, turnState) => Task.FromResult(name);
+            PromptFunction<TurnState> promptFunctionOverride = (turnContext, turnState) => Task.FromResult(nameOverride);
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
@@ -55,13 +53,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void AddFunction_AlreadyExists_NotAllowOverride()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            var promptManager = new PromptManager<TurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
             var name = "promptFunctionName";
             var nameOverride = "promptFunctionNameOverride";
-            Task<string> promptFunction(ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(name);
-            Task<string> promptFunctionOverride(ITurnContext turnContext, TestTurnState turnState) => Task.FromResult(nameOverride);
+            Task<string> promptFunction(ITurnContext turnContext, TurnState turnState) => Task.FromResult(name);
+            Task<string> promptFunctionOverride(ITurnContext turnContext, TurnState turnState) => Task.FromResult(nameOverride);
 
             // Act
             promptManager.AddFunction(name, promptFunction, false);
@@ -75,7 +73,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void AddPromptTemplate_Simple()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            var promptManager = new PromptManager<TurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
                 "template string",
@@ -101,7 +99,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void AddPromptTemplate_AlreadyExists()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            var promptManager = new PromptManager<TurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
                 "template string",
@@ -128,7 +126,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void LoadPromptTemplate_FromCollection()
         {
             // Arrange
-            var promptManager = new PromptManager<TestTurnState>();
+            var promptManager = new PromptManager<TurnState>();
             var name = "promptTemplateName";
             var promptTemplate = new PromptTemplate(
                 "template string",
@@ -163,7 +161,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
 
             var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
-            var promptManager = new PromptManager<TestTurnState>(directoryPath);
+            var promptManager = new PromptManager<TurnState>(directoryPath);
             var name = "promptTemplateFolder";
             var expectedPromptTemplate = new PromptTemplate(
                 "This is a prompt template string.",
@@ -215,7 +213,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
 
             var directoryPath = Path.GetFullPath(Path.Combine(currentAssemblyDirectory, $"../../../AITests/prompts"));
-            var promptManager = new PromptManager<TestTurnState>(directoryPath);
+            var promptManager = new PromptManager<TurnState>(directoryPath);
             var name = "invalidPromptTemplateFolder";
 
             // Act
@@ -229,7 +227,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void RenderPrompt_PlainText()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             //var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
 
@@ -263,7 +261,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void RenderPrompt_ResolveFunction_FunctionExists()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             //var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
@@ -279,7 +277,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             /// Configure function
             var promptFunctionName = "promptFunctionName";
             var output = "output";
-            PromptFunction<TurnState<Record, Record, TempState>> promptFunction = (TurnContext, TestTurnState) => Task.FromResult(output);
+            PromptFunction<TurnState> promptFunction = (TurnContext, TurnState) => Task.FromResult(output);
 
             /// Configure prompt
             var promptString = "The output of the function is {{ " + promptFunctionName + " }}";
@@ -301,7 +299,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async Task RenderPrompt_ResolveFunction_FunctionNotExists()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             //var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
@@ -338,7 +336,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void RenderPrompt_ResolveVariable()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             //var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
@@ -372,10 +370,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public async void RenderPrompt_ResolveVariable_TestTurnState()
+        public async void RenderPrompt_ResolveVariable_TurnState()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             //var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
@@ -419,7 +417,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void RenderPrompt_ResolveVariable_CustomTurnState()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
                 new Activity
@@ -472,7 +470,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async void RenderPrompt_ResolveVariable_NotExist_ShouldResolveToEmptyString()
         {
             // Arrange
-            var promptManager = new PromptManager<TurnState<Record, Record, TempState>>();
+            var promptManager = new PromptManager<TurnState>();
             //var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);

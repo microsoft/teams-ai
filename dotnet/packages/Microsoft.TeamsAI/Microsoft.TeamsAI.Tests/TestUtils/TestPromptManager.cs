@@ -2,10 +2,11 @@
 
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    public class TestPromptManager : IPromptManager<TestTurnState>
+    public class TestPromptManager : IPromptManager<TurnState>
     {
         public IList<string> Record { get; } = new List<string>();
 
@@ -13,19 +14,19 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
         public IDictionary<string, string> Variables => throw new NotImplementedException();
 
-        public IPromptManager<TestTurnState> AddFunction(string name, PromptFunction<TestTurnState> promptFunction, bool allowOverrides = false)
+        public IPromptManager<TurnState> AddFunction(string name, PromptFunction<TurnState> promptFunction, bool allowOverrides = false)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return this;
         }
 
-        public IPromptManager<TestTurnState> AddPromptTemplate(string name, PromptTemplate promptTemplate)
+        public IPromptManager<TurnState> AddPromptTemplate(string name, PromptTemplate promptTemplate)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return this;
         }
 
-        public Task<string> InvokeFunction(ITurnContext turnContext, TestTurnState turnState, string name)
+        public Task<string> InvokeFunction(ITurnContext turnContext, TurnState turnState, string name)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             throw new NotImplementedException();
@@ -37,13 +38,13 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             throw new NotImplementedException();
         }
 
-        public Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TestTurnState turnState, string name)
+        public Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TurnState turnState, string name)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(RenderPromptResult);
         }
 
-        public Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TestTurnState turnState, PromptTemplate promptTemplate)
+        public Task<PromptTemplate> RenderPromptAsync(ITurnContext turnContext, TurnState turnState, PromptTemplate promptTemplate)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(RenderPromptResult);

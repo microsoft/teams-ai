@@ -9,7 +9,7 @@ namespace Microsoft.Teams.AI.AI
     /// Options for configuring the AI system.
     /// </summary>
     /// <typeparam name="TState">The turn state class.</typeparam>
-    public sealed class AIOptions<TState> where TState : ITurnState<Record, Record, TempState>
+    public sealed class AIOptions<TState> where TState : TurnState
     {
         /// <summary>
         /// The planner to use for generating plans.

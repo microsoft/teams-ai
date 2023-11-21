@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.AI.Planner
     /// <summary>
     /// Options for the OpenAI planner.
     /// </summary>
-    public class OpenAIPlannerOptions<TState> where TState : ITurnState<Record, Record, TempState>
+    public class OpenAIPlannerOptions<TState> where TState : TurnState
     {
         /// <summary>
         /// OpenAI API key.

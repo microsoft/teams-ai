@@ -9,13 +9,7 @@ namespace Microsoft.Teams.AI.State
     /// Base class defining a collection of turn state scopes.
     /// Developers can create a derived class that extends `TurnState` to add additional state scopes.
     /// </summary>
-    /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
-    /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
-    /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
-    public class TurnState<TConversationState, TUserState, TTempState> : ITurnState<TConversationState, TUserState, TTempState>
-        where TConversationState : Record, new()
-        where TUserState : Record, new()
-        where TTempState : TempState, new()
+    public class TurnState : IMemory
     {
         private Dictionary<string, TurnStateEntry> _scopes = new();
         private bool _isLoaded = false;
@@ -62,7 +56,7 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Stores all the conversation-related state.
         /// </summary>
-        public TConversationState Conversation
+        public Record Conversation
         {
             get
             {
@@ -72,7 +66,7 @@ namespace Microsoft.Teams.AI.State
                     throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
                 }
 
-                return (TConversationState)scope.Value!;
+                return scope.Value!;
             }
             set
             {
@@ -91,7 +85,7 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Stores all the user related state.
         /// </summary>
-        public TUserState User
+        public Record User
         {
             get
             {
@@ -101,7 +95,7 @@ namespace Microsoft.Teams.AI.State
                     throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
                 }
 
-                return (TUserState)scope.Value!;
+                return scope.Value!;
             }
             set
             {
@@ -120,7 +114,7 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Stores all the temporary state for the current turn.
         /// </summary>
-        public TTempState Temp
+        public TempState Temp
         {
             get
             {
@@ -130,7 +124,7 @@ namespace Microsoft.Teams.AI.State
                     throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
                 }
 
-                return (TTempState)scope.Value!;
+                return (TempState)scope.Value!;
             }
             set
             {
@@ -315,10 +309,12 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Saves all of the state scopes for the current turn.
         /// </summary>
-        /// <param name="storage">Optional. Storage provider to save state scopes to.</param>
         /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
-        public async Task SaveStateAsync(IStorage? storage, ITurnContext turnContext)
+        /// <param name="storage">Optional. Storage provider to save state scopes to.</param>
+        public async Task SaveStateAsync(ITurnContext turnContext, IStorage? storage)
         {
+            Verify.ParamNotNull(turnContext);
+
             // Check for existing load operation
             if (!this._isLoaded && this._loadingTask!.Result)
             {
@@ -444,9 +440,4 @@ namespace Microsoft.Teams.AI.State
             return (scope, parts[1]);
         }
     }
-
-    /// <summary>
-    /// Defines the state scopes.
-    /// </summary>
-    public class TurnState : TurnState<Record, Record, TempState> { }
 }

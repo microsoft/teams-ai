@@ -50,7 +50,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var endpoint = "https://test.cognitiveservices.azure.com";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TestTurnState is implemented, get the user input
+            // TODO: when TurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
@@ -97,7 +97,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -130,7 +130,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var endpoint = "https://test.cognitiveservices.azure.com";
 
             var botAdapterMock = new Mock<BotAdapter>();
-            // TODO: when TestTurnState is implemented, get the user input
+            // TODO: when TurnState is implemented, get the user input
             var activity = new Activity()
             {
                 Text = "input",
@@ -156,7 +156,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -186,7 +186,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, ModerationType.Both);
-            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -220,7 +220,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -266,7 +266,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.AnalyzeTextAsync(It.IsAny<AnalyzeTextOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(analyzeTextResult, response));
 
             var options = new AzureContentSafetyModeratorOptions(apiKey, endpoint, moderate);
-            var moderator = new AzureContentSafetyModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act

@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.AI.Prompt
     /// Interface for a prompt manager.
     /// </summary>
     /// <typeparam name="TState">The turn state class.</typeparam>
-    public interface IPromptManager<TState> where TState : ITurnState<Record, Record, TempState>
+    public interface IPromptManager<TState> where TState : TurnState
     {
         /// <summary>
         /// Register prompt variables.

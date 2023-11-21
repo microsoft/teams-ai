@@ -8,8 +8,6 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Schema;
 using Moq;
 using Microsoft.Bot.Builder;
-using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
-using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -21,11 +19,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var instance = new DifferentReturnTypesActions();
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var actionNames = new[] { "action1", "action2", "action3" };
 
             // Act
-            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
+            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             foreach (var actionName in actionNames)
             {
                 actions[actionName].Handler.PerformAction(turnContext, turnState);
@@ -43,14 +41,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_Actions_DifferentParameterAttributes()
         {
             // Arrange
-            var instance = new DifferentParameterAttributesActions<TestTurnState>();
+            var instance = new DifferentParameterAttributesActions<TurnState>();
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var actionNames = new[] { "action1", "action2", "action3", "action4", "action5", "action6" };
             var entities = new object();
 
             // Act
-            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
+            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             foreach (var actionName in actionNames)
             {
                 actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName);
@@ -79,12 +77,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var actionName = "action";
             var entities = new object();
 
             // Act
-            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
+            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
 
             // Assert
@@ -92,7 +90,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal($"Cannot assign {from} to {to} of action method Action", exception.Message);
         }
 
-        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : ITurnState<Record, Record, TempState>
+        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : TurnState
         {
             AIOptions<TState> options = new(
                 new Mock<IPlanner<TState>>().Object,
@@ -108,25 +106,25 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             yield return new object[]
             {
-                new TestActions<string, TestTurnState, object, string>(),
+                new TestActions<string, TurnState, object, string>(),
                 typeof(TurnContext),
                 typeof(string),
             };
             yield return new object[]
             {
                 new TestActions<TurnContext, string, object, string>(),
-                typeof(TestTurnState),
+                typeof(TurnState),
                 typeof(string),
             };
             yield return new object[]
             {
-                new TestActions<TurnContext, TestTurnState, string, string>(),
+                new TestActions<TurnContext, TurnState, string, string>(),
                 typeof(object),
                 typeof(string),
             };
             yield return new object[]
             {
-                new TestActions<TurnContext, TestTurnState, object, int>(),
+                new TestActions<TurnContext, TurnState, object, int>(),
                 typeof(string),
                 typeof(int),
             };
@@ -158,7 +156,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
         }
 
-        private sealed class DifferentParameterAttributesActions<TState> where TState : ITurnState<Record, Record, TempState>
+        private sealed class DifferentParameterAttributesActions<TState> where TState : TurnState
         {
             public List<object?[]> Calls { get; set; } = new List<object?[]>();
 

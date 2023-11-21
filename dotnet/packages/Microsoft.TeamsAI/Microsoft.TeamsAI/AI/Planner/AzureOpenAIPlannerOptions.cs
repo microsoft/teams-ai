@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.AI.Planner
     /// The Azure OpenAI API version is set to latest by default.
     /// </remarks>
     public class AzureOpenAIPlannerOptions<TState> : OpenAIPlannerOptions<TState>
-        where TState : ITurnState<Record, Record, TempState>
+        where TState : TurnState
     {
         /// <summary>
         /// Endpoint for your Azure OpenAI deployment.

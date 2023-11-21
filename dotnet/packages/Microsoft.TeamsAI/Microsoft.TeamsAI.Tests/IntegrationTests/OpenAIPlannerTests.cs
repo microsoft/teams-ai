@@ -10,6 +10,7 @@ using Xunit.Abstractions;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.IntegrationTests
 {
@@ -50,13 +51,13 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             Assert.NotNull(config.ApiKey);
             Assert.NotNull(config.ModelId);
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(config.ApiKey, config.ModelId, new PromptManager<TestTurnState>(), string.Empty);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var options = new OpenAIPlannerOptions<TurnState>(config.ApiKey, config.ModelId, new PromptManager<TurnState>(), string.Empty);
+            var planner = new OpenAIPlanner<TurnState>(options, _loggerFactory);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
 
             var promptTemplate = new PromptTemplate(
                 prompt,
@@ -91,13 +92,13 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             Assert.NotNull(config.ApiKey);
             Assert.NotNull(config.ChatModelId);
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(config.ApiKey, config.ChatModelId, new PromptManager<TestTurnState>(), string.Empty);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var options = new OpenAIPlannerOptions<TurnState>(config.ApiKey, config.ChatModelId, new PromptManager<TurnState>(), string.Empty);
+            var planner = new OpenAIPlanner<TurnState>(options, _loggerFactory);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
 
             var promptTemplate = new PromptTemplate(
                 prompt,
@@ -129,13 +130,13 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             Assert.NotNull(config.ChatModelId);
             var invalidApiKey = "invalidApiKey";
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(invalidApiKey, config.ChatModelId, new PromptManager<TestTurnState>(), string.Empty);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var options = new OpenAIPlannerOptions<TurnState>(invalidApiKey, config.ChatModelId, new PromptManager<TurnState>(), string.Empty);
+            var planner = new OpenAIPlanner<TurnState>(options, _loggerFactory);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
@@ -164,13 +165,13 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
             Assert.NotNull(config.ApiKey);
 
-            var options = new OpenAIPlannerOptions<TestTurnState>(config.ApiKey, "invalidModel", new PromptManager<TestTurnState>(), string.Empty);
-            var planner = new OpenAIPlanner<TestTurnState>(options, _loggerFactory);
-            var moderatorMock = new Mock<IModerator<TestTurnState>>();
+            var options = new OpenAIPlannerOptions<TurnState>(config.ApiKey, "invalidModel", new PromptManager<TurnState>(), string.Empty);
+            var planner = new OpenAIPlanner<TurnState>(options, _loggerFactory);
+            var moderatorMock = new Mock<IModerator<TurnState>>();
 
-            var aiOptions = new AIOptions<TestTurnState>(planner, moderatorMock.Object);
+            var aiOptions = new AIOptions<TurnState>(planner, moderatorMock.Object);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
+            var turnStateMock = new Mock<TurnState>();
 
             var promptTemplate = new PromptTemplate(
                 "prompt",
