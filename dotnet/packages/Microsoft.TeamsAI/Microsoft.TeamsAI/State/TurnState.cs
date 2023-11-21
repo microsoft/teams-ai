@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.State
     /// <typeparam name="TConversationState">Optional. Type of the conversation state object being persisted.</typeparam>
     /// <typeparam name="TUserState">Optional. Type of the user state object being persisted.</typeparam>
     /// <typeparam name="TTempState">Optional. Type of the temp state object being persisted.</typeparam>
-    public class TurnState<TConversationState, TUserState, TTempState> : Record, IMemory, ITurnState<TConversationState, TUserState, TTempState>
+    public class TurnState<TConversationState, TUserState, TTempState> : ITurnState<TConversationState, TUserState, TTempState>
         where TConversationState : Record, new()
         where TUserState : Record, new()
         where TTempState : TempState, new()
@@ -45,29 +45,45 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Returns the TurnStateEntry associated with the specified currScope.
         /// </summary>
-        /// <param name="scope">The specified currScope.</param>
+        /// <param name="name">The specified currScope.</param>
         /// <returns>The state saved for the currScope.</returns>
-        public TurnStateEntry GetScope(string scope)
+        public TurnStateEntry? GetScope(string name)
         {
-            return _scopes[scope];
+            try
+            {
+                return _scopes[name];
+            }
+            catch (KeyNotFoundException)
+            {
+                return null;
+            }
         }
 
         /// <summary>
         /// Stores all the conversation-related state.
         /// </summary>
-        public TConversationState? Conversation
+        public TConversationState Conversation
         {
             get
             {
-                TurnStateEntry scope = GetScope(CONVERSATION_SCOPE);
-                Verify.ParamNotNull(scope);
-                return scope.Value as TConversationState;
+                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                return (TConversationState)scope.Value!;
             }
             set
             {
                 Verify.ParamNotNull(value);
-                TurnStateEntry scope = GetScope(CONVERSATION_SCOPE);
-                Verify.ParamNotNull(scope);
+
+                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
                 scope.Replace(value!);
             }
         }
@@ -75,19 +91,28 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Stores all the user related state.
         /// </summary>
-        public TUserState? User
+        public TUserState User
         {
             get
             {
-                TurnStateEntry scope = GetScope(USER_SCOPE);
-                Verify.ParamNotNull(scope);
-                return scope.Value as TUserState;
+                TurnStateEntry? scope = GetScope(USER_SCOPE);
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                return (TUserState)scope.Value!;
             }
             set
             {
                 Verify.ParamNotNull(value);
-                TurnStateEntry scope = GetScope(USER_SCOPE);
-                Verify.ParamNotNull(scope);
+
+                TurnStateEntry? scope = GetScope(USER_SCOPE);
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
                 scope.Replace(value!);
             }
         }
@@ -95,19 +120,28 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Stores all the temporary state for the current turn.
         /// </summary>
-        public TTempState? Temp
+        public TTempState Temp
         {
             get
             {
-                TurnStateEntry scope = GetScope(TEMP_SCOPE);
-                Verify.ParamNotNull(scope);
-                return scope.Value as TTempState;
+                TurnStateEntry? scope = GetScope(TEMP_SCOPE);
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                return (TTempState)scope.Value!;
             }
             set
             {
                 Verify.ParamNotNull(value);
-                TurnStateEntry scope = GetScope(TEMP_SCOPE);
-                Verify.ParamNotNull(scope);
+
+                TurnStateEntry? scope = GetScope(TEMP_SCOPE);
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
                 scope.Replace(value!);
             }
         }
@@ -117,8 +151,12 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public void DeleteConversationState()
         {
-            TurnStateEntry scope = GetScope(CONVERSATION_SCOPE);
-            Verify.ParamNotNull(scope);
+            TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+            if (scope == null)
+            {
+                throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+            }
+
             scope.Delete();
         }
 
@@ -127,8 +165,11 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public void DeleteTempState()
         {
-            TurnStateEntry scope = GetScope(TEMP_SCOPE);
-            Verify.ParamNotNull(scope);
+            TurnStateEntry? scope = GetScope(TEMP_SCOPE);
+            if (scope == null)
+            {
+                throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+            }
             scope.Delete();
         }
 
@@ -137,8 +178,11 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public void DeleteUserState()
         {
-            TurnStateEntry scope = GetScope(USER_SCOPE);
-            Verify.ParamNotNull(scope);
+            TurnStateEntry? scope = GetScope(USER_SCOPE);
+            if (scope == null)
+            {
+                throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+            }
             scope.Delete();
         }
 
@@ -391,7 +435,7 @@ namespace Microsoft.Teams.AI.State
             }
 
             // Validate currScope
-            TurnStateEntry scope = GetScope(parts[0]);
+            TurnStateEntry? scope = GetScope(parts[0]);
             if (scope == null)
             {
                 throw new ArgumentNullException($"Invalid state currScope: ${parts[0]}");

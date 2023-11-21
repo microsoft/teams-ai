@@ -9,25 +9,40 @@ namespace Microsoft.Teams.AI.State
     /// <typeparam name="TConversationState">The conversation state class.</typeparam>
     /// <typeparam name="TUserState">The user state class.</typeparam>
     /// <typeparam name="TTempState">The temp state class.</typeparam>
-    public interface ITurnState<out TConversationState, out TUserState, out TTempState>
-        where TConversationState : class
-        where TUserState : class
+    public interface ITurnState<out TConversationState, out TUserState, out TTempState> : IMemory
+        where TConversationState : Record
+        where TUserState : Record
         where TTempState : TempState
     {
         /// <summary>
         /// Gets the conversation state.
         /// </summary>
-        public TConversationState? Conversation { get; }
+        public TConversationState Conversation { get; }
+
+        /// <summary>
+        /// Deletes the conversation state.
+        /// </summary>
+        public void DeleteConversationState();
 
         /// <summary>
         /// Gets the user state.
         /// </summary>
-        public TUserState? User { get; }
+        public TUserState User { get; }
+
+        /// <summary>
+        /// Deletes the user state.
+        /// </summary>
+        public void DeleteUserState();
 
         /// <summary>
         /// Gets the temp state.
         /// </summary>
-        public TTempState? Temp { get; }
+        public TTempState Temp { get; }
+
+        /// <summary>
+        /// Deletes the temp state.
+        /// </summary>
+        public void DeleteTempState();
 
         /// <summary>
         /// Loads all of the state scopes for the current turn.
