@@ -1,6 +1,6 @@
 ﻿using AdaptiveCards;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 
 namespace Microsoft.Teams.AI.Tests
 {

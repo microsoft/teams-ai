@@ -1,5 +1,5 @@
 ﻿using AdaptiveCards;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using System.Text.Json;
 
 namespace Microsoft.Teams.AI.AI
