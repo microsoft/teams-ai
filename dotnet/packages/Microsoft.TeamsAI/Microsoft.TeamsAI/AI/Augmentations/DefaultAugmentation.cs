@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
     /// <summary>
     /// Default Augmentation
     /// </summary>
-    public class DefaultAugmentation : IAugmentation, IPromptResponseValidator<string>
+    public class DefaultAugmentation : IAugmentation
     {
         /// <summary>
         /// Creates an instance of `DefaultAugmentation`
@@ -40,9 +40,9 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Validation<string>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
         {
-            return await Task.FromResult(new Validation<string>()
+            return await Task.FromResult(new Validation()
             {
                 Valid = true
             });

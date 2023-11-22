@@ -1,5 +1,5 @@
 ﻿using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 

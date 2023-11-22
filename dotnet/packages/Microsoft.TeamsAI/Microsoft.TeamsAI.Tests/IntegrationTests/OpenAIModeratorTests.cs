@@ -1,6 +1,5 @@
 ﻿using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -60,7 +59,6 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
             var turnStateMock = new Mock<TurnState>();
-            var promptTemplateMock = new Mock<PromptTemplate>(string.Empty, new PromptTemplateConfiguration());
 
             // Act
             var result = await moderator.ReviewInput(turnContext, turnStateMock.Object);

@@ -1,8 +1,8 @@
 ﻿using Castle.Core.Logging;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Bot.Schema;
 using Moq;
@@ -25,7 +25,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
-                new PromptTemplateConfiguration
+                new Prompt(new()
+                {
+
+                })
+            )
+            {
+                Configuration = new PromptTemplateConfiguration
                 {
                     Completion =
                     {
@@ -34,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                         TopP = 0.5,
                     }
                 }
-            );
+            };
 
             var clientMock = new Mock<OpenAIClient>(It.IsAny<OpenAIClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
             var exception = new TeamsAIException("Exception Message");
@@ -63,7 +69,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
-                new PromptTemplateConfiguration
+                new(new() { })
+            )
+            {
+                Configuration = new PromptTemplateConfiguration
                 {
                     Completion =
                     {
@@ -72,7 +81,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                         TopP = 0.5,
                     }
                 }
-            );
+            };
 
             var clientMock = new Mock<OpenAIClient>(It.IsAny<OpenAIClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
             var response = new ModerationResponse()

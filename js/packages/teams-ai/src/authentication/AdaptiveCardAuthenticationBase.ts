@@ -26,8 +26,16 @@ export interface AdaptiveCardLoginRequest {
 
 /**
  * @internal
+ * 
+ * Base class to handle adaptive card authentication.
  */
 export abstract class AdaptiveCardAuthenticationBase {
+
+    /**
+     * Authenticates the user.
+     * @param {TurnContext} context - The turn context.
+     * @returns {Promise<string | undefined>} - The authentication token, or undefined if authentication failed. Teams will ask user to sign-in if authentication failed.
+     */
     public async authenticate(context: TurnContext): Promise<string | undefined> {
         const value = context.activity.value;
         
@@ -90,15 +98,36 @@ export abstract class AdaptiveCardAuthenticationBase {
         return;
     }
 
+    /**
+     * Checks if the activity is a valid Adaptive Card activity that supports authentication.
+     * @param context - The turn context.
+     * @returns A boolean indicating if the activity is valid.
+     */
     public isValidActivity(context: TurnContext): boolean {
         return context.activity.type == ActivityTypes.Invoke && context.activity.name == ACTION_INVOKE_NAME;
     }
 
+    /**
+     * Handles the SSO token exchange.
+     * @param context - The turn context.
+     * @returns A promise that resolves to the token response or undefined if token exchange failed.
+     */
     public abstract handleSsoTokenExchange(
         context: TurnContext
     ): Promise<TokenResponse | undefined>
 
+    /**
+     * Handles the user sign-in.
+     * @param context - The turn context.
+     * @param magicCode - The magic code from user sign-in.
+     * @returns A promise that resolves to the token response or undefined if failed to verify the magic code.
+     */
     public abstract handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined>
 
+    /**
+     * Gets the login request for Adaptive Card authentication.
+     * @param context - The turn context.
+     * @returns A promise that resolves to the login request.
+     */
     public abstract getLoginRequest(context: TurnContext): Promise<AdaptiveCardLoginRequest>
 }

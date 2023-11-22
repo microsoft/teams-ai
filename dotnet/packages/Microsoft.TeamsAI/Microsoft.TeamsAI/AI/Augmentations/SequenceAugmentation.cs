@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
     /// <summary>
     /// Sequence Augmentation
     /// </summary>
-    public class SequenceAugmentation : IAugmentation, IPromptResponseValidator<Plan>
+    public class SequenceAugmentation : IAugmentation
     {
         private readonly ActionAugmentationSection _section;
         private readonly JsonResponseValidator _planValidator;
@@ -57,9 +57,9 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Validation<Plan>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
         {
-            Validation<Dictionary<string, JsonElement>> validation = await this._planValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts);
+            Validation validation = await this._planValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts);
 
             if (!validation.Valid)
             {
@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 };
             }
 
-            Plan? plan = validation.Value?.AsJsonElement().Deserialize<Plan>();
+            Plan? plan = ((Dictionary<string, JsonElement>?)validation.Value)?.AsJsonElement().Deserialize<Plan>();
 
             if (plan == null)
             {
@@ -83,7 +83,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
 
             foreach (IPredictedCommand command in plan.Commands)
             {
-                Validation<Plan>? valid;
+                Validation? valid;
 
                 if (command.Type == "DO")
                 {
@@ -121,7 +121,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             };
         }
 
-        private async Task<Validation<Plan>?> _ValidateDoCommand(ITurnContext context, IMemory memory, ITokenizer tokenizer, int remainingAttempts, IPredictedCommand command)
+        private async Task<Validation?> _ValidateDoCommand(ITurnContext context, IMemory memory, ITokenizer tokenizer, int remainingAttempts, IPredictedCommand command)
         {
             PredictedDoCommand? doCommand = command as PredictedDoCommand;
 
@@ -144,7 +144,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 }
             };
 
-            Validation<ValidatedChatCompletionAction> valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts);
+            Validation valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts);
 
             if (!valid.Valid)
             {
@@ -158,7 +158,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             return null;
         }
 
-        private async Task<Validation<Plan>?> _ValidateSayCommand(IPredictedCommand command)
+        private async Task<Validation?> _ValidateSayCommand(IPredictedCommand command)
         {
             PredictedSayCommand? sayCommand = command as PredictedSayCommand;
 
@@ -171,7 +171,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 };
             }
 
-            return await Task.FromResult<Validation<Plan>?>(null);
+            return await Task.FromResult<Validation?>(null);
         }
     }
 }

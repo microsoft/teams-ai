@@ -1,5 +1,5 @@
 ﻿using Microsoft.Teams.AI.AI.Action;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.Moderator;
