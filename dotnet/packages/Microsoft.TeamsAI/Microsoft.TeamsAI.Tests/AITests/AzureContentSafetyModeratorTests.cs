@@ -10,7 +10,6 @@ using Microsoft.Bot.Builder;
 using Azure.AI.ContentSafety;
 using Azure;
 using Microsoft.Teams.AI.State;
-using Record = Microsoft.Teams.AI.State.Record;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests
