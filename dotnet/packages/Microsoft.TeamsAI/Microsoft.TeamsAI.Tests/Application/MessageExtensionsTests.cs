@@ -48,12 +48,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200,
                 Body = actionResponseMock.Object
             };
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitActionHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitActionHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
                 Assert.Equal("test-title", actionData.Title);
@@ -102,12 +102,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitActionHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitActionHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
                 Assert.Equal("test-title", actionData.Title);
@@ -138,7 +138,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -147,7 +147,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            SubmitActionHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitActionHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(actionResponseMock.Object);
             };
@@ -201,13 +201,13 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = actionResponseMock.Object,
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
 
             });
-            BotMessagePreviewEditHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
+            BotMessagePreviewEditHandler<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
                 return Task.FromResult(actionResponseMock.Object);
@@ -260,12 +260,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            BotMessagePreviewEditHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
+            BotMessagePreviewEditHandler<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
                 return Task.FromResult(actionResponseMock.Object);
@@ -294,7 +294,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var actionResponseMock = new Mock<MessagingExtensionActionResponse>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -303,7 +303,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            BotMessagePreviewEditHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            BotMessagePreviewEditHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(actionResponseMock.Object);
             };
@@ -356,12 +356,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = new MessagingExtensionActionResponse()
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            BotMessagePreviewSendHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
+            BotMessagePreviewSendHandler<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
                 return Task.CompletedTask;
@@ -413,12 +413,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 ChannelId = "channelId",
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            BotMessagePreviewSendHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
+            BotMessagePreviewSendHandler<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
                 return Task.CompletedTask;
@@ -446,7 +446,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 ChannelId = "channelId",
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -455,7 +455,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            BotMessagePreviewSendHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            BotMessagePreviewSendHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.CompletedTask;
             };
@@ -498,12 +498,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = taskModuleResponseMock.Object
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchTaskHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -544,12 +544,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchTaskHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -577,7 +577,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -586,7 +586,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            FetchTaskHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -641,12 +641,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, query, cancellationToken) =>
+            QueryHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal(1, query.Parameters.Count);
                 Assert.Equal("test-value", query.Parameters["test-name"]);
@@ -700,12 +700,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, query, cancellationToken) =>
+            QueryHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal(1, query.Parameters.Count);
                 Assert.Equal("test-value", query.Parameters["test-name"]);
@@ -737,7 +737,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -746,7 +746,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            QueryHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            QueryHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -789,12 +789,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SelectItemHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, item, cancellationToken) =>
+            SelectItemHandler<TurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -840,12 +840,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SelectItemHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, item, cancellationToken) =>
+            SelectItemHandler<TurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -891,12 +891,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 Assert.Equal("test-url", url);
                 return Task.FromResult(messagingExtensionResultMock.Object);
@@ -934,12 +934,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -985,12 +985,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 Assert.Equal("test-url", url);
                 return Task.FromResult(messagingExtensionResultMock.Object);
@@ -1028,12 +1028,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -1075,11 +1075,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 }
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryUrlSettingHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, cancellationToken) =>
+            QueryUrlSettingHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -1116,11 +1116,11 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var messagingExtensionResultMock = new Mock<MessagingExtensionResult>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -1161,11 +1161,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            ConfigureSettingsHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, settings, cancellationToken) =>
+            ConfigureSettingsHandler<TurnState> handler = (turnContext, turnState, settings, cancellationToken) =>
             {
                 JObject? obj = settings as JObject;
                 Assert.NotNull(obj);
@@ -1204,11 +1204,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 ChannelId = "channelId",
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            ConfigureSettingsHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, settings, cancellationToken) =>
+            ConfigureSettingsHandler<TurnState> handler = (turnContext, turnState, settings, cancellationToken) =>
             {
                 return Task.CompletedTask;
             };
@@ -1245,11 +1245,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            CardButtonClickedHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, cardData, cancellationToken) =>
+            CardButtonClickedHandler<TurnState> handler = (turnContext, turnState, cardData, cancellationToken) =>
             {
                 return Task.CompletedTask;
             };
@@ -1285,11 +1285,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 ChannelId = "channelId",
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            CardButtonClickedHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, cardData, cancellationToken) =>
+            CardButtonClickedHandler<TurnState> handler = (turnContext, turnState, cardData, cancellationToken) =>
             {
                 return Task.CompletedTask;
             };

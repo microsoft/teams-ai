@@ -8,7 +8,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
     /// The default moderator that does nothing. Used when no moderator is specified.
     /// </summary>
     /// <typeparam name="TState">The turn state class.</typeparam>
-    public class DefaultModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
+    public class DefaultModerator<TState> : IModerator<TState> where TState : TurnState
     {
         /// <inheritdoc />
         public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)

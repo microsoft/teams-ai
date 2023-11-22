@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 
 namespace Microsoft.Teams.AI.Tests.Application
@@ -11,7 +12,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         public void Test_ApplicationBuilder_DefaultSetup()
         {
             // Act
-            var app = new ApplicationBuilder<TestTurnState>().Build();
+            var app = new ApplicationBuilder<TurnState>().Build();
 
             // Assert
             Assert.NotEqual(null, app.Options);
@@ -39,7 +40,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             IStorage storage = new MemoryStorage();
             BotAdapter adapter = new SimpleAdapter();
             TestLoggerFactory loggerFactory = new();
-            Func<TestTurnState> turnStateFactory = () => new TestTurnState();
+            Func<TurnState> turnStateFactory = () => new TurnState();
             AdaptiveCardsOptions adaptiveCards = new()
             {
                 ActionSubmitFilter = "cardFilter"
@@ -48,13 +49,13 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 TaskDataFilter = "taskFilter",
             };
-            AIOptions<TestTurnState> aiOptions = new(
+            AIOptions<TurnState> aiOptions = new(
                 planner: new TestPlanner(),
                 moderator: new TestModerator()
             );
 
             // Act
-            var app = new ApplicationBuilder<TestTurnState>()
+            var app = new ApplicationBuilder<TurnState>()
                 .SetRemoveRecipientMention(removeRecipientMention)
                 .WithStorage(storage)
                 .WithAIOptions(aiOptions)
@@ -90,7 +91,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Act
             var func = () =>
             {
-                new ApplicationBuilder<TestTurnState>()
+                new ApplicationBuilder<TurnState>()
                .WithLongRunningMessages(adapter, "").Build();
             };
 

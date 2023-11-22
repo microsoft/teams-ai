@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
     /// An moderator that uses Azure Content Safety API.
     /// </summary>
     /// <typeparam name="TState">The turn state class.</typeparam>
-    public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : ITurnState<Record, Record, TempState>
+    public class AzureContentSafetyModerator<TState> : IModerator<TState> where TState : TurnState
     {
         private readonly AzureContentSafetyModeratorOptions _options;
         private readonly ContentSafetyClient _client;

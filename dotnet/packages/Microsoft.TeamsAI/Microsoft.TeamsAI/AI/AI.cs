@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI.AI
     /// generating prompts. It can be used free standing or routed to by the Application object.
     /// </remarks>
     /// <typeparam name="TState">Optional. Type of the turn state.</typeparam>
-    public class AI<TState> where TState : ITurnState<Record, Record, TempState>
+    public class AI<TState> where TState : TurnState
     {
         private readonly IActionCollection<TState> _actions;
 
