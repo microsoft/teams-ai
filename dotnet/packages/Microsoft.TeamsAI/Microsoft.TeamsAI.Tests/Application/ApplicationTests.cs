@@ -54,10 +54,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 TaskDataFilter = "taskFilter",
             };
-            AIOptions<TurnState> aiOptions = new(
-                planner: new TestPlanner(),
-                moderator: new TestModerator()
-            );
+            AIOptions<TurnState> aiOptions = new(new TestPlanner())
+            {
+                Moderator = new TestModerator()
+            };
             ApplicationOptions<TurnState> applicationOptions = new()
             {
                 RemoveRecipientMention = removeRecipientMention,
