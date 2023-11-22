@@ -14,5 +14,5 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of ConfigResponseBase.</returns>
-    public delegate Task<ConfigResponseBase> ConfigHandler<TState>(ITurnContext turnContext, TState turnState, object configData, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
+    public delegate Task<ConfigResponseBase> ConfigHandler<TState>(ITurnContext turnContext, TState turnState, object configData, CancellationToken cancellationToken) where TState : TurnState;
 }

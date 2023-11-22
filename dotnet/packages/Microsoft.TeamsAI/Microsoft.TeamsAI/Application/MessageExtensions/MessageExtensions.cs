@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
     public class MessageExtensions<TState>
-        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
+        where TState : TurnState, new()
     {
         private static readonly string SUBMIT_ACTION_INVOKE_NAME = "composeExtension/submitAction";
         private static readonly string FETCH_TASK_INVOKE_NAME = "composeExtension/fetchTask";
