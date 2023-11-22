@@ -5,7 +5,7 @@ using Record = Microsoft.Teams.AI.State.Record;
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     // Extend the turn state by configuring custom strongly typed state classes.
-    internal class CustomTurnState : TurnState
+    internal sealed class CustomTurnState : TurnState
     {
         /// <summary>
         /// Stores all the conversation-related state.
@@ -49,7 +49,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
     }
 
     // This class adds custom properties to the turn state which will be accessible in the activity handler methods.
-    internal class ConversationState : Record
+    internal sealed class ConversationState : Record
     {
         private const string _countKey = "countKey";
 
