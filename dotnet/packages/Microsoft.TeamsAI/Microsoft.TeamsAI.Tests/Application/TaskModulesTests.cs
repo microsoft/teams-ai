@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -144,7 +144,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            FetchHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -199,7 +199,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -253,7 +253,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 TurnStateFactory = () => turnState.Result,
             });
 
-            SubmitHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -290,7 +290,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            SubmitHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };

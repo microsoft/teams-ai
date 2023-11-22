@@ -95,5 +95,5 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A list of AdaptiveCardsSearchResult.</returns>
-    public delegate Task<IList<AdaptiveCardsSearchResult>> SearchHandlerAsync<TState>(ITurnContext turnContext, TState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
+    public delegate Task<IList<AdaptiveCardsSearchResult>> SearchHandlerAsync<TState>(ITurnContext turnContext, TState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken) where TState : TurnState;
 }
