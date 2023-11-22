@@ -1,11 +1,11 @@
 ﻿using Azure;
 using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using System.Reflection;
 using Microsoft.Teams.AI.AI.Embeddings;
 using Azure.AI.OpenAI;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.State;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests
@@ -21,8 +21,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var options = new OpenAIEmbeddingsOptions(apiKey, model);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var openAiEmbeddings = new OpenAIEmbeddings<TestTurnState, OpenAIEmbeddingsOptions>(options);
+            var turnStateMock = new Mock<TurnState>();
+            var openAiEmbeddings = new OpenAIEmbeddings<TurnState, OpenAIEmbeddingsOptions>(options);
 
             IList<string> inputs = new List<string> { "test" };
             var clientMock = new Mock<OpenAIClient>(It.IsAny<string>());
@@ -55,8 +55,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var options = new AzureOpenAIEmbeddingsOptions(apiKey, model, endpoint);
 
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var openAiEmbeddings = new OpenAIEmbeddings<TestTurnState, AzureOpenAIEmbeddingsOptions>(options);
+            var turnStateMock = new Mock<TurnState>();
+            var openAiEmbeddings = new OpenAIEmbeddings<TurnState, AzureOpenAIEmbeddingsOptions>(options);
 
             IList<string> inputs = new List<string> { "test" };
             IEnumerable<EmbeddingItem> data = new List<EmbeddingItem>()
@@ -90,8 +90,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var options = new OpenAIEmbeddingsOptions(apiKey, model);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var openAiEmbeddings = new OpenAIEmbeddings<TestTurnState, OpenAIEmbeddingsOptions>(options);
+            var turnStateMock = new Mock<TurnState>();
+            var openAiEmbeddings = new OpenAIEmbeddings<TurnState, OpenAIEmbeddingsOptions>(options);
 
             IList<string> inputs = new List<string> { "test" };
             var exception = new RequestFailedException(statusCode, errorMsg);
@@ -117,8 +117,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var options = new OpenAIEmbeddingsOptions(apiKey, model);
             var turnContextMock = new Mock<ITurnContext>();
-            var turnStateMock = new Mock<TestTurnState>();
-            var openAiEmbeddings = new OpenAIEmbeddings<TestTurnState, OpenAIEmbeddingsOptions>(options);
+            var turnStateMock = new Mock<TurnState>();
+            var openAiEmbeddings = new OpenAIEmbeddings<TurnState, OpenAIEmbeddingsOptions>(options);
 
             IList<string> inputs = new List<string> { "test" };
             var exception = new InvalidOperationException("other exception");

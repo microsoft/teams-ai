@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -138,7 +138,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
             var turnContext2 = new TurnContext(adapter, activity2);
 
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -179,7 +179,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -235,7 +235,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -283,7 +283,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -347,7 +347,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -394,7 +394,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -442,7 +442,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -499,7 +499,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -566,7 +566,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -625,7 +625,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -670,7 +670,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -714,7 +714,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -758,7 +758,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -803,7 +803,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -846,7 +846,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -889,7 +889,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -932,7 +932,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -975,7 +975,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1018,7 +1018,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1061,7 +1061,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1127,7 +1127,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1190,7 +1190,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1261,7 +1261,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1323,7 +1323,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1383,7 +1383,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1432,7 +1432,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1492,7 +1492,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1558,7 +1558,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1616,7 +1616,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1680,7 +1680,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1739,7 +1739,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1798,7 +1798,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1877,7 +1877,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = configResponseMock.Object
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -1967,7 +1967,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = configResponseMock.Object
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -2051,7 +2051,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -2132,7 +2132,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Status = 200
             };
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -2206,7 +2206,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -2253,7 +2253,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -2294,7 +2294,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,

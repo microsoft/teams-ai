@@ -9,7 +9,7 @@ namespace Microsoft.Teams.AI.AI.Action
     /// The action handler built from method.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state</typeparam>
-    internal sealed class ActionHandler<TState> : IActionHandler<TState> where TState : ITurnState<Record, Record, TempState>
+    internal sealed class ActionHandler<TState> : IActionHandler<TState> where TState : TurnState
     {
         private readonly MethodInfo _method;
 

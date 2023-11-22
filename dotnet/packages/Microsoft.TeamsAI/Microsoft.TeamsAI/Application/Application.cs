@@ -24,7 +24,7 @@ namespace Microsoft.Teams.AI
     /// </remarks>
     /// <typeparam name="TState">Type of the turnState. This allows for strongly typed access to the turn turnState.</typeparam>
     public class Application<TState> : IBot
-        where TState : ITurnState<Record, Record, TempState>, IMemory, new()
+        where TState : TurnState, new()
     {
         private static readonly string CONFIG_FETCH_INVOKE_NAME = "config/fetch";
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
@@ -824,7 +824,7 @@ namespace Microsoft.Teams.AI
                         // Save turn state
                         // - This lets the bot keep track of why it ended the previous turn. It also
                         //   allows the dialog system to be used before the AI system is called.
-                        await turnState!.SaveStateAsync(storage, turnContext);
+                        await turnState!.SaveStateAsync(turnContext, storage);
 
                         return;
                     }
@@ -875,7 +875,7 @@ namespace Microsoft.Teams.AI
                         return;
                     }
                 }
-                await turnState!.SaveStateAsync(storage, turnContext);
+                await turnState!.SaveStateAsync(turnContext, storage);
 
             }
             finally

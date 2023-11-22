@@ -8,7 +8,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
     /// A moderator is responsible for reviewing and approving AI prompts and plans.
     /// </summary>
     /// <typeparam name="TState">Type of the applications turn state.</typeparam>
-    public interface IModerator<TState> where TState : ITurnState<Record, Record, TempState>
+    public interface IModerator<TState> where TState : TurnState
     {
         /// <summary>
         /// Reviews an incoming utterance and generated prompt before it's sent to the planner.

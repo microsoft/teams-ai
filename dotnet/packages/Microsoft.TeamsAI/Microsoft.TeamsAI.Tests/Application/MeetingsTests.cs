@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContexts = CreateMeetingTurnContext("application/vnd.microsoft.meetingStart", adapter);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContexts[0]);
 
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -49,7 +49,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContexts = CreateMeetingTurnContext("application/vnd.microsoft.meetingEnd", adapter);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContexts[0]);
 
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -81,7 +81,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContexts = CreateMeetingTurnContext("application/vnd.microsoft.meetingParticipantJoin", adapter);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContexts[0]);
 
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,
@@ -113,7 +113,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContexts = CreateMeetingTurnContext("application/vnd.microsoft.meetingParticipantLeave", adapter);
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContexts[0]);
 
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
                 StartTypingTimer = false,

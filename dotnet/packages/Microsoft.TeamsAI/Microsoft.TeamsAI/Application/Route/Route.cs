@@ -21,9 +21,9 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns></returns>
-    public delegate Task RouteHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
+    public delegate Task RouteHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : TurnState;
 
-    internal class Route<TState> where TState : ITurnState<Record, Record, TempState>
+    internal class Route<TState> where TState : TurnState
     {
         public Route(RouteSelectorAsync selector, bool isInvokeRoute = false)
         {

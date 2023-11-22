@@ -9,8 +9,6 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.Bot.Builder;
-using TestTurnState = Microsoft.Teams.AI.Tests.TestUtils.TestTurnState;
-using Record = Microsoft.Teams.AI.State.Record;
 using Microsoft.Teams.AI.AI.Moderator;
 
 namespace Microsoft.Teams.AI.Tests.AITests
@@ -21,7 +19,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_DefaultActions_Are_Imported()
         {
             // Act
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
 
             // Assert
             Assert.True(actions.ContainsAction(AIConstants.UnknownActionName));
@@ -39,10 +37,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var logs = new List<string>();
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>(logs);
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>(logs);
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
 
             // Act
             var unknownAction = actions[AIConstants.UnknownActionName];
@@ -59,10 +57,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var logs = new List<string>();
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>(logs);
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>(logs);
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
 
             // Act
             var flaggedInputAction = actions[AIConstants.FlaggedInputActionName];
@@ -79,10 +77,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var logs = new List<string>();
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>(logs);
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>(logs);
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
 
             // Act
             var flaggedOutputAction = actions[AIConstants.FlaggedOutputActionName];
@@ -98,10 +96,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async Task Test_Execute_HttpErrorAction()
         {
             // Arrange
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
 
             // Act
             var httpErrorAction = actions[AIConstants.HttpErrorActionName];
@@ -116,10 +114,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async Task Test_Execute_PlanReadyAction()
         {
             // Arrange
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var plan0 = new Plan(new List<IPredictedCommand>());
             var plan1 = new Plan(new List<IPredictedCommand>()
             {
@@ -143,12 +141,12 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async Task Test_Execute_DoCommandAction()
         {
             // Arrange
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
             var activity = MessageFactory.Text("hello");
             var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var handler = new TestActionHandler();
-            var data = new DoCommandActionData<TestTurnState>
+            var data = new DoCommandActionData<TurnState>
             {
                 PredictedDoCommand = new PredictedDoCommand("test-action"),
                 Handler = handler,
@@ -170,11 +168,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async Task Test_Execute_SayCommandAction()
         {
             // Arrange
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
             var turnContextMock = new Mock<ITurnContext>();
             turnContextMock.Setup(tc => tc.Activity).Returns(new Activity { Type = ActivityTypes.Message });
             turnContextMock.Setup(tc => tc.SendActivityAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new ResourceResponse()));
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var command = new PredictedSayCommand("hello");
 
             // Act
@@ -193,9 +191,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public async Task Test_Execute_TooManyStepsAction()
         {
             // Arrange
-            IActionCollection<TestTurnState> actions = ImportDefaultActions<TestTurnState>();
+            IActionCollection<TurnState> actions = ImportDefaultActions<TurnState>();
             var turnContextMock = new Mock<ITurnContext>();
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var tooManyStepsParameters1 = new TooManyStepsParameters(25, TimeSpan.Zero, DateTime.UtcNow, 30);
             var tooManyStepsParameters2 = new TooManyStepsParameters(25, TimeSpan.Zero, DateTime.UtcNow, 20);
 
@@ -211,7 +209,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal("The AI system has exceeded the maximum amount of time allowed.", exception2.Message);
         }
 
-        private static IActionCollection<TState> ImportDefaultActions<TState>(List<string>? logs = null) where TState : ITurnState<Record, Record, TempState>
+        private static IActionCollection<TState> ImportDefaultActions<TState>(List<string>? logs = null) where TState : TurnState
         {
             ILogger? logger = null;
             if (logs != null)

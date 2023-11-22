@@ -27,7 +27,7 @@ namespace Microsoft.Teams.AI.AI.Planners
     ///   dramatic reduction in the number of invalid responses returned by the model.
     /// </remarks>
     /// <typeparam name="TState">Type of application state.</typeparam>
-    public class ActionPlanner<TState> : IPlanner<TState> where TState : ITurnState<Record, Record, TempState>, IMemory
+    public class ActionPlanner<TState> : IPlanner<TState> where TState : TurnState
     {
         /// <summary>
         /// Options used to configure the planner.

@@ -47,7 +47,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
-            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new OpenAIModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -119,7 +119,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
-            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new OpenAIModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -160,7 +160,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
-            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new OpenAIModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
@@ -223,7 +223,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
-            var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
+            var moderator = new OpenAIModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act

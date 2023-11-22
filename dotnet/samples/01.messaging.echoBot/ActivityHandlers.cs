@@ -14,7 +14,7 @@ namespace EchoBot
         /// </summary>
         public static RouteHandler<AppState> ResetMessageHandler = async (ITurnContext turnContext, AppState turnState, CancellationToken cancellationToken) =>
         {
-            turnState.ConversationStateEntry.Delete();
+            turnState.DeleteConversationState();
             await turnContext.SendActivityAsync("Ok I've deleted the current conversation state", cancellationToken: cancellationToken);
         };
 

@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
     public class TaskModules<TState>
-       where TState : ITurnState<Record, Record, TempState>, IMemory, new()
+       where TState : TurnState, new()
     {
         private static readonly string FETCH_INVOKE_NAME = "task/fetch";
         private static readonly string SUBMIT_INVOKE_NAME = "task/submit";

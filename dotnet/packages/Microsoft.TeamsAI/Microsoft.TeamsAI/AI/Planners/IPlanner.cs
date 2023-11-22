@@ -6,7 +6,7 @@ namespace Microsoft.Teams.AI.AI.Planners
     /// <summary>
     /// A planner is responsible for generating a plan that the AI system will execute.
     /// </summary>
-    public interface IPlanner<TState> where TState : ITurnState<Record, Record, TempState>
+    public interface IPlanner<TState> where TState : TurnState
     {
         /// <summary>
         /// Starts a new task.

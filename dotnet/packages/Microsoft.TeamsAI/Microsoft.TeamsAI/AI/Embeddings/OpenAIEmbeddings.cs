@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
     /// Embeddings class that uses OpenAI's embeddings API.
     /// </summary>
     public class OpenAIEmbeddings<TState, TOptions> : IEmbeddings<TState>
-        where TState : ITurnState<Record, Record, TempState>
+        where TState : TurnState
         where TOptions : OpenAIEmbeddingsOptions
     {
         private TOptions _options { get; }
