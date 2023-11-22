@@ -30,13 +30,14 @@ namespace Microsoft.Teams.AI.AI
         {
             Verify.ParamNotNull(options);
 
-            Options = options;
-            _actions = new ActionCollection<TState>();
-
-            if (Options.Moderator == null)
+            Options = new AIOptions<TState>(options.Planner)
             {
-                Options.Moderator = new DefaultModerator<TState>();
-            }
+                Moderator = options.Moderator ?? new DefaultModerator<TState>(),
+                MaxSteps = options.MaxSteps ?? 25,
+                MaxTime = options.MaxTime ?? TimeSpan.FromMilliseconds(300000),
+                AllowLooping = options.AllowLooping ?? true,
+            };
+            _actions = new ActionCollection<TState>();
 
             // Import default actions
             ImportActions(new DefaultActions<TState>(loggerFactory));
@@ -217,7 +218,7 @@ namespace Microsoft.Teams.AI.AI
             // Review input on first loop
             if (stepCount == 0)
             {
-                plan = await Options.Moderator.ReviewInput(turnContext, turnState);
+                plan = await Options.Moderator!.ReviewInput(turnContext, turnState);
             }
 
             // Generate plan
@@ -233,7 +234,7 @@ namespace Microsoft.Teams.AI.AI
                 }
 
                 // Review the plans output
-                plan = await Options.Moderator.ReviewOutput(turnContext, turnState, plan);
+                plan = await Options.Moderator!.ReviewOutput(turnContext, turnState, plan);
             }
 
             // Process generated plan
@@ -253,7 +254,7 @@ namespace Microsoft.Teams.AI.AI
                 if (DateTime.UtcNow - startTime > Options.MaxTime || ++stepCount > Options.MaxSteps)
                 {
                     completed = false;
-                    TooManyStepsParameters parameters = new(Options.MaxSteps, Options.MaxTime, startTime.Value, stepCount);
+                    TooManyStepsParameters parameters = new(Options.MaxSteps!.Value, Options.MaxTime!.Value, startTime.Value, stepCount);
                     await _actions[AIConstants.TooManyStepsActionName]
                         .Handler
                         .PerformAction(turnContext, turnState, parameters, AIConstants.TooManyStepsActionName);
@@ -309,7 +310,7 @@ namespace Microsoft.Teams.AI.AI
             }
 
             // Check for looping
-            if (completed && shouldLoop && Options.AllowLooping)
+            if (completed && shouldLoop && Options.AllowLooping!.Value)
             {
                 return await RunAsync(turnContext, turnState, startTime, stepCount, cancellationToken);
             }
