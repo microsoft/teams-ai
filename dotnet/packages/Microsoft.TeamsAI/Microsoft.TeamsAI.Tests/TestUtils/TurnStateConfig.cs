@@ -1,7 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.State;
-using Microsoft.Teams.AI.Utilities;
 using Moq;
 using Record = Microsoft.Teams.AI.State.Record;
 
@@ -9,12 +8,15 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 {
     public static class TurnStateConfig
     {
-        public static async Task<TurnState<Record, Record, TempState>> GetTurnStateWithConversationStateAsync(TurnContext turnContext)
+        public static async Task<TurnState> GetTurnStateWithConversationStateAsync(TurnContext turnContext)
         {
-            Verify.ParamNotNull(turnContext);
+            if (turnContext == null)
+            {
+                throw new ArgumentNullException(nameof(turnContext));
+            }
 
             // Arrange
-            var state = new TurnState<Record, Record, TempState>();
+            var state = new TurnState();
             Activity activity = turnContext.Activity;
             string channelId = activity.ChannelId;
             string botId = activity.Recipient.Id;
