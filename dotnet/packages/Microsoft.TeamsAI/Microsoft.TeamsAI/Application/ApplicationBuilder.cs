@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Microsoft.Teams.AI
 {
@@ -124,6 +125,17 @@ namespace Microsoft.Teams.AI
         public ApplicationBuilder<TState> SetStartTypingTimer(bool startTypingTimer)
         {
             Options.StartTypingTimer = startTypingTimer;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures authentication for the application.
+        /// </summary>
+        /// <param name="authenticationOptions">The options for authentication.</param>
+        /// <returns>The ApplicationBuilder instance.</returns>
+        public ApplicationBuilder<TState> WithAuthenticationOptions(AuthenticationOptions authenticationOptions)
+        {
+             Options.AuthenticationOptions = authenticationOptions;
             return this;
         }
 

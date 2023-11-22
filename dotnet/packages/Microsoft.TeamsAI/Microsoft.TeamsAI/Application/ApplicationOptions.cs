@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Microsoft.Teams.AI
 {
@@ -83,5 +84,10 @@ namespace Microsoft.Teams.AI
         /// completed and many shared hosting environments will mark the bot's process as idle and shut it down.
         /// </remarks>
         public bool LongRunningMessages { get; set; } = false;
+
+        /// <summary>
+        /// Optional. Options used to enable authentication for the application.
+        /// </summary>
+        public AuthenticationOptions? AuthenticationOptions { get; set; }
     }
 }
