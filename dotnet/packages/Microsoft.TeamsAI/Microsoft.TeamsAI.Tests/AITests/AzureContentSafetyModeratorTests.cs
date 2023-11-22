@@ -1,7 +1,7 @@
 ﻿using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Bot.Schema;
 using Moq;
 using System.Reflection;
@@ -34,7 +34,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
-                new PromptTemplateConfiguration
+                new(new() { })
+            )
+            {
+                Configuration = new PromptTemplateConfiguration
                 {
                     Completion =
                         {
@@ -43,7 +46,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                             TopP = 0.5,
                         }
                 }
-            );
+            };
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
             var exception = new RequestFailedException("Exception Message");
@@ -80,7 +83,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
-                new PromptTemplateConfiguration
+                new(new() { })
+            )
+            {
+                Configuration = new PromptTemplateConfiguration
                 {
                     Completion =
                         {
@@ -89,7 +95,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                             TopP = 0.5,
                         }
                 }
-            );
+            };
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
             AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(hateResult: ContentSafetyModelFactory.TextAnalyzeSeverityResult(TextCategory.Hate, 2));
@@ -139,7 +145,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var turnStateMock = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var promptTemplate = new PromptTemplate(
                 "prompt",
-                new PromptTemplateConfiguration
+                new(new() { })
+            )
+            {
+                Configuration = new PromptTemplateConfiguration
                 {
                     Completion =
                         {
@@ -148,7 +157,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                             TopP = 0.5,
                         }
                 }
-            );
+            };
 
             var clientMock = new Mock<ContentSafetyClient>(new Uri(endpoint), new AzureKeyCredential(apiKey));
             AnalyzeTextResult analyzeTextResult = ContentSafetyModelFactory.AnalyzeTextResult(hateResult: ContentSafetyModelFactory.TextAnalyzeSeverityResult(TextCategory.Hate, 0));

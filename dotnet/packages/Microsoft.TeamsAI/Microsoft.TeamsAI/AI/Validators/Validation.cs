@@ -3,8 +3,7 @@
     /// <summary>
     /// Response returned by a `PromptResponseValidator`
     /// </summary>
-    /// <typeparam name="TValue"></typeparam>
-    public class Validation<TValue>
+    public class Validation
     {
         /// <summary>
         /// Whether the validation is valid.
@@ -22,6 +21,6 @@
         /// Optional. Replacement value to use for the response.
         /// Can be set if the validation succeeds. If set, the value will replace the responses `message.content` property.
         /// </summary>
-        public TValue? Value { get; set; }
+        public object? Value { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
+using Microsoft.Teams.AI.AI.Validators;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Augmentations
@@ -9,7 +10,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
     /// <summary>
     /// Creates an optional prompt section for the augmentation.
     /// </summary>
-    public interface IAugmentation
+    public interface IAugmentation : IPromptResponseValidator
     {
         /// <summary>
         /// Creates an optional prompt section for the augmentation.

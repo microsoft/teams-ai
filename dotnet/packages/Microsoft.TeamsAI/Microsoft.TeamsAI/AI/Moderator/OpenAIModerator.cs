@@ -1,4 +1,4 @@
-﻿using Microsoft.Teams.AI.AI.Planner;
+﻿using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.State;

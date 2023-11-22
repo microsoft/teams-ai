@@ -2,7 +2,7 @@
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Schema;

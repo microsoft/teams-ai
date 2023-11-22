@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.AI.Planner;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Moderator

@@ -188,7 +188,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
     /// <summary>
     /// Monologue Augmentation
     /// </summary>
-    public class MonologueAugmentation : IAugmentation, IPromptResponseValidator<InnerMonologue>
+    public class MonologueAugmentation : IAugmentation
     {
         private readonly ActionAugmentationSection _section;
         private readonly JsonResponseValidator _monologueValidator;
@@ -291,9 +291,9 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Validation<InnerMonologue>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
         {
-            Validation<Dictionary<string, JsonElement>> validation = await this._monologueValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts);
+            Validation validation = await this._monologueValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts);
 
             if (!validation.Valid)
             {
@@ -311,7 +311,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 };
             }
 
-            InnerMonologue? monologue = validation.Value?.AsJsonElement().Deserialize<InnerMonologue>();
+            InnerMonologue? monologue = ((Dictionary<string, JsonElement>?)validation.Value)?.AsJsonElement().Deserialize<InnerMonologue>();
 
             if (monologue == null)
             {
@@ -332,7 +332,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 }
             };
 
-            Validation<ValidatedChatCompletionAction> valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts);
+            Validation valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts);
 
             if (!valid.Valid)
             {

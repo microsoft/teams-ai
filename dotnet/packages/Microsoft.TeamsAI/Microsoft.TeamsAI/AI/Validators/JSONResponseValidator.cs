@@ -12,7 +12,7 @@ namespace Microsoft.Teams.AI.AI.Validators
     /// <summary>
     /// Parses any JSON returned by the model and optionally verifies it against a JSON schema.
     /// </summary>
-    public class JsonResponseValidator : IPromptResponseValidator<Dictionary<string, JsonElement>>
+    public class JsonResponseValidator : IPromptResponseValidator
     {
         /// <summary>
         /// JSON schema to validate the response against.
@@ -43,14 +43,14 @@ namespace Microsoft.Teams.AI.AI.Validators
         }
 
         /// <inheritdoc />
-        public async Task<Validation<Dictionary<string, JsonElement>>> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
         {
             string text = response.Message?.Content ?? "";
             List<Dictionary<string, JsonElement>> jsonObjects = ResponseJsonParsers.ParseAllObjects(text);
 
             if (jsonObjects.Count == 0)
             {
-                return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
+                return await Task.FromResult(new Validation()
                 {
                     Valid = false,
                     Feedback = this.MissingJsonFeedback
@@ -67,7 +67,7 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                     if (res.IsValid)
                     {
-                        return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
+                        return await Task.FromResult(new Validation()
                         {
                             Valid = true,
                             Value = jsonObject
@@ -82,14 +82,14 @@ namespace Microsoft.Teams.AI.AI.Validators
 
                 string errorText = string.Join("\n", errors.Select(e => $" - [{e.Key}]: {e.Value}"));
 
-                return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
+                return await Task.FromResult(new Validation()
                 {
                     Valid = false,
                     Feedback = $"{this.ErrorFeedback}\n{errorText}"
                 });
             }
 
-            return await Task.FromResult(new Validation<Dictionary<string, JsonElement>>()
+            return await Task.FromResult(new Validation()
             {
                 Valid = true,
                 Value = jsonObjects.Last()
