@@ -1,6 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Clients;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Validators;
