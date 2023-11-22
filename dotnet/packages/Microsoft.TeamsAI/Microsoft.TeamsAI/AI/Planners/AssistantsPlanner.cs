@@ -13,7 +13,7 @@ namespace Microsoft.Teams.AI.AI.Planners
     /// A planner that uses OpenAI's Assistants APIs to generate plans.
     /// </summary>
     public class AssistantsPlanner<TState> : IPlanner<TState>
-        where TState : ITurnState<Record, Record, TempState>, IAssistantsState
+        where TState : TurnState, IAssistantsState
     {
         private static readonly TimeSpan DEFAULT_POLLING_INTERVAL = TimeSpan.FromSeconds(1);
 

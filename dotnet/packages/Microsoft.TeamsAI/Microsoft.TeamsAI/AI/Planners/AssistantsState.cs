@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.AI.Planners
     /// <summary>
     /// The default implementation of <see cref="IAssistantsState"/>.
     /// </summary>
-    public class AssistantsState : TurnState<Record, Record, TempState>, IAssistantsState
+    public class AssistantsState : TurnState, IAssistantsState
     {
         /// <summary>
         /// Get or set the thread ID.
