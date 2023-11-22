@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>An instance of AdaptiveCardInvokeResponse, which can be created using <see cref="AdaptiveCardInvokeResponseFactory"/>.</returns>
-    public delegate Task<AdaptiveCardInvokeResponse> ActionExecuteHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
+    public delegate Task<AdaptiveCardInvokeResponse> ActionExecuteHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : TurnState;
 
     /// <summary>
     /// Function for handling Adaptive Card Action.Submit events.
@@ -83,7 +83,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task ActionSubmitHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
+    public delegate Task ActionSubmitHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : TurnState;
 
     /// <summary>
     /// Function for handling Adaptive Card dynamic search events.
@@ -95,5 +95,5 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A list of AdaptiveCardsSearchResult.</returns>
-    public delegate Task<IList<AdaptiveCardsSearchResult>> SearchHandler<TState>(ITurnContext turnContext, TState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken) where TState : ITurnState<Record, Record, TempState>;
+    public delegate Task<IList<AdaptiveCardsSearchResult>> SearchHandler<TState>(ITurnContext turnContext, TState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken) where TState : TurnState;
 }

@@ -49,12 +49,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = taskModuleResponseMock.Object
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -102,12 +102,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -135,7 +135,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -144,7 +144,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            FetchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -194,12 +194,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Body = taskModuleResponseMock.Object
             };
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -247,13 +247,13 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
 
-            SubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -281,7 +281,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            var app = new Application<TurnState<Record, Record, TempState>>(new()
+            var app = new Application<TurnState>(new()
             {
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
@@ -290,7 +290,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 return Task.FromResult(true);
             };
-            SubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };

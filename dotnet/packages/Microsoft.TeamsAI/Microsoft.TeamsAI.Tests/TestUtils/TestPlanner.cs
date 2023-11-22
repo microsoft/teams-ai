@@ -1,11 +1,12 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.State;
 using System.Reflection;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    public class TestPlanner : IPlanner<TestTurnState>
+    public class TestPlanner : IPlanner<TurnState>
     {
         public IList<string> Record { get; } = new List<string>();
 
@@ -27,13 +28,13 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             }
         };
 
-        public Task<Plan> BeginTaskAsync(ITurnContext turnContext, TestTurnState turnState, AI<TestTurnState> ai, CancellationToken cancellationToken)
+        public Task<Plan> BeginTaskAsync(ITurnContext turnContext, TurnState turnState, AI<TurnState> ai, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(BeginPlan);
         }
 
-        public Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TestTurnState turnState, AI<TestTurnState> ai, CancellationToken cancellationToken)
+        public Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TurnState turnState, AI<TurnState> ai, CancellationToken cancellationToken)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(ContinuePlan);
