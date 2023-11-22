@@ -2,6 +2,8 @@
 
 This sample shows how to incorporate a basic conversational SSO flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
+This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
