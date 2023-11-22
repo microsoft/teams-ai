@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.State
         /// <param name="storage">Optional. Storage provider to load state scopes from.</param>
         /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
         /// <returns>True if the states need to be loaded.</returns>
-        public Task<bool> LoadStateAsync(IStorage? storage, ITurnContext turnContext);
+        public Task<bool> LoadStateAsync(IStorage? storage, ITurnContext turnContext, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Saves all of the state scopes for the current turn.

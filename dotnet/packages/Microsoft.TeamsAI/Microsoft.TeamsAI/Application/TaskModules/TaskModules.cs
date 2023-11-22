@@ -37,12 +37,12 @@ namespace Microsoft.Teams.AI
         /// <param name="verb">Name of the verb to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnFetch(string verb, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(string verb, FetchHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
             string filter = _app.Options.TaskModules?.TaskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(verb, input), filter, FETCH_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => string.Equals(verb, input), filter, FETCH_INVOKE_NAME);
             return OnFetch(routeSelector, handler);
         }
 
@@ -52,12 +52,12 @@ namespace Microsoft.Teams.AI
         /// <param name="verbPattern">Regular expression to match against the verbs to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnFetch(Regex verbPattern, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(Regex verbPattern, FetchHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
             string filter = _app.Options.TaskModules?.TaskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
-            RouteSelector routeSelector = CreateTaskSelector((string input) => verbPattern.IsMatch(input), filter, FETCH_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => verbPattern.IsMatch(input), filter, FETCH_INVOKE_NAME);
             return OnFetch(routeSelector, handler);
         }
 
@@ -67,7 +67,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnFetch(RouteSelector routeSelector, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(RouteSelectorAsync routeSelector, FetchHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -98,10 +98,10 @@ namespace Microsoft.Teams.AI
         /// <summary>
         ///  Registers a handler to process the initial fetch of the task module.
         /// </summary>
-        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector selectors.</param>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelectorAsync selectors.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnFetch(MultipleRouteSelector routeSelectors, FetchHandler<TState> handler)
+        public Application<TState> OnFetch(MultipleRouteSelector routeSelectors, FetchHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -122,7 +122,7 @@ namespace Microsoft.Teams.AI
             }
             if (routeSelectors.RouteSelectors != null)
             {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
+                foreach (RouteSelectorAsync routeSelector in routeSelectors.RouteSelectors)
                 {
                     OnFetch(routeSelector, handler);
                 }
@@ -137,12 +137,12 @@ namespace Microsoft.Teams.AI
         /// <param name="verb">Name of the verb to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnSubmit(string verb, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(string verb, SubmitHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(verb);
             Verify.ParamNotNull(handler);
             string filter = _app.Options.TaskModules?.TaskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
-            RouteSelector routeSelector = CreateTaskSelector((string input) => string.Equals(verb, input), filter, SUBMIT_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => string.Equals(verb, input), filter, SUBMIT_INVOKE_NAME);
             return OnSubmit(routeSelector, handler);
         }
 
@@ -153,12 +153,12 @@ namespace Microsoft.Teams.AI
         /// <param name="verbPattern">Regular expression to match against the verbs to register the handler for</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnSubmit(Regex verbPattern, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(Regex verbPattern, SubmitHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(verbPattern);
             Verify.ParamNotNull(handler);
             string filter = _app.Options.TaskModules?.TaskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
-            RouteSelector routeSelector = CreateTaskSelector((string input) => verbPattern.IsMatch(input), filter, SUBMIT_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => verbPattern.IsMatch(input), filter, SUBMIT_INVOKE_NAME);
             return OnSubmit(routeSelector, handler);
         }
 
@@ -168,7 +168,7 @@ namespace Microsoft.Teams.AI
         /// <param name="routeSelector">Function that's used to select a route. The function returning true triggers the route.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnSubmit(RouteSelector routeSelector, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(RouteSelectorAsync routeSelector, SubmitHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(routeSelector);
             Verify.ParamNotNull(handler);
@@ -199,10 +199,10 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Registers a handler to process the submission of a task module.
         /// </summary>
-        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelector verb(s) to register the handler for.</param>
+        /// <param name="routeSelectors">Combination of String, Regex, and RouteSelectorAsync verb(s) to register the handler for.</param>
         /// <param name="handler">Function to call when the route is triggered.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState> OnSubmit(MultipleRouteSelector routeSelectors, SubmitHandler<TState> handler)
+        public Application<TState> OnSubmit(MultipleRouteSelector routeSelectors, SubmitHandlerAsync<TState> handler)
         {
             Verify.ParamNotNull(routeSelectors);
             Verify.ParamNotNull(handler);
@@ -223,7 +223,7 @@ namespace Microsoft.Teams.AI
             }
             if (routeSelectors.RouteSelectors != null)
             {
-                foreach (RouteSelector routeSelector in routeSelectors.RouteSelectors)
+                foreach (RouteSelectorAsync routeSelector in routeSelectors.RouteSelectors)
                 {
                     OnSubmit(routeSelector, handler);
                 }
@@ -232,9 +232,9 @@ namespace Microsoft.Teams.AI
             return _app;
         }
 
-        private static RouteSelector CreateTaskSelector(Func<string, bool> isMatch, string filter, string invokeName)
+        private static RouteSelectorAsync CreateTaskSelector(Func<string, bool> isMatch, string filter, string invokeName)
         {
-            RouteSelector routeSelector = (ITurnContext turnContext, CancellationToken cancellationToken) =>
+            RouteSelectorAsync routeSelector = (ITurnContext turnContext, CancellationToken cancellationToken) =>
             {
                 bool isInvoke = string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
                     && string.Equals(turnContext.Activity.Name, invokeName);

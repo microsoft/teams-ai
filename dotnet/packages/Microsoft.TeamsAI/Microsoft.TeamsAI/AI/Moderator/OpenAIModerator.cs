@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        public async Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             switch (_options.Moderate)
             {
@@ -44,7 +44,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
                 {
                     string input = turnState.Temp?.Input ?? turnContext.Activity.Text;
 
-                    return await _HandleTextModeration(input, true);
+                    return await _HandleTextModerationAsync(input, true, cancellationToken);
                 }
                 default:
                     break;
@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        public async Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             switch (_options.Moderate)
             {
@@ -68,7 +68,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
                             string output = sayCommand.Response;
 
                             // If plan is flagged it will be replaced
-                            Plan? newPlan = await _HandleTextModeration(output, false);
+                            Plan? newPlan = await _HandleTextModerationAsync(output, false, cancellationToken);
 
                             return newPlan ?? plan;
                         }
@@ -83,11 +83,11 @@ namespace Microsoft.Teams.AI.AI.Moderator
             return plan;
         }
 
-        private async Task<Plan?> _HandleTextModeration(string text, bool isModelInput)
+        private async Task<Plan?> _HandleTextModerationAsync(string text, bool isModelInput, CancellationToken cancellationToken = default)
         {
             try
             {
-                ModerationResponse response = await _client.ExecuteTextModeration(text, _options.Model);
+                ModerationResponse response = await _client.ExecuteTextModerationAsync(text, _options.Model, cancellationToken);
                 ModerationResult? result = response.Results.Count > 0 ? response.Results[0] : null;
 
                 if (result != null)

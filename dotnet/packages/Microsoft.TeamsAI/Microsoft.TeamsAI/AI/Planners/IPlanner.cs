@@ -21,9 +21,10 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <param name="turnContext">Context for the current turn of conversation</param>
         /// <param name="turnState">Application state for the current turn of conversation</param>
         /// <param name="ai">The AI system that is generating the plan.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>The plan that was generated.</returns>
-        Task<Plan> BeginTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken);
+        Task<Plan> BeginTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Continues the current task.
@@ -39,8 +40,9 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <param name="turnContext">Context for the current turn of conversation</param>
         /// <param name="turnState">Application state for the current turn of conversation</param>
         /// <param name="ai">The AI system that is generating the plan.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>The plan that was generated.</returns>
-        Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken);
+        Task<Plan> ContinueTaskAsync(ITurnContext turnContext, TState turnState, AI<TState> ai, CancellationToken cancellationToken = default);
     }
 }

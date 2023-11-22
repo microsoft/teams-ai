@@ -89,8 +89,10 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="functions">functions</param>
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>prompt rendered as a list of messages</returns>
-        public abstract Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
+        public abstract Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Render As Text
@@ -100,10 +102,12 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         /// <param name="functions">functions</param>
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="maxTokens">max tokens</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>prompt rendered as text</returns>
-        public virtual async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public virtual async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default)
         {
-            RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
+            RenderedPromptSection<List<ChatMessage>> rendered = await this.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens, cancellationToken);
 
             if (rendered.Output.Count == 0)
             {

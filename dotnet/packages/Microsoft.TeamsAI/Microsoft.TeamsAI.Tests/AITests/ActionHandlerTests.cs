@@ -28,7 +28,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions[actionName].Handler.PerformAction(turnContext, turnState);
+                actions[actionName].Handler.PerformActionAsync(turnContext, turnState);
             }
 
             // Assert
@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName);
+                actions[actionName].Handler.PerformActionAsync(turnContext, turnState, entities, actionName);
             }
 
             // Assert
@@ -85,7 +85,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformActionAsync(turnContext, turnState, entities, actionName));
 
             // Assert
             Assert.NotNull(exception);

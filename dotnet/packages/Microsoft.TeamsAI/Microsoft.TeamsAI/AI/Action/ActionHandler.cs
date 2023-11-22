@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Action
             _parameterTypes = parameterTypes.ToArray();
         }
 
-        public async Task<string> PerformAction(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null)
+        public async Task<string> PerformActionAsync(ITurnContext turnContext, TState turnState, object? entities = null, string? action = null, CancellationToken cancellationToken = default)
         {
             List<object?> parameters = new();
             foreach (Tuple<ActionParameterType, Type> parameterType in _parameterTypes)

@@ -32,7 +32,7 @@ namespace Microsoft.Teams.AI
         public Application<TState> OnStart(MeetingStartHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI
         public Application<TState> OnEnd(MeetingEndHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
@@ -78,7 +78,7 @@ namespace Microsoft.Teams.AI
         public Application<TState> OnParticipantsJoin(MeetingParticipantsEventHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
@@ -101,7 +101,7 @@ namespace Microsoft.Teams.AI
         public Application<TState> OnParticipantsLeave(MeetingParticipantsEventHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)

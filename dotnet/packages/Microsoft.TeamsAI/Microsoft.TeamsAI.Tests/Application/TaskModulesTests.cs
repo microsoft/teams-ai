@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -140,11 +140,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            FetchHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -199,7 +199,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -253,7 +253,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 TurnStateFactory = () => turnState.Result,
             });
 
-            SubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -286,11 +286,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            SubmitHandler<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState<Record, Record, TempState>> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };

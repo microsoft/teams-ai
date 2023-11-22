@@ -113,7 +113,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
         private sealed class TestActionHandler : IActionHandler<TestTurnState>
         {
-            public Task<string> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
+            public Task<string> PerformActionAsync(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null, CancellationToken cancellationToken = default)
             {
                 return Task.FromResult(string.Empty);
             }

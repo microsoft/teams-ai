@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created Assistant.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Assistant> CreateAssistant(AssistantCreateParams assistantCreateParams, CancellationToken cancellationToken)
+        public virtual async Task<Assistant> CreateAssistantAsync(AssistantCreateParams assistantCreateParams, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIAssistantEndpoint, content, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequestAsync(OpenAIAssistantEndpoint, content, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Assistant result = JsonSerializer.Deserialize<Assistant>(responseJson) ?? throw new SerializationException($"Failed to deserialize assistant result response json: {responseJson}");
@@ -61,11 +61,11 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The Assistant.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Assistant> RetrieveAssistant(string assistantId, CancellationToken cancellationToken)
+        public virtual async Task<Assistant> RetrieveAssistantAsync(string assistantId, CancellationToken cancellationToken = default)
         {
             try
             {
-                using HttpResponseMessage httpResponse = await _ExecuteGetRequest($"{OpenAIAssistantEndpoint}/{assistantId}", null, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecuteGetRequestAsync($"{OpenAIAssistantEndpoint}/{assistantId}", null, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Assistant result = JsonSerializer.Deserialize<Assistant>(responseJson) ?? throw new SerializationException($"Failed to deserialize assistant result response json: {responseJson}");

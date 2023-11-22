@@ -28,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response)
+        public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response, CancellationToken cancellationToken = default)
         {
             return await Task.FromResult(new Plan()
             {
@@ -40,7 +40,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default)
         {
             return await Task.FromResult(new Validation()
             {

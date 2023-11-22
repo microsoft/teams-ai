@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
     {
         public string? ActionName { get; set; }
 
-        public Task<string> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
+        public Task<string> PerformActionAsync(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null, CancellationToken cancellationToken = default)
         {
             ActionName = action;
             return Task.FromResult("test-result");

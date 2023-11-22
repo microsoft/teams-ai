@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             ai.RegisterAction(AIConstants.UnknownActionName, handler);
             FieldInfo actionsField = typeof(AI<TestTurnState>).GetField("_actions", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance)!;
             IActionCollection<TestTurnState> actions = (IActionCollection<TestTurnState>)actionsField!.GetValue(ai)!;
-            var result = await actions[AIConstants.UnknownActionName].Handler.PerformAction(turnContextMock.Object, turnState, null, null);
+            var result = await actions[AIConstants.UnknownActionName].Handler.PerformActionAsync(turnContextMock.Object, turnState, null, null);
             var exception = Assert.Throws<InvalidOperationException>(() => ai.RegisterAction(AIConstants.UnknownActionName, handler));
 
             // Assert
@@ -90,7 +90,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.True(result);
             Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInputAsync", "ReviewOutputAsync" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
         }
@@ -124,7 +124,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.False(result);
             Assert.Equal(new string[] { "ContinueTaskAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewOutputAsync" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
@@ -158,7 +158,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.False(result);
             Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInputAsync", "ReviewOutputAsync" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
@@ -191,7 +191,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
     internal sealed class TestTurnStateActionHandler : IActionHandler<TurnState<Record, Record, TempState>>
     {
         public string? ActionName { get; set; }
-        public Task<string> PerformAction(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, object? entities = null, string? action = null)
+        public Task<string> PerformActionAsync(ITurnContext turnContext, TurnState<Record, Record, TempState> turnState, object? entities = null, string? action = null, CancellationToken cancellationToken = default)
         {
             ActionName = action;
             return Task.FromResult("test-result");
@@ -202,13 +202,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
     {
         public IList<string> Record { get; } = new List<string>();
 
-        public Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        public Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult<Plan?>(null);
         }
 
-        public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        public Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(plan);

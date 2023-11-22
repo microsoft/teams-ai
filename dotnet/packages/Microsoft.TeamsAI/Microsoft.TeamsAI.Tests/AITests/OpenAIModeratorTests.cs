@@ -44,14 +44,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var clientMock = new Mock<OpenAIClient>(It.IsAny<OpenAIClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
             var exception = new TeamsAIException("Exception Message");
-            clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
+            clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
             var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Result));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewInputAsync(turnContext, turnStateMock.Result));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -116,14 +116,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     }
                 }
             };
-            clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(response);
+            clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
             var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Result);
 
             // Assert
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
@@ -157,14 +157,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             var clientMock = new Mock<OpenAIClient>(It.IsAny<OpenAIClientOptions>(), It.IsAny<ILogger>(), It.IsAny<HttpClient>());
             var exception = new TeamsAIException("Exception Message");
-            clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(exception);
+            clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
 
             var options = new OpenAIModeratorOptions(apiKey, ModerationType.Both);
             var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -220,14 +220,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
                     }
                 }
             };
-            clientMock.Setup(client => client.ExecuteTextModeration(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(response);
+            clientMock.Setup(client => client.ExecuteTextModerationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
             var options = new OpenAIModeratorOptions(apiKey, moderate);
             var moderator = new OpenAIModerator<TurnState<Record, Record, TempState>>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan);
 
             // Assert
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
