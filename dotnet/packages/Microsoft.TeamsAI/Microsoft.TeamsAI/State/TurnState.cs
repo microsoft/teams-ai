@@ -276,13 +276,17 @@ namespace Microsoft.Teams.AI.State
                             items = new Dictionary<string, object>();
                         }
 
+                        // Compute scope types
+                        Dictionary<string, Record> defaults = OnComputeScopeDefaults(turnContext);
+
                         // Create scopes for items
                         foreach (KeyValuePair<string, string> currScope in scopes)
                         {
                             if (scopes.ContainsKey(currScope.Key))
                             {
+                                Record scopeDefault = defaults.ContainsKey(currScope.Key) ? defaults[currScope.Key] : new Record();
                                 string storageKey = scopes[currScope.Key];
-                                object value = items[storageKey];
+                                object value = items.ContainsKey(storageKey) ? items[storageKey] : scopeDefault;
                                 this._scopes[currScope.Key] = new TurnStateEntry((value as Record)!, storageKey);
                             }
                         }
@@ -393,7 +397,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         /// <param name="context">Context for the current turn.</param>
         /// <returns>Stored conversation and user scopes.</returns>
-        protected Dictionary<string, string> OnComputeStorageKeys(ITurnContext context)
+        protected virtual Dictionary<string, string> OnComputeStorageKeys(ITurnContext context)
         {
             // Compute state keys
             Activity activity = context.Activity;
@@ -415,6 +419,19 @@ namespace Microsoft.Teams.AI.State
             keys.Add(CONVERSATION_SCOPE, conversationKey);
             keys.Add(USER_SCOPE, userKey);
             return keys;
+        }
+
+        /// <summary>
+        /// Computes the default state types
+        /// </summary>
+        /// <param name="context">Context for the current turn.</param>
+        /// <returns></returns>
+        protected virtual Dictionary<string, Record> OnComputeScopeDefaults(ITurnContext context)
+        {
+            Dictionary<string, Record> types = new();
+            types.Add(CONVERSATION_SCOPE, new Record());
+            types.Add(USER_SCOPE, new Record());
+            return types;
         }
 
         private (TurnStateEntry, string) GetScopeAndName(string path)

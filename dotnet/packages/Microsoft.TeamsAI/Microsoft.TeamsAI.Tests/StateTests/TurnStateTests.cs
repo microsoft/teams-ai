@@ -9,11 +9,13 @@ namespace Microsoft.Teams.AI.Tests.StateTests
 {
     /// <summary>
     /// TODO: Add tests that enforce required properties. Ex. If a required param/object is null, should throw exception.
+    /// TODO: Add tests for save state
+    /// TODO: Add tests for each public method
     /// </summary>
     public class TurnStateTests
     {
         [Fact]
-        public async void Test_LoadState_NoStorageProvided_ShouldThrow()
+        public async void Test_LoadState_NoStorageProvided_ShouldCreateDefaultTurnState()
         {
             // Arrange
             var state = new TurnState();
@@ -21,13 +23,13 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             IStorage? storage = null;
 
             // Act
-            var func = async () =>
-            {
-                await state.LoadStateAsync(storage, turnContext);
-            };
+            bool loadResult = await state.LoadStateAsync(storage, turnContext);
 
             // Assert
-            Exception ex = await Assert.ThrowsAsync<AggregateException>(() => func());
+            Assert.True(loadResult);
+            Assert.NotNull(state.Temp);
+            Assert.NotNull(state.Conversation);
+            Assert.NotNull(state.User);
         }
 
         [Fact]
@@ -104,6 +106,61 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             Assert.Equal(state.Conversation, conversationState);
             Assert.Equal(state.User, userState);
             Assert.NotNull(state.Temp);
+        }
+
+        [Fact]
+        public async void Test_LoadState_CustomTurnState_MemoryStorageProvided_ShouldPopulateTurnState()
+        {
+            // Arrange
+            var state = new CustomTurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            Activity activity = turnContext.Activity;
+            string channelId = activity.ChannelId;
+            string botId = activity.Recipient.Id;
+            string conversationId = activity.Conversation.Id;
+            string userId = activity.From.Id;
+
+            string conversationKey = $"{channelId}/${botId}/conversations/${conversationId}";
+            string userKey = $"{channelId}/${botId}/users/${userId}";
+
+            var conversationState = new TestUtils.ConversationState();
+            var userState = new Record();
+
+            IStorage storage = new MemoryStorage();
+            IDictionary<string, object> items = new Dictionary<string, object>
+            {
+                [conversationKey] = conversationState,
+                [userKey] = userState
+            };
+            await storage.WriteAsync(items);
+
+            // Act
+            bool loadResult = await state.LoadStateAsync(storage, turnContext);
+
+            // Assert
+            Assert.True(loadResult);
+            Assert.NotNull(state);
+            Assert.Equal(state.Conversation, conversationState);
+            Assert.Equal(state.User, userState);
+            Assert.NotNull(state.Temp);
+        }
+
+        [Fact]
+        public async void Test_LoadState_CustomTurnState_EmptyMemoryStorageProvided_ShouldPopulateTurnState()
+        {
+            // Arrange
+            var state = new CustomTurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            IStorage storage = new MemoryStorage();
+
+            // Act
+            bool loadResult = await state.LoadStateAsync(storage, turnContext);
+
+            // Assert
+            Assert.True(loadResult);
+            Assert.NotNull(state.Conversation);
+            Assert.NotNull(state.Temp);
+            Assert.NotNull(state.User);
         }
     }
 }
