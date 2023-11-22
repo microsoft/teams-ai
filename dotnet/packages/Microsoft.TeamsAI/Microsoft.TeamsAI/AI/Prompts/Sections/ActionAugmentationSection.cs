@@ -1,5 +1,4 @@
-﻿using Json.Schema;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;
