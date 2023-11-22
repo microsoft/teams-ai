@@ -18,6 +18,8 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
         public Dictionary<string, List<Run>> Runs { get; set; } = new();
 
+        public Queue<RequiredAction> RemainingActions { get; set; } = new();
+
         public Queue<string> RemainingRunStatus { get; set; } = new();
 
         public Queue<string> RemainingMessages { get; set; } = new();
@@ -27,6 +29,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             Threads.Clear();
             Messages.Clear();
             Runs.Clear();
+            RemainingActions.Clear();
             RemainingRunStatus.Clear();
             RemainingMessages.Clear();
         }
@@ -120,8 +123,12 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 Model = runCreateParams.Model ?? string.Empty,
                 Tools = runCreateParams.Tools ?? new(),
                 ThreadId = threadId,
-                Status = "in_progress"
+                Status = "in_progress",
             };
+            if (RemainingActions.Count > 0)
+            {
+                newRun.RequiredAction = RemainingActions.Dequeue();
+            }
             if (Runs.ContainsKey(threadId))
             {
                 Runs[threadId].Add(newRun);
@@ -156,7 +163,6 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
         public override async Task<Run> SubmitToolOutputs(string threadId, string runId, SubmitToolOutputsParams submitToolOutputsParams, CancellationToken cancellationToken)
         {
             Run run = await RetrieveRun(threadId, runId, cancellationToken);
-            run.Status = "in_progress";
             return run;
         }
     }

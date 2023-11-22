@@ -7,7 +7,7 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 using System.Text.Json;
 
-namespace Microsoft.Teams.AI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planners
 {
     /// <summary>
     /// A planner that uses OpenAI's Assistants APIs to generate plans.

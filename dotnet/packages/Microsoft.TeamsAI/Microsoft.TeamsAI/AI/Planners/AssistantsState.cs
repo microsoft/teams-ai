@@ -1,9 +1,10 @@
 ﻿using Microsoft.Teams.AI.State;
 
-namespace Microsoft.Teams.AI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planners
 {
     /// <summary>
     /// Model represents assistants state.
+    /// A default implementation is <see cref="AssistantsState"/>.
     /// </summary>
     public interface IAssistantsState
     {

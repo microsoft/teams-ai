@@ -1,6 +1,6 @@
 ﻿using Microsoft.Teams.AI.Utilities;
 
-namespace Microsoft.Teams.AI.AI.Planner
+namespace Microsoft.Teams.AI.AI.Planners
 {
     /// <summary>
     /// Options for the Assistants planner.
