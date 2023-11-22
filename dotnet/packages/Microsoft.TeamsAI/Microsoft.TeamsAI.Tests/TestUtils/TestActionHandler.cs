@@ -1,13 +1,14 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Action;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    public class TestActionHandler : IActionHandler<TestTurnState>
+    public class TestActionHandler : IActionHandler<TurnState>
     {
         public string? ActionName { get; set; }
 
-        public Task<string> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
+        public Task<string> PerformAction(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null)
         {
             ActionName = action;
             return Task.FromResult("test-result");

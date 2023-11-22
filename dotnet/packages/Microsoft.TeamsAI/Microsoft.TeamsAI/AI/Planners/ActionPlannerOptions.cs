@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI.AI.Planners
     /// Options used to configure an `ActionPlanner` instance.
     /// </summary>
     /// <typeparam name="TState">Type of application state.</typeparam>
-    public class ActionPlannerOptions<TState> where TState : ITurnState<Record, Record, TempState>, IMemory
+    public class ActionPlannerOptions<TState> where TState : TurnState, IMemory
     {
         /// <summary>
         /// Model instance to use.
