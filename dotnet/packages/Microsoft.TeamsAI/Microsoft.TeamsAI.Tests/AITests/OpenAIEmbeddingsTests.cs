@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             openAiEmbeddings.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
-            var result = await openAiEmbeddings.CreateEmbeddings(inputs);
+            var result = await openAiEmbeddings.CreateEmbeddingsAsync(inputs);
 
             // Assert
             Assert.NotNull(result);
@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             openAiEmbeddings.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
-            var result = await openAiEmbeddings.CreateEmbeddings(inputs);
+            var result = await openAiEmbeddings.CreateEmbeddingsAsync(inputs);
 
             // Assert
             Assert.NotNull(result);
@@ -100,7 +100,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             openAiEmbeddings.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
-            var result = await openAiEmbeddings.CreateEmbeddings(inputs);
+            var result = await openAiEmbeddings.CreateEmbeddingsAsync(inputs);
 
             // Assert
             Assert.NotNull(result);
@@ -127,7 +127,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             openAiEmbeddings.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAiEmbeddings, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await openAiEmbeddings.CreateEmbeddings(inputs));
+            var result = await Assert.ThrowsAsync<TeamsAIException>(async () => await openAiEmbeddings.CreateEmbeddingsAsync(inputs));
 
             // Assert
             Assert.Equal("Error while executing openAI Embeddings execution: other exception", result.Message);

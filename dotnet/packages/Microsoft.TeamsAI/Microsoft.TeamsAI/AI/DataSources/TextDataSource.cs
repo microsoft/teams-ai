@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI.AI.DataSources
         }
 
         /// <inheritdoc />
-        public async Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int maxTokens)
+        public async Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default)
         {
             if (this._tokens.Count == 0)
             {

@@ -242,7 +242,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response)
+        public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -291,9 +291,9 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default)
         {
-            Validation validation = await this._monologueValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts);
+            Validation validation = await this._monologueValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts, cancellationToken);
 
             if (!validation.Valid)
             {
@@ -332,7 +332,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 }
             };
 
-            Validation valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts);
+            Validation valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts, cancellationToken);
 
             if (!valid.Valid)
             {

@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
         }
 
         /// <inheritdoc/>
-        public async Task<EmbeddingsResponse> CreateEmbeddings(IList<string> inputs)
+        public async Task<EmbeddingsResponse> CreateEmbeddingsAsync(IList<string> inputs, CancellationToken cancellationToken = default)
         {
             if (this._options.LogRequests)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.AI.Embeddings
             try
             {
                 DateTime startTime = DateTime.Now;
-                Response<Azure.AI.OpenAI.Embeddings> response = await _client.GetEmbeddingsAsync(embeddingsOptions);
+                Response<Azure.AI.OpenAI.Embeddings> response = await _client.GetEmbeddingsAsync(embeddingsOptions, cancellationToken);
                 List<ReadOnlyMemory<float>> embeddingItems = response.Value.Data.OrderBy(item => item.Index).Select(item => item.Embedding).ToList();
 
                 if (this._options.LogRequests)

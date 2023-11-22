@@ -3,7 +3,7 @@
 namespace Microsoft.Teams.AI
 {
     /// <summary>
-    /// Combination of String, Regex, and RouteSelector selectors.
+    /// Combination of String, Regex, and RouteSelectorAsync selectors.
     /// </summary>
     public class MultipleRouteSelector
     {
@@ -18,8 +18,8 @@ namespace Microsoft.Teams.AI
         public Regex[]? Regexes { get; set; }
 
         /// <summary>
-        /// The RouteSelector function selectors. 
+        /// The RouteSelectorAsync function selectors. 
         /// </summary>
-        public RouteSelector[]? RouteSelectors { get; set; }
+        public RouteSelectorAsync[]? RouteSelectors { get; set; }
     }
 }

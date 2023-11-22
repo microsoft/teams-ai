@@ -81,7 +81,7 @@ namespace Microsoft.Teams.AI.AI.Models
             if (_options.CompletionType == CompletionConfiguration.CompletionType.Text)
             {
                 // Render prompt
-                RenderedPromptSection<string> prompt = await promptTemplate.Prompt.RenderAsTextAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens);
+                RenderedPromptSection<string> prompt = await promptTemplate.Prompt.RenderAsTextAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
                 if (prompt.TooLong)
                 {
                     return new PromptResponse
@@ -166,7 +166,7 @@ namespace Microsoft.Teams.AI.AI.Models
             else
             {
                 // Render prompt
-                RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens);
+                RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
                 if (prompt.TooLong)
                 {
                     return new PromptResponse

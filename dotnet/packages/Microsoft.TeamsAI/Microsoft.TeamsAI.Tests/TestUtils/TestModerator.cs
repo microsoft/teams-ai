@@ -10,13 +10,13 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
     {
         public IList<string> Record { get; } = new List<string>();
 
-        public Task<Plan> ReviewOutput(ITurnContext turnContext, TurnState turnState, Plan plan)
+        public Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TurnState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(plan);
         }
 
-        public Task<Plan?> ReviewInput(ITurnContext turnContext, TurnState turnState)
+        public Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken = default)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult<Plan?>(null);

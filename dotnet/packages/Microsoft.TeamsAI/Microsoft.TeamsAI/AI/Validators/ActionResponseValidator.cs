@@ -59,7 +59,7 @@ namespace Microsoft.Teams.AI.AI.Validators
         }
 
         /// <inheritdoc />
-        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default)
         {
             if (response.Message?.FunctionCall == null && this._required == false)
             {
@@ -105,7 +105,7 @@ namespace Microsoft.Teams.AI.AI.Validators
                     string args = func.Arguments == "{}" ? "" : func.Arguments;
                     ChatMessage message = new(ChatRole.Assistant) { Content = args };
                     Validation result = await validator.ValidateResponseAsync(
-                        context, memory, tokenizer, new() { Status = PromptResponseStatus.Success, Message = message }, remainingAttempts);
+                        context, memory, tokenizer, new() { Status = PromptResponseStatus.Success, Message = message }, remainingAttempts, cancellationToken);
 
                     if (!result.Valid)
                     {

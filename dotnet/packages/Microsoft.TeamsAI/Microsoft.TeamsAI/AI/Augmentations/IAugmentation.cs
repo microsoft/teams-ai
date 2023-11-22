@@ -24,7 +24,9 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         /// <param name="context">Context for the current turn of conversation.</param>
         /// <param name="memory">An interface for accessing state variables.</param>
         /// <param name="response">The validated and transformed response for the prompt.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns></returns>
-        public Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response);
+        public Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response, CancellationToken cancellationToken = default);
     }
 }

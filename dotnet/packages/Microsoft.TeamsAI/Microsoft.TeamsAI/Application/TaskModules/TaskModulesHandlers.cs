@@ -13,7 +13,7 @@ namespace Microsoft.Teams.AI
     /// <param name="data">The data associated with the fetch.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>An instance of TaskModuleResponse.</returns>
-    public delegate Task<TaskModuleResponse> FetchHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : TurnState;
+    public delegate Task<TaskModuleResponse> FetchHandlerAsync<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : TurnState;
 
     /// <summary>
     /// Function for handling Task Module submit events.
@@ -24,6 +24,6 @@ namespace Microsoft.Teams.AI
     /// <param name="data">The data associated with the fetch.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns>An instance of TaskModuleResponse.</returns>
-    public delegate Task<TaskModuleResponse> SubmitHandler<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : TurnState;
+    public delegate Task<TaskModuleResponse> SubmitHandlerAsync<TState>(ITurnContext turnContext, TState turnState, object data, CancellationToken cancellationToken) where TState : TurnState;
 
 }

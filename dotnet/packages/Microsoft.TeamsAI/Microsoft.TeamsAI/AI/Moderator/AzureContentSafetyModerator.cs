@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        public async Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             switch (_options.Moderate)
             {
@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        public async Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             switch (_options.Moderate)
             {
