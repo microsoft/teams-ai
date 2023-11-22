@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// </summary>
         [JsonPropertyName("schema")]
         [JsonPropertyOrder(1)]
-        public int Schema { get; set; } = 1;
+        public double Schema { get; set; } = 1;
 
         /// <summary>
         /// Type, such as "completion", "embeddings", etc.
@@ -119,7 +119,10 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <returns>Prompt template configuration.</returns>
         internal static PromptTemplateConfiguration FromJson(string json)
         {
-            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json);
+            PromptTemplateConfiguration? result = JsonSerializer.Deserialize<PromptTemplateConfiguration>(json, new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            });
 
             if (result == null)
             {
@@ -141,7 +144,8 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// </summary>
         [JsonPropertyName("completion_type")]
         [JsonPropertyOrder(1)]
-        public CompletionType? Type { get; set; } = null;
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public CompletionType Type { get; set; } = CompletionType.Chat;
 
         /// <summary>
         /// Controls the model’s tendency to repeat predictions. The frequency penalty reduces the probability
@@ -254,6 +258,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// </summary>
         [JsonPropertyName("augmentation_type")]
         [JsonPropertyOrder(1)]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public AugmentationType Type { get; set; } = AugmentationType.None;
 
         /// <summary>
