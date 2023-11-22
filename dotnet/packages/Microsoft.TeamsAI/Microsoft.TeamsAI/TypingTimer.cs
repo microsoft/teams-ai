@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI
             }
 
             // Listen for outgoing activities
-            turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandler);
+            turnContext.OnSendActivities(StopTimerWhenSendMessageActivityHandlerAsync);
 
             // Start periodically send "typing" activity
             _timer = new Timer(SendTypingActivity, turnContext, Timeout.Infinite, Timeout.Infinite);
@@ -115,7 +115,7 @@ namespace Microsoft.Teams.AI
             }
         }
 
-        private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+        private Task<ResourceResponse[]> StopTimerWhenSendMessageActivityHandlerAsync(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
             if (_timer != null)
             {

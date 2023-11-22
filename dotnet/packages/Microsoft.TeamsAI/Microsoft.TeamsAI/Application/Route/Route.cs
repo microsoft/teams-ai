@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>True if the route handler should be triggered. Otherwise, False.</returns>
-    public delegate Task<bool> RouteSelector(ITurnContext turnContext, CancellationToken cancellationToken);
+    public delegate Task<bool> RouteSelectorAsync(ITurnContext turnContext, CancellationToken cancellationToken);
 
     /// <summary>
     /// The common route handler. Function for handling an incoming request.
@@ -25,7 +25,7 @@ namespace Microsoft.Teams.AI
 
     internal class Route<TState> where TState : TurnState
     {
-        public Route(RouteSelector selector, bool isInvokeRoute = false)
+        public Route(RouteSelectorAsync selector, bool isInvokeRoute = false)
         {
             Selector = selector;
             Handler = (_, _, _) => Task.CompletedTask;
@@ -39,14 +39,14 @@ namespace Microsoft.Teams.AI
             IsInvokeRoute = isInvokeRoute;
         }
 
-        public Route(RouteSelector selector, RouteHandler<TState> handler, bool isInvokeRoute = false)
+        public Route(RouteSelectorAsync selector, RouteHandler<TState> handler, bool isInvokeRoute = false)
         {
             Selector = selector;
             Handler = handler;
             IsInvokeRoute = isInvokeRoute;
         }
 
-        public RouteSelector Selector { get; private set; }
+        public RouteSelectorAsync Selector { get; private set; }
 
         public RouteHandler<TState> Handler { get; private set; }
 

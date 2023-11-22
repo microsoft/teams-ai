@@ -18,7 +18,9 @@ namespace Microsoft.Teams.AI.AI.Validators
         /// <param name="tokenizer">Tokenizer to use for encoding and decoding text.</param>
         /// <param name="response">Response to validate.</param>
         /// <param name="remainingAttempts">Number of remaining attempts to validate the response.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns></returns>
-        public Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts);
+        public Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default);
     }
 }

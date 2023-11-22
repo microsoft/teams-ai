@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitActionHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitActionHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
                 Assert.Equal("test-title", actionData.Title);
@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SubmitActionHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitActionHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 MessageExtensionActionData actionData = Cast<MessageExtensionActionData>(data);
                 Assert.Equal("test-title", actionData.Title);
@@ -143,11 +143,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            SubmitActionHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitActionHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(actionResponseMock.Object);
             };
@@ -207,7 +207,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 TurnStateFactory = () => turnState.Result,
 
             });
-            BotMessagePreviewEditHandler<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
+            BotMessagePreviewEditHandlerAsync<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
                 return Task.FromResult(actionResponseMock.Object);
@@ -265,7 +265,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            BotMessagePreviewEditHandler<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
+            BotMessagePreviewEditHandlerAsync<TurnState> handler = (turnContext, turnState, activityPreview, cancellationToken) =>
             {
                 Assert.Equivalent(activity, activityPreview);
                 return Task.FromResult(actionResponseMock.Object);
@@ -299,11 +299,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            BotMessagePreviewEditHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            BotMessagePreviewEditHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(actionResponseMock.Object);
             };
@@ -451,7 +451,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
@@ -503,7 +503,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchTaskHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandlerAsync<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -549,7 +549,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            FetchTaskHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandlerAsync<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -582,11 +582,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            FetchTaskHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
+            FetchTaskHandlerAsync<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -646,7 +646,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            QueryHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal(1, query.Parameters.Count);
                 Assert.Equal("test-value", query.Parameters["test-name"]);
@@ -705,7 +705,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            QueryHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal(1, query.Parameters.Count);
                 Assert.Equal("test-value", query.Parameters["test-name"]);
@@ -742,11 +742,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            QueryHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            QueryHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -794,7 +794,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SelectItemHandler<TurnState> handler = (turnContext, turnState, item, cancellationToken) =>
+            SelectItemHandlerAsync<TurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -845,7 +845,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SelectItemHandler<TurnState> handler = (turnContext, turnState, item, cancellationToken) =>
+            SelectItemHandlerAsync<TurnState> handler = (turnContext, turnState, item, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -896,7 +896,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandlerAsync<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 Assert.Equal("test-url", url);
                 return Task.FromResult(messagingExtensionResultMock.Object);
@@ -939,7 +939,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandlerAsync<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -990,7 +990,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandlerAsync<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 Assert.Equal("test-url", url);
                 return Task.FromResult(messagingExtensionResultMock.Object);
@@ -1033,7 +1033,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandlerAsync<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -1079,7 +1079,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryUrlSettingHandler<TurnState> handler = (turnContext, turnState, cancellationToken) =>
+            QueryUrlSettingHandlerAsync<TurnState> handler = (turnContext, turnState, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };
@@ -1120,7 +1120,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 TurnStateFactory = () => turnState.Result,
             });
-            QueryLinkHandler<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
+            QueryLinkHandlerAsync<TurnState> handler = (turnContext, turnState, url, cancellationToken) =>
             {
                 return Task.FromResult(messagingExtensionResultMock.Object);
             };

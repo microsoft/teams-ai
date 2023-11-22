@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Action
         }
 
         [Action(AIConstants.DoCommandActionName, isDefault: true)]
-        public async Task<string> DoCommand([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionParameters] DoCommandActionData<TState> doCommandActionData)
+        public async Task<string> DoCommandAsync([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] TState turnState, [ActionParameters] DoCommandActionData<TState> doCommandActionData, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(doCommandActionData);
 
@@ -70,22 +70,22 @@ namespace Microsoft.Teams.AI.AI.Action
 
             IActionHandler<TState> handler = doCommandActionData.Handler;
 
-            return await handler.PerformAction(turnContext, turnState, doCommandActionData.PredictedDoCommand.Parameters, doCommandActionData.PredictedDoCommand.Action);
+            return await handler.PerformActionAsync(turnContext, turnState, doCommandActionData.PredictedDoCommand.Parameters, doCommandActionData.PredictedDoCommand.Action, cancellationToken);
         }
 
         [Action(AIConstants.SayCommandActionName, isDefault: true)]
-        public async Task<string> SayCommand([ActionTurnContext] ITurnContext turnContext, [ActionParameters] PredictedSayCommand command)
+        public async Task<string> SayCommandAsync([ActionTurnContext] ITurnContext turnContext, [ActionParameters] PredictedSayCommand command, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(command);
 
             string response = command.Response;
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                await turnContext.SendActivityAsync(response.Replace("\n", "<br>"));
+                await turnContext.SendActivityAsync(response.Replace("\n", "<br>"), null, null, cancellationToken);
             }
             else
             {
-                await turnContext.SendActivityAsync(response);
+                await turnContext.SendActivityAsync(response, null, null, cancellationToken);
             };
 
             return string.Empty;
