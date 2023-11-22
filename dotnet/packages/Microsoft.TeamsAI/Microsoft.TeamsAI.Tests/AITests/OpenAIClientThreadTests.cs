@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.CreateThread(new ThreadCreateParams(), CancellationToken.None);
+            var result = await openAIClient.CreateThreadAsync(new ThreadCreateParams(), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.CreateMessage("thread_test", new MessageCreateParams
+            var result = await openAIClient.CreateMessageAsync("thread_test", new MessageCreateParams
             {
                 Content = "hello"
             }, CancellationToken.None);
@@ -103,7 +103,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.ListNewMessages("thread_1", "msg_0", CancellationToken.None).ToListAsync();
+            var result = await openAIClient.ListNewMessagesAsync("thread_1", "msg_0", CancellationToken.None).ToListAsync();
 
             // Assert
             Assert.NotNull(result);
@@ -132,7 +132,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.CreateRun("thread_test", new RunCreateParams
+            var result = await openAIClient.CreateRunAsync("thread_test", new RunCreateParams
             {
                 AssistantId = "asst_test"
             }, CancellationToken.None);
@@ -164,7 +164,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.RetrieveRun("thread_test", "run_test", CancellationToken.None);
+            var result = await openAIClient.RetrieveRunAsync("thread_test", "run_test", CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -198,7 +198,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.RetrieveLastRun("thread_test", CancellationToken.None);
+            var result = await openAIClient.RetrieveLastRunAsync("thread_test", CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -224,7 +224,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.RetrieveLastRun("thread_test", CancellationToken.None);
+            var result = await openAIClient.RetrieveLastRunAsync("thread_test", CancellationToken.None);
 
             // Assert
             Assert.Null(result);
@@ -250,7 +250,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.SubmitToolOutputs("thread_test", "run_test", new SubmitToolOutputsParams
+            var result = await openAIClient.SubmitToolOutputsAsync("thread_test", "run_test", new SubmitToolOutputsParams
             {
                 ToolOutputs = new List<ToolOutput>
                 {

@@ -510,7 +510,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Strings = new[] { ActivityTypes.Invoke },
                 Regexes = new[] { new Regex("^message$") },
-                RouteSelectors = new RouteSelector[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
+                RouteSelectors = new RouteSelectorAsync[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
             },
             (context, _, _) =>
             {
@@ -1503,7 +1503,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Strings = new[] { "world" },
                 Regexes = new[] { new Regex("come") },
-                RouteSelectors = new RouteSelector[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
+                RouteSelectors = new RouteSelectorAsync[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
             },
             (context, _, _) =>
             {

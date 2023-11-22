@@ -183,7 +183,8 @@ namespace Microsoft.Teams.AI.AI.Clients
                     memory,
                     this.Options.Tokenizer,
                     response,
-                    this.Options.MaxRepairAttempts
+                    this.Options.MaxRepairAttempts,
+                    cancellationToken
                 );
 
                 if (validation.Valid)
@@ -343,7 +344,8 @@ namespace Microsoft.Teams.AI.AI.Clients
                 fork,
                 this.Options.Tokenizer,
                 repairResponse,
-                remainingAttempts
+                remainingAttempts,
+                cancellationToken
             );
 
             if (repairValidation.Valid)

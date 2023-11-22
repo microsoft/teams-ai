@@ -68,7 +68,7 @@ namespace TypeAheadBot
         /// <summary>
         /// Handles Adaptive Card dynamic search events.
         /// </summary>
-        public SearchHandler<TurnState> SearchHandler => async (ITurnContext turnContext, TurnState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken) =>
+        public SearchHandlerAsync<TurnState> SearchHandler => async (ITurnContext turnContext, TurnState turnState, Query<AdaptiveCardsSearchParams> query, CancellationToken cancellationToken) =>
         {
             string queryText = query.Parameters.QueryText;
             int count = query.Count;

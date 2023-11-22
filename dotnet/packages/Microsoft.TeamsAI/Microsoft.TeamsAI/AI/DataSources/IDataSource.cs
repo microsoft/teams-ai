@@ -22,7 +22,9 @@ namespace Microsoft.Teams.AI.AI.DataSources
         /// <param name="memory">An interface for accessing state values.</param>
         /// <param name="tokenizer">Tokenizer to use when rendering the data source.</param>
         /// <param name="maxTokens">Maximum number of tokens allowed to be rendered.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns></returns>
-        public Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int maxTokens);
+        public Task<RenderedPromptSection<string>> RenderDataAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default);
     }
 }
