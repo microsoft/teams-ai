@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Json.Schema;
+using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Augmentations;
 using Microsoft.Teams.AI.AI.DataSources;
 using Microsoft.Teams.AI.AI.Models;
@@ -6,6 +7,7 @@ using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
+using System.Text.Json;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
@@ -189,6 +191,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
         private PromptTemplate _LoadPromptTemplateFromFile(string name)
         {
+            const string ACTIONS_FILE = "actions.json";
             const string CONFIG_FILE = "config.json";
             const string PROMPT_FILE = "skprompt.txt";
 
@@ -197,7 +200,11 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
             // Continue only if prompt template exists
             string promptPath = Path.Combine(promptFolder, PROMPT_FILE);
-            if (!File.Exists(promptPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing"); }
+
+            if (!File.Exists(promptPath))
+            {
+                throw new InvalidOperationException($"Error while loading prompt. The `{PROMPT_FILE}` file is either invalid or missing");
+            }
 
             // Load prompt template
             string text = File.ReadAllText(promptPath);
@@ -206,18 +213,33 @@ namespace Microsoft.Teams.AI.AI.Prompts
             // Load prompt configuration. Note: the configuration is optional.
             PromptTemplateConfiguration? config;
             string configPath = Path.Combine(promptFolder, CONFIG_FILE);
-            if (!File.Exists(configPath)) { throw new InvalidOperationException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing"); }
+
+            if (!File.Exists(configPath))
+            {
+                throw new InvalidOperationException($"Error while loading prompt. The `{CONFIG_FILE}` file is either invalid or missing");
+            }
+
+            List<ChatCompletionAction> actions = new();
+            string actionsPath = Path.Combine(promptFolder, ACTIONS_FILE);
 
             try
             {
                 config = PromptTemplateConfiguration.FromJson(File.ReadAllText(configPath));
+
+                if (File.Exists(actionsPath))
+                {
+                    actions = JsonSerializer.Deserialize<List<ChatCompletionAction>>(File.ReadAllText(actionsPath)) ?? new();
+                }
             }
             catch (Exception ex)
             {
                 throw new TeamsAIException($"Error while loading prompt. {ex.Message}");
             }
 
-            return new PromptTemplate(name, prompt, config);
+            return new PromptTemplate(name, prompt, config)
+            {
+                Actions = actions
+            };
         }
 
         private void _VerifyDirectoryExists(string directoryPath)

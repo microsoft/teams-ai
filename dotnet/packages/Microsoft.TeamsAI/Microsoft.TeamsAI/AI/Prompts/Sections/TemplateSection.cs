@@ -179,7 +179,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             return (context, memory, functions, tokenizer, maxTokens) =>
             {
-                dynamic? value = memory.GetValue(name);
+                object? value = memory.GetValue(name);
                 return Task.FromResult(Convert.ToString(value));
             };
         }

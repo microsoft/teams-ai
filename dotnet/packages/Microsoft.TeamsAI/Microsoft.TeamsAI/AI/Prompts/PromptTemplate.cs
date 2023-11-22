@@ -39,6 +39,19 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Creates an instance of `PromptTemplate`
         /// </summary>
+        /// <param name="template"></param>
+        public PromptTemplate(PromptTemplate template)
+        {
+            this.Name = template.Name;
+            this.Prompt = template.Prompt;
+            this.Configuration = template.Configuration;
+            this.Actions = template.Actions;
+            this.Augmentation = template.Augmentation;
+        }
+
+        /// <summary>
+        /// Creates an instance of `PromptTemplate`
+        /// </summary>
         /// <param name="name">Name of the prompt template.</param>
         /// <param name="prompt">Prompt that should be rendered</param>
         public PromptTemplate(string name, Prompt prompt)

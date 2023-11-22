@@ -203,7 +203,7 @@ namespace Microsoft.Teams.AI.State
         public bool HasValue(string path)
         {
             (TurnStateEntry scope, string name) = GetScopeAndName(path);
-            return scope.Value!.ContainsKey(name);
+            return scope.Value?.ContainsKey(name) == true;
         }
 
         /// <summary>
@@ -212,10 +212,16 @@ namespace Microsoft.Teams.AI.State
         /// <param name="path">Path to the value to retrieve in the form of `[currScope].property`.
         /// If currScope is omitted, the value is retrieved from the temporary currScope.</param>
         /// <returns>The value or undefined if not found.</returns>
-        public object GetValue(string path)
+        public object? GetValue(string path)
         {
             (TurnStateEntry scope, string name) = GetScopeAndName(path);
-            return scope.Value![name];
+
+            if (scope.Value?.ContainsKey(name) != true)
+            {
+                return null;
+            }
+
+            return scope.Value[name];
         }
 
         /// <summary>
