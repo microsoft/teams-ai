@@ -159,7 +159,7 @@ namespace Microsoft.Teams.AI.AI.Clients
             }
             else
             {
-                input = memory.GetValue(this.Options.InputVariable)?.ToString() ?? "";
+                input = memory.GetValue(this.Options.InputVariable)?.ToString() ?? string.Empty;
             }
 
             try
@@ -263,14 +263,14 @@ namespace Microsoft.Teams.AI.AI.Clients
 
             List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
 
-            history.Add(new(ChatRole.User)
+            history.Insert(0, new(ChatRole.User)
             {
                 Content = input
             });
 
             if (history.Count > this.Options.MaxHistoryMessages)
             {
-                history.RemoveAt(0);
+                history.RemoveAt(history.Count - 1);
             }
 
             memory.SetValue(variable, history);
@@ -285,11 +285,11 @@ namespace Microsoft.Teams.AI.AI.Clients
 
             List<ChatMessage> history = (List<ChatMessage>?)memory.GetValue(variable) ?? new() { };
 
-            history.Add(message);
+            history.Insert(0, message);
 
             if (history.Count > this.Options.MaxHistoryMessages)
             {
-                history.RemoveAt(0);
+                history.RemoveAt(history.Count - 1);
             }
 
             memory.SetValue(variable, history);
@@ -314,11 +314,12 @@ namespace Microsoft.Teams.AI.AI.Clients
                 this.AddOutputToHistory(fork, $"{this.Options.HistoryVariable}-repair", response.Message);
             }
 
-            PromptTemplate repairTemplate = new(this.Options.Template.Name, new(new()
+            PromptTemplate repairTemplate = new(this.Options.Template);
+            repairTemplate.Prompt = new(new()
             {
                 this.Options.Template.Prompt,
                 new ConversationHistorySection($"{this.Options.HistoryVariable}-repair")
-            }));
+            });
 
             if (this.Options.LogRepairs)
             {

@@ -42,7 +42,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
     },
     {
       ""type"": ""DO"",
-      ""entities"": {
+      ""action"": ""DoSomething"",
+      ""parameters"": {
         ""prop"": ""value""
       }
     }

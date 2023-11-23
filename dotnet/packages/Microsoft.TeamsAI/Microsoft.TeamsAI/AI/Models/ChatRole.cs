@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -7,7 +8,11 @@ namespace Microsoft.Teams.AI.AI.Models
     /// </summary>
     public readonly partial struct ChatRole : IEquatable<ChatRole>
     {
-        private readonly string _value;
+        /// <summary>
+        /// Raw String Value
+        /// </summary>
+        [JsonPropertyName("value")]
+        public readonly string Value;
 
         /// <summary>
         /// Initializes a new instance of <see cref="ChatRole"/>.
@@ -16,7 +21,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
         public ChatRole(string value)
         {
-            _value = value ?? throw new ArgumentNullException(nameof(value));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         private const string SystemValue = "system";
@@ -76,12 +81,12 @@ namespace Microsoft.Teams.AI.AI.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object obj) => obj is ChatRole other && Equals(other);
         /// <inheritdoc />
-        public bool Equals(ChatRole other) => string.Equals(_value, other._value, StringComparison.InvariantCultureIgnoreCase);
+        public bool Equals(ChatRole other) => string.Equals(Value, other.Value, StringComparison.InvariantCultureIgnoreCase);
 
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
+        public override int GetHashCode() => Value?.GetHashCode() ?? 0;
         /// <inheritdoc />
-        public override string ToString() => _value;
+        public override string ToString() => Value;
     }
 }

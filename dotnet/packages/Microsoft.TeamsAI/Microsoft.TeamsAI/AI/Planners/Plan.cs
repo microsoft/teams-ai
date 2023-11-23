@@ -55,6 +55,14 @@ namespace Microsoft.Teams.AI.AI.Planners
         }
 
         /// <summary>
+        /// Returns a Json string representation of the plan.
+        /// </summary>
+        public override string ToString()
+        {
+            return this.ToJsonString();
+        }
+
+        /// <summary>
         /// Schema
         /// </summary>
         public static JsonSchema Schema()
