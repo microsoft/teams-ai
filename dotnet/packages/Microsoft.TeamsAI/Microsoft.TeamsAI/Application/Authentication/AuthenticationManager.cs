@@ -102,7 +102,7 @@ namespace Microsoft.Teams.AI
 
         private void SetTokenInState(TState state, string handlerName, string token)
         {
-            if ( state.Temp.AuthTokens == null)
+            if (state.Temp.AuthTokens == null)
             {
                 state.Temp.AuthTokens = new Dictionary<string, string>();
             }

@@ -2,7 +2,6 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication
 {
@@ -174,7 +173,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             Assert.True(validActivity);
         }
 
-        private TurnContext MockTurnContext()
+        private static TurnContext MockTurnContext()
         {
             return new TurnContext(new SimpleAdapter(), new Activity()
             {
