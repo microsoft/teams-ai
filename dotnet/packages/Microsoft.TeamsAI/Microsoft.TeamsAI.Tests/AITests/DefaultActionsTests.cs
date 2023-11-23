@@ -233,9 +233,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
             ILoggerFactory loggerFactory = new TestLoggerFactory(logger);
 
-            AIOptions<TState> options = new(
-                new Mock<IPlanner<TState>>().Object,
-                new Mock<IModerator<TState>>().Object);
+            AIOptions<TState> options = new(new Mock<IPlanner<TState>>().Object)
+            {
+                Moderator = new Mock<IModerator<TState>>().Object
+            };
             AI<TState> ai = new(options, loggerFactory);
             // get _actions field from AI class
             FieldInfo actionsField = typeof(AI<TState>).GetField("_actions", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance)!;

@@ -21,7 +21,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TestPlanner();
             var moderator = new TestModerator();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var handler = new TestActionHandler();
 
@@ -42,7 +45,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TestPlanner();
             var moderator = new TestModerator();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var handler = new TestActionHandler();
             var turnContextMock = new Mock<ITurnContext>();
@@ -67,7 +73,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
@@ -99,7 +108,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
@@ -134,7 +146,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
-            var options = new AIOptions<TurnState>(planner, moderator, maxTime: TimeSpan.Zero);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator,
+                MaxTime = TimeSpan.Zero
+            };
             var ai = new AI<TurnState>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,

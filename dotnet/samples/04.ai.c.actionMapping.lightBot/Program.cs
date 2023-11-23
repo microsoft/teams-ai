@@ -45,9 +45,11 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create Model
     OpenAIModel model = new(new OpenAIModelOptions(
         apiKey: config.OpenAI.ApiKey,
-        defaultModel: "gpt-3.5-turbo",
-        logRequests: true
-    ), loggerFactory);
+        defaultModel: "gpt-3.5-turbo"
+    )
+    {
+        LogRequests = true
+    }, loggerFactory);
 
     // Create Prompt Manager
     PromptManager prompts = new(new()
