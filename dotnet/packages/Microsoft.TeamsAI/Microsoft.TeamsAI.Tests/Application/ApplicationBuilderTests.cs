@@ -2,6 +2,7 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.Application.Authentication;
 using Microsoft.Teams.AI.Tests.TestUtils;
 
 namespace Microsoft.Teams.AI.Tests.Application
@@ -54,7 +55,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Moderator = new TestModerator()
             };
-            AuthenticationOptions authOptions = new(new Dictionary<string, IAuthentication>());
+            AuthenticationOptions authOptions = new(new Dictionary<string, IAuthentication>()
+            {
+                {"graph", new MockedAuthentication() }
+            });
 
             // Act
             var app = new ApplicationBuilder<TurnState>()

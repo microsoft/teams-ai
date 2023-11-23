@@ -77,7 +77,6 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
 
             // assert
             Assert.Equal(SignInStatus.Pending, response.Status);
-            Assert.False(turnState.Temp.AuthTokens.ContainsKey("graph"));
             Assert.Null(response.Token);
         }
 
@@ -94,8 +93,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var authManager = new AuthenticationManager<TurnState>(options);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            turnState.Temp.AuthTokens["graph"] = "graph token";
-            turnState.Temp.AuthTokens["sharepoint"] = "sharepoint token";
+            turnState.Temp.AuthTokens = new Dictionary<string, string>()
+            {
+                {"graph", "graph token" },
+                {"sharepoint", "sharepoint token" }
+            };
 
             // act
             await authManager.SignOutUser(turnContext, turnState);
@@ -118,8 +120,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var authManager = new AuthenticationManager<TurnState>(options);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-            turnState.Temp.AuthTokens["graph"] = "graph token";
-            turnState.Temp.AuthTokens["sharepoint"] = "sharepoint token";
+            turnState.Temp.AuthTokens = new Dictionary<string, string>()
+            {
+                {"graph", "graph token" },
+                {"sharepoint", "sharepoint token" }
+            };
 
             // act
             await authManager.SignOutUser(turnContext, turnState, "sharepoint");

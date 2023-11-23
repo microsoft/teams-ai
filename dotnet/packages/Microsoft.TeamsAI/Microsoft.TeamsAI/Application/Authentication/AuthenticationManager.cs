@@ -102,12 +102,16 @@ namespace Microsoft.Teams.AI
 
         private void SetTokenInState(TState state, string handlerName, string token)
         {
+            if ( state.Temp.AuthTokens == null)
+            {
+                state.Temp.AuthTokens = new Dictionary<string, string>();
+            }
             state.Temp.AuthTokens[handlerName] = token;
         }
 
         private void DeleteTokenFromState(TState state, string handlerName)
         {
-            if (state.Temp.AuthTokens.ContainsKey(handlerName))
+            if (state.Temp.AuthTokens != null && state.Temp.AuthTokens.ContainsKey(handlerName))
             {
                 state.Temp.AuthTokens.Remove(handlerName);
             }
