@@ -8,6 +8,10 @@
     "description": "Turns off the lights"
   },
   {
+    "name": "LightStatus",
+    "description": "Gets the lights status"
+  },
+  {
     "name": "Pause",
     "description": "Delays for a period of time",
     "parameters": {
