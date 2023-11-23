@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.AI.Validators
         public DefaultResponseValidator() : base() { }
 
         /// <inheritdoc />
-        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default)
         {
             return await Task.FromResult(new Validation()
             {

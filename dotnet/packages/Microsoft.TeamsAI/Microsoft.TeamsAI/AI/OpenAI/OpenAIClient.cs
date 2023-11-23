@@ -50,9 +50,11 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// </summary>
         /// <param name="text">The input text to moderate.</param>
         /// <param name="model">The moderation model to use.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns>The moderation result from the API call.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<ModerationResponse> ExecuteTextModeration(string text, string? model)
+        public virtual async Task<ModerationResponse> ExecuteTextModerationAsync(string text, string? model, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -66,7 +68,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIModerationEndpoint, content);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequestAsync(OpenAIModerationEndpoint, content, null, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 ModerationResponse result = JsonSerializer.Deserialize<ModerationResponse>(responseJson) ?? throw new SerializationException($"Failed to deserialize moderation result response json: {content}");
@@ -83,7 +85,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
             }
         }
 
-        private async Task<HttpResponseMessage> _ExecuteGetRequest(
+        private async Task<HttpResponseMessage> _ExecuteGetRequestAsync(
             string url,
             IEnumerable<KeyValuePair<string, string>>? queries = null,
             IEnumerable<KeyValuePair<string, string>>? additionalHeaders = null,
@@ -139,7 +141,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
             throw new HttpOperationException($"HTTP response failure status code: {(int)statusCode} ({failureReason})", statusCode, failureReason);
         }
 
-        private async Task<HttpResponseMessage> _ExecutePostRequest(
+        private async Task<HttpResponseMessage> _ExecutePostRequestAsync(
             string url,
             HttpContent? content,
             IEnumerable<KeyValuePair<string, string>>? additionalHeaders = null,

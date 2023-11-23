@@ -1,6 +1,4 @@
-﻿using Azure.AI.ContentSafety;
-
-namespace Microsoft.Teams.AI.AI.Moderator
+﻿namespace Microsoft.Teams.AI.AI.Moderator
 {
     /// <summary>
     /// Options for the Azure Content Safety moderator.
@@ -30,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         /// <summary>
         /// The categories will be analyzed. If not assigned, a default set of the categories' analysis results will be returned.
         /// </summary>
-        public IList<TextCategory>? Categories { get; set; }
+        public IList<AzureContentSafetyTextCategory>? Categories { get; set; }
 
         /// <summary>
         /// The names of blocklists.

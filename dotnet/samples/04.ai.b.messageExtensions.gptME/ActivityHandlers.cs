@@ -27,7 +27,7 @@ namespace GPT
         /// <summary>
         /// Handles Message Extension fetchTask events.
         /// </summary>
-        public FetchTaskHandler<TurnState> FetchTaskHandler => async (ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken) =>
+        public FetchTaskHandlerAsync<TurnState> FetchTaskHandler => async (ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken) =>
         {
             // Return card as a TaskInfo object
             Attachment card = await CardBuilder.NewInitialViewAttachment(cancellationToken);
@@ -40,7 +40,7 @@ namespace GPT
         /// <summary>
         /// Handles Message Extension submitAction events.
         /// </summary>
-        public SubmitActionHandler<TurnState> SubmitActionHandler => async (ITurnContext turnContext, TurnState turnState, object data, CancellationToken cancellationToken) =>
+        public SubmitActionHandlerAsync<TurnState> SubmitActionHandler => async (ITurnContext turnContext, TurnState turnState, object data, CancellationToken cancellationToken) =>
         {
             SubmitData submitData = (data as JObject)?.ToObject<SubmitData>() ?? throw new Exception("Incorrect submit data format"); ;
             switch (submitData.Verb)
@@ -103,7 +103,7 @@ namespace GPT
         /// <summary>
         /// Handles Message Extension botMessagePreview edit events.
         /// </summary>
-        public BotMessagePreviewEditHandler<TurnState> BotMessagePreviewEditHandler => async (ITurnContext turnContext, TurnState turnState, Activity activityPreview, CancellationToken cancellationToken) =>
+        public BotMessagePreviewEditHandlerAsync<TurnState> BotMessagePreviewEditHandler => async (ITurnContext turnContext, TurnState turnState, Activity activityPreview, CancellationToken cancellationToken) =>
         {
             // Get post text from previewed card
             PreviewCard previewCard =
