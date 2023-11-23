@@ -35,6 +35,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
                 IDictionary<string, object> items = new Dictionary<string, object>();
                 items[conversationKey] = conversationState;
                 items[userKey] = userState;
+                items["temp"] = new TempState();
                 return Task.FromResult(items);
             });
 

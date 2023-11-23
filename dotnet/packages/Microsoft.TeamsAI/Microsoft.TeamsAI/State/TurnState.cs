@@ -276,7 +276,7 @@ namespace Microsoft.Teams.AI.State
                         IDictionary<string, object> items;
                         if (storage != null)
                         {
-                            items = await storage.ReadAsync(keys.ToArray(), cancellationToken);
+                            items = await storage.ReadAsync(keys.Where(k => k != TEMP_SCOPE).ToArray(), cancellationToken);
                         }
                         else
                         {
