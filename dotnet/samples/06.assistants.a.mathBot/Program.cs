@@ -19,9 +19,10 @@ if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
     throw new Exception("Missing OpenAI configuration.");
 }
 
-// Missing Assistant ID, create new assistant
+// Missing Assistant ID, create new Assistant
 if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
 {
+    Console.WriteLine("No Assistant ID configured, creating new Assistant...");
     string newAssistantId = AssistantsPlanner<AssistantsState>.CreateAssistantAsync(config.OpenAI.ApiKey, null, new()
     {
         Name = "Math Tutor",
@@ -33,9 +34,9 @@ if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
                 Type = "code_interpreter"
             }
         },
-        Model = "gpt-4-1106-preview"
+        Model = "gpt-3.5-turbo"
     }).Result.Id;
-    Console.WriteLine($"Created a new assistant with an ID of: ${newAssistantId}");
+    Console.WriteLine($"Created a new assistant with an ID of: {newAssistantId}");
     Console.WriteLine("Copy and save above ID, and set `OpenAI:AssistantId` in appsettings.Development.json.");
     Console.WriteLine("Press any key to exit.");
     Console.ReadLine();
