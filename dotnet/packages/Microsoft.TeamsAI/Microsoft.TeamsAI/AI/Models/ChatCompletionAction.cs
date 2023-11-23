@@ -1,4 +1,5 @@
 ﻿using Json.Schema;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -12,11 +13,15 @@ namespace Microsoft.Teams.AI.AI.Models
         ///
         /// Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64.
         /// </summary>
-        public string Name { get; set; }
+        [JsonPropertyName("name")]
+        [JsonPropertyOrder(1)]
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Description of what the action does.
         /// </summary>
+        [JsonPropertyName("description")]
+        [JsonPropertyOrder(2)]
         public string? Description { get; set; }
 
         /// <summary>
@@ -24,6 +29,8 @@ namespace Microsoft.Teams.AI.AI.Models
         ///
         /// See [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for documentation
         /// </summary>
+        [JsonPropertyName("parameters")]
+        [JsonPropertyOrder(3)]
         public JsonSchema? Parameters { get; set; }
 
         /// <summary>
@@ -33,6 +40,14 @@ namespace Microsoft.Teams.AI.AI.Models
         public ChatCompletionAction(string name)
         {
             this.Name = name;
+        }
+
+        /// <summary>
+        /// Creates an instance of `ChatCompletionAction`
+        /// </summary>
+        public ChatCompletionAction()
+        {
+
         }
 
         /// <summary>

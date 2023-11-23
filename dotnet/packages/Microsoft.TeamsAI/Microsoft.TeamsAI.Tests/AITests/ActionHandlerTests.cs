@@ -92,9 +92,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
         private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : TurnState
         {
-            AIOptions<TState> options = new(
-                new Mock<IPlanner<TState>>().Object,
-                new Mock<IModerator<TState>>().Object);
+            AIOptions<TState> options = new(new Mock<IPlanner<TState>>().Object)
+            {
+                Moderator = new Mock<IModerator<TState>>().Object
+            };
             AI<TState> ai = new(options);
             ai.ImportActions(instance);
             // get _actions field from AI class
