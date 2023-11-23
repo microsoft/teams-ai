@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 
-namespace Microsoft.Teams.AI.Application.Authentication
+namespace Microsoft.Teams.AI
 {
 
     /// <summary>

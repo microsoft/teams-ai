@@ -2,7 +2,6 @@
 using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Builder;
-using Microsoft.AspNetCore.Authentication;
 
 namespace Microsoft.Teams.AI
 {
