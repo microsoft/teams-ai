@@ -43,7 +43,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response)
+        public async Task<Plan?> CreatePlanFromResponseAsync(ITurnContext context, IMemory memory, PromptResponse response, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -57,9 +57,9 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         }
 
         /// <inheritdoc />
-        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts)
+        public async Task<Validation> ValidateResponseAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, PromptResponse response, int remainingAttempts, CancellationToken cancellationToken = default)
         {
-            Validation validation = await this._planValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts);
+            Validation validation = await this._planValidator.ValidateResponseAsync(context, memory, tokenizer, response, remainingAttempts, cancellationToken);
 
             if (!validation.Valid)
             {
@@ -87,7 +87,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
 
                 if (command.Type == "DO")
                 {
-                    valid = await this._ValidateDoCommand(context, memory, tokenizer, remainingAttempts, command);
+                    valid = await this._ValidateDoCommandAsync(context, memory, tokenizer, remainingAttempts, command, cancellationToken);
 
                     if (valid != null)
                     {
@@ -96,7 +96,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 }
                 else if (command.Type == "SAY")
                 {
-                    valid = await this._ValidateSayCommand(command);
+                    valid = await this._ValidateSayCommandAsync(command, cancellationToken);
 
                     if (valid != null)
                     {
@@ -121,7 +121,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             };
         }
 
-        private async Task<Validation?> _ValidateDoCommand(ITurnContext context, IMemory memory, ITokenizer tokenizer, int remainingAttempts, IPredictedCommand command)
+        private async Task<Validation?> _ValidateDoCommandAsync(ITurnContext context, IMemory memory, ITokenizer tokenizer, int remainingAttempts, IPredictedCommand command, CancellationToken cancellationToken = default)
         {
             PredictedDoCommand? doCommand = command as PredictedDoCommand;
 
@@ -144,7 +144,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 }
             };
 
-            Validation valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts);
+            Validation valid = await this._actionValidator.ValidateResponseAsync(context, memory, tokenizer, promptResponse, remainingAttempts, cancellationToken);
 
             if (!valid.Valid)
             {
@@ -158,7 +158,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             return null;
         }
 
-        private async Task<Validation?> _ValidateSayCommand(IPredictedCommand command)
+        private async Task<Validation?> _ValidateSayCommandAsync(IPredictedCommand command, CancellationToken cancellationToken = default)
         {
             PredictedSayCommand? sayCommand = command as PredictedSayCommand;
 

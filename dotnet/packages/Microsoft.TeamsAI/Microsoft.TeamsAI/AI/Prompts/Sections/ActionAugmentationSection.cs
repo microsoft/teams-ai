@@ -1,8 +1,8 @@
-﻿using Json.Schema;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;
+using System.Text.Json;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -28,7 +28,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             public class Action
             {
                 public string? Description { get; set; }
-                public JsonSchema? Parameters { get; set; }
+                public Dictionary<string, object>? Parameters { get; set; }
             }
         }
 
@@ -50,7 +50,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                 actionMap.Actions.Add(action.Name, new()
                 {
                     Description = action.Description,
-                    Parameters = action.Parameters,
+                    Parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(action.Parameters)),
                 });
             }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default)
         {
             if (this._tokens == null)
             {

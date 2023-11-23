@@ -5,7 +5,7 @@ using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
-    internal delegate Task<string> RenderFunction(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens);
+    internal delegate Task<string> RenderFunction(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default);
 
     internal enum ParamState
     {
@@ -59,7 +59,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default)
         {
             List<string> rendered = this._renderers
                 .Select(async r => await r(context, memory, functions, tokenizer, maxTokens))
@@ -169,7 +169,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
 
         private RenderFunction CreateTextRenderer(string text)
         {
-            return (context, memory, functions, tokenizer, maxTokens) =>
+            return (context, memory, functions, tokenizer, maxTokens, cancellationToken) =>
             {
                 return Task.FromResult(text);
             };
@@ -177,9 +177,9 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
 
         private RenderFunction CreateVariableRenderer(string name)
         {
-            return (context, memory, functions, tokenizer, maxTokens) =>
+            return (context, memory, functions, tokenizer, maxTokens, cancellationToken) =>
             {
-                dynamic? value = memory.GetValue(name);
+                object? value = memory.GetValue(name);
                 return Task.FromResult(Convert.ToString(value));
             };
         }
@@ -259,7 +259,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             }
 
 
-            return async (context, memory, functions, tokenizer, maxTokens) =>
+            return async (context, memory, functions, tokenizer, maxTokens, cancellationToken) =>
             {
                 dynamic? value = await functions.InvokeFunctionAsync(name, context, memory, tokenizer, args);
                 return await Task.FromResult(Convert.ToString(value));

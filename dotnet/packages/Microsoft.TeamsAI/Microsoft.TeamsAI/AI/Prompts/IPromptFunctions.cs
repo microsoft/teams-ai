@@ -49,7 +49,9 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <param name="memory">memory</param>
         /// <param name="tokenizer">tokenizer</param>
         /// <param name="args">args</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects
+        /// or threads to receive notice of cancellation.</param>
         /// <returns></returns>
-        public Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, IMemory memory, ITokenizer tokenizer, TArgs args);
+        public Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, IMemory memory, ITokenizer tokenizer, TArgs args, CancellationToken cancellationToken = default);
     }
 }

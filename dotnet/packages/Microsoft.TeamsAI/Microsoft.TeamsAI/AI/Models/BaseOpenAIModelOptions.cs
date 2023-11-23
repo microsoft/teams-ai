@@ -8,54 +8,39 @@ namespace Microsoft.Teams.AI.AI.Models
     public abstract class BaseOpenAIModelOptions
     {
         /// <summary>
-        /// Type of completion to use for the default model.
+        /// Optional. Type of completion to use for the default model.
         /// </summary>
-        public CompletionConfiguration.CompletionType CompletionType { get; set; }
+        /// <remarks>
+        /// The default value is `CompletionType.Chat`.
+        /// </remarks>
+        public CompletionConfiguration.CompletionType? CompletionType { get; set; }
 
         /// <summary>
-        /// Whether to log requests to the console.
+        /// Optional. Whether to log requests to the console.
         /// </summary>
         /// <remarks>
         /// This is useful for debugging prompts.
+        /// The default value is `false`.
         /// </remarks>
-        public bool LogRequests { get; set; }
+        public bool? LogRequests { get; set; }
 
         /// <summary>
-        /// Retry policy to use when calling the OpenAI API.
+        /// Optional. Retry policy to use when calling the OpenAI API.
         /// </summary>
         /// <remarks>
         /// The default retry policy is `{ TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) }`
         /// which means that the first retry will be after 2 seconds and the second retry will be after 5 seconds.
         /// </remarks>
-        public List<TimeSpan> RetryPolicy { get; set; }
+        public List<TimeSpan>? RetryPolicy { get; set; }
 
         /// <summary>
-        /// Whether to use `system` messages when calling the OpenAI API.
+        /// Optional. Whether to use `system` messages when calling the OpenAI API.
         /// </summary>
         /// <remarks>
         /// The current generation of models tend to follow instructions from `user` messages better
         /// then `system` messages so the default is `false`, which causes any `system` message in the
         /// prompt to be sent as `user` messages instead.
         /// </remarks>
-        public bool UseSystemMessages { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseOpenAIModelOptions"/> class.
-        /// </summary>
-        /// <param name="completionType">Type of completion to use for the default model.</param>
-        /// <param name="logRequests">Whether to log requests to the console.</param>
-        /// <param name="retryPolicy">Retry policy to use when calling the OpenAI API.</param>
-        /// <param name="useSystemMessages"></param>
-        protected BaseOpenAIModelOptions(
-            CompletionConfiguration.CompletionType completionType = CompletionConfiguration.CompletionType.Chat,
-            bool logRequests = false,
-            List<TimeSpan>? retryPolicy = null,
-            bool useSystemMessages = false)
-        {
-            this.CompletionType = completionType;
-            this.LogRequests = logRequests;
-            this.RetryPolicy = retryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) };
-            this.UseSystemMessages = useSystemMessages;
-        }
+        public bool? UseSystemMessages { get; set; }
     }
 }

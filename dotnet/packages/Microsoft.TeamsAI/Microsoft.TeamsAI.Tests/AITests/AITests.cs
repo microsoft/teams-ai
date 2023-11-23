@@ -21,7 +21,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TestPlanner();
             var moderator = new TestModerator();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var handler = new TestActionHandler();
 
@@ -42,7 +45,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TestPlanner();
             var moderator = new TestModerator();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var handler = new TestActionHandler();
             var turnContextMock = new Mock<ITurnContext>();
@@ -52,7 +58,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             ai.RegisterAction(AIConstants.UnknownActionName, handler);
             FieldInfo actionsField = typeof(AI<TurnState>).GetField("_actions", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance)!;
             IActionCollection<TurnState> actions = (IActionCollection<TurnState>)actionsField!.GetValue(ai)!;
-            var result = await actions[AIConstants.UnknownActionName].Handler.PerformAction(turnContextMock.Object, turnState, null, null);
+            var result = await actions[AIConstants.UnknownActionName].Handler.PerformActionAsync(turnContextMock.Object, turnState, null, null);
             var exception = Assert.Throws<InvalidOperationException>(() => ai.RegisterAction(AIConstants.UnknownActionName, handler));
 
             // Assert
@@ -67,7 +73,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
@@ -89,7 +98,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.True(result);
             Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInputAsync", "ReviewOutputAsync" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { "Test-DO" }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { "Test-SAY" }, actions.SayActionRecord.ToArray());
         }
@@ -99,7 +108,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
-            var options = new AIOptions<TurnState>(planner, moderator);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator
+            };
             var ai = new AI<TurnState>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
@@ -123,7 +135,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.False(result);
             Assert.Equal(new string[] { "ContinueTaskAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewOutputAsync" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
@@ -134,7 +146,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var planner = new TurnStatePlanner<TurnState>();
             var moderator = new TurnStateModerator<TurnState>();
-            var options = new AIOptions<TurnState>(planner, moderator, maxTime: TimeSpan.Zero);
+            var options = new AIOptions<TurnState>(planner)
+            {
+                Moderator = moderator,
+                MaxTime = TimeSpan.Zero
+            };
             var ai = new AI<TurnState>(options);
             var botAdapterStub = Mock.Of<BotAdapter>();
             var turnContextMock = new TurnContext(botAdapterStub,
@@ -157,7 +173,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.False(result);
             Assert.Equal(new string[] { "BeginTaskAsync" }, planner.Record.ToArray());
-            Assert.Equal(new string[] { "ReviewInput", "ReviewOutput" }, moderator.Record.ToArray());
+            Assert.Equal(new string[] { "ReviewInputAsync", "ReviewOutputAsync" }, moderator.Record.ToArray());
             Assert.Equal(new string[] { }, actions.DoActionRecord.ToArray());
             Assert.Equal(new string[] { }, actions.SayActionRecord.ToArray());
         }
@@ -190,7 +206,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
     internal sealed class TurnStateActionHandler : IActionHandler<TurnState>
     {
         public string? ActionName { get; set; }
-        public Task<string> PerformAction(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null)
+        public Task<string> PerformActionAsync(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null, CancellationToken cancellationToken = default)
         {
             ActionName = action;
             return Task.FromResult("test-result");
@@ -201,13 +217,13 @@ namespace Microsoft.Teams.AI.Tests.AITests
     {
         public IList<string> Record { get; } = new List<string>();
 
-        public Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        public Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult<Plan?>(null);
         }
 
-        public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        public Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             Record.Add(MethodBase.GetCurrentMethod()!.Name);
             return Task.FromResult(plan);

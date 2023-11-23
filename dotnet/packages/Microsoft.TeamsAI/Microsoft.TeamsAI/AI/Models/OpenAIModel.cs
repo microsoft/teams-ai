@@ -11,8 +11,10 @@ using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Utilities;
 using System.Net;
 using System.Text.Json;
+using static Microsoft.Teams.AI.AI.Prompts.CompletionConfiguration;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -23,9 +25,7 @@ namespace Microsoft.Teams.AI.AI.Models
     {
         private readonly BaseOpenAIModelOptions _options;
         private readonly ILogger _logger;
-        private readonly HttpClient? _httpClient;
 
-        private bool _useAzure;
         private readonly OpenAIClient _openAIClient;
         private string _deploymentName;
 
@@ -34,43 +34,85 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenAIModel"/> class.
         /// </summary>
-        /// <param name="options">Options for configuring `OpenAIModel`.</param>
+        /// <param name="options">Options for configuring an `OpenAIModel` to call an OpenAI hosted model.</param>
         /// <param name="loggerFactory">The logger factory instance.</param>
         /// <param name="httpClient">HTTP client.</param>
-        public OpenAIModel(BaseOpenAIModelOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
+        public OpenAIModel(OpenAIModelOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
         {
-            _options = options;
-            _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
-            _httpClient = httpClient;
+            Verify.ParamNotNull(options);
+            Verify.ParamNotNull(options.ApiKey, "OpenAIModelOptions.ApiKey");
+            Verify.ParamNotNull(options.DefaultModel, "OpenAIModelOptions.DefaultModel");
 
-            _useAzure = options is AzureOpenAIModelOptions;
+            _options = new OpenAIModelOptions(options.ApiKey, options.DefaultModel)
+            {
+                Organization = options.Organization,
+                CompletionType = options.CompletionType ?? CompletionType.Chat,
+                LogRequests = options.LogRequests ?? false,
+                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
+                UseSystemMessages = options.UseSystemMessages ?? false,
+            };
+            _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
+
             OpenAIClientOptions openAIClientOptions = new()
             {
-                RetryPolicy = new RetryPolicy(_options.RetryPolicy.Count, new SequentialDelayStrategy(_options.RetryPolicy))
+                RetryPolicy = new RetryPolicy(_options.RetryPolicy!.Count, new SequentialDelayStrategy(_options.RetryPolicy))
             };
             openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), HttpPipelinePosition.PerCall);
-            if (_httpClient != null)
+            if (httpClient != null)
             {
-                openAIClientOptions.Transport = new HttpClientTransport(_httpClient);
+                openAIClientOptions.Transport = new HttpClientTransport(httpClient);
+            }
+            OpenAIModelOptions openAIModelOptions = (OpenAIModelOptions)_options;
+            if (!string.IsNullOrEmpty(openAIModelOptions.Organization))
+            {
+                openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", openAIModelOptions.Organization!), HttpPipelinePosition.PerCall);
+            }
+            _openAIClient = new OpenAIClient(openAIModelOptions.ApiKey, openAIClientOptions);
+
+            _deploymentName = options.DefaultModel;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenAIModel"/> class.
+        /// </summary>
+        /// <param name="options">Options for configuring an `OpenAIModel` to call an Azure OpenAI hosted model.</param>
+        /// <param name="loggerFactory">The logger factory instance.</param>
+        /// <param name="httpClient">HTTP client.</param>
+        public OpenAIModel(AzureOpenAIModelOptions options, ILoggerFactory? loggerFactory = null, HttpClient? httpClient = null)
+        {
+            Verify.ParamNotNull(options);
+            Verify.ParamNotNull(options.AzureApiKey, "AzureOpenAIModelOptions.AzureApiKey");
+            Verify.ParamNotNull(options.AzureDefaultDeployment, "AzureOpenAIModelOptions.AzureDefaultDeployment");
+            Verify.ParamNotNull(options.AzureEndpoint, "AzureOpenAIModelOptions.AzureEndpoint");
+            if (!options.AzureEndpoint.StartsWith("https://"))
+            {
+                throw new ArgumentException($"Model created with an invalid endpoint of `{options.AzureEndpoint}`. The endpoint must be a valid HTTPS url.");
             }
 
-            if (_useAzure)
+            _options = new AzureOpenAIModelOptions(options.AzureApiKey, options.AzureDefaultDeployment, options.AzureEndpoint)
             {
-                AzureOpenAIModelOptions azureOpenAIModelOptions = (AzureOpenAIModelOptions)options;
-                openAIClientOptions.AddPolicy(new AddQueryRequestPolicy("api-version", azureOpenAIModelOptions.AzureApiVersion), HttpPipelinePosition.PerCall);
-                _openAIClient = new OpenAIClient(new Uri(azureOpenAIModelOptions.AzureEndpoint), new AzureKeyCredential(azureOpenAIModelOptions.AzureApiKey), openAIClientOptions);
-                _deploymentName = azureOpenAIModelOptions.AzureDefaultDeployment;
-            }
-            else
+                AzureApiVersion = options.AzureApiVersion ?? "2023-05-15",
+                CompletionType = options.CompletionType ?? CompletionType.Chat,
+                LogRequests = options.LogRequests ?? false,
+                RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
+                UseSystemMessages = options.UseSystemMessages ?? false,
+            };
+            _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
+
+            OpenAIClientOptions openAIClientOptions = new()
             {
-                OpenAIModelOptions openAIModelOptions = (OpenAIModelOptions)options;
-                if (!string.IsNullOrEmpty(openAIModelOptions.Organization))
-                {
-                    openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("OpenAI-Organization", openAIModelOptions.Organization!), HttpPipelinePosition.PerCall);
-                }
-                _openAIClient = new OpenAIClient(openAIModelOptions.ApiKey, openAIClientOptions);
-                _deploymentName = openAIModelOptions.DefaultModel;
+                RetryPolicy = new RetryPolicy(_options.RetryPolicy!.Count, new SequentialDelayStrategy(_options.RetryPolicy))
+            };
+            openAIClientOptions.AddPolicy(new AddHeaderRequestPolicy("User-Agent", _userAgent), HttpPipelinePosition.PerCall);
+            if (httpClient != null)
+            {
+                openAIClientOptions.Transport = new HttpClientTransport(httpClient);
             }
+            AzureOpenAIModelOptions azureOpenAIModelOptions = (AzureOpenAIModelOptions)_options;
+            openAIClientOptions.AddPolicy(new AddQueryRequestPolicy("api-version", azureOpenAIModelOptions.AzureApiVersion!), HttpPipelinePosition.PerCall);
+            _openAIClient = new OpenAIClient(new Uri(azureOpenAIModelOptions.AzureEndpoint), new AzureKeyCredential(azureOpenAIModelOptions.AzureApiKey), openAIClientOptions);
+
+            _deploymentName = options.AzureDefaultDeployment;
         }
 
         /// <inheritdoc/>
@@ -78,10 +120,10 @@ namespace Microsoft.Teams.AI.AI.Models
         {
             DateTime startTime = DateTime.UtcNow;
             int maxInputTokens = promptTemplate.Configuration.Completion.MaxInputTokens;
-            if (_options.CompletionType == CompletionConfiguration.CompletionType.Text)
+            if (_options.CompletionType == CompletionType.Text)
             {
                 // Render prompt
-                RenderedPromptSection<string> prompt = await promptTemplate.Prompt.RenderAsTextAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens);
+                RenderedPromptSection<string> prompt = await promptTemplate.Prompt.RenderAsTextAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
                 if (prompt.TooLong)
                 {
                     return new PromptResponse
@@ -93,7 +135,7 @@ namespace Microsoft.Teams.AI.AI.Models
                         }
                     };
                 }
-                if (_options.LogRequests)
+                if (_options.LogRequests!.Value)
                 {
                     // TODO: Colorize
                     _logger.LogTrace("PROMPT:");
@@ -144,7 +186,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
 
-                if (_options.LogRequests)
+                if (_options.LogRequests!.Value)
                 {
                     // TODO: Colorize
                     _logger.LogTrace("RESPONSE:");
@@ -166,7 +208,7 @@ namespace Microsoft.Teams.AI.AI.Models
             else
             {
                 // Render prompt
-                RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens);
+                RenderedPromptSection<List<ChatMessage>> prompt = await promptTemplate.Prompt.RenderAsMessagesAsync(turnContext, memory, promptFunctions, tokenizer, maxInputTokens, cancellationToken);
                 if (prompt.TooLong)
                 {
                     return new PromptResponse
@@ -178,11 +220,11 @@ namespace Microsoft.Teams.AI.AI.Models
                         }
                     };
                 }
-                if (!_options.UseSystemMessages && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
+                if (!_options.UseSystemMessages!.Value && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
                 {
                     prompt.Output[0].Role = ChatRole.User;
                 }
-                if (_options.LogRequests)
+                if (_options.LogRequests!.Value)
                 {
                     // TODO: Colorize
                     _logger.LogTrace("CHAT PROMPT:");
@@ -232,7 +274,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
 
-                if (_options.LogRequests)
+                if (_options.LogRequests!.Value)
                 {
                     // TODO: Colorize
                     _logger.LogTrace("RESPONSE:");

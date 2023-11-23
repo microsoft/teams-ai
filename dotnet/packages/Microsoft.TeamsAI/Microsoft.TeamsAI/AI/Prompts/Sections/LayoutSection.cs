@@ -19,7 +19,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             get
             {
-                return this.Sections.Where(s => s.Tokens < 0 || s.Tokens > 1).OrderBy(s => s.Required).ToList();
+                return this.Sections.Where(s => s.Tokens > -1).OrderBy(s => s.Required).ToList();
             }
         }
 
@@ -27,7 +27,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         {
             get
             {
-                return this.Sections.Where(s => s.Tokens >= 0 || s.Tokens <= 1).OrderBy(s => s.Required).ToList();
+                return this.Sections.Where(s => s.Tokens == -1).OrderBy(s => s.Required).ToList();
             }
         }
 
@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<string>> RenderAsTextAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default)
         {
             int length = 0;
             List<RenderedPromptSection<string>> renderedSections = new();
@@ -54,7 +54,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // render fixed size
             foreach (PromptSection section in this._fixedSections)
             {
-                RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
+                RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens, cancellationToken);
 
                 if (length + rendered.Length >= maxTokens && !section.Required)
                 {
@@ -68,7 +68,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // render auto size
             foreach (PromptSection section in this._autoSections)
             {
-                RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens);
+                RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context, memory, functions, tokenizer, maxTokens, cancellationToken);
 
                 if (length + rendered.Length >= maxTokens && !section.Required)
                 {
@@ -86,7 +86,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
         }
 
         /// <inheritdoc />
-        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens)
+        public override async Task<RenderedPromptSection<List<ChatMessage>>> RenderAsMessagesAsync(ITurnContext context, IMemory memory, IPromptFunctions<List<string>> functions, ITokenizer tokenizer, int maxTokens, CancellationToken cancellationToken = default)
         {
             int length = 0;
             List<RenderedPromptSection<List<ChatMessage>>> renderedSections = new();
@@ -95,7 +95,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // render fixed size
             foreach (PromptSection section in this._fixedSections)
             {
-                RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
+                RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens, cancellationToken);
 
                 if (length + rendered.Length >= maxTokens && !section.Required)
                 {
@@ -109,7 +109,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             // render auto size
             foreach (PromptSection section in this._autoSections)
             {
-                RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens);
+                RenderedPromptSection<List<ChatMessage>> rendered = await section.RenderAsMessagesAsync(context, memory, functions, tokenizer, maxTokens, cancellationToken);
 
                 if (length + rendered.Length >= maxTokens && !section.Required)
                 {

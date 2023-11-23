@@ -53,7 +53,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            ActionExecuteHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 TestAdaptiveCardActionData actionData = Cast<TestAdaptiveCardActionData>(data);
                 Assert.Equal("test-value", actionData.TestKey);
@@ -111,7 +111,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            ActionExecuteHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
@@ -146,11 +146,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            ActionExecuteHandler<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            ActionExecuteHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(adaptiveCardInvokeResponseMock.Object);
             };
@@ -269,7 +269,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
@@ -340,7 +340,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SearchHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            SearchHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
                 Assert.Equal("test-dataset", query.Parameters.Dataset);
@@ -399,7 +399,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            SearchHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            SearchHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
                 Assert.Equal("test-dataset", query.Parameters.Dataset);
@@ -439,11 +439,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 StartTypingTimer = false,
                 TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            SearchHandler<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
+            SearchHandlerAsync<TurnState> handler = (turnContext, turnState, query, cancellationToken) =>
             {
                 Assert.Equal("test-query", query.Parameters.QueryText);
                 Assert.Equal("test-dataset", query.Parameters.Dataset);

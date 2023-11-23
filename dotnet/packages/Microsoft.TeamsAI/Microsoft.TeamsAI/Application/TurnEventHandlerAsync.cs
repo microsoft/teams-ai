@@ -20,5 +20,5 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>True to continue execution of the current turn. Otherwise, False.</returns>
-    public delegate Task<bool> TurnEventHandler<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : TurnState;
+    public delegate Task<bool> TurnEventHandlerAsync<TState>(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) where TState : TurnState;
 }

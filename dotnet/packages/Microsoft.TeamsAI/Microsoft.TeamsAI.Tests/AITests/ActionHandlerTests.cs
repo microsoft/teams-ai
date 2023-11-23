@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions[actionName].Handler.PerformAction(turnContext, turnState);
+                actions[actionName].Handler.PerformActionAsync(turnContext, turnState);
             }
 
             // Assert
@@ -51,7 +51,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName);
+                actions[actionName].Handler.PerformActionAsync(turnContext, turnState, entities, actionName);
             }
 
             // Assert
@@ -83,7 +83,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformActionAsync(turnContext, turnState, entities, actionName));
 
             // Assert
             Assert.NotNull(exception);
@@ -92,9 +92,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
         private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : TurnState
         {
-            AIOptions<TState> options = new(
-                new Mock<IPlanner<TState>>().Object,
-                new Mock<IModerator<TState>>().Object);
+            AIOptions<TState> options = new(new Mock<IPlanner<TState>>().Object)
+            {
+                Moderator = new Mock<IModerator<TState>>().Object
+            };
             AI<TState> ai = new(options);
             ai.ImportActions(instance);
             // get _actions field from AI class

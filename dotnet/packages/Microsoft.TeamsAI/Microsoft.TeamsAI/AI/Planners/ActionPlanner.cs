@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.Clients;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Validators;
@@ -34,13 +35,17 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// </summary>
         public readonly ActionPlannerOptions<TState> Options;
 
+        private readonly ILoggerFactory? _logger;
+
         /// <summary>
         /// Creates a new `ActionPlanner` instance.
         /// </summary>
         /// <param name="options">Options used to configure the planner.</param>
-        public ActionPlanner(ActionPlannerOptions<TState> options)
+        /// <param name="loggerFactory"></param>
+        public ActionPlanner(ActionPlannerOptions<TState> options, ILoggerFactory? loggerFactory = null)
         {
             this.Options = options;
+            this._logger = loggerFactory;
         }
 
         /// <summary>
@@ -58,7 +63,7 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <param name="ai">The AI system that is generating the plan.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The plan that was generated.</returns>
-        public async Task<Plan> BeginTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken)
+        public async Task<Plan> BeginTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken = default)
         {
             return await ContinueTaskAsync(context, state, ai, cancellationToken);
         }
@@ -80,7 +85,7 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <param name="cancellationToken"></param>
         /// <returns>The plan that was generated.</returns>
         /// <exception cref="Exception">thrown when there was an issue generating a plan</exception>
-        public async Task<Plan> ContinueTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken)
+        public async Task<Plan> ContinueTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken = default)
         {
             PromptTemplate template = await this.Options.DefaultPrompt(context, state, this);
             PromptResponse response = await this.CompletePromptAsync(context, state, template, template.Augmentation, cancellationToken);
@@ -90,7 +95,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 throw new Exception(response.Error?.Message ?? "[Action Planner]: an error has occurred");
             }
 
-            Plan? plan = await template.Augmentation.CreatePlanFromResponseAsync(context, state, response);
+            Plan? plan = await template.Augmentation.CreatePlanFromResponseAsync(context, state, response, cancellationToken);
 
             if (plan == null)
             {
@@ -124,7 +129,7 @@ namespace Microsoft.Teams.AI.AI.Planners
             IMemory memory,
             PromptTemplate template,
             IPromptResponseValidator validator,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken = default
         )
         {
             if (!this.Options.Prompts.HasPrompt(template.Name))
@@ -144,7 +149,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 MaxHistoryMessages = this.Options.Prompts.Options.MaxHistoryMessages,
                 MaxRepairAttempts = this.Options.MaxRepairAttempts,
                 LogRepairs = this.Options.LogRepairs
-            });
+            }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Options.Prompts, null, cancellationToken);
         }

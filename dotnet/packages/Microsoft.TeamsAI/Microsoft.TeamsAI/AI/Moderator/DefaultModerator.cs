@@ -11,14 +11,14 @@ namespace Microsoft.Teams.AI.AI.Moderator
     public class DefaultModerator<TState> : IModerator<TState> where TState : TurnState
     {
         /// <inheritdoc />
-        public Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        public Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             // Pass
             return Task.FromResult(plan);
         }
 
         /// <inheritdoc />
-        public Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        public Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             // Just allow input
             return Task.FromResult<Plan?>(null);

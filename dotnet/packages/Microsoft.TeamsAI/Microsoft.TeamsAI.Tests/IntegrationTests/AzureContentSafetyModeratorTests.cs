@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             var turnStateMock = new Mock<TurnState>();
 
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Object);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Object);
 
             // Assert
             if (flagged)
@@ -88,7 +88,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             });
 
             // Act
-            var result = await moderator.ReviewOutput(turnContextMock.Object, turnStateMock.Object, plan);
+            var result = await moderator.ReviewOutputAsync(turnContextMock.Object, turnStateMock.Object, plan);
 
             // Assert
             if (flagged)
