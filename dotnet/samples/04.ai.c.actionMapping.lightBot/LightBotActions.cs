@@ -8,27 +8,27 @@ namespace LightBot
     public class LightBotActions
     {
         [Action("LightsOn")]
-        public async Task<bool> LightsOn([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
+        public async Task<string> LightsOn([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
         {
-            turnState.Conversation!.LightsOn = true;
+            turnState.Conversation.LightsOn = true;
             await turnContext.SendActivityAsync(MessageFactory.Text("[lights on]"));
-            return true;
+            return "the lights are now on";
         }
 
         [Action("LightsOff")]
-        public async Task<bool> LightsOff([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
+        public async Task<string> LightsOff([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
         {
-            turnState.Conversation!.LightsOn = false;
+            turnState.Conversation.LightsOn = false;
             await turnContext.SendActivityAsync(MessageFactory.Text("[lights off]"));
-            return true;
+            return "the lights are now off";
         }
 
         [Action("Pause")]
-        public async Task<bool> LightsOff([ActionTurnContext] ITurnContext turnContext, [ActionEntities] Dictionary<string, object> entities)
+        public async Task<string> LightsOff([ActionTurnContext] ITurnContext turnContext, [ActionParameters] Dictionary<string, object> args)
         {
             // Try to parse entities returned by the model.
             // Expecting "time" to be a number of milliseconds to pause.
-            if (entities.TryGetValue("time", out object? time))
+            if (args.TryGetValue("time", out object? time))
             {
                 if (time != null && time is string timeString)
                 {
@@ -40,21 +40,21 @@ namespace LightBot
                 }
             }
 
-            return true;
+            return "done pausing";
         }
 
         [Action("LightStatus")]
-        public async Task<bool> LightStatus([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
+        public async Task<string> LightStatus([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] AppState turnState)
         {
-            await turnContext.SendActivityAsync(ResponseGenerator.LightStatus(turnState.Conversation!.LightsOn));
-            return false;
+            await turnContext.SendActivityAsync(ResponseGenerator.LightStatus(turnState.Conversation.LightsOn));
+            return turnState.Conversation.LightsOn ? "the lights are on" : "the lights are off";
         }
 
         [Action(AIConstants.UnknownActionName)]
-        public async Task<bool> UnknownAction([ActionTurnContext] TurnContext turnContext, [ActionName] string action)
+        public async Task<string> UnknownAction([ActionTurnContext] TurnContext turnContext, [ActionName] string action)
         {
             await turnContext.SendActivityAsync(ResponseGenerator.UnknownAction(action ?? "Unknown"));
-            return false;
+            return "unknown action";
         }
     }
 }

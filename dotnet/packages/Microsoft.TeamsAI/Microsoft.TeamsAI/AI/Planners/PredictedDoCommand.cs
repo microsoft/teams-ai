@@ -18,9 +18,7 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// The named action that the AI system should perform.
         /// </summary>
         [JsonPropertyName("action")]
-        [JsonRequired]
-        [JsonInclude]
-        public string Action { get; private set; }
+        public string Action { get; set; }
 
         /// <summary>
         /// Any parameters that the AI system should use to perform the action.

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.Clients;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Validators;
@@ -34,13 +35,17 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// </summary>
         public readonly ActionPlannerOptions<TState> Options;
 
+        private readonly ILoggerFactory? _logger;
+
         /// <summary>
         /// Creates a new `ActionPlanner` instance.
         /// </summary>
         /// <param name="options">Options used to configure the planner.</param>
-        public ActionPlanner(ActionPlannerOptions<TState> options)
+        /// <param name="loggerFactory"></param>
+        public ActionPlanner(ActionPlannerOptions<TState> options, ILoggerFactory? loggerFactory = null)
         {
             this.Options = options;
+            this._logger = loggerFactory;
         }
 
         /// <summary>
@@ -144,7 +149,7 @@ namespace Microsoft.Teams.AI.AI.Planners
                 MaxHistoryMessages = this.Options.Prompts.Options.MaxHistoryMessages,
                 MaxRepairAttempts = this.Options.MaxRepairAttempts,
                 LogRepairs = this.Options.LogRepairs
-            });
+            }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Options.Prompts, null, cancellationToken);
         }
