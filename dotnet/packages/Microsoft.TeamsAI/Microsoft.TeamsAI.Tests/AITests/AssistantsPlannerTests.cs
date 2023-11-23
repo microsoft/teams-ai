@@ -96,8 +96,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
             testClient.RemainingRunStatus.Enqueue("completed");
             testClient.RemainingMessages.Enqueue("welcome");
 
-            var thread = await testClient.CreateThread(new(), CancellationToken.None);
-            await testClient.CreateRun(thread.Id, new(), CancellationToken.None);
+            var thread = await testClient.CreateThreadAsync(new(), CancellationToken.None);
+            await testClient.CreateRunAsync(thread.Id, new(), CancellationToken.None);
             turnState.ThreadId = thread.Id;
 
             // Act

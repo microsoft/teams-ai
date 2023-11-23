@@ -34,12 +34,12 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             RemainingMessages.Clear();
         }
 
-        public override Task<Assistant> RetrieveAssistant(string assistantId, CancellationToken cancellationToken)
+        public override Task<Assistant> RetrieveAssistantAsync(string assistantId, CancellationToken cancellationToken)
         {
             return Task.FromResult(Assistant);
         }
 
-        public override Task<AI.OpenAI.Models.Thread> CreateThread(ThreadCreateParams threadCreateParams, CancellationToken cancellationToken)
+        public override Task<AI.OpenAI.Models.Thread> CreateThreadAsync(ThreadCreateParams threadCreateParams, CancellationToken cancellationToken)
         {
             AI.OpenAI.Models.Thread newThread = new()
             {
@@ -63,7 +63,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(newThread);
         }
 
-        public override Task<Message> CreateMessage(string threadId, MessageCreateParams messageCreateParams, CancellationToken cancellationToken)
+        public override Task<Message> CreateMessageAsync(string threadId, MessageCreateParams messageCreateParams, CancellationToken cancellationToken)
         {
             Message newMessage = new()
             {
@@ -86,10 +86,10 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(newMessage);
         }
 
-        public override async IAsyncEnumerable<Message> ListNewMessages(string threadId, string? lastMessageId, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public override async IAsyncEnumerable<Message> ListNewMessagesAsync(string threadId, string? lastMessageId, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             string nextMessage = RemainingMessages.Dequeue();
-            await CreateMessage(threadId, new()
+            await CreateMessageAsync(threadId, new()
             {
                 Content = nextMessage
             }, cancellationToken);
@@ -111,7 +111,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             }
         }
 
-        public override Task<Run> CreateRun(string threadId, RunCreateParams runCreateParams, CancellationToken cancellationToken)
+        public override Task<Run> CreateRunAsync(string threadId, RunCreateParams runCreateParams, CancellationToken cancellationToken)
         {
             Run newRun = new()
             {
@@ -141,7 +141,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(newRun);
         }
 
-        public override Task<Run> RetrieveRun(string threadId, string runId, CancellationToken cancellationToken)
+        public override Task<Run> RetrieveRunAsync(string threadId, string runId, CancellationToken cancellationToken)
         {
             string nextStatus = RemainingRunStatus.Dequeue();
             Run run = Runs[threadId].First(r => string.Equals(r.Id, runId));
@@ -149,7 +149,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(run);
         }
 
-        public override Task<Run?> RetrieveLastRun(string threadId, CancellationToken cancellationToken)
+        public override Task<Run?> RetrieveLastRunAsync(string threadId, CancellationToken cancellationToken)
         {
             Run? run = Runs[threadId].LastOrDefault();
             if (run != null)
@@ -160,9 +160,9 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
             return Task.FromResult(run);
         }
 
-        public override async Task<Run> SubmitToolOutputs(string threadId, string runId, SubmitToolOutputsParams submitToolOutputsParams, CancellationToken cancellationToken)
+        public override async Task<Run> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsParams submitToolOutputsParams, CancellationToken cancellationToken)
         {
-            Run run = await RetrieveRun(threadId, runId, cancellationToken);
+            Run run = await RetrieveRunAsync(threadId, runId, cancellationToken);
             return run;
         }
     }
