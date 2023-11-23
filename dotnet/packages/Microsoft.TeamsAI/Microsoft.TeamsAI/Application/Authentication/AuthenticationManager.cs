@@ -2,7 +2,7 @@
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 
-namespace Microsoft.Teams.AI.Authentication
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// The user authentication manager

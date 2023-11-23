@@ -4,7 +4,6 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.Authentication;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 using System.Collections.Concurrent;
