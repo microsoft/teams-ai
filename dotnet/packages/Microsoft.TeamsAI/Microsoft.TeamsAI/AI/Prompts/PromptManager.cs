@@ -71,7 +71,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         }
 
         /// <inheritdoc />
-        public async Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, IMemory memory, ITokenizer tokenizer, List<string> args)
+        public async Task<dynamic?> InvokeFunctionAsync(string name, ITurnContext context, IMemory memory, ITokenizer tokenizer, List<string> args, CancellationToken cancellationToken = default)
         {
             PromptFunction<List<string>>? func = this.GetFunction(name);
 

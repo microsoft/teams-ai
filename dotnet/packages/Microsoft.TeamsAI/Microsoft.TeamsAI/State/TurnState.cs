@@ -236,7 +236,7 @@ namespace Microsoft.Teams.AI.State
         /// <param name="storage">Optional. Storage provider to load state scopes from.</param>
         /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
         /// <returns>True if the states need to be loaded.</returns>
-        public async Task<bool> LoadStateAsync(IStorage? storage, ITurnContext turnContext)
+        public async Task<bool> LoadStateAsync(IStorage? storage, ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             // Only load on first call
             if (this._isLoaded)
@@ -269,7 +269,7 @@ namespace Microsoft.Teams.AI.State
                         IDictionary<string, object> items;
                         if (storage != null)
                         {
-                            items = await storage.ReadAsync(keys.ToArray());
+                            items = await storage.ReadAsync(keys.ToArray(), cancellationToken);
                         }
                         else
                         {

@@ -44,7 +44,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var unknownAction = actions[AIConstants.UnknownActionName];
-            var result = await unknownAction.Handler.PerformAction(turnContext, turnState, null, "test-action");
+            var result = await unknownAction.Handler.PerformActionAsync(turnContext, turnState, null, "test-action");
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result);
@@ -64,7 +64,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var flaggedInputAction = actions[AIConstants.FlaggedInputActionName];
-            var result = await flaggedInputAction.Handler.PerformAction(turnContext, turnState, null, null);
+            var result = await flaggedInputAction.Handler.PerformActionAsync(turnContext, turnState, null, null);
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result);
@@ -84,7 +84,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var flaggedOutputAction = actions[AIConstants.FlaggedOutputActionName];
-            var result = await flaggedOutputAction.Handler.PerformAction(turnContext, turnState, null, null);
+            var result = await flaggedOutputAction.Handler.PerformActionAsync(turnContext, turnState, null, null);
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result);
@@ -103,7 +103,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var httpErrorAction = actions[AIConstants.HttpErrorActionName];
-            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await httpErrorAction.Handler.PerformAction(turnContext, turnState, null, null));
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(async () => await httpErrorAction.Handler.PerformActionAsync(turnContext, turnState, null, null));
 
             // Assert
             Assert.NotNull(exception);
@@ -126,9 +126,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var planReadyAction = actions[AIConstants.PlanReadyActionName];
-            var result0 = await planReadyAction.Handler.PerformAction(turnContext, turnState, plan0, null);
-            var result1 = await planReadyAction.Handler.PerformAction(turnContext, turnState, plan1, null);
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await planReadyAction.Handler.PerformAction(turnContext, turnState, null, null));
+            var result0 = await planReadyAction.Handler.PerformActionAsync(turnContext, turnState, plan0, null);
+            var result1 = await planReadyAction.Handler.PerformActionAsync(turnContext, turnState, plan1, null);
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await planReadyAction.Handler.PerformActionAsync(turnContext, turnState, null, null));
 
             // Assert
             Assert.Equal(AIConstants.StopCommand, result0);
@@ -154,8 +154,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var doCommandAction = actions[AIConstants.DoCommandActionName];
-            var result = await doCommandAction.Handler.PerformAction(turnContext, turnState, data, null);
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await doCommandAction.Handler.PerformAction(turnContext, turnState, null, null));
+            var result = await doCommandAction.Handler.PerformActionAsync(turnContext, turnState, data, null);
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await doCommandAction.Handler.PerformActionAsync(turnContext, turnState, null, null));
 
             // Assert
             Assert.Equal("test-result", result);
@@ -177,8 +177,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var sayCommandAction = actions[AIConstants.SayCommandActionName];
-            var result = await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, command, null);
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await sayCommandAction.Handler.PerformAction(turnContextMock.Object, turnState, null, null));
+            var result = await sayCommandAction.Handler.PerformActionAsync(turnContextMock.Object, turnState, command, null);
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await sayCommandAction.Handler.PerformActionAsync(turnContextMock.Object, turnState, null, null));
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -199,8 +199,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
 
             // Act
             var tooManyStepsAction = actions[AIConstants.TooManyStepsActionName];
-            var exception1 = await Assert.ThrowsAsync<TeamsAIException>(async () => await tooManyStepsAction.Handler.PerformAction(turnContextMock.Object, turnState, tooManyStepsParameters1, null));
-            var exception2 = await Assert.ThrowsAsync<TeamsAIException>(async () => await tooManyStepsAction.Handler.PerformAction(turnContextMock.Object, turnState, tooManyStepsParameters2, null));
+            var exception1 = await Assert.ThrowsAsync<TeamsAIException>(async () => await tooManyStepsAction.Handler.PerformActionAsync(turnContextMock.Object, turnState, tooManyStepsParameters1, null));
+            var exception2 = await Assert.ThrowsAsync<TeamsAIException>(async () => await tooManyStepsAction.Handler.PerformActionAsync(turnContextMock.Object, turnState, tooManyStepsParameters2, null));
 
             // Assert
             Assert.NotNull(exception1);

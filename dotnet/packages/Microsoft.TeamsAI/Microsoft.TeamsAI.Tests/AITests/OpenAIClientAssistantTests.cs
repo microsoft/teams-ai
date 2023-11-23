@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.CreateAssistant(new AssistantCreateParams
+            var result = await openAIClient.CreateAssistantAsync(new AssistantCreateParams
             {
                 Instructions = "Your are a test bot",
                 Model = "gpt-3.5-turbo"
@@ -57,7 +57,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.RetrieveAssistant("asst_test", CancellationToken.None);
+            var result = await openAIClient.RetrieveAssistantAsync("asst_test", CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);

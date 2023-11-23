@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan?> ReviewInput(ITurnContext turnContext, TState turnState)
+        public async Task<Plan?> ReviewInputAsync(ITurnContext turnContext, TState turnState, CancellationToken cancellationToken = default)
         {
             switch (_options.Moderate)
             {
@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
         }
 
         /// <inheritdoc />
-        public async Task<Plan> ReviewOutput(ITurnContext turnContext, TState turnState, Plan plan)
+        public async Task<Plan> ReviewOutputAsync(ITurnContext turnContext, TState turnState, Plan plan, CancellationToken cancellationToken = default)
         {
             switch (_options.Moderate)
             {
@@ -79,9 +79,9 @@ namespace Microsoft.Teams.AI.AI.Moderator
             AnalyzeTextOptions analyzeTextOptions = new(text);
             if (_options.Categories != null)
             {
-                foreach (TextCategory category in _options.Categories)
+                foreach (AzureContentSafetyTextCategory category in _options.Categories)
                 {
-                    analyzeTextOptions.Categories.Add(category);
+                    analyzeTextOptions.Categories.Add(category.ToTextCategory());
                 }
             }
             if (_options.BlocklistNames != null)
@@ -112,7 +112,7 @@ namespace Microsoft.Teams.AI.AI.Moderator
                             {
                                 new PredictedDoCommand(actionName, new Dictionary<string, object?>
                                 {
-                                    { "Result", response.Value }
+                                    { "Result", BuildModerationResult(response.Value) }
                                 })
                             }
                     };
@@ -141,6 +141,40 @@ namespace Microsoft.Teams.AI.AI.Moderator
         private bool _ShouldBeFlagged(TextAnalyzeSeverityResult result)
         {
             return result != null && result.Severity >= _options.SeverityLevel;
+        }
+
+        private ModerationResult BuildModerationResult(AnalyzeTextResult result)
+        {
+            bool hate = _ShouldBeFlagged(result.HateResult);
+            bool selfHarm = _ShouldBeFlagged(result.SelfHarmResult);
+            bool sexual = _ShouldBeFlagged(result.SexualResult);
+            bool violence = _ShouldBeFlagged(result.ViolenceResult);
+
+            return new()
+            {
+                Flagged = true,
+                CategoriesFlagged = new()
+                {
+                    Hate = hate,
+                    HateThreatening = hate,
+                    SelfHarm = selfHarm,
+                    Sexual = sexual,
+                    SexualMinors = sexual,
+                    Violence = violence,
+                    ViolenceGraphic = violence
+                },
+                CategoryScores = new()
+                {
+                    // Normalize the scores to be between 0 and 1 (highest severity is 6)
+                    Hate = (result.HateResult?.Severity ?? 0) / 6.0,
+                    HateThreatening = (result.HateResult?.Severity ?? 0) / 6.0,
+                    SelfHarm = (result.SelfHarmResult?.Severity ?? 0) / 6.0,
+                    Sexual = (result.SexualResult?.Severity ?? 0) / 6.0,
+                    SexualMinors = (result.SexualResult?.Severity ?? 0) / 6.0,
+                    Violence = (result.ViolenceResult?.Severity ?? 0) / 6.0,
+                    ViolenceGraphic = (result.ViolenceResult?.Severity ?? 0) / 6.0
+                }
+            };
         }
     }
 }

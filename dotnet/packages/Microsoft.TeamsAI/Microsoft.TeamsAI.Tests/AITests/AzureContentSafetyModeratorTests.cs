@@ -10,7 +10,6 @@ using Microsoft.Bot.Builder;
 using Azure.AI.ContentSafety;
 using Azure;
 using Microsoft.Teams.AI.State;
-using Record = Microsoft.Teams.AI.State.Record;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 namespace Microsoft.Teams.AI.Tests.AITests
@@ -57,7 +56,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewInput(turnContext, turnStateMock.Result));
+            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewInputAsync(turnContext, turnStateMock.Result));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -106,8 +105,23 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
+            var expectedResult = new ModerationResult
+            {
+                Flagged = true,
+                CategoriesFlagged = new()
+                {
+                    Hate = true,
+                    HateThreatening = true
+                },
+                CategoryScores = new()
+                {
+                    Hate = 2 / 6.0,
+                    HateThreatening = 2 / 6.0
+                }
+            };
+
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Result);
 
             // Assert
             if (moderate == ModerationType.Input || moderate == ModerationType.Both)
@@ -117,7 +131,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Assert.Equal(AIConstants.FlaggedInputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Parameters);
                 Assert.True(((PredictedDoCommand)result.Commands[0]).Parameters!.ContainsKey("Result"));
-                Assert.StrictEqual(analyzeTextResult, ((PredictedDoCommand)result.Commands[0]).Parameters!.GetValueOrDefault("Result"));
+                _AssertModerationResult(expectedResult, ((PredictedDoCommand)result.Commands[0]).Parameters!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -169,7 +183,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewInput(turnContext, turnStateMock.Result);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Result);
 
             // Assert
             Assert.Null(result);
@@ -199,7 +213,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan));
+            var result = await Assert.ThrowsAsync<RequestFailedException>(async () => await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan));
 
             // Assert
             Assert.Equal("Exception Message", result.Message);
@@ -232,8 +246,23 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var moderator = new AzureContentSafetyModerator<TurnState>(options);
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
+            var expectedResult = new ModerationResult
+            {
+                Flagged = true,
+                CategoriesFlagged = new()
+                {
+                    Hate = true,
+                    HateThreatening = true
+                },
+                CategoryScores = new()
+                {
+                    Hate = 2 / 6.0,
+                    HateThreatening = 2 / 6.0
+                }
+            };
+
             // Act
-            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan);
 
             // Assert
             if (moderate == ModerationType.Output || moderate == ModerationType.Both)
@@ -243,7 +272,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
                 Assert.Equal(AIConstants.FlaggedOutputActionName, ((PredictedDoCommand)result.Commands[0]).Action);
                 Assert.NotNull(((PredictedDoCommand)result.Commands[0]).Parameters);
                 Assert.True(((PredictedDoCommand)result.Commands[0]).Parameters!.ContainsKey("Result"));
-                Assert.StrictEqual(analyzeTextResult, ((PredictedDoCommand)result.Commands[0]).Parameters!.GetValueOrDefault("Result"));
+                _AssertModerationResult(expectedResult, ((PredictedDoCommand)result.Commands[0]).Parameters!.GetValueOrDefault("Result"));
             }
             else
             {
@@ -279,10 +308,30 @@ namespace Microsoft.Teams.AI.Tests.AITests
             moderator.GetType().GetField("_client", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(moderator, clientMock.Object);
 
             // Act
-            var result = await moderator.ReviewOutput(turnContext, turnStateMock.Result, plan);
+            var result = await moderator.ReviewOutputAsync(turnContext, turnStateMock.Result, plan);
 
             // Assert
             Assert.StrictEqual(plan, result);
+        }
+
+        private static void _AssertModerationResult(ModerationResult expected, object actual)
+        {
+            Assert.NotNull(actual);
+            var actualResult = (ModerationResult)actual;
+            Assert.Equal(expected.Flagged, actualResult.Flagged);
+            Assert.Equal(expected.CategoriesFlagged!.Hate, actualResult.CategoriesFlagged!.Hate);
+            Assert.Equal(expected.CategoriesFlagged.HateThreatening, actualResult.CategoriesFlagged.HateThreatening);
+            Assert.Equal(expected.CategoriesFlagged.SelfHarm, actualResult.CategoriesFlagged.SelfHarm);
+            Assert.Equal(expected.CategoriesFlagged.Sexual, actualResult.CategoriesFlagged.Sexual);
+            Assert.Equal(expected.CategoriesFlagged.Violence, actualResult.CategoriesFlagged.Violence);
+            Assert.Equal(expected.CategoriesFlagged.ViolenceGraphic, actualResult.CategoriesFlagged.ViolenceGraphic);
+            Assert.Equal(expected.CategoryScores!.Hate, actualResult.CategoryScores!.Hate, 10);
+            Assert.Equal(expected.CategoryScores.HateThreatening, actualResult.CategoryScores.HateThreatening, 10);
+            Assert.Equal(expected.CategoryScores.SelfHarm, actualResult.CategoryScores.SelfHarm, 10);
+            Assert.Equal(expected.CategoryScores.Sexual, actualResult.CategoryScores.Sexual, 10);
+            Assert.Equal(expected.CategoryScores.SexualMinors, actualResult.CategoryScores.SexualMinors, 10);
+            Assert.Equal(expected.CategoryScores.Violence, actualResult.CategoryScores.Violence, 10);
+            Assert.Equal(expected.CategoryScores.ViolenceGraphic, actualResult.CategoryScores.ViolenceGraphic, 10);
         }
     }
 }

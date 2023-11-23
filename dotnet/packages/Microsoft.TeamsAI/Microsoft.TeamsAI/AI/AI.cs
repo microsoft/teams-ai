@@ -217,7 +217,7 @@ namespace Microsoft.Teams.AI.AI
             // Review input on first loop
             if (stepCount == 0)
             {
-                plan = await Options.Moderator.ReviewInput(turnContext, turnState);
+                plan = await Options.Moderator.ReviewInputAsync(turnContext, turnState, cancellationToken);
             }
 
             // Generate plan
@@ -233,11 +233,11 @@ namespace Microsoft.Teams.AI.AI
                 }
 
                 // Review the plans output
-                plan = await Options.Moderator.ReviewOutput(turnContext, turnState, plan);
+                plan = await Options.Moderator.ReviewOutputAsync(turnContext, turnState, plan, cancellationToken);
             }
 
             // Process generated plan
-            string response = await _actions[AIConstants.PlanReadyActionName].Handler.PerformAction(turnContext, turnState, plan, AIConstants.PlanReadyActionName);
+            string response = await _actions[AIConstants.PlanReadyActionName].Handler.PerformActionAsync(turnContext, turnState, plan, AIConstants.PlanReadyActionName, cancellationToken);
             if (string.Equals(response, AIConstants.StopCommand))
             {
                 return false;
@@ -256,7 +256,7 @@ namespace Microsoft.Teams.AI.AI
                     TooManyStepsParameters parameters = new(Options.MaxSteps, Options.MaxTime, startTime.Value, stepCount);
                     await _actions[AIConstants.TooManyStepsActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState, parameters, AIConstants.TooManyStepsActionName);
+                        .PerformActionAsync(turnContext, turnState, parameters, AIConstants.TooManyStepsActionName, cancellationToken);
                     break;
                 }
 
@@ -274,7 +274,7 @@ namespace Microsoft.Teams.AI.AI
                         // Call action handler
                         output = await this._actions[AIConstants.DoCommandActionName]
                             .Handler
-                            .PerformAction(turnContext, turnState, data, doCommand.Action);
+                            .PerformActionAsync(turnContext, turnState, data, doCommand.Action, cancellationToken);
                         shouldLoop = output.Length > 0;
 
                         if (turnState.Temp != null)
@@ -287,7 +287,7 @@ namespace Microsoft.Teams.AI.AI
                         // Redirect to UnknownAction handler
                         output = await this._actions[AIConstants.UnknownActionName]
                             .Handler
-                            .PerformAction(turnContext, turnState, plan, doCommand.Action);
+                            .PerformActionAsync(turnContext, turnState, plan, doCommand.Action, cancellationToken);
                     }
                 }
                 else if (command is PredictedSayCommand sayCommand)
@@ -295,7 +295,7 @@ namespace Microsoft.Teams.AI.AI
                     shouldLoop = false;
                     output = await this._actions[AIConstants.SayCommandActionName]
                         .Handler
-                        .PerformAction(turnContext, turnState, sayCommand, AIConstants.SayCommandActionName);
+                        .PerformActionAsync(turnContext, turnState, sayCommand, AIConstants.SayCommandActionName, cancellationToken);
                 }
                 else
                 {

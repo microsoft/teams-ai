@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created thread.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Models.Thread> CreateThread(ThreadCreateParams threadCreateParams, CancellationToken cancellationToken)
+        public virtual async Task<Models.Thread> CreateThreadAsync(ThreadCreateParams threadCreateParams, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest(OpenAIThreadEndpoint, content, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequestAsync(OpenAIThreadEndpoint, content, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Models.Thread result = JsonSerializer.Deserialize<Models.Thread>(responseJson) ?? throw new SerializationException($"Failed to deserialize thread result response json: {responseJson}");
@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created message.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Message> CreateMessage(string threadId, MessageCreateParams messageCreateParams, CancellationToken cancellationToken)
+        public virtual async Task<Message> CreateMessageAsync(string threadId, MessageCreateParams messageCreateParams, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest($"{OpenAIThreadEndpoint}/{threadId}/messages", content, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequestAsync($"{OpenAIThreadEndpoint}/{threadId}/messages", content, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Message result = JsonSerializer.Deserialize<Message>(responseJson) ?? throw new SerializationException($"Failed to deserialize message result response json: {responseJson}");
@@ -98,7 +98,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The new messages ordered by created_at timestamp desc.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async IAsyncEnumerable<Message> ListNewMessages(string threadId, string? lastMessageId, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public virtual async IAsyncEnumerable<Message> ListNewMessagesAsync(string threadId, string? lastMessageId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             bool hasMore;
             string? before = lastMessageId;
@@ -108,7 +108,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                 ListResponse<Message> listResult;
                 try
                 {
-                    using HttpResponseMessage httpResponse = await _ExecuteGetRequest($"{OpenAIThreadEndpoint}/{threadId}/messages", BuildListQuery(before, after), OpenAIBetaHeaders, cancellationToken);
+                    using HttpResponseMessage httpResponse = await _ExecuteGetRequestAsync($"{OpenAIThreadEndpoint}/{threadId}/messages", BuildListQuery(before, after), OpenAIBetaHeaders, cancellationToken);
                     string responseJson = await httpResponse.Content.ReadAsStringAsync();
                     listResult = JsonSerializer.Deserialize<ListResponse<Message>>(responseJson) ?? throw new SerializationException($"Failed to deserialize message list result response json: {responseJson}");
                 }
@@ -143,7 +143,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The created run.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Run> CreateRun(string threadId, RunCreateParams runCreateParams, CancellationToken cancellationToken)
+        public virtual async Task<Run> CreateRunAsync(string threadId, RunCreateParams runCreateParams, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest($"{OpenAIThreadEndpoint}/{threadId}/runs", content, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequestAsync($"{OpenAIThreadEndpoint}/{threadId}/runs", content, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Run result = JsonSerializer.Deserialize<Run>(responseJson) ?? throw new SerializationException($"Failed to deserialize run result response json: {responseJson}");
@@ -179,11 +179,11 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The run.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Run> RetrieveRun(string threadId, string runId, CancellationToken cancellationToken)
+        public virtual async Task<Run> RetrieveRunAsync(string threadId, string runId, CancellationToken cancellationToken = default)
         {
             try
             {
-                using HttpResponseMessage httpResponse = await _ExecuteGetRequest($"{OpenAIThreadEndpoint}/{threadId}/runs/{runId}", null, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecuteGetRequestAsync($"{OpenAIThreadEndpoint}/{threadId}/runs/{runId}", null, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Run result = JsonSerializer.Deserialize<Run>(responseJson) ?? throw new SerializationException($"Failed to deserialize run result response json: {responseJson}");
@@ -208,11 +208,11 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The last run if exist, otherwise null.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Run?> RetrieveLastRun(string threadId, CancellationToken cancellationToken)
+        public virtual async Task<Run?> RetrieveLastRunAsync(string threadId, CancellationToken cancellationToken = default)
         {
             try
             {
-                using HttpResponseMessage httpResponse = await _ExecuteGetRequest($"{OpenAIThreadEndpoint}/{threadId}/runs", LimitOneQuery, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecuteGetRequestAsync($"{OpenAIThreadEndpoint}/{threadId}/runs", LimitOneQuery, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 ListResponse<Run> result = JsonSerializer.Deserialize<ListResponse<Run>>(responseJson) ?? throw new SerializationException($"Failed to deserialize run list result response json: {responseJson}");
@@ -239,7 +239,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         /// or threads to receive notice of cancellation.</param>
         /// <returns>The run.</returns>
         /// <exception cref="HttpOperationException" />
-        public virtual async Task<Run> SubmitToolOutputs(string threadId, string runId, SubmitToolOutputsParams submitToolOutputsParams, CancellationToken cancellationToken)
+        public virtual async Task<Run> SubmitToolOutputsAsync(string threadId, string runId, SubmitToolOutputsParams submitToolOutputsParams, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -249,7 +249,7 @@ namespace Microsoft.Teams.AI.AI.OpenAI
                     "application/json"
                 );
 
-                using HttpResponseMessage httpResponse = await _ExecutePostRequest($"{OpenAIThreadEndpoint}/{threadId}/runs/{runId}/submit_tool_outputs", content, OpenAIBetaHeaders, cancellationToken);
+                using HttpResponseMessage httpResponse = await _ExecutePostRequestAsync($"{OpenAIThreadEndpoint}/{threadId}/runs/{runId}/submit_tool_outputs", content, OpenAIBetaHeaders, cancellationToken);
 
                 string responseJson = await httpResponse.Content.ReadAsStringAsync();
                 Run result = JsonSerializer.Deserialize<Run>(responseJson) ?? throw new SerializationException($"Failed to deserialize run result response json: {responseJson}");
