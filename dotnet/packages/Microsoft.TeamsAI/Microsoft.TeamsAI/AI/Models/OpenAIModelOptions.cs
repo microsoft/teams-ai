@@ -1,5 +1,4 @@
 ﻿using Microsoft.Teams.AI.Utilities;
-using Microsoft.Teams.AI.AI.Prompts;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -34,26 +33,15 @@ namespace Microsoft.Teams.AI.AI.Models
         /// </summary>
         /// <param name="apiKey">API key to use when calling the OpenAI API.</param>
         /// <param name="defaultModel">Default model to use for completion.</param>
-        /// <param name="organization">Organization to use when calling the OpenAI API.</param>
-        /// <param name="completionType">Type of completion to use for the default model.</param>
-        /// <param name="logRequests">Whether to log requests to the console.</param>
-        /// <param name="retryPolicy">Retry policy to use when calling the OpenAI API.</param>
-        /// <param name="useSystemMessages"></param>
         public OpenAIModelOptions(
             string apiKey,
-            string defaultModel,
-            string? organization = null,
-            CompletionConfiguration.CompletionType completionType = CompletionConfiguration.CompletionType.Chat,
-            bool logRequests = false,
-            List<TimeSpan>? retryPolicy = null,
-            bool useSystemMessages = false) : base(completionType, logRequests, retryPolicy, useSystemMessages)
+            string defaultModel) : base()
         {
             Verify.ParamNotNull(apiKey);
             Verify.ParamNotNull(defaultModel);
 
             this.ApiKey = apiKey;
             this.DefaultModel = defaultModel;
-            this.Organization = organization;
         }
     }
 }
