@@ -298,9 +298,6 @@ namespace Microsoft.Teams.AI.State
                             }
                         }
 
-                        // Add the temp currScope
-                        this._scopes[TEMP_SCOPE] = new TurnStateEntry(new TempState());
-
                         // Clear loading task
                         this._isLoaded = true;
                         this._loadingTask = null;
@@ -345,7 +342,7 @@ namespace Microsoft.Teams.AI.State
 
             foreach (KeyValuePair<string, TurnStateEntry> scope in this._scopes)
             {
-                if (!this._scopes.ContainsKey(scope.Key))
+                if (!this._scopes.ContainsKey(scope.Key) || scope.Key == TEMP_SCOPE)
                 {
                     continue;
                 }
@@ -425,6 +422,7 @@ namespace Microsoft.Teams.AI.State
             Dictionary<string, string> keys = new();
             keys.Add(CONVERSATION_SCOPE, conversationKey);
             keys.Add(USER_SCOPE, userKey);
+            keys.Add(TEMP_SCOPE, TEMP_SCOPE);
             return keys;
         }
 
@@ -438,6 +436,7 @@ namespace Microsoft.Teams.AI.State
             Dictionary<string, Record> types = new();
             types.Add(CONVERSATION_SCOPE, new Record());
             types.Add(USER_SCOPE, new Record());
+            types.Add(TEMP_SCOPE, new TempState());
             return types;
         }
 
@@ -451,7 +450,7 @@ namespace Microsoft.Teams.AI.State
             }
             else if (parts.Length == 1)
             {
-                parts.Prepend(TEMP_SCOPE);
+                parts = parts.Prepend(TEMP_SCOPE).ToArray();
             }
 
             // Validate currScope
