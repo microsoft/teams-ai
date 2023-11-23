@@ -32,6 +32,15 @@ namespace Microsoft.Teams.AI
         /// The access token. Only available when sign-in status is Complete.
         /// </summary>
         public string? Token { get; set; }
+
+        /// <summary>
+        /// Initialize an instance of current class
+        /// </summary>
+        /// <param name="status">The sign in status</param>
+        public SignInResponse(SignInStatus status)
+        {
+            this.Status = status;
+        }
     }
 
     /// <summary>

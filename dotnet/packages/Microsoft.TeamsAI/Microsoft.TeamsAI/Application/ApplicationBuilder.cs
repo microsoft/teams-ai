@@ -135,7 +135,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The ApplicationBuilder instance.</returns>
         public ApplicationBuilder<TState> WithAuthenticationOptions(AuthenticationOptions authenticationOptions)
         {
-             Options.AuthenticationOptions = authenticationOptions;
+             Options.Authentication = authenticationOptions;
             return this;
         }
 

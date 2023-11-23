@@ -66,12 +66,12 @@ namespace Microsoft.Teams.AI
             MessageExtensions = new MessageExtensions<TState>(this);
             TaskModules = new TaskModules<TState>(this);
 
-            if (options.AuthenticationOptions != null)
+            if (options.Authentication != null)
             {
-                Authentication = new AuthenticationManager<TState>(options.AuthenticationOptions);
-                if (options.AuthenticationOptions.AutoSignIn != null)
+                Authentication = new AuthenticationManager<TState>(options.Authentication);
+                if (options.Authentication.AutoSignIn != null)
                 {
-                    _startSignIn = options.AuthenticationOptions.AutoSignIn;
+                    _startSignIn = options.Authentication.AutoSignIn;
                 }
                 else
                 {
