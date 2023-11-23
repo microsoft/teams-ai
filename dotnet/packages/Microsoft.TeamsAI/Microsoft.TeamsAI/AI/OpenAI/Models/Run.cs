@@ -22,7 +22,8 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
         public long CreatedAt { get; set; }
 
         [JsonPropertyName("expires_at")]
-        public long ExpiredAt { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public long? ExpiredAt { get; set; }
 
         [JsonPropertyName("failed_at")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
