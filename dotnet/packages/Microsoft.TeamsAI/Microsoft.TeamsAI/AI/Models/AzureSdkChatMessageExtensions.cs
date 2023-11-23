@@ -16,7 +16,9 @@
             {
                 Content = chatMessage.Content,
                 Name = chatMessage.Name,
-                FunctionCall = new FunctionCall(chatMessage.FunctionCall.Name, chatMessage.FunctionCall.Arguments)
+                FunctionCall = chatMessage.FunctionCall != null ?
+                    new FunctionCall(chatMessage.FunctionCall.Name, chatMessage.FunctionCall.Arguments) :
+                    null
             };
             return message;
         }
