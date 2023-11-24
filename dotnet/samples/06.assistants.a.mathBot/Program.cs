@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.AI.OpenAI.Models;
 using Microsoft.Teams.AI.AI.Planners;
 using MathBot;
 
@@ -31,7 +32,7 @@ if (string.IsNullOrEmpty(config.OpenAI.AssistantId))
         {
             new()
             {
-                Type = "code_interpreter"
+                Type = Tool.CODE_INTERPRETER_TYPE
             }
         },
         Model = "gpt-3.5-turbo"
