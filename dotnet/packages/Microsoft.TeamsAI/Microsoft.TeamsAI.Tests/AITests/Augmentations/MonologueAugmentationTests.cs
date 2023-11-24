@@ -38,7 +38,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
                 }
             });
 
-            InnerMonologue monologue = new(new("test", "test", "test"), new("test", new()
+            InnerMonologue monologue = new(new("test", "test"), new("test", new()
             {
                 { "foo", "bar" }
             }));
