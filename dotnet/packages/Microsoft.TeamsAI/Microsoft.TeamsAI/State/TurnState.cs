@@ -291,7 +291,7 @@ namespace Microsoft.Teams.AI.State
                         IDictionary<string, object> items;
                         if (storage != null)
                         {
-                            items = await storage.ReadAsync(keys.ToArray(), cancellationToken);
+                            items = await storage.ReadAsync(keys.Where(k => k != TEMP_SCOPE).ToArray(), cancellationToken);
                         }
                         else
                         {
@@ -357,7 +357,7 @@ namespace Microsoft.Teams.AI.State
 
             foreach (KeyValuePair<string, TurnStateEntry> scope in this._scopes)
             {
-                if (!this._scopes.ContainsKey(scope.Key))
+                if (!this._scopes.ContainsKey(scope.Key) || scope.Key == TEMP_SCOPE)
                 {
                     continue;
                 }
@@ -437,6 +437,7 @@ namespace Microsoft.Teams.AI.State
             Dictionary<string, string> keys = new();
             keys.Add(CONVERSATION_SCOPE, conversationKey);
             keys.Add(USER_SCOPE, userKey);
+            keys.Add(TEMP_SCOPE, TEMP_SCOPE);
             return keys;
         }
 
@@ -450,7 +451,7 @@ namespace Microsoft.Teams.AI.State
             }
             else if (parts.Length == 1)
             {
-                parts.Prepend(TEMP_SCOPE);
+                parts = parts.Prepend(TEMP_SCOPE).ToArray();
             }
 
             // Validate scope
