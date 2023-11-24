@@ -1,6 +1,5 @@
 ﻿using ListBot.Model;
 using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI;
 
@@ -8,178 +7,134 @@ namespace ListBot
 {
     public class ListBotActions
     {
-        private readonly Application<ListState, ListStateManager> _application;
-
-        public ListBotActions(Application<ListState, ListStateManager> application)
+        public ListBotActions()
         {
-            _application = application;
         }
 
         [Action("CreateList")]
-        public bool CreateList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
+        public string CreateList([ActionTurnState] ListState turnState, [ActionParameters] Dictionary<string, object> parameters)
         {
             ArgumentNullException.ThrowIfNull(turnState);
-            ArgumentNullException.ThrowIfNull(entities);
+            ArgumentNullException.ThrowIfNull(parameters);
 
-            string listName = GetEntityString(entities, "list");
+            string listName = GetParameterString(parameters, "list");
 
             EnsureListExists(turnState, listName);
 
-            return true;
+            return "list created. think about your next action";
         }
 
         [Action("DeleteList")]
-        public bool DeleteList([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
+        public string DeleteList([ActionTurnState] ListState turnState, [ActionParameters] Dictionary<string, object> parameters)
         {
             ArgumentNullException.ThrowIfNull(turnState);
-            ArgumentNullException.ThrowIfNull(entities);
+            ArgumentNullException.ThrowIfNull(parameters);
 
-            string listName = GetEntityString(entities, "list");
+            string listName = GetParameterString(parameters, "list");
 
             DeleteList(turnState, listName);
 
-            return true;
+            return "list deleted. think about your next action";
         }
 
         [Action("AddItem")]
-        public bool AddItem([ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
+        public string AddItem([ActionTurnState] ListState turnState, [ActionParameters] Dictionary<string, object> parameters)
         {
             ArgumentNullException.ThrowIfNull(turnState);
-            ArgumentNullException.ThrowIfNull(entities);
+            ArgumentNullException.ThrowIfNull(parameters);
 
-            string listName = GetEntityString(entities, "list");
-            string item = GetEntityString(entities, "item");
+            string listName = GetParameterString(parameters, "list");
+            string item = GetParameterString(parameters, "item");
 
             IList<string> items = GetItems(turnState, listName);
             items.Add(item);
             SetItems(turnState, listName, items);
 
-            return true;
+            return "item added. think about your next action";
         }
 
         [Action("RemoveItem")]
-        public async Task<bool> RemoveItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
+        public async Task<string> RemoveItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionParameters] Dictionary<string, object> parameters)
         {
             ArgumentNullException.ThrowIfNull(turnContext);
             ArgumentNullException.ThrowIfNull(turnState);
-            ArgumentNullException.ThrowIfNull(entities);
+            ArgumentNullException.ThrowIfNull(parameters);
 
-            string listName = GetEntityString(entities, "list");
-            string item = GetEntityString(entities, "item");
+            string listName = GetParameterString(parameters, "list");
+            string item = GetParameterString(parameters, "item");
 
             IList<string> items = GetItems(turnState, listName);
-            if (!items.Contains(listName))
+
+            if (!items.Contains(item))
             {
                 await turnContext.SendActivityAsync(ResponseBuilder.ItemNotFound(listName, item)).ConfigureAwait(false);
-
-                // End the current chain
-                return false;
-            }
-            else
-            {
-                items.Remove(item);
-                SetItems(turnState, listName, items);
-
-                return true;
-            }
-        }
-
-        [Action("FindItem")]
-        public async Task<bool> FindItem([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState, [ActionEntities] Dictionary<string, object> entities)
-        {
-            ArgumentNullException.ThrowIfNull(turnContext);
-            ArgumentNullException.ThrowIfNull(turnState);
-            ArgumentNullException.ThrowIfNull(entities);
-
-            string listName = GetEntityString(entities, "list");
-            string item = GetEntityString(entities, "item");
-
-            IList<string> items = GetItems(turnState, listName);
-            await turnContext.SendActivityAsync(items.Contains(item) ?
-                ResponseBuilder.ItemFound(listName, item) :
-                ResponseBuilder.ItemNotFound(listName, item)).ConfigureAwait(false);
-
-            // End the current chain
-            return false;
-        }
-
-        [Action("SummarizeLists")]
-        public async Task<bool> SummarizeLists([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] ListState turnState)
-        {
-            ArgumentNullException.ThrowIfNull(turnContext);
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            Dictionary<string, IList<string>>? lists = turnState.Conversation!.Lists;
-            if (lists is not null)
-            {
-                await _application.AI.ChainAsync(turnContext, turnState, "Summarize").ConfigureAwait(false);
-            }
-            else
-            {
-                await turnContext.SendActivityAsync(ResponseBuilder.NoListsFound()).ConfigureAwait(false);
+                return "item not found. think about your next action";
             }
 
-            // End the current chain
-            return false;
+            items.Remove(item);
+            SetItems(turnState, listName, items);
+            return "item removed. think about your next action";
         }
 
         [Action(AIConstants.UnknownActionName)]
-        public async Task<bool> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
+        public async Task<string> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
         {
             ArgumentNullException.ThrowIfNull(turnContext);
 
             await turnContext.SendActivityAsync(ResponseBuilder.UnknownAction(action)).ConfigureAwait(false);
 
-            return false;
+            return $"unknown action: {action}";
         }
 
         private static IList<string> GetItems(ListState turnState, string listName)
         {
-            EnsureListExists(turnState, listName);
+            if (turnState.Conversation.Lists.ContainsKey(listName))
+            {
+                return turnState.Conversation.Lists[listName];
+            }
 
-            return turnState.Conversation!.Lists![listName];
+            return new List<string>();
         }
 
         private static void SetItems(ListState turnState, string listName, IList<string> items)
         {
-            EnsureListExists(turnState, listName);
-
-            turnState.Conversation!.Lists![listName] = items;
+            var lists = turnState.Conversation.Lists;
+            lists[listName] = items;
+            turnState.Conversation.Lists = lists;
         }
 
         private static void EnsureListExists(ListState turnState, string listName)
         {
-            if (turnState.Conversation!.Lists is null)
-            {
-                turnState.Conversation.Lists = new Dictionary<string, IList<string>>();
-                turnState.Conversation.ListNames = new List<string>();
-            }
+            var lists = turnState.Conversation.Lists;
 
-            if (!turnState.Conversation.Lists.ContainsKey(listName))
+            if (!lists.ContainsKey(listName))
             {
-                turnState.Conversation.Lists[listName] = new List<string>();
-                turnState.Conversation.ListNames!.Add(listName);
+                lists[listName] = new List<string>();
+                turnState.Conversation.Lists = lists;
             }
         }
 
         private static void DeleteList(ListState turnState, string listName)
         {
-            if (turnState.Conversation!.Lists?.Remove(listName) == true)
+            var lists = turnState.Conversation.Lists;
+
+            if (lists.ContainsKey(listName))
             {
-                turnState.Conversation.ListNames!.Remove(listName);
+                lists.Remove(listName);
+                turnState.Conversation.Lists = lists;
             }
         }
 
-        private static string GetEntityString(Dictionary<string, object> entities, string key)
+        private static string GetParameterString(Dictionary<string, object> parameters, string key)
         {
-            if (!entities.TryGetValue(key, out object? value))
+            if (!parameters.TryGetValue(key, out object? value))
             {
-                throw new ArgumentException($"No {key} in entities.", nameof(entities));
+                throw new ArgumentException($"No {key} in parameters.", nameof(parameters));
             }
 
             if (value is not string castValue)
             {
-                throw new ArgumentException($"{key} is not of type string.", nameof(entities));
+                throw new ArgumentException($"{key} is not of type string.", nameof(parameters));
             }
 
             return castValue;

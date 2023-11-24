@@ -63,8 +63,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.PromptsTests.SectionsTests
 
             RenderedPromptSection<string> rendered = await section.RenderAsTextAsync(context.Object, memory, manager, tokenizer, 15);
 
-            Assert.Equal("this is a test message: Hello World!", rendered.Output);
-            Assert.Equal(9, rendered.Length);
+            Assert.Equal("this is a test message: \"Hello World!\"", rendered.Output);
+            Assert.Equal(10, rendered.Length);
         }
     }
 }

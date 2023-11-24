@@ -48,34 +48,26 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         public class InnerMonologueThoughts
         {
             /// <summary>
-            /// Thought
+            /// The LLM's current thought.
             /// </summary>
             [JsonPropertyName("thought")]
             public string Thought { get; set; }
 
             /// <summary>
-            /// Reasoning
+            /// The LLM's reasoning for the current thought.
             /// </summary>
             [JsonPropertyName("reasoning")]
             public string Reasoning { get; set; }
 
             /// <summary>
-            /// Plan
-            /// </summary>
-            [JsonPropertyName("plan")]
-            public string Plan { get; set; }
-
-            /// <summary>
             /// Creates an instance of `InnerMonologueThoughts`
             /// </summary>
-            /// <param name="thought"></param>
-            /// <param name="reasoning"></param>
-            /// <param name="plan"></param>
-            public InnerMonologueThoughts(string thought, string reasoning, string plan)
+            /// <param name="thought">The LLM's current thought.</param>
+            /// <param name="reasoning">The LLM's reasoning for the current thought.</param>
+            public InnerMonologueThoughts(string thought, string reasoning)
             {
                 this.Thought = thought;
                 this.Reasoning = reasoning;
-                this.Plan = plan;
             }
 
             /// <summary>
@@ -91,19 +83,16 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                             "thought",
                             new JsonSchemaBuilder()
                                 .Type(SchemaValueType.String)
+                                .Description("The LLM's current thought.")
                         ),
                         (
                             "reasoning",
                             new JsonSchemaBuilder()
                                 .Type(SchemaValueType.String)
-                        ),
-                        (
-                            "plan",
-                            new JsonSchemaBuilder()
-                                .Type(SchemaValueType.String)
+                                .Description("The LLM's reasoning for the current thought.")
                         )
                     )
-                    .Required(new string[] { "thought", "reasoning", "plan" })
+                    .Required(new string[] { "thought", "reasoning" })
                     .Build();
             }
         }
@@ -114,13 +103,13 @@ namespace Microsoft.Teams.AI.AI.Augmentations
         public class InnerMonologueAction
         {
             /// <summary>
-            /// Name
+            /// Name of the action to perform.
             /// </summary>
             [JsonPropertyName("name")]
             public string Name { get; set; }
 
             /// <summary>
-            /// Parameters
+            /// Parameters for the action.
             /// </summary>
             [JsonPropertyName("parameters")]
             [JsonConverter(typeof(DictionaryJsonConverter))]
@@ -129,8 +118,8 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             /// <summary>
             /// Creates an instance of `InnerMonologueAction`
             /// </summary>
-            /// <param name="name">Name</param>
-            /// <param name="parameters">Parameters</param>
+            /// <param name="name">Name of the action to perform.</param>
+            /// <param name="parameters">Parameters for the action.</param>
             public InnerMonologueAction(string name, Dictionary<string, object?> parameters)
             {
                 this.Name = name;
@@ -150,11 +139,13 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                             "name",
                             new JsonSchemaBuilder()
                                 .Type(SchemaValueType.String)
+                                .Description("Name of the action to perform.")
                         ),
                         (
-                            "properties",
+                            "parameters",
                             new JsonSchemaBuilder()
                                 .Type(SchemaValueType.Object)
+                                .Description("Parameters for the action.")
                         )
                     )
                     .Required(new string[] { "name" })
@@ -228,7 +219,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
                 "If you're not sure what to do, you can always say something by returning a SAY action.",
                 "If you're told your JSON response has errors, do your best to fix them.",
                 "Response Format:",
-                "{\"thoughts\":{\"thought\":\"<your current thought>\",\"reasoning\":\"<self reflect on why you made this decision>\",\"plan\":\"- short bulleted\\\\n- list that conveys\\\\n- long-term plan\"},\"action\":{\"name\":\"<action name>\",\"parameters\":{\"<name>\":\"<value>\"}}}"
+                "{\"thoughts\":{\"thought\":\"<your current thought>\",\"reasoning\":\"<self reflect on why you made this decision>\"},\"action\":{\"name\":\"<action name>\",\"parameters\":{\"<name>\":\"<value>\"}}}"
             }));
 
             this._monologueValidator = new(InnerMonologue.Schema(), "No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.");
@@ -346,7 +337,7 @@ namespace Microsoft.Teams.AI.AI.Augmentations
             return new()
             {
                 Valid = true,
-                Value = monologue
+                Value = JsonSerializer.Serialize(monologue)
             };
         }
     }
