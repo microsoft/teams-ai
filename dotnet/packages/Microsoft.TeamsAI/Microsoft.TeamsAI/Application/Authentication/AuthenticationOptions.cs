@@ -25,12 +25,14 @@ namespace Microsoft.Teams.AI
 
         /// <summary>
         /// Describes the authentication class the bot should use if the user does not specify a authentication class name.
+        /// If the value is not provided, the first one in `Authentications` setting will be used as the default one.
         /// </summary>
         public string? Default { get; set; }
 
         /// <summary>
         /// Indicates whether the bot should start the sign in flow when the user sends a message to the bot or triggers a message extension.
         /// If the selector returns false, the bot will not start the sign in flow before routing the activity to the bot logic.
+        /// If the selector is not provided, the sign in will always happen for valid activities.
         /// </summary>
         public SelectorAsync? AutoSignIn { get; set; }
 
