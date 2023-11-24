@@ -11,13 +11,23 @@ using System.Text.RegularExpressions;
 namespace Microsoft.Teams.AI
 {
     /// <summary>
+    /// Constants for adaptive card invoke names
+    /// </summary>
+    public class AdaptiveCardsInvokeNames
+    {
+        /// <summary>
+        /// Action invoke name
+        /// </summary>
+        public static readonly string ACTION_INVOKE_NAME = "adaptiveCard/action";
+    }
+
+    /// <summary>
     /// AdaptiveCards class to enable fluent style registration of handlers related to Adaptive Cards.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
     public class AdaptiveCards<TState>
         where TState : TurnState, new()
     {
-        private static readonly string ACTION_INVOKE_NAME = "adaptiveCard/action";
         private static readonly string ACTION_EXECUTE_TYPE = "Action.Execute";
         private static readonly string SEARCH_INVOKE_NAME = "application/search";
         private static readonly string DEFAULT_ACTION_SUBMIT_FILTER = "verb";
@@ -75,7 +85,7 @@ namespace Microsoft.Teams.AI
             {
                 AdaptiveCardInvokeValue? invokeValue;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
+                    || !string.Equals(turnContext.Activity.Name, AdaptiveCardsInvokeNames.ACTION_INVOKE_NAME)
                     || (invokeValue = ActivityUtilities.GetTypedValue<AdaptiveCardInvokeValue>(turnContext.Activity)) == null
                     || invokeValue.Action == null
                     || !string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE))
@@ -395,7 +405,7 @@ namespace Microsoft.Teams.AI
                 AdaptiveCardInvokeValue? invokeValue;
                 return Task.FromResult(
                     string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(turnContext.Activity.Name, ACTION_INVOKE_NAME)
+                    && string.Equals(turnContext.Activity.Name, AdaptiveCardsInvokeNames.ACTION_INVOKE_NAME)
                     && (invokeValue = ActivityUtilities.GetTypedValue<AdaptiveCardInvokeValue>(turnContext.Activity)) != null
                     && invokeValue.Action != null
                     && string.Equals(invokeValue.Action.Type, ACTION_EXECUTE_TYPE)
