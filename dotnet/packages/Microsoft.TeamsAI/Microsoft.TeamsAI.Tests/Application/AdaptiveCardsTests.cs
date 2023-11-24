@@ -6,7 +6,6 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
