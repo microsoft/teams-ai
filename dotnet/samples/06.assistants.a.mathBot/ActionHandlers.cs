@@ -7,7 +7,7 @@ namespace MathBot
     public class ActionHandlers
     {
         [Action(AIConstants.HttpErrorActionName)]
-        public async Task<string> OnFlaggedInput([ActionTurnContext] ITurnContext turnContext)
+        public async Task<string> OnHttpError([ActionTurnContext] ITurnContext turnContext)
         {
             await turnContext.SendActivityAsync("An AI request failed. Please try again later.");
             return AIConstants.StopCommand;
