@@ -8,6 +8,16 @@ namespace Microsoft.Teams.AI.AI.OpenAI.Models
     public class Tool
     {
         /// <summary>
+        /// The type of Code Interpreter tool.
+        /// </summary>
+        public const string CODE_INTERPRETER_TYPE = "code_interpreter";
+
+        /// <summary>
+        /// The type of Function Calling tool.
+        /// </summary>
+        public const string FUNCTION_CALLING_TYPE = "function";
+
+        /// <summary>
         /// Type of tool.
         /// </summary>
         [JsonPropertyName("type")]
