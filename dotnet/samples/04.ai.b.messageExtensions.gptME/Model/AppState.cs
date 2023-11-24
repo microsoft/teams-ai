@@ -5,9 +5,6 @@ namespace GPT.Model
 {
     public class AppState : TurnState
     {
-        /// <summary>
-        /// Stores all the conversation-related state.
-        /// </summary>
         public new AppTempState Temp
         {
             get
@@ -23,7 +20,7 @@ namespace GPT.Model
             }
             set
             {
-                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+                TurnStateEntry? scope = GetScope(TEMP_SCOPE);
 
                 if (scope == null)
                 {
