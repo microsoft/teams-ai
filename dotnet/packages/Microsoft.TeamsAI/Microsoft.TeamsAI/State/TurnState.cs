@@ -16,19 +16,34 @@ namespace Microsoft.Teams.AI.State
         private Task<bool>? _loadingTask = Task.FromResult(false);
 
         /// <summary>
-        /// Name of the conversation currScope.
+        /// Name of the conversation scope.
         /// </summary>
         public const string CONVERSATION_SCOPE = "conversation";
 
         /// <summary>
-        /// Name of the user currScope.
+        /// Name of the user scope.
         /// </summary>
         public const string USER_SCOPE = "user";
 
         /// <summary>
-        /// Name of the temp currScope.
+        /// Name of the temp scope.
         /// </summary>
         public const string TEMP_SCOPE = "temp";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TurnState"/> class.
+        /// </summary>
+        public TurnState()
+        {
+            ScopeDefaults = new Dictionary<string, Record>();
+            ScopeDefaults.Add(CONVERSATION_SCOPE, new Record());
+            ScopeDefaults.Add(USER_SCOPE, new Record());
+        }
+
+        /// <summary>
+        /// The default values to initial for each scope.
+        /// </summary>
+        protected Dictionary<string, Record> ScopeDefaults;
 
         /// <summary>
         /// Provides the current status of the load.
@@ -37,10 +52,10 @@ namespace Microsoft.Teams.AI.State
         public bool IsLoaded() { return _isLoaded; }
 
         /// <summary>
-        /// Returns the TurnStateEntry associated with the specified currScope.
+        /// Returns the TurnStateEntry associated with the specified scope.
         /// </summary>
-        /// <param name="name">The specified currScope.</param>
-        /// <returns>The state saved for the currScope.</returns>
+        /// <param name="name">The specified scope.</param>
+        /// <returns>The state saved for the scope.</returns>
         public TurnStateEntry? GetScope(string name)
         {
             try
@@ -183,8 +198,8 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Deletes a value from the memory.
         /// </summary>
-        /// <param name="path">Path to the value to delete in the form of `[currScope].property`.
-        /// If currScope is omitted, the value is deleted from the temporary currScope.</param>
+        /// <param name="path">Path to the value to delete in the form of `[scope].property`.
+        /// If scope is omitted, the value is deleted from the temporary scope.</param>
         public void DeleteValue(string path)
         {
             (TurnStateEntry scope, string name) = GetScopeAndName(path);
@@ -197,8 +212,8 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Checks if a value exists in the memory.
         /// </summary>
-        /// <param name="path"> Path to the value to check in the form of `[currScope].property`.
-        /// If currScope is omitted, the value is checked in the temporary currScope.</param>
+        /// <param name="path"> Path to the value to check in the form of `[scope].property`.
+        /// If scope is omitted, the value is checked in the temporary scope.</param>
         /// <returns>True if the value exists, false otherwise.</returns>
         public bool HasValue(string path)
         {
@@ -209,8 +224,8 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Retrieves a value from the memory.
         /// </summary>
-        /// <param name="path">Path to the value to retrieve in the form of `[currScope].property`.
-        /// If currScope is omitted, the value is retrieved from the temporary currScope.</param>
+        /// <param name="path">Path to the value to retrieve in the form of `[scope].property`.
+        /// If scope is omitted, the value is retrieved from the temporary scope.</param>
         /// <returns>The value or undefined if not found.</returns>
         public object? GetValue(string path)
         {
@@ -227,8 +242,8 @@ namespace Microsoft.Teams.AI.State
         /// <summary>
         /// Assigns a value to the memory.
         /// </summary>
-        /// <param name="path">Path to the value to assign in the form of `[currScope].property`.
-        /// If currScope is omitted, the value is assigned to the temporary currScope.</param>
+        /// <param name="path">Path to the value to assign in the form of `[scope].property`.
+        /// If scope is omitted, the value is assigned to the temporary scope.</param>
         /// <param name="value">Value to assign.</param>
         public void SetValue(string path, object value)
         {
@@ -241,7 +256,7 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         /// <param name="storage">Optional. Storage provider to load state scopes from.</param>
         /// <param name="turnContext">Context for the current turn of conversation with the user.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Optional. The cancellation token.</param>   
         /// <returns>True if the states need to be loaded.</returns>
         public async Task<bool> LoadStateAsync(IStorage? storage, ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
@@ -264,11 +279,11 @@ namespace Microsoft.Teams.AI.State
                         // Compute state keys
                         List<string> keys = new();
                         Dictionary<string, string> scopes = OnComputeStorageKeys(turnContext);
-                        foreach (KeyValuePair<string, string> currScope in scopes)
+                        foreach (KeyValuePair<string, string> scope in scopes)
                         {
-                            if (scopes.ContainsKey(currScope.Key))
+                            if (scopes.ContainsKey(scope.Key))
                             {
-                                keys.Add(scopes[currScope.Key]);
+                                keys.Add(scopes[scope.Key]);
                             }
                         }
 
@@ -283,20 +298,20 @@ namespace Microsoft.Teams.AI.State
                             items = new Dictionary<string, object>();
                         }
 
-                        // Compute scope types
-                        Dictionary<string, Record> defaults = OnComputeScopeDefaults(turnContext);
-
                         // Create scopes for items
-                        foreach (KeyValuePair<string, string> currScope in scopes)
+                        foreach (KeyValuePair<string, string> scope in scopes)
                         {
-                            if (scopes.ContainsKey(currScope.Key))
+                            if (scopes.ContainsKey(scope.Key))
                             {
-                                Record scopeDefault = defaults.ContainsKey(currScope.Key) ? defaults[currScope.Key] : new Record();
-                                string storageKey = scopes[currScope.Key];
+                                Record scopeDefault = ScopeDefaults.ContainsKey(scope.Key) ? ScopeDefaults[scope.Key] : new Record();
+                                string storageKey = scopes[scope.Key];
                                 object value = items.ContainsKey(storageKey) ? items[storageKey] : scopeDefault;
-                                this._scopes[currScope.Key] = new TurnStateEntry((value as Record)!, storageKey);
+                                this._scopes[scope.Key] = new TurnStateEntry((value as Record)!, storageKey);
                             }
                         }
+
+                        // Add the temp scope
+                        this._scopes[TEMP_SCOPE] = new TurnStateEntry(new TempState());
 
                         // Clear loading task
                         this._isLoaded = true;
@@ -426,23 +441,9 @@ namespace Microsoft.Teams.AI.State
             return keys;
         }
 
-        /// <summary>
-        /// Computes the default state types
-        /// </summary>
-        /// <param name="context">Context for the current turn.</param>
-        /// <returns></returns>
-        protected virtual Dictionary<string, Record> OnComputeScopeDefaults(ITurnContext context)
-        {
-            Dictionary<string, Record> types = new();
-            types.Add(CONVERSATION_SCOPE, new Record());
-            types.Add(USER_SCOPE, new Record());
-            types.Add(TEMP_SCOPE, new TempState());
-            return types;
-        }
-
         private (TurnStateEntry, string) GetScopeAndName(string path)
         {
-            // Get variable currScope and name
+            // Get variable scope and name
             string[] parts = path.Split('.');
             if (parts.Length > 2)
             {
@@ -453,11 +454,11 @@ namespace Microsoft.Teams.AI.State
                 parts = parts.Prepend(TEMP_SCOPE).ToArray();
             }
 
-            // Validate currScope
+            // Validate scope
             TurnStateEntry? scope = GetScope(parts[0]);
             if (scope == null)
             {
-                throw new ArgumentNullException($"Invalid state currScope: ${parts[0]}");
+                throw new ArgumentNullException($"Invalid state scope: ${parts[0]}");
             }
 
             return (scope, parts[1]);

@@ -38,6 +38,10 @@ builder.Services.AddTransient<IBot>(sp =>
     ApplicationOptions<AppState> applicationOptions = new()
     {
         Storage = storage,
+        TurnStateFactory = () =>
+        {
+            return new AppState();
+        }
     };
 
     Application<AppState> app = new(applicationOptions);
