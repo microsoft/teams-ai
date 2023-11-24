@@ -10,7 +10,7 @@ namespace ListBot
             ArgumentNullException.ThrowIfNull(turnContext);
             ArgumentNullException.ThrowIfNull(turnState);
 
-            if (!turnState.Conversation!.Greeted)
+            if (!turnState.Conversation.Greeted)
             {
                 turnState.Conversation.Greeted = true;
                 await turnContext.SendActivityAsync(MessageFactory.Text(ResponseBuilder.Greeting()), cancellationToken).ConfigureAwait(false);
@@ -22,7 +22,7 @@ namespace ListBot
             ArgumentNullException.ThrowIfNull(turnContext);
             ArgumentNullException.ThrowIfNull(turnState);
 
-            turnState.ConversationStateEntry?.Delete();
+            turnState.DeleteConversationState();
             await turnContext.SendActivityAsync(MessageFactory.Text(ResponseBuilder.Reset()), cancellationToken).ConfigureAwait(false);
         }
     }

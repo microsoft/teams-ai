@@ -10,7 +10,6 @@ using System.Reflection;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Teams.AI.AI.OpenAI;
 using Microsoft.Teams.AI.State;
-using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {

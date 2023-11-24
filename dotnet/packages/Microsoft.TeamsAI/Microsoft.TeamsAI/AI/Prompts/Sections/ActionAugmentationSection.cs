@@ -1,10 +1,9 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Json.More;
+using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;
 using System.Text.Json;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -28,7 +27,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             public class Action
             {
                 public string? Description { get; set; }
-                public Dictionary<string, object>? Parameters { get; set; }
+                public Dictionary<string, dynamic>? Parameters { get; set; }
             }
         }
 
@@ -50,15 +49,11 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                 actionMap.Actions.Add(action.Name, new()
                 {
                     Description = action.Description,
-                    Parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(action.Parameters)),
+                    Parameters = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(action.Parameters.ToJsonDocument().RootElement.ToJsonString()),
                 });
             }
 
-            ISerializer serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-
-            this._text = $"{serializer.Serialize(actionMap)}\n\n{callToAction}";
+            this._text = $"{JsonSerializer.Serialize(actionMap)}\n\n{callToAction}";
         }
 
         /// <inheritdoc />
