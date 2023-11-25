@@ -1,0 +1,14 @@
+[
+    {
+        "name": "user_personal_information",
+        "description": "Gets personal information about the user"
+    },
+    {
+        "name": "user_profile_picture",
+        "description": "Gets the user's profile picture"
+    },
+    {
+        "name": "user_manager",
+        "description": "Gets the user's manager information"
+    }
+]
