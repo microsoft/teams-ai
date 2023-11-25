@@ -1164,6 +1164,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/isomorphic-fetch@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/isomorphic-fetch/-/isomorphic-fetch-0.0.38.tgz#90882932a371e294a3c6143430275c15cb6ebf1b"
+  integrity sha512-DcXWx26qmt89lQ1Saoit0P38yHqT7fGceVs7UpMy2gU7AjEZISPdM7rqoFY5VHtl33H+cJ+VBDYmNRssTM4Zlw==
+
 "@types/isomorphic-fetch@^0.0.39":
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/isomorphic-fetch/-/isomorphic-fetch-0.0.39.tgz#889573a72ca637bc1a665910a41ff1cb3b52011f"
@@ -1276,6 +1281,16 @@
   version "8.5.11"
   resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.5.11.tgz#f64077a9f578ca57430ac28509722ad991edaa44"
   integrity sha512-aMSWmbAKoyKelDQ+J70Vv+ieR6rjvAG0DNyn4XbqO0e69SZJY7ohuqlCzNd7TjgUFY5NcbV0zFyAV7hmxpNLTA==
+  dependencies:
+    "@types/bunyan" "*"
+    "@types/formidable" "^1"
+    "@types/node" "*"
+    "@types/spdy" "*"
+
+"@types/restify@8.5.7":
+  version "8.5.7"
+  resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.5.7.tgz#6e702c6915d090a1e6c071d2e7d55c763337d027"
+  integrity sha512-AyVCoo+28MS7FVJikENrDD4vmnF/NuShIQabT/sdy8TIt7/bi9t9EmmY9WIPlkvNyLFUEQHJry+V/8Ym7GO24w==
   dependencies:
     "@types/bunyan" "*"
     "@types/formidable" "^1"
