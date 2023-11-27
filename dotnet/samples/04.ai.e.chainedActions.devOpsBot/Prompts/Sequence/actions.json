@@ -1,0 +1,73 @@
+[
+    {
+        "name": "UpdateMembers",
+        "description": "Update the list of members associated with the project",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "added": {
+                    "type": "array",
+                    "description": "Optional list of project members to add",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "removed": {
+                    "type": "array",
+                    "description": "Optional list of project members to remove",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "name": "CreateWI",
+        "description": "creates a new work item and returns the created items ID",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "The items title"
+                },
+                "assignedTo": {
+                    "type": "string",
+                    "description": "Optional user to assign the items to"
+                }
+            },
+            "required": [
+                "title"
+            ]
+        }
+    },
+    {
+        "name": "UpdateWI",
+        "description": "updates the information for an existing work item",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "number",
+                    "description": "The ID of the work item"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Optional change to the items title"
+                },
+                "assignedTo": {
+                    "type": "string",
+                    "description": "Optional re-assignment of the item to a different user"
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Optional change to the items triage status"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        }
+    }
+]
