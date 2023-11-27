@@ -51,16 +51,9 @@ Note that this bot will only work in tenants where the following graph scopes ar
     yarn start
     ```
 
-4. Create a `env` folder in the sample root, and create `.env.local.user` file. In that file add copy the following environment variables:
+4. Create a `.env` file in the `teams-ai/js/samples/07.whoBot` folder.
 
-    ```
-    OAUTH_CONNECTION_NAME=graph-connection
-    OPENAI_KEY=<openai-key>
-    AZURE_OPENAI_KEY=<aoai-key>
-    AZURE_OPENAI_ENDPOINT=<aoai-endpoint>
-    ```
-
-5. If you are using OpenAI then update the `OPENAI_KEY` variable. Otherwise if you are using Azure OpenAI then update the `AZURE_OPENAI_KEY` & `AZURE_OPENAI_ENDPOINT` variables.
+5. If you are using OpenAI then create the `OPENAI_KEY` variable and add your key. Otherwise if you are using Azure OpenAI then create variables `AZURE_OPENAI_KEY` & `AZURE_OPENAI_ENDPOINT` variables and set them appropriately.
 
 ## Interacting with the bot
 
@@ -78,10 +71,12 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
-1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
-1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
-1. In the browser that launches, select the **Add** button to install the app to Teams.
+   1. Login with your M365 account.
+   2. Login with your Azure account. Ensure that you have a valid subscription and resource group. This will be required to provision your bot.
+2. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
+3. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
+4. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
+5. In the browser that launches, select the **Add** button to install the app to Teams.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.
 

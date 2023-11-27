@@ -1,4 +1,4 @@
-import { CardFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import { Attachment, CardFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import {
     AI,
     ActionPlanner,
@@ -10,7 +10,7 @@ import {
 } from '@microsoft/teams-ai';
 import { configureUserAuthentication } from './userAuth';
 import { GraphClient } from './utils/graphClient';
-import { createUserPersonalInformationCard } from './utils/cards';
+import { createCalendarEventCard, createUserEmailCard, createUserPersonalInformationCard } from './utils/cards';
 import { adapter } from '.';
 import * as path from 'path';
 
@@ -127,7 +127,15 @@ app.ai.action('user_manager', async (context: TurnContext, state: ApplicationTur
     }
 
     const graphClient = new GraphClient(state.temp.authTokens['graph']!);
-    const profile = await graphClient.getMyManager();
+    let profile;
+    try {
+        profile = await graphClient.getMyManager();
+    } catch (e) {
+        await context.sendActivity(
+            "Hmm...I wasn't able to get your manager details from Graph. You might not have a manager."
+        );
+        return AI.StopCommandName;
+    }
 
     const card = createUserPersonalInformationCard(
         profile.displayName,
@@ -142,6 +150,110 @@ app.ai.action('user_manager', async (context: TurnContext, state: ApplicationTur
 
     await context.sendActivity({
         attachments: [card]
+    });
+
+    return AI.StopCommandName;
+});
+
+app.ai.action('user_colleagues', async (context: TurnContext, state: ApplicationTurnState) => {
+    const token = await app.getTokenOrStartSignIn(context, state, 'graph');
+    if (!token) {
+        await context.sendActivity('You have to be signed in to fulfill this request. Starting sign in flow...');
+        return AI.StopCommandName;
+    }
+
+    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const colleagues = await graphClient.getMyColleagues();
+
+    const colleaguesCards: Attachment[] = [];
+
+    colleagues.value.forEach(async (profile: any) => {
+        colleaguesCards.push(
+            createUserPersonalInformationCard(
+                profile.displayName,
+                profile.givenName,
+                profile.surname,
+                profile.jobTitle,
+                profile.officeLocation,
+                profile.mail
+            )
+        );
+    });
+
+    if (colleagues.length == 0) {
+        await context.sendActivity("You don't have any colleagues.");
+        return AI.StopCommandName;
+    }
+
+    await context.sendActivity('Here are the people you work with:');
+
+    await context.sendActivity({
+        attachments: colleaguesCards
+    });
+
+    return AI.StopCommandName;
+});
+
+app.ai.action('user_mail', async (context: TurnContext, state: ApplicationTurnState) => {
+    const token = await app.getTokenOrStartSignIn(context, state, 'graph');
+    if (!token) {
+        await context.sendActivity('You have to be signed in to fulfill this request. Starting sign in flow...');
+        return AI.StopCommandName;
+    }
+
+    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const mails = await graphClient.getMyEmails();
+    const mailsCard: Attachment[] = [];
+
+    mails.value.forEach(async (mail: any) => {
+        mailsCard.push(
+            createUserEmailCard(
+                mail.subject,
+                mail.from.emailAddress.name,
+                mail.sentDateTime,
+                mail.bodyPreview,
+                mail.webLink
+            )
+        );
+    });
+
+    await context.sendActivity('Here are your recent emails:');
+
+    await context.sendActivity({
+        attachments: mailsCard
+    });
+
+    return AI.StopCommandName;
+});
+
+app.ai.action('user_calendar_events', async (context: TurnContext, state: ApplicationTurnState) => {
+    const token = await app.getTokenOrStartSignIn(context, state, 'graph');
+    if (!token) {
+        await context.sendActivity('You have to be signed in to fulfill this request. Starting sign in flow...');
+        return AI.StopCommandName;
+    }
+
+    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const events = await graphClient.getMyCalendarEvents();
+    const eventsCard: Attachment[] = [];
+
+    events.value.slice(0, 5).forEach(async (event: any) => {
+        eventsCard.push(
+            createCalendarEventCard(
+                event.organizer.emailAddress.name,
+                event.subject,
+                event.start.dateTime,
+                event.end.dateTime,
+                event.bodyPreview,
+                event.webLink
+            )
+        );
+    });
+
+    await context.sendActivity('Here are the upcoming five events in your calendar:');
+
+    await context.sendActivity({
+        attachments: eventsCard
     });
 
     return AI.StopCommandName;

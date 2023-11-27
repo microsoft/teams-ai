@@ -47,6 +47,17 @@ export class GraphClient {
         return await this.graphClient.api('/me/drive/recent').get();
     }
 
+    public async getMyCalendarEvents() {
+        const startTime = new Date().toISOString();
+        const date = new Date();
+        // set it to next week
+        date.setDate(date.getDate() + 7);
+        const endTime = date.toISOString();
+
+        const endpoint = `/me/calendarview?startdatetime=${startTime}&enddatetime=${endTime}`;
+        return await this.graphClient.api(endpoint).get();
+    }
+
     // Gets the user's photo
     public async getProfilePhoto(): Promise<string> {
         const graphPhotoEndpoint = 'https://graph.microsoft.com/v1.0/me/photos/240x240/$value';
