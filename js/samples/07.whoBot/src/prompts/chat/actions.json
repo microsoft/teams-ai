@@ -10,5 +10,17 @@
     {
         "name": "user_manager",
         "description": "Gets the user's manager information"
+    },
+    {
+        "name": "user_colleagues",
+        "description": "Gets the user's colleagues information"
+    },
+    {
+        "name": "user_mail",
+        "description": "Gets the user's recent mail"
+    },
+    {
+        "name": "user_calendar_events",
+        "description": "Gets the user's calendar events"
     }
 ]

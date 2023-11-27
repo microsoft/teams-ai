@@ -28,11 +28,17 @@ provision:
       authority: AAD_APP_OAUTH_AUTHORITY
       authorityHost: AAD_APP_OAUTH_AUTHORITY_HOST
 
+  - uses: file/createOrUpdateEnvironmentFile
+    with:
+        target: ./env/.env.${{TEAMSFX_ENV}}
+        envs:
+          OAUTH_CONNECTION_NAME: graph-connection
+
   - uses: aadApp/update
     with:
-      manifestPath: ./aad.manifest.json
-      outputFilePath : ./build/aad.manifest.${{TEAMSFX_ENV}}.json
-  
+      manifestPath: ./infra/aad.manifest.json
+      outputFilePath : ./infra/build/aad.manifest.${{TEAMSFX_ENV}}.json
+
   - uses: arm/deploy
     with:
       subscriptionId: ${{AZURE_SUBSCRIPTION_ID}}
@@ -84,5 +90,5 @@ deploy:
       envs:
         BOT_ID: ${{BOT_ID}}
         BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
-        OAUTH_CONNECTION_NAME: ${{OAUTH_CONNECTION_NAME}}
-        OPENAI_KEY: ${{OPENAI_KEY}}
+        # an arbitrary name for the connection
+        OAUTH_CONNECTION_NAME: graph-connection
