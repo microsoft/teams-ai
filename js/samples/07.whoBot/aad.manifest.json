@@ -23,6 +23,22 @@
                 {
                     "id": "User.ReadBasic.All",
                     "type": "Scope"
+                },
+                {
+                    "id": "User.Read",
+                    "type": "Scope"
+                },
+                {
+                    "id": "People.Read",
+                    "type": "Scope"
+                },
+                {
+                    "id": "Mail.Read",
+                    "type": "Scope"
+                },
+                {
+                    "id": "Calendars.Read.Shared",
+                    "type": "Scope"
                 }
             ]
         }
