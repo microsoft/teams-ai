@@ -1,181 +1,121 @@
 ﻿using DevOpsBot.Model;
-using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace DevOpsBot
 {
     public class DevOpsActions
     {
-        private readonly Application<DevOpsState, DevOpsStateManager> _application;
-
-        public DevOpsActions(Application<DevOpsState, DevOpsStateManager> application)
+        [Action("UpdateMembers")]
+        public string UpdateMembers([ActionTurnState] DevOpsState turnState, [ActionParameters] Dictionary<string, object> parameters)
         {
-            _application = application;
+            ArgumentNullException.ThrowIfNull(turnState);
+
+            UserUpdate userUpdate = GetUserUpdate(parameters);
+            if (userUpdate.Added!.Length > 0 || userUpdate.Removed!.Length > 0)
+            {
+                foreach (string item in userUpdate.Removed!)
+                {
+                    int index = Array.IndexOf(turnState.Conversation.Members, item);
+                    if (index > -1)
+                    {
+                        turnState.Conversation.Members = RemoveAt(turnState.Conversation.Members, index);
+                    }
+                }
+                foreach (string item in userUpdate.Added)
+                {
+                    if (!turnState.Conversation.Members.Contains(item))
+                    {
+                        turnState.Conversation.Members = turnState.Conversation.Members.Append(item).ToArray();
+                    }
+                }
+                return "members updated. think about your next action";
+            }
+
+            return "no member changes made. think about your next action";
         }
 
         [Action("CreateWI")]
-        public async Task<bool> CreateWI([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
-        {
-            ArgumentNullException.ThrowIfNull(turnContext);
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            EntityData workItem = GetEntityData(entities);
-            int id = CreateNewWorkItem(turnState, workItem);
-            await turnContext.SendActivityAsync($"New work item created with ID: {id} and assigned to: {workItem.AssignedTo}").ConfigureAwait(false);
-            return false;
-        }
-
-        [Action("AssignWI")]
-        public bool AssignWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
+        public string CreateWI([ActionTurnState] DevOpsState turnState, [ActionParameters] Dictionary<string, object> parameters)
         {
             ArgumentNullException.ThrowIfNull(turnState);
 
-            AssignWorkItem(turnState, GetEntityData(entities));
-            return true;
-        }
+            WorkItem workItem = GetWorkItem(parameters);
+            turnState.Conversation.NextId = turnState.Conversation.NextId + 1;
+            workItem.Id = turnState.Conversation.NextId;
+            workItem.Status = "proposed";
+            turnState.Conversation.WorkItems = turnState.Conversation.WorkItems.Append(workItem).ToArray();
 
-        [Action("UpdateWI")]
-        public bool UpdateWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
-        {
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            UpdateWorkItem(turnState, GetEntityData(entities));
-            return true;
-        }
-
-        [Action("TriageWI")]
-        public bool TriageWI([ActionTurnState] DevOpsState turnState, [ActionEntities] Dictionary<string, object> entities)
-        {
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            TriageWorkItem(turnState, GetEntityData(entities));
-            return true;
-        }
-
-        [Action("Summarize")]
-        public async Task<bool> Summarize([ActionTurnContext] ITurnContext turnContext, [ActionTurnState] DevOpsState turnState)
-        {
-            ArgumentNullException.ThrowIfNull(turnContext);
-            ArgumentNullException.ThrowIfNull(turnState);
-
-            EntityData[] workItems = turnState.Conversation!.WorkItems;
-            if (workItems.Length > 0)
+            if (string.IsNullOrEmpty(workItem.AssignedTo))
             {
-                // Chain into a new summarization prompt
-                await _application.AI.ChainAsync(turnContext, turnState, "Summarize").ConfigureAwait(false);
+                return $"work item created with id {workItem.Id}. think about your next action";
             }
             else
             {
-                await turnContext.SendActivityAsync(ResponseBuilder.NoListFound()).ConfigureAwait(false);
+                return $"work item created with id {workItem.Id} but needs to be assigned. think about your next action";
+            }
+        }
+
+        [Action("UpdateWI")]
+        public string UpdateWI([ActionTurnState] DevOpsState turnState, [ActionParameters] Dictionary<string, object> parameters)
+        {
+            ArgumentNullException.ThrowIfNull(turnState);
+
+            WorkItem workItem = GetWorkItem(parameters);
+            WorkItem[] workItems = turnState.Conversation.WorkItems;
+            WorkItem? target = workItems.FirstOrDefault(item => item.Id == workItem.Id);
+            if (target != null)
+            {
+                target.Title = workItem.Title ?? target.Title;
+                target.AssignedTo = workItem.AssignedTo ?? target.AssignedTo;
+                target.Status = workItem.Status ?? target.Status;
+                turnState.Conversation.WorkItems = workItems;
             }
 
-            // End the current chain
-            return false;
+            return $"work item {workItem.Id} was updated. think about your next action";
         }
 
-        [Action(AIConstants.UnknownActionName)]
-        public async Task<bool> UnknownAction([ActionTurnContext] ITurnContext turnContext, [ActionName] string action)
+        private static WorkItem GetWorkItem(Dictionary<string, object> parameters)
         {
-            ArgumentNullException.ThrowIfNull(turnContext);
+            ArgumentNullException.ThrowIfNull(parameters);
 
-            await turnContext.SendActivityAsync(ResponseBuilder.UnknownAction(action)).ConfigureAwait(false);
-            return false;
-        }
-
-        private static EntityData GetEntityData(Dictionary<string, object> entities)
-        {
-            ArgumentNullException.ThrowIfNull(entities);
-
-            EntityData workItem =
-                JsonConvert.DeserializeObject<EntityData>(JsonConvert.SerializeObject(entities))
+            WorkItem workItem =
+                JsonSerializer.Deserialize<WorkItem>(JsonSerializer.Serialize(parameters))
                 ?? throw new ArgumentException("Action data is not work item.");
 
             return workItem;
         }
 
-        /// <summary>
-        /// This method is used to create new work item.
-        /// </summary>
-        /// <param name="turnState">The application turn state.</param>
-        /// <param name="workItemInfo">Data containing the work item information.</param>
-        /// <returns>The ID of the newly created work item.</returns>
-        private static int CreateNewWorkItem(DevOpsState turnState, EntityData workItemInfo)
+        private static UserUpdate GetUserUpdate(Dictionary<string, object> parameters)
         {
-            if (workItemInfo.Id == 0)
-            {
-                workItemInfo.Id = turnState.Conversation!.WorkItems.Length + 1;
-            }
-            workItemInfo.Status = "Proposed";
-            turnState.Conversation!.WorkItems = turnState.Conversation!.WorkItems.Concat(new[] { workItemInfo }).ToArray();
-            return workItemInfo.Id;
+            ArgumentNullException.ThrowIfNull(parameters);
+
+            string content = JsonSerializer.Serialize(parameters);
+
+            UserUpdate userUpdate = JsonSerializer.Deserialize<UserUpdate>(content)
+                ?? throw new ArgumentException("Action data is not user update.");
+
+            return userUpdate;
         }
 
-        /// <summary>
-        /// This method is used to assign a work item to a person.
-        /// </summary>
-        /// <param name="turnState">The application turn state.</param>
-        /// <param name="workItemInfo">Data containing the work item information.</param>
-        private static void AssignWorkItem(DevOpsState turnState, EntityData workItemInfo)
+        private static string[] RemoveAt(string[] IndicesArray, int RemoveAt)
         {
-            EntityData[] workItems = turnState.Conversation!.WorkItems;
-            if (workItemInfo.Id != 0)
+            string[] newIndicesArray = new string[IndicesArray.Length - 1];
+
+            int i = 0;
+            int j = 0;
+            while (i < IndicesArray.Length)
             {
-                EntityData? target = workItems.FirstOrDefault(item => item.Id == workItemInfo.Id);
-                if (target != null)
+                if (i != RemoveAt)
                 {
-                    target.AssignedTo = workItemInfo.AssignedTo;
-
-                    // Set back to state to be persisted
-                    turnState.Conversation!.WorkItems = workItems;
+                    newIndicesArray[j] = IndicesArray[i];
+                    j++;
                 }
+
+                i++;
             }
-        }
 
-        /// <summary>
-        /// This method is used to triage work item.
-        /// </summary>
-        /// <param name="turnState">The application turn state.</param>
-        /// <param name="workItemInfo">Data containing the work item information.</param>
-        private static void TriageWorkItem(DevOpsState turnState, EntityData workItemInfo)
-        {
-            EntityData[] workItems = turnState.Conversation!.WorkItems;
-            if (workItemInfo.Id != 0)
-            {
-                EntityData? target = workItems.FirstOrDefault(item => item.Id == workItemInfo.Id);
-                if (target != null)
-                {
-                    target.Status = workItemInfo.Status;
-
-                    // Set back to state to be persisted
-                    turnState.Conversation!.WorkItems = workItems;
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method is used to update the existing work item.
-        /// </summary>
-        /// <param name="turnState">The application turn state.</param>
-        /// <param name="workItemInfo">Data containing the work item information.</param>
-        private static void UpdateWorkItem(DevOpsState turnState, EntityData workItemInfo)
-        {
-            EntityData[] workItems = turnState.Conversation!.WorkItems;
-            if (workItemInfo.Id != 0)
-            {
-                EntityData? target = workItems.FirstOrDefault(item => item.Id == workItemInfo.Id);
-                if (target != null)
-                {
-                    target.Title = workItemInfo.Title ?? target.Title;
-                    target.AssignedTo = workItemInfo.AssignedTo ?? target.AssignedTo;
-                    target.Status = workItemInfo.Status ?? target.Status;
-
-                    // Set back to state to be persisted
-                    turnState.Conversation!.WorkItems = workItems;
-                }
-            }
+            return newIndicesArray;
         }
     }
 }
