@@ -88,11 +88,15 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
         public override async IAsyncEnumerable<Message> ListNewMessagesAsync(string threadId, string? lastMessageId, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            string nextMessage = RemainingMessages.Dequeue();
-            await CreateMessageAsync(threadId, new()
+            while (RemainingMessages.Count > 0)
             {
-                Content = nextMessage
-            }, cancellationToken);
+                string nextMessage = RemainingMessages.Dequeue();
+                await CreateMessageAsync(threadId, new()
+                {
+                    Content = nextMessage
+                }, cancellationToken);
+            }
+
             List<Message> messages = Messages[threadId];
             bool start = lastMessageId == null;
             await foreach (var message in messages.ToAsyncEnumerable())
