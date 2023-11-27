@@ -2,6 +2,7 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.Application.Authentication;
 using Microsoft.Teams.AI.Tests.TestUtils;
 
 namespace Microsoft.Teams.AI.Tests.Application
@@ -24,6 +25,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Null(app.Options.AdaptiveCards);
             Assert.Null(app.Options.TaskModules);
             Assert.Null(app.Options.LoggerFactory);
+            Assert.Null(app.Options.Authentication);
             Assert.Equal(true, app.Options.RemoveRecipientMention);
             Assert.Equal(true, app.Options.StartTypingTimer);
             Assert.Equal(false, app.Options.LongRunningMessages);
@@ -53,6 +55,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Moderator = new TestModerator()
             };
+            AuthenticationOptions authOptions = new(new Dictionary<string, IAuthentication>()
+            {
+                {"graph", new MockedAuthentication() }
+            });
 
             // Act
             var app = new ApplicationBuilder<TurnState>()
@@ -63,6 +69,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 .WithLongRunningMessages(adapter, botAppId)
                 .WithAdaptiveCardOptions(adaptiveCards)
                 .WithTaskModuleOptions(taskModules)
+                .WithAuthenticationOptions(authOptions)
                 .WithLoggerFactory(loggerFactory)
                 .SetStartTypingTimer(startTypingTimer)
                 .Build();
@@ -76,6 +83,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Equal(turnStateFactory, app.Options.TurnStateFactory);
             Assert.Equal(adaptiveCards, app.Options.AdaptiveCards);
             Assert.Equal(taskModules, app.Options.TaskModules);
+            Assert.Equal(authOptions, app.Options.Authentication);
             Assert.Equal(loggerFactory, app.Options.LoggerFactory);
             Assert.Equal(removeRecipientMention, app.Options.RemoveRecipientMention);
             Assert.Equal(startTypingTimer, app.Options.StartTypingTimer);

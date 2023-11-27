@@ -30,6 +30,11 @@ namespace Microsoft.Teams.AI.State
         public const string ActionOutputsKey = "actionOutputs";
 
         /// <summary>
+        /// Name of the auth tokens property.
+        /// </summary>
+        public const string AuthTokenKey = "authTokens";
+
+        /// <summary>
         /// Creates a new instance of the <see cref="TempState"/> class.
         /// </summary>
         public TempState() : base()
@@ -76,6 +81,15 @@ namespace Microsoft.Teams.AI.State
         {
             get => Get<Dictionary<string, string>>(ActionOutputsKey)!;
             set => Set(ActionOutputsKey, value);
+        }
+
+        /// <summary>
+        /// All tokens acquired after sign-in for current activity
+        /// </summary>
+        public Dictionary<string, string> AuthTokens
+        {
+            get => Get<Dictionary<string, string>>(AuthTokenKey)!;
+            set => Set(AuthTokenKey, value);
         }
     }
 }
