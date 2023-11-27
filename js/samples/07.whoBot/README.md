@@ -2,6 +2,16 @@
 
 This bot can tell you about your personal work-related information, who your manager is, and what your profile picture is. It uses a predefined prompt with the sequence augmentation and the action planner to map user's message to predefined actions. These actions then make graph calls to fulfil user's request.
 
+Note that this bot will only work in tenants where the following graph scopes are permitted:
+
+- `User.Read`
+- `User.ReadBasic.All`
+- `People.Read`
+- `Mail.Read`
+- `Calendar.Read.Shared`
+
+*Table of contents*
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
@@ -40,6 +50,17 @@ This bot can tell you about your personal work-related information, who your man
     cd teams-ai/js/samples/07.whoBot/
     yarn start
     ```
+
+4. Create a `env` folder in the sample root, and create `.env.local.user` file. In that file add copy the following environment variables:
+
+    ```
+    OAUTH_CONNECTION_NAME=graph-connection
+    OPENAI_KEY=<openai-key>
+    AZURE_OPENAI_KEY=<aoai-key>
+    AZURE_OPENAI_ENDPOINT=<aoai-endpoint>
+    ```
+
+5. If you are using OpenAI then update the `OPENAI_KEY` variable. Otherwise if you are using Azure OpenAI then update the `AZURE_OPENAI_KEY` & `AZURE_OPENAI_ENDPOINT` variables.
 
 ## Interacting with the bot
 
