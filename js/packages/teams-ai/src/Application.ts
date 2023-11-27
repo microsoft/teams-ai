@@ -26,17 +26,17 @@ import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
-import { setTokenInState } from './authentication/BotAuthenticationBase';
+import {
+    deleteUserInSignInFlow,
+    setTokenInState,
+    setUserInSignInFlow,
+    userInSignInFlow
+} from './authentication/BotAuthenticationBase';
 
 /**
  * @private
  */
 const TYPING_TIMER_DELAY = 1000;
-
-/**
- * @private
- */
-const IS_SIGNED_IN_KEY = '__InSignInFlow__';
 
 /**
  * Query arguments for a search-based message extension.
@@ -620,13 +620,18 @@ export class Application<TState extends TurnState = TurnState> {
                 await state.load(context, storage);
 
                 // Sign the user in
-                if (this._authentication && ((await this._startSignIn?.(context)) || this.userInSignInFlow(state))) {
-                    const response = await this._authentication.signUserIn(context, state);
-                    // set to true if the user is in the sign in flow
-                    (state.user as any)[IS_SIGNED_IN_KEY] = true;
+                // If user is in sign in flow, return the authentication setting name
+                let settingName = userInSignInFlow(state);
+                if (this._authentication && ((await this._startSignIn?.(context)) || settingName)) {
+                    if (!settingName) {
+                        // user was not in a sign in flow, but auto-sign in is enabled
+                        settingName = this.authentication.default;
+                    }
+
+                    const response = await this._authentication.signUserIn(context, state, settingName);
 
                     if (response.status == 'complete') {
-                        this.deleteUserInSignInFlow(state);
+                        deleteUserInSignInFlow(state);
                     }
 
                     if (response.status == 'pending') {
@@ -638,7 +643,7 @@ export class Application<TState extends TurnState = TurnState> {
 
                     // Invalid activities should be ignored for auth
                     if (response.status == 'error' && response.cause != 'invalidActivity') {
-                        this.deleteUserInSignInFlow(state);
+                        deleteUserInSignInFlow(state);
                         throw response.error;
                     }
                 }
@@ -979,46 +984,36 @@ export class Application<TState extends TurnState = TurnState> {
 
         if (token) {
             setTokenInState(state, settingName, token);
-            this.deleteUserInSignInFlow(state);
+            deleteUserInSignInFlow(state);
             return token;
         }
 
-        const userSignInState = (state.user as any)[IS_SIGNED_IN_KEY];
-        if (!userSignInState) {
-            (state.user as any)[IS_SIGNED_IN_KEY] = false;
+        if (!userInSignInFlow(state)) {
+            // set the setting name in the user state so that we know the user is in the sign in flow
+            setUserInSignInFlow(state, settingName);
+        } else {
+            deleteUserInSignInFlow(state);
+            throw new Error('Invalid state - cannot start sign in when already started');
         }
 
-        if ((state.user as any)[IS_SIGNED_IN_KEY] == false) {
-            const response = await this.authentication.signUserIn(context, state, settingName);
-            (state.user as any)[IS_SIGNED_IN_KEY] = true;
+        const response = await this.authentication.signUserIn(context, state, settingName);
 
-            if (response.status == 'error') {
-                const message =
-                    response.cause == 'invalidActivity'
-                        ? `User is not signed in and cannot start sign in flow for this activity: ${response.error}`
-                        : `${response.error}`;
-                throw new Error(`Error occured while trying to authenticate user: ${message}`);
-            }
-
-            if (response.status == 'complete') {
-                this.deleteUserInSignInFlow(state);
-                return state.temp.authTokens[settingName];
-            }
-
-            if (response.status == 'pending') {
-                return;
-            }
+        if (response.status == 'error') {
+            const message =
+                response.cause == 'invalidActivity'
+                    ? `User is not signed in and cannot start sign in flow for this activity: ${response.error}`
+                    : `${response.error}`;
+            throw new Error(`Error occured while trying to authenticate user: ${message}`);
         }
 
-        throw new Error('Invalid state - cannot start sign in when already started');
-    }
+        if (response.status == 'complete') {
+            deleteUserInSignInFlow(state);
+            return state.temp.authTokens[settingName];
+        }
 
-    private userInSignInFlow(state: TState) {
-        return (state.user as any)[IS_SIGNED_IN_KEY] == true;
-    }
-
-    private deleteUserInSignInFlow(state: TState) {
-        delete (state.user as any)[IS_SIGNED_IN_KEY];
+        if (response.status == 'pending') {
+            return;
+        }
     }
 }
 
