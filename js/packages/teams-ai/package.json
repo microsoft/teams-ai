@@ -39,8 +39,8 @@
     "devDependencies": {
         "@types/assert": "^1.5.10",
         "@types/jsonwebtoken": "^9.0.4",
-        "@types/mocha": "^10.0.4",
-        "@types/node": "^20.9.2",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^20.10.0",
         "@types/uuid": "^9.0.7",
         "eslint": "^8.54.0",
         "jsonwebtoken": "^9.0.2",
