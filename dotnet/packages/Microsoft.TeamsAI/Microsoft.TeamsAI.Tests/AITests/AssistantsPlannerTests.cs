@@ -261,6 +261,41 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal("test-tool-id", turnState.SubmitToolMap.First().Value);
         }
 
+        [Fact]
+        public async Task Test_ContinueTaskAsync_Assistant_MultipleMessages()
+        {
+            // Arrange
+            var testClient = new TestAssistantsOpenAIClient();
+            var planner = new AssistantsPlanner<AssistantsState>(new("test-key", "test-assistant-id")
+            {
+                PollingInterval = TimeSpan.FromMilliseconds(100)
+            });
+            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnState = await _CreateAssistantsState();
+            turnState.Temp!.Input = "hello";
+
+            var aiOptions = new AIOptions<AssistantsState>(planner);
+            var ai = new AI<AssistantsState>(aiOptions);
+
+            testClient.RemainingRunStatus.Enqueue("completed");
+            testClient.RemainingMessages.Enqueue("message 2");
+            testClient.RemainingMessages.Enqueue("message 1");
+            testClient.RemainingMessages.Enqueue("welcome");
+
+            // Act
+            var plan = await planner.ContinueTaskAsync(turnContextMock.Object, turnState, ai, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(plan);
+            Assert.NotNull(plan.Commands);
+            Assert.Equal(3, plan.Commands.Count);
+            Assert.Equal(AIConstants.SayCommand, plan.Commands[0].Type);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan.Commands[0]).Response);
+            Assert.Equal("message 1", ((PredictedSayCommand)plan.Commands[1]).Response);
+            Assert.Equal("message 2", ((PredictedSayCommand)plan.Commands[2]).Response);
+        }
+
         private static async Task<AssistantsState> _CreateAssistantsState()
         {
             var state = new AssistantsState();

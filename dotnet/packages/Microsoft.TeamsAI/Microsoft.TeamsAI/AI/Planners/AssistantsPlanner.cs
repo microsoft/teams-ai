@@ -186,6 +186,9 @@ namespace Microsoft.Teams.AI.AI.Planners
                 }
             }
 
+            // ListMessages return messages in desc, reverse to be in asc order
+            newMessages.Reverse();
+
             // Convert the messages to SAY commands
             Plan plan = new();
             foreach (Message message in newMessages)
