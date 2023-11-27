@@ -1100,10 +1100,10 @@
   resolved "https://registry.yarnpkg.com/@types/argparse/-/argparse-1.0.38.tgz#a81fd8606d481f873a3800c6ebae4f1d768a56a9"
   integrity sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==
 
-"@types/assert@^1.5.9":
-  version "1.5.9"
-  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.5.9.tgz#28ae15572976d07bee5c24234eec6fb4465aae29"
-  integrity sha512-uQ+/hp0DbfrhnJFgiqHlsrLTGgr8HZGssV7vYN8XunlvyJkzArcyBy/9e5Rey2T7lpL7jVuoNI/8CWCDCwISgg==
+"@types/assert@^1.5.10":
+  version "1.5.10"
+  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.5.10.tgz#27eceb3e0705d1d76a4ec0a5586a48921d209eee"
+  integrity sha512-qEO+AUgYab7GVbeDDgUNCU3o0aZUoIMpNAe+w5LDbRxfxQX7vQAdDgwj1AroX+i8KaV56FWg0srXlSZROnsrIQ==
 
 "@types/atob-lite@^2.0.0":
   version "2.0.0"
@@ -2183,7 +2183,7 @@ botbuilder-dialogs-adaptive-runtime-core@4.21.1-preview:
   dependencies:
     dependency-graph "^0.10.0"
 
-"botbuilder-dialogs@>=4.18.0 <5.0.0", botbuilder-dialogs@^4.21.1:
+"botbuilder-dialogs@>=4.18.0 <5.0.0", botbuilder-dialogs@^4.21.0, botbuilder-dialogs@^4.21.1:
   version "4.21.1"
   resolved "https://registry.yarnpkg.com/botbuilder-dialogs/-/botbuilder-dialogs-4.21.1.tgz#20def4cb23b3b4caf3acc99b54364bec2385a895"
   integrity sha512-flYakT2p5PPvIJ59oPSppJIpzNPKarAsevk4LmlYbx0C1VU9z2FRMrDXo79oOI+VU4ndFbqLo2wvPRvTsvVgQw==
@@ -2205,7 +2205,7 @@ botbuilder-stdlib@4.21.1-internal:
   resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.21.1-internal.tgz#3592dafe4d67571bdc1d2526e0fdd2255347773e"
   integrity sha512-weHVc7H9nnxrT+gj9WEahxPQEELdsPI02dgnCOLExusdBBJ7DI32I9o5+0kUgeJvjVtNhf7BxOoJoOqqKb02Fg==
 
-"botbuilder@>=4.18.0 <5.0.0", botbuilder@^4.21.1:
+"botbuilder@>=4.18.0 <5.0.0", botbuilder@^4.21.0, botbuilder@^4.21.1:
   version "4.21.1"
   resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.21.1.tgz#c806ccd7eff8faeab81d465f04719e8a08f01d6b"
   integrity sha512-fP5g5wTHScAUOtoviERogXOigubTKe6oLWkrxgtCLFPlX0mjgqYsh4+SyxEVWf9IGFUfHOnI8ZI34gqsXwCy2w==
