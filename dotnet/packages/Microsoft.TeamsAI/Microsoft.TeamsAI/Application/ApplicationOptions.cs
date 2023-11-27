@@ -83,5 +83,10 @@ namespace Microsoft.Teams.AI
         /// completed and many shared hosting environments will mark the bot's process as idle and shut it down.
         /// </remarks>
         public bool LongRunningMessages { get; set; } = false;
+
+        /// <summary>
+        /// Optional. Options used to enable authentication for the application.
+        /// </summary>
+        public AuthenticationOptions? Authentication { get; set; }
     }
 }

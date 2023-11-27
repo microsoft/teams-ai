@@ -39,6 +39,8 @@ namespace Microsoft.Teams.AI
         private readonly ConcurrentQueue<TurnEventHandlerAsync<TState>> _beforeTurn;
         private readonly ConcurrentQueue<TurnEventHandlerAsync<TState>> _afterTurn;
 
+        private readonly SelectorAsync? _startSignIn;
+
         /// <summary>
         /// Creates a new Application instance.
         /// </summary>
@@ -63,6 +65,19 @@ namespace Microsoft.Teams.AI
             Meetings = new Meetings<TState>(this);
             MessageExtensions = new MessageExtensions<TState>(this);
             TaskModules = new TaskModules<TState>(this);
+
+            if (options.Authentication != null)
+            {
+                Authentication = new AuthenticationManager<TState>(options.Authentication);
+                if (options.Authentication.AutoSignIn != null)
+                {
+                    _startSignIn = options.Authentication.AutoSignIn;
+                }
+                else
+                {
+                    _startSignIn = (context, cancellationToken) => Task.FromResult(true);
+                }
+            }
 
             // Validate long running messages configuration
             if (Options.LongRunningMessages && (Options.Adapter == null || Options.BotAppId == null))
@@ -95,6 +110,11 @@ namespace Microsoft.Teams.AI
         /// Fluent interface for accessing Task Modules' specific features.
         /// </summary>
         public TaskModules<TState> TaskModules { get; }
+
+        /// <summary>
+        /// Accessing authentication specific features.
+        /// </summary>
+        public AuthenticationManager<TState>? Authentication { get; }
 
         /// <summary>
         /// Fluent interface for accessing AI specific features.
@@ -815,6 +835,24 @@ namespace Microsoft.Teams.AI
                 IStorage? storage = Options.Storage;
 
                 await turnState!.LoadStateAsync(storage, turnContext);
+
+                // Sign the user in
+                if (Authentication != null && _startSignIn != null && await _startSignIn(turnContext, cancellationToken))
+                {
+                    // Should skip activity that does not support sign-in
+                    if (await Authentication.IsValidActivity(turnContext))
+                    {
+                        SignInResponse response = await Authentication.SignUserIn(turnContext, turnState);
+                        if (response.Status == SignInStatus.Pending)
+                        {
+                            // Requires user action, save state and stop processing current activity
+                            await turnState.SaveStateAsync(turnContext, storage);
+                            return;
+                        }
+
+                        // Sign-in success, continue processing current activity
+                    }
+                }
 
                 // Call before turn handler
                 foreach (TurnEventHandlerAsync<TState> beforeTurnHandler in _beforeTurn)
