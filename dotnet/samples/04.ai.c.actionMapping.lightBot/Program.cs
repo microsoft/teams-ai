@@ -30,10 +30,24 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Clou
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-// Use Azure OpenAI service
-if (string.IsNullOrEmpty(config.OpenAI?.ApiKey))
+OpenAIModel? model = null;
+
+if (config.OpenAI?.ApiKey != null)
 {
-    throw new Exception("Missing Azure OpenAI configuration.");
+    model = new(new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
+}
+else if (config.Azure?.OpenAIApiKey != null && config.Azure.OpenAIEndpoint != null)
+{
+    model = new(new AzureOpenAIModelOptions(
+        config.Azure.OpenAIApiKey,
+        "gpt-3.5-turbo",
+        config.Azure.OpenAIEndpoint
+    ));
+}
+
+if (model == null)
+{
+    throw new Exception("please configure settings for either OpenAI or Azure");
 }
 
 // Create the bot as transient. In this case the ASP Controller is expecting an IBot.
@@ -41,15 +55,6 @@ builder.Services.AddTransient<IBot>(sp =>
 {
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    // Create Model
-    OpenAIModel model = new(new OpenAIModelOptions(
-        apiKey: config.OpenAI.ApiKey,
-        defaultModel: "gpt-3.5-turbo"
-    )
-    {
-        LogRequests = true
-    }, loggerFactory);
 
     // Create Prompt Manager
     PromptManager prompts = new(new()
