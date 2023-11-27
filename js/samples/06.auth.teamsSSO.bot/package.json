@@ -30,7 +30,7 @@
     "devDependencies": {
         "@types/dotenv": "8.2.0",
         "@types/jsonwebtoken": "^8.5.4",
-        "@types/restify": "8.5.10",
+        "@types/restify": "8.5.11",
         "nodemon": "~3.0.1",
         "rimraf": "^5.0.5",
         "ts-node": "^10.9.1",
