@@ -14,6 +14,7 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 using System.Net;
 using System.Text.Json;
+using static Azure.AI.OpenAI.OpenAIClientOptions;
 using static Microsoft.Teams.AI.AI.Prompts.CompletionConfiguration;
 
 namespace Microsoft.Teams.AI.AI.Models
@@ -88,10 +89,16 @@ namespace Microsoft.Teams.AI.AI.Models
             {
                 throw new ArgumentException($"Model created with an invalid endpoint of `{options.AzureEndpoint}`. The endpoint must be a valid HTTPS url.");
             }
+            string apiVersion = options.AzureApiVersion ?? "2023-05-15";
+            ServiceVersion? serviceVersion = ConvertStringToServiceVersion(apiVersion);
+            if (serviceVersion == null)
+            {
+                throw new ArgumentException($"Model created with an unsupported API version of `{apiVersion}`.");
+            }
 
             _options = new AzureOpenAIModelOptions(options.AzureApiKey, options.AzureDefaultDeployment, options.AzureEndpoint)
             {
-                AzureApiVersion = options.AzureApiVersion ?? "2023-05-15",
+                AzureApiVersion = apiVersion,
                 CompletionType = options.CompletionType ?? CompletionType.Chat,
                 LogRequests = options.LogRequests ?? false,
                 RetryPolicy = options.RetryPolicy ?? new List<TimeSpan> { TimeSpan.FromMilliseconds(2000), TimeSpan.FromMilliseconds(5000) },
@@ -99,7 +106,7 @@ namespace Microsoft.Teams.AI.AI.Models
             };
             _logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger<OpenAIModel>();
 
-            OpenAIClientOptions openAIClientOptions = new()
+            OpenAIClientOptions openAIClientOptions = new(serviceVersion.Value)
             {
                 RetryPolicy = new RetryPolicy(_options.RetryPolicy!.Count, new SequentialDelayStrategy(_options.RetryPolicy))
             };
@@ -109,7 +116,6 @@ namespace Microsoft.Teams.AI.AI.Models
                 openAIClientOptions.Transport = new HttpClientTransport(httpClient);
             }
             AzureOpenAIModelOptions azureOpenAIModelOptions = (AzureOpenAIModelOptions)_options;
-            openAIClientOptions.AddPolicy(new AddQueryRequestPolicy("api-version", azureOpenAIModelOptions.AzureApiVersion!), HttpPipelinePosition.PerCall);
             _openAIClient = new OpenAIClient(new Uri(azureOpenAIModelOptions.AzureEndpoint), new AzureKeyCredential(azureOpenAIModelOptions.AzureApiKey), openAIClientOptions);
 
             _deploymentName = options.AzureDefaultDeployment;
@@ -292,6 +298,21 @@ namespace Microsoft.Teams.AI.AI.Models
                 }
 
                 return promptResponse;
+            }
+        }
+
+        private ServiceVersion? ConvertStringToServiceVersion(string apiVersion)
+        {
+            switch (apiVersion)
+            {
+                case "2022-12-01": return ServiceVersion.V2022_12_01;
+                case "2023-05-15": return ServiceVersion.V2023_05_15;
+                case "2023-06-01-preview": return ServiceVersion.V2023_06_01_Preview;
+                case "2023-07-01-preview": return ServiceVersion.V2023_07_01_Preview;
+                case "2023-08-01-preview": return ServiceVersion.V2023_08_01_Preview;
+                case "2023-09-01-preview": return ServiceVersion.V2023_09_01_Preview;
+                default:
+                    return null;
             }
         }
     }
