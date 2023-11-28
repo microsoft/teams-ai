@@ -22,6 +22,7 @@ import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
+import { InputFileDownloader } from './InputFileDownloader';
 
 /**
  * @private
@@ -122,6 +123,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * Optional. Factory used to create a custom turn state instance.
      */
     turnStateFactory: () => TState;
+
+    /**
+     * Optional. Array of input file download plugins to use.
+     */
+    fileDownloaders?: InputFileDownloader<TState>[];
 }
 
 /**
@@ -568,6 +574,27 @@ export class Application<TState extends TurnState = TurnState> {
                     //   allows the dialog system to be used before the AI system is called.
                     await state.save(context, storage);
                     return false;
+                }
+
+                // Populate {{$temp.input}}
+                if (typeof state.temp.input != 'string') {
+                    // Use the received activity text
+                    state.temp.input = context.activity.text;
+                }
+
+                // Download any input files
+                if (Array.isArray(this._options.fileDownloaders) && this._options.fileDownloaders.length > 0) {
+                    const inputFiles = state.temp.input_files ?? [];
+                    for (let i = 0; i < this._options.fileDownloaders.length; i++) {
+                        const files = await this._options.fileDownloaders[i].downloadFiles(context, state);
+                        inputFiles.push(...files);
+                    }
+                    state.temp.input_files = inputFiles;
+                }
+
+                // Initialize {{$allOutputs}}
+                if (state.temp.actionOutputs == undefined) {
+                    state.temp.actionOutputs = {};
                 }
 
                 // Run any RouteSelectors in this._invokeRoutes first if the incoming Teams activity.type is "Invoke".

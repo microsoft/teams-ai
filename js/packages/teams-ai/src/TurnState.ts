@@ -8,6 +8,7 @@
 
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { Memory } from './MemoryFork';
+import { InputFile } from './InputFileDownloader';
 
 /**
  * @private
@@ -50,14 +51,14 @@ export interface DefaultUserState {}
  */
 export interface DefaultTempState {
     /**
-     * Input passed to an AI prompt
+     * Input passed by the user to the AI Library
      */
     input: string;
 
     /**
-     * Formatted conversation history for embedding in an AI prompt
+     * Downloaded files passed by the user to the AI Library
      */
-    history: string;
+    input_files: InputFile[];
 
     /**
      * Output returned from the last executed action

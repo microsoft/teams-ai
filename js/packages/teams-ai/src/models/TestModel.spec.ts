@@ -20,6 +20,7 @@ describe("TestModel", () => {
                 frequency_penalty: 0,
                 include_history: true,
                 include_input: true,
+                include_images: false,
                 max_input_tokens: 100,
                 max_tokens: 100,
                 presence_penalty: 0,

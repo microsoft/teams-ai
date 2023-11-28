@@ -55,9 +55,9 @@ export class TestModel implements PromptCompletionModel {
      */
     public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>> {
         if (this.error) {
-            return { status: this.status, error: this.error };
+            return { status: this.status, input: undefined, error: this.error };
         } else {
-            return { status: this.status, message: this.response };
+            return { status: this.status, input: undefined, message: this.response };
         }
     }
 }

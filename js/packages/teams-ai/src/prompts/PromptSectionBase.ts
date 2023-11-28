@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { Message } from "./Message";
+import { Message, MessageContentParts } from "./Message";
 import { PromptFunctions } from "./PromptFunctions";
 import { PromptSection, RenderedPromptSection } from "./PromptSection";
 import { TurnContext } from 'botbuilder';
@@ -85,7 +85,7 @@ export abstract class PromptSectionBase implements PromptSection {
      * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
      * @returns The rendered prompt section.
      */
-    public abstract renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    public abstract renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<any>[]>>;
 
     /**
      * Calculates the token budget for the prompt section.
@@ -135,8 +135,10 @@ export abstract class PromptSectionBase implements PromptSection {
      * @returns The message content as a string.
      */
     public static getMessageText(message: Message): string {
-        let text = message.content ?? '';
-        if (message.function_call) {
+        let text: MessageContentParts[]|string = message.content ?? '';
+        if (Array.isArray(text)) {
+            text = text.filter((part) => part.type === 'text').map((part) => part.text).join(' ');
+        } else if (message.function_call) {
             text = JSON.stringify(message.function_call);
         } else if (message.name) {
             text = `${message.name} returned ${text}`;

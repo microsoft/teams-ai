@@ -24,4 +24,5 @@ export * from "./SystemMessage";
 export * from "./TemplateSection";
 export * from "./TestPromptManager";
 export * from "./TextSection";
+export * from "./UserInputMessage";
 export * from "./UserMessage";

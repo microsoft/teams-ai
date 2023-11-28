@@ -33,7 +33,7 @@ describe('OAuthPromptMessageExtensionAuthentication', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            input_files: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}

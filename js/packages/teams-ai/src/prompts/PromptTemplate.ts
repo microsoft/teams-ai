@@ -115,6 +115,14 @@ export interface CompletionConfig {
     include_input: boolean;
 
     /**
+     * If true, the prompt will be augmented with any images uploaded by the user.
+     * @remarks
+     * New in schema version 1.1.
+     * Defaults to false.
+     */
+    include_images: boolean;
+
+    /**
      * The maximum number of tokens to generate.
      * @remarks
      * Defaults to 150.
