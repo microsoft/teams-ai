@@ -88,7 +88,7 @@ app.ai.action('user_personal_information', async (context: TurnContext, state: A
         return AI.StopCommandName;
     }
 
-    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const graphClient = new GraphClient(token);
     const profile = await graphClient.getMyProfile();
 
     const card = createUserPersonalInformationCard(
@@ -116,7 +116,7 @@ app.ai.action('user_profile_picture', async (context: TurnContext, state: Applic
         return AI.StopCommandName;
     }
 
-    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const graphClient = new GraphClient(token);
     const photo = await graphClient.getProfilePhoto();
 
     const profileCard = CardFactory.thumbnailCard(context.activity.from.name, CardFactory.images([photo]));
@@ -135,7 +135,7 @@ app.ai.action('user_manager', async (context: TurnContext, state: ApplicationTur
         return AI.StopCommandName;
     }
 
-    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const graphClient = new GraphClient(token);
     let profile;
     try {
         profile = await graphClient.getMyManager();
@@ -171,7 +171,7 @@ app.ai.action('user_colleagues', async (context: TurnContext, state: Application
         return AI.StopCommandName;
     }
 
-    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const graphClient = new GraphClient(token);
     const colleagues = await graphClient.getMyColleagues();
 
     const colleaguesCards: Attachment[] = [];
@@ -210,7 +210,7 @@ app.ai.action('user_mail', async (context: TurnContext, state: ApplicationTurnSt
         return AI.StopCommandName;
     }
 
-    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const graphClient = new GraphClient(token);
     const mails = await graphClient.getMyEmails();
     const mailsCard: Attachment[] = [];
 
@@ -242,7 +242,7 @@ app.ai.action('user_calendar_events', async (context: TurnContext, state: Applic
         return AI.StopCommandName;
     }
 
-    const graphClient = new GraphClient(state.temp.authTokens['graph']!);
+    const graphClient = new GraphClient(token);
     const events = await graphClient.getMyCalendarEvents();
     const eventsCard: Attachment[] = [];
 
