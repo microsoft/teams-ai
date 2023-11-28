@@ -128,7 +128,7 @@ namespace Microsoft.Teams.AI.AI.Planners
             ITurnContext context,
             IMemory memory,
             PromptTemplate template,
-            IPromptResponseValidator validator,
+            IPromptResponseValidator? validator,
             CancellationToken cancellationToken = default
         )
         {
@@ -144,7 +144,7 @@ namespace Microsoft.Teams.AI.AI.Planners
             LLMClient<object> client = new(new(this.Options.Model, template)
             {
                 HistoryVariable = historyVariable,
-                Validator = validator,
+                Validator = validator ?? new DefaultResponseValidator(),
                 Tokenizer = this.Options.Tokenizer,
                 MaxHistoryMessages = this.Options.Prompts.Options.MaxHistoryMessages,
                 MaxRepairAttempts = this.Options.MaxRepairAttempts,

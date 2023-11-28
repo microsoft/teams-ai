@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <PackageId>Microsoft.Teams.AI</PackageId>
     <Product>Microsoft Teams AI SDK</Product>
-    <Version>1.0.0-preview</Version>
+    <Version>1.0.0-preview-1</Version>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
@@ -44,15 +44,9 @@
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.21.1" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.57.0" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="0.23.230906.2-preview">
-      <IncludeAssets>all</IncludeAssets>
-      <!-- Include SemanticKernel contentFiles (Tokenizers/) -->
-      <PrivateAssets>analyzers;build</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SharpToken" Version="1.2.12" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
-    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>

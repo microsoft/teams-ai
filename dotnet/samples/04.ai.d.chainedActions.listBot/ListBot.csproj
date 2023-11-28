@@ -17,9 +17,6 @@
 
   <!-- Include prompt as content in build output -->
   <ItemGroup>
-    <Folder Include="Prompts/Chat/" />
-    <Folder Include="Prompts/ChatGPT/" />
-	<Folder Include="Prompts/Summarize/" />
     <Content Include="Prompts/*/skprompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -38,10 +35,14 @@
   <!-- Exclude local settings from publish -->
   <ItemGroup>
     <Content Remove="appsettings.Development.json" />
+    <None Remove="prompts\monologue\skprompt.txt" />
     <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>None</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Prompts\Monologue\" />
   </ItemGroup>
 	
 </Project>

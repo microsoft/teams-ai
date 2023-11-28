@@ -2,6 +2,7 @@
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.State;
+using System.Text.Json;
 
 namespace Microsoft.Teams.AI.AI.Prompts.Sections
 {
@@ -180,7 +181,24 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
             return (context, memory, functions, tokenizer, maxTokens, cancellationToken) =>
             {
                 object? value = memory.GetValue(name);
-                return Task.FromResult(Convert.ToString(value));
+
+                if (value == null)
+                {
+                    return Task.FromResult(string.Empty);
+                }
+
+                string text = string.Empty;
+
+                try
+                {
+                    text = JsonSerializer.Serialize(value);
+                }
+                catch (Exception)
+                {
+                    text = Convert.ToString(value);
+                }
+
+                return Task.FromResult(text);
             };
         }
 
