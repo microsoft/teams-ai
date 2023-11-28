@@ -1,4 +1,4 @@
-import { Attachment, CardFactory, MemoryStorage, TurnContext } from 'botbuilder';
+import { ActivityTypes, Attachment, CardFactory, MemoryStorage, TurnContext } from 'botbuilder';
 import {
     AI,
     ActionPlanner,
@@ -67,6 +67,15 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
         planner
     })
     .build();
+
+// Register activity handlers
+app.activity(ActivityTypes.InstallationUpdate, async (context: TurnContext) => {
+    await context.sendActivity(
+        "Hi! I'm WhoBot. I can help by providing you work-related information such as who your manager is, \
+        who your colleagues are, and your recent emails. I can also show you your personal information and \
+        profile picture. To get started, ask me anything."
+    );
+});
 
 // Register authentication handlers
 configureUserAuthentication(app);
