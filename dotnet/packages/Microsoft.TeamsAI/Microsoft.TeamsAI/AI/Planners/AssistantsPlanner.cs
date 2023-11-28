@@ -2,12 +2,16 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Teams.AI.AI.OpenAI;
 using Microsoft.Teams.AI.AI.OpenAI.Models;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 using System.Text.Json;
 
-namespace Microsoft.Teams.AI.AI.Planners
+// Assistants API is currently in beta and is subject to change.
+#pragma warning disable IDE0130 // Namespace does not match folder structure
+namespace Microsoft.Teams.AI.AI.Experimental.Planners
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 {
     /// <summary>
     /// A planner that uses OpenAI's Assistants APIs to generate plans.
