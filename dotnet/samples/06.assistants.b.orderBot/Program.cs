@@ -4,6 +4,7 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.OpenAI.Models;
+using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.AI.Planners;
 using OrderBot;
 using OrderBot.Models;
