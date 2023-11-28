@@ -22,6 +22,7 @@ lib-cov
 /**/.vscode
 /**/lib
 lib
+!.vscode
 
 # Coverage directory used by tools like istanbul
 coverage
@@ -119,3 +120,4 @@ appPackage/build
 
 .env.*
 .env
+
