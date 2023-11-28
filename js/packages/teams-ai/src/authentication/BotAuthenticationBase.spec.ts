@@ -10,7 +10,7 @@ import {
 } from './BotAuthenticationBase';
 import { Activity, TestAdapter, TurnContext } from 'botbuilder';
 
-describe.only('BotAuthenticationBase.ts utility functions', () => {
+describe('BotAuthenticationBase.ts utility functions', () => {
     const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
         const adapter = new TestAdapter();
         const context = new TurnContext(adapter, {
@@ -53,7 +53,7 @@ describe.only('BotAuthenticationBase.ts utility functions', () => {
 
             setTokenInState<TurnState>(state, settingName, token);
 
-            assert(state.temp.authTokens[settingName] === token);
+            assert(state.temp.authTokens[settingName] == token);
         });
     });
 
