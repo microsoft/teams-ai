@@ -6,7 +6,8 @@ namespace Microsoft.Teams.AI.Application.Authentication
     /// <summary>
     /// Handles authentication using OAuth Connection.
     /// </summary>
-    public class OAuthAuthentication : IAuthentication
+    public class OAuthAuthentication<TState> : IAuthentication<TState>
+        where TState : TurnState, new()
     {
         /// <summary>
         /// Whether the current activity is a valid activity that supports authentication
@@ -24,7 +25,7 @@ namespace Microsoft.Teams.AI.Application.Authentication
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <returns>The sign in response</returns>
-        public Task<SignInResponse> SignInUser(ITurnContext context, TurnState state)
+        public Task<SignInResponse> SignInUser(ITurnContext context, TState state)
         {
             throw new NotImplementedException();
         }
@@ -34,7 +35,7 @@ namespace Microsoft.Teams.AI.Application.Authentication
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
-        public Task SignOutUser(ITurnContext context, TurnState state)
+        public Task SignOutUser(ITurnContext context, TState state)
         {
             throw new NotImplementedException();
         }

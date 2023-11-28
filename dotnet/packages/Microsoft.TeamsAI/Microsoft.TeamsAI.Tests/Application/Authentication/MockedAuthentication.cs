@@ -3,7 +3,8 @@ using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication
 {
-    public class MockedAuthentication : IAuthentication
+    public class MockedAuthentication<TState> : IAuthentication<TState>
+        where TState : TurnState
     {
         private string _mockedToken;
         private SignInStatus _mockedStatus;
@@ -21,17 +22,17 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return Task.FromResult(_validActivity);
         }
 
-        public Task<SignInResponse> SignInUser(ITurnContext context, TurnState state)
+        public Task<SignInResponse> SignInUser(ITurnContext context, TState state)
         {
             var result = new SignInResponse(_mockedStatus);
-            if(_mockedStatus == SignInStatus.Complete)
+            if (_mockedStatus == SignInStatus.Complete)
             {
                 result.Token = _mockedToken;
             }
             return Task.FromResult(result);
         }
 
-        public Task SignOutUser(ITurnContext context, TurnState state)
+        public Task SignOutUser(ITurnContext context, TState state)
         {
             return Task.CompletedTask;
         }

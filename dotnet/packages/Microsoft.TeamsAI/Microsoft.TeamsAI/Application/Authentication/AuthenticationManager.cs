@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI
     public class AuthenticationManager<TState>
         where TState : TurnState, new()
     {
-        private Dictionary<string, IAuthentication> _authentications { get; }
+        private Dictionary<string, IAuthentication<TState>> _authentications { get; }
         private string _default { get; set; }
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="options">The authentication options</param>
         /// <exception cref="TeamsAIException">Throws when the options does not contain authentication handlers</exception>
-        public AuthenticationManager(AuthenticationOptions options)
+        public AuthenticationManager(AuthenticationOptions<TState> options)
         {
             if (options.Authentications.Count == 0)
             {
@@ -46,11 +46,11 @@ namespace Microsoft.Teams.AI
                 handlerName = _default;
             }
 
-            IAuthentication auth = Get(handlerName);
+            IAuthentication<TState> auth = Get(handlerName);
             SignInResponse response = await auth.SignInUser(context, state);
             if (response.Status == SignInStatus.Complete)
             {
-                SetTokenInState(state, handlerName, response.Token!);
+                AuthUtilities.SetTokenInState(state, handlerName, response.Token!);
             }
             return response;
         }
@@ -68,9 +68,9 @@ namespace Microsoft.Teams.AI
                 handlerName = _default;
             }
 
-            IAuthentication auth = Get(handlerName);
+            IAuthentication<TState> auth = Get(handlerName);
             await auth.SignOutUser(context, state);
-            DeleteTokenFromState(state, handlerName);
+            AuthUtilities.DeleteTokenFromState(state, handlerName);
         }
 
         /// <summary>
@@ -86,11 +86,11 @@ namespace Microsoft.Teams.AI
                 handlerName = _default;
             }
 
-            IAuthentication auth = Get(handlerName);
+            IAuthentication<TState> auth = Get(handlerName);
             return await auth.IsValidActivity(context);
         }
 
-        private IAuthentication Get(string name)
+        private IAuthentication<TState> Get(string name)
         {
             if (_authentications.ContainsKey(name))
             {
@@ -98,23 +98,6 @@ namespace Microsoft.Teams.AI
             }
 
             throw new TeamsAIException($"Could not find authentication handler with name '{name}'.");
-        }
-
-        private void SetTokenInState(TState state, string handlerName, string token)
-        {
-            if (state.Temp.AuthTokens == null)
-            {
-                state.Temp.AuthTokens = new Dictionary<string, string>();
-            }
-            state.Temp.AuthTokens[handlerName] = token;
-        }
-
-        private void DeleteTokenFromState(TState state, string handlerName)
-        {
-            if (state.Temp.AuthTokens != null && state.Temp.AuthTokens.ContainsKey(handlerName))
-            {
-                state.Temp.AuthTokens.Remove(handlerName);
-            }
         }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Authentication;
 
 namespace Microsoft.Teams.AI
 {
@@ -133,9 +132,9 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="authenticationOptions">The options for authentication.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState> WithAuthenticationOptions(AuthenticationOptions authenticationOptions)
+        public ApplicationBuilder<TState> WithAuthenticationOptions(AuthenticationOptions<TState> authenticationOptions)
         {
-             Options.Authentication = authenticationOptions;
+            Options.Authentication = authenticationOptions;
             return this;
         }
 
