@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Planners.Experimental;
 
 namespace OrderBot
 {

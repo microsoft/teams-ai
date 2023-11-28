@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Experimental.Planners;
+using Microsoft.Teams.AI.AI.Planners.Experimental;
 using Microsoft.Teams.AI.Exceptions;
 using Record = Microsoft.Teams.AI.State.Record;
 using Microsoft.Teams.AI.Tests.TestUtils;

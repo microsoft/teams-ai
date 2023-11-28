@@ -2,7 +2,7 @@
 
 // Assistants API is currently in beta and is subject to change.
 #pragma warning disable IDE0130 // Namespace does not match folder structure
-namespace Microsoft.Teams.AI.AI.Experimental.Planners
+namespace Microsoft.Teams.AI.AI.Planners.Experimental
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 {
     /// <summary>
