@@ -68,17 +68,17 @@ namespace Microsoft.Teams.AI.Application.Authentication
 
             if (_botAuth.IsValidActivity(context))
             {
-                return await _botAuth.Authenticate(context, state);
+                return await _botAuth.AuthenticateAsync(context, state);
             }
 
             if (_messageExtensionsAuth.IsValidActivity(context))
             {
-                return await _messageExtensionsAuth.Authenticate(context);
+                return await _messageExtensionsAuth.AuthenticateAsync(context);
             }
 
             if (_adaptiveCardsAuth.IsValidActivity(context))
             {
-                return await _adaptiveCardsAuth.Authenticate(context);
+                return await _adaptiveCardsAuth.AuthenticateAsync(context);
             }
 
             throw new TeamsAIException("Incoming activity is not a valid activity to initiate authentication flow.");

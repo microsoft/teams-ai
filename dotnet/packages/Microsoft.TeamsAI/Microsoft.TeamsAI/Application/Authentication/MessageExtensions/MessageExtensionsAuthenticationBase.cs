@@ -15,7 +15,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> Authenticate(ITurnContext context)
+        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context)
         {
             JObject value = JObject.FromObject(context.Activity.Value);
             JToken? tokenExchangeRequest = value["authentication"];

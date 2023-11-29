@@ -61,7 +61,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> Authenticate(ITurnContext context, TState state)
+        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context, TState state)
         {
             // Get property names to use
             string userAuthStatePropertyName = GetUserAuthStatePropertyName(context);
@@ -87,7 +87,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
                     // Completed dialog without a token.
                     // This could mean the user declined the consent prompt in the previous turn.
                     // Retry authentication flow again.
-                    return await Authenticate(context, state);
+                    return await AuthenticateAsync(context, state);
                 }
                 else
                 {

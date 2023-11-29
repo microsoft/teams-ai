@@ -98,7 +98,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
             // act
-            var response = await botAuth.Authenticate(context, state);
+            var response = await botAuth.AuthenticateAsync(context, state);
 
             // assert
             var stateKey = "__fromId:test:Bot:AuthState__";
@@ -119,7 +119,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
             // act
-            var response = await botAuth.Authenticate(context, state);
+            var response = await botAuth.AuthenticateAsync(context, state);
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
@@ -136,7 +136,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
             // act
-            var response = await botAuth.Authenticate(context, state);
+            var response = await botAuth.AuthenticateAsync(context, state);
 
             // assert
             Assert.Equal(SignInStatus.Pending, response.Status);

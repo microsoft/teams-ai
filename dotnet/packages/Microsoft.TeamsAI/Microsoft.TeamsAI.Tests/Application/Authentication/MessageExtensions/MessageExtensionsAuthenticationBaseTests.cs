@@ -68,7 +68,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             };
 
             // act
-            var response = await meAuth.Authenticate(context);
+            var response = await meAuth.AuthenticateAsync(context);
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
@@ -96,7 +96,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             };
 
             // act
-            var response = await meAuth.Authenticate(context);
+            var response = await meAuth.AuthenticateAsync(context);
 
             // assert
             Assert.Equal(SignInStatus.Pending, response.Status);
@@ -116,7 +116,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             context.Activity.Value = new MessagingExtensionQuery(state: "123456");
 
             // act
-            var response = await meAuth.Authenticate(context);
+            var response = await meAuth.AuthenticateAsync(context);
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
@@ -138,7 +138,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             context.Activity.Value = new MessagingExtensionQuery();
 
             // act
-            var response = await meAuth.Authenticate(context);
+            var response = await meAuth.AuthenticateAsync(context);
 
             // assert
             Assert.Equal(SignInStatus.Pending, response.Status);
