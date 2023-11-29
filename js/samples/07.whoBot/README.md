@@ -48,7 +48,6 @@ Note that this bot will only work in tenants where the following graph scopes ar
 
     ```bash
     cd teams-ai/js/samples/07.whoBot/
-    yarn start
     ```
 
 4. Create a `.env` file in the `teams-ai/js/samples/07.whoBot` folder.
