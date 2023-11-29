@@ -1,13 +1,11 @@
-import {
-    Application,
-    AssistantsPlanner,
-    AI
-} from '@microsoft/teams-ai';
+import { Application, preview, AI } from '@microsoft/teams-ai';
 import { MemoryStorage, TurnContext } from 'botbuilder';
 
 if (!process.env.OPENAI_KEY) {
     throw new Error('Missing environment variables - please check that OPENAI_KEY.');
 }
+
+const { AssistantsPlanner } = preview;
 
 // Create Assistant if no ID is provided
 if (!process.env.ASSISTANT_ID) {
