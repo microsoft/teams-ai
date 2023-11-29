@@ -34,6 +34,12 @@ namespace Microsoft.Teams.AI.State
         /// </summary>
         public const string AuthTokenKey = "authTokens";
 
+
+        /// <summary>
+        /// Name of the duplicate token exchange property
+        /// </summary>
+        public const string DuplicateTokenExchangeKey = "duplicateTokenExchange";
+
         /// <summary>
         /// Creates a new instance of the <see cref="TempState"/> class.
         /// </summary>
@@ -43,6 +49,8 @@ namespace Microsoft.Teams.AI.State
             this[OutputKey] = string.Empty;
             this[HistoryKey] = string.Empty;
             this[ActionOutputsKey] = new Dictionary<string, string>();
+            this[AuthTokenKey] = new Dictionary<string, string>();
+            this[DuplicateTokenExchangeKey] = false;
         }
 
         /// <summary>
@@ -90,6 +98,15 @@ namespace Microsoft.Teams.AI.State
         {
             get => Get<Dictionary<string, string>>(AuthTokenKey)!;
             set => Set(AuthTokenKey, value);
+        }
+
+        /// <summary>
+        /// Whether current token exchange is a duplicate one
+        /// </summary>
+        public bool DuplicateTokenExchange
+        {
+            get => Get<bool>(DuplicateTokenExchangeKey)!;
+            set => Set(DuplicateTokenExchangeKey, value);
         }
     }
 }

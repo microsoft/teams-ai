@@ -1,13 +1,24 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Identity.Client;
+using Microsoft.Teams.AI.Exceptions;
+using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication for Message Extensions in Teams using Teams SSO.
     /// </summary>
-    public class TeamsSsoMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
+    internal class TeamsSsoMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
     {
+        private TeamsSsoSettings _settings;
+
+        public TeamsSsoMessageExtensionsAuthentication(TeamsSsoSettings settings)
+        {
+            _settings = settings;
+        }
+
+
         /// <summary>
         /// Gets the sign in link for the user.
         /// </summary>
@@ -15,7 +26,9 @@ namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
         /// <returns>The sign in link</returns>
         public override Task<string> GetSignInLink(ITurnContext context)
         {
-            throw new NotImplementedException();
+            string signInLink = $"{_settings.SignInLink}?scope={Uri.EscapeDataString(string.Join(" ", _settings.Scopes))}&clientId={_settings.MSAL.AppConfig.ClientId}&tenantId={_settings.MSAL.AppConfig.TenantId}";
+
+            return Task.FromResult(signInLink);
         }
 
         /// <summary>
@@ -24,9 +37,10 @@ namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
         /// <param name="context">The turn context</param>
         /// <param name="magicCode">The magic code from user sign-in.</param>
         /// <returns>The token response if successfully verified the magic code</returns>
-        public override Task<TokenResponse> HandlerUserSignIn(ITurnContext context, string magicCode)
+        public override Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode)
         {
-            throw new NotImplementedException();
+            // Return empty token response to tirgger silentAuth again
+            return Task.FromResult(new TokenResponse());
         }
 
         /// <summary>
@@ -34,9 +48,43 @@ namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>The token response if token exchange success</returns>
-        public override Task<TokenResponse> HandleSsoTokenExchange(ITurnContext context)
+        public override async Task<TokenResponse> HandleSsoTokenExchange(ITurnContext context)
         {
-            throw new NotImplementedException();
+            JObject value = JObject.FromObject(context.Activity.Value);
+            JToken? tokenExchangeRequest = value["authentication"];
+            JToken? token = tokenExchangeRequest?["token"];
+            if (token != null)
+            {
+                try
+                {
+                    AuthenticationResult result = await _settings.MSAL.AcquireTokenOnBehalfOf(
+                        _settings.Scopes,
+                        new UserAssertion(token.ToString())
+                    ).ExecuteAsync();
+                    return new TokenResponse()
+                    {
+                        Token = result.AccessToken,
+                        Expiration = result.ExpiresOn.ToString("O")
+                    };
+                }
+                catch (MsalUiRequiredException)
+                {
+                    // Requires user consent, ignore this exception
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Failed to exchange access token with error: {ex.Message}";
+                    throw new TeamsAIAuthException(message);
+                }
+            }
+
+            return new TokenResponse();
+        }
+
+        public override bool IsValidActivity(ITurnContext context)
+        {
+            return base.IsValidActivity(context)
+                && context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME;
         }
     }
 }

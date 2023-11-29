@@ -66,19 +66,6 @@ namespace Microsoft.Teams.AI
             MessageExtensions = new MessageExtensions<TState>(this);
             TaskModules = new TaskModules<TState>(this);
 
-            if (options.Authentication != null)
-            {
-                Authentication = new AuthenticationManager<TState>(options.Authentication);
-                if (options.Authentication.AutoSignIn != null)
-                {
-                    _startSignIn = options.Authentication.AutoSignIn;
-                }
-                else
-                {
-                    _startSignIn = (context, cancellationToken) => Task.FromResult(true);
-                }
-            }
-
             // Validate long running messages configuration
             if (Options.LongRunningMessages && (Options.Adapter == null || Options.BotAppId == null))
             {
@@ -89,6 +76,25 @@ namespace Microsoft.Teams.AI
             _invokeRoutes = new ConcurrentQueue<Route<TState>>();
             _beforeTurn = new ConcurrentQueue<TurnEventHandlerAsync<TState>>();
             _afterTurn = new ConcurrentQueue<TurnEventHandlerAsync<TState>>();
+
+            if (options.Authentication != null)
+            {
+                // Initialize the authentication classes
+                foreach (KeyValuePair<string, IAuthentication<TState>> pair in options.Authentication.Authentications)
+                {
+                    pair.Value.Initialize(this, pair.Key, options.Storage);
+                }
+
+                Authentication = new AuthenticationManager<TState>(options.Authentication);
+                if (options.Authentication.AutoSignIn != null)
+                {
+                    _startSignIn = options.Authentication.AutoSignIn;
+                }
+                else
+                {
+                    _startSignIn = (context, cancellationToken) => Task.FromResult(true);
+                }
+            }
         }
 
         /// <summary>

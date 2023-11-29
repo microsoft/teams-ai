@@ -65,7 +65,7 @@ namespace Microsoft.Teams.AI
             {
                 try
                 {
-                    TokenResponse response = await HandlerUserSignIn(context, state.ToString());
+                    TokenResponse response = await HandleUserSignIn(context, state.ToString());
                     if (!string.IsNullOrEmpty(response.Token))
                     {
                         return new SignInResponse(SignInStatus.Complete)
@@ -96,8 +96,7 @@ namespace Microsoft.Teams.AI
                     {
                         Actions = new List<CardAction>
                                 {
-                                    new CardAction
-                                    {
+                                    new() {
                                         Type = ActionTypes.OpenUrl,
                                         Value = signInLink,
                                         Title = "Bot Service OAuth",
@@ -117,13 +116,13 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>True if valid. Otherwise, false.</returns>
-        public bool IsValidActivity(ITurnContext context)
+        public virtual bool IsValidActivity(ITurnContext context)
         {
             return context.Activity.Type == ActivityTypes.Invoke
                 && (context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME
-                    && context.Activity.Name == MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME
-                    && context.Activity.Name == MessageExtensionsInvokeNames.QUERY_LINK_INVOKE_NAME
-                    && context.Activity.Name == MessageExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE_NAME);
+                    || context.Activity.Name == MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME
+                    || context.Activity.Name == MessageExtensionsInvokeNames.QUERY_LINK_INVOKE_NAME
+                    || context.Activity.Name == MessageExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE_NAME);
         }
 
         /// <summary>
@@ -139,7 +138,7 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="magicCode">The magic code from user sign-in.</param>
         /// <returns>The token response if successfully verified the magic code</returns>
-        public abstract Task<TokenResponse> HandlerUserSignIn(ITurnContext context, string magicCode);
+        public abstract Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode);
 
         /// <summary>
         /// Gets the sign in link for the user.
