@@ -16,8 +16,8 @@
         "termsOfUseUrl": "https://www.microsoft.com/en-us/legal/terms-of-use"
     },
     "description": {
-        "short": "Sample bot that repeats back what you say",
-        "full": "Sample bot that repeats back what you say"
+        "short": "This bot can tell you about your personal work-related information.",
+        "full": "This bot can tell you about your personal work-related information"
     },
     "icons": {
         "outline": "outline.png",
