@@ -24,7 +24,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
         /// <param name="context">The turn context</param>
         /// <param name="magicCode">The magic code from user sign-in.</param>
         /// <returns>The token response if successfully verified the magic code</returns>
-        public override Task<TokenResponse> HandlerUserSignIn(ITurnContext context, string magicCode)
+        public override Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode)
         {
             throw new NotImplementedException();
         }

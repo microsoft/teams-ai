@@ -107,7 +107,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>True if valid. Otherwise, false.</returns>
-        public bool IsValidActivity(ITurnContext context)
+        public virtual bool IsValidActivity(ITurnContext context)
         {
             return context.Activity.Type == ActivityTypes.Message
                 && !string.IsNullOrEmpty(context.Activity.Text);
@@ -206,7 +206,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
-        protected Task<bool> VerifyStateRouteSelector(ITurnContext context, CancellationToken cancellationToken)
+        protected virtual Task<bool> VerifyStateRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke
                 && context.Activity.Name == SignInConstants.VerifyStateOperationName);
@@ -218,7 +218,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
-        protected Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
+        protected virtual Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke
                 && context.Activity.Name == SignInConstants.TokenExchangeOperationName);

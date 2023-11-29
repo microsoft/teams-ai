@@ -22,7 +22,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             return Task.FromResult("mocked link");
         }
 
-        public override Task<TokenResponse> HandlerUserSignIn(ITurnContext context, string magicCode)
+        public override Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode)
         {
             if (_signInResponse == null)
             {
