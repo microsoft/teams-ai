@@ -55,9 +55,9 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Moderator = new TestModerator()
             };
-            AuthenticationOptions authOptions = new(new Dictionary<string, IAuthentication>()
+            AuthenticationOptions<TurnState> authOptions = new(new Dictionary<string, IAuthentication<TurnState>>()
             {
-                {"graph", new MockedAuthentication() }
+                {"graph", new MockedAuthentication<TurnState>() }
             });
 
             // Act

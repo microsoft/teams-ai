@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI
 {
@@ -15,13 +16,14 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Options for authentication.
     /// </summary>
-    public class AuthenticationOptions
+    public class AuthenticationOptions<TState>
+        where TState : TurnState
     {
         /// <summary>
         /// The authentication classes to sign-in and sign-out users.
         /// Key uniquely identifies each authentication.
         /// </summary>
-        public Dictionary<string, IAuthentication> Authentications { get; set; }
+        public Dictionary<string, IAuthentication<TState>> Authentications { get; set; }
 
         /// <summary>
         /// Describes the authentication class the bot should use if the user does not specify a authentication class name.
@@ -37,12 +39,12 @@ namespace Microsoft.Teams.AI
         public SelectorAsync? AutoSignIn { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthenticationOptions"/> class.
+        /// Initializes a new instance of this class.
         /// </summary>
         /// <param name="authentications">The authentication classes to sign-in and sign-out users.</param>
         /// <param name="default">Describes the authentication class the bot should use if the user does not specify a authentication class name.</param>
         /// <param name="autoSignIn">Indicates whether the bot should start the sign in flow when the user sends a message to the bot or triggers a message extension.</param>
-        public AuthenticationOptions(Dictionary<string, IAuthentication> authentications, string? @default = null, SelectorAsync? autoSignIn = null)
+        public AuthenticationOptions(Dictionary<string, IAuthentication<TState>> authentications, string? @default = null, SelectorAsync? autoSignIn = null)
         {
             this.Authentications = authentications;
             this.Default = @default;

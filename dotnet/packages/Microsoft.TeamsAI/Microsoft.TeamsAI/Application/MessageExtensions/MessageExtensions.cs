@@ -10,6 +10,29 @@ using System.Text.RegularExpressions;
 namespace Microsoft.Teams.AI
 {
     /// <summary>
+    /// Constants for message extension invoke names
+    /// </summary>
+    public class MessageExtensionsInvokeNames
+    {
+        /// <summary>
+        /// Fetch task invoke name
+        /// </summary>
+        public static readonly string FETCH_TASK_INVOKE_NAME = "composeExtension/fetchTask";
+        /// <summary>
+        /// Query invoke name
+        /// </summary>
+        public static readonly string QUERY_INVOKE_NAME = "composeExtension/query";
+        /// <summary>
+        /// Query link invoke name
+        /// </summary>
+        public static readonly string QUERY_LINK_INVOKE_NAME = "composeExtension/queryLink";
+        /// <summary>
+        /// Anonymous query link invoke name
+        /// </summary>
+        public static readonly string ANONYMOUS_QUERY_LINK_INVOKE_NAME = "composeExtension/anonymousQueryLink";
+    }
+
+    /// <summary>
     /// MessageExtensions class to enable fluent style registration of handlers related to Message Extensions.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
@@ -17,11 +40,7 @@ namespace Microsoft.Teams.AI
         where TState : TurnState, new()
     {
         private static readonly string SUBMIT_ACTION_INVOKE_NAME = "composeExtension/submitAction";
-        private static readonly string FETCH_TASK_INVOKE_NAME = "composeExtension/fetchTask";
-        private static readonly string QUERY_INVOKE_NAME = "composeExtension/query";
         private static readonly string SELECT_ITEM_INVOKE_NAME = "composeExtension/selectItem";
-        private static readonly string QUERY_LINK_INVOKE_NAME = "composeExtension/queryLink";
-        private static readonly string ANONYMOUS_QUERY_LINK_INVOKE_NAME = "composeExtension/anonymousQueryLink";
         private static readonly string CONFIGURE_SETTINGS = "composeExtension/setting";
         private static readonly string QUERY_SETTING_URL = "composeExtension/querySettingUrl";
         private static readonly string QUERY_CARD_BUTTON_CLICKED = "composeExtension/onCardButtonClicked";
@@ -340,7 +359,7 @@ namespace Microsoft.Teams.AI
         {
             Verify.ParamNotNull(commandId);
             Verify.ParamNotNull(handler);
-            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), FETCH_TASK_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME);
             return OnFetchTask(routeSelector, handler);
         }
 
@@ -354,7 +373,7 @@ namespace Microsoft.Teams.AI
         {
             Verify.ParamNotNull(commandIdPattern);
             Verify.ParamNotNull(handler);
-            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), FETCH_TASK_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME);
             return OnFetchTask(routeSelector, handler);
         }
 
@@ -371,7 +390,7 @@ namespace Microsoft.Teams.AI
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, FETCH_TASK_INVOKE_NAME))
+                    || !string.Equals(turnContext.Activity.Name, MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME))
                 {
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnFetchTask() triggered for activity type: {turnContext.Activity.Type}");
                 }
@@ -433,7 +452,7 @@ namespace Microsoft.Teams.AI
         {
             Verify.ParamNotNull(commandId);
             Verify.ParamNotNull(handler);
-            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), QUERY_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => string.Equals(commandId, input), MessageExtensionsInvokeNames.QUERY_INVOKE_NAME);
             return OnQuery(routeSelector, handler);
         }
 
@@ -447,7 +466,7 @@ namespace Microsoft.Teams.AI
         {
             Verify.ParamNotNull(commandIdPattern);
             Verify.ParamNotNull(handler);
-            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), QUERY_INVOKE_NAME);
+            RouteSelectorAsync routeSelector = CreateTaskSelector((string input) => commandIdPattern.IsMatch(input), MessageExtensionsInvokeNames.QUERY_INVOKE_NAME);
             return OnQuery(routeSelector, handler);
         }
 
@@ -465,7 +484,7 @@ namespace Microsoft.Teams.AI
             {
                 MessagingExtensionQuery? messagingExtensionQuery;
                 if (!string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    || !string.Equals(turnContext.Activity.Name, QUERY_INVOKE_NAME)
+                    || !string.Equals(turnContext.Activity.Name, MessageExtensionsInvokeNames.QUERY_INVOKE_NAME)
                     || (messagingExtensionQuery = ActivityUtilities.GetTypedValue<MessagingExtensionQuery>(turnContext.Activity)) == null)
                 {
                     throw new TeamsAIException($"Unexpected MessageExtensions.OnQuery() triggered for activity type: {turnContext.Activity.Type}");
@@ -578,7 +597,7 @@ namespace Microsoft.Teams.AI
             RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(turnContext.Activity.Name, QUERY_LINK_INVOKE_NAME));
+                    && string.Equals(turnContext.Activity.Name, MessageExtensionsInvokeNames.QUERY_LINK_INVOKE_NAME));
             };
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
@@ -616,7 +635,7 @@ namespace Microsoft.Teams.AI
             RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(string.Equals(turnContext.Activity.Type, ActivityTypes.Invoke, StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(turnContext.Activity.Name, ANONYMOUS_QUERY_LINK_INVOKE_NAME));
+                    && string.Equals(turnContext.Activity.Name, MessageExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE_NAME));
             };
             RouteHandler<TState> routeHandler = async (ITurnContext turnContext, TState turnState, CancellationToken cancellationToken) =>
             {
