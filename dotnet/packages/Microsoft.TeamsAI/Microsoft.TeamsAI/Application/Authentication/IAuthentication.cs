@@ -46,7 +46,8 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Handles user sign-in and sign-out.
     /// </summary>
-    public interface IAuthentication
+    public interface IAuthentication<TState>
+        where TState : TurnState
     {
         /// <summary>
         /// Signs in a user.
@@ -55,14 +56,14 @@ namespace Microsoft.Teams.AI
         /// <param name="context">Current turn context.</param>
         /// <param name="state">Application state.</param>
         /// <returns>The authentication token if user is signed in.</returns>
-        Task<SignInResponse> SignInUser(ITurnContext context, TurnState state);
+        Task<SignInResponse> SignInUser(ITurnContext context, TState state);
 
         /// <summary>
         /// Signs out a user.
         /// </summary>
         /// <param name="context">Current turn context.</param>
         /// <param name="state">Application state.</param>
-        Task SignOutUser(ITurnContext context, TurnState state);
+        Task SignOutUser(ITurnContext context, TState state);
 
         /// <summary>
         /// Check whether current activity supports authentication.

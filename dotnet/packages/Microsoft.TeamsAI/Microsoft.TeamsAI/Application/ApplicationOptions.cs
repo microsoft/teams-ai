@@ -87,6 +87,6 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Optional. Options used to enable authentication for the application.
         /// </summary>
-        public AuthenticationOptions? Authentication { get; set; }
+        public AuthenticationOptions<TState>? Authentication { get; set; }
     }
 }
