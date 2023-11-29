@@ -263,6 +263,69 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
+        public async Task Test_ContinueTaskAsync_Assistant_IgnoreRedundantAction()
+        {
+            // Arrange
+            var testClient = new TestAssistantsOpenAIClient();
+            var planner = new AssistantsPlanner<AssistantsState>(new("test-key", "test-assistant-id")
+            {
+                PollingInterval = TimeSpan.FromMilliseconds(100)
+            });
+            planner.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(planner, testClient);
+            var turnContextMock = new Mock<ITurnContext>();
+            var turnState = await _CreateAssistantsState();
+            turnState.Temp!.Input = "hello";
+            turnState.Temp.ActionOutputs["other-action"] = "should not be used";
+
+            var aiOptions = new AIOptions<AssistantsState>(planner);
+            var ai = new AI<AssistantsState>(aiOptions);
+
+            testClient.RemainingActions.Enqueue(new()
+            {
+                SubmitToolOutputs = new()
+                {
+                    ToolCalls = new()
+                    {
+                        new()
+                        {
+                            Id = "test-tool-id",
+                            Function = new()
+                            {
+                                Name = "test-action",
+                                Arguments = "{}"
+                            }
+                        }
+                    }
+                }
+            });
+            testClient.RemainingRunStatus.Enqueue("requires_action");
+            testClient.RemainingRunStatus.Enqueue("in_progress");
+            testClient.RemainingRunStatus.Enqueue("completed");
+            testClient.RemainingMessages.Enqueue("welcome");
+
+            // Act
+            var plan1 = await planner.ContinueTaskAsync(turnContextMock.Object, turnState, ai, CancellationToken.None);
+            turnState.Temp.ActionOutputs["test-action"] = "test-output";
+            var plan2 = await planner.ContinueTaskAsync(turnContextMock.Object, turnState, ai, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(plan1);
+            Assert.NotNull(plan1.Commands);
+            Assert.Single(plan1.Commands);
+            Assert.Equal(AIConstants.DoCommand, plan1.Commands[0].Type);
+            Assert.Equal("test-action", ((PredictedDoCommand)plan1.Commands[0]).Action);
+            Assert.NotNull(plan2);
+            Assert.NotNull(plan2.Commands);
+            Assert.Single(plan2.Commands);
+            Assert.Equal(AIConstants.SayCommand, plan2.Commands[0].Type);
+            Assert.Equal("welcome", ((PredictedSayCommand)plan2.Commands[0]).Response);
+            Assert.Single(turnState.SubmitToolMap);
+            Assert.Equal("test-action", turnState.SubmitToolMap.First().Key);
+            Assert.Equal("test-tool-id", turnState.SubmitToolMap.First().Value);
+        }
+
+
+        [Fact]
         public async Task Test_ContinueTaskAsync_Assistant_MultipleMessages()
         {
             // Arrange

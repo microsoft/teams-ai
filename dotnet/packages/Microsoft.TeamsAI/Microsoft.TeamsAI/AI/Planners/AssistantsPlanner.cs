@@ -230,12 +230,12 @@ namespace Microsoft.Teams.AI.AI.Planners.Experimental
             // Map the action outputs to tool outputs
             List<ToolOutput> toolOutputs = new();
             Dictionary<string, string> toolMap = state.SubmitToolMap;
-            foreach (KeyValuePair<string, string> action in state.Temp!.ActionOutputs)
+            foreach (KeyValuePair<string, string> requiredAction in toolMap)
             {
                 toolOutputs.Add(new()
                 {
-                    ToolCallId = toolMap[action.Key],
-                    Output = action.Value
+                    ToolCallId = requiredAction.Value,
+                    Output = state.Temp!.ActionOutputs.ContainsKey(requiredAction.Key) ? state.Temp!.ActionOutputs[requiredAction.Key] : string.Empty
                 });
             }
 
