@@ -4,7 +4,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 
-namespace Microsoft.Teams.AI.Application.Authentication.Bot
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Base class for bot authentication that handles common logic
@@ -182,22 +182,18 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
         /// The handler function is called when the user has successfully signed in
         /// </summary>
         /// <param name="handler">The handler function to call when the user has successfully signed in</param>
-        /// <returns>The class itself for chaining purpose</returns>
-        public BotAuthenticationBase<TState> OnUserSignInSuccess(Func<ITurnContext, TState, Task> handler)
+        public void OnUserSignInSuccess(Func<ITurnContext, TState, Task> handler)
         {
             _userSignInSuccessHandler = handler;
-            return this;
         }
 
         /// <summary>
         /// The handler function is called when the user sign in flow fails
         /// </summary>
         /// <param name="handler">The handler function to call when the user failed to signed in</param>
-        /// <returns>The class itself for chaining purpose</returns>
-        public BotAuthenticationBase<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
+        public void OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
         {
             _userSignInFailureHandler = handler;
-            return this;
         }
 
         /// <summary>

@@ -1,12 +1,12 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 
-namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication for Message Extensions in Teams using OAuth Connection.
     /// </summary>
-    public class OAuthMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
+    internal class OAuthMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
     {
         /// <summary>
         /// Gets the sign in link for the user.

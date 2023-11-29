@@ -6,12 +6,12 @@ using Microsoft.Teams.AI.Exceptions;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Teams.AI.Application.Authentication.Bot
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication for bot in Teams using Teams SSO.
     /// </summary>
-    public class TeamsSsoBotAuthentication<TState> : BotAuthenticationBase<TState>
+    internal class TeamsSsoBotAuthentication<TState> : BotAuthenticationBase<TState>
         where TState : TurnState, new()
     {
         private const string SSO_DIALOG_ID = "_TeamsSsoDialog";
@@ -23,6 +23,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
         /// </summary>
         /// <param name="app">The application instance</param>
         /// <param name="name">The name of current authentication handler</param>
+        /// <param name="settings">The authentication settings</param>
         /// <param name="storage">The storage to save turn state</param>
         public TeamsSsoBotAuthentication(Application<TState> app, string name, TeamsSsoSettings settings, IStorage? storage = null) : base(app, name, storage)
         {
@@ -67,6 +68,12 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
             return result;
         }
 
+        /// <summary>
+        /// The route selector for signin/tokenExchange activity
+        /// </summary>
+        /// <param name="context">The turn context</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
         protected override async Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             JObject value = JObject.FromObject(context.Activity.Value);
@@ -78,7 +85,7 @@ namespace Microsoft.Teams.AI.Application.Authentication.Bot
 
         private async Task<DialogContext> CreateSsoDialogContext(ITurnContext context, TState state, string dialogStateProperty)
         {
-            TurnStateProperty<DialogState> accessor = new TurnStateProperty<DialogState>(state, "conversation", dialogStateProperty);
+            TurnStateProperty<DialogState> accessor = new(state, "conversation", dialogStateProperty);
             DialogSet dialogSet = new(accessor);
             WaterfallDialog ssoDialog = new(SSO_DIALOG_ID);
             dialogSet.Add(this._prompt);

@@ -4,7 +4,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.Exceptions;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.Teams.AI.Application.Authentication.MessageExtensions
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication for Message Extensions in Teams using Teams SSO.

@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.Exceptions;
 
-namespace Microsoft.Teams.AI.Application.Authentication.Bot
+namespace Microsoft.Teams.AI
 {
     internal class TeamsSsoPrompt : Dialog
     {

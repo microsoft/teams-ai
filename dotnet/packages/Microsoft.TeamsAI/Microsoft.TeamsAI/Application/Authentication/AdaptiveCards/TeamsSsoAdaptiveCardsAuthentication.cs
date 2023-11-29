@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Teams.AI.Application.Authentication.AdaptiveCards
+﻿namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication for Adaptive Cards in Teams based on Teams SSO.

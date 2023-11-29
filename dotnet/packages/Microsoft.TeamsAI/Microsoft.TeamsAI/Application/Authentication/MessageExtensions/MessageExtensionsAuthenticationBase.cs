@@ -96,8 +96,7 @@ namespace Microsoft.Teams.AI
                     {
                         Actions = new List<CardAction>
                                 {
-                                    new CardAction
-                                    {
+                                    new() {
                                         Type = ActionTypes.OpenUrl,
                                         Value = signInLink,
                                         Title = "Bot Service OAuth",
@@ -121,9 +120,9 @@ namespace Microsoft.Teams.AI
         {
             return context.Activity.Type == ActivityTypes.Invoke
                 && (context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME
-                    && context.Activity.Name == MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME
-                    && context.Activity.Name == MessageExtensionsInvokeNames.QUERY_LINK_INVOKE_NAME
-                    && context.Activity.Name == MessageExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE_NAME);
+                    || context.Activity.Name == MessageExtensionsInvokeNames.FETCH_TASK_INVOKE_NAME
+                    || context.Activity.Name == MessageExtensionsInvokeNames.QUERY_LINK_INVOKE_NAME
+                    || context.Activity.Name == MessageExtensionsInvokeNames.ANONYMOUS_QUERY_LINK_INVOKE_NAME);
         }
 
         /// <summary>

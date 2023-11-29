@@ -17,7 +17,7 @@ namespace Microsoft.Teams.AI
     /// Options for authentication.
     /// </summary>
     public class AuthenticationOptions<TState>
-        where TState : TurnState
+        where TState : TurnState, new()
     {
         /// <summary>
         /// The authentication classes to sign-in and sign-out users.

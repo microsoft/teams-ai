@@ -2,7 +2,7 @@
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Exceptions;
 
-namespace Microsoft.Teams.AI.Application.Authentication
+namespace Microsoft.Teams.AI
 {
     internal class TurnStateProperty<TState> : IStatePropertyAccessor<TState>
         where TState : new()
@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI.Application.Authentication
         {
             _propertyName = propertyName;
 
-            var scope = state.GetScope(scopeName);
+            TurnStateEntry? scope = state.GetScope(scopeName);
             if (scope == null)
             {
                 throw new TeamsAIException($"TurnStateProperty: TurnState missing state scope named {scope}");
