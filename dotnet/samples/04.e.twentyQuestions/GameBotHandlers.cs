@@ -1,15 +1,17 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
 
 namespace TwentyQuestions
 {
     public class GameBotHandlers
     {
-        private readonly Application<GameState, GameStateManager> _app;
+        private readonly ActionPlanner<GameState> _actionPlanner;
 
-        public GameBotHandlers(Application<GameState, GameStateManager> app)
+        public GameBotHandlers(ActionPlanner<GameState> actionPlanner)
         {
-            this._app = app;
+            this._actionPlanner = actionPlanner;
         }
 
         public async Task OnMessageActivityAsync(ITurnContext turnContext, GameState turnState, CancellationToken cancellationToken)
@@ -19,7 +21,7 @@ namespace TwentyQuestions
             if (string.Equals("/quit", input, StringComparison.OrdinalIgnoreCase))
             {
                 // Quit Game
-                turnState.ConversationStateEntry?.Delete();
+                turnState.DeleteConversationState();
                 await turnContext.SendActivityAsync(ResponseBuilder.QuitGame(secretWord), cancellationToken: cancellationToken);
             }
             else if (string.IsNullOrEmpty(secretWord))
@@ -82,13 +84,17 @@ namespace TwentyQuestions
             // Set input for prompt
             turnState.Temp!.Input = turnContext.Activity.Text;
 
+            PromptTemplate template = _actionPlanner.Options.Prompts.GetPrompt("hint");
             // Set prompt variables
-            _app.AI.Prompts.Variables.Add("guessCount", turnState.Conversation!.GuessCount.ToString());
-            _app.AI.Prompts.Variables.Add("remainingGuesses", turnState.Conversation!.RemainingGuesses.ToString());
-            _app.AI.Prompts.Variables.Add("secretWord", turnState.Conversation!.SecretWord!);
+            PromptResponse response = await _actionPlanner.CompletePromptAsync(turnContext, turnState, template, null, cancellationToken);
 
-            string hint = await _app.AI.CompletePromptAsync(turnContext, turnState, "Hint", null, cancellationToken);
-            return hint ?? throw new Exception("The request to OpenAI was rate limited. Please try again later.");
+            if (response.Status == PromptResponseStatus.Success && response.Message != null)
+            {
+                // Prompt completed successfully
+                return response.Message.Content!;
+            }
+
+            throw new Exception($"An error occured when trying to make a call to the AI service: {response.Error}");
         }
     }
 }
