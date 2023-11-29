@@ -249,7 +249,7 @@ namespace Microsoft.Teams.AI.AI.Clients
                 return new()
                 {
                     Status = PromptResponseStatus.Error,
-                    Error = new() { Message = ex.Message ?? string.Empty }
+                    Error = new(ex.Message ?? string.Empty)
                 };
             }
         }
@@ -366,10 +366,7 @@ namespace Microsoft.Teams.AI.AI.Clients
                 return new()
                 {
                     Status = PromptResponseStatus.InvalidResponse,
-                    Error = new()
-                    {
-                        Message = feedback ?? "The response was invalid. Try another strategy."
-                    }
+                    Error = new(feedback ?? "The response was invalid. Try another strategy.")
                 };
             }
 
