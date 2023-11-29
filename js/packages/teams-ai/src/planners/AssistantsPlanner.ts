@@ -289,7 +289,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         for (const action in actionOutputs) {
             const output = actionOutputs[action];
             const tool_call_id = tool_map[action];
-            tool_outputs.push({ tool_call_id, output });
+            if (tool_call_id !== undefined) {
+                // Add required output only
+                tool_outputs.push({ tool_call_id, output });
+            }
         }
 
         // Submit the tool outputs
