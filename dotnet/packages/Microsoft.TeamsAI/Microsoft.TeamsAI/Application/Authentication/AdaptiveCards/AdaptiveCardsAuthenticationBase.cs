@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 
-namespace Microsoft.Teams.AI.Application.Authentication.AdaptiveCards
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Base class for adaptive card authentication that handles common logic

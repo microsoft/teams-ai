@@ -10,7 +10,7 @@ namespace Microsoft.Teams.AI
     /// </summary>
     /// <typeparam name="TState">Type of the turn state.</typeparam>
     public class ApplicationOptions<TState>
-        where TState : TurnState
+        where TState : TurnState, new()
     {
         /// <summary>
         /// Optional. Bot adapter being used.

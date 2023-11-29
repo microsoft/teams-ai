@@ -5,7 +5,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Authentication utilities
     /// </summary>
-    public class AuthUtilities
+    internal class AuthUtilities
     {
         /// <summary>
         /// Set token in state

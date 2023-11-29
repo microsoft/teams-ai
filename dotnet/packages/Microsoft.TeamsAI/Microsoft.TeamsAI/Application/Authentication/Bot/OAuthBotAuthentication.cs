@@ -2,12 +2,12 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Teams.AI.State;
 
-namespace Microsoft.Teams.AI.Application.Authentication.Bot
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication for bot in Teams using OAuth Connection.
     /// </summary>
-    public class OAuthBotAuthentication<TState> : BotAuthenticationBase<TState>
+    internal class OAuthBotAuthentication<TState> : BotAuthenticationBase<TState>
         where TState : TurnState, new()
     {
         /// <summary>

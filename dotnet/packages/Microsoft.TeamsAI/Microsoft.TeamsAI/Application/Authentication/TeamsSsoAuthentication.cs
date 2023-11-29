@@ -1,12 +1,9 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Identity.Client;
-using Microsoft.Teams.AI.Application.Authentication.AdaptiveCards;
-using Microsoft.Teams.AI.Application.Authentication.Bot;
-using Microsoft.Teams.AI.Application.Authentication.MessageExtensions;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 
-namespace Microsoft.Teams.AI.Application.Authentication
+namespace Microsoft.Teams.AI
 {
     /// <summary>
     /// Handles authentication based on Teams SSO.
@@ -14,26 +11,30 @@ namespace Microsoft.Teams.AI.Application.Authentication
     public class TeamsSsoAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
-        private readonly string[] _scopes;
-        private readonly TeamsSsoBotAuthentication<TState> _botAuth;
-        private readonly TeamsSsoMessageExtensionsAuthentication _messageExtensionsAuth;
-        private readonly TeamsSsoAdaptiveCardsAuthentication _adaptiveCardsAuth;
-        private readonly IConfidentialClientApplication _msal;
+        private TeamsSsoBotAuthentication<TState> _botAuth;
+        private TeamsSsoMessageExtensionsAuthentication _messageExtensionsAuth;
+        private TeamsSsoAdaptiveCardsAuthentication _adaptiveCardsAuth;
+        private TeamsSsoSettings _settings;
 
         /// <summary>
         /// Initialize instance for current class
         /// </summary>
-        /// <param name="app">The application instance</param>
-        /// <param name="name">The name of the authentication handler</param>
-        /// <param name="msal">The MSAL instance</param>
-        /// <param name="storage">The storage to save turn state</param>
-        /// <param name="scopes">The </param>
-        public TeamsSsoAuthentication(Application<TState> app, string name, string[] scopes, IConfidentialClientApplication msal, IStorage? storage = null)
+        /// <param name="settings">The settings to initialize the class</param>
+        public TeamsSsoAuthentication(TeamsSsoSettings settings)
         {
-            _scopes = scopes;
-            _msal = msal;
-            _botAuth = new TeamsSsoBotAuthentication<TState>(app, name, storage);
-            _messageExtensionsAuth = new TeamsSsoMessageExtensionsAuthentication();
+            _settings = settings;
+        }
+
+        /// <summary>
+        /// Initialize the authentication class
+        /// </summary>
+        /// <param name="app">The application object</param>
+        /// <param name="name">The name of the authentication handler</param>
+        /// <param name="storage">The storage to save turn state</param>
+        public void Initialize(Application<TState> app, string name, IStorage? storage = null)
+        {
+            _botAuth = new TeamsSsoBotAuthentication<TState>(app, name, _settings, storage);
+            _messageExtensionsAuth = new TeamsSsoMessageExtensionsAuthentication(_settings);
             _adaptiveCardsAuth = new TeamsSsoAdaptiveCardsAuthentication();
         }
 
@@ -92,20 +93,42 @@ namespace Microsoft.Teams.AI.Application.Authentication
         public async Task SignOutUser(ITurnContext context, TState state)
         {
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
-            IAccount account = await _msal.GetAccountAsync(homeAccountId);
+            IAccount account = await _settings.MSAL.GetAccountAsync(homeAccountId);
             if (account != null)
             {
-                await _msal.RemoveAsync(account);
+                await _settings.MSAL.RemoveAsync(account);
             }
+        }
+
+        /// <summary>
+        /// The handler function is called when the user has successfully signed in
+        /// </summary>
+        /// <param name="handler">The handler function to call when the user has successfully signed in</param>
+        /// <returns>The class itself for chaining purpose</returns>
+        public IAuthentication<TState> OnUserSignInSuccess(Func<ITurnContext, TState, Task> handler)
+        {
+            _botAuth.OnUserSignInSuccess(handler);
+            return this;
+        }
+
+        /// <summary>
+        /// The handler function is called when the user sign in flow fails
+        /// </summary>
+        /// <param name="handler">The handler function to call when the user failed to signed in</param>
+        /// <returns>The class itself for chaining purpose</returns>
+        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
+        {
+            _botAuth.OnUserSignInFailure(handler);
+            return this;
         }
 
         private async Task<string> TryGetUserToken(ITurnContext context)
         {
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
-            IAccount account = await _msal.GetAccountAsync(homeAccountId);
+            IAccount account = await _settings.MSAL.GetAccountAsync(homeAccountId);
             if (account != null)
             {
-                AuthenticationResult result = await _msal.AcquireTokenSilent(_scopes, account).ExecuteAsync();
+                AuthenticationResult result = await _settings.MSAL.AcquireTokenSilent(_settings.Scopes, account).ExecuteAsync();
                 return result.AccessToken;
             }
             return ""; // Return empty indication no token found in cache

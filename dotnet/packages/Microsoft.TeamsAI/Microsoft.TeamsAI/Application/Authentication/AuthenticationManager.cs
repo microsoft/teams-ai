@@ -90,7 +90,13 @@ namespace Microsoft.Teams.AI
             return await auth.IsValidActivity(context);
         }
 
-        private IAuthentication<TState> Get(string name)
+        /// <summary>
+        /// Get an authentication class via name
+        /// </summary>
+        /// <param name="name">The name of authentication class</param>
+        /// <returns>The authentication class</returns>
+        /// <exception cref="TeamsAIException">When cannot find the class with given name</exception>
+        public IAuthentication<TState> Get(string name)
         {
             if (_authentications.ContainsKey(name))
             {
