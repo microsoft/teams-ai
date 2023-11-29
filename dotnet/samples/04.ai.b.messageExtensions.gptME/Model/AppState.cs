@@ -1,10 +1,14 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Teams.AI.State;
+﻿using Microsoft.Teams.AI.State;
 
 namespace GPT.Model
 {
     public class AppState : TurnState
     {
+        public AppState()
+        {
+            ScopeDefaults[TEMP_SCOPE] = new AppTempState();
+        }
+
         public new AppTempState Temp
         {
             get
@@ -29,18 +33,6 @@ namespace GPT.Model
 
                 scope.Replace(value!);
             }
-        }
-
-        /// <summary>
-        /// Compute default values for each scope. If not set then <see cref="Record"/> will be used by default.
-        /// </summary>
-        /// <param name="context">The turn context.</param>
-        /// <returns>The default values for each scope.</returns>
-        protected override Dictionary<string, Record> OnComputeScopeDefaults(ITurnContext context)
-        {
-            Dictionary<string, Record> defaults = base.OnComputeScopeDefaults(context);
-            defaults[TEMP_SCOPE] = new AppTempState();
-            return defaults;
         }
     }
 

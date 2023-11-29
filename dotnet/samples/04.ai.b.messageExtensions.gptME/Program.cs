@@ -4,12 +4,9 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Moderator;
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Models;
-using Microsoft.Teams.AI.State;
 using GPT.Model;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,15 +41,15 @@ bool PREVIEW_MODE = false;
 
 OpenAIModel? model = null;
 
-if (config.OpenAI?.ApiKey != null)
+if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
     model = new(new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
 }
-else if (config.Azure?.OpenAIApiKey != null && config.Azure.OpenAIEndpoint != null)
+else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
     model = new(new AzureOpenAIModelOptions(
         config.Azure.OpenAIApiKey,
-        "gpt-3.5-turbo",
+        "gpt-35-turbo",
         config.Azure.OpenAIEndpoint
     ));
 }

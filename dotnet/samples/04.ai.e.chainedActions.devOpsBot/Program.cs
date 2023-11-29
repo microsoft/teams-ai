@@ -36,13 +36,13 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
 OpenAIModel? model = null;
 
-if (config.OpenAI?.ApiKey != null)
+if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
     model = new(new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo") { LogRequests = true });
 }
-else if (config.Azure?.OpenAIApiKey != null && config.Azure.OpenAIEndpoint != null)
+else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
-    model = new(new AzureOpenAIModelOptions(config.Azure.OpenAIApiKey, "gpt-3.5-turbo", config.Azure.OpenAIEndpoint)
+    model = new(new AzureOpenAIModelOptions(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint)
     {
         LogRequests = true
     });
