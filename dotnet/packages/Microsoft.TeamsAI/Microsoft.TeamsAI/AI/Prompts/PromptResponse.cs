@@ -1,5 +1,5 @@
-﻿using Microsoft.Bot.Schema;
-using Microsoft.Teams.AI.AI.Models;
+﻿using Microsoft.Teams.AI.AI.Models;
+using Microsoft.Teams.AI.Exceptions;
 
 namespace Microsoft.Teams.AI.AI.Prompts
 {
@@ -21,7 +21,7 @@ namespace Microsoft.Teams.AI.AI.Prompts
         /// <summary>
         /// Error returned.
         /// </summary>
-        public Error? Error { get; set; }
+        public TeamsAIException? Error { get; set; }
     }
 
     /// <summary>

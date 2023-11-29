@@ -3,7 +3,6 @@ using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Microsoft.Bot.Builder;
-using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -135,10 +134,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     return new PromptResponse
                     {
                         Status = PromptResponseStatus.TooLong,
-                        Error = new Error
-                        {
-                            Message = $"The generated text completion prompt had a length of {prompt.Length} tokens which exceeded the MaxInputTokens of {maxInputTokens}."
-                        }
+                        Error = new($"The generated text completion prompt had a length of {prompt.Length} tokens which exceeded the MaxInputTokens of {maxInputTokens}.")
                     };
                 }
                 if (_options.LogRequests!.Value)
@@ -177,18 +173,12 @@ namespace Microsoft.Teams.AI.AI.Models
                     if (httpOperationException.StatusCode == (HttpStatusCode)429)
                     {
                         promptResponse.Status = PromptResponseStatus.RateLimited;
-                        promptResponse.Error = new Error
-                        {
-                            Message = "The text completion API returned a rate limit error."
-                        };
+                        promptResponse.Error = new("The text completion API returned a rate limit error.");
                     }
                     else
                     {
                         promptResponse.Status = PromptResponseStatus.Error;
-                        promptResponse.Error = new Error
-                        {
-                            Message = $"The text completion API returned an error status of {httpOperationException.StatusCode}: {httpOperationException.Message}"
-                        };
+                        promptResponse.Error = new($"The text completion API returned an error status of {httpOperationException.StatusCode}: {httpOperationException.Message}");
                     }
                 }
 
@@ -220,10 +210,7 @@ namespace Microsoft.Teams.AI.AI.Models
                     return new PromptResponse
                     {
                         Status = PromptResponseStatus.TooLong,
-                        Error = new Error
-                        {
-                            Message = $"The generated chat completion prompt had a length of {prompt.Length} tokens which exceeded the MaxInputTokens of {maxInputTokens}."
-                        }
+                        Error = new($"The generated chat completion prompt had a length of {prompt.Length} tokens which exceeded the MaxInputTokens of {maxInputTokens}.")
                     };
                 }
                 if (!_options.UseSystemMessages!.Value && prompt.Output.Count > 0 && prompt.Output[0].Role == ChatRole.System)
@@ -265,18 +252,12 @@ namespace Microsoft.Teams.AI.AI.Models
                     if (httpOperationException.StatusCode == (HttpStatusCode)429)
                     {
                         promptResponse.Status = PromptResponseStatus.RateLimited;
-                        promptResponse.Error = new Error
-                        {
-                            Message = "The chat completion API returned a rate limit error."
-                        };
+                        promptResponse.Error = new("The chat completion API returned a rate limit error.");
                     }
                     else
                     {
                         promptResponse.Status = PromptResponseStatus.Error;
-                        promptResponse.Error = new Error
-                        {
-                            Message = $"The chat completion API returned an error status of {httpOperationException.StatusCode}: {httpOperationException.Message}"
-                        };
+                        promptResponse.Error = new($"The chat completion API returned an error status of {httpOperationException.StatusCode}: {httpOperationException.Message}");
                     }
                 }
 
