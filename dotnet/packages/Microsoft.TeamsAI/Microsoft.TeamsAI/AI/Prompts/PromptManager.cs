@@ -164,9 +164,6 @@ namespace Microsoft.Teams.AI.AI.Prompts
 
             switch (template.Configuration.Augmentation.Type)
             {
-                case AugmentationType.Functions:
-                    template.Augmentation = new FunctionsAugmentation();
-                    break;
                 case AugmentationType.Monologue:
                     template.Augmentation = new MonologueAugmentation(template.Actions);
                     break;

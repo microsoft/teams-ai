@@ -11,11 +11,6 @@
         None,
 
         /// <summary>
-        /// Functions
-        /// </summary>
-        Functions,
-
-        /// <summary>
         /// Sequence
         /// </summary>
         Sequence,
