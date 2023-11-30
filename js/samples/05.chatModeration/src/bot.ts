@@ -36,7 +36,7 @@ const model = new OpenAIModel({
 let moderator: Moderator;
 if (process.env.OPENAI_KEY) {
     moderator = new OpenAIModerator({
-        apiKey: process.env.OPENAI_API_KEY!,
+        apiKey: process.env.OPENAI_KEY!,
         moderate: 'both',
     });
 } else {
