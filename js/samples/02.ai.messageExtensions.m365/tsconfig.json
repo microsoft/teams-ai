@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "lib": ["ESNext", "DOM"],
+        "outDir": "lib",
+        "rootDir": "src",
+        "sourceMap": true,        
+        "allowSyntheticDefaultImports": true,
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "noUnusedLocals": false,
+        "resolveJsonModule": true,
+        "strict": true,
+        "target": "ESNEXT",
+        "incremental": true,
+        "tsBuildInfoFile": "./lib/.tsbuildinfo",
+    },
+    "include": ["src/**/*.ts", "src/**/*.json"],
+    "exclude": ["node_modules", "lib", "src/**/*.spec.ts", "src/**/*.test.ts", "src/**/*.d.ts"]
+}
