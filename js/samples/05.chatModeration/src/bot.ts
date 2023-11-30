@@ -3,7 +3,7 @@ import {
     ActionPlanner,
     OpenAIModel,
     PromptManager,
-    AzureOpenAIModerator,
+    AzureContentSafetyModerator,
     ModerationSeverity,
     AI,
     OpenAIModerator,
@@ -44,7 +44,7 @@ if (process.env.OPENAI_KEY) {
         throw new Error('Missing environment variables - please check that both AZURE_MODERATOR_KEY and AZURE_MODERATOR_ENDPOINT are set.');
     }
 
-    moderator = new AzureOpenAIModerator({
+    moderator = new AzureContentSafetyModerator({
         apiKey: process.env.AZURE_MODERATOR_KEY!,
         endpoint: process.env.AZURE_MODERATOR_ENDPOINT!,
         apiVersion: '2023-04-30-preview',

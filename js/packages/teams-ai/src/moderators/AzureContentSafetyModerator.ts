@@ -62,7 +62,7 @@ const defaultHarmCategories: AzureOpenAIModeratorCategory[] = ['Hate', 'Sexual',
  * This moderation can be configured to review the input from the user, output from the model, or both.
  * @template TState Optional. Type of the applications turn state.
  */
-export class AzureOpenAIModerator<TState extends TurnState = TurnState> extends OpenAIModerator<TState> {
+export class AzureContentSafetyModerator<TState extends TurnState = TurnState> extends OpenAIModerator<TState> {
     private readonly _contentSafetyOptions: ContentSafetyOptions;
     private readonly _azureContentSafetyClient: AzureOpenAIClient;
     private readonly _azureContentSafetyCategories: Record<string, ContentSafetyHarmCategory> = {};
