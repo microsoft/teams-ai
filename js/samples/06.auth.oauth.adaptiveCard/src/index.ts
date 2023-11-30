@@ -78,7 +78,7 @@ const app = new ApplicationBuilder()
     .withAuthentication(adapter, {
         settings: {
             graph: {
-                connectionName: process.env.ConnectionName ?? '',
+                connectionName: process.env.OAUTH_CONNECTION_NAME ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true,
