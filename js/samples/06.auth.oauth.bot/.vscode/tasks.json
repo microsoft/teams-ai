@@ -10,7 +10,7 @@
                 "Validate prerequisites",
                 "Start local tunnel",
                 "Provision",
-                // "Deploy",
+                "Deploy",
                 "Start application"
             ],
             "dependsOrder": "sequence"
