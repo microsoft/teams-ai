@@ -21,8 +21,12 @@ interface UserAuthState {
 }
 
 /**
+ * @private
+ */
+const IS_SIGNED_IN_KEY = '__InSignInFlow__';
+
+/**
  * @internal
- * 
  * Base class to handle Teams conversational bot authentication.
  * @template TState - The type of the turn state.
  */
@@ -281,4 +285,39 @@ export function deleteTokenFromState<TState extends TurnState>(state: TState, se
     }
 
     delete state.temp.authTokens[settingName];
+}
+
+/**
+ * Determines if the user is in the sign in flow.
+ * @template TState
+ * @param {TState} state - the turn state
+ * @returns {string | undefined} The setting name if the user is in sign in flow. Otherwise, undefined.
+ */
+export function userInSignInFlow<TState extends TurnState>(state: TState): string | undefined {
+    if (IS_SIGNED_IN_KEY in state.user && typeof state.user[IS_SIGNED_IN_KEY] == 'string') {
+        // returns the connection name if the user is in the sign in flow
+        return state.user[IS_SIGNED_IN_KEY];
+    }
+
+    return;
+}
+
+/**
+ * Update the turn state to indicate the user is in the sign in flow by providing the authentication setting name used.
+ * @template TState
+ * @param {TState} state - the turn state
+ * @param {string} settingName - the authentication setting name.
+ */
+export function setUserInSignInFlow<TState extends TurnState>(state: TState, settingName: string) {
+    (state.user as any)[IS_SIGNED_IN_KEY] = settingName;
+}
+
+/**
+ * Deletes the user sign in flow state from the turn state.
+ * @template TState
+ * Determines if the user is in the sign in flow.
+ * @param {TState} state - the turn state
+ */
+export function deleteUserInSignInFlow<TState extends TurnState>(state: TState) {
+    delete (state.user as any)[IS_SIGNED_IN_KEY];
 }

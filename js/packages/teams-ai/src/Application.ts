@@ -26,6 +26,12 @@ import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
+import {
+    deleteUserInSignInFlow,
+    setTokenInState,
+    setUserInSignInFlow,
+    userInSignInFlow
+} from './authentication/BotAuthenticationBase';
 
 /**
  * @private
@@ -614,8 +620,19 @@ export class Application<TState extends TurnState = TurnState> {
                 await state.load(context, storage);
 
                 // Sign the user in
-                if (this._authentication && (await this._startSignIn?.(context))) {
-                    const response = await this._authentication.signUserIn(context, state);
+                // If user is in sign in flow, return the authentication setting name
+                let settingName = userInSignInFlow(state);
+                if (this._authentication && ((await this._startSignIn?.(context)) || settingName)) {
+                    if (!settingName) {
+                        // user was not in a sign in flow, but auto-sign in is enabled
+                        settingName = this.authentication.default;
+                    }
+
+                    const response = await this._authentication.signUserIn(context, state, settingName);
+
+                    if (response.status == 'complete') {
+                        deleteUserInSignInFlow(state);
+                    }
 
                     if (response.status == 'pending') {
                         // Save turn state
@@ -626,6 +643,7 @@ export class Application<TState extends TurnState = TurnState> {
 
                     // Invalid activities should be ignored for auth
                     if (response.status == 'error' && response.cause != 'invalidActivity') {
+                        deleteUserInSignInFlow(state);
                         throw response.error;
                     }
                 }
@@ -858,20 +876,26 @@ export class Application<TState extends TurnState = TurnState> {
      * @param {(context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<boolean>} handler Function to call when the event is triggered.
      * @returns {this} The application instance for chaining purposes.
      */
-    public teamsReadReceipt(handler: (context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<void>): this {
+    public teamsReadReceipt(
+        handler: (context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<void>
+    ): this {
         const selector = (context: TurnContext): Promise<boolean> => {
-            return Promise.resolve(context.activity.type === ActivityTypes.Event && context.activity.channelId === 'msteams' && context.activity.name === 'application/vnd.microsoft/readReceipt');
+            return Promise.resolve(
+                context.activity.type === ActivityTypes.Event &&
+                    context.activity.channelId === 'msteams' &&
+                    context.activity.name === 'application/vnd.microsoft/readReceipt'
+            );
         };
 
         const handlerWrapper = (context: TurnContext, state: TState): Promise<void> => {
             const readReceiptInfo = context.activity.value as ReadReceiptInfo;
             return handler(context, state, readReceiptInfo);
-        }
+        };
 
         this.addRoute(selector, handlerWrapper);
 
         return this;
-     }
+    }
 
     /**
      * Calls the given event handlers with the given context and state.
@@ -936,6 +960,59 @@ export class Application<TState extends TurnState = TurnState> {
         } else {
             // Call handler directly
             return handler(context);
+        }
+    }
+
+    /**
+     * If the user is signed in, get the access token. If not, triggers the sign in flow for the provided authentication setting name
+     * and returns. In this case, the bot should end the turn until the sign in flow is completed.
+     * @summary
+     * Use this method to get the access token for a user that is signed in to the bot.
+     * If the user isn't signed in, this method starts the sign-in flow.
+     * The bot should end the turn in this case until the sign-in flow completes and the user is signed in.
+     * @param {TurnContext} context - The context for the current turn with the user.
+     * @param {TState} state - The current state of the conversation.
+     * @param {string} settingName The name of the authentication setting.
+     * @returns {string | undefined} The token for the user if they are signed in, otherwise undefined.
+     */
+    public async getTokenOrStartSignIn(
+        context: TurnContext,
+        state: TState,
+        settingName: string
+    ): Promise<string | undefined> {
+        const token = await this.authentication.get(settingName).isUserSignedIn(context);
+
+        if (token) {
+            setTokenInState(state, settingName, token);
+            deleteUserInSignInFlow(state);
+            return token;
+        }
+
+        if (!userInSignInFlow(state)) {
+            // set the setting name in the user state so that we know the user is in the sign in flow
+            setUserInSignInFlow(state, settingName);
+        } else {
+            deleteUserInSignInFlow(state);
+            throw new Error('Invalid state - cannot start sign in when already started');
+        }
+
+        const response = await this.authentication.signUserIn(context, state, settingName);
+
+        if (response.status == 'error') {
+            const message =
+                response.cause == 'invalidActivity'
+                    ? `User is not signed in and cannot start sign in flow for this activity: ${response.error}`
+                    : `${response.error}`;
+            throw new Error(`Error occured while trying to authenticate user: ${message}`);
+        }
+
+        if (response.status == 'complete') {
+            deleteUserInSignInFlow(state);
+            return state.temp.authTokens[settingName];
+        }
+
+        if (response.status == 'pending') {
+            return;
         }
     }
 }
@@ -1112,9 +1189,9 @@ function createConversationUpdateSelector(event: ConversationUpdateEvents): Rout
             return (context: TurnContext) => {
                 return Promise.resolve(
                     context?.activity?.type == ActivityTypes.ConversationUpdate &&
-                    context?.activity?.channelData?.eventType == event &&
-                    context?.activity?.channelData?.channel &&
-                    context.activity.channelData?.team
+                        context?.activity?.channelData?.eventType == event &&
+                        context?.activity?.channelData?.channel &&
+                        context.activity.channelData?.team
                 );
             };
         case 'membersAdded':
@@ -1265,8 +1342,8 @@ function createMessageReactionSelector(event: MessageReactionEvents): RouteSelec
             return (context: TurnContext) => {
                 return Promise.resolve(
                     context?.activity?.type == ActivityTypes.MessageReaction &&
-                    Array.isArray(context?.activity?.reactionsRemoved) &&
-                    context.activity.reactionsRemoved.length > 0
+                        Array.isArray(context?.activity?.reactionsRemoved) &&
+                        context.activity.reactionsRemoved.length > 0
                 );
             };
     }
