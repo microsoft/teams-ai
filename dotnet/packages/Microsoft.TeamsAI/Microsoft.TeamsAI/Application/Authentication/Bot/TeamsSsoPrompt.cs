@@ -105,7 +105,12 @@ namespace Microsoft.Teams.AI
                 {
                     try
                     {
-                        AuthenticationResult exchangedToken = await _settings.MSAL.AcquireTokenOnBehalfOf(_settings.Scopes, new UserAssertion(ssoToken)).ExecuteAsync();
+                        string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
+                        AuthenticationResult exchangedToken = await ((ILongRunningWebApi)_settings.MSAL).InitiateLongRunningProcessInWebApi(
+                                _settings.Scopes,
+                                ssoToken,
+                                ref homeAccountId
+                            ).ExecuteAsync();
 
                         tokenResponse = new TokenResponse
                         {
@@ -215,7 +220,7 @@ namespace Microsoft.Teams.AI
             return (context.Activity.Type == ActivityTypes.Invoke) && (context.Activity.Name == SignInConstants.TokenExchangeOperationName);
         }
 
-        private static async Task SendInvokeResponseAsync(ITurnContext turnContext, HttpStatusCode statusCode, object body, CancellationToken cancellationToken)
+        private static async Task SendInvokeResponseAsync(ITurnContext turnContext, HttpStatusCode statusCode, object? body, CancellationToken cancellationToken)
         {
             await turnContext.SendActivityAsync(
                 new Activity

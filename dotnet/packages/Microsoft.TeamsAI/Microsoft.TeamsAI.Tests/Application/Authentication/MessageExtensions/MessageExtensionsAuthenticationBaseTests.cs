@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI.Tests.TestUtils;
+using Microsoft.Teams.AI.Exceptions;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
 {
@@ -26,7 +27,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         {
             if (_signInResponse == null)
             {
-                throw new Exception("HandlerUserSignIn failed");
+                throw new TeamsAIAuthException("HandlerUserSignIn failed");
             }
             return Task.FromResult(_signInResponse);
         }
@@ -35,7 +36,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         {
             if (_tokenExchangeResponse == null)
             {
-                throw new Exception("HandleSsoTokenExchange failed");
+                throw new TeamsAIAuthException("HandleSsoTokenExchange failed");
             }
             return Task.FromResult(_tokenExchangeResponse);
         }

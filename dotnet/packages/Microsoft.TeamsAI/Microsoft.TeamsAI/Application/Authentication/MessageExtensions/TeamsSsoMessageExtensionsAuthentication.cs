@@ -57,10 +57,13 @@ namespace Microsoft.Teams.AI
             {
                 try
                 {
-                    AuthenticationResult result = await _settings.MSAL.AcquireTokenOnBehalfOf(
-                        _settings.Scopes,
-                        new UserAssertion(token.ToString())
-                    ).ExecuteAsync();
+                    string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
+                    AuthenticationResult result = await ((ILongRunningWebApi)_settings.MSAL).InitiateLongRunningProcessInWebApi(
+                    _settings.Scopes,
+                            token.ToString(),
+                            ref homeAccountId
+                        ).ExecuteAsync();
+
                     return new TokenResponse()
                     {
                         Token = result.AccessToken,

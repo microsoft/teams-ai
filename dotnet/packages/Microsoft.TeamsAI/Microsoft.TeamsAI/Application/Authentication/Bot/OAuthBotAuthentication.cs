@@ -26,8 +26,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="dialogStateProperty">The property name for storing dialog state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>Dialog turn result that contains token if sign in success</returns>
-        public override Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty)
+        public override Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -38,8 +39,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="dialogStateProperty">The property name for storing dialog state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>Dialog turn result that contains token if sign in success</returns>
-        public override Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty)
+        public override Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

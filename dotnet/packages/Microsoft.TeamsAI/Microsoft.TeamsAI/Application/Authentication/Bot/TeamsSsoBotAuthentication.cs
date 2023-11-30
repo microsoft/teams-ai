@@ -43,8 +43,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="dialogStateProperty">The property name for storing dialog state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>Dialog turn result that contains token if sign in success</returns>
-        public override async Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty)
+        public override async Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
             DialogContext dialogContext = await CreateSsoDialogContext(context, state, dialogStateProperty);
             return await dialogContext.ContinueDialogAsync();
@@ -56,8 +57,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="dialogStateProperty">The property name for storing dialog state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>Dialog turn result that contains token if sign in success</returns>
-        public override async Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty)
+        public override async Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
             DialogContext dialogContext = await CreateSsoDialogContext(context, state, dialogStateProperty);
             DialogTurnResult result = await dialogContext.ContinueDialogAsync();
@@ -76,8 +78,8 @@ namespace Microsoft.Teams.AI
         /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
         protected override async Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
-            JObject value = JObject.FromObject(context.Activity.Value);
-            JToken? id = value["id"];
+            JObject? value = context.Activity.Value as JObject;
+            JToken? id = value?["id"];
             string idStr = id?.ToString() ?? "";
             return await base.TokenExchangeRouteSelector(context, cancellationToken)
                 && this._tokenExchangeIdRegex.IsMatch(idStr);

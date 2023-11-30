@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Extensibility;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 
@@ -11,9 +12,8 @@ namespace Microsoft.Teams.AI
     public class TeamsSsoAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
-        private TeamsSsoBotAuthentication<TState> _botAuth;
-        private TeamsSsoMessageExtensionsAuthentication _messageExtensionsAuth;
-        private TeamsSsoAdaptiveCardsAuthentication _adaptiveCardsAuth;
+        private TeamsSsoBotAuthentication<TState>? _botAuth;
+        private TeamsSsoMessageExtensionsAuthentication? _messageExtensionsAuth;
         private TeamsSsoSettings _settings;
 
         /// <summary>
@@ -35,7 +35,6 @@ namespace Microsoft.Teams.AI
         {
             _botAuth = new TeamsSsoBotAuthentication<TState>(app, name, _settings, storage);
             _messageExtensionsAuth = new TeamsSsoMessageExtensionsAuthentication(_settings);
-            _adaptiveCardsAuth = new TeamsSsoAdaptiveCardsAuthentication();
         }
 
         /// <summary>
@@ -43,11 +42,11 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>True if valid. Otherwise, false.</returns>
-        public Task<bool> IsValidActivity(ITurnContext context)
+        public Task<bool> IsValidActivityAsync(ITurnContext context)
         {
-            return Task.FromResult(_botAuth.IsValidActivity(context)
-                || _messageExtensionsAuth.IsValidActivity(context)
-                || _adaptiveCardsAuth.IsValidActivity(context));
+            return Task.FromResult(
+                (_botAuth != null && _botAuth.IsValidActivity(context))
+                || (_messageExtensionsAuth != null && _messageExtensionsAuth.IsValidActivity(context)));
         }
 
         /// <summary>
@@ -55,8 +54,9 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> SignInUser(ITurnContext context, TState state)
+        public async Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             string token = await TryGetUserToken(context);
             if (!string.IsNullOrEmpty(token))
@@ -67,19 +67,14 @@ namespace Microsoft.Teams.AI
                 };
             }
 
-            if (_botAuth.IsValidActivity(context))
+            if ((_botAuth != null && _botAuth.IsValidActivity(context)))
             {
                 return await _botAuth.AuthenticateAsync(context, state);
             }
 
-            if (_messageExtensionsAuth.IsValidActivity(context))
+            if ((_messageExtensionsAuth != null && _messageExtensionsAuth.IsValidActivity(context)))
             {
                 return await _messageExtensionsAuth.AuthenticateAsync(context);
-            }
-
-            if (_adaptiveCardsAuth.IsValidActivity(context))
-            {
-                return await _adaptiveCardsAuth.AuthenticateAsync(context);
             }
 
             throw new TeamsAIException("Incoming activity is not a valid activity to initiate authentication flow.");
@@ -90,13 +85,15 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
-        public async Task SignOutUser(ITurnContext context, TState state)
+        /// <param name="cancellationToken">The cancellation token</param>
+        public async Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
-            IAccount account = await _settings.MSAL.GetAccountAsync(homeAccountId);
-            if (account != null)
+
+            ILongRunningWebApi? oboCca = _settings.MSAL as ILongRunningWebApi;
+            if (oboCca != null)
             {
-                await _settings.MSAL.RemoveAsync(account);
+                await oboCca.StopLongRunningProcessInWebApiAsync(homeAccountId, cancellationToken);
             }
         }
 
@@ -107,7 +104,10 @@ namespace Microsoft.Teams.AI
         /// <returns>The class itself for chaining purpose</returns>
         public IAuthentication<TState> OnUserSignInSuccess(Func<ITurnContext, TState, Task> handler)
         {
-            _botAuth.OnUserSignInSuccess(handler);
+            if (_botAuth != null)
+            {
+                _botAuth.OnUserSignInSuccess(handler);
+            }
             return this;
         }
 
@@ -118,19 +118,29 @@ namespace Microsoft.Teams.AI
         /// <returns>The class itself for chaining purpose</returns>
         public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
         {
-            _botAuth.OnUserSignInFailure(handler);
+            if (_botAuth != null)
+            {
+                _botAuth.OnUserSignInFailure(handler);
+            }
             return this;
         }
 
         private async Task<string> TryGetUserToken(ITurnContext context)
         {
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
-            IAccount account = await _settings.MSAL.GetAccountAsync(homeAccountId);
-            if (account != null)
+            try
             {
-                AuthenticationResult result = await _settings.MSAL.AcquireTokenSilent(_settings.Scopes, account).ExecuteAsync();
+                AuthenticationResult result = await ((ILongRunningWebApi)_settings.MSAL).AcquireTokenInLongRunningProcess(
+                    _settings.Scopes,
+                            homeAccountId
+                        ).ExecuteAsync();
                 return result.AccessToken;
             }
+            catch (MsalClientException)
+            {
+                // Cannot acquire token from cache
+            }
+
             return ""; // Return empty indication no token found in cache
         }
     }

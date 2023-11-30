@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>True if valid. Otherwise, false.</returns>
-        public Task<bool> IsValidActivity(ITurnContext context)
+        public Task<bool> IsValidActivityAsync(ITurnContext context)
         {
             throw new NotImplementedException();
         }
@@ -56,8 +56,9 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public Task<SignInResponse> SignInUser(ITurnContext context, TState state)
+        public Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -67,7 +68,8 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
-        public Task SignOutUser(ITurnContext context, TState state)
+        /// <param name="cancellationToken">The cancellation token</param>
+        public Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
