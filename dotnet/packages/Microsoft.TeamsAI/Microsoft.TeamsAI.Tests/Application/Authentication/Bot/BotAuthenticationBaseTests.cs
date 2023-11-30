@@ -21,16 +21,16 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             _throwExceptionWhenContinue = throwExceptionWhenContinue;
         }
 
-        public override Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty)
+        public override Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
             if (_throwExceptionWhenContinue)
             {
-                throw new Exception("mocked error");
+                throw new TeamsAIAuthException("mocked error");
             }
             return Task.FromResult(_continueDialogResult);
         }
 
-        public override Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty)
+        public override Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
             var result = _runDialogResult.FirstOrDefault();
             if (result == null)
@@ -113,7 +113,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
-            var botAuth = new MockedBotAuthentication<TurnState>(app, "test", runDialogResult: new List<DialogTurnResult>() { new DialogTurnResult(DialogTurnStatus.Complete, new TokenResponse(token: "test token")) });
+            var botAuth = new MockedBotAuthentication<TurnState>(app, "test", runDialogResult: new List<DialogTurnResult>() { new(DialogTurnStatus.Complete, new TokenResponse(token: "test token")) });
             var context = MockTurnContext();
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
@@ -130,7 +130,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         {
             // arrange
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
-            var botAuth = new MockedBotAuthentication<TurnState>(app, "test", runDialogResult: new List<DialogTurnResult>() { new DialogTurnResult(DialogTurnStatus.Complete) });
+            var botAuth = new MockedBotAuthentication<TurnState>(app, "test", runDialogResult: new List<DialogTurnResult>() { new(DialogTurnStatus.Complete) });
             var context = MockTurnContext();
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
@@ -161,7 +161,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 messageText = context.Activity.Text;
                 return Task.CompletedTask;
             });
-            botAuth.OnUserSignInFailure((context, state, exception) => { throw new Exception("sign in failure handler should not be called"); });
+            botAuth.OnUserSignInFailure((context, state, exception) => { throw new TeamsAIAuthException("sign in failure handler should not be called"); });
 
             // act
             await botAuth.HandleSignInActivity(context, state, new CancellationToken());
@@ -180,7 +180,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var context = MockTurnContext();
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
             TeamsAIAuthException? authException = null;
-            botAuth.OnUserSignInSuccess((context, state) => { throw new Exception("sign in success handler should not be called"); });
+            botAuth.OnUserSignInSuccess((context, state) => { throw new TeamsAIAuthException("sign in success handler should not be called"); });
             botAuth.OnUserSignInFailure((context, state, exception) => { authException = exception; return Task.CompletedTask; });
 
             // act
@@ -200,7 +200,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var context = MockTurnContext();
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
             TeamsAIAuthException? authException = null;
-            botAuth.OnUserSignInSuccess((context, state) => { throw new Exception("sign in success handler should not be called"); });
+            botAuth.OnUserSignInSuccess((context, state) => { throw new TeamsAIAuthException("sign in success handler should not be called"); });
             botAuth.OnUserSignInFailure((context, state, exception) => { authException = exception; return Task.CompletedTask; });
 
             // act

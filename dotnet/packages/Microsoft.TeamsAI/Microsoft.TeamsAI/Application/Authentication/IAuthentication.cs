@@ -56,22 +56,24 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">Current turn context.</param>
         /// <param name="state">Application state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The authentication token if user is signed in.</returns>
-        Task<SignInResponse> SignInUser(ITurnContext context, TState state);
+        Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Signs out a user.
         /// </summary>
         /// <param name="context">Current turn context.</param>
         /// <param name="state">Application state.</param>
-        Task SignOutUser(ITurnContext context, TState state);
+        /// <param name="cancellationToken">The cancellation token</param>
+        Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Check whether current activity supports authentication.
         /// </summary>
         /// <param name="context">Current turn context.</param>
         /// <returns>True if current activity supports authentication. Otherwise, false.</returns>
-        Task<bool> IsValidActivity(ITurnContext context);
+        Task<bool> IsValidActivityAsync(ITurnContext context);
 
         /// <summary>
         /// Initialize the authentication class

@@ -8,14 +8,15 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Base class for message extension authentication that handles common logic
     /// </summary>
-    public abstract class MessageExtensionsAuthenticationBase
+    internal abstract class MessageExtensionsAuthenticationBase
     {
         /// <summary>
         /// Authenticate current user
         /// </summary>
         /// <param name="context">The turn context</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context)
+        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context, CancellationToken cancellationToken = default)
         {
             JObject value = JObject.FromObject(context.Activity.Value);
             JToken? tokenExchangeRequest = value["authentication"];
@@ -106,7 +107,7 @@ namespace Microsoft.Teams.AI
                 },
             };
 
-            await context.SendActivityAsync(ActivityUtilities.CreateInvokeResponseActivity(resposne));
+            await context.SendActivityAsync(ActivityUtilities.CreateInvokeResponseActivity(resposne), cancellationToken);
 
             return new SignInResponse(SignInStatus.Pending);
         }
