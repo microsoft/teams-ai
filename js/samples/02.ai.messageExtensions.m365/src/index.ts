@@ -15,7 +15,6 @@ import {
     MemoryStorage
 } from 'botbuilder';
 import { SearchAppAI } from './searchApp.ai';
-import { SearchApp } from './searchApp';
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
@@ -66,8 +65,6 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 const storage = new MemoryStorage();
 
 const appAi = new SearchAppAI(storage);
-
-const app = new SearchApp();
 
 // Listen for incoming server requests.
 server.post('/api/messages', async (req, res) => {

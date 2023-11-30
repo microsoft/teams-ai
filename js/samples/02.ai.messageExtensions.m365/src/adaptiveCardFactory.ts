@@ -74,9 +74,10 @@ export class AdaptiveCardFactory {
       actions: [
         {
           type: 'Action.Submit',
-          title: 'Approve/Reject',
+          title: 'AI Approve/Reject',
           data:
             {
+              verb: 'approve/reject',
               msteams: {
                   type: 'task/fetch'
               }, 
@@ -86,9 +87,10 @@ export class AdaptiveCardFactory {
         },
         {
           type: "Action.Submit",
-          title: "Review Document",
+          title: "Review AI Document",
           data:
             {
+              verb: 'reviewDocument',
               msteams: {
                   type: 'task/fetch'
               },
@@ -113,7 +115,7 @@ export class AdaptiveCardFactory {
       body: [
         {
           type: "TextBlock",
-          text: "Please review the document before approving or rejcting the deliverable.",
+          text: "Please review the document before approving or rejecting the deliverable.",
           wrap: true,
           size: "medium",
         },
@@ -127,8 +129,9 @@ export class AdaptiveCardFactory {
               msteams: {
                   type: 'task/fetch'
               }, 
-              command: 'view_document',
-              id: '${id}'
+              command: 'reviewDocument',
+              id: '${id}',
+              verb: 'reviewDocument'
             }
         }
       ],
@@ -156,7 +159,8 @@ export class AdaptiveCardFactory {
           title: 'Approve',
           data: {
               command: 'approve',
-              id: '${id}'
+              id: '${id}',
+              verb: 'approve/reject'
           }
         },
         {
@@ -178,7 +182,8 @@ export class AdaptiveCardFactory {
                       title: "Reject",
                       data: {
                         command: "reject",
-                        id: '${id}'
+                        id: '${id}',
+                        verb: 'approve/reject'
                       }
                   }
               ],
@@ -190,7 +195,6 @@ export class AdaptiveCardFactory {
 
     return approveRejectCard;
   }
-
 
 
   public getDeliverableAdaptiveCard(data: any): Attachment {
@@ -213,7 +217,5 @@ export class AdaptiveCardFactory {
     const card = new ACData.Template(expenseReportCard);  
 
     return this.getAdaptiveCardWithData(card, expenseReportData);
-  }
-
-
+  }  
 }

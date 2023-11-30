@@ -7,7 +7,7 @@ import {
     TaskModuleTaskInfo,
     TurnContext
 } from 'botbuilder';
-import { AdaptiveCardFactoryAI } from './adaptiveCardFactory.ai';
+import { AdaptiveCardFactory } from './adaptiveCardFactory';
 import { Deliverables } from './data';
 
 export type TData = Record<string, any | any[]>;
@@ -15,7 +15,7 @@ export type TData = Record<string, any | any[]>;
 export class SearchAppAI extends Application<TurnState> {
     public static readonly MessageExtensionCommand = 'searchQuery';
     private hasBeenReviewed = false;
-    private adaptiveCardFactory = new AdaptiveCardFactoryAI();
+    private adaptiveCardFactory = new AdaptiveCardFactory();
 
     constructor(storage: MemoryStorage) {
         super({ storage });
@@ -70,36 +70,6 @@ export class SearchAppAI extends Application<TurnState> {
             }
         );
 
-        /**
-         * Handles the selectItem command for the message extension.
-         * This is sent when the user selects an item from the search results.
-         * @param context The turn context.
-         * @param state The turn state.
-         * @param data The selected item data.
-         */
-        // this.messageExtensions.handleOnButtonClicked(
-        //     async (context: TurnContext, state: TurnState, data: TData) => {
-        //         console.log(`data: ${JSON.stringify(data, null, 2)}`);
-        //         console.log(`Activity Type: ${JSON.stringify(context.activity.type, null, 2)}`);
-        //         console.log(`Activity Name: ${JSON.stringify(context.activity.name, null, 2)}`);
-        //         console.log(`Activity Value: ${JSON.stringify(context.activity.value, null, 2)}`);
-
-        //         if (data.command === 'approve_reject') {
-        //             const card = this.adaptiveCardFactory.getApproveRejectAdaptiveCard(context.activity.value);
-        //             await context.sendActivity({
-        //                 value: { status: 200 } as InvokeResponse,
-        //                 type: ActivityTypes.InvokeResponse
-        //             });
-        //         } else if (data.command === 'view_document') {
-        //             const card = this.adaptiveCardFactory.getReviewDocumentAdaptiveCard(context.activity.value);
-        //             await context.sendActivity({
-        //                 attachments: [card],
-        //                 id: context.activity.replyToId,
-        //                 type: 'message'
-        //             });
-        //         }
-        //     }
-        // );
 
         /**
          * Handles the fetch command for the task module.
