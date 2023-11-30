@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourceBaseName": {
-      "value": "bot${{RESOURCE_SUFFIX}}"
+      "value": "bot-${{RESOURCE_SUFFIX}}-${{TEAMSFX_ENV}}"
     },
     "botAadAppClientId": {
       "value": "${{BOT_ID}}"
@@ -11,11 +11,11 @@
     "botAadAppClientSecret": {
       "value": "${{SECRET_BOT_PASSWORD}}"
     },
-    "webAppSKU": {
-      "value": "B1"
-    },
     "botDisplayName": {
-      "value": "SsoAuthBotInfra"
+      "value": "SsoAuthBot-${{TEAMSFX_ENV}}"
+    },
+    "botAppDomain": {
+      "value": "${{BOT_DOMAIN}}"
     },
     "oauthConnectionName": {
       "value": "${{OAUTH_CONNECTION_NAME}}"
