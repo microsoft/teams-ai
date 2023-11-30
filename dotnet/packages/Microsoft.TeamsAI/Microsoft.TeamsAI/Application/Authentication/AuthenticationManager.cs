@@ -38,8 +38,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="handlerName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> SignUserIn(ITurnContext context, TState state, string? handlerName = null)
+        public async Task<SignInResponse> SignUserInAsync(ITurnContext context, TState state, string? handlerName = null, CancellationToken cancellationToken = default)
         {
             if (handlerName == null)
             {
@@ -47,7 +48,7 @@ namespace Microsoft.Teams.AI
             }
 
             IAuthentication<TState> auth = Get(handlerName);
-            SignInResponse response = await auth.SignInUser(context, state);
+            SignInResponse response = await auth.SignInUserAsync(context, state, cancellationToken);
             if (response.Status == SignInStatus.Complete)
             {
                 AuthUtilities.SetTokenInState(state, handlerName, response.Token!);
@@ -61,7 +62,8 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="handlerName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
-        public async Task SignOutUser(ITurnContext context, TState state, string? handlerName = null)
+        /// <param name="cancellationToken">The cancellation token</param>
+        public async Task SignOutUserAsync(ITurnContext context, TState state, string? handlerName = null, CancellationToken cancellationToken = default)
         {
             if (handlerName == null)
             {
@@ -69,7 +71,7 @@ namespace Microsoft.Teams.AI
             }
 
             IAuthentication<TState> auth = Get(handlerName);
-            await auth.SignOutUser(context, state);
+            await auth.SignOutUserAsync(context, state, cancellationToken);
             AuthUtilities.DeleteTokenFromState(state, handlerName);
         }
 
@@ -79,7 +81,7 @@ namespace Microsoft.Teams.AI
         /// <param name="context">Current turn context.</param>
         /// <param name="handlerName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
         /// <returns>True if current activity supports authentication. Otherwise, false.</returns>
-        public async Task<bool> IsValidActivity(ITurnContext context, string? handlerName = null)
+        public async Task<bool> IsValidActivityAsync(ITurnContext context, string? handlerName = null)
         {
             if (handlerName == null)
             {
@@ -87,7 +89,7 @@ namespace Microsoft.Teams.AI
             }
 
             IAuthentication<TState> auth = Get(handlerName);
-            return await auth.IsValidActivity(context);
+            return await auth.IsValidActivityAsync(context);
         }
 
         /// <summary>

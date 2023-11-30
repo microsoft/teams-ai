@@ -31,22 +31,25 @@ namespace Microsoft.Teams.AI
             return Task.CompletedTask;
         }
 
-        public Task<TState> GetAsync(ITurnContext turnContext, Func<TState> defaultValueFactory = null, CancellationToken cancellationToken = default)
+        public Task<TState> GetAsync(ITurnContext turnContext, Func<TState>? defaultValueFactory = null, CancellationToken cancellationToken = default)
         {
             if (_state.Value != null)
             {
-                if (!_state.Value.ContainsKey(_propertyName))
-                {
-                    _state.Value[_propertyName] = defaultValueFactory();
-                }
-
                 if (_state.Value.TryGetValue(_propertyName, out TState result))
                 {
                     return Task.FromResult(result);
                 }
                 else
                 {
+                    if (defaultValueFactory == null)
+                    {
+                        throw new ArgumentNullException(nameof(defaultValueFactory));
+                    }
                     TState defaultValue = defaultValueFactory();
+                    if (defaultValue == null)
+                    {
+                        throw new ArgumentNullException(nameof(defaultValue));
+                    }
                     _state.Value[_propertyName] = defaultValue;
                     return Task.FromResult(defaultValue);
                 }

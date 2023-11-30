@@ -9,7 +9,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Base class for bot authentication that handles common logic
     /// </summary>
-    public abstract class BotAuthenticationBase<TState>
+    internal abstract class BotAuthenticationBase<TState>
         where TState : TurnState, new()
     {
         /// <summary>
@@ -47,12 +47,12 @@ namespace Microsoft.Teams.AI
             app.AddRoute(this.VerifyStateRouteSelector, async (context, state, cancellationToken) =>
             {
                 await this.HandleSignInActivity(context, state, cancellationToken);
-            });
+            }, true);
 
             app.AddRoute(this.TokenExchangeRouteSelector, async (context, state, cancellationToken) =>
             {
                 await this.HandleSignInActivity(context, state, cancellationToken);
-            });
+            }, true);
         }
 
         /// <summary>
@@ -60,8 +60,9 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context, TState state)
+        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             // Get property names to use
             string userAuthStatePropertyName = GetUserAuthStatePropertyName(context);
@@ -76,7 +77,7 @@ namespace Microsoft.Teams.AI
                 });
             }
 
-            DialogTurnResult result = await RunDialog(context, state, userDialogStatePropertyName);
+            DialogTurnResult result = await RunDialog(context, state, userDialogStatePropertyName, cancellationToken);
             if (result.Status == DialogTurnStatus.Complete)
             {
                 // Delete user auth state
@@ -87,7 +88,7 @@ namespace Microsoft.Teams.AI
                     // Completed dialog without a token.
                     // This could mean the user declined the consent prompt in the previous turn.
                     // Retry authentication flow again.
-                    return await AuthenticateAsync(context, state);
+                    return await AuthenticateAsync(context, state, cancellationToken);
                 }
                 else
                 {
@@ -125,7 +126,7 @@ namespace Microsoft.Teams.AI
             try
             {
                 string userDialogStatePropertyName = GetUserDialogStatePropertyName(context);
-                DialogTurnResult result = await ContinueDialog(context, state, userDialogStatePropertyName);
+                DialogTurnResult result = await ContinueDialog(context, state, userDialogStatePropertyName, cancellationToken);
 
                 if (result.Status == DialogTurnStatus.Complete)
                 {
@@ -259,8 +260,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="dialogStateProperty">The property name for storing dialog state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>Dialog turn result that contains token if sign in success</returns>
-        public abstract Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty);
+        public abstract Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Continue the authentication dialog.
@@ -268,7 +270,8 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
         /// <param name="dialogStateProperty">The property name for storing dialog state.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>Dialog turn result that contains token if sign in success</returns>
-        public abstract Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty);
+        public abstract Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default);
     }
 }

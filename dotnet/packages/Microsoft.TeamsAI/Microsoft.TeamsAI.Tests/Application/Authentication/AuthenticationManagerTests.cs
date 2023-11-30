@@ -23,7 +23,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
 
             // act
-            var response = await authManager.SignUserIn(turnContext, turnState);
+            var response = await authManager.SignUserInAsync(turnContext, turnState);
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
 
             // act
-            var response = await authManager.SignUserIn(turnContext, turnState, "sharepoint");
+            var response = await authManager.SignUserInAsync(turnContext, turnState, "sharepoint");
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
@@ -72,7 +72,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
 
             // act
-            var response = await authManager.SignUserIn(turnContext, turnState);
+            var response = await authManager.SignUserInAsync(turnContext, turnState);
 
             // assert
             Assert.Equal(SignInStatus.Pending, response.Status);
@@ -99,7 +99,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             };
 
             // act
-            await authManager.SignOutUser(turnContext, turnState);
+            await authManager.SignOutUserAsync(turnContext, turnState);
 
             // assert
             Assert.False(turnState.Temp.AuthTokens.ContainsKey("graph"));
@@ -126,7 +126,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             };
 
             // act
-            await authManager.SignOutUser(turnContext, turnState, "sharepoint");
+            await authManager.SignOutUserAsync(turnContext, turnState, "sharepoint");
 
             // assert
             Assert.False(turnState.Temp.AuthTokens.ContainsKey("sharepoint"));
@@ -147,7 +147,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var turnContext = MockTurnContext();
 
             // act
-            var validActivity = await authManager.IsValidActivity(turnContext);
+            var validActivity = await authManager.IsValidActivityAsync(turnContext);
 
             // assert
             Assert.True(validActivity);
@@ -167,7 +167,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             var turnContext = MockTurnContext();
 
             // act
-            var validActivity = await authManager.IsValidActivity(turnContext, "sharepoint");
+            var validActivity = await authManager.IsValidActivityAsync(turnContext, "sharepoint");
 
             // assert
             Assert.True(validActivity);

@@ -6,7 +6,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Base class for adaptive card authentication that handles common logic
     /// </summary>
-    public abstract class AdaptiveCardsAuthenticationBase
+    internal abstract class AdaptiveCardsAuthenticationBase
     {
         /// <summary>
         /// Authenticate current user

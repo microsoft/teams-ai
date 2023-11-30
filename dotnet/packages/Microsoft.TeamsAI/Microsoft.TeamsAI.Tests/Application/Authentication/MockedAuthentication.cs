@@ -23,7 +23,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return;
         }
 
-        public Task<bool> IsValidActivity(ITurnContext context)
+        public Task<bool> IsValidActivityAsync(ITurnContext context)
         {
             return Task.FromResult(_validActivity);
         }
@@ -38,7 +38,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return this;
         }
 
-        public Task<SignInResponse> SignInUser(ITurnContext context, TState state)
+        public Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             var result = new SignInResponse(_mockedStatus);
             if (_mockedStatus == SignInStatus.Complete)
@@ -48,7 +48,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return Task.FromResult(result);
         }
 
-        public Task SignOutUser(ITurnContext context, TState state)
+        public Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

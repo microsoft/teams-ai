@@ -846,9 +846,9 @@ namespace Microsoft.Teams.AI
                 if (Authentication != null && _startSignIn != null && await _startSignIn(turnContext, cancellationToken))
                 {
                     // Should skip activity that does not support sign-in
-                    if (await Authentication.IsValidActivity(turnContext))
+                    if (await Authentication.IsValidActivityAsync(turnContext))
                     {
-                        SignInResponse response = await Authentication.SignUserIn(turnContext, turnState);
+                        SignInResponse response = await Authentication.SignUserInAsync(turnContext, turnState);
                         if (response.Status == SignInStatus.Pending)
                         {
                             // Requires user action, save state and stop processing current activity
