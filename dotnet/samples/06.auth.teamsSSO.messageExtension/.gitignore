@@ -22,5 +22,4 @@ appPackage/build
 build
 .deployment
 # Teams Toolkit Local Development
-appsettings.Development.json
 env/.env.local
