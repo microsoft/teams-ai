@@ -1,6 +1,6 @@
 import {
     Application,
-    AssistantsPlanner,
+    preview,
     AI
 } from '@microsoft/teams-ai';
 import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuilder';
@@ -10,6 +10,8 @@ import { generateCardForOrder } from './foodOrderCard';
 if (!process.env.OPENAI_KEY) {
     throw new Error('Missing environment variables - please check that OPENAI_KEY.');
 }
+
+const { AssistantsPlanner } = preview;
 
 // Create Assistant if no ID is provided
 if (!process.env.ASSISTANT_ID) {
