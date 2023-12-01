@@ -12,7 +12,11 @@ namespace Microsoft.Teams.AI
         where TState : TurnState, new()
     {
         private Dictionary<string, IAuthentication<TState>> _authentications { get; }
-        private string _default { get; set; }
+
+        /// <summary>
+        /// The default authentication setting name.
+        /// </summary>
+        public string Default { get; }
 
         /// <summary>
         /// Creates a new instance of the class
@@ -27,68 +31,68 @@ namespace Microsoft.Teams.AI
             }
 
             // If developer does not specify default authentication, set default to the first one in the options
-            _default = options.Default ?? options.Authentications.First().Key;
+            Default = options.Default ?? options.Authentications.First().Key;
 
             _authentications = options.Authentications;
         }
 
         /// <summary>
-        /// Sign in a user
+        /// Sign in a user.
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
-        /// <param name="handlerName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
+        /// <param name="settingName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> SignUserInAsync(ITurnContext context, TState state, string? handlerName = null, CancellationToken cancellationToken = default)
+        public async Task<SignInResponse> SignUserInAsync(ITurnContext context, TState state, string? settingName = null, CancellationToken cancellationToken = default)
         {
-            if (handlerName == null)
+            if (settingName == null)
             {
-                handlerName = _default;
+                settingName = Default;
             }
 
-            IAuthentication<TState> auth = Get(handlerName);
+            IAuthentication<TState> auth = Get(settingName);
             SignInResponse response = await auth.SignInUserAsync(context, state, cancellationToken);
             if (response.Status == SignInStatus.Complete)
             {
-                AuthUtilities.SetTokenInState(state, handlerName, response.Token!);
+                AuthUtilities.SetTokenInState(state, settingName, response.Token!);
             }
             return response;
         }
 
         /// <summary>
-        /// Signs out a user
+        /// Signs out a user.
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="state">The turn state</param>
-        /// <param name="handlerName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
+        /// <param name="settingName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        public async Task SignOutUserAsync(ITurnContext context, TState state, string? handlerName = null, CancellationToken cancellationToken = default)
+        public async Task SignOutUserAsync(ITurnContext context, TState state, string? settingName = null, CancellationToken cancellationToken = default)
         {
-            if (handlerName == null)
+            if (settingName == null)
             {
-                handlerName = _default;
+                settingName = Default;
             }
 
-            IAuthentication<TState> auth = Get(handlerName);
+            IAuthentication<TState> auth = Get(settingName);
             await auth.SignOutUserAsync(context, state, cancellationToken);
-            AuthUtilities.DeleteTokenFromState(state, handlerName);
+            AuthUtilities.DeleteTokenFromState(state, settingName);
         }
 
         /// <summary>
         /// Check whether current activity supports authentication.
         /// </summary>
         /// <param name="context">Current turn context.</param>
-        /// <param name="handlerName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
+        /// <param name="settingName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
         /// <returns>True if current activity supports authentication. Otherwise, false.</returns>
-        public async Task<bool> IsValidActivityAsync(ITurnContext context, string? handlerName = null)
+        public async Task<bool> IsValidActivityAsync(ITurnContext context, string? settingName = null)
         {
-            if (handlerName == null)
+            if (settingName == null)
             {
-                handlerName = _default;
+                settingName = Default;
             }
 
-            IAuthentication<TState> auth = Get(handlerName);
+            IAuthentication<TState> auth = Get(settingName);
             return await auth.IsValidActivityAsync(context);
         }
 
