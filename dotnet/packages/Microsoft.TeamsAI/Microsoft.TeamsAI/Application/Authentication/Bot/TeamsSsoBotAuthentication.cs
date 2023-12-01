@@ -141,7 +141,7 @@ namespace Microsoft.Teams.AI
             if (context == null || context.Activity == null
                 || context.Activity.Conversation == null)
             {
-                throw new TeamsAIAuthException("Invalid context, can not get storage key!");
+                throw new AuthException("Invalid context, can not get storage key!");
             }
 
             Activity activity = context.Activity;
@@ -149,13 +149,13 @@ namespace Microsoft.Teams.AI
             string conversationId = activity.Conversation.Id;
             if (activity.Type != ActivityTypes.Invoke || activity.Name != SignInConstants.TokenExchangeOperationName)
             {
-                throw new TeamsAIAuthException("TokenExchangeState can only be used with Invokes of signin/tokenExchange.");
+                throw new AuthException("TokenExchangeState can only be used with Invokes of signin/tokenExchange.");
             }
             JObject value = JObject.FromObject(activity.Value);
             JToken? id = value["id"];
             if (id == null)
             {
-                throw new TeamsAIAuthException("Invalid signin/tokenExchange. Missing activity.value.id.");
+                throw new AuthException("Invalid signin/tokenExchange. Missing activity.value.id.");
             }
             return $"{channelId}/{conversationId}/{id}";
         }

@@ -30,7 +30,7 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Callback when user sign in fail
         /// </summary>
-        protected Func<ITurnContext, TState, TeamsAIAuthException, Task>? _userSignInFailureHandler;
+        protected Func<ITurnContext, TState, AuthException, Task>? _userSignInFailureHandler;
 
         /// <summary>
         /// Initializes the class
@@ -163,7 +163,7 @@ namespace Microsoft.Teams.AI
                         // Failed sign in
                         if (_userSignInFailureHandler != null)
                         {
-                            await _userSignInFailureHandler(context, state, new TeamsAIAuthException("Authentication flow completed without a token.", TeamsAIAuthExceptionReason.CompletionWithoutToken));
+                            await _userSignInFailureHandler(context, state, new AuthException("Authentication flow completed without a token.", AuthExceptionReason.CompletionWithoutToken));
                         }
                     }
                 }
@@ -174,7 +174,7 @@ namespace Microsoft.Teams.AI
 
                 if (_userSignInFailureHandler != null)
                 {
-                    await _userSignInFailureHandler(context, state, new TeamsAIAuthException(message));
+                    await _userSignInFailureHandler(context, state, new AuthException(message));
                 }
             }
         }
@@ -192,7 +192,7 @@ namespace Microsoft.Teams.AI
         /// The handler function is called when the user sign in flow fails
         /// </summary>
         /// <param name="handler">The handler function to call when the user failed to signed in</param>
-        public void OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
+        public void OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler)
         {
             _userSignInFailureHandler = handler;
         }

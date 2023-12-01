@@ -1,14 +1,20 @@
 ﻿namespace Microsoft.Teams.AI.Exceptions
 {
     /// <summary>
-    /// Cause of an authentication exception.
+    /// Cause of user authentication exception.
     /// </summary>
-    public enum TeamsAIAuthExceptionReason
+    public enum AuthExceptionReason
     {
         /// <summary>
         /// The authentication flow completed without a token.
         /// </summary>
         CompletionWithoutToken,
+
+        /// <summary>
+        /// The incomming activity is not valid for sign in flow.
+        /// </summary>
+        InvalidActivity,
+
         /// <summary>
         /// Other error.
         /// </summary>
@@ -16,21 +22,21 @@
     }
 
     /// <summary>
-    /// An exception thrown when an authentication error occurs.
+    /// An exception thrown when user authentication error occurs.
     /// </summary>
-    public class TeamsAIAuthException : Exception
+    public class AuthException : Exception
     {
         /// <summary>
         /// The cause of the exception.
         /// </summary>
-        public TeamsAIAuthExceptionReason Cause { get; }
+        public AuthExceptionReason Cause { get; }
 
         /// <summary>
         /// Initializes the class
         /// </summary>
         /// <param name="message">The exception message</param>
         /// <param name="reason">The cause of the exception</param>
-        public TeamsAIAuthException(string message, TeamsAIAuthExceptionReason reason = TeamsAIAuthExceptionReason.Other) : base(message)
+        public AuthException(string message, AuthExceptionReason reason = AuthExceptionReason.Other) : base(message)
         {
             Cause = reason;
         }

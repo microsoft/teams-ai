@@ -23,12 +23,17 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return;
         }
 
+        public Task<string?> IsUserSignedInAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
+
         public Task<bool> IsValidActivityAsync(ITurnContext context)
         {
             return Task.FromResult(_validActivity);
         }
 
-        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
+        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler)
         {
             return this;
         }

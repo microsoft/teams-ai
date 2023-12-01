@@ -13,10 +13,16 @@ namespace Microsoft.Teams.AI
         /// Sign-in not complete and requires user interaction
         /// </summary>
         Pending,
+
         /// <summary>
         /// Sign-in complete
         /// </summary>
-        Complete
+        Complete,
+
+        /// <summary>
+        /// Error occurred during sign-in
+        /// </summary>
+        Error
     }
 
     /// <summary>
@@ -33,6 +39,16 @@ namespace Microsoft.Teams.AI
         /// The access token. Only available when sign-in status is Complete.
         /// </summary>
         public string? Token { get; set; }
+
+        /// <summary>
+        /// The exception object. Only available when sign-in status is Error.
+        /// </summary>
+        public Exception? Error { get; set; }
+
+        /// <summary>
+        /// The cause of error. Only available when sign-in status is Error.
+        /// </summary>
+        public AuthExceptionReason? Cause { get; set; }
 
         /// <summary>
         /// Initialize an instance of current class
@@ -96,6 +112,14 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">The handler function to call when the user failed to signed in</param>
         /// <returns>The class itself for chaining purpose</returns>
-        IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler);
+        IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler);
+
+        /// <summary>
+        /// Check if the user is signed, if they are then return the token.
+        /// </summary>
+        /// <param name="turnContext">The turn context.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The token if the user is signed. Otherwise null.</returns>
+        Task<string?> IsUserSignedInAsync(ITurnContext turnContext, CancellationToken cancellationToken = default);
     }
 }

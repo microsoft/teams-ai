@@ -1,9 +1,15 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace Microsoft.Teams.AI
 {
+    /// <summary>
+    /// Maps the turn state property to a bot State property.
+    /// Note: Used to inject data into <seealso cref="DialogSet"/>.
+    /// </summary>
+    /// <typeparam name="TState"></typeparam>
     internal class TurnStateProperty<TState> : IStatePropertyAccessor<TState>
         where TState : new()
     {

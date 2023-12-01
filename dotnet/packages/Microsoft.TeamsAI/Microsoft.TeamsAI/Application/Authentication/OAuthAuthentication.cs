@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Handles authentication using OAuth Connection.
     /// </summary>
-    public class OAuthAuthentication<TState> : IAuthentication<TState>
+    internal class OAuthAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
         /// <summary>
@@ -17,6 +17,17 @@ namespace Microsoft.Teams.AI
         /// <param name="name">The name of the authentication handler</param>
         /// <param name="storage">The storage to save turn state</param>
         public void Initialize(Application<TState> app, string name, IStorage? storage = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Check if the user is signed, if they are then return the token.
+        /// </summary>
+        /// <param name="turnContext">The turn context.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The token if the user is signed. Otherwise null.</returns>
+        public Task<string?> IsUserSignedInAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -36,7 +47,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">The handler function to call when the user failed to signed in</param>
         /// <returns>The class itself for chaining purpose</returns>
-        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
+        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler)
         {
             throw new NotImplementedException();
         }
