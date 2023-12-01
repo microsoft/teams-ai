@@ -7,7 +7,7 @@ using Microsoft.Teams.AI.Exceptions;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
 {
-    internal class MockedMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
+    internal sealed class MockedMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
     {
         private TokenResponse? _tokenExchangeResponse;
         private TokenResponse? _signInResponse;
@@ -42,12 +42,12 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         }
     }
 
-    internal class TokenExchangeRequest
+    internal sealed class TokenExchangeRequest
     {
         public Authentication? authentication { get; set; }
     }
 
-    internal class Authentication
+    internal sealed class Authentication
     {
         public string? token { get; set; }
     }

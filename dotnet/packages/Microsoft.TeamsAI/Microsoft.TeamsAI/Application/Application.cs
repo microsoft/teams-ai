@@ -859,17 +859,17 @@ namespace Microsoft.Teams.AI
 
                 // If user is in sign in flow, return the authentication setting name
                 string? settingName = AuthUtilities.UserInSignInFlow(turnState);
-                bool shouldStartSignIn = _startSignIn != null && await _startSignIn(turnContext, cancellationToken;
+                bool shouldStartSignIn = _startSignIn != null && await _startSignIn(turnContext, cancellationToken);
 
                 // Sign the user in
-                if (Authentication != null && (shouldStartSignIn || settingName != null))
+                if (this._authentication != null && (shouldStartSignIn || settingName != null))
                 {
                     if (settingName == null)
                     {
-                        settingName = this.Authentication.Default;
+                        settingName = this._authentication.Default;
                     }
 
-                    SignInResponse response = await Authentication.SignUserInAsync(turnContext, turnState, settingName);
+                    SignInResponse response = await this._authentication.SignUserInAsync(turnContext, turnState, settingName);
 
                     if (response.Status == SignInStatus.Complete)
                     {
