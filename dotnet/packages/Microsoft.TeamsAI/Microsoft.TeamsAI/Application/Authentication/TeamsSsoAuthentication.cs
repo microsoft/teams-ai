@@ -9,7 +9,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Handles authentication based on Teams SSO.
     /// </summary>
-    internal class TeamsSsoAuthentication<TState> : IAuthentication<TState>
+    public class TeamsSsoAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
         private TeamsSsoBotAuthentication<TState>? _botAuth;
