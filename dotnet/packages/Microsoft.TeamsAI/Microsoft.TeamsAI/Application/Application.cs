@@ -4,6 +4,7 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 using System.Collections.Concurrent;
@@ -30,6 +31,8 @@ namespace Microsoft.Teams.AI
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
 
         private readonly AI<TState>? _ai;
+        private readonly AuthenticationManager<TState>? _authentication;
+
         private readonly int _typingTimerDelay = 1000;
         private TypingTimer? _typingTimer;
 
@@ -85,7 +88,7 @@ namespace Microsoft.Teams.AI
                     pair.Value.Initialize(this, pair.Key, options.Storage);
                 }
 
-                Authentication = new AuthenticationManager<TState>(options.Authentication);
+                _authentication = new AuthenticationManager<TState>(options.Authentication);
                 if (options.Authentication.AutoSignIn != null)
                 {
                     _startSignIn = options.Authentication.AutoSignIn;
@@ -120,7 +123,19 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Accessing authentication specific features.
         /// </summary>
-        public AuthenticationManager<TState>? Authentication { get; }
+        public AuthenticationManager<TState> Authentication
+        {
+
+            get
+            {
+                if (_authentication == null)
+                {
+                    throw new ArgumentException("The Application.Authentication property is unavailable because no authentication options were configured.");
+                }
+
+                return _authentication;
+            }
+        }
 
         /// <summary>
         /// Fluent interface for accessing AI specific features.
@@ -842,21 +857,36 @@ namespace Microsoft.Teams.AI
 
                 await turnState!.LoadStateAsync(storage, turnContext);
 
-                // Sign the user in
-                if (Authentication != null && _startSignIn != null && await _startSignIn(turnContext, cancellationToken))
-                {
-                    // Should skip activity that does not support sign-in
-                    if (await Authentication.IsValidActivityAsync(turnContext))
-                    {
-                        SignInResponse response = await Authentication.SignUserInAsync(turnContext, turnState);
-                        if (response.Status == SignInStatus.Pending)
-                        {
-                            // Requires user action, save state and stop processing current activity
-                            await turnState.SaveStateAsync(turnContext, storage);
-                            return;
-                        }
+                // If user is in sign in flow, return the authentication setting name
+                string? settingName = AuthUtilities.UserInSignInFlow(turnState);
+                bool shouldStartSignIn = _startSignIn != null && await _startSignIn(turnContext, cancellationToken;
 
-                        // Sign-in success, continue processing current activity
+                // Sign the user in
+                if (Authentication != null && (shouldStartSignIn || settingName != null))
+                {
+                    if (settingName == null)
+                    {
+                        settingName = this.Authentication.Default;
+                    }
+
+                    SignInResponse response = await Authentication.SignUserInAsync(turnContext, turnState, settingName);
+
+                    if (response.Status == SignInStatus.Complete)
+                    {
+                        AuthUtilities.DeleteUserInSignInFlow(turnState);
+                    }
+
+                    if (response.Status == SignInStatus.Pending)
+                    {
+                        // Requires user action, save state and stop processing current activity
+                        await turnState.SaveStateAsync(turnContext, storage);
+                        return;
+                    }
+
+                    if (response.Status == SignInStatus.Error && response.Cause != AuthExceptionReason.InvalidActivity)
+                    {
+                        AuthUtilities.DeleteUserInSignInFlow(turnState);
+                        throw new TeamsAIException("An error occured when trying to sign in.", response.Error!);
                     }
                 }
 
@@ -927,6 +957,66 @@ namespace Microsoft.Teams.AI
                 // Stop the timer if configured
                 StopTypingTimer();
             }
+        }
+
+        /// <summary>
+        /// If the user is signed in, get the access token. If not, triggers the sign in flow for the provided authentication setting name
+        /// and returns.In this case, the bot should end the turn until the sign in flow is completed.
+        /// </summary>
+        /// <remarks>
+        /// Use this method to get the access token for a user that is signed in to the bot.
+        /// If the user isn't signed in, this method starts the sign-in flow.
+        /// The bot should end the turn in this case until the sign-in flow completes and the user is signed in.
+        /// </remarks>
+        /// <param name="turnContext"> The turn context.</param>
+        /// <param name="turnState">The turn state.</param>
+        /// <param name="settingName">The name of the authentication setting.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The access token for the user if they are signed, otherwise null.</returns>
+        /// <exception cref="TeamsAIException"></exception>
+        public async Task<string?> GetTokenOrStartSignInAsync(ITurnContext turnContext, TState turnState, string settingName, CancellationToken cancellationToken = default)
+        {
+            string? token = await Authentication.Get(settingName).IsUserSignedInAsync(turnContext, cancellationToken);
+
+            if (token != null)
+            {
+                AuthUtilities.SetTokenInState(turnState, settingName, token);
+                AuthUtilities.DeleteUserInSignInFlow(turnState);
+                return token;
+            }
+
+            // User is currently not in sign in flow
+            if (AuthUtilities.UserInSignInFlow(turnState) == null)
+            {
+                AuthUtilities.SetUserInSignInFlow(turnState, settingName);
+            }
+            else
+            {
+                AuthUtilities.DeleteUserInSignInFlow(turnState);
+                throw new TeamsAIException("Invalid sign in flow state. Cannot start sign in when already started");
+            }
+
+            SignInResponse response = await Authentication.SignUserInAsync(turnContext, turnState, settingName);
+
+            if (response.Status == SignInStatus.Error)
+            {
+                string message = response.Error!.ToString();
+                if (response.Cause == AuthExceptionReason.InvalidActivity)
+                {
+                    message = $"User is not signed in and cannot start sign in flow for this activity: {response.Error}";
+                }
+
+                throw new TeamsAIException($"Error occured while trying to authenticate user: {message}");
+            }
+
+            if (response.Status == SignInStatus.Complete)
+            {
+                AuthUtilities.DeleteUserInSignInFlow(turnState);
+                return turnState.Temp.AuthTokens[settingName];
+            }
+
+            // response.Status == SignInStatus.Pending
+            return null;
         }
 
         /// <summary>

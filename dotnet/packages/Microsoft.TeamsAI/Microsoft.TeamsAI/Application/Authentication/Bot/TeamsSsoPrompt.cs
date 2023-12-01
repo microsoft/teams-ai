@@ -132,7 +132,7 @@ namespace Microsoft.Teams.AI
                     catch (Exception ex)
                     {
                         string message = $"Failed to get access token with error: {ex.Message}";
-                        throw new TeamsAIAuthException(message);
+                        throw new AuthException(message);
                     }
                 }
             }

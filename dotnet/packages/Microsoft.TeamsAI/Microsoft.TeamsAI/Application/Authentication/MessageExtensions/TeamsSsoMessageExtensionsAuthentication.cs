@@ -77,7 +77,7 @@ namespace Microsoft.Teams.AI
                 catch (Exception ex)
                 {
                     string message = $"Failed to exchange access token with error: {ex.Message}";
-                    throw new TeamsAIAuthException(message);
+                    throw new AuthException(message);
                 }
             }
 

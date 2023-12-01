@@ -9,7 +9,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Handles authentication based on Teams SSO.
     /// </summary>
-    public class TeamsSsoAuthentication<TState> : IAuthentication<TState>
+    internal class TeamsSsoAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
         private TeamsSsoBotAuthentication<TState>? _botAuth;
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The sign in response</returns>
         public async Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
-            string token = await TryGetUserToken(context);
+            string token = await _TryGetUserToken(context);
             if (!string.IsNullOrEmpty(token))
             {
                 return new SignInResponse(SignInStatus.Complete)
@@ -116,7 +116,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">The handler function to call when the user failed to signed in</param>
         /// <returns>The class itself for chaining purpose</returns>
-        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, TeamsAIAuthException, Task> handler)
+        public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler)
         {
             if (_botAuth != null)
             {
@@ -125,7 +125,19 @@ namespace Microsoft.Teams.AI
             return this;
         }
 
-        private async Task<string> TryGetUserToken(ITurnContext context)
+        /// <summary>
+        /// Check if the user is signed, if they are then return the token.
+        /// </summary>
+        /// <param name="context">The turn context.</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The token if the user is signed. Otherwise null.</returns>
+        public async Task<string?> IsUserSignedInAsync(ITurnContext context, CancellationToken cancellationToken = default)
+        {
+            string token = await _TryGetUserToken(context);
+            return token == "" ? null : token;
+        }
+
+        private async Task<string> _TryGetUserToken(ITurnContext context)
         {
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
             try

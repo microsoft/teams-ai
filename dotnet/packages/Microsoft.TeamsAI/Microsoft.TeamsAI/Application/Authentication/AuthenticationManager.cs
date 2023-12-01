@@ -12,7 +12,11 @@ namespace Microsoft.Teams.AI
         where TState : TurnState, new()
     {
         private Dictionary<string, IAuthentication<TState>> _authentications { get; }
-        private string _default { get; set; }
+
+        /// <summary>
+        /// The default authentication setting name.
+        /// </summary>
+        public string Default { get; }
 
         /// <summary>
         /// Creates a new instance of the class
@@ -27,7 +31,7 @@ namespace Microsoft.Teams.AI
             }
 
             // If developer does not specify default authentication, set default to the first one in the options
-            _default = options.Default ?? options.Authentications.First().Key;
+            Default = options.Default ?? options.Authentications.First().Key;
 
             _authentications = options.Authentications;
         }
@@ -44,7 +48,7 @@ namespace Microsoft.Teams.AI
         {
             if (handlerName == null)
             {
-                handlerName = _default;
+                handlerName = Default;
             }
 
             IAuthentication<TState> auth = Get(handlerName);
@@ -67,7 +71,7 @@ namespace Microsoft.Teams.AI
         {
             if (handlerName == null)
             {
-                handlerName = _default;
+                handlerName = Default;
             }
 
             IAuthentication<TState> auth = Get(handlerName);
@@ -85,7 +89,7 @@ namespace Microsoft.Teams.AI
         {
             if (handlerName == null)
             {
-                handlerName = _default;
+                handlerName = Default;
             }
 
             IAuthentication<TState> auth = Get(handlerName);

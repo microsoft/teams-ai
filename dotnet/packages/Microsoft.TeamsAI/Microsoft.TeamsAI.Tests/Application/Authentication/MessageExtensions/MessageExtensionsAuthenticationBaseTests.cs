@@ -27,7 +27,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         {
             if (_signInResponse == null)
             {
-                throw new TeamsAIAuthException("HandlerUserSignIn failed");
+                throw new AuthException("HandlerUserSignIn failed");
             }
             return Task.FromResult(_signInResponse);
         }
@@ -36,7 +36,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
         {
             if (_tokenExchangeResponse == null)
             {
-                throw new TeamsAIAuthException("HandleSsoTokenExchange failed");
+                throw new AuthException("HandleSsoTokenExchange failed");
             }
             return Task.FromResult(_tokenExchangeResponse);
         }
