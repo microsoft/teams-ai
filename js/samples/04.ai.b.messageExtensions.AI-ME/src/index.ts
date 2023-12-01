@@ -91,10 +91,6 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment OPENAI_API_KEY');
-}
-
 interface ConversationState extends DefaultConversationState {
 }
 
