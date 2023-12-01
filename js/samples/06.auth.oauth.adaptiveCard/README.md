@@ -39,9 +39,10 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
-    yarn start
+    cd teams-ai/js/samples/06.auth.oauth.adaptivecard
     ```
+
+4. Jump to [Multiple ways to test](#multiple-ways-to-test).
 
 ## Interacting with the bot
 
@@ -92,7 +93,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.oauth.adaptivecard
     teamsfx provision --env local
 
     ```
@@ -113,10 +114,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/06.auth.adaptiveCardSSO/`
+1. In a terminal, navigate to `teams-ai/js/samples/06.auth.oauth.adaptivecard`
 
     ```bash
-    cd teams-ai/js/samples/06.auth.adaptiveCardSSO/
+    cd teams-ai/js/samples/06.auth.oauth.adaptivecard
     ```
 
 1. Run ngrok tunneling service - point to port 3978

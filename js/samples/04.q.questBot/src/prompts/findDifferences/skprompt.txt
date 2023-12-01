@@ -1,7 +1,0 @@
-Original Description:
-{{$originalText}}
-
-New Location Description:
-{{$newText}}
-
-Create a new description with just the differences:
