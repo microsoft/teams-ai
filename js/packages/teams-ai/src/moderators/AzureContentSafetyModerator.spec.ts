@@ -4,7 +4,7 @@ import { strict as assert } from 'assert';
 import { restore, stub } from 'sinon';
 import { TurnContext, CloudAdapter } from 'botbuilder';
 
-import { AzureOpenAIModerator } from './AzureOpenAIModerator';
+import { AzureContentSafetyModerator } from './AzureContentSafetyModerator';
 import { TurnStateEntry } from '../TurnState';
 import { AI } from '../AI';
 import {
@@ -15,7 +15,7 @@ import {
     OpenAIClientResponse
 } from '../internals';
 
-describe('AzureOpenAIModerator', () => {
+describe('AzureContentSafetyModerator', () => {
     afterEach(() => {
         restore();
     });
@@ -76,7 +76,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -116,7 +116,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -164,7 +164,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -246,7 +246,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -288,7 +288,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -326,7 +326,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -377,7 +377,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
@@ -457,7 +457,7 @@ describe('AzureOpenAIModerator', () => {
                 }
             } as any);
 
-            const moderator = new AzureOpenAIModerator({
+            const moderator = new AzureContentSafetyModerator({
                 apiKey: 'test',
                 moderate: 'both',
                 endpoint: 'https://test'
