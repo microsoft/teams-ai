@@ -289,7 +289,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
         for (const action in actionOutputs) {
             const output = actionOutputs[action];
             const tool_call_id = tool_map[action];
-            tool_outputs.push({ tool_call_id, output });
+            if (tool_call_id !== undefined) {
+                // Add required output only
+                tool_outputs.push({ tool_call_id, output });
+            }
         }
 
         // Submit the tool outputs
@@ -311,7 +314,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             case 'expired':
                 return { type: 'plan', commands: [{type: 'DO', action: AI.TooManyStepsActionName} as PredictedDoCommand] };
             default:
-                throw new Error(`Run failed ${results.status}`);
+                throw new Error(
+                    `Run failed ${results.status}. ErrorCode: ${results.last_error?.code}. ErrorMessage: ${results.last_error?.message}`
+                );
         }
     }
 
@@ -346,7 +351,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             case 'expired':
                 return { type: 'plan', commands: [{type: 'DO', action: AI.TooManyStepsActionName} as PredictedDoCommand] };
             default:
-                throw new Error(`Run failed ${results.status}`);
+                throw new Error(
+                    `Run failed ${results.status}. ErrorCode: ${results.last_error?.code}. ErrorMessage: ${results.last_error?.message}`
+                );
         }
     }
 
@@ -383,6 +390,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
                 newMessages.push(message);
             }
         }
+
+        // listMessages return messages in desc, reverse to be in asc order
+        newMessages.reverse();
 
         // Convert the messages to SAY commands
         const plan: Plan = { type: 'plan', commands: [] };

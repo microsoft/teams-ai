@@ -13,7 +13,7 @@ https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/s
 https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/AI.ts
 https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/Application.ts
 https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/AzureOpenAIPlanner.ts
-https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/AzureOpenAIModerator.ts
+https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/AzureContentSafetyModerator.ts
 https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/ConversationHistory.ts
 https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/DefaultModerator.ts
 https://raw.githubusercontent.com/microsoft/teams-ai/main/js/packages/teams-ai/src/DefaultPromptManager.ts

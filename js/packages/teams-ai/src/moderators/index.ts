@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-export * from './AzureOpenAIModerator';
+export * from './AzureContentSafetyModerator';
 export * from './DefaultModerator';
 export * from './Moderator';
 export * from './OpenAIModerator';
