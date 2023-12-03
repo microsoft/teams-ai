@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Teams.AI
 {
@@ -8,14 +9,22 @@ namespace Microsoft.Teams.AI
     /// </summary>
     internal class OAuthMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
     {
+        private string _oauthConnectionName;
+
+        public OAuthMessageExtensionsAuthentication(string oauthConnectionName)
+        {
+            _oauthConnectionName = oauthConnectionName;
+        }
+
         /// <summary>
         /// Gets the sign in link for the user.
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>The sign in link</returns>
-        public override Task<string> GetSignInLink(ITurnContext context)
+        public override async Task<string> GetSignInLink(ITurnContext context)
         {
-            throw new NotImplementedException();
+            SignInResource signInResource = await UserTokenClientWrapper.GetSignInResourceAsync(context, _oauthConnectionName);
+            return signInResource.SignInLink;
         }
 
         /// <summary>
@@ -24,9 +33,9 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="magicCode">The magic code from user sign-in.</param>
         /// <returns>The token response if successfully verified the magic code</returns>
-        public override Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode)
+        public override async Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode)
         {
-            throw new NotImplementedException();
+            return await UserTokenClientWrapper.GetUserTokenAsync(context, _oauthConnectionName, magicCode);
         }
 
         /// <summary>
@@ -34,9 +43,16 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <returns>The token response if token exchange success</returns>
-        public override Task<TokenResponse> HandleSsoTokenExchange(ITurnContext context)
+        public override async Task<TokenResponse> HandleSsoTokenExchange(ITurnContext context)
         {
-            throw new NotImplementedException();
+            JObject value = JObject.FromObject(context.Activity.Value);
+            TokenExchangeRequest? tokenExchangeRequest = value["authentication"]?.ToObject<TokenExchangeRequest>();
+            if (tokenExchangeRequest != null && !string.IsNullOrEmpty(tokenExchangeRequest.Token))
+            {
+                return await UserTokenClientWrapper.ExchangeTokenAsync(context, _oauthConnectionName, tokenExchangeRequest);
+            }
+
+            return new TokenResponse();
         }
     }
 }
