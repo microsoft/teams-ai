@@ -54,7 +54,7 @@ Teams Toolkit automates the setup of Azure Bot Resources and provides a local de
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
     - Running the debugger from the root of the repo will not work - you must open a new window at the sample's root.
 1. Using the TTK extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps to Teams.
-1. Further, detailed instructions can be found at [Getting Started - Teams Toolkit](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER/TEAMS-TOOLKIT.md)
+1. Further, detailed instructions can be found at [Getting Started - Teams Toolkit](../../../getting-started/OTHER/TEAMS-TOOLKIT.md)
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client (in Microsoft Edge).
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
