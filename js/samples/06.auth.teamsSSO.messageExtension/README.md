@@ -72,7 +72,7 @@ If you type `profile` in the Message Extension's search box, it will show your p
 
 [TeamsFx command line interface](https://learn.microsoft.com/microsoftteams/platform/toolkit/teamsfx-cli?pivots=version-two) is a text-based command line interface that accelerates Teams application development. It aims to provide keyboard centric experience while building Teams applications.
 
-Navigate to [Teams Toolkit CLI](../../../getting-started/OTHER/TEAMS-TOOLKIT.md#teams-toolkit-cli) for setup instructions.
+Navigate to [Teams Toolkit CLI](../../../getting-started/OTHER/TEAMS-TOOLKIT-CLI.md) for setup instructions.
 
 ### Manual resource management and uploading to Teams
 
