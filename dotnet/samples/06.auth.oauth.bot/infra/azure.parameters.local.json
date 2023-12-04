@@ -18,7 +18,7 @@
       "value": "${{BOT_DOMAIN}}"
     },
     "oauthConnectionName": {
-      "value": "${{OAUTH_CONNECTION_NAME}}"
+      "value": "graph-connection"
     }
   }
 }
