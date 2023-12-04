@@ -9,17 +9,18 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Handles authentication using OAuth Connection.
     /// </summary>
-    internal class OAuthAuthentication<TState> : IAuthentication<TState>
+    public class OAuthAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
         private OAuthPromptSettings _settings;
         private OAuthMessageExtensionsAuthentication? _messageExtensionAuth;
+        private OAuthBotAuthentication<TState>? _botAuthentication;
 
         /// <summary>
         /// Initializes the class
         /// </summary>
         /// <param name="settings">The settings to initialize the class</param>
-        public OAuthAuthentication(OAuthPromptSettings settings)
+        public OAuthAuthentication(OAuthSettings settings)
         {
             _settings = settings;
         }
@@ -33,6 +34,7 @@ namespace Microsoft.Teams.AI
         public void Initialize(Application<TState> app, string name, IStorage? storage = null)
         {
             _messageExtensionAuth = new OAuthMessageExtensionsAuthentication(_settings.ConnectionName);
+            _botAuthentication = new OAuthBotAuthentication<TState>(app, _settings, name, storage);
         }
 
         /// <summary>
@@ -41,9 +43,16 @@ namespace Microsoft.Teams.AI
         /// <param name="turnContext">The turn context.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The token if the user is signed. Otherwise null.</returns>
-        public Task<string?> IsUserSignedInAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
+        public async Task<string?> IsUserSignedInAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            TokenResponse tokenResponse = await UserTokenClientWrapper.GetUserTokenAsync(turnContext, _settings.ConnectionName, "", cancellationToken);
+
+            if (tokenResponse != null && tokenResponse.Token != string.Empty)
+            {
+                return tokenResponse.Token;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -53,7 +62,10 @@ namespace Microsoft.Teams.AI
         /// <returns>True if valid. Otherwise, false.</returns>
         public Task<bool> IsValidActivityAsync(ITurnContext context)
         {
-            return Task.FromResult(_messageExtensionAuth != null && _messageExtensionAuth.IsValidActivity(context));
+            bool validMessageExtensionAuth = _messageExtensionAuth != null && _messageExtensionAuth.IsValidActivity(context);
+            bool validBotAuth = _botAuthentication != null && _botAuthentication.IsValidActivity(context);
+
+            return Task.FromResult(validBotAuth || validMessageExtensionAuth);
         }
 
         /// <summary>
@@ -63,7 +75,13 @@ namespace Microsoft.Teams.AI
         /// <returns>The class itself for chaining purpose</returns>
         public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler)
         {
-            throw new NotImplementedException();
+            if (_botAuthentication == null)
+            {
+                throw new TeamsAIException("Bot authentication is not initialized.");
+            }
+
+            _botAuthentication.OnUserSignInFailure(handler);
+            return this;
         }
 
         /// <summary>
@@ -73,7 +91,13 @@ namespace Microsoft.Teams.AI
         /// <returns>The class itself for chaining purpose</returns>
         public IAuthentication<TState> OnUserSignInSuccess(Func<ITurnContext, TState, Task> handler)
         {
-            throw new NotImplementedException();
+            if (_botAuthentication == null)
+            {
+                throw new TeamsAIException("Bot authentication is not initialized.");
+            }
+
+            _botAuthentication.OnUserSignInSuccess(handler);
+            return this;
         }
 
         /// <summary>
@@ -99,7 +123,12 @@ namespace Microsoft.Teams.AI
                 return await _messageExtensionAuth.AuthenticateAsync(context);
             }
 
-            throw new TeamsAIException("Incoming activity is not a valid activity to initiate authentication flow.");
+            if ((_botAuthentication != null && _botAuthentication.IsValidActivity(context)))
+            {
+                return await _botAuthentication.AuthenticateAsync(context, state, cancellationToken);
+            }
+
+            throw new AuthException("Incoming activity is not a valid activity to initiate authentication flow.", AuthExceptionReason.InvalidActivity);
         }
 
         /// <summary>
@@ -110,6 +139,8 @@ namespace Microsoft.Teams.AI
         /// <param name="cancellationToken">The cancellation token</param>
         public async Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
+            _botAuthentication?.DeleteAuthFlowState(context, state);
+
             await UserTokenClientWrapper.SignoutUserAsync(context, _settings.ConnectionName, cancellationToken);
         }
     }

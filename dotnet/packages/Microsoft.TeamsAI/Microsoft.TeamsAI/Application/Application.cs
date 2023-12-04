@@ -31,6 +31,7 @@ namespace Microsoft.Teams.AI
         private static readonly string CONFIG_SUBMIT_INVOKE_NAME = "config/submit";
 
         private readonly AI<TState>? _ai;
+        private readonly BotAdapter? _adapter;
         private readonly AuthenticationManager<TState>? _authentication;
 
         private readonly int _typingTimerDelay = 1000;
@@ -62,6 +63,11 @@ namespace Microsoft.Teams.AI
             if (Options.AI != null)
             {
                 _ai = new AI<TState>(Options.AI, Options.LoggerFactory);
+            }
+
+            if (Options.Adapter != null)
+            {
+                _adapter = Options.Adapter;
             }
 
             AdaptiveCards = new AdaptiveCards<TState>(this);
@@ -154,6 +160,22 @@ namespace Microsoft.Teams.AI
                 }
 
                 return _ai;
+            }
+        }
+
+        /// <summary>
+        /// Fluent interface for accessing the bot adapter used to configure the application.
+        /// </summary>
+        public BotAdapter Adapter
+        {
+            get
+            {
+                if (_adapter == null)
+                {
+                    throw new ArgumentException("The Application.Adapter property is unavailable because it was not configured.");
+                }
+
+                return _adapter;
             }
         }
 
@@ -886,7 +908,7 @@ namespace Microsoft.Teams.AI
                     if (response.Status == SignInStatus.Error && response.Cause != AuthExceptionReason.InvalidActivity)
                     {
                         AuthUtilities.DeleteUserInSignInFlow(turnState);
-                        throw new TeamsAIException("An error occured when trying to sign in.", response.Error!);
+                        throw new TeamsAIException("An error occurred when trying to sign in.", response.Error!);
                     }
                 }
 

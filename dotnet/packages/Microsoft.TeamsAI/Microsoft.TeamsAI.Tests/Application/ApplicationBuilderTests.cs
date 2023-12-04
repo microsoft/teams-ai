@@ -69,7 +69,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 .WithLongRunningMessages(adapter, botAppId)
                 .WithAdaptiveCardOptions(adaptiveCards)
                 .WithTaskModuleOptions(taskModules)
-                .WithAuthenticationOptions(authOptions)
+                .WithAuthentication(adapter, authOptions)
                 .WithLoggerFactory(loggerFactory)
                 .SetStartTypingTimer(startTypingTimer)
                 .Build();

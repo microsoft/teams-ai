@@ -237,7 +237,7 @@ namespace Microsoft.Teams.AI
             return state.Conversation.TryGetValue(propertyName, out authState);
         }
 
-        private void DeleteAuthFlowState(ITurnContext context, TState state)
+        public void DeleteAuthFlowState(ITurnContext context, TState state)
         {
             // Delete user auth state
             string userAuthStatePropertyName = GetUserAuthStatePropertyName(context);
