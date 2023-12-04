@@ -30,10 +30,6 @@
     <None Include="infra/**/*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="assets\" />
-  </ItemGroup>
-
   <!-- Exclude local settings from publish -->
   <ItemGroup>
     <Content Remove="appsettings.Development.json" />

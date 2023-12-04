@@ -3,7 +3,7 @@
 		"Microsoft Teams (browser)": {
 			"commandName": "Project",
 			"launchBrowser": true,
-			"launchUrl": "https://teams.microsoft.com/l/app/c7c6001b-336c-44bf-9529-3d53b9728204?installAppPackage=true&webjoin=true&appTenantId=72f988bf-86f1-41af-91ab-2d7cd011db47&login_hint=kavinsingh@microsoft.com",
+			"launchUrl": "",
 			"environmentVariables": {
 				"ASPNETCORE_ENVIRONMENT": "Development"
 			},

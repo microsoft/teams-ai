@@ -16,8 +16,20 @@ If you are using the Teams Toolkit to set up the bot (recommended) to set up thi
 1. Add the resource group name to the `AZURE_RESOURCE_GROUP_NAME` variable.
 1. Add an arbitrary name to `RESOURCE_SUFFIX`. For example: _"ssobot"_.
 
-After setting those up, you can follow the generic set up instructions here:
- [Setup Instructions](../README.md).
+Now you can follow the generic set up instructions here:
+ [Setup Instructions](../README.md). 
+ 
+ #### Known set up bug
+ There is currently a bug where after successfully executing `Teams Toolkit > Preparing Teams App Dependencies` the following warning shows:
+
+ ![Dependency setup error](assets/error.png)
+
+ When performing the F5 (Debug) you will see this error:
+
+ ![Deployment error](assets/deployment-errors.png)
+
+ You should click "Yes".
+
 
 ## Interacting with the Bot
 
@@ -25,11 +37,17 @@ At this point you should have set up the bot and installed it in Teams. You can 
 
 Here's a sample interaction with the bot:
 
-![Sample interaction](assets/helloworld.png)
+![Flow 1](assets/flow-1.png)
 
-You can reset the message count by sending the bot the message `/reset`.
+You can click continue to go ahead with the SSO sign in flow. This will redirect you to a page where you have to sign in.
 
-![Reset interaction](assets/reset.png)
+![Flow 2](assets/flow-2.png)
+
+Then accept the permissions. If you successfully logged in then you should get this message.
+
+![Flow 3](assets/flow-3.png)
+
+You can also sign out by sending `/signout` to the bot.
 
 ## Deploy to Azure
 
