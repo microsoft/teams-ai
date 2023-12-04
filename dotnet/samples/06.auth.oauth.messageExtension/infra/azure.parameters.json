@@ -14,8 +14,8 @@
     "botDisplayName": {
       "value": "MEAuthBot-${{TEAMSFX_ENV}}"
     },
-    "botAppDomain": {
-      "value": "${{BOT_DOMAIN}}"
+    "webAppSKU": {
+      "value":  "B1"
     },
     "oauthConnectionName": {
       "value": "graph-connection"
