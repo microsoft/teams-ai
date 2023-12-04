@@ -11,7 +11,7 @@
         CompletionWithoutToken,
 
         /// <summary>
-        /// The incomming activity is not valid for sign in flow.
+        /// The incoming activity is not valid for sign in flow.
         /// </summary>
         InvalidActivity,
 

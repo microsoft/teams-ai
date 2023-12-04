@@ -52,11 +52,30 @@ namespace Microsoft.Teams.AI
             }
 
             IAuthentication<TState> auth = Get(settingName);
-            SignInResponse response = await auth.SignInUserAsync(context, state, cancellationToken);
+            SignInResponse response;
+            try
+            {
+                response = await auth.SignInUserAsync(context, state, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                SignInResponse newResponse = new(SignInStatus.Error);
+                newResponse.Error = ex;
+                newResponse.Cause = AuthExceptionReason.Other;
+                if (ex is AuthException authEx)
+                {
+                    newResponse.Cause = authEx.Cause;
+                }
+
+                return newResponse;
+            }
+
+
             if (response.Status == SignInStatus.Complete)
             {
                 AuthUtilities.SetTokenInState(state, settingName, response.Token!);
             }
+
             return response;
         }
 
