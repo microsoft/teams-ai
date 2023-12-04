@@ -25,15 +25,22 @@ It shows Teams AI SDK capabilities like:
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
-The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+The 'prompts/monologue/skprompt.txt' file has descriptive prompt engineering that, in plain language, instructs GPT how the bot should conduct itself at submit time. For example, in 'skprompt.txt':
 
-#### generate.txt
+#### skprompt.txt
 
 ```
-This is a Microsoft Teams extension that assists the user with creating posts.
-Using the prompt below, create a post that appropriate for a business environment.
-Prompt: {{data.prompt}}
-Post:
+The following is a conversation with an AI assistant.
+The assistant can manage lists of items.
+
+rules:
+- only create lists the user has explicitly asked to create.
+- only add items to a list that the user has asked to have added.
+- if multiple lists are being manipulated, call a separate action for each list.
+- if items are being added and removed from a list, call a separate action for each operation.
+
+Current lists:
+{{$conversation.lists}}
 ```
 
 </details>
@@ -86,20 +93,6 @@ app.ai.action('findItem', async (context: TurnContext, state: ApplicationTurnSta
     // End the current chain
     return false;
 });
-
-app.ai.action('summarizeLists', async (context: TurnContext, state: ApplicationTurnState, data: EntityData) => {
-    const lists = state.conversation.value.lists;
-    if (lists) {
-        // Chain into a new summarization prompt
-        state.temp.value.lists = lists;
-        await app.ai.chain(context, state, 'summarize');
-    } else {
-        await context.sendActivity(responses.noListsFound());
-    }
-
-    // End the current chain
-    return false;
-});
 ```
 
 </details>
@@ -120,8 +113,14 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
     cd teams-ai/js
     yarn install
     yarn build
-    cd samples/04.ai.d.chainedactions.listbot
+    cd samples/04.ai.d.chainedActions.listBot
     ```
+
+3. Duplicate the `sample.env` in the `teams-ai/js/04.ai.d.chainedActions.listBot` folder. Rename the file to `.env`.
+
+4. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+
+5. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Interacting with the bot
 
