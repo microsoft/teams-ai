@@ -9,7 +9,7 @@ namespace Microsoft.Teams.AI
     /// <summary>
     /// Handles authentication using OAuth Connection.
     /// </summary>
-    internal class OAuthAuthentication<TState> : IAuthentication<TState>
+    public class OAuthAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
         private OAuthPromptSettings _settings;
