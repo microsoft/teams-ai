@@ -2,6 +2,8 @@
 
 This sample shows how to incorporate a basic Message Extension app with SSO into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search npmjs for packages.
 
+This sample depends on Teams SSO and gives you more flexibility on how to configure AAD, like using a client certificate. There is no need to create an OAuth Connection in Azure Bot Service to run this sample.
+
 ## Showcase
 - Message Extensions are convenient ways to add functionality to Teams.
 - This sample adds a search command to the compose area of a chat.
@@ -54,7 +56,6 @@ Teams Toolkit automates the setup of Azure Bot Resources and provides a local de
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
     - Running the debugger from the root of the repo will not work - you must open a new window at the sample's root.
 1. Using the TTK extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps to Teams.
-1. Further, detailed instructions can be found at [Getting Started - Teams Toolkit](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER/TEAMS-TOOLKIT.md)
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client (in Microsoft Edge).
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
@@ -64,14 +65,14 @@ Teams Toolkit automates the setup of Azure Bot Resources and provides a local de
 
 In a chat window (not the bot's chat window) select the app's icon in the chat compose area. This opens a dialog that allows you to search NPM for a package. Selecting a package will output an Adaptive Card with it's description to the chat.
 
-If you type `profile` in the Message Extension's search box to show the current user's profile in search result.
+If you type `profile` in the Message Extension's search box, it will show your profile in search result.
 
 ## Other ways to run the sample
 ### Teams Toolkit CLI
 
 [TeamsFx command line interface](https://learn.microsoft.com/microsoftteams/platform/toolkit/teamsfx-cli?pivots=version-two) is a text-based command line interface that accelerates Teams application development. It aims to provide keyboard centric experience while building Teams applications.
 
-Navigate to [Teams Toolkit CLI](https://github.com/microsoft/teams-ai/tree/main/getting-started/OTHER/TEAMS-TOOLKIT.md#teams-toolkit-cli) for setup instructions.
+Navigate to [Teams Toolkit CLI](../../../getting-started/OTHER/TEAMS-TOOLKIT.md#teams-toolkit-cli) for setup instructions.
 
 ### Manual resource management and uploading to Teams
 
