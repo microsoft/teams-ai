@@ -131,10 +131,12 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Configures authentication for the application.
         /// </summary>
+        /// <param name="adapter">The bot adapter.</param>
         /// <param name="authenticationOptions">The options for authentication.</param>
         /// <returns>The ApplicationBuilder instance.</returns>
-        public ApplicationBuilder<TState> WithAuthenticationOptions(AuthenticationOptions<TState> authenticationOptions)
+        public ApplicationBuilder<TState> WithAuthentication(BotAdapter adapter, AuthenticationOptions<TState> authenticationOptions)
         {
+            Options.Adapter = adapter;
             Options.Authentication = authenticationOptions;
             return this;
         }
