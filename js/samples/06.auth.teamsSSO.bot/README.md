@@ -8,7 +8,7 @@ This sample depends on Teams SSO and gives you more flexibility on how to config
 
 <!-- code_chunk_output -->
 
-- [Teams SSO Bot](#teams-message-extension-sso-bot)
+- [Teams SSO Bot](#teams-sso-bot)
   - [Setting up the sample](#setting-up-the-sample)
   - [Interacting with the bot](#interacting-with-the-bot)
   - [Test using Teams Toolkit for Visual Studio Code](#test-using-teams-toolkit-for-visual-studio-code)
