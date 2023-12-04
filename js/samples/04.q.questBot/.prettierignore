@@ -1,7 +1,0 @@
-bin
-build
-demo-packages
-dist
-manifest
-node_modules
-package-lock.json
