@@ -49,7 +49,7 @@ This sample illustrates basic conversational bot behavior in Microsoft Teams. Th
     cd samples/04.ai.e.chainedActions.devOpsBot
     ```
 
-1. Duplicate the `sample.env` in the `teams-ai/js/04.ai.e.chainedActions.devOpsBot` folder. Rename the file to `.env`.
+1. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.e.chainedActions.devOpsBot` folder. Rename the file to `.env`.
 
 1. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 

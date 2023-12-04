@@ -24,15 +24,21 @@ It shows following SDK capabilities:
 </details>
 <details open>
     <summary><h3>Prompt engineering</h3></summary>
-The 'generate.txt' and 'update.txt' files have descriptive prompt engineering that, in plain language, instructs GPT how the message extension should conduct itself at submit time. For example, in 'generate.txt':
+The 'prompts/hint/skprompt.txt' file has descriptive prompt engineering that, in plain language, instructs GPT how the bot should conduct itself at submit time. For example, in 'skprompt.txt':
 
-#### generate.txt
+#### skprompt.txt
 
 ```
-This is a Microsoft Teams extension that assists the user with creating posts.
-Using the prompt below, create a post that appropriate for a business environment.
-Prompt: {{data.prompt}}
-Post:
+You are the AI in a game of 20 questions.
+The goal of the game is for the Human to guess a secret within 20 questions.
+The AI should answer questions about the secret.
+The AI should assume that every message from the Human is a question about the secret.
+
+GuessCount: {{$conversation.guessCount}}
+RemainingGuesses: {{$conversation.remainingGuesses}}
+Secret: {{$conversation.secretWord}}
+
+Answer the humans question but do not mention the secret word.
 ```
 
 </details>
@@ -100,8 +106,14 @@ app.activity(ActivityTypes.Message, async (context: TurnContext, state: Applicat
     cd teams-ai/js
     yarn install
     yarn build
-    cd samples/04.e.twentyquestions
+    cd samples/04.e.twentyQuestions
     ```
+
+3. Duplicate the `sample.env` in the `teams-ai/js/samples/04.e.twentyQuestions` folder. Rename the file to `.env`.
+
+4. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+
+5. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Multiple ways to test
 
