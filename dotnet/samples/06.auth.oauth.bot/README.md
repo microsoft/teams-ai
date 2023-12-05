@@ -13,23 +13,12 @@ If you are using the Teams Toolkit to set up the bot (recommended) to set up thi
 
 1. Navigate to the `env/.env.local` file.
 1. Add the azure subscription id to the `AZURE_SUBSCRIPTION_ID` variable.
-1. Add the resource group name to the `AZURE_RESOURCE_GROUP_NAME` variable.
-1. Add an arbitrary name to `RESOURCE_SUFFIX`. For example: _"ssobot"_.
+1. Add the resource group name to the `AZURE_RESOURCE_GROUP_NAME` variable. The resource group should already exist in your Azure subscription.
+
+The support of selecting Azure subscription and resource group during "Prepare Teams App Dependencies" will come with Visual Studio 17.9 release in the future. You can skip above steps when using Visual Studio 17.9 or higher.
 
 Now you can follow the generic set up instructions here:
  [Setup Instructions](../README.md). 
- 
- #### Known set up bug
- There is currently a bug where after successfully executing `Teams Toolkit > Preparing Teams App Dependencies` the following warning shows:
-
- ![Dependency setup error](assets/error.png)
-
- When performing the F5 (Debug) you will see this error:
-
- ![Deployment error](assets/deployment-errors.png)
-
- You should click "Yes".
-
 
 ## Interacting with the Bot
 
