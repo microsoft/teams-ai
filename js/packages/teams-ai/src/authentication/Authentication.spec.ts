@@ -48,7 +48,7 @@ describe('Authentication', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            input_files: [],
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
@@ -291,7 +291,7 @@ describe('AuthenticationManager', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            input_files: [],
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}

@@ -559,7 +559,7 @@ export class AI<TState extends TurnState = TurnState> {
             // Copy the actions output to the input
             state.temp.lastOutput = output;
             state.temp.input = output;
-            state.temp.input_files = [];
+            state.temp.inputFiles = [];
         }
 
         // Check for looping

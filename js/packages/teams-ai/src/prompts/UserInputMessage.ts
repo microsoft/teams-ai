@@ -26,9 +26,9 @@ export class UserInputMessage extends PromptSectionBase {
      * Creates a new 'UserInputMessage' instance.
      * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
      * @param inputVariable Optional. Name of the variable containing the user input text. Defaults to `input`.
-     * @param filesVariable Optional. Name of the variable containing the user input files. Defaults to `input_files`.
+     * @param filesVariable Optional. Name of the variable containing the user input files. Defaults to `inputFiles`.
      */
-    public constructor(tokens: number = -1, inputVariable = 'input', filesVariable = 'input_files') {
+    public constructor(tokens: number = -1, inputVariable = 'input', filesVariable = 'inputFiles') {
         super(tokens, true, '\n', 'user: ');
         this._inputVariable = inputVariable;
         this._filesVariable = filesVariable;

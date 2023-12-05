@@ -584,12 +584,12 @@ export class Application<TState extends TurnState = TurnState> {
 
                 // Download any input files
                 if (Array.isArray(this._options.fileDownloaders) && this._options.fileDownloaders.length > 0) {
-                    const inputFiles = state.temp.input_files ?? [];
+                    const inputFiles = state.temp.inputFiles ?? [];
                     for (let i = 0; i < this._options.fileDownloaders.length; i++) {
                         const files = await this._options.fileDownloaders[i].downloadFiles(context, state);
                         inputFiles.push(...files);
                     }
-                    state.temp.input_files = inputFiles;
+                    state.temp.inputFiles = inputFiles;
                 }
 
                 // Initialize {{$allOutputs}}

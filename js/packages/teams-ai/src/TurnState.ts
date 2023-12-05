@@ -58,7 +58,7 @@ export interface DefaultTempState {
     /**
      * Downloaded files passed by the user to the AI Library
      */
-    input_files: InputFile[];
+    inputFiles: InputFile[];
 
     /**
      * Output returned from the last executed action
