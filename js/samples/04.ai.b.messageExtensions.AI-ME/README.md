@@ -1,4 +1,5 @@
 # AI in Microsoft Teams Message Extensions: GPT-ME
+This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -25,9 +26,6 @@
 <!-- /code_chunk_output -->
 
 ## Summary
-
-This sample is a message extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
-
 This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. i.e., “Make my post sound more professional.”
 
 It shows Teams AI SDK capabilities like:
@@ -110,6 +108,12 @@ app.messageExtensions.submitAction<SubmitData>('CreatePost', async (context: Tur
     ```bash
     cd teams-ai/js/samples/04.ai.b.messageExtensions.aime/
     ```
+
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.b.messageExtensions.AI-ME` folder. Rename the file to `.env`. 
+
+5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`variables and fill them in appropriately.
+
+6. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Multiple ways to test
 
