@@ -1,6 +1,6 @@
 # Chat Bot with Moderation Control
 
-This sample shows how to incorporate Azure Open AI Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
+This sample shows how to incorporate Content Safety control into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -40,12 +40,17 @@ This sample shows how to incorporate Azure Open AI Content Safety control into a
 
     ```bash
     cd teams-ai/js/samples/05.chatModeration/
-    yarn start
     ```
+
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/05.chatModeration` folder. Rename the file to `.env`. 
+
+5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT`, `AZURE_MODERATOR_KEY` & `AZURE_MODERATOR_ENDPOINT` variables and fill them in appropriately.
+
+6. Update `config.json` and `bot.ts` with your model deployment name.
 
 ## Interacting with the bot
 
-You can interact with this bot by sending it a message, which will echo back to you.
+You can interact with this bot by sending it a message, and a moderation report will be sent back to you.
 
 ## Multiple ways to test
 
