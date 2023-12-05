@@ -50,9 +50,11 @@ Note that this bot will only work in tenants where the following graph scopes ar
     cd teams-ai/js/samples/07.whoBot/
     ```
 
-4. Create a `.env` file in the `teams-ai/js/samples/07.whoBot` folder.
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/07.whoBot` folder. Rename the file to `.env`. 
 
-5. If you are using OpenAI then create the `OPENAI_KEY` variable and add your key. Otherwise if you are using Azure OpenAI then create variables `AZURE_OPENAI_KEY` & `AZURE_OPENAI_ENDPOINT` variables and set them appropriately.
+5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+
+6. Update `config.json` and `bot.ts` with your model deployment name.
 
 ## Interacting with the bot
 
