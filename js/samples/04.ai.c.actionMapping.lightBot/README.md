@@ -1,4 +1,5 @@
 # AI in Microsoft Teams: Light Bot
+LightBot: Your Enlightened Assistant. This example showcases how the LightBot understands user intent, accurately interpreting commands to effortlessly control light bot.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -19,7 +20,6 @@
 
 <!-- /code_chunk_output -->
 
-LightBot: Your Enlightened Assistant. This example showcases how the LightBot understands user intent, accurately interpreting commands to effortlessly control light bot.
 Explore how the LightBot understands, allowing precise control over turning lights on and off, while demonstrating the power and potential of the Language Model in understanding and executing user intent accurately mapped with app actions.
 
 It shows Teams AI SDK capabilities like:
@@ -98,6 +98,11 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
     ```bash
     cd teams-ai/js/samples/04.ai.c.actionMapping.lightBot/
     ```
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.c.actionMapping.lightBot` folder. Rename the file to `.env`. 
+
+5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
+
+6. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Interacting with the bot
 
