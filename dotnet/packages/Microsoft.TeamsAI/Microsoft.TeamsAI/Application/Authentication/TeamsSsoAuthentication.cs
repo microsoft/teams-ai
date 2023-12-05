@@ -77,7 +77,7 @@ namespace Microsoft.Teams.AI
                 return await _messageExtensionsAuth.AuthenticateAsync(context);
             }
 
-            throw new TeamsAIException("Incoming activity is not a valid activity to initiate authentication flow.");
+            throw new AuthException("Incoming activity is not a valid activity to initiate authentication flow.", AuthExceptionReason.InvalidActivity);
         }
 
         /// <summary>
