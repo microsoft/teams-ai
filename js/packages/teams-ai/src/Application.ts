@@ -32,6 +32,7 @@ import {
     setUserInSignInFlow,
     userInSignInFlow
 } from './authentication/BotAuthenticationBase';
+import { Meetings } from './Meetings';
 
 /**
  * @private
@@ -213,6 +214,7 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
+    private readonly _meetings: Meetings<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _taskModules: TaskModules<TState>;
     private readonly _ai?: AI<TState>;
@@ -260,6 +262,7 @@ export class Application<TState extends TurnState = TurnState> {
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
         this._messageExtensions = new MessageExtensions<TState>(this);
+        this._meetings = new Meetings<TState>(this);
         this._taskModules = new TaskModules<TState>(this);
 
         // Validate long running messages configuration
@@ -331,6 +334,14 @@ export class Application<TState extends TurnState = TurnState> {
      */
     public get messageExtensions(): MessageExtensions<TState> {
         return this._messageExtensions;
+    }
+
+    /**
+     * Fluent interface for accessing Meetings specific features.
+     * @returns {Meetings<TState>} The Meetings instance.
+     */
+    public get meetings(): Meetings<TState> {
+        return this._meetings;
     }
 
     /**
