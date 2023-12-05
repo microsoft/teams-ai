@@ -165,6 +165,7 @@ dotnet_diagnostic.CA2227.severity = none # Change to be read-only by removing th
 dotnet_diagnostic.CA2253.severity = warning # Named placeholders in the logging message template should not be comprised of only numeric characters
 
 dotnet_diagnostic.CS1591.severity = warning # Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS8618.severity = silent # Non-nullable field is uninitialized
 
 dotnet_diagnostic.IDE0001.severity = warning # Simplify name
 dotnet_diagnostic.IDE0002.severity = warning # Simplify member access
@@ -191,7 +192,7 @@ dotnet_diagnostic.IDE0071.severity = warning # Simplify interpolation
 dotnet_diagnostic.IDE0073.severity = warning # Require file header
 dotnet_diagnostic.IDE0080.severity = warning # Remove unnecessary suppression operator
 dotnet_diagnostic.IDE0082.severity = warning # Convert typeof to nameof
-dotnet_diagnostic.IDE0090.severity = warning # Simplify new expression
+dotnet_diagnostic.IDE0090.severity = silent # Simplify new expression
 dotnet_diagnostic.IDE0100.severity = warning # Remove unnecessary equality operator
 dotnet_diagnostic.IDE0110.severity = warning # Remove unnecessary discards
 dotnet_diagnostic.IDE0130.severity = warning # Namespace does not match folder structure
