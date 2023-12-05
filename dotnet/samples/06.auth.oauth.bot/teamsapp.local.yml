@@ -39,9 +39,6 @@ provision:
       outputFilePath : ./build/aad.manifest.${{TEAMSFX_ENV}}.json
 
   - uses: arm/deploy # Deploy given ARM templates parallelly.
-    env:
-      # an arbitrary name for the connection
-      OAUTH_CONNECTION_NAME: graph-connection
     with:
       # AZURE_SUBSCRIPTION_ID is a built-in environment variable,
       # if its value is empty, TeamsFx will prompt you to select a subscription.
@@ -66,15 +63,12 @@ provision:
 
   # Generate runtime appsettings to JSON file
   - uses: file/createOrUpdateJsonFile
-    env:
-      # an arbitrary name for the connection
-      OAUTH_CONNECTION_NAME: graph-connection
     with:
       target: ./appsettings.Development.json
       content:
         BOT_ID: ${{BOT_ID}}
         BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
-        OAUTH_CONNECTION_NAME: ${{OAUTH_CONNECTION_NAME}}
+        OAUTH_CONNECTION_NAME: graph-connection
         BOT_DOMAIN: ${{BOT_DOMAIN}}
         AAD_APP_CLIENT_ID: ${{BOT_ID}}
         AAD_APP_CLIENT_SECRET: ${{SECRET_BOT_PASSWORD}}
