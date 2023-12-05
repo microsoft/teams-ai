@@ -113,25 +113,19 @@ const planner = new ActionPlanner({
     defaultPrompt: 'chat',
 });
 
-// const moderator = new OpenAIModerator({
-//     apiKey: process.env.OPENAI_API_KEY || '',
-//     moderate: 'both'
-// });
-
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
-        // moderator
     }
 });
 
 // Register your data source with planner
 planner.prompts.addDataSource(new VectraDataSource({
     name: 'teams-ai',
-    apiKey:  process.env.OPENAI_API_KEY!,
+    apiKey:  process.env.OPENAI_KEY!,
     indexFolder: path.join(__dirname, '../index'),
 }));
 
