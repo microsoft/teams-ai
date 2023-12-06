@@ -17,7 +17,7 @@ provision:
   # Automates the creation of a Teams app registration and saves the App ID to an environment file.
   - uses: teamsApp/create
     with:
-      name: EchoBot-${{TEAMSFX_ENV}}
+      name: TwentyQuestions-${{TEAMSFX_ENV}}
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
@@ -25,7 +25,7 @@ provision:
   # The Bot ID (AAD app client ID) and Bot Password (AAD app client secret) are saved to an environment file.
   - uses: botAadApp/create
     with:
-      name: EchoBot-${{TEAMSFX_ENV}}
+      name: TwentyQuestions-${{TEAMSFX_ENV}}
     writeToEnvironmentFile:
       botId: BOT_ID
       botPassword: SECRET_BOT_PASSWORD
@@ -39,7 +39,7 @@ provision:
       templates:
         - path: ./infra/azure.bicep
           parameters: ./infra/azure.parameters.json
-          deploymentName: Create-resources-for-tab
+          deploymentName: Create-resources-for-bot
       bicepCliVersion: v0.9.1
 
   # Optional: Automates schema and error checking of the Teams app manifest and outputs the results in the console.
@@ -68,18 +68,6 @@ provision:
 # Defines what the `deploy` lifecycle step does with Teams Toolkit.
 # Runs with the Deploy menu or CLI using `teamsfx deploy --env {environment name}`.
 deploy:
-
-  # Install any dependencies and build the web app using NPM
-  - uses: cli/runNpmCommand
-    name: install dependencies
-    with:
-      args: install
-
-  - uses: cli/runNpmCommand
-    name: build app
-    with:
-      args: run build --if-present
-
   # Deploy to an Azure App Service using the zip file created in the provision step.
   - uses: azureAppService/zipDeploy
     with:

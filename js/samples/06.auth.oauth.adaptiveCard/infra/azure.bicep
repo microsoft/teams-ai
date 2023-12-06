@@ -19,6 +19,8 @@ param serverfarmsName string = resourceBaseName
 param webAppName string = resourceBaseName
 param location string = resourceGroup().location
 
+param oauthConnectionName string
+
 // Compute resources for your Web App
 resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
   kind: 'app'
@@ -53,12 +55,16 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: '1'
         }
         {
-          name: 'MicrosoftAppId'
+          name: 'BOT_ID'
           value: botAadAppClientId
         }
         {
-          name: 'MicrosoftAppPassword'
+          name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
+        }
+        {
+          name: 'OAUTH_CONNECTION_NAME'
+          value: oauthConnectionName
         }
       ]
       ftpsState: 'FtpsOnly'
@@ -74,6 +80,8 @@ module azureBotRegistration './botRegistration/azurebot.bicep' = {
     botAadAppClientId: botAadAppClientId
     botAppDomain: webApp.properties.defaultHostName
     botDisplayName: botDisplayName
+    botAddAppClientSecret: botAadAppClientSecret
+    oauthConnectionName: oauthConnectionName
   }
 }
 

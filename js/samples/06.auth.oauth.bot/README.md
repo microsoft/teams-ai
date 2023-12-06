@@ -4,6 +4,10 @@ This sample shows how to incorporate a basic conversational SSO flow into a Micr
 
 This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
 
+Note that this bot will only work in tenants where the following graph scopes are permitted:
+
+- `User.Read`
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
@@ -39,9 +43,11 @@ This sample requires creating an OAuth Connection in Azure Bot Service, which pr
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.SsoAuthBot/
-    yarn start
+    cd teams-ai/js/samples/06.auth.oauth.bot/
     ```
+
+4. Jump to [Multiple ways to test](#multiple-ways-to-test).
+
 
 ## Interacting with the bot
 
@@ -59,6 +65,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+   1. Login with your M365 account.
+   2. Login with your Azure account. Ensure that you have a valid subscription and resource group. This will be required to provision your bot.
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
@@ -92,7 +100,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 1. In the repository directory, run the Teams Toolkit CLI commands to automate the setup needed for the app
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.SsoAuthBot/
+    cd teams-ai/js/samples/06.auth.oauth.bot/
     teamsfx provision --env local
 
     ```
@@ -113,10 +121,10 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 > If you used Teams Toolkit in the above steps, you can [upload a custom app](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload) to a desktop client using the `/appPackage/appPackage.local.zip` file created by the tools and skip to step 6.
 
-1. In a terminal, navigate to `teams-ai/js/samples/01.messaging.a.SsoAuthBot/`
+1. In a terminal, navigate to `teams-ai/js/samples/06.auth.oauth.bot/`
 
     ```bash
-    cd teams-ai/js/samples/01.messaging.a.SsoAuthBot/
+    cd teams-ai/js/samples/06.auth.oauth.bot/
     ```
 
 1. Run ngrok tunneling service - point to port 3978

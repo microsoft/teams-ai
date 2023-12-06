@@ -13,7 +13,7 @@ import {
     CardFactory,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     MessagingExtensionAttachment,
     MessagingExtensionResult,
@@ -26,7 +26,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -78,7 +83,7 @@ const app = new ApplicationBuilder()
     .withAuthentication(adapter, {
         settings: {
             graph: {
-                connectionName: process.env.ConnectionName ?? '',
+                connectionName: process.env.OAUTH_CONNECTION_NAME ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true
@@ -220,7 +225,7 @@ async function getUserDetailsFromGraph(token: string): Promise<{ displayName: st
     // The user is signed in, so use the token to create a Graph Clilent and show profile
     const graphClient = new GraphClient(token);
     const profile = await graphClient.getMyProfile();
-    const profilePhoto = await graphClient.getProfilePhotoAsync ();
+    const profilePhoto = await graphClient.getProfilePhotoAsync();
     return { displayName: profile.displayName, profilePhoto: profilePhoto };
 }
 

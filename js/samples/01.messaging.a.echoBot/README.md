@@ -2,6 +2,26 @@
 
 This sample shows how to incorporate a basic conversational flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Teams Echo Bot](#teams-echo-bot)
+  - [Showcase](#showcase)
+  - [Setting up the sample](#setting-up-the-sample)
+  - [Teams Toolkit for Visual Studio Code](#teams-toolkit-for-visual-studio-code)
+    - [Prerequisites](#prerequisites)
+    - [Run the sample](#run-the-sample)
+  - [Interacting with the bot](#interacting-with-the-bot)
+  - [Other ways to run the sample](#other-ways-to-run-the-sample)
+    - [Teams Toolkit CLI](#teams-toolkit-cli)
+    - [Manual resource management and uploading to Teams](#manual-resource-management-and-uploading-to-teams)
+    - [BotFramework Emulator](#botframework-emulator)
+  - [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+  - [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
 ## Showcase
 
 - The bot echos back any message it receives. That's it!

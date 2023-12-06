@@ -1,6 +1,6 @@
 import {
     Application,
-    AssistantsPlanner,
+    preview,
     AI
 } from '@microsoft/teams-ai';
 import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuilder';
@@ -11,7 +11,9 @@ if (!process.env.OPENAI_KEY) {
     throw new Error('Missing environment variables - please check that OPENAI_KEY.');
 }
 
-// Create Assistant if no ID is provided
+const { AssistantsPlanner } = preview;
+
+// Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
     (async () => {
         const assistant = await AssistantsPlanner.createAssistant(process.env.OPENAI_KEY!, {

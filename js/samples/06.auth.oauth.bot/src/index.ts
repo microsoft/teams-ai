@@ -12,7 +12,7 @@ import {
     ActivityTypes,
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     TurnContext
 } from 'botbuilder';
@@ -22,7 +22,12 @@ const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
-    process.env as ConfigurationBotFrameworkAuthenticationOptions
+    {},
+    new ConfigurationServiceClientCredentialFactory({
+        MicrosoftAppId: process.env.BOT_ID,
+        MicrosoftAppPassword: process.env.BOT_PASSWORD,
+        MicrosoftAppType: 'MultiTenant'
+    })
 );
 
 // Create adapter.
@@ -46,7 +51,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 
     // Send a message to the user
     await context.sendActivity(
-        'The bot encountered an error or bug. To continue to run this bot, please fix the bot source code.'
+        `The bot encountered an error or bug: ${error.message} . To continue to run this bot, please fix the bot source code.`
     );
 };
 
@@ -76,7 +81,7 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
     .withAuthentication(adapter, {
         settings: {
             graph: {
-                connectionName: process.env.ConnectionName ?? '',
+                connectionName: process.env.OAUTH_CONNECTION_NAME ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true
