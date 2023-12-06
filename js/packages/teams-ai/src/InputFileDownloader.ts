@@ -10,7 +10,7 @@ import { TurnContext } from 'botbuilder';
 import { TurnState } from './TurnState';
 
 /**
- * A plugin responsible for downloading files relative to the current users input.
+ * A plugin responsible for downloading files relative to the current user's input.
  * @template TState Optional. Type of application state.
  */
 export interface InputFileDownloader<TState extends TurnState = TurnState> {
