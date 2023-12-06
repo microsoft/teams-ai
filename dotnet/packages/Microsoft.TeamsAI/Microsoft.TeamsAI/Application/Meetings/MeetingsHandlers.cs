@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task MeetingStartHandler<TState>(ITurnContext turnContext, TState turnState, MeetingStartEventDetails meeting, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task MeetingStartHandler<TState>(ITurnContext turnContext, TState turnState, MeetingStartEventDetails meeting, CancellationToken cancellationToken) where TState : TurnState;
 
     /// <summary>
     /// Function for handling Microsoft Teams meeting end events.
@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task MeetingEndHandler<TState>(ITurnContext turnContext, TState turnState, MeetingEndEventDetails meeting, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task MeetingEndHandler<TState>(ITurnContext turnContext, TState turnState, MeetingEndEventDetails meeting, CancellationToken cancellationToken) where TState : TurnState;
 
     /// <summary>
     /// Function for handling Microsoft Teams meeting participants join or leave events.
@@ -38,6 +38,6 @@ namespace Microsoft.Teams.AI
     /// <param name="cancellationToken">A cancellation token that can be used by other objects
     /// or threads to receive notice of cancellation.</param>
     /// <returns>A task that represents the work queued to execute.</returns>
-    public delegate Task MeetingParticipantsEventHandler<TState>(ITurnContext turnContext, TState turnState, MeetingParticipantsEventDetails meeting, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task MeetingParticipantsEventHandler<TState>(ITurnContext turnContext, TState turnState, MeetingParticipantsEventDetails meeting, CancellationToken cancellationToken) where TState : TurnState;
 
 }

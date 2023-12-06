@@ -19,9 +19,7 @@
 
   <!-- Include prompt as content in build output -->
   <ItemGroup>
-    <Folder Include="Prompts/Chat/" />
-    <Folder Include="Prompts/ChatGPT/" />
-    <Folder Include="Prompts/Summarize/" />
+    <Folder Include="Prompts/Sequence/" />
     <Content Include="Prompts/*/skprompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

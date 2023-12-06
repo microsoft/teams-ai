@@ -1,4 +1,4 @@
-﻿using Microsoft.Teams.AI.AI.Planner;
+﻿using Microsoft.Teams.AI.AI.Planners;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -42,7 +42,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
     },
     {
       ""type"": ""DO"",
-      ""entities"": {
+      ""action"": ""DoSomething"",
+      ""parameters"": {
         ""prop"": ""value""
       }
     }

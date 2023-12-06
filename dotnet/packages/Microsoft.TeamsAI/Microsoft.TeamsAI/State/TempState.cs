@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.State
     /// <remarks>
     /// Inherit a new class from this base abstract class to strongly type the applications temp state.
     /// </remarks>
-    public class TempState : StateBase
+    public class TempState : Record
     {
         /// <summary>
         /// Name of the input property.
@@ -20,9 +20,20 @@ namespace Microsoft.Teams.AI.State
         public const string OutputKey = "output";
 
         /// <summary>
-        /// Name of the history property.
+        /// Name of the action outputs property.
         /// </summary>
-        public const string HistoryKey = "history";
+        public const string ActionOutputsKey = "actionOutputs";
+
+        /// <summary>
+        /// Name of the auth tokens property.
+        /// </summary>
+        public const string AuthTokenKey = "authTokens";
+
+
+        /// <summary>
+        /// Name of the duplicate token exchange property
+        /// </summary>
+        public const string DuplicateTokenExchangeKey = "duplicateTokenExchange";
 
         /// <summary>
         /// Creates a new instance of the <see cref="TempState"/> class.
@@ -31,7 +42,9 @@ namespace Microsoft.Teams.AI.State
         {
             this[InputKey] = string.Empty;
             this[OutputKey] = string.Empty;
-            this[HistoryKey] = string.Empty;
+            this[ActionOutputsKey] = new Dictionary<string, string>();
+            this[AuthTokenKey] = new Dictionary<string, string>();
+            this[DuplicateTokenExchangeKey] = false;
         }
 
         /// <summary>
@@ -53,14 +66,31 @@ namespace Microsoft.Teams.AI.State
             set => Set(OutputKey, value);
         }
 
+        /// <summary>
+        /// All outputs returned from the action sequence that was executed.
+        /// </summary>
+        public Dictionary<string, string> ActionOutputs
+        {
+            get => Get<Dictionary<string, string>>(ActionOutputsKey)!;
+            set => Set(ActionOutputsKey, value);
+        }
 
         /// <summary>
-        /// Formatted conversation history for embedding in an AI prompt
+        /// All tokens acquired after sign-in for current activity
         /// </summary>
-        public string History
+        public Dictionary<string, string> AuthTokens
         {
-            get => Get<string>(HistoryKey)!;
-            set => Set(HistoryKey, value);
+            get => Get<Dictionary<string, string>>(AuthTokenKey)!;
+            set => Set(AuthTokenKey, value);
+        }
+
+        /// <summary>
+        /// Whether current token exchange is a duplicate one
+        /// </summary>
+        public bool DuplicateTokenExchange
+        {
+            get => Get<bool>(DuplicateTokenExchangeKey)!;
+            set => Set(DuplicateTokenExchangeKey, value);
         }
     }
 }
