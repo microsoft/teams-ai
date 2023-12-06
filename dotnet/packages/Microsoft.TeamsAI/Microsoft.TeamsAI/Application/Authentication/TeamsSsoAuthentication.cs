@@ -19,34 +19,15 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Initialize instance for current class
         /// </summary>
+        /// <param name="app">The application.</param>
+        /// <param name="name">The authentication name.</param>
         /// <param name="settings">The settings to initialize the class</param>
-        public TeamsSsoAuthentication(TeamsSsoSettings settings)
+        /// <param name="storage">The storage to use.</param>
+        public TeamsSsoAuthentication(Application<TState> app, string name, TeamsSsoSettings settings, IStorage? storage = null)
         {
             _settings = settings;
-        }
-
-        /// <summary>
-        /// Initialize the authentication class
-        /// </summary>
-        /// <param name="app">The application object</param>
-        /// <param name="name">The name of the authentication handler</param>
-        /// <param name="storage">The storage to save turn state</param>
-        public void Initialize(Application<TState> app, string name, IStorage? storage = null)
-        {
             _botAuth = new TeamsSsoBotAuthentication<TState>(app, name, _settings, storage);
             _messageExtensionsAuth = new TeamsSsoMessageExtensionsAuthentication(_settings);
-        }
-
-        /// <summary>
-        /// Whether the current activity is a valid activity that supports authentication
-        /// </summary>
-        /// <param name="context">The turn context</param>
-        /// <returns>True if valid. Otherwise, false.</returns>
-        public Task<bool> IsValidActivityAsync(ITurnContext context)
-        {
-            return Task.FromResult(
-                (_botAuth != null && _botAuth.IsValidActivity(context))
-                || (_messageExtensionsAuth != null && _messageExtensionsAuth.IsValidActivity(context)));
         }
 
         /// <summary>
@@ -56,15 +37,12 @@ namespace Microsoft.Teams.AI
         /// <param name="state">The turn state</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
+        public async Task<string?> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             string token = await _TryGetUserToken(context);
             if (!string.IsNullOrEmpty(token))
             {
-                return new SignInResponse(SignInStatus.Complete)
-                {
-                    Token = token
-                };
+                return token;
             }
 
             if ((_botAuth != null && _botAuth.IsValidActivity(context)))

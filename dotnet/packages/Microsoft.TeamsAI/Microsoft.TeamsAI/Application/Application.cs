@@ -88,13 +88,8 @@ namespace Microsoft.Teams.AI
 
             if (options.Authentication != null)
             {
-                // Initialize the authentication classes
-                foreach (KeyValuePair<string, IAuthentication<TState>> pair in options.Authentication.Authentications)
-                {
-                    pair.Value.Initialize(this, pair.Key, options.Storage);
-                }
+                _authentication = new AuthenticationManager<TState>(this, options.Authentication, options.Storage);
 
-                _authentication = new AuthenticationManager<TState>(options.Authentication);
                 if (options.Authentication.AutoSignIn != null)
                 {
                     _startSignIn = options.Authentication.AutoSignIn;

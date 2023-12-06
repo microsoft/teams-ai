@@ -37,22 +37,20 @@ builder.Services.AddTransient<IBot>(sp =>
     IStorage storage = sp.GetService<IStorage>();
     BotAdapter adapter = sp.GetService<CloudAdapter>();
 
+    AuthenticationOptions<AppState> options = new();
+    options.AddAuthentication("graph", new OAuthSettings()
+    {
+        ConnectionName = config.OAUTH_CONNECTION_NAME,
+        Title = "Sign In",
+        Text = "Please sign in to use the bot.",
+        EndOnInvalidMessage = true,
+    }
+    );
+
     Application<AppState> app = new ApplicationBuilder<AppState>()
         .WithStorage(storage)
         .WithTurnStateFactory(() => new AppState())
-        .WithAuthentication(adapter, new(new()
-        {
-            {
-                "graph",
-                new OAuthAuthentication<AppState>(new()
-                {
-                    ConnectionName = config.OAUTH_CONNECTION_NAME,
-                    Title = "Sign In",
-                    Text = "Please sign in to use the bot.",
-                    EndOnInvalidMessage = true,
-                })
-            },
-        }))
+        .WithAuthentication(adapter, options)
         .Build();
 
     // Listen for user to say "/reset" and then delete conversation state

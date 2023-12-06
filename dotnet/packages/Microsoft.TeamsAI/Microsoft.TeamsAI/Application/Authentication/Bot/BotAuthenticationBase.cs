@@ -62,7 +62,7 @@ namespace Microsoft.Teams.AI
         /// <param name="state">The turn state</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
+        public async Task<string?> AuthenticateAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             // Get property names to use
             string userAuthStatePropertyName = GetUserAuthStatePropertyName(context);
@@ -93,14 +93,11 @@ namespace Microsoft.Teams.AI
                 else
                 {
                     // Return token
-                    return new SignInResponse(SignInStatus.Complete)
-                    {
-                        Token = tokenResponse.Token
-                    };
+                    return tokenResponse.Token;
                 }
             }
 
-            return new SignInResponse(SignInStatus.Pending);
+            return null;
         }
 
         /// <summary>
@@ -202,7 +199,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
+        /// <returns>True if the activity should be handled by current authentication handler. Otherwise, false.</returns>
         protected virtual Task<bool> VerifyStateRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke
@@ -214,7 +211,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
+        /// <returns>True if the activity should be handled by current authentication handler. Otherwise, false.</returns>
         protected virtual Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke

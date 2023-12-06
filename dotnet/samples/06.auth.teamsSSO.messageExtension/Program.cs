@@ -56,20 +56,18 @@ builder.Services.AddSingleton<IConfidentialClientApplication>(sp =>
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>()!;
+    BotAdapter adapter = sp.GetService<CloudAdapter>()!;
     IConfidentialClientApplication msal = sp.GetService<IConfidentialClientApplication>();
     string signInLink = $"https://{config.BOT_DOMAIN}/auth-start.html";
-    ApplicationOptions<TurnState> applicationOptions = new()
-    {
-        Storage = storage,
-        Authentication = new AuthenticationOptions<TurnState>(
-            new Dictionary<string, IAuthentication<TurnState>>()
-            {
-                { "graph", new TeamsSsoAuthentication<TurnState>(new TeamsSsoSettings(new string[]{"User.Read"}, signInLink, msal)) }
-            }
-        )
-    };
 
-    Application<TurnState> app = new(applicationOptions);
+    AuthenticationOptions<TurnState> options = new();
+    options.AddAuthentication("graph", new TeamsSsoSettings(new string[]{"User.Read"}, signInLink, msal));
+
+    Application<TurnState> app = new ApplicationBuilder<TurnState>()
+        .WithStorage(storage)
+        .WithTurnStateFactory(() => new TurnState())
+        .WithAuthentication(adapter, options)
+        .Build();
 
     Utilities utilities = sp.GetService<Utilities>()!;
 
