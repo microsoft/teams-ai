@@ -48,7 +48,7 @@ describe('Authentication', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
@@ -85,7 +85,10 @@ describe('Authentication', () => {
         it('should call botAuth.authenticate() when activity type is message and the text is a non-empty string', async () => {
             const isUserSignedInStub = sinon.stub(auth, 'isUserSignedIn').returns(Promise.resolve(undefined));
 
-            const [context, state] = await createTurnContextAndState({ type: ActivityTypes.Message, text: 'non empty' });
+            const [context, state] = await createTurnContextAndState({
+                type: ActivityTypes.Message,
+                text: 'non empty'
+            });
 
             await auth.signInUser(context, state);
 
@@ -291,7 +294,7 @@ describe('AuthenticationManager', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}

@@ -271,22 +271,10 @@ export class LLMClient<TContent = any> {
      * @param context Current turn context.
      * @param memory An interface for accessing state values.
      * @param functions Functions to use when rendering the prompt.
-     * @param input Optional. Input to use when completing the prompt.
      * @returns A `PromptResponse` with the status and message.
      */
-    public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, input?: string): Promise<PromptResponse<TContent>> {
+    public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions): Promise<PromptResponse<TContent>> {
         const { model, template, tokenizer, validator, max_repair_attempts, history_variable, input_variable } = this.options;
-
-        // Update/get user input
-        if (input_variable) {
-            if (typeof input === 'string') {
-                memory.setValue(input_variable, input);
-            } else {
-                input = memory.hasValue(input_variable) ? memory.getValue(input_variable) : ''
-            }
-        } else if (!input) {
-            input = '';
-        }
 
         try {
             // Ask client to complete prompt
@@ -294,6 +282,13 @@ export class LLMClient<TContent = any> {
             if (response.status !== 'success') {
                 // The response isn't valid so we don't care that the messages type is potentially incorrect.
                 return response;
+            }
+
+            // Get input message
+            let inputMsg = response.input;
+            if (!inputMsg && input_variable) {
+                const content = memory.getValue(input_variable) ?? '';
+                inputMsg = { role: 'user', content };
             }
 
             // Validate response
@@ -305,7 +300,7 @@ export class LLMClient<TContent = any> {
                 }
 
                 // Update history and return
-                this.addInputToHistory(memory, history_variable, input!);
+                this.addInputToHistory(memory, history_variable, inputMsg!);
                 this.addResponseToHistory(memory, history_variable, response.message!);
                 return response;
             }
@@ -341,7 +336,7 @@ export class LLMClient<TContent = any> {
             // - we never want to save an invalid response to conversation history.
             // - the caller can take further corrective action, including simply re-trying.
             if (repair.status === 'success') {
-                this.addInputToHistory(memory, history_variable, input!);
+                this.addInputToHistory(memory, history_variable, inputMsg!);
                 this.addResponseToHistory(memory, history_variable, repair.message!);
             }
 
@@ -349,6 +344,7 @@ export class LLMClient<TContent = any> {
         } catch (err: unknown) {
             return {
                 status: 'error',
+                input: undefined,
                 error: err as Error
             };
         }
@@ -357,10 +353,10 @@ export class LLMClient<TContent = any> {
     /**
      * @private
      */
-    private addInputToHistory(memory: Memory, variable: string, input: string): void {
-        if (variable && input.length > 0) {
+    private addInputToHistory(memory: Memory, variable: string, input: Message<any>): void {
+        if (variable) {
             const history: Message[] = memory.getValue(variable) ?? [];
-            history.push({ role: 'user', content: input });
+            history.push(input);
             if (history.length > this.options.max_history_messages) {
                 history.splice(0, history.length - this.options.max_history_messages);
             }
@@ -391,7 +387,7 @@ export class LLMClient<TContent = any> {
         // Add response and feedback to repair history
         const feedback = validation.feedback ?? 'The response was invalid. Try another strategy.';
         this.addResponseToHistory(fork, `${history_variable}-repair`, response.message!);
-        this.addInputToHistory(fork, `${history_variable}-repair`, feedback);
+        this.addInputToHistory(fork, `${history_variable}-repair`, { role: 'user', content: feedback });
 
         // Append repair history to prompt
         const repairTemplate = Object.assign({}, template, {
@@ -429,6 +425,7 @@ export class LLMClient<TContent = any> {
         if (remaining_attempts <= 0) {
             return {
                 status: 'invalid_response',
+                input: undefined,
                 error: new Error(validation.feedback ?? 'The response was invalid. Try another strategy.')
             };
         }

@@ -96,8 +96,14 @@ export class ConversationHistory extends PromptSectionBase {
                 message.content = Utilities.toString(tokenizer, msg.content);
             }
 
-            // Get message length
-            const length = tokenizer.encode(PromptSectionBase.getMessageText(message)).length;
+            // Get text message length
+            let length = tokenizer.encode(PromptSectionBase.getMessageText(message)).length;
+
+            // Add length of any image parts
+            // TODO: This accounts for low detail images but not high detail images.
+            if (Array.isArray(message.content)) {
+                length += message.content.filter((part) => part.type === 'image').length * 85;
+            }
 
             // Add initial message if required
             if (messages.length === 0 && this.required) {

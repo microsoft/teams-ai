@@ -23,6 +23,7 @@ import { ConversationHistory } from "./ConversationHistory";
 import { UserMessage } from "./UserMessage";
 import { GroupSection } from "./GroupSection";
 import { Prompt } from "./Prompt";
+import { UserInputMessage } from "./UserInputMessage";
 
 /**
  * Options used to configure the prompt manager.
@@ -319,7 +320,9 @@ export class PromptManager implements PromptFunctions {
             }
 
             // Include user input
-            if (template.config.completion.include_input) {
+            if (template.config.completion.include_images) {
+                sections.push(new UserInputMessage(this.options.max_input_tokens));
+            } else if (template.config.completion.include_input) {
                 sections.push(new UserMessage('{{$temp.input}}', this.options.max_input_tokens));
             }
 
@@ -364,6 +367,7 @@ export class PromptManager implements PromptFunctions {
             frequency_penalty: 0.0,
             include_history: true,
             include_input: true,
+            include_images: false,
             max_tokens: 150,
             max_input_tokens: 2048,
             presence_penalty: 0.0,

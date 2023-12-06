@@ -71,7 +71,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import axios from 'axios';
-import { ApplicationBuilder, AuthError, TurnState } from '@microsoft/teams-ai';
+import { ApplicationBuilder, TurnState } from '@microsoft/teams-ai';
 import { createNpmPackageCard, createNpmSearchResultCard, createSignOutCard } from './cards';
 import { GraphClient } from './graphClient';
 

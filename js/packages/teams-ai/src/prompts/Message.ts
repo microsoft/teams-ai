@@ -46,3 +46,30 @@ export interface FunctionCall {
      */
     arguments?: string;
 }
+
+export type MessageContentParts = TextContentPart | ImageContentPart;
+
+export interface TextContentPart {
+    /**
+     * Type of the message content. Should always be 'text'.
+     */
+    type: 'text';
+
+    /**
+     * The text of the message.
+     */
+    text: string;
+}
+
+export interface ImageContentPart {
+    /**
+     * Type of the message content. Should always be 'image'.
+     */
+    type: 'image';
+
+    /**
+     * The URL of the image.
+     */
+    image_url: string|{url: string};
+}
+

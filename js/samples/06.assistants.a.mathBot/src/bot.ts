@@ -11,10 +11,10 @@ const { AssistantsPlanner } = preview;
 if (!process.env.ASSISTANT_ID) {
     (async () => {
         const assistant = await AssistantsPlanner.createAssistant(process.env.OPENAI_KEY!, {
-            name: "Math Tutor",
-            instructions: "You are a personal math tutor. Write and run code to answer math questions.",
-            tools: [{ type: "code_interpreter" }],
-            model: "gpt-4-1106-preview"
+            name: 'Math Tutor',
+            instructions: 'You are a personal math tutor. Write and run code to answer math questions.',
+            tools: [{ type: 'code_interpreter' }],
+            model: 'gpt-4-1106-preview'
         });
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);

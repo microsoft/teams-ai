@@ -42,7 +42,7 @@ describe('TeamsSsoBotAuthentication', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
