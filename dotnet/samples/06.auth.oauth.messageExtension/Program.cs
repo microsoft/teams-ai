@@ -43,17 +43,17 @@ builder.Services.AddSingleton<Utilities>();
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>()!;
-    string signInLink = $"https://{config.BOT_DOMAIN}/auth-start.html";
     ApplicationOptions<TurnState> applicationOptions = new()
     {
         Storage = storage,
         Authentication = new AuthenticationOptions<TurnState>(
             new Dictionary<string, IAuthentication<TurnState>>()
             {
-                { "graph", new OAuthAuthentication<TurnState>(new Microsoft.Bot.Builder.Dialogs.OAuthPromptSettings()
-                {
-                    ConnectionName = config.OAUTH_CONNECTION_NAME
-                }) }
+                { "graph", new OAuthAuthentication<TurnState>(new OAuthSettings()
+                    {
+                        ConnectionName = config.OAUTH_CONNECTION_NAME
+                    }
+                )}
             }
         )
     };
