@@ -1,4 +1,5 @@
 ﻿using Microsoft.Teams.AI.State;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.StateTests
 {
@@ -7,8 +8,11 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         [Fact]
         public void Test_Delete_EntryIsDeleted()
         {
+            Record record = new();
+            object temp = new();
+            record.Add("key", temp);
             // Arrange
-            TurnStateEntry<string> entry = new("key", new string("string"));
+            TurnStateEntry entry = new(record, new string("string"));
 
             // Act
             entry.Delete();
@@ -21,26 +25,27 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public void Test_ComputeHash_FromDictionary()
         {
             // Arrange
-            StateBase map = new();
-            map["key1"] = "value1";
+            Record record = new();
+            object val = new();
+            record["key1"] = val;
 
             // Act
-            string hash = TurnStateEntry<StateBase>.ComputeHash(map);
+            string hash = TurnStateEntry.ComputeHash(record);
 
             // Assert
-            Assert.Equal("{\"key1\":\"value1\"}", hash);
+            Assert.Equal("{\"key1\":{}}", hash);
         }
 
         [Fact]
         public void Test_HasChanged_IsChanged()
         {
             // Arrange
-            StateBase map = new();
-            map["key1"] = "value1";
-            TurnStateEntry<StateBase> entry = new(map);
+            Record map = new();
+            map["key1"] = new object();
+            TurnStateEntry entry = new(map);
 
             // Act
-            map["key1"] = "value2";
+            map["key1"] = new List<string>();
 
             // Assert
             Assert.True(entry.HasChanged);
@@ -50,12 +55,13 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public void Test_HasChanged_NotChanged()
         {
             // Arrange
-            StateBase map = new();
-            map["key1"] = "value1";
-            TurnStateEntry<StateBase> entry = new(map);
+            Record map = new();
+            object val = new();
+            map["key1"] = val;
+            TurnStateEntry entry = new(map);
 
             // Act
-            map["key1"] = "value1";
+            map["key1"] = val;
 
             // Assert
             Assert.False(entry.HasChanged);
@@ -65,11 +71,11 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public void Test_Value_GetsValue()
         {
             // Arrange
-            StateBase map = new();
-            TurnStateEntry<StateBase> entry = new(map);
+            Record map = new();
+            TurnStateEntry entry = new(map);
 
             // Act
-            StateBase value = entry.Value;
+            Record value = entry.Value!;
 
             // Assert
             Assert.Equal(value, map);
@@ -79,12 +85,12 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public void Test_Value_RestoreDeletedEntry()
         {
             // Arrange
-            StateBase map = new();
-            TurnStateEntry<StateBase> entry = new(map);
+            Record map = new();
+            TurnStateEntry entry = new(map);
             entry.Delete(); // Should be deleted
 
             // Act - accessing deleted entry value should undelete entry
-            StateBase _ = entry.Value;
+            Record _ = entry.Value!;
 
             // Assert
             Assert.False(entry.IsDeleted);
@@ -94,14 +100,20 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         public void Test_Replace_ReplacesEntryValue()
         {
             // Arrange
-            TurnStateEntry<string> entry = new("string 1");
+            Record record = new();
+            record.Set("key 1", "string 1");
+            TurnStateEntry entry = new(record);
             entry.Delete(); // Should be deleted
 
             // Act - accessing deleted entry value should undelete entry
-            entry.Replace("string 2");
+            Record recordTwo = new();
+            record.Set("key 2", "string 2");
+            entry.Replace(recordTwo);
 
             // Assert
-            Assert.Equal("string 2", entry.Value);
+            Assert.Equal(recordTwo, entry.Value);
         }
+
+        private sealed class TestState : Record { }
     }
 }

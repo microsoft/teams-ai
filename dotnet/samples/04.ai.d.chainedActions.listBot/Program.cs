@@ -4,9 +4,9 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Models;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,89 +32,60 @@ builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
 
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-#region Use Azure OpenAI
-if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
-    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+OpenAIModel? model = null;
+
+if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
-    throw new Exception("Missing Azure configuration.");
+    model = new(new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
+}
+else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+{
+    model = new(new AzureOpenAIModelOptions(
+        config.Azure.OpenAIApiKey,
+        "gpt-35-turbo",
+        config.Azure.OpenAIEndpoint
+    ));
 }
 
-builder.Services.AddSingleton(_ => new AzureOpenAIPlannerOptions(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint)
+if (model == null)
 {
-    LogRequests = true
-});
+    throw new Exception("please configure settings for either OpenAI or Azure");
+}
 
 // Create the Application.
 builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
 {
+    // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    PromptManager<ListState> promptManager = new("./Prompts");
+    PromptManager prompts = new(new() { PromptFolder = "./Prompts" });
 
-    AzureOpenAIPlanner<ListState> planner = new(sp.GetService<AzureOpenAIPlannerOptions>()!, loggerFactory);
+    // Create OpenAIPlanner
+    ActionPlanner<ListState> planner = new(
+        new(
+            model,
+            prompts,
+            async (context, state, planner) =>
+            {
+                return await Task.FromResult(prompts.GetPrompt("Monologue"));
+            }
+        ),
+        loggerFactory
+    );
 
-    ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
+    ListBotApplication app = new(new()
     {
-        AI = new AIOptions<ListState>(planner, promptManager)
-        {
-            Prompt = "Chat"
-        },
+        AI = new(planner),
         Storage = sp.GetService<IStorage>(),
         LoggerFactory = loggerFactory,
-    };
-
-    ListBotApplication app = new(applicationOptions);
+        TurnStateFactory = () => new ListState()
+    });
 
     // register turn and activity handlers
-    app
-        .OnConversationUpdate(ConversationUpdateEvents.MembersAdded, ListBotHandlers.OnMembersAddedAsync)
+    app.OnConversationUpdate(ConversationUpdateEvents.MembersAdded, ListBotHandlers.OnMembersAddedAsync)
         .OnMessage("/reset", ListBotHandlers.OnResetMessageAsync);
     return app;
 });
-#endregion
-
-#region Use OpenAI
-/**
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
-{
-    throw new Exception("Missing OpenAI configuration.");
-}
-
-builder.Services.AddSingleton(_ => new OpenAIPlannerOptions(config.OpenAI.ApiKey, "text-davinci-003")
-{
-    LogRequests = true
-});
-
-// Create the Application.
-builder.Services.AddTransient<IBot, ListBotApplication>(sp =>
-{
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    PromptManager<ListState> promptManager = new("./Prompts");
-
-    OpenAIPlanner<ListState> planner = new(sp.GetService<OpenAIPlannerOptions>()!, loggerFactory);
-
-    ApplicationOptions<ListState, ListStateManager> applicationOptions = new()
-    {
-        AI = new AIOptions<ListState>(planner, promptManager)
-        {
-            Prompt = "Chat"
-        },
-        Storage = sp.GetService<IStorage>(),
-        LoggerFactory = loggerFactory,
-    };
-
-    ListBotApplication app = new(applicationOptions);
-
-    // register turn and activity handlers
-    app
-        .OnConversationUpdate(ConversationUpdateEvents.MembersAdded, ListBotHandlers.OnMembersAddedAsync)
-        .OnMessage("/reset", ListBotHandlers.OnResetMessageAsync);
-    return app;
-});
-**/
-#endregion
 
 var app = builder.Build();
 

@@ -1,39 +1,7 @@
 # AI in Microsoft Teams: Twenty Qestions
 
 Welcome to the 20 Questions Bot: The Ultimate Guessing Game! This developer sample application showcases the incredible capabilities of language models and the concept of user intent. Challenge your skills as the human player and try to guess a secret within 20 questions, while the AI-powered bot answers your queries about the secret. Experience firsthand how language models interpret user input and provide informative responses, creating an engaging and interactive gaming experience. Get ready to dive into the world of language models and explore the fascinating realm of user interaction and intent.
-It shows following SDK capabilities:
-
-<details open>
-    <summary><h3>Bot scaffolding</h3></summary>
-    Throughout the 'Program.cs' and 'GameBot.cs' files you'll see the scaffolding created to run a bot with AI features.
-</details>
-<details open>
-    <summary><h3>Prompt engineering</h3></summary>
-The 'Prompts/Hint/skprompt.txt' file has descriptive prompt engineering that, in plain language, instructs GPT how the bot should conduct itself at submit time. For example, in 'skprompt.txt':
-
-#### skprompt.txt
-
-```text
-You are the AI in a game of 20 questions. 
-The goal of the game is for the Human to guess a secret within 20 questions. 
-The AI should answer questions about the secret.
-The AI should assume that every message from the Human is a question about the secret.
-
-GuessCount: {{$guessCount}}
-RemainingGuesses: {{$remainingGuesses}}
-Secret: {{$secretWord}}
-
-Answer the humans question but do not mention the secret word.
-
-Human: {{$input}}
-AI: 
-```
-
-- The major section ("*You are the AI ... the secret word.*") defines the basic direction, to tell how AI should behave on human's input.
-- Variables "*{{$guessCount}}*", "*{{$remainingGuesses}}*" and "*{{$secretWord}}*" are set via `AI.Prompt.Variables` in `GameBot.cs`.
-- You can also add function call via `AI.Prompt.AddFunction`, then reference it as "*{{function}}*" in prompt.
-- The final section ("*Human: ... AI: ...*") defines the input of current turn. In addition, you can also add "*{{$history}}*" here to let AI to know the context about previous turns.
-- "*{{input}}*", "*{{output}}*" and "*{{history}}*" are automatically resolved from `TurnState.Temp`.
+It shows following SDK capabilities.
 
 </details>
 
@@ -89,11 +57,6 @@ The `SECRET_` prefix is a convention used by Teams Toolkit to mask the value in 
 ## Use OpenAI
 
 Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI as AI service.
-
-**As prerequisites**
-
-1. Prepare your own OpenAI service.
-1. Modify source code `Program.cs`, comment out the "*#Use Azure OpenAI and Azure Content Safety*" part, and uncomment the "*#Use OpenAI*" part.
 
 **For Local Debug (F5) with Teams Toolkit for Visual Studio**
 

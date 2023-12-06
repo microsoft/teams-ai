@@ -1,6 +1,5 @@
 ﻿using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -30,7 +29,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile(path: settingsPath, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
-                .AddUserSecrets<AzureOpenAICompletionTests>()
+                .AddUserSecrets<AzureContentSafetyModeratorTests>()
                 .Build();
         }
 
@@ -54,10 +53,9 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             };
             var turnContext = new TurnContext(botAdapterMock.Object, activity);
             var turnStateMock = new Mock<TurnState>();
-            var promptTemplateMock = new Mock<PromptTemplate>(string.Empty, new PromptTemplateConfiguration());
 
             // Act
-            var result = await moderator.ReviewPrompt(turnContext, turnStateMock.Object, promptTemplateMock.Object);
+            var result = await moderator.ReviewInputAsync(turnContext, turnStateMock.Object);
 
             // Assert
             if (flagged)
@@ -90,7 +88,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             });
 
             // Act
-            var result = await moderator.ReviewPlan(turnContextMock.Object, turnStateMock.Object, plan);
+            var result = await moderator.ReviewOutputAsync(turnContextMock.Object, turnStateMock.Object, plan);
 
             // Assert
             if (flagged)

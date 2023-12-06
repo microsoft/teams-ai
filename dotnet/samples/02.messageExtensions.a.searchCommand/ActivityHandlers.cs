@@ -29,7 +29,7 @@ namespace SearchCommand
         /// <summary>
         /// Handles Message Extension query events.
         /// </summary>
-        public QueryHandler<TurnState> QueryHandler => async (ITurnContext turnContext, TurnState turnState, Query<Dictionary<string, object>> query, CancellationToken cancellationToken) =>
+        public QueryHandlerAsync<TurnState> QueryHandler => async (ITurnContext turnContext, TurnState turnState, Query<Dictionary<string, object>> query, CancellationToken cancellationToken) =>
         {
             string text = (string)query.Parameters["queryText"];
             int count = query.Count;
@@ -68,7 +68,7 @@ namespace SearchCommand
         /// <summary>
         /// Handles Message Extension selecting item events.
         /// </summary>
-        public SelectItemHandler<TurnState> SelectItemHandler => async (ITurnContext turnContext, TurnState turnState, object item, CancellationToken cancellationToken) =>
+        public SelectItemHandlerAsync<TurnState> SelectItemHandler => async (ITurnContext turnContext, TurnState turnState, object item, CancellationToken cancellationToken) =>
         {
             JObject? obj = item as JObject;
             CardPackage package = CardPackage.Create(obj!.ToObject<Package>()!);

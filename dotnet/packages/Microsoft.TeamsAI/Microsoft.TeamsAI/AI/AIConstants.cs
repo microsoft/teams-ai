@@ -22,6 +22,11 @@ namespace Microsoft.Teams.AI.AI
         public const string SayCommand = "SAY";
 
         /// <summary>
+        /// The type of command that will stop the running.
+        /// </summary>
+        public const string StopCommand = "STOP";
+
+        /// <summary>
         /// An action that will be called anytime an unknown action is predicted by the planner.
         /// </summary>
         /// <remarks>
@@ -49,9 +54,9 @@ namespace Microsoft.Teams.AI.AI
         public const string FlaggedOutputActionName = "___FlaggedOutput___";
 
         /// <summary>
-        /// An action that will be called anytime the planner is rate limited.
+        /// An action that will be called anytime the planner experiences an http error.
         /// </summary>
-        public const string RateLimitedActionName = "___RateLimited___";
+        public const string HttpErrorActionName = "___HttpError___";
 
         /// <summary>
         /// An action that will be called after the plan has been predicted by the planner and it has
@@ -94,5 +99,10 @@ namespace Microsoft.Teams.AI.AI
         /// will need to handle that yourself.
         /// </remarks>
         public const string SayCommandActionName = "___SAY___";
+
+        /// <summary>
+        /// The task either executed too many steps or timed out.
+        /// </summary>
+        public const string TooManyStepsActionName = "___TooManySteps___";
     }
 }

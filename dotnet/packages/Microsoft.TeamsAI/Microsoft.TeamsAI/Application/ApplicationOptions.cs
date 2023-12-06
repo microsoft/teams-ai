@@ -6,13 +6,11 @@ using Microsoft.Bot.Builder;
 namespace Microsoft.Teams.AI
 {
     /// <summary>
-    /// Options for the <see cref="Application{TState, TTurnStateManager}"/> class.
+    /// Options for the <see cref="Application{TState}"/> class.
     /// </summary>
     /// <typeparam name="TState">Type of the turn state.</typeparam>
-    /// <typeparam name="TTurnStateManager">Type of the turn state manager.</typeparam>
-    public class ApplicationOptions<TState, TTurnStateManager>
-        where TState : ITurnState<StateBase, StateBase, TempState>
-        where TTurnStateManager : ITurnStateManager<TState>
+    public class ApplicationOptions<TState>
+        where TState : TurnState, new()
     {
         /// <summary>
         /// Optional. Bot adapter being used.
@@ -26,7 +24,7 @@ namespace Microsoft.Teams.AI
         /// Optional. Application ID of the bot.
         /// </summary>
         /// <remarks>
-        /// If using the <see cref="ApplicationOptions{TState, TTurnStateManager}.LongRunningMessages"/> option or calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, Bot.Schema.Activity, BotCallbackHandler, CancellationToken)"/> method, this property is required.
+        /// If using the <see cref="ApplicationOptions{TState}.LongRunningMessages"/> option or calling the <see cref="CloudAdapterBase.ContinueConversationAsync(string, Bot.Schema.Activity, BotCallbackHandler, CancellationToken)"/> method, this property is required.
         /// </remarks>
         public string? BotAppId { get; set; }
 
@@ -51,16 +49,14 @@ namespace Microsoft.Teams.AI
         public AIOptions<TState>? AI { get; set; }
 
         /// <summary>
-        /// Optional. Turn state manager to use. If omitted, an instance of TTurnStateManager will
-        /// be created using the parameterless constructor.
+        /// Optional. Factory used to create a custom turn state instance.
         /// </summary>
-        public TTurnStateManager? TurnStateManager { get; set; }
+        public Func<TState>? TurnStateFactory { get; set; }
 
         /// <summary>
         /// Optional. Logger factory that will be used in this application.
         /// </summary>
         /// <remarks>
-        /// <see cref="AI.Planner.OpenAIPlanner{TState, TOptions}"/> and <see cref="AI.Planner.AzureOpenAIPlanner{TState}"/> prompt completion data will is logged at the <see cref="LogLevel.Information"/> level.
         /// </remarks>
         public ILoggerFactory? LoggerFactory { get; set; }
 
@@ -87,5 +83,10 @@ namespace Microsoft.Teams.AI
         /// completed and many shared hosting environments will mark the bot's process as idle and shut it down.
         /// </remarks>
         public bool LongRunningMessages { get; set; } = false;
+
+        /// <summary>
+        /// Optional. Options used to enable authentication for the application.
+        /// </summary>
+        public AuthenticationOptions<TState>? Authentication { get; set; }
     }
 }

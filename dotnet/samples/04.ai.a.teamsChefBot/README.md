@@ -2,7 +2,7 @@
 
 ## Summary
 
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook Teams apps. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
+This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook Teams apps. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
 
@@ -56,8 +56,7 @@ Above steps use Azure OpenAI as AI service, optionally, you can also use OpenAI 
 
 **As prerequisites**
 
-1. Prepare your own OpenAI service.
-1. Modify source code `Program.cs`, comment out the "*#Use Azure OpenAI and Azure Content Safety*" part, and uncomment the "*#Use OpenAI*" part.
+1. Get an OpenAI api key.
 
 **For debugging (F5)**
 

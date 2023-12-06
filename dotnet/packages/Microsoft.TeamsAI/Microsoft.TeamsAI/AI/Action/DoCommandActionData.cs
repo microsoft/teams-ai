@@ -1,4 +1,4 @@
-﻿using Microsoft.Teams.AI.AI.Planner;
+﻿using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.AI.Action
@@ -7,7 +7,7 @@ namespace Microsoft.Teams.AI.AI.Action
     /// The data for default DO command action handler.
     /// </summary>
     /// <typeparam name="TState">Type of turn state.</typeparam>
-    internal sealed class DoCommandActionData<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal sealed class DoCommandActionData<TState> where TState : TurnState
     {
         /// <summary>
         /// The predicted DO command.

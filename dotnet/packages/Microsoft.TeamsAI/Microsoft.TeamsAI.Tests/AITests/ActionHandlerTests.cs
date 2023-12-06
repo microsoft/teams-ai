@@ -2,8 +2,7 @@
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.AI.Action;
 using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Microsoft.Bot.Schema;
@@ -20,14 +19,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Arrange
             var instance = new DifferentReturnTypesActions();
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState();
-            var actionNames = new[] { "action1", "action2", "action3", "action4", "action5", "action6" };
+            var turnState = new TurnState();
+            var actionNames = new[] { "action1", "action2", "action3" };
 
             // Act
-            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
+            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions[actionName].Handler.PerformAction(turnContext, turnState);
+                actions[actionName].Handler.PerformActionAsync(turnContext, turnState);
             }
 
             // Assert
@@ -42,17 +41,17 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_Actions_DifferentParameterAttributes()
         {
             // Arrange
-            var instance = new DifferentParameterAttributesActions<TestTurnState>();
+            var instance = new DifferentParameterAttributesActions<TurnState>();
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var actionNames = new[] { "action1", "action2", "action3", "action4", "action5", "action6" };
             var entities = new object();
 
             // Act
-            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
+            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
             foreach (var actionName in actionNames)
             {
-                actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName);
+                actions[actionName].Handler.PerformActionAsync(turnContext, turnState, entities, actionName);
             }
 
             // Assert
@@ -78,25 +77,25 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             // Arrange
             var turnContext = new TurnContext(new NotImplementedAdapter(), MessageFactory.Text("hello"));
-            var turnState = new TestTurnState();
+            var turnState = new TurnState();
             var actionName = "action";
             var entities = new object();
 
             // Act
-            IActionCollection<TestTurnState> actions = ImportActions<TestTurnState>(instance);
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformAction(turnContext, turnState, entities, actionName));
+            IActionCollection<TurnState> actions = ImportActions<TurnState>(instance);
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await actions[actionName].Handler.PerformActionAsync(turnContext, turnState, entities, actionName));
 
             // Assert
             Assert.NotNull(exception);
             Assert.Equal($"Cannot assign {from} to {to} of action method Action", exception.Message);
         }
 
-        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : ITurnState<StateBase, StateBase, TempState>
+        private static IActionCollection<TState> ImportActions<TState>(object instance) where TState : TurnState
         {
-            AIOptions<TState> options = new(
-                new Mock<IPlanner<TState>>().Object,
-                new PromptManager<TState>(),
-                new Mock<IModerator<TState>>().Object);
+            AIOptions<TState> options = new(new Mock<IPlanner<TState>>().Object)
+            {
+                Moderator = new Mock<IModerator<TState>>().Object
+            };
             AI<TState> ai = new(options);
             ai.ImportActions(instance);
             // get _actions field from AI class
@@ -108,25 +107,25 @@ namespace Microsoft.Teams.AI.Tests.AITests
         {
             yield return new object[]
             {
-                new TestActions<string, TestTurnState, object, string>(),
+                new TestActions<string, TurnState, object, string>(),
                 typeof(TurnContext),
                 typeof(string),
             };
             yield return new object[]
             {
                 new TestActions<TurnContext, string, object, string>(),
-                typeof(TestTurnState),
+                typeof(TurnState),
                 typeof(string),
             };
             yield return new object[]
             {
-                new TestActions<TurnContext, TestTurnState, string, string>(),
+                new TestActions<TurnContext, TurnState, string, string>(),
                 typeof(object),
                 typeof(string),
             };
             yield return new object[]
             {
-                new TestActions<TurnContext, TestTurnState, object, int>(),
+                new TestActions<TurnContext, TurnState, object, int>(),
                 typeof(string),
                 typeof(int),
             };
@@ -137,92 +136,81 @@ namespace Microsoft.Teams.AI.Tests.AITests
             public List<string> Calls { get; set; } = new List<string>();
 
             [Action("action1")]
-            public void Action1()
+            public string Action1()
             {
                 Calls.Add("action1");
+                return string.Empty;
             }
 
             [Action("action2")]
-            public bool Action2()
+            public Task<string> Action2()
             {
                 Calls.Add("action2");
-                return true;
+                return Task.FromResult(string.Empty);
             }
 
             [Action("action3")]
-            public Task Action3()
+            public ValueTask<string> Action6()
             {
                 Calls.Add("action3");
-                return Task.CompletedTask;
-            }
-
-            [Action("action4")]
-            public Task<bool> Action4()
-            {
-                Calls.Add("action4");
-                return Task.FromResult(true);
-            }
-
-            [Action("action5")]
-            public ValueTask Action5()
-            {
-                Calls.Add("action5");
-                return ValueTask.CompletedTask;
-            }
-
-            [Action("action6")]
-            public ValueTask<bool> Action6()
-            {
-                Calls.Add("action6");
-                return ValueTask.FromResult(true);
+                return ValueTask.FromResult(string.Empty);
             }
         }
 
-        private sealed class DifferentParameterAttributesActions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+        private sealed class DifferentParameterAttributesActions<TState> where TState : TurnState
         {
             public List<object?[]> Calls { get; set; } = new List<object?[]>();
 
             [Action("action1")]
-            public void Action1([ActionTurnContext] ITurnContext context, [ActionTurnState] TState state, [ActionEntities] object entities, [ActionName] string name)
+            public string Action1([ActionTurnContext] ITurnContext context, [ActionTurnState] TState state, [ActionParameters] object entities, [ActionName] string name)
             {
                 Calls.Add(new[] { context, state, entities, name });
+                return string.Empty;
             }
 
             [Action("action2")]
-            public void Action2([ActionName] string name, [ActionEntities] object entities, [ActionTurnState] TState state, [ActionTurnContext] ITurnContext context)
+            public string Action2([ActionName] string name, [ActionParameters] object entities, [ActionTurnState] TState state, [ActionTurnContext] ITurnContext context)
             {
                 Calls.Add(new[] { name, entities, state, context });
+                return string.Empty;
             }
 
             [Action("action3")]
-            public void Action3([ActionTurnContext] ITurnContext context, [ActionName] string name)
+            public string Action3([ActionTurnContext] ITurnContext context, [ActionName] string name)
             {
                 Calls.Add(new object?[] { context, name });
+                return string.Empty;
             }
 
             [Action("action4")]
-            public void Action4([ActionTurnContext] ITurnContext context, ITurnContext myContext, int myInt)
+            public string Action4([ActionTurnContext] ITurnContext context, ITurnContext myContext, int myInt)
             {
                 Calls.Add(new object?[] { context, myContext, myInt });
+                return string.Empty;
             }
 
             [Action("action5")]
-            public void Action5([ActionTurnState] TState state1, [ActionTurnState] TState state2, [ActionName] string name)
+            public string Action5([ActionTurnState] TState state1, [ActionTurnState] TState state2, [ActionName] string name)
             {
                 Calls.Add(new object?[] { state1, state2, name });
+                return string.Empty;
             }
 
             [Action("action6")]
-            public void Action6()
+            public string Action6()
             {
                 Calls.Add(new object?[] { });
+                return string.Empty;
             }
         }
 
         private sealed class TestActions<TContext, TState, TEntities, TName>
         {
             [Action("action")]
-            public static void Action([ActionTurnContext] TContext _0, [ActionTurnState] TState _1, [ActionEntities] TEntities _2, [ActionName] TName _3) { }
+            public static string Action([ActionTurnContext] TContext _0, [ActionTurnState] TState _1, [ActionParameters] TEntities _2, [ActionName] TName _3)
+            {
+                return string.Empty;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using System.Reflection;
 
@@ -13,10 +14,10 @@ namespace Microsoft.Teams.AI.Tests.Application
         public void Test_Application_DefaultSetup()
         {
             // Arrange
-            ApplicationOptions<TestTurnState, TestTurnStateManager> applicationOptions = new();
+            ApplicationOptions<TurnState> applicationOptions = new();
 
             // Act
-            Application<TestTurnState, TestTurnStateManager> app = new(applicationOptions);
+            Application<TurnState> app = new(applicationOptions);
 
             // Assert
             Assert.NotEqual(null, app.Options);
@@ -24,7 +25,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Null(app.Options.BotAppId);
             Assert.Null(app.Options.Storage);
             Assert.Null(app.Options.AI);
-            Assert.NotEqual(null, app.Options.TurnStateManager);
+            Assert.NotEqual(null, app.Options.TurnStateFactory);
             Assert.Null(app.Options.AdaptiveCards);
             Assert.Null(app.Options.TaskModules);
             Assert.Null(app.Options.LoggerFactory);
@@ -44,7 +45,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             IStorage storage = new MemoryStorage();
             BotAdapter adapter = new SimpleAdapter();
             TestLoggerFactory loggerFactory = new();
-            TestTurnStateManager turnStateManager = new();
+            Func<TurnState> turnStateFactory = () => new TurnState();
             AdaptiveCardsOptions adaptiveCardOptions = new()
             {
                 ActionSubmitFilter = "cardFilter"
@@ -53,12 +54,11 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 TaskDataFilter = "taskFilter",
             };
-            AIOptions<TestTurnState> aiOptions = new(
-                planner: new TestPlanner(),
-                promptManager: new TestPromptManager(),
-                moderator: new TestModerator()
-            );
-            ApplicationOptions<TestTurnState, TestTurnStateManager> applicationOptions = new()
+            AIOptions<TurnState> aiOptions = new(new TestPlanner())
+            {
+                Moderator = new TestModerator()
+            };
+            ApplicationOptions<TurnState> applicationOptions = new()
             {
                 RemoveRecipientMention = removeRecipientMention,
                 StartTypingTimer = startTypingTimer,
@@ -67,14 +67,14 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Storage = storage,
                 Adapter = adapter,
                 LoggerFactory = loggerFactory,
-                TurnStateManager = turnStateManager,
+                TurnStateFactory = turnStateFactory,
                 AdaptiveCards = adaptiveCardOptions,
                 TaskModules = taskModuleOptions,
                 AI = aiOptions
             };
 
             // Act
-            Application<TestTurnState, TestTurnStateManager> app = new(applicationOptions);
+            Application<TurnState> app = new(applicationOptions);
 
             // Assert
             Assert.NotNull(app.Options);
@@ -82,7 +82,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Equal(botAppId, app.Options.BotAppId);
             Assert.Equal(storage, app.Options.Storage);
             Assert.Equal(aiOptions, app.Options.AI);
-            Assert.Equal(turnStateManager, app.Options.TurnStateManager);
+            Assert.Equal(turnStateFactory, app.Options.TurnStateFactory);
             Assert.Equal(adaptiveCardOptions, app.Options.AdaptiveCards);
             Assert.Equal(taskModuleOptions, app.Options.TaskModules);
             Assert.Equal(loggerFactory, app.Options.LoggerFactory);
@@ -97,7 +97,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TurnState>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -115,7 +115,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.Message };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TurnState>(new());
 
             // Act 1
             app.StartTypingTimer(turnContext);
@@ -143,7 +143,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TurnState>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -157,7 +157,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         public void Test_StopTypingTimer_WithoutEverStartingTypingTimer()
         {
             // Arrange
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TurnState>(new());
 
             // Act
             app.StopTypingTimer();
@@ -174,7 +174,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity = new Activity { Type = ActivityTypes.MessageUpdate };
             var turnContext = new TurnContext(new SimpleAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new());
+            var app = new Application<TurnState>(new());
 
             // Act
             app.StartTypingTimer(turnContext);
@@ -189,12 +189,15 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_TurnEventHandler_BeforeTurn_AfterTurn()
         {
             // Arrange
-            var activity = MessageFactory.Text("hello");
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            turnContext.Activity.Type = "message";
+
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var messages = new List<string>();
             app.OnBeforeTurn((context, _, _) =>
@@ -221,12 +224,15 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_TurnEventHandler_BeforeTurn_ReturnsFalse()
         {
             // Arrange
-            var activity = MessageFactory.Text("hello");
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            turnContext.Activity.Type = "message";
+
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var messages = new List<string>();
             app.OnBeforeTurn((context, _, _) =>
@@ -252,12 +258,14 @@ namespace Microsoft.Teams.AI.Tests.Application
         public async Task Test_TurnEventHandler_AfterTurn_ReturnsFalse()
         {
             // Arrange
-            var activity = MessageFactory.Text("hello");
-            var turnContext = new TurnContext(new NotImplementedAdapter(), activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            turnContext.Activity.Type = "message";
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var messages = new List<string>();
             app.OnBeforeTurn((context, _, _) =>

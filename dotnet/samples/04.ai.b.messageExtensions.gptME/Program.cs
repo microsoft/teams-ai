@@ -4,11 +4,10 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
-using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
+using Microsoft.Teams.AI.AI.Models;
+using GPT.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,114 +39,62 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 bool PREVIEW_MODE = false;
 
-#region Use Azure OpenAI and Azure Content Safety
-// Following code is for using Azure OpenAI and Azure Content Safety
-if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
-    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint)
-    || string.IsNullOrEmpty(config.Azure.ContentSafetyApiKey)
-    || string.IsNullOrEmpty(config.Azure.ContentSafetyEndpoint))
+OpenAIModel? model = null;
+
+if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
-    throw new Exception("Missing Azure configuration.");
+    model = new(new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
 }
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "text-davinci-003", config.Azure.OpenAIEndpoint));
-builder.Services.AddSingleton<AzureContentSafetyModeratorOptions>(_ => new(config.Azure.ContentSafetyApiKey, config.Azure.ContentSafetyEndpoint, ModerationType.Both));
+else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+{
+    model = new(new AzureOpenAIModelOptions(
+        config.Azure.OpenAIApiKey,
+        "gpt-35-turbo",
+        config.Azure.OpenAIEndpoint
+    ));
+}
+
+if (model == null)
+{
+    throw new Exception("please configure settings for either OpenAI or Azure");
+}
 
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
 {
-    // Create loggers
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    // Create AzureOpenAIPlanner
-    IPlanner<TurnState> planner = new AzureOpenAIPlanner<TurnState>(
-        sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory);
-
-    // Create AzureContentSafetyModerator
-    IModerator<TurnState> moderator = new AzureContentSafetyModerator<TurnState>(sp.GetService<AzureContentSafetyModeratorOptions>()!);
-
-    // Setup Application
-    AIOptions<TurnState> aiOptions = new(
-        planner: planner,
-        promptManager: new PromptManager<TurnState>("./Prompts"),
-        moderator: moderator);
-    var applicationBuilder = new ApplicationBuilder<TurnState, TurnStateManager>()
-    .WithAIOptions(aiOptions)
-    .WithLoggerFactory(loggerFactory)
-    .WithTurnStateManager(new TurnStateManager());
-
-    // Set storage options
     IStorage? storage = sp.GetService<IStorage>();
-    if (storage != null)
-    {
-        applicationBuilder.WithStorage(storage);
-    }
 
-    // Create Application
-    Application<TurnState, TurnStateManager> app = applicationBuilder.Build();
-
-    ActivityHandlers routeHandlers = new(app, PREVIEW_MODE);
-
-    app.MessageExtensions.OnFetchTask("CreatePost", routeHandlers.FetchTaskHandler);
-    app.MessageExtensions.OnSubmitAction("CreatePost", routeHandlers.SubmitActionHandler);
-    app.MessageExtensions.OnBotMessagePreviewEdit("CreatePost", routeHandlers.BotMessagePreviewEditHandler);
-    app.MessageExtensions.OnBotMessagePreviewSend("CreatePost", routeHandlers.BotMessagePreviewSendHandler);
-
-    return app;
-});
-#endregion
-
-#region Use OpenAI
-/** // Use OpenAI
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
-{
-    throw new Exception("Missing OpenAI configuration.");
-}
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "text-davinci-003"));
-builder.Services.AddSingleton<OpenAIModeratorOptions>(_ => new(config.OpenAI.ApiKey, ModerationType.Both));
-
-// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-builder.Services.AddTransient<IBot>(sp =>
-{
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Get HttpClient
-    HttpClient moderatorHttpClient = sp.GetService<IHttpClientFactory>()!.CreateClient("WebClient");
+    PromptManager prompts = new(new() { PromptFolder = "./Prompts" });
 
     // Create OpenAIPlanner
-    IPlanner<TurnState> planner = new OpenAIPlanner<TurnState>(
-        sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory);
+    ActionPlanner<AppState> planner = new(
+        new(
+            model,
+            prompts,
+            async (context, state, planner) =>
+            {
+                return await Task.FromResult(prompts.GetPrompt("chat"));
+            }
+        ),
+        loggerFactory
+    );
 
-    // Create OpenAIModerator
-    IModerator<TurnState> moderator = new OpenAIModerator<TurnState>(
-        sp.GetService<OpenAIModeratorOptions>()!,
-        loggerFactory,
-        moderatorHttpClient);
+    var appBuilder = new ApplicationBuilder<AppState>()
+        .WithAIOptions(new(planner))
+        .WithLoggerFactory(loggerFactory)
+        .WithTurnStateFactory(() => new AppState());
 
-    // Setup Application
-    AIOptions<TurnState> aiOptions = new(
-        planner: planner,
-        promptManager: new PromptManager<TurnState>("./Prompts"),
-        moderator: moderator);
-    var applicationBuilder = new ApplicationBuilder<TurnState, TurnStateManager>()
-    .WithAIOptions(aiOptions)
-    .WithLoggerFactory(loggerFactory)
-    .WithTurnStateManager(new TurnStateManager());
-
-    // Set storage options
-    IStorage? storage = sp.GetService<IStorage>();
     if (storage != null)
     {
-        applicationBuilder.WithStorage(storage);
+        appBuilder.WithStorage(storage);
     }
 
     // Create Application
-    Application<TurnState, TurnStateManager> app = applicationBuilder.Build();
-
-    ActivityHandlers routeHandlers = new(app, PREVIEW_MODE);
+    Application<AppState> app = appBuilder.Build();
+    ActivityHandlers routeHandlers = new(planner, prompts, PREVIEW_MODE);
 
     app.MessageExtensions.OnFetchTask("CreatePost", routeHandlers.FetchTaskHandler);
     app.MessageExtensions.OnSubmitAction("CreatePost", routeHandlers.SubmitActionHandler);
@@ -156,8 +103,6 @@ builder.Services.AddTransient<IBot>(sp =>
 
     return app;
 });
-**/
-#endregion
 
 var app = builder.Build();
 

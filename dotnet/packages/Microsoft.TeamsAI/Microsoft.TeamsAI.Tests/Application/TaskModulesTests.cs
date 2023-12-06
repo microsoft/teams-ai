@@ -2,9 +2,11 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
+using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -34,7 +36,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                         },
                         verb = "test-verb",
                     }
-                })
+                }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var expectedInvokeResponse = new InvokeResponse()
@@ -42,11 +48,13 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200,
                 Body = taskModuleResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            FetchHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -86,14 +94,20 @@ namespace Microsoft.Teams.AI.Tests.Application
                         },
                         verb = "not-test-verb",
                     }
-                })
+                }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            FetchHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -113,18 +127,24 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext = new TurnContext(adapter, new Activity()
             {
                 Type = ActivityTypes.Invoke,
-                Name = "task/fetch"
+                Name = "task/fetch",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            FetchHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            FetchHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -161,7 +181,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                         },
                         verb = "test-verb",
                     }
-                })
+                }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
             var expectedInvokeResponse = new InvokeResponse()
@@ -169,11 +193,13 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200,
                 Body = taskModuleResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            SubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -213,15 +239,21 @@ namespace Microsoft.Teams.AI.Tests.Application
                         },
                         verb = "not-test-verb",
                     }
-                })
+                }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
 
-            SubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -241,18 +273,24 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext = new TurnContext(adapter, new Activity()
             {
                 Type = ActivityTypes.Invoke,
-                Name = "task/submit"
+                Name = "task/submit",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             });
             var taskModuleResponseMock = new Mock<TaskModuleResponse>();
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
-            RouteSelector routeSelector = (turnContext, cancellationToken) =>
+            RouteSelectorAsync routeSelector = (turnContext, cancellationToken) =>
             {
                 return Task.FromResult(true);
             };
-            SubmitHandler<TestTurnState> handler = (turnContext, turnState, data, cancellationToken) =>
+            SubmitHandlerAsync<TurnState> handler = (turnContext, turnState, data, cancellationToken) =>
             {
                 return Task.FromResult(taskModuleResponseMock.Object);
             };
@@ -264,6 +302,5 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Assert
             Assert.Equal("Unexpected TaskModules.OnSubmit() triggered for activity type: invoke", exception.Message);
         }
-
     }
 }
