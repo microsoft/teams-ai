@@ -74,6 +74,7 @@ namespace Microsoft.Teams.AI
             if (token != null)
             {
                 AuthUtilities.SetTokenInState(state, settingName, token);
+                return new SignInResponse(SignInStatus.Complete);
             }
 
             return new SignInResponse(SignInStatus.Pending);

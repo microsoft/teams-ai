@@ -9,13 +9,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
     {
         private string _mockedToken;
         private SignInStatus _mockedStatus;
-        private bool _validActivity;
 
-        public MockedAuthentication(SignInStatus mockedStatus = SignInStatus.Complete, string mockedToken = "mocked token", bool validActivity = true)
+        public MockedAuthentication(SignInStatus mockedStatus = SignInStatus.Complete, string mockedToken = "mocked token")
         {
             _mockedToken = mockedToken;
             _mockedStatus = mockedStatus;
-            _validActivity = validActivity;
         }
 
         public void Initialize(Application<TState> app, string name, IStorage? storage = null)
@@ -28,11 +26,6 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return Task.FromResult<string?>(null);
         }
 
-        public Task<bool> IsValidActivityAsync(ITurnContext context)
-        {
-            return Task.FromResult(_validActivity);
-        }
-
         public IAuthentication<TState> OnUserSignInFailure(Func<ITurnContext, TState, AuthException, Task> handler)
         {
             return this;
@@ -43,14 +36,14 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
             return this;
         }
 
-        public Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
+        public Task<string?> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
-            var result = new SignInResponse(_mockedStatus);
             if (_mockedStatus == SignInStatus.Complete)
             {
-                result.Token = _mockedToken;
+                return Task.FromResult(_mockedToken)!;
             }
-            return Task.FromResult(result);
+
+            return Task.FromResult<string?>(null)!;
         }
 
         public Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)

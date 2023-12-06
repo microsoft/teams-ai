@@ -97,12 +97,12 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
             // act
-            var response = await botAuth.AuthenticateAsync(context, state);
+            var token = await botAuth.AuthenticateAsync(context, state);
 
             // assert
             var stateKey = "__fromId:test:Bot:AuthState__";
             var authState = state.Conversation[stateKey] as Dictionary<string, string>;
-            Assert.Equal(SignInStatus.Pending, response.Status);
+            Assert.Equal(null, token);
             Assert.NotNull(authState);
             Assert.True(authState.ContainsKey("message"));
             Assert.Equal("test text", authState["message"]);
@@ -118,11 +118,10 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
             // act
-            var response = await botAuth.AuthenticateAsync(context, state);
+            var token = await botAuth.AuthenticateAsync(context, state);
 
             // assert
-            Assert.Equal(SignInStatus.Complete, response.Status);
-            Assert.Equal("test token", response.Token);
+            Assert.Equal("test token", token);
         }
 
         [Fact]
@@ -135,10 +134,10 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var state = await TurnStateConfig.GetTurnStateWithConversationStateAsync(context);
 
             // act
-            var response = await botAuth.AuthenticateAsync(context, state);
+            var token = await botAuth.AuthenticateAsync(context, state);
 
             // assert
-            Assert.Equal(SignInStatus.Pending, response.Status);
+            Assert.Equal(null, token);
         }
 
         [Fact]

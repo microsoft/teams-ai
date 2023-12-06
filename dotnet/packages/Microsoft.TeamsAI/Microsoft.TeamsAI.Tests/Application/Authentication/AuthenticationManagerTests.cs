@@ -27,7 +27,6 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
-            Assert.Equal(graphToken, response.Token);
             Assert.True(turnState.Temp.AuthTokens.ContainsKey("graph"));
             Assert.Equal(graphToken, turnState.Temp.AuthTokens["graph"]);
         }
@@ -52,7 +51,6 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
 
             // assert
             Assert.Equal(SignInStatus.Complete, response.Status);
-            Assert.Equal(sharepointToken, response.Token);
             Assert.True(turnState.Temp.AuthTokens.ContainsKey("sharepoint"));
             Assert.Equal(sharepointToken, turnState.Temp.AuthTokens["sharepoint"]);
         }
@@ -76,7 +74,6 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
 
             // assert
             Assert.Equal(SignInStatus.Pending, response.Status);
-            Assert.Null(response.Token);
         }
 
         [Fact]

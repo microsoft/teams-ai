@@ -36,11 +36,6 @@ namespace Microsoft.Teams.AI
         public SignInStatus Status { get; set; }
 
         /// <summary>
-        /// The access token. Only available when sign-in status is Complete.
-        /// </summary>
-        public string? Token { get; set; }
-
-        /// <summary>
         /// The exception object. Only available when sign-in status is Error.
         /// </summary>
         public Exception? Error { get; set; }
