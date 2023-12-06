@@ -1192,7 +1192,7 @@
     "@types/node" "*"
     form-data "^4.0.0"
 
-"@types/node@*", "@types/node@^20.10.3":
+"@types/node@*", "@types/node@^20.10.3", "@types/node@^20.9.0":
   version "20.10.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.10.3.tgz#4900adcc7fc189d5af5bb41da8f543cea6962030"
   integrity sha512-XJavIpZqiXID5Yxnxv3RUDKTN5b81ddNC3ecsA0SoFXz/QU8OGBwZGMomiq0zw+uuqbL/krztv/DINAQ/EV4gg==
@@ -1220,6 +1220,16 @@
   version "8.5.11"
   resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.5.11.tgz#f64077a9f578ca57430ac28509722ad991edaa44"
   integrity sha512-aMSWmbAKoyKelDQ+J70Vv+ieR6rjvAG0DNyn4XbqO0e69SZJY7ohuqlCzNd7TjgUFY5NcbV0zFyAV7hmxpNLTA==
+  dependencies:
+    "@types/bunyan" "*"
+    "@types/formidable" "^1"
+    "@types/node" "*"
+    "@types/spdy" "*"
+
+"@types/restify@8.5.9":
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.5.9.tgz#9c3753093724bef7131d0322c71cd86b58db1672"
+  integrity sha512-4zXKw10NhlgDsVXcSJXfwjlQQwagITwogEVDM6ouyCOLRsiHfZdAuOkT9sRHBZHd2118TJBBItGx3vqLiGntjQ==
   dependencies:
     "@types/bunyan" "*"
     "@types/formidable" "^1"
@@ -2143,7 +2153,7 @@ botbuilder-stdlib@4.21.2-internal:
   resolved "https://registry.yarnpkg.com/botbuilder-stdlib/-/botbuilder-stdlib-4.21.2-internal.tgz#6a317ca8e960f73ba3f57947ab93192bc5de9dea"
   integrity sha512-M7n0RcmjlCipKS92E7ddxpBcRF0A85btQRNOd3+gpzGptk6YU0FMvE70+besVANxFHQQTMPwuwAdxVWBD2e4MA==
 
-"botbuilder@>=4.18.0 <5.0.0", botbuilder@^4.21.2:
+"botbuilder@>=4.18.0 <5.0.0", botbuilder@^4.21.0, botbuilder@^4.21.2:
   version "4.21.2"
   resolved "https://registry.yarnpkg.com/botbuilder/-/botbuilder-4.21.2.tgz#3458064c451c4316b35b3a957778119824d1517c"
   integrity sha512-3o4y+b7a2D+CnYYIlCctFwrz1isHK32tKw9I37k6+p47q4CeWyXf2pgnooJjkNz10HcdN1uE2hgEH8c6xY+AQw==

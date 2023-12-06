@@ -36,7 +36,7 @@ describe('BotAuthenticationBase.ts utility functions', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
