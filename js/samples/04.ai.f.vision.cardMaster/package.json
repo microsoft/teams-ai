@@ -25,8 +25,7 @@
         "botbuilder": "^4.21.0",
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
-        "restify": "~11.1.0",
-        "vectra": "^0.4.4"
+        "restify": "~11.1.0"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",
