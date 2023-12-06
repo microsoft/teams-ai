@@ -36,11 +36,6 @@ namespace Microsoft.Teams.AI
         public SignInStatus Status { get; set; }
 
         /// <summary>
-        /// The access token. Only available when sign-in status is Complete.
-        /// </summary>
-        public string? Token { get; set; }
-
-        /// <summary>
         /// The exception object. Only available when sign-in status is Error.
         /// </summary>
         public Exception? Error { get; set; }
@@ -73,8 +68,8 @@ namespace Microsoft.Teams.AI
         /// <param name="context">Current turn context.</param>
         /// <param name="state">Application state.</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>The authentication token if user is signed in.</returns>
-        Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
+        /// <returns>The authentication token if user is signed in. Otherwise returns null. In that case the bot will attempt to sign the user in.</returns>
+        Task<string?> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Signs out a user.
@@ -83,22 +78,6 @@ namespace Microsoft.Teams.AI
         /// <param name="state">Application state.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Check whether current activity supports authentication.
-        /// </summary>
-        /// <param name="context">Current turn context.</param>
-        /// <returns>True if current activity supports authentication. Otherwise, false.</returns>
-        Task<bool> IsValidActivityAsync(ITurnContext context);
-
-        /// <summary>
-        /// Initialize the authentication class
-        /// </summary>
-        /// <param name="app">The application object</param>
-        /// <param name="name">The name of the authentication handler</param>
-        /// <param name="storage">The storage to save turn state</param>
-        /// 
-        void Initialize(Application<TState> app, string name, IStorage? storage = null);
 
         /// <summary>
         /// The handler function is called when the user has successfully signed in

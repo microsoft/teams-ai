@@ -72,8 +72,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             var response = await meAuth.AuthenticateAsync(context);
 
             // assert
-            Assert.Equal(SignInStatus.Complete, response.Status);
-            Assert.Equal("test token", response.Token);
+            Assert.Equal("test token", response);
         }
 
         [Fact]
@@ -97,10 +96,10 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             };
 
             // act
-            var response = await meAuth.AuthenticateAsync(context);
+            var token = await meAuth.AuthenticateAsync(context);
 
             // assert
-            Assert.Equal(SignInStatus.Pending, response.Status);
+            Assert.Equal(null, token);
             Assert.NotNull(activities);
             var sentActivity = activities.FirstOrDefault();
             Assert.NotNull(sentActivity);
@@ -117,11 +116,10 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             context.Activity.Value = new MessagingExtensionQuery(state: "123456");
 
             // act
-            var response = await meAuth.AuthenticateAsync(context);
+            var token = await meAuth.AuthenticateAsync(context);
 
             // assert
-            Assert.Equal(SignInStatus.Complete, response.Status);
-            Assert.Equal("test token", response.Token);
+            Assert.Equal("test token", token);
         }
 
         [Fact]
@@ -139,10 +137,10 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             context.Activity.Value = new MessagingExtensionQuery();
 
             // act
-            var response = await meAuth.AuthenticateAsync(context);
+            var token = await meAuth.AuthenticateAsync(context);
 
             // assert
-            Assert.Equal(SignInStatus.Pending, response.Status);
+            Assert.Equal(null, token);
             Assert.NotNull(activities);
             var sentActivity = activities.FirstOrDefault();
             Assert.NotNull(sentActivity);

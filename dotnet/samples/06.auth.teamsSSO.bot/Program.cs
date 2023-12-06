@@ -48,24 +48,18 @@ builder.Services.AddSingleton<IConfidentialClientApplication>(sp =>
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>();
+    BotAdapter adapter = sp.GetService<CloudAdapter>()!;
     IConfidentialClientApplication msal = sp.GetService<IConfidentialClientApplication>();
     string signInLink = $"https://{config.BOT_DOMAIN}/auth-start.html";
-    ApplicationOptions<AppState> applicationOptions = new()
-    {
-        Storage = storage,
-        TurnStateFactory = () =>
-        {
-            return new AppState();
-        },
-        Authentication = new AuthenticationOptions<AppState>(
-            new Dictionary<string, IAuthentication<AppState>>()
-            {
-                { "graph", new TeamsSsoAuthentication<AppState>(new TeamsSsoSettings(new string[]{"User.Read"}, signInLink, msal)) }
-            }
-        )
-    };
 
-    Application<AppState> app = new(applicationOptions);
+    AuthenticationOptions<AppState> options = new();
+    options.AddAuthentication("graph", new TeamsSsoSettings(new string[]{"User.Read"}, signInLink, msal));
+
+    Application<AppState> app = new ApplicationBuilder<AppState>()
+        .WithStorage(storage)
+        .WithTurnStateFactory(() => new AppState())
+        .WithAuthentication(adapter, options)
+        .Build();
 
     // Listen for user to say "/reset" and then delete conversation state
     app.OnMessage("/reset", async (turnContext, turnState, cancellationToken) =>
