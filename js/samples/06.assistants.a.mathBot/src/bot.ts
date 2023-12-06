@@ -7,7 +7,7 @@ if (!process.env.OPENAI_KEY) {
 
 const { AssistantsPlanner } = preview;
 
-// Create Assistant if no ID is provided
+// Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
     (async () => {
         const assistant = await AssistantsPlanner.createAssistant(process.env.OPENAI_KEY!, {

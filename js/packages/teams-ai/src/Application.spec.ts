@@ -447,4 +447,35 @@ describe('Application', () => {
             );
         });
     });
+
+    describe('teamsReadReceipt', () => {
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+
+        it('should route to correct handler for teamsReadReceipt', async () => {
+            let handlerCalled = false;
+            mockApp.teamsReadReceipt(async (context, _state, readReceiptInfo) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Event);
+                assert.equal(context.activity.name, 'application/vnd.microsoft/readReceipt');
+            });
+
+            const testActivity = {
+                channelId: Channels.Msteams,
+                name: 'application/vnd.microsoft/readReceipt',
+                type: ActivityTypes.Event,
+                value: {
+                    lastReadMessageId: '000000000000-0000-0000-0000-000000000000'
+                }
+            };
+
+            await adapter.processActivity(testActivity, async (context) => {
+                await mockApp.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+    });
 });

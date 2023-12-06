@@ -16,7 +16,7 @@ provision:
   # Automates the creation of a Teams app registration and saves the App ID to an environment file.
   - uses: teamsApp/create
     with:
-      name: EchoBot-${{TEAMSFX_ENV}}
+      name: TwentyQuestions-${{TEAMSFX_ENV}}
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
@@ -24,7 +24,7 @@ provision:
   # The Bot ID (AAD app client ID) and Bot Password (AAD app client secret) are saved to an environment file.
   - uses: botAadApp/create
     with:
-      name: EchoBot-${{TEAMSFX_ENV}}
+      name: TwentyQuestions-${{TEAMSFX_ENV}}
     writeToEnvironmentFile:
       botId: BOT_ID
       botPassword: SECRET_BOT_PASSWORD
@@ -35,7 +35,7 @@ provision:
   - uses: botFramework/create
     with:
       botId: ${{BOT_ID}}
-      name: EchoBot
+      name: TwentyQuestions
       messagingEndpoint: ${{BOT_ENDPOINT}}/api/messages
       description: ""
       channels:
@@ -63,11 +63,6 @@ provision:
 # Defines what the `deploy` lifecycle step does with Teams Toolkit.
 # Runs after `provision` during Start Debugging (F5) or run manually using `teamsfx deploy --env local`.
 deploy:
-  # Ensures that the project dependnecies are installed.
-  - uses: cli/runNpmCommand
-    with:
-      args: install --no-audit
-
   # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
   - uses: file/createOrUpdateEnvironmentFile
     with:
