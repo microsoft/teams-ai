@@ -43,22 +43,22 @@ builder.Services.AddSingleton<Utilities>();
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>()!;
-    ApplicationOptions<TurnState> applicationOptions = new()
-    {
-        Storage = storage,
-        Authentication = new AuthenticationOptions<TurnState>(
-            new Dictionary<string, IAuthentication<TurnState>>()
-            {
-                { "graph", new OAuthAuthentication<TurnState>(new OAuthSettings()
-                    {
-                        ConnectionName = config.OAUTH_CONNECTION_NAME
-                    }
-                )}
-            }
-        )
-    };
+    BotAdapter adapter = sp.GetService<CloudAdapter>()!;
 
-    Application<TurnState> app = new(applicationOptions);
+    AuthenticationOptions<TurnState> options = new();
+    options.AddAuthentication("graph", new OAuthSettings()
+    {
+        ConnectionName = config.OAUTH_CONNECTION_NAME,
+        Title = "Sign In",
+        Text = "Please sign in to use the bot.",
+        EndOnInvalidMessage = true,
+    }
+    );
+
+    Application<TurnState> app = new ApplicationBuilder<TurnState>()
+        .WithStorage(storage)
+        .WithAuthentication(adapter, options)
+        .Build();
 
     Utilities utilities = sp.GetService<Utilities>()!;
 
