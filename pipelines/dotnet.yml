@@ -3,7 +3,6 @@ trigger:
   branches:
     include:
     - main
-    - breaking-changes-2
   paths:
     include:
     - dotnet
