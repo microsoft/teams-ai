@@ -20,11 +20,6 @@ namespace Microsoft.Teams.AI.State
         public const string OutputKey = "output";
 
         /// <summary>
-        /// Name of the history property.
-        /// </summary>
-        public const string HistoryKey = "history";
-
-        /// <summary>
         /// Name of the action outputs property.
         /// </summary>
         public const string ActionOutputsKey = "actionOutputs";
@@ -47,7 +42,6 @@ namespace Microsoft.Teams.AI.State
         {
             this[InputKey] = string.Empty;
             this[OutputKey] = string.Empty;
-            this[HistoryKey] = string.Empty;
             this[ActionOutputsKey] = new Dictionary<string, string>();
             this[AuthTokenKey] = new Dictionary<string, string>();
             this[DuplicateTokenExchangeKey] = false;
@@ -70,16 +64,6 @@ namespace Microsoft.Teams.AI.State
         {
             get => Get<string>(OutputKey)!;
             set => Set(OutputKey, value);
-        }
-
-
-        /// <summary>
-        /// Formatted conversation history for embedding in an AI prompt
-        /// </summary>
-        public string History
-        {
-            get => Get<string>(HistoryKey)!;
-            set => Set(HistoryKey, value);
         }
 
         /// <summary>
