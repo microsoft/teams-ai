@@ -4,6 +4,10 @@ This sample shows how to incorporate a basic conversational SSO flow into a Micr
 
 This sample requires creating an OAuth Connection in Azure Bot Service, which provides a token store to store the token after sign-in.
 
+Note that this bot will only work in tenants where the following graph scopes are permitted:
+
+- `User.Read`
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
@@ -61,6 +65,8 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 
 1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+   1. Login with your M365 account.
+   2. Login with your Azure account. Ensure that you have a valid subscription and resource group. This will be required to provision your bot.
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
