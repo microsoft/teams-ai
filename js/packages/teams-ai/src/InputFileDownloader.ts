@@ -15,7 +15,7 @@ import { TurnState } from './TurnState';
  */
 export interface InputFileDownloader<TState extends TurnState = TurnState> {
     /**
-     * Download any files relative to the current users input.
+     * Download any files relative to the current user's input.
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      */
