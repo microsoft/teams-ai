@@ -99,23 +99,6 @@ namespace Microsoft.Teams.AI
         }
 
         /// <summary>
-        /// Check whether current activity supports authentication.
-        /// </summary>
-        /// <param name="context">Current turn context.</param>
-        /// <param name="settingName">Optional. The name of the authentication handler to use. If not specified, the default handler name is used.</param>
-        /// <returns>True if current activity supports authentication. Otherwise, false.</returns>
-        public async Task<bool> IsValidActivityAsync(ITurnContext context, string? settingName = null)
-        {
-            if (settingName == null)
-            {
-                settingName = Default;
-            }
-
-            IAuthentication<TState> auth = Get(settingName);
-            return await auth.IsValidActivityAsync(context);
-        }
-
-        /// <summary>
         /// Get an authentication class via name
         /// </summary>
         /// <param name="name">The name of authentication class</param>

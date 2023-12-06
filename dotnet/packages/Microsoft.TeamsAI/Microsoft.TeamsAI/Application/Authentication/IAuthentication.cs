@@ -85,19 +85,11 @@ namespace Microsoft.Teams.AI
         Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Check whether current activity supports authentication.
-        /// </summary>
-        /// <param name="context">Current turn context.</param>
-        /// <returns>True if current activity supports authentication. Otherwise, false.</returns>
-        Task<bool> IsValidActivityAsync(ITurnContext context);
-
-        /// <summary>
         /// Initialize the authentication class
         /// </summary>
         /// <param name="app">The application object</param>
         /// <param name="name">The name of the authentication handler</param>
         /// <param name="storage">The storage to save turn state</param>
-        /// 
         void Initialize(Application<TState> app, string name, IStorage? storage = null);
 
         /// <summary>

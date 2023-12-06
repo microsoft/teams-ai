@@ -7,7 +7,7 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 
 namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 {
-    internal class MockedBotAuthentication<TState> : BotAuthenticationBase<TState>
+    internal sealed class MockedBotAuthentication<TState> : BotAuthenticationBase<TState>
         where TState : TurnState, new()
     {
         private List<DialogTurnResult> _runDialogResult;

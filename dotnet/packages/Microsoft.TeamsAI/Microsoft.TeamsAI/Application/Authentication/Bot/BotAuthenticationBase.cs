@@ -202,7 +202,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
+        /// <returns>True if the activity should be handled by current authentication handler. Otherwise, false.</returns>
         protected virtual Task<bool> VerifyStateRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke
@@ -214,7 +214,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>True if the activity should be handled by current authentication hanlder. Otherwise, false.</returns>
+        /// <returns>True if the activity should be handled by current authentication handler. Otherwise, false.</returns>
         protected virtual Task<bool> TokenExchangeRouteSelector(ITurnContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.Activity.Type == ActivityTypes.Invoke

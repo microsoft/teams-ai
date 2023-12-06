@@ -55,10 +55,11 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Moderator = new TestModerator()
             };
-            AuthenticationOptions<TurnState> authOptions = new(new Dictionary<string, IAuthentication<TurnState>>()
+            AuthenticationOptions<TurnState> authOptions = new();
+            authOptions.Authentications = new Dictionary<string, IAuthentication<TurnState>>()
             {
                 {"graph", new MockedAuthentication<TurnState>() }
-            });
+            };
 
             // Act
             var app = new ApplicationBuilder<TurnState>()

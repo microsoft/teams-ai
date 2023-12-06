@@ -56,19 +56,6 @@ namespace Microsoft.Teams.AI
         }
 
         /// <summary>
-        /// Whether the current activity is a valid activity that supports authentication
-        /// </summary>
-        /// <param name="context">The turn context</param>
-        /// <returns>True if valid. Otherwise, false.</returns>
-        public Task<bool> IsValidActivityAsync(ITurnContext context)
-        {
-            bool validMessageExtensionAuth = _messageExtensionAuth != null && _messageExtensionAuth.IsValidActivity(context);
-            bool validBotAuth = _botAuthentication != null && _botAuthentication.IsValidActivity(context);
-
-            return Task.FromResult(validBotAuth || validMessageExtensionAuth);
-        }
-
-        /// <summary>
         /// The handler function is called when the user sign in flow fails
         /// </summary>
         /// <param name="handler">The handler function to call when the user failed to signed in</param>

@@ -39,16 +39,35 @@ namespace Microsoft.Teams.AI
         public SelectorAsync? AutoSignIn { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of this class.
+        /// Configures the options to add an OAuth authentication setting.
         /// </summary>
-        /// <param name="authentications">The authentication classes to sign-in and sign-out users.</param>
-        /// <param name="default">Describes the authentication class the bot should use if the user does not specify a authentication class name.</param>
-        /// <param name="autoSignIn">Indicates whether the bot should start the sign in flow when the user sends a message to the bot or triggers a message extension.</param>
-        public AuthenticationOptions(Dictionary<string, IAuthentication<TState>> authentications, string? @default = null, SelectorAsync? autoSignIn = null)
+        /// <param name="name">The authentication name.</param>
+        /// <param name="oauthSettings">The OAuth settings</param>
+        /// <returns>The object for chaining purposes.</returns>
+        public AuthenticationOptions<TState> AddAuthentication(string name, OAuthSettings oauthSettings)
         {
-            this.Authentications = authentications;
-            this.Default = @default;
-            this.AutoSignIn = autoSignIn;
+            Authentications.Add(name, new OAuthAuthentication<TState>(oauthSettings));
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the options to add an teams sso authentication setting.
+        /// </summary>
+        /// <param name="name">The authentication name.</param>
+        /// <param name="teamsSsoSettings">The OAuth settings</param>
+        /// <returns>The object for chaining purposes.</returns>
+        public AuthenticationOptions<TState> AddAuthentication(string name, TeamsSsoSettings teamsSsoSettings)
+        {
+            Authentications.Add(name, new TeamsSsoAuthentication<TState>(teamsSsoSettings));
+            return this;
+        }
+
+        /// <summary>
+        /// The authentication options constructor.
+        /// </summary>
+        public AuthenticationOptions()
+        {
+            Authentications = new Dictionary<string, IAuthentication<TState>>();
         }
     }
 }

@@ -38,18 +38,6 @@ namespace Microsoft.Teams.AI
         }
 
         /// <summary>
-        /// Whether the current activity is a valid activity that supports authentication
-        /// </summary>
-        /// <param name="context">The turn context</param>
-        /// <returns>True if valid. Otherwise, false.</returns>
-        public Task<bool> IsValidActivityAsync(ITurnContext context)
-        {
-            return Task.FromResult(
-                (_botAuth != null && _botAuth.IsValidActivity(context))
-                || (_messageExtensionsAuth != null && _messageExtensionsAuth.IsValidActivity(context)));
-        }
-
-        /// <summary>
         /// Sign in current user
         /// </summary>
         /// <param name="context">The turn context</param>
