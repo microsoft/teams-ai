@@ -41,9 +41,9 @@ There are a few ways to get the application up and running. The latest way is us
 > recommend creating and using a [Microsoft 365 Developer Program](https://developer.microsoft.com/microsoft-365/dev-program) account -
 > a free program to get your own dev environment sandbox that includes Teams.
 
-1. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio. If step 3 was completed correctly then this should launch a browser.
-2. In the launched browser, select the `Add` button to load the app in Teams.
-3. This should redirect you to a chat window with the bot.
+5. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio. If step 3 was completed correctly then this should launch a browser.
+6. In the launched browser, select the `Add` button to load the app in Teams.
+7. This should redirect you to a chat window with the bot.
 </details>
 
 <details>
