@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> AuthenticateAsync(ITurnContext context, CancellationToken cancellationToken = default)
+        public async Task<string?> AuthenticateAsync(ITurnContext context, CancellationToken cancellationToken = default)
         {
             JObject value = JObject.FromObject(context.Activity.Value);
             JToken? tokenExchangeRequest = value["authentication"];
@@ -32,10 +32,7 @@ namespace Microsoft.Teams.AI
                         TokenResponse tokenExchangeResponse = await HandleSsoTokenExchange(context);
                         if (!string.IsNullOrEmpty(tokenExchangeResponse.Token))
                         {
-                            return new SignInResponse(SignInStatus.Complete)
-                            {
-                                Token = tokenExchangeResponse.Token
-                            };
+                            return tokenExchangeResponse.Token;
                         }
                     }
                     catch (Exception ex)
@@ -56,7 +53,7 @@ namespace Microsoft.Teams.AI
                     };
                     await context.SendActivityAsync(response);
 
-                    return new SignInResponse(SignInStatus.Pending);
+                    return null;
                 }
             }
 
@@ -69,10 +66,7 @@ namespace Microsoft.Teams.AI
                     TokenResponse response = await HandleUserSignIn(context, state.ToString());
                     if (!string.IsNullOrEmpty(response.Token))
                     {
-                        return new SignInResponse(SignInStatus.Complete)
-                        {
-                            Token = response.Token
-                        };
+                        return response.Token;
                     }
                 }
                 catch
@@ -109,7 +103,7 @@ namespace Microsoft.Teams.AI
 
             await context.SendActivityAsync(ActivityUtilities.CreateInvokeResponseActivity(resposne), cancellationToken);
 
-            return new SignInResponse(SignInStatus.Pending);
+            return null;
         }
 
         /// <summary>

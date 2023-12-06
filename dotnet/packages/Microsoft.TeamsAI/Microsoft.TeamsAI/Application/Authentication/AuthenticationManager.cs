@@ -52,10 +52,10 @@ namespace Microsoft.Teams.AI
             }
 
             IAuthentication<TState> auth = Get(settingName);
-            SignInResponse response;
+            string? token;
             try
             {
-                response = await auth.SignInUserAsync(context, state, cancellationToken);
+                token = await auth.SignInUserAsync(context, state, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -71,12 +71,12 @@ namespace Microsoft.Teams.AI
             }
 
 
-            if (response.Status == SignInStatus.Complete)
+            if (token != null)
             {
-                AuthUtilities.SetTokenInState(state, settingName, response.Token!);
+                AuthUtilities.SetTokenInState(state, settingName, token);
             }
 
-            return response;
+            return new SignInResponse(SignInStatus.Pending);
         }
 
         /// <summary>

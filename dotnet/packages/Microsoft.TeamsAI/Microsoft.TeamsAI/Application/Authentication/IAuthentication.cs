@@ -73,8 +73,8 @@ namespace Microsoft.Teams.AI
         /// <param name="context">Current turn context.</param>
         /// <param name="state">Application state.</param>
         /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>The authentication token if user is signed in.</returns>
-        Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
+        /// <returns>The authentication token if user is signed in. Otherwise returns null. In that case the bot will attempt to sign the user in.</returns>
+        Task<string?> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Signs out a user.

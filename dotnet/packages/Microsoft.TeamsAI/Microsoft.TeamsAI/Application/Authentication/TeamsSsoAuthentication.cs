@@ -44,15 +44,12 @@ namespace Microsoft.Teams.AI
         /// <param name="state">The turn state</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The sign in response</returns>
-        public async Task<SignInResponse> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
+        public async Task<string?> SignInUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default)
         {
             string token = await _TryGetUserToken(context);
             if (!string.IsNullOrEmpty(token))
             {
-                return new SignInResponse(SignInStatus.Complete)
-                {
-                    Token = token
-                };
+                return token;
             }
 
             if ((_botAuth != null && _botAuth.IsValidActivity(context)))
