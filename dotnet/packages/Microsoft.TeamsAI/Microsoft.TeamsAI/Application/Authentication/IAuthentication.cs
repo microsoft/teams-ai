@@ -80,14 +80,6 @@ namespace Microsoft.Teams.AI
         Task SignOutUserAsync(ITurnContext context, TState state, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Initialize the authentication class
-        /// </summary>
-        /// <param name="app">The application object</param>
-        /// <param name="name">The name of the authentication handler</param>
-        /// <param name="storage">The storage to save turn state</param>
-        void Initialize(Application<TState> app, string name, IStorage? storage = null);
-
-        /// <summary>
         /// The handler function is called when the user has successfully signed in
         /// </summary>
         /// <param name="handler">The handler function to call when the user has successfully signed in</param>

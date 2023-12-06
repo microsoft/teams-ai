@@ -11,7 +11,7 @@ namespace Microsoft.Teams.AI
     public class AuthenticationManager<TState>
         where TState : TurnState, new()
     {
-        private Dictionary<string, IAuthentication<TState>> _authentications { get; }
+        private protected Dictionary<string, IAuthentication<TState>> _authentications { get; }
 
         /// <summary>
         /// The default authentication setting name.
@@ -21,19 +21,34 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Creates a new instance of the class
         /// </summary>
+        /// <param name="app">The application.</param>
         /// <param name="options">The authentication options</param>
+        /// <param name="storage">The storage to use.</param>
         /// <exception cref="TeamsAIException">Throws when the options does not contain authentication handlers</exception>
-        public AuthenticationManager(AuthenticationOptions<TState> options)
+        public AuthenticationManager(Application<TState> app, AuthenticationOptions<TState> options, IStorage? storage)
         {
-            if (options.Authentications.Count == 0)
+            if (options._authenticationSettings.Count == 0)
             {
                 throw new TeamsAIException("Authentications setting is empty");
             }
 
-            // If developer does not specify default authentication, set default to the first one in the options
-            Default = options.Default ?? options.Authentications.First().Key;
+            _authentications = new Dictionary<string, IAuthentication<TState>>();
 
-            _authentications = options.Authentications;
+            // If developer does not specify default authentication, set default to the first one in the options
+            Default = options.Default ?? options._authenticationSettings.First().Key;
+
+            foreach (string key in options._authenticationSettings.Keys)
+            {
+                object setting = options._authenticationSettings[key];
+                if (setting is OAuthSettings oauthSetting)
+                {
+                    _authentications.Add(key, new OAuthAuthentication<TState>(app, key, oauthSetting, storage));
+                }
+                else if (setting is TeamsSsoSettings teamsSsoSettings)
+                {
+                    _authentications.Add(key, new TeamsSsoAuthentication<TState>(app, key, teamsSsoSettings, storage));
+                }
+            }
         }
 
         /// <summary>

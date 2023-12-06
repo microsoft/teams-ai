@@ -8,17 +8,18 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
     public class AuthenticationManagerTests
     {
         [Fact]
-        public async void Test_SignIn_DefaultHandler()
+        public async void Test_SignIn_DefaultSetting()
         {
             // arrange
             var graphToken = "graph token";
+            var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
-            options.Authentications = new Dictionary<string, IAuthentication<TurnState>>()
+            options._authenticationSettings = new Dictionary<string, object>()
             {
-                { "graph", new MockedAuthentication<TurnState>(mockedToken: graphToken) },
-                { "sharepoint", new MockedAuthentication<TurnState>() }
+                { "graph", new TestAuthenticationSettings(graphToken) },
+                { "sharepoint", new TestAuthenticationSettings() }
             };
-            var authManager = new AuthenticationManager<TurnState>(options);
+            var authManager = new TestAuthenticationManager(options, app);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
 
@@ -32,17 +33,18 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         }
 
         [Fact]
-        public async void Test_SignIn_SpecificHandler()
+        public async void Test_SignIn_SpecificSetting()
         {
             // arrange
-            var sharepointToken = "sharepoint token";
+            var sharepointToken = "graph token";
+            var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
-            options.Authentications = new Dictionary<string, IAuthentication<TurnState>>()
+            options._authenticationSettings = new Dictionary<string, object>()
             {
-                { "graph", new MockedAuthentication<TurnState>() },
-                { "sharepoint", new MockedAuthentication<TurnState>(mockedToken: sharepointToken) }
+                { "graph", new TestAuthenticationSettings() },
+                { "sharepoint", new TestAuthenticationSettings(sharepointToken) }
             };
-            var authManager = new AuthenticationManager<TurnState>(options);
+            var authManager = new TestAuthenticationManager(options, app);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
 
@@ -58,14 +60,14 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         [Fact]
         public async void Test_SignIn_Pending()
         {
-            // arrange
+            var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
-            options.Authentications = new Dictionary<string, IAuthentication<TurnState>>()
+            options._authenticationSettings = new Dictionary<string, object>()
             {
-                { "graph", new MockedAuthentication<TurnState>(SignInStatus.Pending) },
-                { "sharepoint", new MockedAuthentication<TurnState>() }
+                { "graph", new TestAuthenticationSettings() },
+                { "sharepoint", new TestAuthenticationSettings() }
             };
-            var authManager = new AuthenticationManager<TurnState>(options);
+            var authManager = new TestAuthenticationManager(options, app);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
 
@@ -80,13 +82,14 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         public async void Test_SignOut_DefaultHandler()
         {
             // arrange
+            var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
-            options.Authentications = new Dictionary<string, IAuthentication<TurnState>>()
+            options._authenticationSettings = new Dictionary<string, object>()
             {
-                { "graph", new MockedAuthentication<TurnState>() },
-                { "sharepoint", new MockedAuthentication<TurnState>() }
+                { "graph", new TestAuthenticationSettings() },
+                { "sharepoint", new TestAuthenticationSettings() }
             };
-            var authManager = new AuthenticationManager<TurnState>(options);
+            var authManager = new TestAuthenticationManager(options, app);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             turnState.Temp.AuthTokens = new Dictionary<string, string>()
@@ -107,13 +110,15 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         public async void Test_SignOut_SpecificHandler()
         {
             // arrange
+            var graphToken = "graph token";
+            var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
-            options.Authentications = new Dictionary<string, IAuthentication<TurnState>>()
+            options._authenticationSettings = new Dictionary<string, object>()
             {
-                { "graph", new MockedAuthentication<TurnState>() },
-                { "sharepoint", new MockedAuthentication<TurnState>() }
+                { "graph", new TestAuthenticationSettings() },
+                { "sharepoint", new TestAuthenticationSettings() }
             };
-            var authManager = new AuthenticationManager<TurnState>(options);
+            var authManager = new TestAuthenticationManager(options, app);
             var turnContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
             turnState.Temp.AuthTokens = new Dictionary<string, string>()

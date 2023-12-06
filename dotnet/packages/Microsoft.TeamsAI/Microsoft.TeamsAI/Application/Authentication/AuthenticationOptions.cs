@@ -20,10 +20,10 @@ namespace Microsoft.Teams.AI
         where TState : TurnState, new()
     {
         /// <summary>
-        /// The authentication classes to sign-in and sign-out users.
+        /// The authentication settings to sign-in and sign-out users.
         /// Key uniquely identifies each authentication.
         /// </summary>
-        public Dictionary<string, IAuthentication<TState>> Authentications { get; set; }
+        internal Dictionary<string, object> _authenticationSettings { get; set; }
 
         /// <summary>
         /// Describes the authentication class the bot should use if the user does not specify a authentication class name.
@@ -46,7 +46,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The object for chaining purposes.</returns>
         public AuthenticationOptions<TState> AddAuthentication(string name, OAuthSettings oauthSettings)
         {
-            Authentications.Add(name, new OAuthAuthentication<TState>(oauthSettings));
+            _authenticationSettings.Add(name, oauthSettings);
             return this;
         }
 
@@ -58,7 +58,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The object for chaining purposes.</returns>
         public AuthenticationOptions<TState> AddAuthentication(string name, TeamsSsoSettings teamsSsoSettings)
         {
-            Authentications.Add(name, new TeamsSsoAuthentication<TState>(teamsSsoSettings));
+            _authenticationSettings.Add(name, teamsSsoSettings);
             return this;
         }
 
@@ -67,7 +67,7 @@ namespace Microsoft.Teams.AI
         /// </summary>
         public AuthenticationOptions()
         {
-            Authentications = new Dictionary<string, IAuthentication<TState>>();
+            _authenticationSettings = new Dictionary<string, object>();
         }
     }
 }

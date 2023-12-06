@@ -19,20 +19,13 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Initializes the class
         /// </summary>
+        /// <param name="app">The application.</param>
+        /// <param name="name">The authentication name.</param>
         /// <param name="settings">The settings to initialize the class</param>
-        public OAuthAuthentication(OAuthSettings settings)
+        /// <param name="storage">The storage to use.</param>
+        public OAuthAuthentication(Application<TState> app, string name, OAuthSettings settings, IStorage? storage)
         {
             _settings = settings;
-        }
-
-        /// <summary>
-        /// Initialize the authentication class
-        /// </summary>
-        /// <param name="app">The application object</param>
-        /// <param name="name">The name of the authentication handler</param>
-        /// <param name="storage">The storage to save turn state</param>
-        public void Initialize(Application<TState> app, string name, IStorage? storage = null)
-        {
             _messageExtensionAuth = new OAuthMessageExtensionsAuthentication(_settings.ConnectionName);
             _botAuthentication = new OAuthBotAuthentication<TState>(app, _settings, name, storage);
         }
