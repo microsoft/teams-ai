@@ -51,7 +51,7 @@ export interface DefaultUserState {}
  */
 export interface DefaultTempState {
     /**
-     * Input passed by the user to the AI Library
+     * Input passed from the user to the AI Library
      */
     input: string;
 
