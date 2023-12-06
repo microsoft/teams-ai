@@ -116,3 +116,4 @@ appPackage/build
 
 .env.*
 .env
+build

@@ -2,6 +2,28 @@
 
 This sample shows how to incorporate a basic Message Extension app into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK. Users can search npmjs for packages.
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Teams Search Command Message Extension](#teams-search-command-message-extension)
+  - [Showcase](#showcase)
+  - [Setting up the sample](#setting-up-the-sample)
+  - [Multiple ways to test](#multiple-ways-to-test)
+  - [Teams Toolkit for Visual Studio Code](#teams-toolkit-for-visual-studio-code)
+    - [Prerequisites](#prerequisites)
+    - [Run the sample](#run-the-sample)
+  - [Interacting with the bot](#interacting-with-the-bot)
+  - [Other ways to run the sample](#other-ways-to-run-the-sample)
+    - [Teams Toolkit CLI](#teams-toolkit-cli)
+    - [Manual resource management and uploading to Teams](#manual-resource-management-and-uploading-to-teams)
+    - [BotFramework Emulator](#botframework-emulator)
+  - [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+  - [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
+
 ## Showcase
 - Message Extensions are convenient ways to add functionality to Teams.
 - This sample adds a search command to the compose area of a chat.
