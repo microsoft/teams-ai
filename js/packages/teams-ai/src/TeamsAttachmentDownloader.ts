@@ -43,7 +43,7 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
     }
 
     /**
-     * Download any files relative to the current users input.
+     * Download any files relative to the current user's input.
      * @param context Context for the current turn of conversation.
      * @param state Application state for the current turn of conversation.
      */
