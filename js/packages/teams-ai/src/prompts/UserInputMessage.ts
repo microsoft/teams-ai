@@ -6,14 +6,14 @@
  * Licensed under the MIT License.
  */
 
-import { Message, MessageContentParts } from "./Message";
-import { PromptFunctions } from "./PromptFunctions";
-import { RenderedPromptSection } from "./PromptSection";
-import { PromptSectionBase } from "./PromptSectionBase";
-import { TurnContext } from "botbuilder";
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
-import { InputFile } from "../InputFileDownloader";
+import { Message, MessageContentParts } from './Message';
+import { PromptFunctions } from './PromptFunctions';
+import { RenderedPromptSection } from './PromptSection';
+import { PromptSectionBase } from './PromptSectionBase';
+import { TurnContext } from 'botbuilder';
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
+import { InputFile } from '../InputFileDownloader';
 
 /**
  * A section capable of rendering user input text and images as a user message.
@@ -35,9 +35,20 @@ export class UserInputMessage extends PromptSectionBase {
     }
 
     /**
+     * @param context
+     * @param memory
+     * @param functions
+     * @param tokenizer
+     * @param maxTokens
      * @private
      */
-    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<any>[]>> {
+    public async renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message<any>[]>> {
         // Get input text & images
         const inputText: string = memory.getValue(this._inputVariable) ?? '';
         const inputFiles: InputFile[] = memory.getValue(this._filesVariable) ?? [];

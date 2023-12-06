@@ -78,7 +78,7 @@ export interface DefaultTempState {
     /**
      * Flag indicating whether a token exchange event has already been processed
      */
-    duplicateTokenExchange?: boolean
+    duplicateTokenExchange?: boolean;
 }
 
 /**

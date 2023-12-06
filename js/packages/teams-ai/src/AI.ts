@@ -25,7 +25,12 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
      * @param action Name of the action being executed.
      * @returns Whether the AI system should continue executing the plan.
      */
-    handler: (context: TurnContext, state: TState, parameters?: Record<string, any>, action?: string) => Promise<string>;
+    handler: (
+        context: TurnContext,
+        state: TState,
+        parameters?: Record<string, any>,
+        action?: string
+    ) => Promise<string>;
 }
 
 /**
@@ -225,11 +230,14 @@ export class AI<TState extends TurnState = TurnState> {
      * @param {ConfiguredAIOptions} options The options used to configure the AI system.
      */
     public constructor(options: AIOptions<TState>) {
-        this._options = Object.assign({
-            max_steps: 25,
-            max_time: 300000,
-            allow_looping: true
-        }, options) as ConfiguredAIOptions<TState>;
+        this._options = Object.assign(
+            {
+                max_steps: 25,
+                max_time: 300000,
+                allow_looping: true
+            },
+            options
+        ) as ConfiguredAIOptions<TState>;
 
         // Create moderator if needed
         if (!this._options.moderator) {
@@ -237,52 +245,37 @@ export class AI<TState extends TurnState = TurnState> {
         }
 
         // Register default UnknownAction handler
-        this.defaultAction(
-            AI.UnknownActionName,
-            (context, state, data, action?) => {
-                console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
-                return Promise.resolve(AI.StopCommandName);
-            }
-        );
+        this.defaultAction(AI.UnknownActionName, (context, state, data, action?) => {
+            console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
+            return Promise.resolve(AI.StopCommandName);
+        });
 
         // Register default FlaggedInputAction handler
-        this.defaultAction(
-            AI.FlaggedInputActionName,
-            () => {
-                console.error(
-                    `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
-                );
-                return Promise.resolve(AI.StopCommandName);
-            }
-        );
+        this.defaultAction(AI.FlaggedInputActionName, () => {
+            console.error(
+                `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
+            );
+            return Promise.resolve(AI.StopCommandName);
+        });
 
         // Register default FlaggedOutputAction handler
-        this.defaultAction(
-            AI.FlaggedOutputActionName,
-            () => {
-                console.error(
-                    `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
-                );
-                return Promise.resolve(AI.StopCommandName);
-            }
-        );
+        this.defaultAction(AI.FlaggedOutputActionName, () => {
+            console.error(
+                `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
+            );
+            return Promise.resolve(AI.StopCommandName);
+        });
 
         // Register default HttpErrorActionName
-        this.defaultAction(
-            AI.HttpErrorActionName,
-            (context, state, data, action) => {
-                throw new Error(`An AI http request failed`);
-            }
-        );
+        this.defaultAction(AI.HttpErrorActionName, (context, state, data, action) => {
+            throw new Error(`An AI http request failed`);
+        });
 
         // Register default PlanReadyActionName
-        this.defaultAction<Plan>(
-            AI.PlanReadyActionName,
-            (context, state, plan) => {
-                const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
-                return Promise.resolve(!isValid ? AI.StopCommandName : '');
-            }
-        );
+        this.defaultAction<Plan>(AI.PlanReadyActionName, (context, state, plan) => {
+            const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
+            return Promise.resolve(!isValid ? AI.StopCommandName : '');
+        });
 
         // Register default DoCommandActionName
         this.defaultAction<PredictedDoCommandAndHandler<TState>>(
@@ -294,32 +287,26 @@ export class AI<TState extends TurnState = TurnState> {
         );
 
         // Register default SayCommandActionName
-        this.defaultAction<PredictedSayCommand>(
-            AI.SayCommandActionName,
-            async (context, state, data, action) => {
-                const response = data.response;
-                if (context.activity.channelId == Channels.Msteams) {
-                    await context.sendActivity(response.split('\n').join('<br>'));
-                } else {
-                    await context.sendActivity(response);
-                }
-
-                return '';
+        this.defaultAction<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
+            const response = data.response;
+            if (context.activity.channelId == Channels.Msteams) {
+                await context.sendActivity(response.split('\n').join('<br>'));
+            } else {
+                await context.sendActivity(response);
             }
-        );
+
+            return '';
+        });
 
         // Register default TooManyStepsActionName
-        this.defaultAction<TooManyStepsParameters>(
-            AI.TooManyStepsActionName,
-            async (context, state, data, action) => {
-                const { max_steps, step_count } = data;
-                if (step_count > max_steps) {
-                    throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
-                } else {
-                    throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
-                }
+        this.defaultAction<TooManyStepsParameters>(AI.TooManyStepsActionName, async (context, state, data, action) => {
+            const { max_steps, step_count } = data;
+            if (step_count > max_steps) {
+                throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
+            } else {
+                throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
             }
-        );
+        });
     }
 
     /**
@@ -391,7 +378,7 @@ export class AI<TState extends TurnState = TurnState> {
      * @param handler Function to call when the action is triggered.
      * @returns The AI system instance for chaining purposes.
      */
-    public defaultAction<TParameters extends (Record<string, any> | undefined)>(
+    public defaultAction<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
         handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
     ): this {
@@ -434,7 +421,6 @@ export class AI<TState extends TurnState = TurnState> {
         return this._actions.has(action);
     }
 
-
     /**
      * Calls the configured planner to generate a plan and executes the plan that is returned.
      * @remarks
@@ -447,12 +433,7 @@ export class AI<TState extends TurnState = TurnState> {
      * @param step_count Optional. Number of steps that have been executed.
      * @returns True if the plan was completely executed, otherwise false.
      */
-    public async run(
-        context: TurnContext,
-        state: TState,
-        start_time?: number,
-        step_count?: number
-    ): Promise<boolean> {
+    public async run(context: TurnContext, state: TState, start_time?: number, step_count?: number): Promise<boolean> {
         // Initialize start time and action count
         const { max_steps, max_time } = this._options;
         if (start_time === undefined) {
@@ -463,7 +444,8 @@ export class AI<TState extends TurnState = TurnState> {
         }
 
         // Review input on first loop
-        let plan: Plan|undefined = step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
+        let plan: Plan | undefined =
+            step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
 
         // Generate plan
         if (!plan) {
@@ -479,7 +461,9 @@ export class AI<TState extends TurnState = TurnState> {
 
         // Process generated plan
         let completed = false;
-        let response = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, AI.PlanReadyActionName);
+        const response = await this._actions
+            .get(AI.PlanReadyActionName)!
+            .handler(context, state, plan, AI.PlanReadyActionName);
         if (response == AI.StopCommandName) {
             return false;
         }
@@ -492,8 +476,15 @@ export class AI<TState extends TurnState = TurnState> {
             // Check for timeout
             if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
                 completed = false;
-                const parameters: TooManyStepsParameters = { max_steps, max_time, start_time: start_time!, step_count: step_count! };
-                await this._actions.get(AI.TooManyStepsActionName)!.handler(context, state, parameters, AI.TooManyStepsActionName);
+                const parameters: TooManyStepsParameters = {
+                    max_steps,
+                    max_time,
+                    start_time: start_time!,
+                    step_count: step_count!
+                };
+                await this._actions
+                    .get(AI.TooManyStepsActionName)!
+                    .handler(context, state, parameters, AI.TooManyStepsActionName);
                 break;
             }
 
@@ -513,9 +504,7 @@ export class AI<TState extends TurnState = TurnState> {
                         state.temp.actionOutputs[action] = output;
                     } else {
                         // Redirect to UnknownAction handler
-                        output = await this._actions
-                            .get(AI.UnknownActionName)!
-                            .handler(context, state, plan, action);
+                        output = await this._actions.get(AI.UnknownActionName)!.handler(context, state, plan, action);
                     }
                     break;
                 }
