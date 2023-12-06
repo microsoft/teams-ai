@@ -2,6 +2,26 @@
 
 This sample shows how to incorporate Adaptive Cards into a Microsoft Teams application using [Teams developer portal](https://dev.teams.microsoft.com) and the Teams AI SDK. Type-Ahead gives an enhanced search experience with Adaptive Cards to search and select data.
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+-   [Type-Ahead Search](#type-ahead-search)
+    -   [Showcase](#showcase)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Using Teams Toolkit for Visual Studio Code](#teams-toolkit-for-visual-studio-code)
+        -   [Prerequisites](#prerequisites)
+        -   [Run the sample](#run-the-sample)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Other ways to run the sample](#other-ways-to-run-the-sample)
+        -   [Using Teams Toolkit CLI](#teams-toolkit-cli)
+        -   [Manually upload the app to a Teams desktop client](#manual-resource-management-and-uploading-to-teams)
+        -   [Testing in BotFramework Emulator](#botframework-emulator)
+    -   [Deploy the bot to Azure](#deploy-the-bot-to-azure)
+    -   [Further reading](#further-reading)
+
+<!-- /code_chunk_output -->
+
 ## Showcase
 
 - You can interact by sending 'dynamic' or 'static' to the app. The app will respond with an Adaptive Card.

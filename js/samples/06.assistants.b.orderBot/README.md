@@ -40,12 +40,15 @@ This example shows how to create a conversational assistant that uses tools to c
 
     ```bash
     cd teams-ai/js/samples/06.assistants.b.orderBot/
-    yarn start
     ```
+
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/06.assistants.b.orderBot` folder. Rename the file to `.env`.
+
+5. Fill in the variables with your keys.
 
 ## Interacting with the bot
 
-You can interact with this bot by sending it a message, which will echo back to you.
+You can interact with this bot by sending it a message, and the bot will reply to your order requirements.
 
 ## Multiple ways to test
 

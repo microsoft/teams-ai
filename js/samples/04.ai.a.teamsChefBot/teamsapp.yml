@@ -76,4 +76,3 @@ publish:
     writeToEnvironmentFile:
       # Write the information of installed dependencies into environment file for the specified environment variable(s).
       publishedAppId: TEAMS_APP_PUBLISHED_APP_ID
-projectId: f76f76ab-fa47-46f5-a401-5d5deb608718

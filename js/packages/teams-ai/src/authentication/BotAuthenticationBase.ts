@@ -21,7 +21,14 @@ interface UserAuthState {
 }
 
 /**
+ * @private
+ */
+const IS_SIGNED_IN_KEY = '__InSignInFlow__';
+
+/**
  * @internal
+ * Base class to handle Teams conversational bot authentication.
+ * @template TState - The type of the turn state.
  */
 export abstract class BotAuthenticationBase<TState extends TurnState> {
     protected _storage: Storage;
@@ -29,6 +36,12 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
     private _userSignInSuccessHandler?: (context: TurnContext, state: TState) => Promise<void>;
     private _userSignInFailureHandler?: (context: TurnContext, state: TState, error: AuthError) => Promise<void>;
 
+    /**
+     * Creates a new instance of BotAuthenticationBase.
+     * @param {Application<TState>} app - The application instance.
+     * @param {string} settingName - The name of the setting.
+     * @param {Storage} [storage] - The storage to save states.
+     */
     public constructor(app: Application<TState>, settingName: string, storage?: Storage) {
         this._settingName = settingName;
 
@@ -51,6 +64,12 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         );
     }
 
+    /**
+     * Authenticates the user.
+     * @param {TurnContext} context - The turn context.
+     * @param {TState} state - The turn state.
+     * @returns {Promise<string | undefined>} - The authentication token, or undefined if authentication failed.
+     */
     public async authenticate(context: TurnContext, state: TState): Promise<string | undefined> {
         // Get property names to use
         const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
@@ -82,6 +101,11 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         return undefined;
     }
 
+    /**
+     * Checks if the activity is a valid message activity
+     * @param {TurnContext} context - The turn context.
+     * @returns {boolean} - True if the activity is a valid message activity.
+     */
     public isValidActivity(context: TurnContext): boolean {
         // Should be a message activity with non-empty text property.
         return (
@@ -112,6 +136,11 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         this._userSignInFailureHandler = handler;
     }
 
+    /**
+     * Handles the signin/verifyState activity. The onUserSignInSuccess and onUserSignInFailure handlers will be called based on the result.
+     * @param {TurnContext} context - The turn context.
+     * @param {TState} state - The turn state.
+     */
     public async handleSignInActivity(context: TurnContext, state: TState): Promise<void> {
         try {
             const userDialogStatePropertyName = this.getUserDialogStatePropertyName(context);
@@ -149,6 +178,11 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         }
     }
 
+    /**
+     * Deletes the user auth state and user dialog state from the turn state. So that the next message can start a new authentication flow.
+     * @param {TurnContext} context - The turn context.
+     * @param {TState} state - The turn state.
+     */
     public deleteAuthFlowState(context: TurnContext, state: TState) {
         // Delete user auth state
         const userAuthStatePropertyName = this.getUserAuthStatePropertyName(context);
@@ -163,10 +197,20 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         }
     }
 
+    /**
+     * Gets the property name for storing user authentication state.
+     * @param {TurnContext} context - The turn context.
+     * @returns {string} - The property name.
+     */
     public getUserAuthStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:${this._settingName}:Bot:AuthState__`;
     }
 
+    /**
+     * Gets the property name for storing user dialog state.
+     * @param {TurnContext} context - The turn context.
+     * @returns {string} - The property name.
+     */
     public getUserDialogStatePropertyName(context: TurnContext): string {
         return `__${context.activity.from.id}:${this._settingName}:DialogState__`;
     }
@@ -188,12 +232,26 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
         return context.activity.type === ActivityTypes.Invoke && context.activity.name === tokenExchangeOperationName;
     }
 
+    /**
+     * Run or continue the authentication dialog.
+     * @param {TurnContext} context - The turn context.
+     * @param {TState} state - The turn state.
+     * @param {string} dialogStateProperty - The property name for storing dialog state.
+     * @returns {Promise<DialogTurnResult<TokenResponse>>} - A promise that resolves to the dialog turn result containing the token response.
+     */
     public abstract runDialog(
         context: TurnContext,
         state: TState,
         dialogStateProperty: string
     ): Promise<DialogTurnResult<TokenResponse>>;
 
+    /**
+     * Continues the authentication dialog.
+     * @param {TurnContext} context - The turn context.
+     * @param {TState} state - The turn state.
+     * @param {string} dialogStateProperty - The property name for storing dialog state.
+     * @returns {Promise<DialogTurnResult<TokenResponse>>} - A promise that resolves to the dialog turn result containing the token response.
+     */
     public abstract continueDialog(
         context: TurnContext,
         state: TState,
@@ -227,4 +285,39 @@ export function deleteTokenFromState<TState extends TurnState>(state: TState, se
     }
 
     delete state.temp.authTokens[settingName];
+}
+
+/**
+ * Determines if the user is in the sign in flow.
+ * @template TState
+ * @param {TState} state - the turn state
+ * @returns {string | undefined} The setting name if the user is in sign in flow. Otherwise, undefined.
+ */
+export function userInSignInFlow<TState extends TurnState>(state: TState): string | undefined {
+    if (IS_SIGNED_IN_KEY in state.user && typeof state.user[IS_SIGNED_IN_KEY] == 'string') {
+        // returns the connection name if the user is in the sign in flow
+        return state.user[IS_SIGNED_IN_KEY];
+    }
+
+    return;
+}
+
+/**
+ * Update the turn state to indicate the user is in the sign in flow by providing the authentication setting name used.
+ * @template TState
+ * @param {TState} state - the turn state
+ * @param {string} settingName - the authentication setting name.
+ */
+export function setUserInSignInFlow<TState extends TurnState>(state: TState, settingName: string) {
+    (state.user as any)[IS_SIGNED_IN_KEY] = settingName;
+}
+
+/**
+ * Deletes the user sign in flow state from the turn state.
+ * @template TState
+ * Determines if the user is in the sign in flow.
+ * @param {TState} state - the turn state
+ */
+export function deleteUserInSignInFlow<TState extends TurnState>(state: TState) {
+    delete (state.user as any)[IS_SIGNED_IN_KEY];
 }

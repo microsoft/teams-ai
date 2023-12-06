@@ -5,7 +5,8 @@ import { Activity, MemoryStorage, TestAdapter, TurnContext } from "botbuilder"
 import * as sinon from 'sinon';
 import assert from 'assert';
 import { Application, RouteSelector } from "../Application";
-import { TeamsSsoPrompt, TeamsSsoSettings } from "./TeamsBotSsoPrompt";
+import { TeamsSsoPrompt } from "./TeamsBotSsoPrompt";
+import { TeamsSsoSettings } from "./TeamsSsoSettings";
 import { TurnState } from "../TurnState";
 import { TeamsSsoBotAuthentication } from "./TeamsSsoBotAuthentication";
 import { ConfidentialClientApplication } from "@azure/msal-node";

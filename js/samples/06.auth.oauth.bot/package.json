@@ -1,0 +1,39 @@
+{
+    "name": "botsso-demo",
+    "version": "1.0.0",
+    "description": "A simple bot sample that uses SSO to authenticate users",
+    "author": "Microsoft",
+    "license": "MIT",
+    "main": "./lib/index.js",
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "rimraf node_modules lib tsconfig.tsbuildinfo",
+        "lint": "eslint **/**/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
+        "start": "tsc --build && node ./lib/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "nodemon --watch ./src -e ts --exec \"yarn start\"",
+        "dev:teamsfx": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com"
+    },
+    "dependencies": {
+        "@microsoft/teams-ai": "~1.0.0-preview.1",
+        "botbuilder": "^4.21.2",
+        "botbuilder-dialogs": "^4.21.2",
+        "dotenv": "^16.3.1",
+        "replace": "~1.2.0",
+        "restify": "~11.1.0"
+    },
+    "devDependencies": {
+        "@types/dotenv": "8.2.0",
+        "@types/jsonwebtoken": "^8.5.4",
+        "@types/restify": "8.5.11",
+        "nodemon": "~3.0.1",
+        "rimraf": "^5.0.5",
+        "ts-node": "^10.9.1",
+        "tsc-watch": "^6.0.4",
+        "typescript": "^5.3.2"
+    }
+}

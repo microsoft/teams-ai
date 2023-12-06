@@ -69,23 +69,6 @@ provision:
 # Defines what the `deploy` lifecycle step does with Teams Toolkit.
 # Runs after `provision` during Start Debugging (F5) or run manually using `teamsfx deploy --env local`.
 deploy:
-  # Ensures that the project dependencies are installed.
-  # - uses: cli/runNpmCommand
-    # with:
-    #   args: install --no-audit
-  - uses: script
-    with:
-      run: yarn
-      workingDirectory: .
-      shell: powershell
-
-  # Build the project
-  - uses: script
-    with:
-      run: yarn build
-      workingDirectory: .
-      shell: powershell
-
   # Provides the Teams Toolkit .env file values to the apps runtime so they can be accessed with `process.env`.
   - uses: file/createOrUpdateEnvironmentFile
     with:
@@ -94,7 +77,3 @@ deploy:
         BOT_ID: ${{BOT_ID}}
         BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
         TEAMS_APP_TENANT_ID: ${{TEAMS_APP_TENANT_ID}}
-        AZURE_OPENAI_ENDPOINT: ${{AZURE_OPENAI_ENDPOINT}}
-        AZURE_OPENAI_KEY: ${{AZURE_OPENAI_KEY}}
-        AZURE_MODERATOR_ENDPOINT: ${{AZURE_MODERATOR_ENDPOINT}}
-        AZURE_MODERATOR_API_KEY: ${{AZURE_MODERATOR_API_KEY}}

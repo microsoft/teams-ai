@@ -18,7 +18,7 @@ import { DataSource } from "../dataSources";
 import { PromptSection } from "./PromptSection";
 import { Memory } from "../MemoryFork";
 import { DataSourceSection } from "./DataSourceSection";
-import { FunctionsAugmentation, MonologueAugmentation, SequenceAugmentation } from "../augmentations";
+import { MonologueAugmentation, SequenceAugmentation } from "../augmentations";
 import { ConversationHistory } from "./ConversationHistory";
 import { UserMessage } from "./UserMessage";
 import { GroupSection } from "./GroupSection";
@@ -412,9 +412,6 @@ export class PromptManager implements PromptFunctions {
                 default:
                 case 'none':
                     // No augmentation needed
-                    break;
-                case 'functions':
-                    template.augmentation = new FunctionsAugmentation(template.actions ?? []);
                     break;
                 case 'monologue':
                     template.augmentation = new MonologueAugmentation(template.actions ?? []);
