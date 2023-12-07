@@ -311,7 +311,8 @@ namespace Microsoft.Teams.AI.State
                         }
 
                         // Add the temp scope
-                        this._scopes[TEMP_SCOPE] = new TurnStateEntry(new TempState());
+                        Record tempStateValue = ScopeDefaults.ContainsKey(TEMP_SCOPE) ? ScopeDefaults[TEMP_SCOPE] : new TempState();
+                        this._scopes[TEMP_SCOPE] = new TurnStateEntry(tempStateValue);
 
                         // Clear loading task
                         this._isLoaded = true;

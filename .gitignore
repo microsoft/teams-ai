@@ -121,3 +121,4 @@ env/.env.*.user
 env/.env.local
 env/.env.staging
 .env*
+/dotnet/samples/NuGet.Config

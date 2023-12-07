@@ -47,16 +47,6 @@
             "canUpdateConfiguration": true
         }
     ],
-    "bots": [
-        {
-            "botId": "${{BOT_ID}}",
-            "scopes": ["personal", "team", "groupChat"],
-            "isNotificationOnly": false,
-            "supportsCalling": false,
-            "supportsVideo": false,
-            "supportsFiles": false
-        }
-    ],
     "permissions": ["identity", "messageTeamMembers"],
     "validDomains": [
         "${{BOT_DOMAIN}}"
