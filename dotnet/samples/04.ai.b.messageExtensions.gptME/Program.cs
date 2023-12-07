@@ -39,22 +39,32 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 bool PREVIEW_MODE = false;
 
-OpenAIModel? model = null;
-
+// Create AI Model
 if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
-    model = new(new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo"));
+    builder.Services.AddSingleton<OpenAIModel>(sp => new(
+        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo")
+        {
+            LogRequests = true
+        },
+        sp.GetService<ILoggerFactory>()
+    ));
 }
 else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
-    model = new(new AzureOpenAIModelOptions(
-        config.Azure.OpenAIApiKey,
-        "gpt-35-turbo",
-        config.Azure.OpenAIEndpoint
+    builder.Services.AddSingleton<OpenAIModel>(sp => new(
+        new AzureOpenAIModelOptions(
+            config.Azure.OpenAIApiKey,
+            "gpt-35-turbo",
+            config.Azure.OpenAIEndpoint
+        )
+        {
+            LogRequests = true
+        },
+        sp.GetService<ILoggerFactory>()
     ));
 }
-
-if (model == null)
+else
 {
     throw new Exception("please configure settings for either OpenAI or Azure");
 }
@@ -72,7 +82,7 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create OpenAIPlanner
     ActionPlanner<AppState> planner = new(
         new(
-            model,
+            sp.GetService<OpenAIModel>()!,
             prompts,
             async (context, state, planner) =>
             {
