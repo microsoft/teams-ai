@@ -11,7 +11,7 @@ provision:
   # Creates a new Azure Active Directory (AAD) app to authenticate users if the environment variable that stores clientId is empty  
   - uses: aadApp/create
     with:
-  # Note: when you run aadApp/update, the AAD app name will be updated based on the definition in manifest. If you don't want to change the name, make sure the name in AAD manifest is the same with the name defined here.
+      # Note: when you run aadApp/update, the AAD app name will be updated based on the definition in manifest. If you don't want to change the name, make sure the name in AAD manifest is the same with the name defined here.
       name: BotAuth-aad
       # If the value is false, the action will not generate client secret for you
       generateClientSecret: true
@@ -26,7 +26,7 @@ provision:
       tenantId: AAD_APP_TENANT_ID
       authority: AAD_APP_OAUTH_AUTHORITY
       authorityHost: AAD_APP_OAUTH_AUTHORITY_HOST
-      
+
   # Creates a Teams app
   - uses: teamsApp/create
     with:
