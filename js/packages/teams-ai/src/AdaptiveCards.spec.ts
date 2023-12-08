@@ -10,8 +10,6 @@ describe.only('AdaptiveCards', () => {
     let selector: RouteSelector;
     let handler: any;
     let addRouteStub: sinon.SinonStub;
-    const testVerb = 'testVerb';
-    const testHandler = (context: TurnContext, state: TurnState, data: Record<string, any>) => Promise.resolve('test');
 
     const createTurnContext = (activity: any) => {
         return new TurnContext(new TestAdapter(), activity);
@@ -32,6 +30,10 @@ describe.only('AdaptiveCards', () => {
     });
 
     describe('actionExecute()', () => {
+        const testVerb = 'testVerb';
+        const testHandler = (context: TurnContext, state: TurnState, data: Record<string, any>) =>
+            Promise.resolve('test');
+
         it('should call application addRoute', () => {
             adaptiveCards.actionExecute(testVerb, testHandler);
 
@@ -81,7 +83,7 @@ describe.only('AdaptiveCards', () => {
                 });
             });
 
-            describe('verb is a regular expression', () => {
+            describe('verb is a string', () => {
                 const verb = 'test';
 
                 beforeEach(() => {
@@ -263,6 +265,168 @@ describe.only('AdaptiveCards', () => {
                         type: ActivityTypes.InvokeResponse
                     })
                 );
+            });
+        });
+    });
+
+    describe.only('actionSubmit()', () => {
+        const testVerb = 'testVerb';
+        const testHandler = (context: TurnContext, state: TurnState, data: Record<string, any>) => Promise.resolve();
+
+        it('should call application addRoute', () => {
+            adaptiveCards.actionSubmit(testVerb, testHandler);
+
+            assert(addRouteStub.calledOnce);
+        });
+
+        describe('createActionSubmitSelector()', () => {
+            it('verb is a function', () => {
+                const verb: RouteSelector = () => Promise.resolve(true);
+
+                adaptiveCards.actionSubmit(verb, testHandler);
+
+                assert(selector === verb);
+            });
+
+            describe('verb is a regular expression', () => {
+                const verbRegex = new RegExp('test');
+
+                beforeEach(() => {
+                    adaptiveCards.actionSubmit(verbRegex, testHandler);
+                });
+
+                it('incomming activity is valid action submit type and should match regex', async () => {
+                    // a valid action submit type is a message activity with a value property.
+                    const activity = {
+                        type: 'message',
+                        value: {
+                            // "verb" key is the default filter
+                            verb: 'test'
+                        }
+                    };
+                    const context = createTurnContext(activity);
+
+                    // the selector should be testing if `value.verb` matches the regex `verbRegex`.
+                    assert((await selector(context)) == true);
+                });
+
+                it('incomming activity is valid action submit type and should not match regex ', async () => {
+                    // a valid action submit type is a message activity with a value property.
+                    const activity = {
+                        type: 'message',
+                        value: {
+                            // "verb" key is the default filter
+                            verb: 'verbThatDoesNotMatchRegex'
+                        }
+                    };
+                    const context = createTurnContext(activity);
+
+                    // the selector should be testing if `value.verb` matches the regex `verbRegex`.
+                    assert((await selector(context)) == false);
+                });
+
+                it('incomming activity is invalid', async () => {
+                    const activity = {
+                        type: 'notActionSubmit'
+                    };
+
+                    const context = createTurnContext(activity);
+
+                    assert((await selector(context)) == false);
+                });
+            });
+
+            describe('verb is a string', () => {
+                const verb = 'test';
+
+                beforeEach(() => {
+                    adaptiveCards.actionSubmit(verb, testHandler);
+                });
+
+                it('activity is valid invoke type and verb matches', async () => {
+                    // a valid action submit type is a message activity with a value property and no text.
+                    const activity = {
+                        type: 'message',
+                        value: {
+                            // "verb" key is the default filter
+                            verb: 'test'
+                        }
+                    };
+                    const context = createTurnContext(activity);
+
+                    // the selector should be testing if `value.verb` == `verb`.
+                    assert((await selector(context)) == true);
+                });
+
+                it('activity is valid invoke type and verbs are not equal', async () => {
+                    // a valid action submit type is a message activity with a value property.
+                    const activity = {
+                        type: 'message',
+                        value: {
+                            // "verb" key is the default filter
+                            verb: 'notEqualToTest'
+                        }
+                    };
+                    const context = createTurnContext(activity);
+
+                    // the selector should be testing if `value.verb` == `verb`.
+                    assert((await selector(context)) == false);
+                });
+
+                it('activity is invalid', async () => {
+                    const activity = {
+                        type: 'NotActionSubmit'
+                    };
+
+                    const context = createTurnContext(activity);
+
+                    assert((await selector(context)) == false);
+                });
+            });
+        });
+
+        describe('handler creation logic', () => {
+            it('should create handler', () => {
+                adaptiveCards.actionSubmit(testVerb, testHandler);
+
+                assert(typeof handler === 'function');
+            });
+
+            it('should throw error if incomming activity is not valid', async () => {
+                adaptiveCards.actionSubmit(testVerb, testHandler);
+
+                const activity = {
+                    type: 'invalidActivityType'
+                };
+
+                const context = createTurnContext(activity);
+                const state = new TurnState();
+                const errorMsg = `Unexpected AdaptiveCards.actionSubmit() triggered for activity type: invalidActivityType`;
+
+                assert.rejects(async () => await handler(context, state), errorMsg);
+            });
+
+            it('should call the test handler with the correct parameters', async () => {
+                const testHandlerStub = sinon.spy(testHandler);
+
+                adaptiveCards.actionSubmit(testVerb, testHandlerStub);
+
+                const activity = {
+                    type: 'message',
+                    value: {
+                        // "verb" key is the default filter
+                        verb: 'test'
+                    }
+                };
+
+                const context = createTurnContext(activity);
+                const state = new TurnState();
+
+                // this is the handler that is registered as an app route.
+                await handler(context, state);
+
+                assert(testHandlerStub.calledOnce);
+                assert(testHandlerStub.calledWith(context, state, activity.value));
             });
         });
     });
