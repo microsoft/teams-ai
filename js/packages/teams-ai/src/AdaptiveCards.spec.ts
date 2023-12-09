@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { AdaptiveCard, AdaptiveCardSearchResult, AdaptiveCards, AdaptiveCardsSearchParams, TurnState } from '.';
 import assert from 'assert';
 
-describe.only('AdaptiveCards', () => {
+describe('AdaptiveCards', () => {
     let adaptiveCards: AdaptiveCards<TurnState>;
     let app: Application;
     let selector: RouteSelector;
@@ -531,7 +531,7 @@ describe.only('AdaptiveCards', () => {
                         type: 'invoke',
                         name: 'application/search',
                         value: {
-                            dataset: 'test'
+                            dataset: 'NotEqualToTest'
                         }
                     };
                     const context = createTurnContext(activity);
