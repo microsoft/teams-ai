@@ -120,9 +120,9 @@ export class Authentication<TState extends TurnState> {
 
         // Signout flow is agnostic of the activity type.
         if (this.isOAuthSettings(this.settings)) {
-            return UserTokenAccess.signOutUser(context, this.settings);
+            return await UserTokenAccess.signOutUser(context, this.settings);
         } else {
-            return this.removeTokenFromMsalCache(context);
+            return await this.removeTokenFromMsalCache(context);
         }
     }
 
