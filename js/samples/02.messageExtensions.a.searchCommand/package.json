@@ -30,7 +30,7 @@
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.11",
         "nodemon": "~1.19.4",
-        "typescript": "^5.3.2",
-        "ts-node": "^10.9.1"
+        "typescript": "^5.3.3",
+        "ts-node": "^10.9.2"
     }
 }
