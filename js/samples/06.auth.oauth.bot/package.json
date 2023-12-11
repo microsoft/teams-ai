@@ -19,7 +19,7 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.0.0-preview.1",
+        "@microsoft/teams-ai": "~1.0.0",
         "botbuilder": "^4.21.2",
         "botbuilder-dialogs": "^4.21.2",
         "dotenv": "^16.3.1",
