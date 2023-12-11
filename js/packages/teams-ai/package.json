@@ -24,8 +24,8 @@
     "dependencies": {
         "@azure/msal-node": "^2.6.0",
         "axios": "^1.6.2",
-        "botbuilder": "^4.21.2",
-        "botbuilder-dialogs": "^4.21.2",
+        "botbuilder": "^4.21.3",
+        "botbuilder-dialogs": "^4.21.3",
         "gpt-3-encoder": "^1.1.4",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
