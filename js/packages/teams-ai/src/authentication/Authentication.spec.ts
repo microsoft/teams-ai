@@ -11,6 +11,9 @@ import * as UserTokenAccess from './UserTokenAccess';
 import * as BotAuth from './BotAuthenticationBase';
 import { OAuthPromptMessageExtensionAuthentication } from './OAuthMessageExtensionAuthentication';
 import { OAuthBotAuthentication } from './OAuthBotAuthentication';
+import { OAuthAdaptiveCardAuthentication } from './OAuthAdaptiveCardAuthentication';
+import { AdaptiveCardAuthenticationBase } from './AdaptiveCardAuthenticationBase';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
 
 describe('Authentication', () => {
     const adapter = new TestAdapter();
@@ -19,6 +22,8 @@ describe('Authentication', () => {
     let botAuthenticateStub: sinon.SinonStub;
     let messageExtensionsAuth: MessageExtensionAuthenticationBase;
     let messageExtensionAuthenticateStub: sinon.SinonStub;
+    let adaptiveCardAuth: AdaptiveCardAuthenticationBase;
+    let adaptiveCardAuthenticateStub: sinon.SinonStub;
     let app: Application;
     let appStub: sinon.SinonStubbedInstance<Application>;
     let settings: OAuthPromptSettings;
@@ -69,8 +74,35 @@ describe('Authentication', () => {
         messageExtensionAuthenticateStub = sinon.stub(messageExtensionsAuth, 'authenticate');
         botAuth = new OAuthBotAuthentication(appStub, settings, settingName);
         botAuthenticateStub = sinon.stub(botAuth, 'authenticate');
+        adaptiveCardAuth = new OAuthAdaptiveCardAuthentication(settings);
+        adaptiveCardAuthenticateStub = sinon.stub(adaptiveCardAuth, 'authenticate');
 
-        auth = new Authentication(appStub, settingName, settings, undefined, messageExtensionsAuth, botAuth);
+        auth = new Authentication(
+            appStub,
+            settingName,
+            settings,
+            undefined,
+            messageExtensionsAuth,
+            botAuth,
+            adaptiveCardAuth
+        );
+    });
+
+    it('should construct authentication object with teams sso settings', () => {
+        const teamsSsoSettings = {
+            scopes: ['User.Read'],
+            msalConfig: {
+                auth: {
+                    clientId: 'id',
+                    clientSecret: 'secret',
+                    authority: 'authority',
+                }
+            }
+        } as TeamsSsoSettings;
+
+        const teamsSsoAuth = new Authentication(appStub, 'setting', teamsSsoSettings, undefined, undefined, undefined);
+
+        assert(teamsSsoAuth.settings == teamsSsoSettings);
     });
 
     describe('signInUser()', () => {
@@ -80,6 +112,19 @@ describe('Authentication', () => {
 
         after(() => {
             sinon.restore();
+        });
+
+        it('should return token if user is already signed in', async () => {
+            const isUserSignedInStub = sinon.stub(auth, 'isUserSignedIn').returns(Promise.resolve('token'));
+            const [context, state] = await createTurnContextAndState({
+                type: ActivityTypes.Message,
+                text: 'non empty'
+            });
+
+            const token = await auth.signInUser(context, state);
+
+            assert(token == 'token');
+            assert(isUserSignedInStub.calledOnce);
         });
 
         it('should call botAuth.authenticate() when activity type is message and the text is a non-empty string', async () => {
@@ -94,6 +139,20 @@ describe('Authentication', () => {
 
             assert(isUserSignedInStub.calledOnce);
             assert(botAuthenticateStub.calledOnce);
+        });
+
+        it('should call adaptiveCardAuth.authenticate() when activity type is invoke and name is adaptive card action', async () => {
+            const isUserSignedInStub = sinon.stub(auth, 'isUserSignedIn').returns(Promise.resolve(undefined));
+
+            const [context, state] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'adaptiveCard/action'
+            });
+
+            await auth.signInUser(context, state);
+
+            assert(isUserSignedInStub.calledOnce);
+            assert(adaptiveCardAuthenticateStub.calledOnce);
         });
 
         it('should call messageExtensionsAuth.authenticate() when activity type is a composeExtension/query activity', async () => {
@@ -152,10 +211,6 @@ describe('Authentication', () => {
         let context: TurnContext;
         let state: TurnState;
 
-        before(() => {
-            userTokenAccessStub = sinon.stub(UserTokenAccess, 'signOutUser');
-        });
-
         beforeEach(async () => {
             [context, state] = await createTurnContextAndState({
                 type: ActivityTypes.Message,
@@ -165,6 +220,9 @@ describe('Authentication', () => {
                 },
                 channelId: 'test'
             });
+
+            sinon.restore();
+            userTokenAccessStub = sinon.stub(UserTokenAccess, 'signOutUser');
         });
 
         it('should call botAuth.deleteAuthFlowState()', async () => {
@@ -172,13 +230,26 @@ describe('Authentication', () => {
 
             await auth.signOutUser(context, state);
 
-            botAuthDeleteAuthFlowStateStub.calledOnce;
+            assert(botAuthDeleteAuthFlowStateStub.calledOnce);
         });
 
-        it('should call UserTokenAccess.signOutUser()', async () => {
+        it('should call UserTokenAccess.signOutUser() if settings is OAuthSettings', async () => {
+            const isOAuthSettingsStub = sinon.stub(auth, <any>'isOAuthSettings').returns(true);
+
             await auth.signOutUser(context, state);
 
-            userTokenAccessStub.calledOnce;
+            assert(isOAuthSettingsStub.calledOnce);
+            assert(userTokenAccessStub.calledOnce);
+        });
+
+        it('should call removeTokenFromMsalCache if settings is TeamsSsoSettings', async () => {
+            const isOAuthSettingsStub = sinon.stub(auth, <any>'isOAuthSettings').returns(false);
+            const removeTokenFromMsalCacheStub = sinon.stub(auth, <any>'removeTokenFromMsalCache');
+
+            await auth.signOutUser(context, state);
+
+            assert(isOAuthSettingsStub.calledOnce);
+            assert(removeTokenFromMsalCacheStub.calledOnce);
         });
     });
 
@@ -196,13 +267,13 @@ describe('Authentication', () => {
         it(`should call botAuth.onUserSignInFailure()`, async () => {
             const botAuthDeleteAuthFlowStateStub = sinon.stub(botAuth, 'onUserSignInFailure');
 
-            auth.onUserSignInSuccess(() => Promise.resolve());
+            auth.onUserSignInFailure(() => Promise.resolve());
 
             botAuthDeleteAuthFlowStateStub.calledOnce;
         });
     });
 
-    describe('isUserSignedIn()', () => {
+    describe('isUserSignedIn() with OAuthSettings', () => {
         let context: TurnContext;
         let getUserTokenStub: sinon.SinonStub;
 
@@ -224,6 +295,7 @@ describe('Authentication', () => {
         });
 
         it(`should call UserTokenAccess.getUserToken`, async () => {
+            sinon.stub(auth, <any>'isOAuthSettings').returns(true);
             getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken');
 
             await auth.isUserSignedIn(context);
@@ -232,6 +304,7 @@ describe('Authentication', () => {
         });
 
         it(`should return token if UserTokenAccess.getUserToken returns token`, async () => {
+            sinon.stub(auth, <any>'isOAuthSettings').returns(true);
             getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
                 Promise.resolve({
                     token: 'token',
@@ -247,6 +320,7 @@ describe('Authentication', () => {
         });
 
         it(`should return undefined if UserTokenAccess.getUserToken returns empty string for token`, async () => {
+            sinon.stub(auth, <any>'isOAuthSettings').returns(true);
             getUserTokenStub = sinon.stub(UserTokenAccess, 'getUserToken').returns(
                 Promise.resolve({
                     token: '',
@@ -259,6 +333,67 @@ describe('Authentication', () => {
 
             assert(response == undefined);
             getUserTokenStub.calledOnce;
+        });
+    });
+
+    describe('isUserSignedIn() with TeamsSSOSettings', () => {
+        let context: TurnContext;
+        let acquireTokenFromMsalCacheStub: sinon.SinonStub;
+
+        beforeEach(async () => {
+            const obj = await createTurnContextAndState({
+                type: ActivityTypes.Message,
+                from: {
+                    id: 'test',
+                    name: 'test'
+                },
+                channelId: 'test'
+            });
+
+            context = obj[0];
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        it(`should call this.acquireTokenFromMsalCache`, async () => {
+            sinon.stub(auth, <any>'isOAuthSettings').returns(false);
+            acquireTokenFromMsalCacheStub = sinon.stub(auth, <any>'acquireTokenFromMsalCache');
+
+            await auth.isUserSignedIn(context);
+
+            acquireTokenFromMsalCacheStub.calledOnce;
+        });
+
+        it(`should return token if this.acquireTokenFromMsalCache returns token`, async () => {
+            sinon.stub(auth, <any>'isOAuthSettings').returns(false);
+            acquireTokenFromMsalCacheStub = sinon.stub(auth, <any>'acquireTokenFromMsalCache').returns(
+                Promise.resolve({
+                    accessToken: 'token',
+                    expiresOn: 'exiresOn'
+                })
+            );
+
+            const response = await auth.isUserSignedIn(context);
+
+            assert(response == 'token');
+            acquireTokenFromMsalCacheStub.calledOnce;
+        });
+
+        it(`should return undefined if UserTokenAccess.getUserToken returns empty string for token`, async () => {
+            sinon.stub(auth, <any>'isOAuthSettings').returns(false);
+            acquireTokenFromMsalCacheStub = sinon.stub(auth, <any>'acquireTokenFromMsalCache').returns(
+                Promise.resolve({
+                    accessToken: '',
+                    expiresOn: 'exiresOn'
+                })
+            );
+
+            const response = await auth.isUserSignedIn(context);
+
+            assert(response == undefined);
+            acquireTokenFromMsalCacheStub.calledOnce;
         });
     });
 });

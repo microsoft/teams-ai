@@ -35,7 +35,7 @@ const DEFAULT_ACTION_SUBMIT_FILTER = 'verb';
 /**
  * @private
  */
-const SEARCH_INvOKE_NAME = `application/search`;
+const SEARCH_INVOKE_NAME = `application/search`;
 
 /**
  * Strongly typed Adaptive Card.
@@ -245,7 +245,7 @@ export class AdaptiveCards<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an Action.Execute as expected
                     const a = context?.activity;
-                    if (a?.type !== ActivityTypes.Invoke || a?.name !== SEARCH_INvOKE_NAME) {
+                    if (a?.type !== ActivityTypes.Invoke || a?.name !== SEARCH_INVOKE_NAME) {
                         throw new Error(`Unexpected AdaptiveCards.search() triggered for activity type: ${a?.type}`);
                     }
 
@@ -369,7 +369,7 @@ function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSe
         // Return a function that matches the dataset using a RegExp
         return (context: TurnContext) => {
             const a = context?.activity;
-            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INvOKE_NAME;
+            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INVOKE_NAME;
             if (isSearch && typeof a?.value?.dataset == 'string') {
                 return Promise.resolve(dataset.test(a.value.dataset));
             } else {
@@ -380,7 +380,7 @@ function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSe
         // Return a function that attempts to match dataset
         return (context: TurnContext) => {
             const a = context?.activity;
-            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INvOKE_NAME;
+            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INVOKE_NAME;
             return Promise.resolve(isSearch && a?.value?.dataset === dataset);
         };
     }
