@@ -107,7 +107,7 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
  * @internal
  * SSO Token Exchange Middleware for Teams that filters based on the connection name.
  */
-class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {
+export class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {
     private readonly _oauthConnectionName: string;
 
     public constructor(storage: Storage, oauthConnectionName: string) {
