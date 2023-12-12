@@ -1,6 +1,5 @@
 # Microsoft Teams Conversational Bot with AI: Teams Chef
-
-> Please note: this sample is still being tweaked and therefore not setup with Teams Toolkit yet. We'll get it updated ASAP!
+This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
@@ -23,9 +22,6 @@
 <!-- /code_chunk_output -->
 
 ## Summary
-
-This is a conversational bot for Microsoft Teams that thinks it's a Chef to help you cook apps using the Teams AI Library. The bot uses the `gpt-3.5-turbo` model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
-
 This sample illustrates how to use [Retrieval Augmented Generation (RAG)](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to easily inject contextual relevant information into the prompt sent to the model. This results in better and more accurate replies from the bot.
 
 The sample uses a local Vector Database, called [Vectra](https://github.com/Stevenic/vectra), and [Semantic Search](https://en.wikipedia.org/wiki/Semantic_search) to find the most relevant information to include in the prompt for the users input. The index can be found in `./index/teams-ai` and includes all of the projects Getting Started docs and the source code for the Teams AI Library. This means you can ask the Teams Chef Bot anything about the library and it can answer it. You can even ask it to write sample code for you!
@@ -46,7 +42,7 @@ Open the panel below to learn fine-tuned details on how this sample works.
 ```javascript
 // Create AI components
 const planner = new OpenAIPlanner({
-    apiKey: process.env.OPENAI_API_KEY || '',
+    apiKey: process.env.OPENAI_KEY || '',
     defaultModel: 'gpt-3.5-turbo',
     logRequests: true
 });
@@ -149,6 +145,11 @@ Notice that the bot remembered Dave's first message when responding to the secon
     ```bash
     cd teams-ai/js/samples/04.ai.a.teamsChefBot/
     ```
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.a.teamsChefBot` folder. Rename the file to `.env`. 
+
+5. Add in your `OPENAI_KEY` key.
+
+6. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Multiple ways to test
 

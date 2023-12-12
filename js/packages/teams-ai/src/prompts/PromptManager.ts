@@ -18,11 +18,12 @@ import { DataSource } from "../dataSources";
 import { PromptSection } from "./PromptSection";
 import { Memory } from "../MemoryFork";
 import { DataSourceSection } from "./DataSourceSection";
-import { FunctionsAugmentation, MonologueAugmentation, SequenceAugmentation } from "../augmentations";
+import { MonologueAugmentation, SequenceAugmentation } from "../augmentations";
 import { ConversationHistory } from "./ConversationHistory";
 import { UserMessage } from "./UserMessage";
 import { GroupSection } from "./GroupSection";
 import { Prompt } from "./Prompt";
+import { UserInputMessage } from "./UserInputMessage";
 
 /**
  * Options used to configure the prompt manager.
@@ -100,15 +101,15 @@ export interface ConfiguredPromptManagerOptions {
 
 /**
  * A filesystem based prompt manager.
- * @summary
+ * @remarks
  * The default prompt manager uses the file system to define prompts that are compatible with
  * Microsoft's Semantic Kernel SDK (see: https://github.com/microsoft/semantic-kernel)
  *
- * Each prompt is a separate folder under a root prompts folder. The folder should contain 2 files:
+ * Each prompt is a separate folder under a root prompts folder. The folder should contain the following files:
  *
- * - "config.json": contains the prompts configuration and is a serialized instance of `PromptTemplateConfig`.
- * - "skprompt.txt": contains the text of the prompt and supports Semantic Kernels prompt template syntax.
- * - "functions.json": Optional. Contains a list of functions that can be invoked by the prompt.
+ * - "config.json": Required. Contains the prompts configuration and is a serialized instance of `PromptTemplateConfig`.
+ * - "skprompt.txt": Required. Contains the text of the prompt and supports Semantic Kernels prompt template syntax.
+ * - "actions.json": Optional. Contains a list of actions that can be called by the prompt.
  *
  * Prompts can be loaded and used by name and new dynamically defined prompt templates can be
  * registered with the prompt manager.
@@ -133,6 +134,9 @@ export class PromptManager implements PromptFunctions {
         }, options as ConfiguredPromptManagerOptions);
     }
 
+    /**
+     * Gets the configured prompt manager options.
+     */
     public get options(): ConfiguredPromptManagerOptions {
         return this._options;
     }
@@ -249,7 +253,7 @@ export class PromptManager implements PromptFunctions {
 
     /**
      * Loads a named prompt template from the filesystem.
-     * @summary
+     * @remarks
      * The template will be pre-parsed and cached for use when the template is rendered by name.
      *
      * Any augmentations will also be added to the template.
@@ -316,7 +320,9 @@ export class PromptManager implements PromptFunctions {
             }
 
             // Include user input
-            if (template.config.completion.include_input) {
+            if (template.config.completion.include_images) {
+                sections.push(new UserInputMessage(this.options.max_input_tokens));
+            } else if (template.config.completion.include_input) {
                 sections.push(new UserMessage('{{$temp.input}}', this.options.max_input_tokens));
             }
 
@@ -352,12 +358,16 @@ export class PromptManager implements PromptFunctions {
         return true;
     }
 
+    /**
+     * @private
+     */
     private updateConfig(template: PromptTemplate): void {
         // Set config defaults
         template.config.completion = Object.assign({
             frequency_penalty: 0.0,
             include_history: true,
             include_input: true,
+            include_images: false,
             max_tokens: 150,
             max_input_tokens: 2048,
             presence_penalty: 0.0,
@@ -374,6 +384,9 @@ export class PromptManager implements PromptFunctions {
         }
     }
 
+    /**
+     * @private
+     */
     private appendAugmentations(template: PromptTemplate, sections: PromptSection[]): void {
         // Check for augmentation
         const augmentation = template.config.augmentation;
@@ -399,9 +412,6 @@ export class PromptManager implements PromptFunctions {
                 default:
                 case 'none':
                     // No augmentation needed
-                    break;
-                case 'functions':
-                    template.augmentation = new FunctionsAugmentation(template.actions ?? []);
                     break;
                 case 'monologue':
                     template.augmentation = new MonologueAugmentation(template.actions ?? []);

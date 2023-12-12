@@ -11,7 +11,6 @@ import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
 import { TurnState } from './TurnState';
-import { Schema } from 'jsonschema';
 
 /**
  * Entities argument passed to the action handler for AI.DoCommandActionName.
@@ -26,7 +25,12 @@ export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand
      * @param action Name of the action being executed.
      * @returns Whether the AI system should continue executing the plan.
      */
-    handler: (context: TurnContext, state: TState, parameters?: Record<string, any>, action?: string) => Promise<string>;
+    handler: (
+        context: TurnContext,
+        state: TState,
+        parameters?: Record<string, any>,
+        action?: string
+    ) => Promise<string>;
 }
 
 /**
@@ -105,16 +109,34 @@ export interface ConfiguredAIOptions<TState extends TurnState> {
     allow_looping: boolean;
 }
 
+/**
+ * Parameters passed to the AI.TooManyStepsActionName action.
+ */
 export interface TooManyStepsParameters {
+    /**
+     * Configured maximum number of steps allowed.
+     */
     max_steps: number;
+
+    /**
+     * Configured maximum amount of time allowed.
+     */
     max_time: number;
+
+    /**
+     * Time the AI system started processing the current activity.
+     */
     start_time: number;
+
+    /**
+     * Number of steps that have been executed.
+     */
     step_count: number;
 }
 
 /**
  * AI System.
- * @summary
+ * @remarks
  * The AI system is responsible for generating plans, moderating input and output, and
  * generating prompts. It can be used free standing or routed to by the Application object.
  * @template TState Optional. Type of the turn state.
@@ -123,11 +145,15 @@ export class AI<TState extends TurnState = TurnState> {
     private readonly _actions: Map<string, ActionEntry<TState>> = new Map();
     private readonly _options: ConfiguredAIOptions<TState>;
 
+    /**
+     * A text string that can be returned from an action to stop the AI system from continuing
+     * to execute the current plan.
+     */
     public static readonly StopCommandName = 'STOP';
 
     /**
      * An action that will be called anytime an unknown action is predicted by the planner.
-     * @summary
+     * @remarks
      * The default behavior is to simply log an error to the console. The plan is allowed to
      * continue execution by default.
      */
@@ -135,7 +161,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that will be called anytime an input is flagged by the moderator.
-     * @summary
+     * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
      */
@@ -143,7 +169,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that will be called anytime an output is flagged by the moderator.
-     * @summary
+     * @remarks
      * The default behavior is to simply log an error to the console. Override to send a custom
      * message to the user.
      */
@@ -163,7 +189,7 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * An action that will be called after the plan has been predicted by the planner and it has
      * passed moderation.
-     * @summary
+     * @remarks
      * Overriding this action lets you customize the decision to execute a plan separately from the
      * moderator. The default behavior is to proceed with the plans execution only with a plan
      * contains one or more commands. Returning false from this action can be used to prevent the plan
@@ -173,7 +199,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that is called to DO an action.
-     * @summary
+     * @remarks
      * The action system is used to do other actions. Overriding this action lets you customize the
      * execution of an individual action. You can use it to log actions being used or to prevent
      * certain actions from being executed based on policy.
@@ -185,7 +211,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * An action that is called to SAY something.
-     * @summary
+     * @remarks
      * Overriding this action lets you customize the execution of the SAY command. You can use it
      * to log the output being generated or to add support for sending certain types of output as
      * message attachments.
@@ -204,11 +230,14 @@ export class AI<TState extends TurnState = TurnState> {
      * @param {ConfiguredAIOptions} options The options used to configure the AI system.
      */
     public constructor(options: AIOptions<TState>) {
-        this._options = Object.assign({
-            max_steps: 25,
-            max_time: 300000,
-            allow_looping: true
-        }, options) as ConfiguredAIOptions<TState>;
+        this._options = Object.assign(
+            {
+                max_steps: 25,
+                max_time: 300000,
+                allow_looping: true
+            },
+            options
+        ) as ConfiguredAIOptions<TState>;
 
         // Create moderator if needed
         if (!this._options.moderator) {
@@ -216,52 +245,37 @@ export class AI<TState extends TurnState = TurnState> {
         }
 
         // Register default UnknownAction handler
-        this.defaultAction(
-            AI.UnknownActionName,
-            (context, state, data, action?) => {
-                console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
-                return Promise.resolve(AI.StopCommandName);
-            }
-        );
+        this.defaultAction(AI.UnknownActionName, (context, state, data, action?) => {
+            console.error(`An AI action named "${action}" was predicted but no handler was registered.`);
+            return Promise.resolve(AI.StopCommandName);
+        });
 
         // Register default FlaggedInputAction handler
-        this.defaultAction(
-            AI.FlaggedInputActionName,
-            () => {
-                console.error(
-                    `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
-                );
-                return Promise.resolve(AI.StopCommandName);
-            }
-        );
+        this.defaultAction(AI.FlaggedInputActionName, () => {
+            console.error(
+                `The users input has been moderated but no handler was registered for 'AI.FlaggedInputActionName'.`
+            );
+            return Promise.resolve(AI.StopCommandName);
+        });
 
         // Register default FlaggedOutputAction handler
-        this.defaultAction(
-            AI.FlaggedOutputActionName,
-            () => {
-                console.error(
-                    `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
-                );
-                return Promise.resolve(AI.StopCommandName);
-            }
-        );
+        this.defaultAction(AI.FlaggedOutputActionName, () => {
+            console.error(
+                `The bots output has been moderated but no handler was registered for 'AI.FlaggedOutputActionName'.`
+            );
+            return Promise.resolve(AI.StopCommandName);
+        });
 
         // Register default HttpErrorActionName
-        this.defaultAction(
-            AI.HttpErrorActionName,
-            (context, state, data, action) => {
-                throw new Error(`An AI http request failed`);
-            }
-        );
+        this.defaultAction(AI.HttpErrorActionName, (context, state, data, action) => {
+            throw new Error(`An AI http request failed`);
+        });
 
         // Register default PlanReadyActionName
-        this.defaultAction<Plan>(
-            AI.PlanReadyActionName,
-            (context, state, plan) => {
-                const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
-                return Promise.resolve(!isValid ? AI.StopCommandName : '');
-            }
-        );
+        this.defaultAction<Plan>(AI.PlanReadyActionName, (context, state, plan) => {
+            const isValid = Array.isArray(plan.commands) && plan.commands.length > 0;
+            return Promise.resolve(!isValid ? AI.StopCommandName : '');
+        });
 
         // Register default DoCommandActionName
         this.defaultAction<PredictedDoCommandAndHandler<TState>>(
@@ -273,37 +287,31 @@ export class AI<TState extends TurnState = TurnState> {
         );
 
         // Register default SayCommandActionName
-        this.defaultAction<PredictedSayCommand>(
-            AI.SayCommandActionName,
-            async (context, state, data, action) => {
-                const response = data.response;
-                if (context.activity.channelId == Channels.Msteams) {
-                    await context.sendActivity(response.split('\n').join('<br>'));
-                } else {
-                    await context.sendActivity(response);
-                }
-
-                return '';
+        this.defaultAction<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
+            const response = data.response;
+            if (context.activity.channelId == Channels.Msteams) {
+                await context.sendActivity(response.split('\n').join('<br>'));
+            } else {
+                await context.sendActivity(response);
             }
-        );
+
+            return '';
+        });
 
         // Register default TooManyStepsActionName
-        this.defaultAction<TooManyStepsParameters>(
-            AI.TooManyStepsActionName,
-            async (context, state, data, action) => {
-                const { max_steps, step_count } = data;
-                if (step_count > max_steps) {
-                    throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
-                } else {
-                    throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
-                }
+        this.defaultAction<TooManyStepsParameters>(AI.TooManyStepsActionName, async (context, state, data, action) => {
+            const { max_steps, step_count } = data;
+            if (step_count > max_steps) {
+                throw new Error(`The AI system has exceeded the maximum number of steps allowed.`);
+            } else {
+                throw new Error(`The AI system has exceeded the maximum amount of time allowed.`);
             }
-        );
+        });
     }
 
     /**
      * Returns the moderator being used by the AI system.
-     * @summary
+     * @remarks
      * The default moderator simply allows all messages and plans through without intercepting them.
      * @returns The AI's moderator
      */
@@ -320,7 +328,7 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Registers a handler for a named action.
-     * @summary
+     * @remarks
      * The AI systems planner returns plans that are made up of a series of commands or actions
      * that should be performed. Registering a handler lets you provide code that should be run in
      * response to one of the predicted actions.
@@ -336,25 +344,20 @@ export class AI<TState extends TurnState = TurnState> {
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
-     * @param schema Optional. Schema for the actions parameters.
      * @returns The AI system instance for chaining purposes.
      */
     public action<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
-        schema?: Schema
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
             if (!this._actions.has(n)) {
-                this._actions.set(n, { handler, schema, allowOverrides: false });
+                this._actions.set(n, { handler, allowOverrides: false });
             } else {
                 const entry = this._actions.get(n);
                 if (entry!.allowOverrides) {
                     entry!.handler = handler;
                     entry!.allowOverrides = false;  // Only override once
-                    if (schema) {
-                        entry!.schema = schema;
-                    }
                 } else {
                     throw new Error(
                         `The AI.action() method was called with a previously registered action named "${n}".`
@@ -368,21 +371,19 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Registers the default handler for a named action.
-     * @summary
+     * @remarks
      * Default handlers can be replaced by calling the action() method with the same name.
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param name Unique name of the action.
      * @param handler Function to call when the action is triggered.
-     * @param schema Optional. The schema for the actions parameters.
      * @returns The AI system instance for chaining purposes.
      */
-    public defaultAction<TParameters extends (Record<string, any> | undefined)>(
+    public defaultAction<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
-        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>,
-        schema?: Schema
+        handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>
     ): this {
         (Array.isArray(name) ? name : [name]).forEach((n) => {
-            this._actions.set(n, { handler, schema, allowOverrides: true });
+            this._actions.set(n, { handler, allowOverrides: true });
         });
 
         return this;
@@ -412,19 +413,6 @@ export class AI<TState extends TurnState = TurnState> {
     }
 
     /**
-     * Gets the schema for a given action.
-     * @param action Name of the action to get the schema for.
-     * @returns The schema for the action or undefined if the action doesn't have a schema.
-     */
-    public getActionSchema(action: string): Schema | undefined {
-        if (!this._actions.has(action)) {
-            throw new Error(`Can't find an action named '${action}'.`);
-        }
-
-        return this._actions.get(action)!.schema;
-    }
-
-    /**
      * Checks to see if the AI system has a handler for a given action.
      * @param action Name of the action to check.
      * @returns True if the AI system has a handler for the given action.
@@ -433,10 +421,9 @@ export class AI<TState extends TurnState = TurnState> {
         return this._actions.has(action);
     }
 
-
     /**
      * Calls the configured planner to generate a plan and executes the plan that is returned.
-     * @summary
+     * @remarks
      * The moderator is called to review the input and output of the plan. If the moderator flags
      * the input or output then the appropriate action is called. If the moderator allows the input
      * and output then the plan is executed.
@@ -446,18 +433,7 @@ export class AI<TState extends TurnState = TurnState> {
      * @param step_count Optional. Number of steps that have been executed.
      * @returns True if the plan was completely executed, otherwise false.
      */
-    public async run(
-        context: TurnContext,
-        state: TState,
-        start_time?: number,
-        step_count?: number
-    ): Promise<boolean> {
-        // Populate {{$temp.input}}
-        if (typeof state.temp.input != 'string') {
-            // Use the received activity text
-            state.temp.input = context.activity.text;
-        }
-
+    public async run(context: TurnContext, state: TState, start_time?: number, step_count?: number): Promise<boolean> {
         // Initialize start time and action count
         const { max_steps, max_time } = this._options;
         if (start_time === undefined) {
@@ -468,7 +444,8 @@ export class AI<TState extends TurnState = TurnState> {
         }
 
         // Review input on first loop
-        let plan: Plan|undefined = step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
+        let plan: Plan | undefined =
+            step_count == 0 ? await this._options.moderator.reviewInput(context, state) : undefined;
 
         // Generate plan
         if (!plan) {
@@ -484,7 +461,9 @@ export class AI<TState extends TurnState = TurnState> {
 
         // Process generated plan
         let completed = false;
-        let response = await this._actions.get(AI.PlanReadyActionName)!.handler(context, state, plan, AI.PlanReadyActionName);
+        const response = await this._actions
+            .get(AI.PlanReadyActionName)!
+            .handler(context, state, plan, AI.PlanReadyActionName);
         if (response == AI.StopCommandName) {
             return false;
         }
@@ -497,8 +476,15 @@ export class AI<TState extends TurnState = TurnState> {
             // Check for timeout
             if (Date.now() - start_time! > max_time || ++step_count! > max_steps) {
                 completed = false;
-                const parameters: TooManyStepsParameters = { max_steps, max_time, start_time: start_time!, step_count: step_count! };
-                await this._actions.get(AI.TooManyStepsActionName)!.handler(context, state, parameters, AI.TooManyStepsActionName);
+                const parameters: TooManyStepsParameters = {
+                    max_steps,
+                    max_time,
+                    start_time: start_time!,
+                    step_count: step_count!
+                };
+                await this._actions
+                    .get(AI.TooManyStepsActionName)!
+                    .handler(context, state, parameters, AI.TooManyStepsActionName);
                 break;
             }
 
@@ -515,11 +501,10 @@ export class AI<TState extends TurnState = TurnState> {
                             .get(AI.DoCommandActionName)!
                             .handler(context, state, { handler, ...(cmd as PredictedDoCommand) }, action);
                         should_loop = output.length > 0;
-                        } else {
+                        state.temp.actionOutputs[action] = output;
+                    } else {
                         // Redirect to UnknownAction handler
-                        output = await this._actions
-                            .get(AI.UnknownActionName)!
-                            .handler(context, state, plan, action);
+                        output = await this._actions.get(AI.UnknownActionName)!.handler(context, state, plan, action);
                     }
                     break;
                 }
@@ -540,7 +525,9 @@ export class AI<TState extends TurnState = TurnState> {
             }
 
             // Copy the actions output to the input
+            state.temp.lastOutput = output;
             state.temp.input = output;
+            state.temp.inputFiles = [];
         }
 
         // Check for looping
@@ -557,6 +544,5 @@ export class AI<TState extends TurnState = TurnState> {
  */
 interface ActionEntry<TState> {
     handler: (context: TurnContext, state: TState, entities?: any, action?: string) => Promise<string>;
-    schema?: Schema;
     allowOverrides: boolean;
 }

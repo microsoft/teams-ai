@@ -15,14 +15,25 @@ import { Tokenizer } from "../tokenizers";
 import { DataSource } from "../dataSources";
 import { Memory } from "../MemoryFork";
 
+/**
+ * A section that renders a data source to a prompt.
+ */
 export class DataSourceSection extends PromptSectionBase {
     private readonly _dataSource: DataSource;
 
+    /**
+     * Creates a new `DataSourceSection` instance.
+     * @param dataSource The data source to render.
+     * @param tokens Desired number of tokens to render.
+     */
     public constructor(dataSource: DataSource, tokens: number) {
         super(tokens, true, '\n\n');
         this._dataSource = dataSource;
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>> {
         // Render data source
         const budget = this.getTokenBudget(maxTokens);

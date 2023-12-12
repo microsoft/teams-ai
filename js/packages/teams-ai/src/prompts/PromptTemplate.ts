@@ -74,7 +74,7 @@ export interface PromptTemplateConfig {
     /**
      * @deprecated Use `completion.model` instead.
      * Optional. Array of backends (models) to use for the prompt.
-     * @summary
+     * @remarks
      * Passing the name of a model to use here will override the default model used by a planner.
      */
     default_backends?: string[];
@@ -113,6 +113,14 @@ export interface CompletionConfig {
      * Defaults to true.
      */
     include_input: boolean;
+
+    /**
+     * If true, the prompt will be augmented with any images uploaded by the user.
+     * @remarks
+     * New in schema version 1.1.
+     * Defaults to false.
+     */
+    include_images: boolean;
 
     /**
      * The maximum number of tokens to generate.
@@ -172,7 +180,7 @@ export interface AugmentationConfig {
     /**
      * The type of augmentation to use.
      */
-    augmentation_type: 'none' | 'functions' | 'sequence' | 'monologue';
+    augmentation_type: 'none' | 'sequence' | 'monologue';
 
     /**
      * Optional. List of named data sources to augment the prompt with.

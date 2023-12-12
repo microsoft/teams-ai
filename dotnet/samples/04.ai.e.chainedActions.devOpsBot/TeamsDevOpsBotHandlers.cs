@@ -22,7 +22,7 @@ namespace DevOpsBot
             ArgumentNullException.ThrowIfNull(turnContext);
             ArgumentNullException.ThrowIfNull(turnState);
 
-            turnState.ConversationStateEntry?.Delete();
+            turnState.DeleteConversationState();
             await turnContext.SendActivityAsync(ResponseBuilder.Reset(), cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }

@@ -35,12 +35,12 @@ builder.Services.AddSingleton<ActivityHandlers>();
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>()!;
-    ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new()
+    ApplicationOptions<TurnState> applicationOptions = new()
     {
         Storage = storage,
     };
 
-    Application<TurnState, TurnStateManager> app = new(applicationOptions);
+    Application<TurnState> app = new(applicationOptions);
 
     ActivityHandlers activityHandlers = sp.GetService<ActivityHandlers>()!;
 

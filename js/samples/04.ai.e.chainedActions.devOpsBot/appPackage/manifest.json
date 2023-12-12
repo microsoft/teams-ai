@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "version": "1.0.2",
   "manifestVersion": "1.16",
-  "id": "<<YOUR-MICROSOFT-APP-ID>>",
+  "id": "${{TEAMS_APP_ID}}",
   "packageName": "com.package.name",
   "name": {
-    "short": "DevOps Bot",
+    "short": "DevOps Bot-${{TEAMSFX_ENV}}",
     "full": "DevOps Bot"
   },
   "developer": {
@@ -40,7 +40,7 @@
   ],
   "bots": [
     {
-      "botId": "<<YOUR-MICROSOFT-APP-ID>>",
+      "botId": "${{BOT_ID}}",
       "scopes": [
         "personal",
         "team",

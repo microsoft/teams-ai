@@ -1,3 +1,11 @@
+/**
+ * @module teams-ai
+ */
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 export * from "./AssistantMessage";
 export * from "./DataSourceSection";
 export * from "./ConversationHistory";
@@ -16,4 +24,5 @@ export * from "./SystemMessage";
 export * from "./TemplateSection";
 export * from "./TestPromptManager";
 export * from "./TextSection";
+export * from "./UserInputMessage";
 export * from "./UserMessage";

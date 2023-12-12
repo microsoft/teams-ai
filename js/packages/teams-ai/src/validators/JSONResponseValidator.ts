@@ -8,7 +8,7 @@ import { Memory } from "../MemoryFork";
 
 /**
  * Parses any JSON returned by the model and optionally verifies it against a JSON schema.
- * @template TContent Optional. Type of the content of the message. Defaults to `Record<string, any>`.
+ * @template TValue Optional. Type of the validation value returned. Defaults to `Record<string, any>`.
  */
 export class JSONResponseValidator<TValue = Record<string, any>> implements PromptResponseValidator<TValue> {
 
@@ -16,7 +16,7 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
      * Creates a new `JSONResponseValidator` instance.
      * @param schema Optional. JSON schema to validate the response against.
      * @param missingJsonFeedback Optional. Custom feedback to give when no JSON is returned.
-     * @param errorFeedback Optional. Custom feedback to give when an error is detected.
+     * @param errorFeedback Optional. Custom feedback prefix to use when schema errors are detected.
      */
     public constructor(schema?: Schema, missingJsonFeedback?: string, errorFeedback?: string) {
         this.schema = schema;
@@ -24,9 +24,24 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
         this.errorFeedback = errorFeedback ?? 'The JSON returned had errors. Apply these fixes:';
     }
 
-    public readonly errorFeedback: string;
-    public readonly instanceName?: string;
-    public readonly missingJsonFeedback: string;
+    /**
+     * Feedback prefix given when schema errors are detected.
+     */
+    public errorFeedback: string;
+
+    /**
+     * Optional. Substitution for the word "instance" to use in feedback messages.
+     */
+    public instanceName?: string;
+
+    /**
+     * Feedback given when no JSON is returned.
+     */
+    public missingJsonFeedback: string;
+
+    /**
+     * JSON schema to validate the response against.
+     */
     public readonly schema?: Schema;
 
     /**
@@ -85,6 +100,9 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
         }
     }
 
+    /**
+     * @private
+     */
     private getErrorFix(error: ValidationError): string {
         // Get argument as a string
         let arg: string;

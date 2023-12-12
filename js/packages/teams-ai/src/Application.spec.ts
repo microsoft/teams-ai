@@ -21,6 +21,14 @@ describe('Application', () => {
         planner: new TestPlanner()
     };
     const botAppId = 'testBot';
+    const authenticationSettings = {
+        settings: {
+            testSetting: {
+                connectionName: 'testConnectionName',
+                title: 'testTitle'
+            }
+        }
+    };
     const longRunningMessages = true;
     const removeRecipientMention = false;
     const startTypingTimer = false;
@@ -76,6 +84,7 @@ describe('Application', () => {
             assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.storage, undefined);
             assert.equal(app.options.ai, undefined);
+            assert.equal(app.options.authentication, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.taskModules, undefined);
             assert.equal(app.options.removeRecipientMention, true);
@@ -90,6 +99,7 @@ describe('Application', () => {
                 .withAIOptions(ai)
                 .withLongRunningMessages(adapter, botAppId)
                 .withAdaptiveCardOptions(adaptiveCards)
+                .withAuthentication(adapter, authenticationSettings)
                 .withTaskModuleOptions(taskModules)
                 .setStartTypingTimer(startTypingTimer)
                 .build();
@@ -99,6 +109,7 @@ describe('Application', () => {
             assert.equal(app.options.storage, storage);
             assert.equal(app.options.ai, ai);
             assert.equal(app.options.adaptiveCards, adaptiveCards);
+            assert.equal(app.options.authentication, authenticationSettings);
             assert.equal(app.options.taskModules, taskModules);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);
             assert.equal(app.options.startTypingTimer, startTypingTimer);
@@ -360,6 +371,16 @@ describe('Application', () => {
                 });
             });
         }
+
+        it(`should throw an error when event is not known case`, () => {
+            assert.throws(
+                () =>
+                    mockApp.messageEventUpdate('test' as any, async (_context, _state) => {
+                        assert.fail('should not be called');
+                    }),
+                new Error(`Invalid TeamsMessageEvent type: test`)
+            );
+        });
     });
 
     describe('messageUpdate', () => {
@@ -418,5 +439,43 @@ describe('Application', () => {
                 });
             });
         }
+
+        it('should throw an error when handler is not a function', () => {
+            assert.throws(
+                () => mockApp.messageEventUpdate('editMessage', 1 as any),
+                new Error(`MessageUpdate 'handler' for editMessage is number. Type of 'handler' must be a function.`)
+            );
+        });
+    });
+
+    describe('teamsReadReceipt', () => {
+        let mockApp: Application;
+
+        beforeEach(() => {
+            mockApp = new Application({ adapter });
+        });
+
+        it('should route to correct handler for teamsReadReceipt', async () => {
+            let handlerCalled = false;
+            mockApp.teamsReadReceipt(async (context, _state, readReceiptInfo) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Event);
+                assert.equal(context.activity.name, 'application/vnd.microsoft/readReceipt');
+            });
+
+            const testActivity = {
+                channelId: Channels.Msteams,
+                name: 'application/vnd.microsoft/readReceipt',
+                type: ActivityTypes.Event,
+                value: {
+                    lastReadMessageId: '000000000000-0000-0000-0000-000000000000'
+                }
+            };
+
+            await adapter.processActivity(testActivity, async (context) => {
+                await mockApp.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
     });
 });

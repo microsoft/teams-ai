@@ -1,6 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Action;
-using Microsoft.Teams.AI.Tests.TestUtils;
+using Microsoft.Teams.AI.State;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
@@ -10,15 +10,15 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_Simple()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             string name = "action";
-            IActionHandler<TestTurnState> handler = new TestActionHandler();
+            IActionHandler<TurnState> handler = new TestActionHandler();
             bool allowOverrides = true;
 
             // Act
             actionCollection.AddAction(name, handler, allowOverrides);
-            ActionEntry<TestTurnState> entry = actionCollection[name];
-            bool tryGet = actionCollection.TryGetAction(name, out ActionEntry<TestTurnState> tryGetEntry);
+            ActionEntry<TurnState> entry = actionCollection[name];
+            bool tryGet = actionCollection.TryGetAction(name, out ActionEntry<TurnState> tryGetEntry);
 
             // Assert
             Assert.True(actionCollection.ContainsAction(name));
@@ -37,9 +37,9 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_Add_NonOverridable_Action_Throws_Exception()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             string name = "action";
-            IActionHandler<TestTurnState> handler = new TestActionHandler();
+            IActionHandler<TurnState> handler = new TestActionHandler();
             bool allowOverrides = false;
             actionCollection.AddAction(name, handler, allowOverrides);
 
@@ -55,7 +55,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_Get_NonExistent_Action()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             var nonExistentAction = "non existent action";
 
             // Act
@@ -70,11 +70,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_TryGet_NonExistent_Action()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             var nonExistentAction = "non existent action";
 
             // Act
-            var result = actionCollection.TryGetAction(nonExistentAction, out ActionEntry<TestTurnState> actionEntry);
+            var result = actionCollection.TryGetAction(nonExistentAction, out ActionEntry<TurnState> actionEntry);
 
             // Assert
             Assert.False(result);
@@ -85,7 +85,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_ContainsAction_False()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
             var nonExistentAction = "non existent action";
 
             // Act
@@ -99,8 +99,8 @@ namespace Microsoft.Teams.AI.Tests.AITests
         public void Test_ContainsAction_True()
         {
             // Arrange
-            IActionCollection<TestTurnState> actionCollection = new ActionCollection<TestTurnState>();
-            IActionHandler<TestTurnState> handler = new TestActionHandler();
+            IActionCollection<TurnState> actionCollection = new ActionCollection<TurnState>();
+            IActionHandler<TurnState> handler = new TestActionHandler();
             var name = "actionName";
 
             // Act
@@ -111,11 +111,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.True(containsAction);
         }
 
-        private sealed class TestActionHandler : IActionHandler<TestTurnState>
+        private sealed class TestActionHandler : IActionHandler<TurnState>
         {
-            public Task<bool> PerformAction(ITurnContext turnContext, TestTurnState turnState, object? entities = null, string? action = null)
+            public Task<string> PerformActionAsync(ITurnContext turnContext, TurnState turnState, object? entities = null, string? action = null, CancellationToken cancellationToken = default)
             {
-                return Task.FromResult(true);
+                return Task.FromResult(string.Empty);
             }
         }
     }

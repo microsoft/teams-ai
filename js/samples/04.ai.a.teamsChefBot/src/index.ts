@@ -67,15 +67,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import {
-    AI,
-    Application,
-    ActionPlanner,
-    OpenAIModerator,
-    OpenAIModel,
-    PromptManager,
-    TurnState
-} from '@microsoft/teams-ai';
+import { AI, Application, ActionPlanner, OpenAIModel, PromptManager, TurnState } from '@microsoft/teams-ai';
 import { addResponseFormatter } from './responseFormatter';
 import { VectraDataSource } from './VectraDataSource';
 
@@ -113,25 +105,19 @@ const planner = new ActionPlanner({
     defaultPrompt: 'chat',
 });
 
-// const moderator = new OpenAIModerator({
-//     apiKey: process.env.OPENAI_API_KEY || '',
-//     moderate: 'both'
-// });
-
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
         planner,
-        // moderator
     }
 });
 
 // Register your data source with planner
 planner.prompts.addDataSource(new VectraDataSource({
     name: 'teams-ai',
-    apiKey:  process.env.OPENAI_API_KEY!,
+    apiKey:  process.env.OPENAI_KEY!,
     indexFolder: path.join(__dirname, '../index'),
 }));
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 
 namespace Microsoft.Teams.AI.Tests.Application
@@ -11,7 +12,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         public void Test_ApplicationBuilder_DefaultSetup()
         {
             // Act
-            var app = new ApplicationBuilder<TestTurnState, TestTurnStateManager>().Build();
+            var app = new ApplicationBuilder<TurnState>().Build();
 
             // Assert
             Assert.NotEqual(null, app.Options);
@@ -19,10 +20,11 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Null(app.Options.BotAppId);
             Assert.Null(app.Options.Storage);
             Assert.Null(app.Options.AI);
-            Assert.NotEqual(null, app.Options.TurnStateManager);
+            Assert.NotEqual(null, app.Options.TurnStateFactory);
             Assert.Null(app.Options.AdaptiveCards);
             Assert.Null(app.Options.TaskModules);
             Assert.Null(app.Options.LoggerFactory);
+            Assert.Null(app.Options.Authentication);
             Assert.Equal(true, app.Options.RemoveRecipientMention);
             Assert.Equal(true, app.Options.StartTypingTimer);
             Assert.Equal(false, app.Options.LongRunningMessages);
@@ -39,7 +41,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             IStorage storage = new MemoryStorage();
             BotAdapter adapter = new SimpleAdapter();
             TestLoggerFactory loggerFactory = new();
-            TestTurnStateManager turnStateManager = new();
+            Func<TurnState> turnStateFactory = () => new TurnState();
             AdaptiveCardsOptions adaptiveCards = new()
             {
                 ActionSubmitFilter = "cardFilter"
@@ -48,22 +50,23 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 TaskDataFilter = "taskFilter",
             };
-            AIOptions<TestTurnState> aiOptions = new(
-                planner: new TestPlanner(),
-                promptManager: new TestPromptManager(),
-                moderator: new TestModerator()
-            );
+            AIOptions<TurnState> aiOptions = new(new TestPlanner())
+            {
+                Moderator = new TestModerator()
+            };
+            AuthenticationOptions<TurnState> authOptions = new();
+            authOptions.AddAuthentication("graph", new OAuthSettings());
 
             // Act
-            var app = new ApplicationBuilder<TestTurnState, TestTurnStateManager>()
+            var app = new ApplicationBuilder<TurnState>()
                 .SetRemoveRecipientMention(removeRecipientMention)
                 .WithStorage(storage)
                 .WithAIOptions(aiOptions)
-                .WithTurnStateManager(turnStateManager)
+                .WithTurnStateFactory(turnStateFactory)
                 .WithLongRunningMessages(adapter, botAppId)
-                .WithTurnStateManager(turnStateManager)
                 .WithAdaptiveCardOptions(adaptiveCards)
                 .WithTaskModuleOptions(taskModules)
+                .WithAuthentication(adapter, authOptions)
                 .WithLoggerFactory(loggerFactory)
                 .SetStartTypingTimer(startTypingTimer)
                 .Build();
@@ -74,9 +77,10 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Equal(botAppId, app.Options.BotAppId);
             Assert.Equal(storage, app.Options.Storage);
             Assert.Equal(aiOptions, app.Options.AI);
-            Assert.Equal(turnStateManager, app.Options.TurnStateManager);
+            Assert.Equal(turnStateFactory, app.Options.TurnStateFactory);
             Assert.Equal(adaptiveCards, app.Options.AdaptiveCards);
             Assert.Equal(taskModules, app.Options.TaskModules);
+            Assert.Equal(authOptions, app.Options.Authentication);
             Assert.Equal(loggerFactory, app.Options.LoggerFactory);
             Assert.Equal(removeRecipientMention, app.Options.RemoveRecipientMention);
             Assert.Equal(startTypingTimer, app.Options.StartTypingTimer);
@@ -92,7 +96,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Act
             var func = () =>
             {
-                new ApplicationBuilder<TestTurnState, TestTurnStateManager>()
+                new ApplicationBuilder<TurnState>()
                .WithLongRunningMessages(adapter, "").Build();
             };
 

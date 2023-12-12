@@ -49,6 +49,11 @@ export interface PromptResponse<TContent = unknown> {
     status: PromptResponseStatus;
 
     /**
+     * User input message sent to the model. `undefined` if no input was sent.
+     */
+    input?: Message<any>;
+
+    /**
      * Message returned.
      * @remarks
      * This will be a `Message<TContent>` object if the status is `success`, otherwise it will be a `string`.

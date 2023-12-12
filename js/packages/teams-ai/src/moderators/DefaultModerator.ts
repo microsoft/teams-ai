@@ -13,7 +13,7 @@ import { TurnState } from '../TurnState';
 
 /**
  * Default moderator created by the AI system if one isn't configured.
- * @summary
+ * @remarks
  * The default moderator is a pass-through and always approves all inputs and outputs.
  * @template TState Optional. The Application's turn state.
  */

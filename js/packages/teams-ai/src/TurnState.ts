@@ -8,14 +8,26 @@
 
 import { TurnContext, Storage, StoreItems } from 'botbuilder';
 import { Memory } from './MemoryFork';
+import { InputFile } from './InputFileDownloader';
 
+/**
+ * @private
+ */
 const CONVERSATION_SCOPE = 'conversation';
+
+/**
+ * @private
+ */
 const USER_SCOPE = 'user';
+
+/**
+ * @private
+ */
 const TEMP_SCOPE = 'temp';
 
 /**
  * Default conversation state
- * @summary
+ * @remarks
  * Inherit a new interface from this base interface to strongly type the applications conversation
  * state.
  */
@@ -24,7 +36,7 @@ export interface DefaultConversationState {}
 
 /**
  * Default user state
- * @summary
+ * @remarks
  * Inherit a new interface from this base interface to strongly type the applications user
  * state.
  */
@@ -33,25 +45,40 @@ export interface DefaultUserState {}
 
 /**
  * Default temp state
- * @summary
+ * @remarks
  * Inherit a new interface from this base interface to strongly type the applications temp
  * state.
  */
 export interface DefaultTempState {
     /**
-     * Input passed to an AI prompt
+     * Input passed from the user to the AI Library
      */
     input: string;
 
     /**
-     * Formatted conversation history for embedding in an AI prompt
+     * Downloaded files passed by the user to the AI Library
      */
-    history: string;
+    inputFiles: InputFile[];
 
     /**
-     * Output returned from an AI prompt or function
+     * Output returned from the last executed action
      */
-    output: string;
+    lastOutput: string;
+
+    /**
+     * All outputs returned from the action sequence that was executed
+     */
+    actionOutputs: Record<string, string>;
+
+    /**
+     * User authentication tokens
+     */
+    authTokens: { [key: string]: string };
+
+    /**
+     * Flag indicating whether a token exchange event has already been processed
+     */
+    duplicateTokenExchange?: boolean;
 }
 
 /**
@@ -84,13 +111,19 @@ export interface DefaultTempState {
  * }
  * ```
  */
-export class TurnState<TConversationState = DefaultConversationState, TUserState = DefaultUserState, TTempState = DefaultTempState>
-    implements Memory
+export class TurnState<
+    TConversationState = DefaultConversationState,
+    TUserState = DefaultUserState,
+    TTempState = DefaultTempState
+> implements Memory
 {
     private _scopes: Record<string, TurnStateEntry> = {};
     private _isLoaded = false;
     private _loadingPromise?: Promise<boolean>;
 
+    /**
+     * Accessor for the conversation state.
+     */
     public get conversation(): TConversationState {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
@@ -99,6 +132,10 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         return scope.value as TConversationState;
     }
 
+    /**
+     * Replaces the conversation state with a new value.
+     * @param value New value to replace the conversation state with.
+     */
     public set conversation(value: TConversationState) {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
@@ -107,10 +144,16 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         scope.replace(value as Record<string, unknown>);
     }
 
+    /**
+     * Gets a value indicating whether the applications turn state has been loaded.
+     */
     public get isLoaded(): boolean {
         return this._isLoaded;
     }
 
+    /**
+     * Accessor for the temp state.
+     */
     public get temp(): TTempState {
         const scope = this.getScope(TEMP_SCOPE);
         if (!scope) {
@@ -119,6 +162,10 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         return scope.value as TTempState;
     }
 
+    /**
+     * Replaces the temp state with a new value.
+     * @param value New value to replace the temp state with.
+     */
     public set temp(value: TTempState) {
         const scope = this.getScope(TEMP_SCOPE);
         if (!scope) {
@@ -127,6 +174,9 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         scope.replace(value as Record<string, unknown>);
     }
 
+    /**
+     * Accessor for the user state.
+     */
     public get user(): TUserState {
         const scope = this.getScope(USER_SCOPE);
         if (!scope) {
@@ -135,6 +185,9 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         return scope.value as TUserState;
     }
 
+    /**
+     * Replaces the user state with a new value.
+     */
     public set user(value: TUserState) {
         const scope = this.getScope(USER_SCOPE);
         if (!scope) {
@@ -143,6 +196,9 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         scope.replace(value as Record<string, unknown>);
     }
 
+    /**
+     * Deletes the state object for the current conversation from storage.
+     */
     public deleteConversationState(): void {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
@@ -151,6 +207,9 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         scope.delete();
     }
 
+    /**
+     * Deletes the temp state object.
+     */
     public deleteTempState(): void {
         const scope = this.getScope(TEMP_SCOPE);
         if (!scope) {
@@ -159,6 +218,9 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         scope.delete();
     }
 
+    /**
+     * Deletes the state object for the current user from storage.
+     */
     public deleteUserState(): void {
         const scope = this.getScope(USER_SCOPE);
         if (!scope) {
@@ -167,6 +229,11 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         scope.delete();
     }
 
+    /**
+     * Gets a state scope by name.
+     * @param scope Name of the state scope to return. (i.e. 'conversation', 'user', or 'temp')
+     * @returns The state scope or undefined if not found.
+     */
     public getScope(scope: string): TurnStateEntry | undefined {
         return this._scopes[scope];
     }
@@ -176,7 +243,7 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
      * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
      */
     public deleteValue(path: string): void {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         if (scope.value.hasOwnProperty(name)) {
             delete scope.value[name];
         }
@@ -188,7 +255,7 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
      * @returns True if the value exists, false otherwise.
      */
     public hasValue(path: string): boolean {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         return scope.value.hasOwnProperty(name);
     }
 
@@ -333,6 +400,13 @@ export class TurnState<TConversationState = DefaultConversationState, TUserState
         }
     }
 
+    /**
+     * Computes the storage keys for the state scopes being persisted.
+     * @remarks
+     * Can be overridden in derived classes to add additional storage scopes.
+     * @param context Context for the current turn of conversation with the user.
+     * @returns A dictionary of scope names -> storage keys.
+     */
     protected onComputeStorageKeys(context: TurnContext): Promise<Record<string, string>> {
         // Compute state keys
         const activity = context.activity;
@@ -406,7 +480,7 @@ export class TurnStateEntry {
     }
 
     /**
-    Gets a value indicating whether the state scope has changed since it was last loaded.
+     * Gets a value indicating whether the state scope has changed since it was last loaded.
      * @returns A value indicating whether the state scope has changed.
      */
     public get hasChanged(): boolean {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Teams.AI.AI.Moderator;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Utilities;
 
@@ -10,7 +9,7 @@ namespace Microsoft.Teams.AI.AI
     /// Options for configuring the AI system.
     /// </summary>
     /// <typeparam name="TState">The turn state class.</typeparam>
-    public sealed class AIOptions<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    public sealed class AIOptions<TState> where TState : TurnState
     {
         /// <summary>
         /// The planner to use for generating plans.
@@ -18,54 +17,54 @@ namespace Microsoft.Teams.AI.AI
         public IPlanner<TState> Planner { get; set; }
 
         /// <summary>
-        /// The prompt manager to use for generating prompts.
-        /// </summary>
-        public IPromptManager<TState> PromptManager { get; set; }
-
-        /// <summary>
         /// Optional. The moderator to use for moderating input passed to the model and the output
         /// returned by the model.
         /// </summary>
+        /// <remarks>
+        /// The default value is an instance of <see cref="DefaultModerator{TState}"/>
+        /// </remarks>
         public IModerator<TState>? Moderator { get; set; }
 
-        // TODO: potentially support PromptTemplate and PromptSelector handler as options
         /// <summary>
-        /// Optional. The prompt to use for the current turn.
+        /// Optional. Maximum number of actions to execute in a single turn.
         /// </summary>
         /// <remarks>
-        /// This allows for the use of the AI system in a free standing mode. An exception will be
-        /// thrown if the AI system is routed to by the Application object and a prompt has not been
-        /// configured.
+        /// The default value is 25.
         /// </remarks>
-        public string? Prompt;
+        public int? MaxSteps { get; set; }
 
         /// <summary>
-        /// Optional. The history options to use for the AI system
+        /// Optional. Maximum amount of time to spend executing a single turn in milliseconds.
         /// </summary>
         /// <remarks>
-        /// Defaults to tracking history with a maximum of 3 turns and 1000 tokens per turn.
+        /// The default value is 300000 or 5 minutes.
         /// </remarks>
-        public AIHistoryOptions? History;
+        public TimeSpan? MaxTime { get; set; }
+
+        /// <summary>
+        /// Optional. If true, the AI system will allow the planner to loop.
+        /// </summary>
+        /// <remarks>
+        /// The default value is `true`.
+        /// 
+        /// Looping is needed for augmentations like `functions` and `monologue` where the LLM needs to
+        /// see the result of the last action that was performed. The AI system will attempt to autodetect
+        /// if it needs to loop so you generally don't need to worry about this setting.
+        ///
+        /// If you're using an augmentation like `sequence` you can set this to `false` to guard against
+        /// any accidental looping.
+        /// </remarks>
+        public bool? AllowLooping { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AIOptions{TState}"/> class.
         /// </summary>
         /// <param name="planner">The planner to use for generating plans.</param>
-        /// <param name="promptManager">The prompt manager to use for generating prompts.</param>
-        /// <param name="moderator"> The moderator to use for moderating input passed to the model and the output</param>
-        /// <param name="prompt">Optional. The prompt to use for the current turn.</param>
-        /// <param name="history">Optional. The history options to use for the AI system.</param>
-        public AIOptions(IPlanner<TState> planner, IPromptManager<TState> promptManager, IModerator<TState>? moderator = null, string? prompt = null, AIHistoryOptions? history = null)
+        public AIOptions(IPlanner<TState> planner)
         {
             Verify.ParamNotNull(planner);
-            Verify.ParamNotNull(promptManager);
 
             Planner = planner;
-            PromptManager = promptManager;
-            Moderator = moderator;
-            Prompt = prompt;
-            History = history;
         }
     }
-
 }

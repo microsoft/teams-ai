@@ -72,10 +72,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 import {
-    AI,
-    Application,
     ActionPlanner,
-    OpenAIModerator,
     OpenAIModel,
     PromptManager,
     TurnState,
@@ -90,10 +87,6 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Or use Teams botMessagePreview feature to post the activity directly to the feed onBehalf of the user.
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
-
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Missing environment OPENAI_API_KEY');
-}
 
 interface ConversationState extends DefaultConversationState {
 }

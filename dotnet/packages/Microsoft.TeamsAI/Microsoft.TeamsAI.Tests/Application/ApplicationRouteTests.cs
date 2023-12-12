@@ -2,10 +2,13 @@
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
+using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using Record = Microsoft.Teams.AI.State.Record;
+using Activity = Microsoft.Bot.Schema.Activity;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -16,15 +19,24 @@ namespace Microsoft.Teams.AI.Tests.Application
         {
             // Arrange
             var activity1 = MessageFactory.Text("hello.1");
+            activity1.Recipient = new() { Id = "recipientId" };
+            activity1.Conversation = new() { Id = "conversationId" };
+            activity1.From = new() { Id = "fromId" };
+            activity1.ChannelId = "channelId";
             var activity2 = MessageFactory.Text("hello.2");
-
+            activity2.Recipient = new() { Id = "recipientId" };
+            activity2.Conversation = new() { Id = "conversationId" };
+            activity2.From = new() { Id = "fromId" };
+            activity2.ChannelId = "channelId";
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var messages = new List<string>();
             app.AddRoute(
@@ -51,12 +63,18 @@ namespace Microsoft.Teams.AI.Tests.Application
         {
             // Arrange
             var activity = MessageFactory.Text("hello.1");
+            activity.Recipient = new() { Id = "recipientId" };
+            activity.Conversation = new() { Id = "conversationId" };
+            activity.From = new() { Id = "fromId" };
+            activity.ChannelId = "channelId";
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var selectedRoutes = new List<int>();
             app.AddRoute(
@@ -100,19 +118,30 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "invoke.1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Invoke,
                 Name = "invoke.2",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.AddRoute(
@@ -140,14 +169,20 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "invoke.1"
+                Name = "invoke.1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var selectedRoutes = new List<int>();
             app.AddRoute(
@@ -190,14 +225,20 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "invoke.1"
+                Name = "invoke.1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var selectedRoutes = new List<int>();
             app.AddRoute(
@@ -232,14 +273,20 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "invoke.1"
+                Name = "invoke.1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var selectedRoutes = new List<int>();
             app.AddRoute(
@@ -281,20 +328,30 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity1 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Message,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.Invoke
+                Type = ActivityTypes.Invoke,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var types = new List<string>();
             app.OnActivity(ActivityTypes.Message, (context, _, _) =>
@@ -318,20 +375,30 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity1 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Message,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.MessageDelete
+                Type = ActivityTypes.MessageDelete,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var types = new List<string>();
             app.OnActivity(new Regex("^message$"), (context, _, _) =>
@@ -356,20 +423,30 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity1 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Name = "Message"
+                Name = "Message",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.Invoke
+                Type = ActivityTypes.Invoke,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var types = new List<string>();
             app.OnActivity((context, _) => Task.FromResult(context.Activity?.Name != null), (context, _, _) =>
@@ -393,33 +470,47 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Arrange
             var activity1 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Message,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.MessageDelete,
-                Name = "Delete"
+                Name = "Delete",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Invoke
+                Type = ActivityTypes.Invoke,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var types = new List<string>();
             app.OnActivity(new MultipleRouteSelector
             {
                 Strings = new[] { ActivityTypes.Invoke },
                 Regexes = new[] { new Regex("^message$") },
-                RouteSelectors = new RouteSelector[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
+                RouteSelectors = new RouteSelectorAsync[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
             },
             (context, _, _) =>
             {
@@ -448,24 +539,38 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Type = ActivityTypes.ConversationUpdate,
                 MembersAdded = new List<ChannelAccount> { new() },
                 Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.ConversationUpdate
+                Type = ActivityTypes.ConversationUpdate,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Invoke
+                Type = ActivityTypes.Invoke,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.MembersAdded, (context, _, _) =>
@@ -493,24 +598,38 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Type = ActivityTypes.ConversationUpdate,
                 MembersRemoved = new List<ChannelAccount> { new() },
                 Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.ConversationUpdate
+                Type = ActivityTypes.ConversationUpdate,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Invoke
+                Type = ActivityTypes.Invoke,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId",
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.MembersRemoved, (context, _, _) =>
@@ -544,13 +663,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.ChannelCreated,
@@ -583,13 +707,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.ChannelRenamed,
@@ -622,13 +751,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.ChannelDeleted,
@@ -662,13 +796,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.ChannelRestored,
@@ -700,13 +839,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamRenamed,
@@ -738,13 +882,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamDeleted,
@@ -776,13 +925,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamHardDeleted,
@@ -814,13 +968,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamArchived,
@@ -852,13 +1011,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamUnarchived,
@@ -890,13 +1054,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamRestored,
@@ -928,11 +1097,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.ConversationUpdate,
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity3 = new Activity
             {
@@ -942,15 +1118,20 @@ namespace Microsoft.Teams.AI.Tests.Application
                     EventType = "teamRenamed"
                 },
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamRenamed, (context, _, _) =>
@@ -979,6 +1160,9 @@ namespace Microsoft.Teams.AI.Tests.Application
                 MembersAdded = new List<ChannelAccount> { new() },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
@@ -1005,10 +1189,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(
@@ -1040,6 +1226,9 @@ namespace Microsoft.Teams.AI.Tests.Application
                 MembersAdded = new List<ChannelAccount> { new() },
                 Name = "1",
                 ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
@@ -1050,6 +1239,9 @@ namespace Microsoft.Teams.AI.Tests.Application
                 },
                 Name = "2",
                 ChannelId = Channels.Directline,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity3 = new Activity
             {
@@ -1059,16 +1251,21 @@ namespace Microsoft.Teams.AI.Tests.Application
                     EventType = "teamRenamed"
                 },
                 ChannelId = Channels.Directline,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConversationUpdate(
@@ -1096,27 +1293,41 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity1 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "hello a"
+                Text = "hello a",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "welcome"
+                Text = "welcome",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Text = "hello b"
+                Text = "hello b",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var texts = new List<string>();
             app.OnMessage("hello", (context, _, _) =>
@@ -1142,27 +1353,41 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity1 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "hello"
+                Text = "hello",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "welcome"
+                Text = "welcome",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Text = "hello"
+                Text = "hello",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var texts = new List<string>();
             app.OnMessage(new Regex("llo"), (context, _, _) =>
@@ -1188,20 +1413,30 @@ namespace Microsoft.Teams.AI.Tests.Application
             var activity1 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "hello"
+                Text = "hello",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.Invoke
+                Type = ActivityTypes.Invoke,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var texts = new List<string>();
             app.OnMessage((context, _) => Task.FromResult(context.Activity?.Text != null), (context, _, _) =>
@@ -1227,34 +1462,48 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Message,
                 Text = "hello a",
-                Name = "hello"
+                Name = "hello",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "welcome"
+                Text = "welcome",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Message,
-                Text = "hello world"
+                Text = "hello world",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var texts = new List<string>();
             app.OnMessage(new MultipleRouteSelector
             {
                 Strings = new[] { "world" },
                 Regexes = new[] { new Regex("come") },
-                RouteSelectors = new RouteSelector[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
+                RouteSelectors = new RouteSelectorAsync[] { (context, _) => Task.FromResult(context.Activity?.Name != null) },
             },
             (context, _, _) =>
             {
@@ -1286,7 +1535,10 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     EventType = "editMessage"
                 },
-                Name = "1"
+                Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
@@ -1305,10 +1557,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnMessageEdit((turnContext, _, _) =>
@@ -1339,7 +1593,10 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     EventType = "undeleteMessage"
                 },
-                Name = "1"
+                Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
@@ -1358,10 +1615,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnMessageUndelete((turnContext, _, _) =>
@@ -1392,7 +1651,10 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     EventType = "softDeleteMessage"
                 },
-                Name = "1"
+                Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
@@ -1401,20 +1663,28 @@ namespace Microsoft.Teams.AI.Tests.Application
                 ChannelData = new TeamsChannelData
                 {
                     EventType = "unknown"
-                }
+                },
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Message,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnMessageDelete((turnContext, _, _) =>
@@ -1442,24 +1712,38 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Type = ActivityTypes.MessageReaction,
                 ReactionsAdded = new List<MessageReaction> { new() },
                 Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.MessageReaction
+                Type = ActivityTypes.MessageReaction,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Message,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnMessageReactionsAdded((context, _, _) =>
@@ -1487,24 +1771,38 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Type = ActivityTypes.MessageReaction,
                 ReactionsRemoved = new List<MessageReaction> { new() },
                 Name = "1",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
-                Type = ActivityTypes.MessageReaction
+                Type = ActivityTypes.MessageReaction,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
-                Type = ActivityTypes.Message
+                Type = ActivityTypes.Message,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
 
             var adapter = new NotImplementedAdapter();
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnMessageReactionsRemoved((context, _, _) =>
@@ -1537,24 +1835,36 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/fetch",
-                ChannelId = Channels.Msteams
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/fetch",
-                ChannelId = Channels.Outlook
+                ChannelId = Channels.Outlook,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/submit",
-                ChannelId = Channels.Msteams
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity4 = new Activity
             {
                 Type = ActivityTypes.Message,
-                ChannelId = Channels.Msteams
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
@@ -1566,10 +1876,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200,
                 Body = configResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConfigFetch((turnContext, _, _, _) =>
@@ -1612,25 +1924,37 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "config/submit",
                 ChannelId = Channels.Msteams,
-                Value = JObject.FromObject(data)
+                Value = JObject.FromObject(data),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/submit",
                 ChannelId = Channels.Outlook,
-                Value = JObject.FromObject(data)
+                Value = JObject.FromObject(data),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
                 Name = "config/fetch",
-                ChannelId = Channels.Msteams
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var activity4 = new Activity
             {
                 Type = ActivityTypes.Message,
-                ChannelId = Channels.Msteams
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
@@ -1642,10 +1966,12 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Status = 200,
                 Body = configResponseMock.Object
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnConfigSubmit((turnContext, _, configData, _) =>
@@ -1689,7 +2015,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     action = "accept"
                 }),
-                Id = "test"
+                Id = "test",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
@@ -1699,11 +2029,19 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     action = "decline"
                 }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "composeExtension/queryLink"
+                Name = "composeExtension/queryLink",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
@@ -1712,10 +2050,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Status = 200
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var ids = new List<string>();
             app.OnFileConsentAccept((turnContext, _, _, _) =>
@@ -1756,7 +2096,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     action = "decline"
                 }),
-                Id = "test"
+                Id = "test",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
@@ -1766,23 +2110,33 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     action = "accept"
                 }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "composeExtension/queryLink"
+                Name = "composeExtension/queryLink",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
             var turnContext3 = new TurnContext(adapter, activity3);
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
             var expectedInvokeResponse = new InvokeResponse
             {
                 Status = 200
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var ids = new List<string>();
             app.OnFileConsentDecline((turnContext, _, _, _) =>
@@ -1820,17 +2174,29 @@ namespace Microsoft.Teams.AI.Tests.Application
                 Type = ActivityTypes.Invoke,
                 Name = "actionableMessage/executeAction",
                 Value = new { },
-                Id = "test"
+                Id = "test",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity2 = new Activity
             {
                 Type = ActivityTypes.Event,
-                Name = "actionableMessage/executeAction"
+                Name = "actionableMessage/executeAction",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var activity3 = new Activity
             {
                 Type = ActivityTypes.Invoke,
-                Name = "composeExtension/queryLink"
+                Name = "composeExtension/queryLink",
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+                ChannelId = "channelId"
             };
             var turnContext1 = new TurnContext(adapter, activity1);
             var turnContext2 = new TurnContext(adapter, activity2);
@@ -1839,10 +2205,12 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Status = 200
             };
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext1);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var ids = new List<string>();
             app.OnO365ConnectorCardAction((turnContext, _, _, _) =>
@@ -1878,13 +2246,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     lastReadMessageId = "10101010",
                 }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnTeamsReadReceipt((context, _, _, _) =>
@@ -1914,13 +2287,18 @@ namespace Microsoft.Teams.AI.Tests.Application
                 {
                     lastReadMessageId = "10101010",
                 }),
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
             };
             var adapter = new NotImplementedAdapter();
             var turnContext = new TurnContext(adapter, activity);
-            var app = new Application<TestTurnState, TestTurnStateManager>(new()
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
             {
                 RemoveRecipientMention = false,
-                StartTypingTimer = false
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
             });
             var names = new List<string>();
             app.OnTeamsReadReceipt((context, _, _, _) =>

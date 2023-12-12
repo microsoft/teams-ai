@@ -9,6 +9,5 @@
 export * from "./ActionAugmentationSection";
 export * from "./Augmentation";
 export * from "./DefaultAugmentation";
-export * from "./FunctionsAugmentation";
 export * from "./MonologueAugmentation";
 export * from "./SequenceAugmentation";

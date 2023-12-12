@@ -38,6 +38,9 @@ export class ConversationHistory extends PromptSectionBase {
         this.assistantPrefix = assistantPrefix;
     }
 
+    /**
+     * @private
+     */
     public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
       // Get messages from memory
       const history: Message[] = (memory.getValue<Message[]>(this.variable) ?? []).slice();
@@ -74,6 +77,9 @@ export class ConversationHistory extends PromptSectionBase {
       return { output: lines.join(this.separator), length: tokens, tooLong: tokens > maxTokens };
    }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Get messages from memory
         const history: Message[] = (memory.getValue<Message[]>(this.variable) ?? []).slice();
@@ -90,8 +96,14 @@ export class ConversationHistory extends PromptSectionBase {
                 message.content = Utilities.toString(tokenizer, msg.content);
             }
 
-            // Get message length
-            const length = tokenizer.encode(PromptSectionBase.getMessageText(message)).length;
+            // Get text message length
+            let length = tokenizer.encode(PromptSectionBase.getMessageText(message)).length;
+
+            // Add length of any image parts
+            // TODO: This accounts for low detail images but not high detail images.
+            if (Array.isArray(message.content)) {
+                length += message.content.filter((part) => part.type === 'image').length * 85;
+            }
 
             // Add initial message if required
             if (messages.length === 0 && this.required) {

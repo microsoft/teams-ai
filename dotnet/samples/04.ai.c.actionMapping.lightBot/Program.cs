@@ -3,10 +3,9 @@ using LightBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.Teams.AI;
-using Microsoft.Teams.AI.AI;
-using Microsoft.Teams.AI.AI.Planner;
-using Microsoft.Teams.AI.AI.Prompt;
+using Microsoft.Teams.AI.AI.Models;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,16 +30,35 @@ builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<Clou
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-#region Use Azure OpenAI
-// Use Azure OpenAI service
-if (config.Azure == null
-    || string.IsNullOrEmpty(config.Azure.OpenAIApiKey)
-    || string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+// Create AI Model
+if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
-    throw new Exception("Missing Azure OpenAI configuration.");
+    builder.Services.AddSingleton<OpenAIModel>(sp => new(
+        new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo")
+        {
+            LogRequests = true
+        },
+        sp.GetService<ILoggerFactory>()
+    ));
 }
-
-builder.Services.AddSingleton<AzureOpenAIPlannerOptions>(_ => new(config.Azure.OpenAIApiKey, "gpt-35-turbo", config.Azure.OpenAIEndpoint) { LogRequests = true });
+else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
+{
+    builder.Services.AddSingleton<OpenAIModel>(sp => new(
+        new AzureOpenAIModelOptions(
+            config.Azure.OpenAIApiKey,
+            "gpt-35-turbo",
+            config.Azure.OpenAIEndpoint
+        )
+        {
+            LogRequests = true
+        },
+        sp.GetService<ILoggerFactory>()
+    ));
+}
+else
+{
+    throw new Exception("please configure settings for either OpenAI or Azure");
+}
 
 // Create the bot as transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot>(sp =>
@@ -48,79 +66,45 @@ builder.Services.AddTransient<IBot>(sp =>
     // Create loggers
     ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
 
-    // Create AzureOpenAIPlanner
-    IPlanner<AppState> planner = new AzureOpenAIPlanner<AppState>(
-        sp.GetService<AzureOpenAIPlannerOptions>()!,
-        loggerFactory);
-
-    // Create Application
-    AIHistoryOptions aiHistoryOptions = new()
+    // Create Prompt Manager
+    PromptManager prompts = new(new()
     {
-        AssistantHistoryType = AssistantHistoryType.Text
-    };
+        PromptFolder = "./Prompts"
+    });
 
-    AIOptions<AppState> aiOptions = new(
-        planner: planner,
-        promptManager: new PromptManager<AppState>("./Prompts"),
-        prompt: "chatGPT",
-        history: aiHistoryOptions);
-
-    ApplicationOptions<AppState, AppStateManager> ApplicationOptions = new()
+    // Adds function to be referenced in the prompt template
+    prompts.AddFunction("getLightStatus", async (context, memory, functions, tokenizer, args) =>
     {
-        TurnStateManager = new AppStateManager(),
+        bool lightsOn = (bool)(memory.GetValue("conversation.lightsOn") ?? false);
+        return await Task.FromResult(lightsOn ? "on" : "off");
+    });
+
+    // Create ActionPlanner
+    ActionPlanner<AppState> planner = new(
+        options: new(
+            model: sp.GetService<OpenAIModel>()!,
+            prompts: prompts,
+            defaultPrompt: async (context, state, planner) =>
+            {
+                PromptTemplate template = prompts.GetPrompt("sequence");
+                return await Task.FromResult(template);
+            }
+        )
+        { LogRepairs = true },
+        loggerFactory: loggerFactory
+    );
+
+    return new TeamsLightBot(new()
+    {
         Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
+        AI = new(planner),
         LoggerFactory = loggerFactory,
-    };
-
-    return new TeamsLightBot(ApplicationOptions);
+        TurnStateFactory = () =>
+        {
+            return new AppState();
+        }
+    });
 });
-#endregion
-
-#region Use OpenAI
-/** // Use OpenAI service
-if (config.OpenAI == null || string.IsNullOrEmpty(config.OpenAI.ApiKey))
-{
-    throw new Exception("Missing OpenAI configuration.");
-}
-
-builder.Services.AddSingleton<OpenAIPlannerOptions>(_ => new(config.OpenAI.ApiKey, "gpt-3.5-turbo") { LogRequests = true });
-
-// Create the bot as transient. In this case the ASP Controller is expecting an IBot.
-builder.Services.AddTransient<IBot>(sp =>
-{
-    // Create loggers
-    ILoggerFactory loggerFactory = sp.GetService<ILoggerFactory>()!;
-
-    // Create OpenAIPlanner
-    IPlanner<AppState> planner = new OpenAIPlanner<AppState>(
-        sp.GetService<OpenAIPlannerOptions>()!,
-        loggerFactory);
-
-    // Create Application
-    AIHistoryOptions aiHistoryOptions = new()
-    {
-        AssistantHistoryType = AssistantHistoryType.Text
-    };
-
-    AIOptions<AppState> aiOptions = new(
-        planner: planner,
-        promptManager: new PromptManager<AppState>("./Prompts"),
-        prompt: "chatGPT",
-        history: aiHistoryOptions);
-
-    ApplicationOptions<AppState, AppStateManager> ApplicationOptions = new()
-    {
-        TurnStateManager = new AppStateManager(),
-        Storage = sp.GetService<IStorage>(),
-        AI = aiOptions,
-        LoggerFactory = loggerFactory,
-    };
-
-    return new TeamsLightBot(ApplicationOptions);
-});
-**/
-#endregion
 
 var app = builder.Build();
 

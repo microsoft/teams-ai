@@ -8,9 +8,11 @@
 
 import {
     ActivityTypes,
+    CacheInfo,
     Channels,
     INVOKE_RESPONSE_KEY,
     InvokeResponse,
+    SuggestedActions,
     TaskModuleResponse,
     TaskModuleTaskInfo,
     TurnContext
@@ -18,9 +20,31 @@ import {
 import { Application, RouteSelector } from './Application';
 import { TurnState } from './TurnState';
 
-const FETCH_INVOKE_NAME = `task/fetch`;
-const SUBMIT_INVOKE_NAME = `task/submit`;
-const DEFAULT_TASK_DATA_FILTER = 'verb';
+export enum TaskModuleInvokeNames {
+    CONFIG_FETCH_INVOKE_NAME = `config/fetch`,
+    CONFIG_SUBMIT_INVOKE_NAME = `config/submit`,
+    FETCH_INVOKE_NAME = `task/fetch`,
+    SUBMIT_INVOKE_NAME = `task/submit`,
+    DEFAULT_TASK_DATA_FILTER = 'verb'
+}
+
+/**
+ * temporary types
+ * Due to an error found in botbuilder-js, we need to temporarily define these types here in order to avoid being blocked by botbuilder-js bugfix release. corinagum is tracking; message her for updates. Merged PR: https://github.com/microsoft/botbuilder-js/pull/4570
+ * release tbd
+ */
+export interface ConfigResponse {
+    cacheInfo?: CacheInfo;
+    config: ConfigResponseConfig;
+    responseType: 'config';
+}
+export interface BotConfigAuth {
+    suggestedActions?: SuggestedActions;
+    type: 'auth';
+}
+
+export type ConfigResponseConfig = BotConfigAuth | TaskModuleResponse;
+// end temporary types section
 
 /**
  * Options for TaskModules class.
@@ -28,7 +52,7 @@ const DEFAULT_TASK_DATA_FILTER = 'verb';
 export interface TaskModulesOptions {
     /**
      * Data field to use to identify the verb of the handler to trigger.
-     * @summary
+     * @remarks
      * When a task module is triggered, the field name specified here will be used to determine
      * the name of the verb for the handler to route the request to.
      *
@@ -54,7 +78,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the initial fetch of the task module.
-     * @summary
+     * @remarks
      * Handlers should respond with either an initial TaskInfo object or a string containing
      * a message to display to the user.
      * @template TData Optional. Type of the data object being passed to the handler.
@@ -70,6 +94,7 @@ export class TaskModules<TState extends TurnState> {
         handler: (context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string>
     ): Application<TState> {
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
+            const { DEFAULT_TASK_DATA_FILTER, FETCH_INVOKE_NAME } = TaskModuleInvokeNames;
             const filterField = this._app.options.taskModules?.taskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
             const selector = createTaskSelector(v, filterField, FETCH_INVOKE_NAME);
             this._app.addRoute(
@@ -125,7 +150,7 @@ export class TaskModules<TState extends TurnState> {
 
     /**
      * Registers a handler to process the submission of a task module.
-     * @summary
+     * @remarks
      * Handlers should respond with another TaskInfo object, message string, or `null` to indicate
      * the task is completed.
      * @template TData Optional. Type of the data object being passed to the handler.
@@ -145,6 +170,7 @@ export class TaskModules<TState extends TurnState> {
         ) => Promise<TaskModuleTaskInfo | string | null | undefined>
     ): Application<TState> {
         (Array.isArray(verb) ? verb : [verb]).forEach((v) => {
+            const { DEFAULT_TASK_DATA_FILTER, SUBMIT_INVOKE_NAME } = TaskModuleInvokeNames;
             const filterField = this._app.options.taskModules?.taskDataFilter ?? DEFAULT_TASK_DATA_FILTER;
             const selector = createTaskSelector(v, filterField, SUBMIT_INVOKE_NAME);
             this._app.addRoute(
@@ -204,6 +230,104 @@ export class TaskModules<TState extends TurnState> {
         });
         return this._app;
     }
+
+    /**
+     * Registers a handler for fetching Teams config data for Auth or Task Modules
+     * @template TData Optional. Type of the data object being passed to the handler.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string | null | undefined>} handler - Function to call when the handler is triggered.
+     * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
+     * @param {TState} handler.state - Current state of the turn.
+     * @param {TData} handler.data - Data object passed to the handler.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public configFetch<TData extends Record<string, any>>(
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<BotConfigAuth | TaskModuleResponse>
+    ): Application<TState> {
+        const selector = (context: TurnContext) => {
+            const { CONFIG_SUBMIT_INVOKE_NAME } = TaskModuleInvokeNames;
+            return Promise.resolve(
+                context?.activity?.type === ActivityTypes.Invoke &&
+                    context?.activity?.name === CONFIG_SUBMIT_INVOKE_NAME
+            );
+        };
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                if (context?.activity?.channelId === Channels.Msteams) {
+                    // Call handler and then check to see if an invoke response has already been added
+                    const result = await handler(context, state, context.activity.value?.data ?? {});
+                    let response: ConfigResponse;
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Format invoke response)
+                        response = {
+                            responseType: 'config',
+                            config: result
+                        };
+
+                        if ('cacheInfo' in result) {
+                            response.cacheInfo = result.cacheInfo;
+                        }
+
+                        // Queue up invoke response
+                        await context.sendActivity({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                }
+            },
+            true
+        );
+        return this._app;
+    }
+
+    /**
+     * Registers a handler for submitting Teams config data for Auth or Task Modules
+     * @template TData Optional. Type of the data object being passed to the handler.
+     * @param {(context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string | null | undefined>} handler - Function to call when the handler is triggered.
+     * @param {TurnContext} handler.context - Context for the current turn of conversation with the user.
+     * @param {TState} handler.state - Current state of the turn.
+     * @param {TData} handler.data - Data object passed to the handler.
+     * @returns {Application<TState>} The application for chaining purposes.
+     */
+    public configSubmit<TData extends Record<string, any>>(
+        handler: (context: TurnContext, state: TState, data: TData) => Promise<BotConfigAuth | TaskModuleResponse>
+    ): Application<TState> {
+        const selector = (context: TurnContext) => {
+            const { CONFIG_FETCH_INVOKE_NAME } = TaskModuleInvokeNames;
+            return Promise.resolve(
+                context?.activity?.type === ActivityTypes.Invoke && context?.activity?.name === CONFIG_FETCH_INVOKE_NAME
+            );
+        };
+        this._app.addRoute(
+            selector,
+            async (context, state) => {
+                if (context?.activity?.channelId === Channels.Msteams) {
+                    // Call handler and then check to see if an invoke response has already been added
+                    const result = await handler(context, state, context.activity.value?.data ?? {});
+                    let response: ConfigResponse;
+                    if (!context.turnState.get(INVOKE_RESPONSE_KEY)) {
+                        // Format invoke response)
+                        response = {
+                            responseType: 'config',
+                            config: result
+                        };
+                        if ('cacheInfo' in result) {
+                            response.cacheInfo = result.cacheInfo;
+                        }
+
+                        // Queue up invoke response
+                        await context.sendActivity({
+                            value: { body: response, status: 200 } as InvokeResponse,
+                            type: ActivityTypes.InvokeResponse
+                        });
+                    }
+                }
+            },
+            true
+        );
+        return this._app;
+    }
 }
 
 /**
@@ -213,7 +337,7 @@ export class TaskModules<TState extends TurnState> {
  * @param {string} invokeName - The name of the invoke action.
  * @returns {RouteSelector} The route selector function.
  * @private
- * @summary
+ * @remarks
  * This function is used to create a route selector function for a given verb, filter field, and invoke name.
  * The route selector function is used to match incoming requests to the appropriate handler function.
  */

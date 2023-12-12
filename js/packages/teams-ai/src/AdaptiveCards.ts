@@ -20,7 +20,7 @@ import { TurnState } from './TurnState';
 /**
  * @private
  */
-const ACTION_INVOKE_NAME = `adaptiveCard/action`;
+export const ACTION_INVOKE_NAME = `adaptiveCard/action`;
 
 /**
  * @private
@@ -35,11 +35,11 @@ const DEFAULT_ACTION_SUBMIT_FILTER = 'verb';
 /**
  * @private
  */
-const SEARCH_INvOKE_NAME = `application/search`;
+const SEARCH_INVOKE_NAME = `application/search`;
 
 /**
  * Strongly typed Adaptive Card.
- * @summary
+ * @remarks
  * see https://adaptivecards.io/explorer/ for schema details.
  */
 export interface AdaptiveCard {
@@ -60,7 +60,7 @@ export interface AdaptiveCard {
 export interface AdaptiveCardsOptions {
     /**
      * Data field used to identify the Action.Submit handler to trigger.
-     * @summary
+     * @remarks
      * When an Action.Submit is triggered, the field name specified here will be used to determine
      * the handler to route the request to.
      *
@@ -182,7 +182,7 @@ export class AdaptiveCards<TState extends TurnState> {
 
     /**
      * Adds a route to the application for handling Adaptive Card Action.Submit events.
-     * @summary
+     * @remarks
      * The route will be added for the specified verb(s) and will be filtered using the
      * `actionSubmitFilter` option. The default filter is to use the `verb` field.
      *
@@ -224,6 +224,12 @@ export class AdaptiveCards<TState extends TurnState> {
         return this._app;
     }
 
+    /**
+     * Adds a route to the application for handling the `Data.Query` request for an `Input.ChoiceSet`.
+     * @param dataset The named dataset(s) to be handled.
+     * @param handler The code to execute when the query is triggered.
+     * @returns The application for chaining purposes.
+     */
     public search(
         dataset: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
         handler: (
@@ -239,7 +245,7 @@ export class AdaptiveCards<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an Action.Execute as expected
                     const a = context?.activity;
-                    if (a?.type !== ActivityTypes.Invoke || a?.name !== SEARCH_INvOKE_NAME) {
+                    if (a?.type !== ActivityTypes.Invoke || a?.name !== SEARCH_INVOKE_NAME) {
                         throw new Error(`Unexpected AdaptiveCards.search() triggered for activity type: ${a?.type}`);
                     }
 
@@ -363,7 +369,7 @@ function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSe
         // Return a function that matches the dataset using a RegExp
         return (context: TurnContext) => {
             const a = context?.activity;
-            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INvOKE_NAME;
+            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INVOKE_NAME;
             if (isSearch && typeof a?.value?.dataset == 'string') {
                 return Promise.resolve(dataset.test(a.value.dataset));
             } else {
@@ -374,7 +380,7 @@ function createSearchSelector(dataset: string | RegExp | RouteSelector): RouteSe
         // Return a function that attempts to match dataset
         return (context: TurnContext) => {
             const a = context?.activity;
-            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INvOKE_NAME;
+            const isSearch = a?.type == ActivityTypes.Invoke && a?.name === SEARCH_INVOKE_NAME;
             return Promise.resolve(isSearch && a?.value?.dataset === dataset);
         };
     }

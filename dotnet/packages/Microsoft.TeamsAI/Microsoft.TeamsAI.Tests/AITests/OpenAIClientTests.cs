@@ -5,7 +5,7 @@ using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.Tests.AITests
 {
-    public class OpenAIClientTests
+    public partial class OpenAIClientTests
     {
         [Fact]
         public async Task Test_OpenAIClient_Uses_DefaultHttpClient()
@@ -23,7 +23,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"));
 
             // Action
-            var result = await openAIClient.ExecuteTextModeration("test-text", "test-model");
+            var result = await openAIClient.ExecuteTextModerationAsync("test-text", "test-model");
 
             // Assert
             Assert.NotNull(result);
@@ -45,7 +45,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var openAIClient = new OpenAIClient(new OpenAIClientOptions("test-key"), null, httpClient);
 
             // Action
-            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await openAIClient.ExecuteTextModeration("test-text", "test-model"));
+            var exception = await Assert.ThrowsAsync<HttpOperationException>(async () => await openAIClient.ExecuteTextModerationAsync("test-text", "test-model"));
 
             // Assert
             Assert.NotNull(exception);

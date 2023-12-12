@@ -24,7 +24,6 @@ import { OpenAIClient, OpenAIClientOptions, OpenAIClientResponse } from './OpenA
 /**
  * @private
  */
-
 export interface AzureOpenAIClientOptions extends OpenAIClientOptions {
     /**
      * Azure OpenAI endpoint.

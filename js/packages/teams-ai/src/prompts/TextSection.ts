@@ -20,7 +20,14 @@ import { Memory } from "../MemoryFork";
 export class TextSection extends PromptSectionBase {
     private _length: number = -1;
 
+    /**
+     * Text to use for this section.
+     */
     public readonly text: string;
+
+    /**
+     * Message role to use for this section.
+     */
     public readonly role: string;
 
     /**
@@ -38,6 +45,9 @@ export class TextSection extends PromptSectionBase {
         this.role = role;
     }
 
+    /**
+     * @private
+     */
     public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache length
         if (this._length < 0) {
