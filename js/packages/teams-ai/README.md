@@ -1,6 +1,6 @@
-# Teams AI (JS) SDK JS
+# Teams AI SDK
 
-Welcome to the Teams AI SDK js package. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
+Welcome to the Teams AI SDK JavaScript package. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
 
 Requirements:
 
@@ -8,7 +8,7 @@ Requirements:
 
 ## Getting Started: Migration v.s. New Project
 
-If you're migrating an existing project, switching to add on the Teams AI layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](getting-started/00.MIGRATION.md). The basics are listed below.
+If you're migrating an existing project, switching to add on the Teams AI layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](../../../getting-started/js/00.MIGRATION.md). The basics are listed below.
 
 ### Migration
 
@@ -20,9 +20,7 @@ yarn add @microsoft/teams-ai
 npm install @microsoft/teams-ai
 ```
 
-Replace `BotActivityHandler` and `ApplicationTurnState` with this `Application` and `DefaultTurnState` in your bot. Note that here, `DefaultTurnState` is constructed to include `ConversationState`, but can also have `UserState` and `TempState`.
-
-![Line 72 shows use of 'Application' class](https://user-images.githubusercontent.com/14900841/225122653-6338b82f-2236-4897-8c6d-807fd293a6ca.png)
+Replace `BotActivityHandler` and `ApplicationTurnState` in your bot. Note that here, `TurnState` is constructed to include `ConversationState`, but can also have `UserState` and `TempState`.
 
 js `index.ts`:
 
@@ -33,11 +31,10 @@ js `index.ts`:
 interface ConversationState {
     count: number;
 }
-type ApplicationTurnState = DefaultTurnState<ConversationState>;
+type ApplicationTurnState = TurnState<ConversationState>;
 
 const app =
-    new Application() <
-    ApplicationTurnState >
+    new Application<ApplicationTurnState>()
     {
         storage // in this case, MemoryStorage
     };
@@ -57,7 +54,7 @@ If you are starting a new project, you can use the [Teams AI SDK echobot sample]
 
 You can either copy-paste the code into your own project, or clone the repo and run the Teams Toolkit features to explore.
 
-### Optional ApplicationBuilder Class 
+### Optional ApplicationBuilder Class
 
 You may also use the `ApplicationBuilder` class to instantiate your `Application` instance. This option provides greater readability and separates the management of the various configuration options (e.g., storage, turn state, AI module options, etc).
 
@@ -77,9 +74,9 @@ const app = new ApplicationBuilder()<ApplicationTurnState>
 
 ## AI Setup
 
-The detailed steps for setting up your bot to use AI are in the [GPT Setup Guide](getting-started/01.AI-SETUP.md).
+The detailed steps for setting up your bot to use AI are in the [GPT Setup Guide](../../../getting-started/js/01.AI-SETUP.md).
 
-On top of your Microsoft App Id and password, you will need an OpenAI API key. You can get one from the [OpenAI platform](https://platform.openai.com/). Once you have your key, add it to your `.env` file as `OPEN_AI_KEY`
+On top of your Microsoft App Id and password, you will need an Azure OpenAI or OpenAI API key. You can get one from the [OpenAI platform](https://platform.openai.com/). Once you have your key, add it to your `.env` file as `OPEN_AI_KEY`
 
 ### AI Prompt Manager
 
@@ -100,6 +97,6 @@ const app = new Application<ApplicationTurnState>({
 });
 ```
 
-For more information on how to create and use prompts, see [APIREFERENCE](./02.API-REFERENCE.md) and look at the [samples](../samples/) numbered `04._.xxx`).
+For more information on how to create and use prompts, see [APIREFERENCE](../../../getting-started/00.PROMPTS.md) and look at the [samples](../samples/) numbered `04._.xxx`).
 
 Happy coding!
