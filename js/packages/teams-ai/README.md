@@ -1,6 +1,6 @@
 # Teams AI SDK
 
-Welcome to the Teams AI SDK JavaScriptpackage. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
+Welcome to the Teams AI SDK JavaScript package. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
 
 Requirements:
 
