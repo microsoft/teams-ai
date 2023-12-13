@@ -34,8 +34,8 @@
         "@types/restify": "8.5.11",
         "nodemon": "~3.0.1",
         "rimraf": "^5.0.5",
-        "ts-node": "^10.9.1",
+        "ts-node": "^10.9.2",
         "tsc-watch": "^6.0.4",
-        "typescript": "^5.3.2"
+        "typescript": "^5.3.3"
     }
 }
