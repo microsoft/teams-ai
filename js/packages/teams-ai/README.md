@@ -1,14 +1,15 @@
-# Teams AI SDK
+# Teams AI Library
 
-Welcome to the Teams AI SDK JavaScript package. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
+Welcome to the Teams AI Library JavaScript package. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
 
 Requirements:
 
 -   node v16.x
+-   node v18.x
 
 ## Getting Started: Migration v.s. New Project
 
-If you're migrating an existing project, switching to add on the Teams AI layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](../../../getting-started/js/00.MIGRATION.md). The basics are listed below.
+If you're migrating an existing project, switching to add on the Teams AI layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/00.MIGRATION.md). The basics are listed below.
 
 ### Migration
 
