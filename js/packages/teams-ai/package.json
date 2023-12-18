@@ -29,7 +29,7 @@
         "gpt-3-encoder": "^1.1.4",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.21.0",
+        "openai": "^4.23.0",
         "uuid": "^9.0.1",
         "yaml": "^2.3.4"
     },
