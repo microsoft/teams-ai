@@ -1,6 +1,8 @@
 # Teams AI Library
 
-Welcome to the Teams AI Library JavaScript package. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, including updates on dotnet support.
+Welcome to the Teams AI Library JavaScript package! 
+
+This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, and .Net support is available via the [dotnet](https://github.com/microsoft/teams-ai/tree/main/dotnet) folder.
 
 Requirements:
 
@@ -9,11 +11,11 @@ Requirements:
 
 ## Getting Started: Migration v.s. New Project
 
-If you're migrating an existing project, switching to add on the Teams AI layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/00.MIGRATION.md). The basics are listed below.
+If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/00.MIGRATION.md). The basics are listed below.
 
 ### Migration
 
-In your existing Teams bot, you'll need to add the Teams AI SDK package and import it into your bot code.
+In your existing Teams bot, you'll need to add the Teams AI Library SDK package and import it into your bot code.
 
 ```bash
 yarn add @microsoft/teams-ai
@@ -47,11 +49,11 @@ That's it!
 
 Run your bot (with ngrok) and sideload your manifest to test.
 
-For migrating specific features such as Message Extension and Adaptive Card capabilities, please see the [Migration Guide](../../getting-started/00.MIGRATION.md).
+For migrating specific features such as Message Extension and Adaptive Card capabilities, please see the [Migration Guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/00.MIGRATION.md).
 
 ### New Project
 
-If you are starting a new project, you can use the [Teams AI SDK echobot sample](../samples/01.messaging.a.echoBot/) as a starting point. You don't need to make any changes to the sample to get it running, but you can use it as your base setup. Echo Bot supports the Teams AI SDK out of the box.
+If you are starting a new project, you can use the [Teams AI SDK echobot sample](https://github.com/microsoft/teams-ai/tree/main/js/samples/01.messaging.a.echoBot) as a starting point. You don't need to make any changes to the sample to get it running, but you can use it as your base setup. Echo Bot supports the Teams AI SDK out of the box.
 
 You can either copy-paste the code into your own project, or clone the repo and run the Teams Toolkit features to explore.
 
@@ -75,7 +77,7 @@ const app = new ApplicationBuilder()<ApplicationTurnState>
 
 ## AI Setup
 
-The detailed steps for setting up your bot to use AI are in the [GPT Setup Guide](../../../getting-started/js/01.AI-SETUP.md).
+The detailed steps for setting up your bot to use AI are in the [GPT Setup Guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/01.AI-SETUP.md).
 
 On top of your Microsoft App Id and password, you will need an Azure OpenAI or OpenAI API key. You can get one from the [OpenAI platform](https://platform.openai.com/). Once you have your key, add it to your `.env` file as `OPEN_AI_KEY`
 
@@ -98,6 +100,6 @@ const app = new Application<ApplicationTurnState>({
 });
 ```
 
-For more information on how to create and use prompts, see [APIREFERENCE](../../../getting-started/00.PROMPTS.md) and look at the [samples](../samples/) numbered `04._.xxx`).
+For more information on how to create and use prompts, see [APIREFERENCE](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.PROMPTS.md) and look at the [samples](https://github.com/microsoft/teams-ai/tree/main/js/samples) numbered `04._.xxx`.
 
 Happy coding!
