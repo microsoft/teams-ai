@@ -31,7 +31,7 @@
         "@types/dotenv": "8.2.0",
         "@types/isomorphic-fetch": "^0.0.39",
         "@types/jsonwebtoken": "^8.5.4",
-        "@types/restify": "8.5.11",
+        "@types/restify": "8.5.12",
         "nodemon": "~3.0.1",
         "rimraf": "^5.0.5",
         "ts-node": "^10.9.2",
