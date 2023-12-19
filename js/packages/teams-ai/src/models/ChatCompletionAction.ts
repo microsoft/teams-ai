@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { Schema } from "jsonschema";
+import { Schema } from 'jsonschema';
 
 /**
  * An action that can be called by an LLM.

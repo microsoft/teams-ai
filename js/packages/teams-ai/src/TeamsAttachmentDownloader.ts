@@ -68,13 +68,15 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
     }
 
     /**
+     * @param attachment
+     * @param accessToken
      * @private
      */
     private async downloadFile(attachment: Attachment, accessToken: string): Promise<InputFile> {
         if (attachment.contentUrl && attachment.contentUrl.startsWith('https://')) {
             // Download file
             const headers = {
-                'Authorization': `Bearer ${accessToken}`
+                Authorization: `Bearer ${accessToken}`
             };
             const response = await this._httpClient.get(attachment.contentUrl, {
                 headers,
@@ -94,13 +96,13 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
             return {
                 content,
                 contentType,
-                contentUrl: attachment.contentUrl,
+                contentUrl: attachment.contentUrl
             };
         } else {
             return {
                 content: Buffer.from(attachment.content),
                 contentType: attachment.contentType,
-                contentUrl: attachment.contentUrl,
+                contentUrl: attachment.contentUrl
             };
         }
     }
@@ -112,8 +114,16 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
         const headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         };
-        const body = `grant_type=client_credentials&client_id=${encodeURI(this._options.botAppId)}&client_secret=${encodeURI(this._options.botAppPassword)}&scope=https%3A%2F%2Fapi.botframework.com%2F.default`;
-        const token = await this._httpClient.post<JWTToken>('https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token', body, { headers });
+        const body = `grant_type=client_credentials&client_id=${encodeURI(
+            this._options.botAppId
+        )}&client_secret=${encodeURI(
+            this._options.botAppPassword
+        )}&scope=https%3A%2F%2Fapi.botframework.com%2F.default`;
+        const token = await this._httpClient.post<JWTToken>(
+            'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
+            body,
+            { headers }
+        );
         return token.data.access_token;
     }
 }

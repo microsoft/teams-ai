@@ -19,7 +19,7 @@ export interface Message<TContent = string> {
     /**
      * Text of the message.
      */
-    content: TContent|undefined;
+    content: TContent | undefined;
 
     /**
      * Optional. A named function to call.
@@ -70,6 +70,5 @@ export interface ImageContentPart {
     /**
      * The URL of the image.
      */
-    image_url: string|{url: string};
+    image_url: string | { url: string };
 }
-

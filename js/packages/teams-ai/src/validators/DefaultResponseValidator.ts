@@ -6,11 +6,11 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { Tokenizer } from "../tokenizers";
-import { PromptResponse } from "../models";
-import { Validation, PromptResponseValidator } from "./PromptResponseValidator";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../models';
+import { Validation, PromptResponseValidator } from './PromptResponseValidator';
+import { Memory } from '../MemoryFork';
 
 /**
  * Default response validator that always returns true.
@@ -26,7 +26,13 @@ export class DefaultResponseValidator<TValue = any> implements PromptResponseVal
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>> {
+    public validateResponse(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        response: PromptResponse<string>,
+        remaining_attempts: number
+    ): Promise<Validation<TValue>> {
         return Promise.resolve({
             type: 'Validation',
             valid: true

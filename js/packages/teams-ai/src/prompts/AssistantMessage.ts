@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { TemplateSection } from "./TemplateSection";
+import { TemplateSection } from './TemplateSection';
 
 /**
  * A message sent by the assistant.

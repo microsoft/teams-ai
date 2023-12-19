@@ -6,12 +6,12 @@
  * Licensed under the MIT License.
  */
 
-import { Message } from "./Message";
-import { PromptFunctions } from "./PromptFunctions";
-import { RenderedPromptSection, PromptSection } from "./PromptSection";
+import { Message } from './Message';
+import { PromptFunctions } from './PromptFunctions';
+import { RenderedPromptSection, PromptSection } from './PromptSection';
 import { TurnContext } from 'botbuilder';
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * Base layout engine that renders a set of `auto`, `fixed`, or `proportional` length sections.
@@ -39,9 +39,20 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param context
+     * @param memory
+     * @param functions
+     * @param tokenizer
+     * @param maxTokens
      * @private
      */
-    public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderAsText(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>> {
         // Start a new layout
         // - Adds all sections from the current LayoutEngine hierarchy to a flat array
         const layout: PromptSectionLayout<string>[] = [];
@@ -71,9 +82,20 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param context
+     * @param memory
+     * @param functions
+     * @param tokenizer
+     * @param maxTokens
      * @private
      */
-    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message[]>> {
         // Start a new layout
         // - Adds all sections from the current LayoutEngine hierarchy to a flat array
         const layout: PromptSectionLayout<Message[]>[] = [];
@@ -100,6 +122,8 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param sections
+     * @param layout
      * @private
      */
     private addSectionsToLayout<T>(sections: PromptSection[], layout: PromptSectionLayout<T>[]): void {
@@ -114,6 +138,12 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param layout
+     * @param maxTokens
+     * @param cbFixed
+     * @param cbProportional
+     * @param textLayout
+     * @param tokenizer
      * @private
      */
     private async layoutSections<T>(
@@ -149,14 +179,19 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param layout
+     * @param callback
      * @private
      */
-    private async layoutFixedSections<T>(layout: PromptSectionLayout<T>[], callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>): Promise<void> {
+    private async layoutFixedSections<T>(
+        layout: PromptSectionLayout<T>[],
+        callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>
+    ): Promise<void> {
         const promises: Promise<RenderedPromptSection<T>>[] = [];
         for (let i = 0; i < layout.length; i++) {
             const section = layout[i];
             if (section.section.tokens < 0 || section.section.tokens > 1.0) {
-                promises.push(callback(section.section).then((output) => section.layout = output));
+                promises.push(callback(section.section).then((output) => (section.layout = output)));
             }
         }
 
@@ -164,14 +199,19 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param layout
+     * @param callback
      * @private
      */
-    private async layoutProportionalSections<T>(layout: PromptSectionLayout<T>[], callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>): Promise<void> {
+    private async layoutProportionalSections<T>(
+        layout: PromptSectionLayout<T>[],
+        callback: (section: PromptSection) => Promise<RenderedPromptSection<T>>
+    ): Promise<void> {
         const promises: Promise<RenderedPromptSection<T>>[] = [];
         for (let i = 0; i < layout.length; i++) {
             const section = layout[i];
             if (section.section.tokens >= 0.0 && section.section.tokens <= 1.0) {
-                promises.push(callback(section.section).then((output) => section.layout = output));
+                promises.push(callback(section.section).then((output) => (section.layout = output)));
             }
         }
 
@@ -179,9 +219,16 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param layout
+     * @param textLayout
+     * @param tokenizer
      * @private
      */
-    private getLayoutLength<T>(layout: PromptSectionLayout<T>[], textLayout: boolean = false, tokenizer?: Tokenizer): number {
+    private getLayoutLength<T>(
+        layout: PromptSectionLayout<T>[],
+        textLayout: boolean = false,
+        tokenizer?: Tokenizer
+    ): number {
         if (textLayout && tokenizer) {
             const output: string[] = [];
             for (let i = 0; i < layout.length; i++) {
@@ -205,6 +252,7 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param layout
      * @private
      */
     private dropLastOptionalSection<T>(layout: PromptSectionLayout<T>[]): boolean {
@@ -220,6 +268,7 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
+     * @param layout
      * @private
      */
     private needsMoreLayout<T>(layout: PromptSectionLayout<T>[]): boolean {

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Configuration } from "@azure/msal-node";
+import { Configuration } from '@azure/msal-node';
 
 /**
  * Represents the settings for Teams Single Sign-On (SSO) authentication.
@@ -29,7 +29,7 @@ export interface TeamsSsoSettings {
     timeout?: number;
     /**
      * (Optional) value indicating whether the OAuthPrompt should end upon
-     * receiving an invalid message. 
+     * receiving an invalid message.
      * Defaults to `true`.
      */
     endOnInvalidMessage?: boolean;

@@ -438,6 +438,7 @@ export class TurnState<
     }
 
     /**
+     * @param path
      * @private
      */
     private getScopeAndName(path: string): { scope: TurnStateEntry; name: string } {

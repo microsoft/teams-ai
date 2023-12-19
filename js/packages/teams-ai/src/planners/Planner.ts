@@ -28,11 +28,7 @@ export interface Planner<TState extends TurnState = TurnState> {
      * @param ai The AI system that is generating the plan.
      * @returns The plan that was generated.
      */
-    beginTask(
-        context: TurnContext,
-        state: TState,
-        ai: AI<TState>
-    ): Promise<Plan>;
+    beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
 
     /**
      * Continues the current task.
@@ -48,11 +44,7 @@ export interface Planner<TState extends TurnState = TurnState> {
      * @param ai The AI system that is generating the plan.
      * @returns The plan that was generated.
      */
-    continueTask(
-        context: TurnContext,
-        state: TState,
-        ai: AI<TState>
-    ): Promise<Plan>;
+    continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
 }
 
 /**

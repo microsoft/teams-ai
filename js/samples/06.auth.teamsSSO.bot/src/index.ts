@@ -87,7 +87,7 @@ const app = new ApplicationBuilder<ApplicationTurnState>()
                     auth: {
                         clientId: process.env.AAD_APP_CLIENT_ID!,
                         clientSecret: process.env.AAD_APP_CLIENT_SECRET!,
-                        authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/${process.env.AAD_APP_TENANT_ID}`,
+                        authority: `${process.env.AAD_APP_OAUTH_AUTHORITY_HOST}/${process.env.AAD_APP_TENANT_ID}`
                     }
                 },
                 signInLink: `https://${process.env.BOT_DOMAIN}/auth-start.html`,
@@ -147,8 +147,8 @@ server.post('/api/messages', async (req, res) => {
 });
 
 server.get(
-    "/auth-:name(start|end).html",
+    '/auth-:name(start|end).html',
     restify.plugins.serveStatic({
-      directory: path.join(__dirname, "public"),
+        directory: path.join(__dirname, 'public')
     })
-  );
+);

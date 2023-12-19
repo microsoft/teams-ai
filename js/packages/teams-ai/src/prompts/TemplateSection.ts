@@ -6,14 +6,14 @@
  * Licensed under the MIT License.
  */
 
-import { Message } from "./Message";
-import { PromptFunctions } from "./PromptFunctions";
-import { RenderedPromptSection } from "./PromptSection";
-import { PromptSectionBase } from "./PromptSectionBase";
-import { Utilities } from "../Utilities";
+import { Message } from './Message';
+import { PromptFunctions } from './PromptFunctions';
+import { RenderedPromptSection } from './PromptSection';
+import { PromptSectionBase } from './PromptSectionBase';
+import { Utilities } from '../Utilities';
 import { TurnContext } from 'botbuilder';
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * A template section that will be rendered as a message.
@@ -44,7 +44,14 @@ export class TemplateSection extends PromptSectionBase {
      * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
      * @param textPrefix Optional. Prefix to use for text output. Defaults to `undefined`.
      */
-    public constructor(template: string, role: string, tokens: number = -1, required: boolean = true, separator: string = '\n', textPrefix?: string) {
+    public constructor(
+        template: string,
+        role: string,
+        tokens: number = -1,
+        required: boolean = true,
+        separator: string = '\n',
+        textPrefix?: string
+    ) {
         super(tokens, required, separator, textPrefix);
         this.template = template;
         this.role = role;
@@ -52,11 +59,24 @@ export class TemplateSection extends PromptSectionBase {
     }
 
     /**
+     * @param context
+     * @param memory
+     * @param functions
+     * @param tokenizer
+     * @param maxTokens
      * @private
      */
-    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message[]>> {
         // Render parts in parallel
-        const renderedParts = await Promise.all(this._parts.map((part) => part(context, memory, functions, tokenizer, maxTokens)));
+        const renderedParts = await Promise.all(
+            this._parts.map((part) => part(context, memory, functions, tokenizer, maxTokens))
+        );
 
         // Join all parts
         const text = renderedParts.join('');
@@ -133,30 +153,48 @@ export class TemplateSection extends PromptSectionBase {
     }
 
     /**
+     * @param text
      * @private
      */
     private createTextRenderer(text: string): PartRenderer {
-        return (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
+        return (
+            context: TurnContext,
+            memory: Memory,
+            functions: PromptFunctions,
+            tokenizer: Tokenizer,
+            maxTokens: number
+        ): Promise<string> => {
             return Promise.resolve(text);
         };
     }
 
     /**
+     * @param name
      * @private
      */
     private createVariableRenderer(name: string): PartRenderer {
-        return (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
+        return (
+            context: TurnContext,
+            memory: Memory,
+            functions: PromptFunctions,
+            tokenizer: Tokenizer,
+            maxTokens: number
+        ): Promise<string> => {
             const value = memory.getValue(name);
             return Promise.resolve(Utilities.toString(tokenizer, value));
         };
     }
 
     /**
+     * @param param
      * @private
      */
     private createFunctionRenderer(param: string): PartRenderer {
         let name = '';
-        let args: string[] = [];
+        const args: string[] = [];
+        /**
+         *
+         */
         function savePart() {
             if (part.length > 0) {
                 if (!name) {
@@ -201,7 +239,13 @@ export class TemplateSection extends PromptSectionBase {
         savePart();
 
         // Return renderer
-        return async (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<string> => {
+        return async (
+            context: TurnContext,
+            memory: Memory,
+            functions: PromptFunctions,
+            tokenizer: Tokenizer,
+            maxTokens: number
+        ): Promise<string> => {
             const value = await functions.invokeFunction(name, context, memory, tokenizer, args);
             return Utilities.toString(tokenizer, value);
         };
@@ -211,7 +255,13 @@ export class TemplateSection extends PromptSectionBase {
 /**
  * @private
  */
-type PartRenderer = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number) => Promise<string>;
+type PartRenderer = (
+    context: TurnContext,
+    memory: Memory,
+    functions: PromptFunctions,
+    tokenizer: Tokenizer,
+    maxTokens: number
+) => Promise<string>;
 
 /**
  * @private

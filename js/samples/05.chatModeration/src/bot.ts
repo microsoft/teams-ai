@@ -37,11 +37,13 @@ let moderator: Moderator;
 if (process.env.OPENAI_KEY) {
     moderator = new OpenAIModerator({
         apiKey: process.env.OPENAI_KEY!,
-        moderate: 'both',
+        moderate: 'both'
     });
 } else {
     if (!process.env.AZURE_CONTENT_SAFETY_KEY || !process.env.AZURE_CONTENT_SAFETY_ENDPOINT) {
-        throw new Error('Missing environment variables - please check that both AZURE_CONTENT_SAFETY_KEY and AZURE_CONTENT_SAFETY_ENDPOINT are set.');
+        throw new Error(
+            'Missing environment variables - please check that both AZURE_CONTENT_SAFETY_KEY and AZURE_CONTENT_SAFETY_ENDPOINT are set.'
+        );
     }
 
     moderator = new AzureContentSafetyModerator({
@@ -79,7 +81,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat',
+    defaultPrompt: 'chat'
 });
 
 // Define storage and application

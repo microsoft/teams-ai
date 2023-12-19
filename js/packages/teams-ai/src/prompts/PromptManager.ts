@@ -6,24 +6,23 @@
  * Licensed under the MIT License.
  */
 
-import { PromptFunctions, PromptFunction } from "./PromptFunctions";
-import { PromptTemplate } from "./PromptTemplate";
-import { Tokenizer } from "../tokenizers";
-import { TurnContext } from "botbuilder";
+import { PromptFunctions, PromptFunction } from './PromptFunctions';
+import { PromptTemplate, CompletionConfig } from './PromptTemplate';
+import { Tokenizer } from '../tokenizers';
+import { TurnContext } from 'botbuilder';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { TemplateSection } from "./TemplateSection";
-import { CompletionConfig } from "./PromptTemplate";
-import { DataSource } from "../dataSources";
-import { PromptSection } from "./PromptSection";
-import { Memory } from "../MemoryFork";
-import { DataSourceSection } from "./DataSourceSection";
-import { MonologueAugmentation, SequenceAugmentation } from "../augmentations";
-import { ConversationHistory } from "./ConversationHistory";
-import { UserMessage } from "./UserMessage";
-import { GroupSection } from "./GroupSection";
-import { Prompt } from "./Prompt";
-import { UserInputMessage } from "./UserInputMessage";
+import { TemplateSection } from './TemplateSection';
+import { DataSource } from '../dataSources';
+import { PromptSection } from './PromptSection';
+import { Memory } from '../MemoryFork';
+import { DataSourceSection } from './DataSourceSection';
+import { MonologueAugmentation, SequenceAugmentation } from '../augmentations';
+import { ConversationHistory } from './ConversationHistory';
+import { UserMessage } from './UserMessage';
+import { GroupSection } from './GroupSection';
+import { Prompt } from './Prompt';
+import { UserInputMessage } from './UserInputMessage';
 
 /**
  * Options used to configure the prompt manager.
@@ -126,12 +125,15 @@ export class PromptManager implements PromptFunctions {
      * @param options Options used to configure the prompt manager.
      */
     public constructor(options: PromptManagerOptions) {
-        this._options = Object.assign({
-            role: 'system',
-            max_conversation_history_tokens: 1.0,
-            max_history_messages: 10,
-            max_input_tokens: -1
-        }, options as ConfiguredPromptManagerOptions);
+        this._options = Object.assign(
+            {
+                role: 'system',
+                max_conversation_history_tokens: 1.0,
+                max_history_messages: 10,
+                max_input_tokens: -1
+            },
+            options as ConfiguredPromptManagerOptions
+        );
     }
 
     /**
@@ -227,7 +229,13 @@ export class PromptManager implements PromptFunctions {
      * @param args Arguments to pass to the function.
      * @returns Value returned by the function.
      */
-    public invokeFunction(name: string, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: string[]): Promise<any> {
+    public invokeFunction(
+        name: string,
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        args: string[]
+    ): Promise<any> {
         const fn = this.getFunction(name);
         return fn(context, memory as any, this as any, tokenizer, args);
     }
@@ -316,7 +324,12 @@ export class PromptManager implements PromptFunctions {
             // - The ConversationHistory section will use the remaining tokens from
             //   max_input_tokens.
             if (template.config.completion.include_history) {
-                sections.push(new ConversationHistory(`conversation.${template.name}_history`, this.options.max_conversation_history_tokens));
+                sections.push(
+                    new ConversationHistory(
+                        `conversation.${template.name}_history`,
+                        this.options.max_conversation_history_tokens
+                    )
+                );
             }
 
             // Include user input
@@ -359,21 +372,25 @@ export class PromptManager implements PromptFunctions {
     }
 
     /**
+     * @param template
      * @private
      */
     private updateConfig(template: PromptTemplate): void {
         // Set config defaults
-        template.config.completion = Object.assign({
-            frequency_penalty: 0.0,
-            include_history: true,
-            include_input: true,
-            include_images: false,
-            max_tokens: 150,
-            max_input_tokens: 2048,
-            presence_penalty: 0.0,
-            temperature: 0.0,
-            top_p: 0.0
-        } as CompletionConfig, template.config.completion);
+        template.config.completion = Object.assign(
+            {
+                frequency_penalty: 0.0,
+                include_history: true,
+                include_input: true,
+                include_images: false,
+                max_tokens: 150,
+                max_input_tokens: 2048,
+                presence_penalty: 0.0,
+                temperature: 0.0,
+                top_p: 0.0
+            } as CompletionConfig,
+            template.config.completion
+        );
 
         // Migrate old schema
         if (template.config.schema === 1) {
@@ -385,6 +402,8 @@ export class PromptManager implements PromptFunctions {
     }
 
     /**
+     * @param template
+     * @param sections
      * @private
      */
     private appendAugmentations(template: PromptTemplate, sections: PromptSection[]): void {

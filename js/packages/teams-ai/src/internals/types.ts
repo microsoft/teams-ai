@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { ChatCompletionAction } from "../models/ChatCompletionAction";
+import { ChatCompletionAction } from '../models/ChatCompletionAction';
 
 /**
  * @private
@@ -96,7 +96,6 @@ export interface CreateChatCompletionRequest {
     user?: string;
 }
 
-
 /**
  * @private
  */
@@ -106,7 +105,7 @@ export declare type CreateChatCompletionRequestFunctionCall = CreateChatCompleti
  * @private
  */
 export interface CreateChatCompletionRequestFunctionCallOneOf {
-    'name': string;
+    name: string;
 }
 
 /**
@@ -152,7 +151,7 @@ export interface CreateChatCompletionResponseChoicesInner {
  */
 export interface ChatCompletionResponseMessage {
     role: 'system' | 'user' | 'assistant';
-    content: string|undefined;
+    content: string | undefined;
     function_call?: ChatCompletionRequestMessageFunctionCall;
 }
 
@@ -160,8 +159,8 @@ export interface ChatCompletionResponseMessage {
  * @private
  */
 export interface ChatCompletionRequestMessageFunctionCall {
-    'name'?: string;
-    'arguments'?: string;
+    name?: string;
+    arguments?: string;
 }
 
 /**
@@ -304,7 +303,6 @@ export enum ModerationSeverity {
  */
 export type ModerationInput = CreateModerationRequest | CreateContentSafetyRequest;
 export type ModerationResponse = CreateModerationResponse | CreateContentSafetyResponse;
-
 
 /**
  * @private

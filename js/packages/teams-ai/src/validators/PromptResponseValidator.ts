@@ -6,10 +6,10 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { Tokenizer } from "../tokenizers";
-import { PromptResponse } from "../models";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { Tokenizer } from '../tokenizers';
+import { PromptResponse } from '../models';
+import { Memory } from '../MemoryFork';
 
 /**
  * A validator that can be used to validate prompt responses.
@@ -24,7 +24,13 @@ export interface PromptResponseValidator<TValue = any> {
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>>;
+    validateResponse(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        response: PromptResponse<string>,
+        remaining_attempts: number
+    ): Promise<Validation<TValue>>;
 }
 
 /**
