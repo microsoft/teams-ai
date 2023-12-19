@@ -8,11 +8,11 @@
 
 import {
     ActivityTypes,
-    CacheInfo,
+    BotConfigAuth,
     Channels,
+    ConfigResponse,
     INVOKE_RESPONSE_KEY,
     InvokeResponse,
-    SuggestedActions,
     TaskModuleResponse,
     TaskModuleTaskInfo,
     TurnContext
@@ -28,30 +28,13 @@ export enum TaskModuleInvokeNames {
     DEFAULT_TASK_DATA_FILTER = 'verb'
 }
 
-/**
- * temporary types
- * Due to an error found in botbuilder-js, we need to temporarily define these types here in order to avoid being blocked by botbuilder-js bugfix release. corinagum is tracking; message her for updates. Merged PR: https://github.com/microsoft/botbuilder-js/pull/4570
- * release tbd
- */
-export interface ConfigResponse {
-    cacheInfo?: CacheInfo;
-    config: ConfigResponseConfig;
-    responseType: 'config';
-}
-export interface BotConfigAuth {
-    suggestedActions?: SuggestedActions;
-    type: 'auth';
-}
-
-export type ConfigResponseConfig = BotConfigAuth | TaskModuleResponse;
-// end temporary types section
 
 /**
  * Options for TaskModules class.
  */
 export interface TaskModulesOptions {
     /**
-     * Data field to use to identify the verb of the handler to trigger.
+     * Data field to use to ide1ntify the verb of the handler to trigger.
      * @remarks
      * When a task module is triggered, the field name specified here will be used to determine
      * the name of the verb for the handler to route the request to.
@@ -244,10 +227,9 @@ export class TaskModules<TState extends TurnState> {
         handler: (context: TurnContext, state: TState, data: TData) => Promise<BotConfigAuth | TaskModuleResponse>
     ): Application<TState> {
         const selector = (context: TurnContext) => {
-            const { CONFIG_SUBMIT_INVOKE_NAME } = TaskModuleInvokeNames;
+            const { CONFIG_FETCH_INVOKE_NAME } = TaskModuleInvokeNames;
             return Promise.resolve(
-                context?.activity?.type === ActivityTypes.Invoke &&
-                    context?.activity?.name === CONFIG_SUBMIT_INVOKE_NAME
+                context?.activity?.type === ActivityTypes.Invoke && context?.activity?.name === CONFIG_FETCH_INVOKE_NAME
             );
         };
         this._app.addRoute(
@@ -294,9 +276,10 @@ export class TaskModules<TState extends TurnState> {
         handler: (context: TurnContext, state: TState, data: TData) => Promise<BotConfigAuth | TaskModuleResponse>
     ): Application<TState> {
         const selector = (context: TurnContext) => {
-            const { CONFIG_FETCH_INVOKE_NAME } = TaskModuleInvokeNames;
+            const { CONFIG_SUBMIT_INVOKE_NAME } = TaskModuleInvokeNames;
             return Promise.resolve(
-                context?.activity?.type === ActivityTypes.Invoke && context?.activity?.name === CONFIG_FETCH_INVOKE_NAME
+                context?.activity?.type === ActivityTypes.Invoke &&
+                    context?.activity?.name === CONFIG_SUBMIT_INVOKE_NAME
             );
         };
         this._app.addRoute(
