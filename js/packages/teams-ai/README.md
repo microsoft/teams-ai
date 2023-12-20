@@ -100,6 +100,6 @@ const app = new Application<ApplicationTurnState>({
 });
 ```
 
-For more information on how to create and use prompts, see [APIREFERENCE](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.PROMPTS.md) and look at the [samples](https://github.com/microsoft/teams-ai/tree/main/js/samples) numbered `04._.xxx`.
+For more information on how to create and use prompts, see [PROMPTS](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.PROMPTS.md) and look at the [samples](https://github.com/microsoft/teams-ai/tree/main/js/samples) numbered `04._.xxx`.
 
 Happy coding!
