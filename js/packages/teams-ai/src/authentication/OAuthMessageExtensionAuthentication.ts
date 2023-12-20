@@ -8,11 +8,10 @@ import * as UserTokenAccess from './UserTokenAccess';
 
 /**
  * @internal
- * 
+ *
  * Handles authentication for Teams Message Extension.
  */
 export class OAuthPromptMessageExtensionAuthentication extends MessageExtensionAuthenticationBase {
-
     /**
      * Creates a new instance of OAuthPromptMessageExtensionAuthentication.
      * @param settings The OAuthPromptSettings.

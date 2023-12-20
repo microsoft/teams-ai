@@ -12,7 +12,7 @@ const colorizer = require('json-colorizer');
  * @private
  */
 export class Colorize {
-    public static error(error: Error|string): string {
+    public static error(error: Error | string): string {
         if (typeof error === 'string') {
             return `\x1b[31;1m${error}\x1b[0m`;
         } else {
@@ -59,6 +59,5 @@ export class Colorize {
 
     public static warning(warning: string): string {
         return `\x1b[33m${warning}\x1b[0m`;
-
     }
 }

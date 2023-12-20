@@ -88,11 +88,9 @@ import { createInitialView, createEditView, createPostCard } from './cards';
 // Set PREVIEW_MODE to true to enable this feature and update your manifest accordingly.
 const PREVIEW_MODE = false;
 
-interface ConversationState extends DefaultConversationState {
-}
+interface ConversationState extends DefaultConversationState {}
 
-interface UserState extends DefaultUserState {
-}
+interface UserState extends DefaultUserState {}
 
 interface TempState extends DefaultTempState {
     post: string | undefined;
@@ -128,7 +126,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat',
+    defaultPrompt: 'chat'
 });
 
 // Define storage and application

@@ -112,13 +112,13 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat',
+    defaultPrompt: 'chat'
 });
 
 // Create an attachment downloader
 const downloader = new TeamsAttachmentDownloader({
     botAppId: process.env.BOT_ID!,
-    botAppPassword: process.env.BOT_PASSWORD!,
+    botAppPassword: process.env.BOT_PASSWORD!
 });
 
 // Define storage and application
@@ -128,7 +128,7 @@ const app = new Application<ApplicationTurnState>({
     ai: {
         planner
     },
-    fileDownloaders: [downloader],
+    fileDownloaders: [downloader]
 });
 
 interface SendCardParams {

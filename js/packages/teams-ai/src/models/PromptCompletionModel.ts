@@ -24,7 +24,13 @@ export interface PromptCompletionModel {
      * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>>;
+    completePrompt(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        template: PromptTemplate
+    ): Promise<PromptResponse<string>>;
 }
 
 /**

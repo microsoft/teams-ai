@@ -171,7 +171,7 @@ export abstract class BotAuthenticationBase<TState extends TurnState> {
             }
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : JSON.stringify(e);
-            const message = `Unexpected error encountered while signing in: ${errorMessage}. 
+            const message = `Unexpected error encountered while signing in: ${errorMessage}.
                 Incoming activity details: type: ${context.activity.type}, name: ${context.activity.name}`;
 
             await this._userSignInFailureHandler?.(context, state, new AuthError(message));

@@ -46,11 +46,7 @@ export class TestPlanner implements Planner<TurnState> {
      * @param ai The AI system that is generating the plan.
      * @returns The plan that was generated.
      */
-    public beginTask(
-        context: TurnContext,
-        state: TurnState,
-        ai: AI<TurnState>
-    ): Promise<Plan> {
+    public beginTask(context: TurnContext, state: TurnState, ai: AI<TurnState>): Promise<Plan> {
         return Promise.resolve(this.beginPlan);
     }
 
@@ -68,11 +64,7 @@ export class TestPlanner implements Planner<TurnState> {
      * @param ai The AI system that is generating the plan.
      * @returns The plan that was generated.
      */
-    public continueTask(
-        context: TurnContext,
-        state: TurnState,
-        ai: AI<TurnState>
-    ): Promise<Plan> {
+    public continueTask(context: TurnContext, state: TurnState, ai: AI<TurnState>): Promise<Plan> {
         return Promise.resolve(this.continuePlan);
     }
 }

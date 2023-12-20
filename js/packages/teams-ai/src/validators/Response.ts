@@ -6,7 +6,6 @@
  * Licensed under the MIT License.
  */
 
-
 /**
  * Utilities for working with Large Language Model responses.
  */
@@ -51,7 +50,7 @@ export class Response {
         if (startBrace >= 0) {
             // Find substring
             const objText = text.substring(startBrace);
-            const nesting = ['}']
+            const nesting = ['}'];
             let cleaned = '{';
             let inString = false;
             for (let i = 1; i < objText.length && nesting.length > 0; i++) {
@@ -129,7 +128,6 @@ export class Response {
 
     /**
      * Removes any empty fields from an object.
-     *
      * @remarks
      * Empty fields include `null`, `undefined`, `[]`, `{}`, and `""`.
      * @param obj The object to clean.
@@ -156,7 +154,6 @@ export class Response {
                         if (Object.keys(cleaned).length == 0) {
                             continue;
                         }
-
                     }
                     break;
                 case 'undefined':

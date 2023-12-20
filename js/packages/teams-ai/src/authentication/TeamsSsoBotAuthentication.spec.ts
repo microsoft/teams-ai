@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Activity, MemoryStorage, TestAdapter, TurnContext } from "botbuilder"
+import { Activity, MemoryStorage, TestAdapter, TurnContext } from 'botbuilder';
 import * as sinon from 'sinon';
 import assert from 'assert';
-import { Application, RouteSelector } from "../Application";
-import { TeamsSsoPrompt } from "./TeamsBotSsoPrompt";
-import { TeamsSsoSettings } from "./TeamsSsoSettings";
-import { TurnState } from "../TurnState";
-import { TeamsSsoBotAuthentication } from "./TeamsSsoBotAuthentication";
-import { ConfidentialClientApplication } from "@azure/msal-node";
-import { DialogContext, DialogTurnStatus } from "botbuilder-dialogs";
+import { Application, RouteSelector } from '../Application';
+import { TeamsSsoPrompt } from './TeamsBotSsoPrompt';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
+import { TurnState } from '../TurnState';
+import { TeamsSsoBotAuthentication } from './TeamsSsoBotAuthentication';
+import { ConfidentialClientApplication } from '@azure/msal-node';
+import { DialogContext, DialogTurnStatus } from 'botbuilder-dialogs';
 
 describe('TeamsSsoBotAuthentication', () => {
     const adapter = new TestAdapter();
@@ -93,7 +93,7 @@ describe('TeamsSsoBotAuthentication', () => {
         it('should register route to handle signin/verifyState', async () => {
             const appSpy = sinon.stub(app, 'addRoute');
 
-            let selectors: RouteSelector[] = [];
+            const selectors: RouteSelector[] = [];
 
             appSpy.callsFake((selector) => {
                 selectors.push(selector);
@@ -112,7 +112,7 @@ describe('TeamsSsoBotAuthentication', () => {
         it('should register route to handle signin/tokenExchange', async () => {
             const appSpy = sinon.stub(app, 'addRoute');
 
-            let selectors: RouteSelector[] = [];
+            const selectors: RouteSelector[] = [];
 
             appSpy.callsFake((selector) => {
                 selectors.push(selector);
@@ -123,7 +123,11 @@ describe('TeamsSsoBotAuthentication', () => {
             const msal = new ConfidentialClientApplication(settings.msalConfig);
             new TeamsSsoBotAuthentication(app, settings, settingName, msal);
 
-            const context = new TurnContext(adapter, { type: 'invoke', name: 'signin/tokenExchange', value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` } });
+            const context = new TurnContext(adapter, {
+                type: 'invoke',
+                name: 'signin/tokenExchange',
+                value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }
+            });
 
             assert(await selectors[1](context)); // The second selector is for signin/tokenExchange
         });
@@ -141,7 +145,9 @@ describe('TeamsSsoBotAuthentication', () => {
             const [context, state] = await createTurnContextAndState({ type: 'message' });
 
             sinon.stub(DialogContext.prototype, 'continueDialog').resolves({ status: DialogTurnStatus.empty });
-            const beginDialogSpy = sinon.stub(DialogContext.prototype, 'beginDialog').resolves({ status: DialogTurnStatus.waiting });
+            const beginDialogSpy = sinon
+                .stub(DialogContext.prototype, 'beginDialog')
+                .resolves({ status: DialogTurnStatus.waiting });
 
             const result = await auth.runDialog(context, state, 'dialogState');
 
@@ -156,7 +162,9 @@ describe('TeamsSsoBotAuthentication', () => {
             const [context, state] = await createTurnContextAndState({ type: 'message' });
 
             sinon.stub(DialogContext.prototype, 'beginDialog').resolves({ status: DialogTurnStatus.waiting });
-            const continueDialogSpy = sinon.stub(DialogContext.prototype, 'continueDialog').resolves({ status: DialogTurnStatus.complete });
+            const continueDialogSpy = sinon
+                .stub(DialogContext.prototype, 'continueDialog')
+                .resolves({ status: DialogTurnStatus.complete });
 
             const result = await auth.runDialog(context, state, 'dialogState');
 
@@ -174,10 +182,16 @@ describe('TeamsSsoBotAuthentication', () => {
             const msal = new ConfidentialClientApplication(settings.msalConfig);
             const auth = new TeamsSsoBotAuthentication(app, settings, settingName, msal);
 
-            const [context, state] = await createTurnContextAndState({ type: 'invoke', name: 'signin/tokenExchange', value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` } });
+            const [context, state] = await createTurnContextAndState({
+                type: 'invoke',
+                name: 'signin/tokenExchange',
+                value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }
+            });
 
             sinon.stub(DialogContext.prototype, 'continueDialog').resolves({ status: DialogTurnStatus.complete });
-            const beginDialogSpy = sinon.stub(DialogContext.prototype, 'beginDialog').resolves({ status: DialogTurnStatus.waiting });
+            const beginDialogSpy = sinon
+                .stub(DialogContext.prototype, 'beginDialog')
+                .resolves({ status: DialogTurnStatus.waiting });
 
             const result = await auth.continueDialog(context, state, 'dialogState');
 
@@ -186,7 +200,7 @@ describe('TeamsSsoBotAuthentication', () => {
         });
     });
 
-    describe('dedupe', ()=> {
+    describe('dedupe', () => {
         afterEach(() => {
             sinon.restore();
         });
@@ -198,8 +212,11 @@ describe('TeamsSsoBotAuthentication', () => {
             // const [, state] = await createTurnContextAndState({ type: 'invoke', name: 'signin/tokenExchange', value: { id: `00000000-0000-0000-0000-000000000000` } });
 
             sinon.stub(TeamsSsoPrompt.prototype, 'beginDialog').resolves({ status: DialogTurnStatus.waiting });
-            sinon.stub(TeamsSsoPrompt.prototype, 'continueDialog').callsFake(async (dc)=> {
-                return await dc.endDialog({ status: DialogTurnStatus.complete, result: { connectionName: "", token: "", expiration: ""}});
+            sinon.stub(TeamsSsoPrompt.prototype, 'continueDialog').callsFake(async (dc) => {
+                return await dc.endDialog({
+                    status: DialogTurnStatus.complete,
+                    result: { connectionName: '', token: '', expiration: '' }
+                });
             });
 
             const storage = new MemoryStorage();
@@ -213,20 +230,41 @@ describe('TeamsSsoBotAuthentication', () => {
                 await state.save(turnContext, storage);
             });
 
+            /**
+             *
+             * @param msg
+             * @param expected
+             */
             function assertResponse(msg: Partial<Activity>, expected: string) {
                 const response = JSON.parse(msg.text!);
                 assert.equal(response.status, expected);
             }
 
             await adapter
-                    .send("hi")
-                    .assertReply((msg)=> {assertResponse(msg, "waiting")})
-                    .send({ type: 'invoke', name: 'signin/tokenExchange', value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }})
-                    .assertReply((msg)=> {assertResponse(msg, "complete")})
-                    .send("hi")
-                    .assertReply((msg)=> {assertResponse(msg, "waiting")})
-                    .send({ type: 'invoke', name: 'signin/tokenExchange', value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }}) // Repeat with same id on purpose to simulate multiple token exchange activities
-                    .assertReply((msg)=> {assertResponse(msg, "waiting")});
+                .send('hi')
+                .assertReply((msg) => {
+                    assertResponse(msg, 'waiting');
+                })
+                .send({
+                    type: 'invoke',
+                    name: 'signin/tokenExchange',
+                    value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }
+                })
+                .assertReply((msg) => {
+                    assertResponse(msg, 'complete');
+                })
+                .send('hi')
+                .assertReply((msg) => {
+                    assertResponse(msg, 'waiting');
+                })
+                .send({
+                    type: 'invoke',
+                    name: 'signin/tokenExchange',
+                    value: { id: `00000000-0000-0000-0000-000000000000-${settingName}` }
+                }) // Repeat with same id on purpose to simulate multiple token exchange activities
+                .assertReply((msg) => {
+                    assertResponse(msg, 'waiting');
+                });
         });
     });
 });

@@ -6,16 +6,16 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder-core";
-import { ChatCompletionAction, PromptResponse } from "../models";
-import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from "../planners";
-import { Tokenizer } from "../tokenizers";
-import { ActionResponseValidator, JSONResponseValidator, Validation } from "../validators";
-import { Augmentation } from "./Augmentation";
-import { ActionAugmentationSection } from "./ActionAugmentationSection";
-import { Schema } from "jsonschema";
-import { Message, PromptSection } from "../prompts";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder-core';
+import { ChatCompletionAction, PromptResponse } from '../models';
+import { Plan, PredictedCommand, PredictedDoCommand, PredictedSayCommand } from '../planners';
+import { Tokenizer } from '../tokenizers';
+import { ActionResponseValidator, JSONResponseValidator, Validation } from '../validators';
+import { Augmentation } from './Augmentation';
+import { ActionAugmentationSection } from './ActionAugmentationSection';
+import { Schema } from 'jsonschema';
+import { Message, PromptSection } from '../prompts';
+import { Memory } from '../MemoryFork';
 
 /**
  * @private
@@ -64,34 +64,34 @@ export interface InnerMonologue {
          * Optional. Parameters for the action.
          */
         parameters?: Record<string, any>;
-    }
+    };
 }
 
 /**
  * JSON schema for validating an `InnerMonologue`.
  */
 export const InnerMonologueSchema: Schema = {
-    type: "object",
+    type: 'object',
     properties: {
         thoughts: {
-            type: "object",
+            type: 'object',
             properties: {
-                thought: { type: "string" },
-                reasoning: { type: "string" },
-                plan: { type: "string" }
+                thought: { type: 'string' },
+                reasoning: { type: 'string' },
+                plan: { type: 'string' }
             },
-            required: ["thought", "reasoning", "plan"]
+            required: ['thought', 'reasoning', 'plan']
         },
         action: {
-            type: "object",
+            type: 'object',
             properties: {
-                name: { type: "string" },
-                parameters: { type: "object" }
+                name: { type: 'string' },
+                parameters: { type: 'object' }
             },
-            required: ["name"]
+            required: ['name']
         }
     },
-    required: ["thoughts", "action"]
+    required: ['thoughts', 'action']
 };
 
 /**
@@ -100,9 +100,12 @@ export const InnerMonologueSchema: Schema = {
  * This augmentation adds support for an inner monologue to the prompt. The monologue helps the LLM
  * to perform chain-of-thought reasoning across multiple turns of conversation.
  */
-export class MonologueAugmentation implements Augmentation<InnerMonologue|undefined> {
+export class MonologueAugmentation implements Augmentation<InnerMonologue | undefined> {
     private readonly _section: ActionAugmentationSection;
-    private readonly _monologueValidator: JSONResponseValidator<InnerMonologue> = new JSONResponseValidator(InnerMonologueSchema,  `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`);
+    private readonly _monologueValidator: JSONResponseValidator<InnerMonologue> = new JSONResponseValidator(
+        InnerMonologueSchema,
+        `No valid JSON objects were found in the response. Return a valid JSON object with your thoughts and the next action to perform.`
+    );
     private readonly _actionValidator: ActionResponseValidator;
 
     /**
@@ -111,21 +114,24 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
      */
     public constructor(actions: ChatCompletionAction[]) {
         actions = appendSAYAction(actions);
-        this._section = new ActionAugmentationSection(actions, [
-            `Return a JSON object with your thoughts and the next action to perform.`,
-            `Only respond with the JSON format below and base your plan on the actions above.`,
-            `If you're not sure what to do, you can always say something by returning a SAY action.`,
-            `If you're told your JSON response has errors, do your best to fix them.`,
-            `Response Format:`,
-            `{"thoughts":{"thought":"<your current thought>","reasoning":"<self reflect on why you made this decision>","plan":"- short bulleted\\n- list that conveys\\n- long-term plan"},"action":{"name":"<action name>","parameters":{"<name>":"<value>"}}}`
-        ].join('\n'));
+        this._section = new ActionAugmentationSection(
+            actions,
+            [
+                `Return a JSON object with your thoughts and the next action to perform.`,
+                `Only respond with the JSON format below and base your plan on the actions above.`,
+                `If you're not sure what to do, you can always say something by returning a SAY action.`,
+                `If you're told your JSON response has errors, do your best to fix them.`,
+                `Response Format:`,
+                `{"thoughts":{"thought":"<your current thought>","reasoning":"<self reflect on why you made this decision>","plan":"- short bulleted\\n- list that conveys\\n- long-term plan"},"action":{"name":"<action name>","parameters":{"<name>":"<value>"}}}`
+            ].join('\n')
+        );
         this._actionValidator = new ActionResponseValidator(actions, true);
     }
 
     /**
      * Creates an optional prompt section for the augmentation.
      */
-    public createPromptSection(): PromptSection|undefined {
+    public createPromptSection(): PromptSection | undefined {
         return this._section;
     }
 
@@ -138,9 +144,21 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue|undefined>> {
+    public async validateResponse(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        response: PromptResponse<string>,
+        remaining_attempts: number
+    ): Promise<Validation<InnerMonologue | undefined>> {
         // Validate that we got a well-formed inner monologue
-        const validationResult = await this._monologueValidator.validateResponse(context, memory, tokenizer, response, remaining_attempts);
+        const validationResult = await this._monologueValidator.validateResponse(
+            context,
+            memory,
+            tokenizer,
+            response,
+            remaining_attempts
+        );
         if (!validationResult.valid) {
             // Catch the case where the action is missing.
             // - GPT-3.5 gets stuck in a loop here sometimes so we'll redirect it to just use the SAY action.
@@ -153,8 +171,18 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
         // Validate that the action exists and its parameters are valid
         const monologue = validationResult.value as InnerMonologue;
         const parameters = JSON.stringify(monologue.action.parameters ?? {});
-        const message: Message = { role: 'assistant', content: undefined, function_call: { name: monologue.action.name, arguments: parameters } };
-        const actionValidation = await this._actionValidator.validateResponse(context, memory, tokenizer, { status: 'success', message }, remaining_attempts);
+        const message: Message = {
+            role: 'assistant',
+            content: undefined,
+            function_call: { name: monologue.action.name, arguments: parameters }
+        };
+        const actionValidation = await this._actionValidator.validateResponse(
+            context,
+            memory,
+            tokenizer,
+            { status: 'success', message },
+            remaining_attempts
+        );
         if (!actionValidation.valid) {
             return actionValidation as any;
         }
@@ -170,7 +198,11 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
      * @param response The validated and transformed response for the prompt.
      * @returns The created plan.
      */
-    public createPlanFromResponse(context: TurnContext, memory: Memory, response: PromptResponse<InnerMonologue|undefined>): Promise<Plan> {
+    public createPlanFromResponse(
+        context: TurnContext,
+        memory: Memory,
+        response: PromptResponse<InnerMonologue | undefined>
+    ): Promise<Plan> {
         // Identify the action to perform
         let command: PredictedCommand;
         const monologue = response.message!.content as InnerMonologue;
@@ -191,6 +223,7 @@ export class MonologueAugmentation implements Augmentation<InnerMonologue|undefi
 }
 
 /**
+ * @param actions
  * @private
  */
 function appendSAYAction(actions: ChatCompletionAction[]): ChatCompletionAction[] {

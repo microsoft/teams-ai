@@ -6,11 +6,11 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { RenderedPromptSection } from "../prompts";
-import { Tokenizer } from "../tokenizers";
-import { DataSource } from "./DataSource";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { RenderedPromptSection } from '../prompts';
+import { Tokenizer } from '../tokenizers';
+import { DataSource } from './DataSource';
+import { Memory } from '../MemoryFork';
 
 /**
  * A data source that can be used to add a static block of text to a prompt.
@@ -48,7 +48,12 @@ export class TextDataSource implements DataSource {
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      * @returns The text to inject into the prompt as a `RenderedPromptSection` object.
      */
-    public renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public renderData(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>> {
         // Tokenize text on first use
         if (!this._tokens) {
             this._tokens = tokenizer.encode(this._text);

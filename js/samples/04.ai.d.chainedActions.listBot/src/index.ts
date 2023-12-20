@@ -88,7 +88,6 @@ interface ConversationState extends DefaultConversationState {
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
-
 if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
     throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
 }
@@ -116,7 +115,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'monologue',
+    defaultPrompt: 'monologue'
 });
 
 // Define storage and application
@@ -237,7 +236,10 @@ function ensureListExists(state: ApplicationTurnState, listName: string): void {
  * @param {string} listName - The name of the list to delete.
  */
 function deleteList(state: ApplicationTurnState, listName: string): void {
-    if (typeof state.conversation.lists == 'object' && Object.prototype.hasOwnProperty.call(state.conversation.lists, listName)) {
+    if (
+        typeof state.conversation.lists == 'object' &&
+        Object.prototype.hasOwnProperty.call(state.conversation.lists, listName)
+    ) {
         delete state.conversation.lists[listName];
     }
 }
