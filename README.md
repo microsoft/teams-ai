@@ -7,7 +7,7 @@ Welcome to the Teams AI Library! This SDK is specifically designed to assist you
 ![Teams AI flow diagram](https://github.com/microsoft/teams-ai/assets/14900841/154353ff-bafe-4423-abcd-6dc5a8680fe9)
 This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.
 
-The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). .NET support is available in the [dotnet](./dotnet) folder.
+The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). .NET support is available in the [`dotnet`](./dotnet) folder and via the [teams-ai package on NuGet](https://www.nuget.org/packages/Microsoft.Teams.AI).
 
 ## Getting Started
 
@@ -25,7 +25,7 @@ This SDK is now generally available. We welcome your feedback and contributions!
 
 ### Teams-centric component scaffolding
 
-> For examples of the below, browse through the [`js`](./js/samples/) folders.
+> For examples of the below, browse through the [`js`](./js/samples/) sample folders or the [`dotnet`](./dotnet/samples) sample folders.
 > Simple scaffolding for any conversational app component, including:
 
 - Chat bots
@@ -43,7 +43,9 @@ With a simple text file written in human language, you can describe the function
 
 ### Moderation
 
-A configurable API call to filter inappropriate content for input content, output content, or both. (See [OpenAIModerator.ts](./js/packages/teams-ai/src/moderators/OpenAIModerator.ts))
+A configurable API call to filter inappropriate content for input content, output content, or both. 
+
+(Moderators are available whether you decide to you OpenAI or Azure OpenAI for your models. If using OpenAI see [OpenAIModerator.ts](./js/packages/teams-ai/src/moderators/OpenAIModerator.ts) or [OpenAIModerator.cs](https://github.com/microsoft/teams-ai/blob/46042530f43058a815df4376f0f068f9d8d2e144/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/AI/Moderator/OpenAIModerator.cs) and for Azure's moderator see [AzureContentSaftyModerator.ts](./js/packages/teams-ai/src/moderators/AzureContentSafetyModerator.ts). Azure's moderator for C# is in development)
 
 ### Predictive Engine to Map Intents to Actions
 
