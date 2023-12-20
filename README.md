@@ -1,10 +1,11 @@
-# <image src="https://github.com/microsoft/teams-ai/assets/14900841/972a9a1b-679a-4725-bfc0-a1e76151a78a" height="10%" width="10%" /> Teams AI Library
+# ![teams logo](https://github.com/microsoft/teams-ai/assets/14900841/10a0fbac-9d31-46d5-ad65-0eeb33b787a8) Teams AI Library
 
 [![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main)
 
 Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 
-![This is a diagram of the Teams-AI flow. Teams AI Library SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.](https://github.com/microsoft/teams-ai/assets/14900841/154353ff-bafe-4423-abcd-6dc5a8680fe9)
+![Teams AI flow diagram](https://github.com/microsoft/teams-ai/assets/14900841/154353ff-bafe-4423-abcd-6dc5a8680fe9)
+This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.
 
 The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). .NET support is available in the [dotnet](./dotnet) folder.
 
