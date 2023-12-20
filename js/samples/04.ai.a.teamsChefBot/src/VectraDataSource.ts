@@ -72,13 +72,13 @@ export class VectraDataSource implements DataSource {
         // Create embeddings model
         const embeddings = new OpenAIEmbeddings({
             model: 'text-embedding-ada-002',
-            apiKey: options.apiKey,
+            apiKey: options.apiKey
         });
 
         // Create local index
         this._index = new LocalDocumentIndex({
             embeddings,
-            folderPath: path.join(options.indexFolder, options.name),
+            folderPath: path.join(options.indexFolder, options.name)
         });
     }
 
@@ -89,12 +89,17 @@ export class VectraDataSource implements DataSource {
      * @param tokenizer Tokenizer to use when rendering the data source.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      */
-    public async renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderData(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>> {
         // Query index
         const query = memory.getValue('temp.input') as string;
         const results = await this._index.queryDocuments(query, {
             maxDocuments: this._options.maxDocuments ?? 5,
-            maxChunks: this._options.maxChunks ?? 50,
+            maxChunks: this._options.maxChunks ?? 50
         });
 
         // Add documents until you run out of tokens
@@ -111,7 +116,10 @@ export class VectraDataSource implements DataSource {
             }
 
             // Render document section
-            const sections = await result.renderSections(Math.min(remainingTokens, this._options.maxTokensPerDocument ?? 600), 1);
+            const sections = await result.renderSections(
+                Math.min(remainingTokens, this._options.maxTokensPerDocument ?? 600),
+                1
+            );
             docLength += sections[0].tokenCount;
             doc += sections[0].text;
 
@@ -123,5 +131,4 @@ export class VectraDataSource implements DataSource {
 
         return { output, length, tooLong: length > maxTokens };
     }
-
 }

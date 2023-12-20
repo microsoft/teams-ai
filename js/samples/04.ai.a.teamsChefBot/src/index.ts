@@ -102,7 +102,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat',
+    defaultPrompt: 'chat'
 });
 
 // Define storage and application
@@ -110,16 +110,18 @@ const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
+        planner
     }
 });
 
 // Register your data source with planner
-planner.prompts.addDataSource(new VectraDataSource({
-    name: 'teams-ai',
-    apiKey:  process.env.OPENAI_KEY!,
-    indexFolder: path.join(__dirname, '../index'),
-}));
+planner.prompts.addDataSource(
+    new VectraDataSource({
+        name: 'teams-ai',
+        apiKey: process.env.OPENAI_KEY!,
+        indexFolder: path.join(__dirname, '../index')
+    })
+);
 
 // Add a custom response formatter to convert markdown code blocks to <pre> tags
 addResponseFormatter(app);

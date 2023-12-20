@@ -1,26 +1,28 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { TurnContext } from "botbuilder-core";
-import { TokenResponse } from "botframework-schema";
-import { MessageExtensionAuthenticationBase } from "./MessageExtensionAuthenticationBase";
-import { TeamsSsoSettings } from "./TeamsSsoSettings";
-import { ConfidentialClientApplication } from "@azure/msal-node";
+import { TurnContext } from 'botbuilder-core';
+import { TokenResponse } from 'botframework-schema';
+import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
+import { ConfidentialClientApplication } from '@azure/msal-node';
 import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
 /**
  * @internal
- * 
+ *
  * Handles authentication for Teams Message Extension using Single Sign-On (SSO).
  */
 export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuthenticationBase {
-
     /**
      * Creates a new instance of TeamsSsoMessageExtensionAuthentication.
      * @param settings The Teams SSO settings.
      * @param msal The MSAL (Microsoft Authentication Library) instance.
      */
-    public constructor(private readonly settings: TeamsSsoSettings, private readonly msal: ConfidentialClientApplication) {
+    public constructor(
+        private readonly settings: TeamsSsoSettings,
+        private readonly msal: ConfidentialClientApplication
+    ) {
         super();
     }
 
@@ -52,10 +54,10 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
         });
         if (result) {
             return {
-                connectionName: "",
+                connectionName: '',
                 token: result.accessToken,
-                expiration: result.expiresOn?.toISOString() ?? ""
-            }
+                expiration: result.expiresOn?.toISOString() ?? ''
+            };
         }
         return undefined;
     }
@@ -77,13 +79,12 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
      */
     public async getSignInLink(context: TurnContext): Promise<string> {
         const clientId = this.settings.msalConfig.auth.clientId;
-        const scope = encodeURI(this.settings.scopes.join(" "));
-        const authority = this.settings.msalConfig.auth.authority ?? "https://login.microsoftonline.com/common/";
+        const scope = encodeURI(this.settings.scopes.join(' '));
+        const authority = this.settings.msalConfig.auth.authority ?? 'https://login.microsoftonline.com/common/';
         const tenantId = authority.match(/https:\/\/[^\/]+\/([^\/]+)\/?/)?.[1];
 
         const signInLink = `${this.settings.signInLink}?scope=${scope}&clientId=${clientId}&tenantId=${tenantId}`;
 
         return signInLink;
     }
-
 }

@@ -28,7 +28,6 @@ export enum TaskModuleInvokeNames {
     DEFAULT_TASK_DATA_FILTER = 'verb'
 }
 
-
 /**
  * Options for TaskModules class.
  */

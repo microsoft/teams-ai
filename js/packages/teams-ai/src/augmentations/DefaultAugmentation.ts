@@ -6,14 +6,14 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder-core";
-import { PromptResponse } from "../models";
-import { Plan, PredictedSayCommand } from "../planners";
-import { Tokenizer } from "../tokenizers";
-import { Validation } from "../validators";
-import { Augmentation } from "./Augmentation";
-import { PromptSection } from "../prompts";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder-core';
+import { PromptResponse } from '../models';
+import { Plan, PredictedSayCommand } from '../planners';
+import { Tokenizer } from '../tokenizers';
+import { Validation } from '../validators';
+import { Augmentation } from './Augmentation';
+import { PromptSection } from '../prompts';
+import { Memory } from '../MemoryFork';
 
 /**
  * The default 'none' augmentation.
@@ -25,7 +25,7 @@ export class DefaultAugmentation implements Augmentation<string> {
     /**
      * Creates an optional prompt section for the augmentation.
      */
-    public createPromptSection(): PromptSection|undefined {
+    public createPromptSection(): PromptSection | undefined {
         return undefined;
     }
 
@@ -38,10 +38,16 @@ export class DefaultAugmentation implements Augmentation<string> {
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<string>> {
+    public validateResponse(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        response: PromptResponse<string>,
+        remaining_attempts: number
+    ): Promise<Validation<string>> {
         return Promise.resolve({
             type: 'Validation',
-            valid: true,
+            valid: true
         });
     }
 
@@ -52,7 +58,11 @@ export class DefaultAugmentation implements Augmentation<string> {
      * @param response The validated and transformed response for the prompt.
      * @returns The created plan.
      */
-    public createPlanFromResponse(context: TurnContext, memory: Memory, response: PromptResponse<string>): Promise<Plan> {
+    public createPlanFromResponse(
+        context: TurnContext,
+        memory: Memory,
+        response: PromptResponse<string>
+    ): Promise<Plan> {
         return Promise.resolve({
             type: 'plan',
             commands: [

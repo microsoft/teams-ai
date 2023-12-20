@@ -6,12 +6,12 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder-core";
-import { PromptResponseValidator } from "../validators";
-import { Plan } from "../planners";
-import { PromptSection } from "../prompts";
-import { Memory } from "../MemoryFork";
-import { PromptResponse } from "../models";
+import { TurnContext } from 'botbuilder-core';
+import { PromptResponseValidator } from '../validators';
+import { Plan } from '../planners';
+import { PromptSection } from '../prompts';
+import { Memory } from '../MemoryFork';
+import { PromptResponse } from '../models';
 
 /**
  * An augmentation is a component that can be added to a prompt template to add additional
@@ -22,7 +22,7 @@ export interface Augmentation<TContent = any> extends PromptResponseValidator<TC
     /**
      * Creates an optional prompt section for the augmentation.
      */
-    createPromptSection(): PromptSection|undefined;
+    createPromptSection(): PromptSection | undefined;
 
     /**
      * Creates a plan given validated response value.
@@ -31,10 +31,5 @@ export interface Augmentation<TContent = any> extends PromptResponseValidator<TC
      * @param response The validated and transformed response for the prompt.
      * @returns The created plan.
      */
-    createPlanFromResponse(
-        context: TurnContext,
-        memory: Memory,
-        response: PromptResponse<TContent>
-    ): Promise<Plan>;
-
+    createPlanFromResponse(context: TurnContext, memory: Memory, response: PromptResponse<TContent>): Promise<Plan>;
 }

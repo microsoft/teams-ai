@@ -6,8 +6,8 @@
  * Licensed under the MIT License.
  */
 
-import { PromptSection } from "./PromptSection";
-import { LayoutEngine } from "./LayoutEngine";
+import { PromptSection } from './PromptSection';
+import { LayoutEngine } from './LayoutEngine';
 
 /**
  * Top level prompt section.
@@ -22,7 +22,12 @@ export class Prompt extends LayoutEngine {
      * @param required Optional. Indicates if this section is required. Defaults to `true`.
      * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n\n`.
      */
-    public constructor(sections: PromptSection[], tokens: number = -1, required: boolean = true, separator: string = '\n\n') {
+    public constructor(
+        sections: PromptSection[],
+        tokens: number = -1,
+        required: boolean = true,
+        separator: string = '\n\n'
+    ) {
         super(sections, tokens, required, separator);
     }
 }

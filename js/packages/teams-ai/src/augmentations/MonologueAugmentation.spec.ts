@@ -1,12 +1,12 @@
-import { strict as assert } from "assert";
-import { MonologueAugmentation } from "./MonologueAugmentation";
-import { TestAdapter } from "botbuilder";
-import { GPT3Tokenizer } from "../tokenizers";
-import { TestTurnState } from "../TestTurnState";
-import { ChatCompletionAction, PromptResponse } from "../models";
-import { TestPromptManager } from "../prompts";
+import { strict as assert } from 'assert';
+import { MonologueAugmentation } from './MonologueAugmentation';
+import { TestAdapter } from 'botbuilder';
+import { GPT3Tokenizer } from '../tokenizers';
+import { TestTurnState } from '../TestTurnState';
+import { ChatCompletionAction, PromptResponse } from '../models';
+import { TestPromptManager } from '../prompts';
 
-describe("MonologueAugmentation", () => {
+describe('MonologueAugmentation', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
     const tokenizer = new GPT3Tokenizer();
@@ -74,36 +74,47 @@ describe("MonologueAugmentation", () => {
         }
     });
 
-    describe("constructor", () => {
-        it("should create a MonologueAugmentation", () => {
+    describe('constructor', () => {
+        it('should create a MonologueAugmentation', () => {
             const augmentation = new MonologueAugmentation(actions);
             assert.notEqual(augmentation, undefined);
         });
     });
 
-    describe("createPromptSection", () => {
-        it("should render a MonologueAugmentation to an array of messages", async () => {
+    describe('createPromptSection', () => {
+        it('should render a MonologueAugmentation to an array of messages', async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
                 const section = await augmentation.createPromptSection();
                 assert.notEqual(section, undefined);
-                const rendered = await section!.renderAsMessages(context,state, functions, tokenizer, 2000);
+                const rendered = await section!.renderAsMessages(context, state, functions, tokenizer, 2000);
                 assert.equal(rendered.output.length, 1);
                 assert.equal(rendered.output[0].role, 'system');
                 assert.equal(rendered.output[0].content?.includes('test action'), true);
-                assert.equal(rendered.output[0].content?.includes('Return a JSON object with your thoughts and the next action to perform.'), true);
+                assert.equal(
+                    rendered.output[0].content?.includes(
+                        'Return a JSON object with your thoughts and the next action to perform.'
+                    ),
+                    true
+                );
                 assert.equal(rendered.tooLong, false);
             });
         });
     });
 
-    describe("validateResponse", () => {
-        it("should pass a valid monologue", async () => {
+    describe('validateResponse', () => {
+        it('should pass a valid monologue', async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response = await augmentation.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assistant', content: valid_monologue } }, 3);
+                const response = await augmentation.validateResponse(
+                    context,
+                    state,
+                    tokenizer,
+                    { status: 'success', message: { role: 'assistant', content: valid_monologue } },
+                    3
+                );
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, true);
                 assert.equal(response.feedback, undefined);
@@ -111,11 +122,17 @@ describe("MonologueAugmentation", () => {
             });
         });
 
-        it("should fail a monologue with missing thoughts", async () => {
+        it('should fail a monologue with missing thoughts', async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response = await augmentation.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assistant', content: missing_thought } }, 3);
+                const response = await augmentation.validateResponse(
+                    context,
+                    state,
+                    tokenizer,
+                    { status: 'success', message: { role: 'assistant', content: missing_thought } },
+                    3
+                );
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, false);
                 assert.notEqual(response.feedback, undefined);
@@ -123,11 +140,17 @@ describe("MonologueAugmentation", () => {
             });
         });
 
-        it("should fail a monologue with an invalid action", async () => {
+        it('should fail a monologue with an invalid action', async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response = await augmentation.validateResponse(context, state, tokenizer, { status: 'success', message: { role: 'assistant', content: invalid_action } }, 3);
+                const response = await augmentation.validateResponse(
+                    context,
+                    state,
+                    tokenizer,
+                    { status: 'success', message: { role: 'assistant', content: invalid_action } },
+                    3
+                );
                 assert.notEqual(response, undefined);
                 assert.equal(response.valid, false);
                 assert.notEqual(response.feedback, undefined);
@@ -136,15 +159,21 @@ describe("MonologueAugmentation", () => {
         });
     });
 
-    describe("createPlanFromResponse", () => {
-        it("should create a plan with a SAY command", async () => {
+    describe('createPlanFromResponse', () => {
+        it('should create a plan with a SAY command', async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response: PromptResponse<string> = { status: 'success', message: { role: 'assistant', content: valid_SAY } };
+                const response: PromptResponse<string> = {
+                    status: 'success',
+                    message: { role: 'assistant', content: valid_SAY }
+                };
                 const validation = await augmentation.validateResponse(context, state, tokenizer, response, 3);
                 assert.equal(validation.valid, true);
-                const plan = await augmentation.createPlanFromResponse(context, state, { status: 'success', message: { role: 'assistant', content: validation.value } });
+                const plan = await augmentation.createPlanFromResponse(context, state, {
+                    status: 'success',
+                    message: { role: 'assistant', content: validation.value }
+                });
                 assert.notEqual(plan, undefined);
                 assert.deepEqual(plan, {
                     type: 'plan',
@@ -158,14 +187,20 @@ describe("MonologueAugmentation", () => {
             });
         });
 
-        it("should create a plan with a DO command", async () => {
+        it('should create a plan with a DO command', async () => {
             await adapter.sendTextToBot('test', async (context) => {
                 const state = await TestTurnState.create(context);
                 const augmentation = new MonologueAugmentation(actions);
-                const response: PromptResponse<string> = { status: 'success', message: { role: 'assistant', content: valid_monologue } };
+                const response: PromptResponse<string> = {
+                    status: 'success',
+                    message: { role: 'assistant', content: valid_monologue }
+                };
                 const validation = await augmentation.validateResponse(context, state, tokenizer, response, 3);
                 assert.equal(validation.valid, true);
-                const plan = await augmentation.createPlanFromResponse(context, state, { status: 'success', message: { role: 'assistant', content: validation.value } });
+                const plan = await augmentation.createPlanFromResponse(context, state, {
+                    status: 'success',
+                    message: { role: 'assistant', content: validation.value }
+                });
                 assert.notEqual(plan, undefined);
                 assert.deepEqual(plan, {
                     type: 'plan',
