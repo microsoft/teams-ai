@@ -1,5 +1,14 @@
 import { strict as assert } from 'assert';
-import { Activity, ActivityTypes, Channels, MemoryStorage, MessageReactionTypes, TestAdapter } from 'botbuilder';
+import {
+    Activity,
+    ActivityTypes,
+    Channels,
+    FileConsentCardResponse,
+    MemoryStorage,
+    MessageReactionTypes,
+    O365ConnectorCardActionQuery,
+    TestAdapter
+} from 'botbuilder';
 import {
     Application,
     ApplicationBuilder,
@@ -11,7 +20,7 @@ import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
 import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
-import { createTestConversationUpdate } from './internals';
+import { createTestConversationUpdate, createTestInvoke } from './internals';
 import { TestPlanner } from './planners/TestPlanner';
 
 describe('Application', () => {
@@ -73,6 +82,33 @@ describe('Application', () => {
             assert.equal(app.options.startTypingTimer, startTypingTimer);
             assert.equal(app.options.storage, storage);
             assert.deepEqual(app.options.taskModules, taskModules);
+        });
+
+        it('should throw an exception if botId is an empty string for longRunningMessages', () => {
+            assert.throws(
+                () =>
+                    new Application({
+                        adapter,
+                        botAppId: '',
+                        longRunningMessages: true
+                    }),
+                new Error(
+                    `The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`
+                )
+            );
+        });
+
+        it('should throw an exception if adapter is not configured', () => {
+            const app = new Application({
+                adapter: undefined,
+                botAppId: 'botid'
+            });
+            assert.throws(
+                () => app.adapter,
+                new Error(
+                    `The Application.adapter property is unavailable because it was not configured when creating the Application.`
+                )
+            );
         });
     });
 
@@ -144,6 +180,39 @@ describe('Application', () => {
         });
     });
 
+    describe('message', () => {
+        it('should return the message property', () => {
+            const app = new Application();
+            assert.notEqual(app.message, undefined);
+        });
+
+        it("should not route activity if there's no handler", async () => {
+            const app = new Application();
+
+            app.message('/\\?/reset/i', async (context) => {
+                const handled = await app.run(context);
+                assert.equal(handled, false);
+            });
+        });
+
+        it('should route to an activity handler for an array of keywords', async () => {
+            const messages = ['hello', 'hi', 'who are you?'];
+            let called = false;
+            const app = new Application();
+            app.message(messages, async (context, state) => {
+                assert.notEqual(context, undefined);
+                assert.notEqual(state, undefined);
+                called = true;
+            });
+
+            await adapter.sendTextToBot('hello', async (context) => {
+                const handled = await app.run(context);
+                assert.equal(called, true);
+                assert.equal(handled, true);
+            });
+        });
+    });
+
     describe('messageExtensions', () => {
         it('should return the messageExtensions property', () => {
             const app = new Application();
@@ -155,6 +224,37 @@ describe('Application', () => {
         it('should return the taskModules property', () => {
             const app = new Application();
             assert.notEqual(app.taskModules, undefined);
+        });
+    });
+
+    describe('authentication', () => {
+        it('should return the authentication property', () => {
+            const app = new Application({
+                adapter,
+                botAppId: 'botid',
+                authentication: authenticationSettings
+            });
+            assert.notEqual(app.authentication, undefined);
+        });
+
+        it('should throw an exception when getting authentication if it is not configured', () => {
+            const app = new Application({
+                adapter,
+                botAppId: 'botid'
+            });
+            assert.throws(
+                () => app.authentication,
+                new Error(
+                    `The Application.authentication property is unavailable because no authentication options were configured.`
+                )
+            );
+        });
+    });
+
+    describe('meetings', () => {
+        it('should return the meetings property', () => {
+            const app = new Application();
+            assert.notEqual(app.meetings, undefined);
         });
     });
 
@@ -199,19 +299,46 @@ describe('Application', () => {
                 assert.equal(handled, true);
             });
         });
+
+        it('should create a route for an array of activity types', async () => {
+            let calledMessage = false;
+            let calledEvent = false;
+            const app = new Application();
+            app.activity([ActivityTypes.Message, ActivityTypes.ConversationUpdate], async (context) => {
+                if (context.activity.type === ActivityTypes.Message) {
+                    calledMessage = true;
+                }
+                if (context.activity.type === ActivityTypes.ConversationUpdate) {
+                    calledEvent = true;
+                }
+            });
+
+            await adapter.sendTextToBot('test', async (context) => {
+                const handled = await app.run(context);
+                assert.equal(calledMessage, true);
+                assert.equal(handled, true);
+            });
+            const eventActivity = createTestConversationUpdate();
+
+            await adapter.processActivity(eventActivity, async (context) => {
+                const handled = await app.run(context);
+                assert.equal(calledEvent, true);
+                assert.equal(handled, true);
+            });
+        });
     });
 
     describe('conversationUpdate', () => {
-        // Optional pre-configured mock Application using Test Adapter. If other mocks are needed, feel free to ignore mockApp and create your own.
-        let mockApp: Application;
+        // Optional pre-configured mock Application using Test Adapter. If other mocks are needed, feel free to ignore app and create your own.
+        let app: Application;
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application({ adapter });
         });
 
         it('should route to an instantiated conversationUpdate handler when channelId is Teams', async () => {
             let handlerCalled = false;
-            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+            app.conversationUpdate('membersAdded', async (context, _state) => {
                 handlerCalled = true;
                 assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
             });
@@ -224,14 +351,14 @@ describe('Application', () => {
             ];
 
             await adapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
 
         it('should route to an instantiated conversationUpdate handler when channelId is not defined', async () => {
             let handlerCalled = false;
-            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+            app.conversationUpdate('membersAdded', async (context, _state) => {
                 handlerCalled = true;
                 assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
             });
@@ -243,7 +370,7 @@ describe('Application', () => {
             ];
 
             await adapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
@@ -278,7 +405,7 @@ describe('Application', () => {
         for (const { event, channelData } of testData) {
             it(`should route to correct handler for '${event}'`, async () => {
                 let handlerCalled = false;
-                mockApp.conversationUpdate(event as ConversationUpdateEvents, async (context, _state) => {
+                app.conversationUpdate(event as ConversationUpdateEvents, async (context, _state) => {
                     handlerCalled = true;
                     assert.equal(context.activity.channelData.eventType, event);
                     assert.deepEqual(context.activity.channelData, channelData);
@@ -287,7 +414,7 @@ describe('Application', () => {
                 const activity = createTestConversationUpdate(channelData);
                 activity.channelId = Channels.Msteams;
                 await adapter.processActivity(activity, async (context) => {
-                    await mockApp.run(context);
+                    await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
             });
@@ -300,7 +427,7 @@ describe('Application', () => {
             const activity = createTestConversationUpdate({ channel, eventType: 'channelCreated', team });
             activity.channelId = Channels.Msteams;
 
-            mockApp.conversationUpdate('channelCreated', async (context, _state) => {
+            app.conversationUpdate('channelCreated', async (context, _state) => {
                 handlerCalled = true;
                 assert.equal(typeof context.activity.channelData, 'object');
                 assert.equal(context.activity.channelData.eventType, 'channelCreated');
@@ -309,14 +436,14 @@ describe('Application', () => {
             });
 
             await adapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
 
         it('should throw an error if handler is not a function', () => {
             assert.throws(
-                () => mockApp.conversationUpdate('membersRemoved', {} as any),
+                () => app.conversationUpdate('membersRemoved', {} as any),
                 new Error(
                     `ConversationUpdate 'handler' for membersRemoved is object. Type of 'handler' must be a function.`
                 )
@@ -325,10 +452,10 @@ describe('Application', () => {
     });
 
     describe('messageReactions', () => {
-        let mockApp: Application;
+        let app: Application;
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application({ adapter });
         });
         const messageReactions: { event: MessageReactionEvents; testActivity: Partial<Activity> }[] = [
             {
@@ -350,7 +477,7 @@ describe('Application', () => {
         for (const { event, testActivity } of messageReactions) {
             it(`should route to correct handler for ${event}`, async () => {
                 let handlerCalled = false;
-                mockApp.messageReactions(event, async (context, _state) => {
+                app.messageReactions(event, async (context, _state) => {
                     handlerCalled = true;
                     assert.equal(context.activity.type, ActivityTypes.MessageReaction);
                     switch (event) {
@@ -366,7 +493,7 @@ describe('Application', () => {
                 });
 
                 await adapter.processActivity(testActivity, async (context) => {
-                    await mockApp.run(context);
+                    await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
             });
@@ -375,7 +502,7 @@ describe('Application', () => {
         it(`should throw an error when event is not known case`, () => {
             assert.throws(
                 () =>
-                    mockApp.messageEventUpdate('test' as any, async (_context, _state) => {
+                    app.messageEventUpdate('test' as any, async (_context, _state) => {
                         assert.fail('should not be called');
                     }),
                 new Error(`Invalid TeamsMessageEvent type: test`)
@@ -383,11 +510,143 @@ describe('Application', () => {
         });
     });
 
+    describe('fileConsentAccept', () => {
+        const fileConsentCardResponse: FileConsentCardResponse = {
+            action: 'accept',
+            context: {
+                theme: 'dark',
+                consentId: '1234567890'
+            },
+            uploadInfo: {
+                name: 'test.txt',
+                uploadUrl: 'https://test.com',
+                contentUrl: 'https://test.com',
+                uniqueId: '1234567890'
+            }
+        };
+        it('should route to correct handler for fileConsentAccept', async () => {
+            let handlerCalled = false;
+
+            const app = new Application();
+            app.fileConsentAccept(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'accept');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await adapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should fail routing to handler for fileConsentAccept if declined', async () => {
+            let handlerCalled = false;
+            fileConsentCardResponse.action = 'decline';
+            const app = new Application();
+            app.fileConsentAccept(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'accept');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await adapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, false);
+            });
+        });
+    });
+
+    describe('fileConsentDecline', () => {
+        const fileConsentCardResponse: FileConsentCardResponse = {
+            action: 'decline',
+            context: {
+                theme: 'dark',
+                consentId: '1234567890'
+            },
+            uploadInfo: {
+                name: 'test.txt',
+                uploadUrl: 'https://test.com',
+                contentUrl: 'https://test.com',
+                uniqueId: '1234567890'
+            }
+        };
+        it('should route to correct handler for fileConsentDecline', async () => {
+            let handlerCalled = false;
+
+            const app = new Application();
+            app.fileConsentDecline(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'decline');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await adapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should fail routing to handler for fileConsentDecline if accepted', async () => {
+            let handlerCalled = false;
+            fileConsentCardResponse.action = 'accept';
+            const app = new Application();
+            app.fileConsentDecline(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'accept');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await adapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, false);
+            });
+        });
+    });
+
+    describe('O365ConnectorCardAction', () => {
+        it('should route to correct handler for O365ConnectorCardAction', async () => {
+            let handlerCalled = false;
+
+            const o365ConnectorCardActionQuery: O365ConnectorCardActionQuery = {
+                body: 'some results',
+                actionId: 'actionId'
+            };
+            const app = new Application();
+            app.O365ConnectorCardAction(async (context, _state, O365ConnectorCardActionQuery) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'actionableMessage/executeAction');
+                assert.equal(O365ConnectorCardActionQuery.body, 'some results');
+                assert.equal(O365ConnectorCardActionQuery.actionId, 'actionId');
+            });
+
+            const activity = createTestInvoke('actionableMessage/executeAction', o365ConnectorCardActionQuery);
+
+            await adapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+    });
+
     describe('messageUpdate', () => {
-        let mockApp: Application;
+        let app: Application;
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application({ adapter });
         });
         const messageUpdateEvents: { event: TeamsMessageEvents; testActivity: Partial<Activity> }[] = [
             {
@@ -416,7 +675,7 @@ describe('Application', () => {
         for (const { event, testActivity } of messageUpdateEvents) {
             it(`should route to correct handler for ${event}`, async () => {
                 let handlerCalled = false;
-                mockApp.messageEventUpdate(event, async (context, _state) => {
+                app.messageEventUpdate(event, async (context, _state) => {
                     handlerCalled = true;
                     switch (event) {
                         case 'editMessage':
@@ -434,7 +693,7 @@ describe('Application', () => {
                 });
 
                 await adapter.processActivity(testActivity, async (context) => {
-                    await mockApp.run(context);
+                    await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
             });
@@ -442,22 +701,22 @@ describe('Application', () => {
 
         it('should throw an error when handler is not a function', () => {
             assert.throws(
-                () => mockApp.messageEventUpdate('editMessage', 1 as any),
+                () => app.messageEventUpdate('editMessage', 1 as any),
                 new Error(`MessageUpdate 'handler' for editMessage is number. Type of 'handler' must be a function.`)
             );
         });
     });
 
     describe('teamsReadReceipt', () => {
-        let mockApp: Application;
+        let app: Application;
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application({ adapter });
         });
 
         it('should route to correct handler for teamsReadReceipt', async () => {
             let handlerCalled = false;
-            mockApp.teamsReadReceipt(async (context, _state, readReceiptInfo) => {
+            app.teamsReadReceipt(async (context, _state, readReceiptInfo) => {
                 handlerCalled = true;
                 assert.equal(context.activity.type, ActivityTypes.Event);
                 assert.equal(context.activity.name, 'application/vnd.microsoft/readReceipt');
@@ -473,7 +732,7 @@ describe('Application', () => {
             };
 
             await adapter.processActivity(testActivity, async (context) => {
-                await mockApp.run(context);
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
