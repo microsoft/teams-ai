@@ -6,51 +6,50 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-  - type: input
-    id: contact
-    attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
-    validations:
-      required: false
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
-    validations:
-      required: true
+        **Please note: any submissions with insufficient reproducible information will be marked as 'Waiting for customer input' and may be closed is there is no response**
   - type: dropdown
-    id: version
+    id: language
     attributes:
-      label: Version
-      description: What version of our software are you running?
+      label: Language
+      description: Which language are you using?
+      multiple: true
       options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
+        - Javascript/Typescript
+        - C#
+        - Python
       default: 0
     validations:
       required: true
-  - type: dropdown
-    id: browsers
+  - type: input
+    id: version
     attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
+      label: Version
+      description: Which version are you using?
+      placeholder: Version...
+      value: latest
+    validations:
+      required: true
   - type: textarea
-    id: logs
+    id: description
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: Shell
+      label: Description
+      description: Provide a clear and concise description of what the bug is.
+      placeholder: Description...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction Steps
+      description: How do you trigger this bug? Please walk us through it step by step.
+      value: |
+        1.
+        2.
+        3.
+        ...
+      render: bash
+    validations:
+      required: true
   - type: checkboxes
     id: terms
     attributes:
