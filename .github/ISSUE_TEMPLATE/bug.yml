@@ -2,7 +2,7 @@ name: Bug Report
 description: File a bug report
 title: "[Bug]: "
 labels: ["bug"]
-projects: ["microsoft/teams-ai"]
+projects: ["microsoft/719"]
 body:
   - type: markdown
     attributes:
