@@ -119,6 +119,8 @@ planner.prompts.addDataSource(
     new VectraDataSource({
         name: 'teams-ai',
         apiKey: process.env.OPENAI_KEY!,
+        azureApiKey: process.env.AZURE_OPENAI_KEY!,
+        azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
         indexFolder: path.join(__dirname, '../index')
     })
 );
