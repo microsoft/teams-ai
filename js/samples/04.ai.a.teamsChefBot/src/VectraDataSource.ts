@@ -18,6 +18,12 @@ export interface VectraDataSourceOptions {
     apiKey: string;
 
     /**
+     * Azure OpenAI API key to use as alternative way for generating embeddings.
+     */
+    azureApiKey: string;
+    azureEndpoint: string;
+
+    /**
      * Path to the folder containing the local index.
      * @remarks
      * This should be the root folder for all local indexes and the index itself
