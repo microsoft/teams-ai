@@ -78,7 +78,12 @@ export class VectraDataSource implements DataSource {
         // Create embeddings model
         const embeddings = new OpenAIEmbeddings({
             model: 'text-embedding-ada-002',
-            apiKey: options.apiKey
+            apiKey: options.apiKey,
+            
+            // Azure OpenAI Support
+            azureApiKey: options.azureApiKey,
+            azureDeployment: 'embedding',
+            azureEndpoint: options.azureEndpoint,
         });
 
         // Create local index
