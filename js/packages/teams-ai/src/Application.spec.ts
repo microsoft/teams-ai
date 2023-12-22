@@ -3,6 +3,7 @@ import {
     Activity,
     ActivityTypes,
     Channels,
+    CloudAdapterBase,
     FileConsentCardResponse,
     MemoryStorage,
     MessageReactionTypes,
@@ -248,6 +249,100 @@ describe('Application', () => {
                     `The Application.authentication property is unavailable because no authentication options were configured.`
                 )
             );
+        });
+        class MockUserTokenClient {
+            /**
+             * Creates a new MockUserTokenClient.
+             * @param {boolean} returnMockToken returns a mock TokenResponse when true, undefined when false
+             * @param {boolean} getUserTokenError getUserToken throws an error when true
+             */
+            constructor(
+                readonly returnMockToken: boolean = true,
+                readonly getUserTokenError = false
+            ) {}
+            static readonly expectedToken = 'mockToken';
+            public async getUserToken(
+                _userId: string,
+                connectionName: string,
+                _channelId: string,
+                _magicCode: string
+            ): Promise<any> {
+                if (this.getUserTokenError) {
+                    throw new Error('MockUserTokenClient.getUserTokenError is true.');
+                }
+                if (this.returnMockToken) {
+                    return {
+                        channelId: Channels.Msteams,
+                        connectionName,
+                        token: MockUserTokenClient.expectedToken,
+                        expiration: '2050-01-01T00:00:00.000Z'
+                    };
+                } else {
+                    return undefined;
+                }
+            }
+            public async getSignInResource(
+                _connectionName: string,
+                _activity: Activity,
+                _finalRediect: string
+            ): Promise<any> {
+                return {};
+            }
+            public async signOutUser(_userId: string, _connectionName: string, _channelId: string): Promise<void> {
+                return;
+            }
+        }
+
+        it('should skip signin flow when user is already signed in.', async () => {
+            const app = new Application({
+                adapter,
+                botAppId: 'botid',
+                authentication: authenticationSettings
+            });
+
+            // Register a message handler for the 'signin' Text Activity
+            // so that app.run() resolves to true.
+            // Additionally, check to see that the user's token was set in TState by setTokenInState.
+            let signinMessageHandlerCalled: boolean = false;
+            app.message('signin', async (_context, state) => {
+                assert.equal(state.temp.authTokens[app.authentication.default], MockUserTokenClient.expectedToken);
+                signinMessageHandlerCalled = true;
+            });
+            await adapter.sendTextToBot('signin', async (context) => {
+                // Set MockUserTokenClient on context.turnState.
+                // Otherwise UserTokenAccess will throw an "OAuth prompt not supported" error
+                // and the test will fail.
+                context.turnState.set(
+                    (context.adapter as CloudAdapterBase).UserTokenClientKey,
+                    new MockUserTokenClient()
+                );
+                const handled = await app.run(context);
+                assert.equal(handled, true);
+                assert.equal(signinMessageHandlerCalled, true);
+            });
+        });
+
+        it('should throw an error when Authentication.signUserIn() throws an error.', async () => {
+            const app = new Application({
+                adapter,
+                botAppId: 'botid',
+                authentication: authenticationSettings
+            });
+
+            await adapter.sendTextToBot('signin', async (context) => {
+                // Set MockUserTokenClient on context.turnState.
+                // Otherwise UserTokenAccess will throw an "OAuth prompt not supported" error
+                // and the test will fail.
+                context.turnState.set(
+                    (context.adapter as CloudAdapterBase).UserTokenClientKey,
+                    // The second constructor parameter is true, which causes getUserToken() to throw an error.
+                    new MockUserTokenClient(undefined, true)
+                );
+                await assert.rejects(
+                    () => app.run(context),
+                    new Error('MockUserTokenClient.getUserTokenError is true.')
+                );
+            });
         });
     });
 
