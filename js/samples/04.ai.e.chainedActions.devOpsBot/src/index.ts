@@ -60,7 +60,6 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 // Set the onTurnError for the singleton CloudAdapter.
 adapter.onTurnError = onTurnErrorHandler;
 
-
 // Create HTTP server.
 const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
@@ -118,7 +117,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'sequence',
+    defaultPrompt: 'sequence'
 });
 
 // Define storage and application

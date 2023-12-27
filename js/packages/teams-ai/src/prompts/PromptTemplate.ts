@@ -6,9 +6,9 @@
  * Licensed under the MIT License.
  */
 
-import { PromptSection } from "./PromptSection";
+import { PromptSection } from './PromptSection';
 import { ChatCompletionAction } from '../models';
-import { Augmentation } from "../augmentations";
+import { Augmentation } from '../augmentations';
 
 /**
  * Prompt template cached by the prompt manager.

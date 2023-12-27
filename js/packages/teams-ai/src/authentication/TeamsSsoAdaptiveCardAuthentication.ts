@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { TurnContext } from "botbuilder-core";
-import { TokenResponse } from "botframework-schema";
-import { AdaptiveCardAuthenticationBase, AdaptiveCardLoginRequest } from "./AdaptiveCardAuthenticationBase";
+import { TurnContext } from 'botbuilder-core';
+import { TokenResponse } from 'botframework-schema';
+import { AdaptiveCardAuthenticationBase, AdaptiveCardLoginRequest } from './AdaptiveCardAuthenticationBase';
 
 /**
  * @internal
- * 
+ *
  * Handles authentication using Teams SSO for Adaptive Cards in Teams.
  */
 export class TeamsSsoAdaptiveCardAuthentication extends AdaptiveCardAuthenticationBase {
@@ -24,7 +24,7 @@ export class TeamsSsoAdaptiveCardAuthentication extends AdaptiveCardAuthenticati
     public async handleSsoTokenExchange(): Promise<never> {
         throw new Error('Not implemented');
     }
-    
+
     /**
      * Handles the user sign-in.
      * @param context - The turn context.
@@ -49,7 +49,9 @@ export class TeamsSsoAdaptiveCardAuthentication extends AdaptiveCardAuthenticati
      */
     public override isValidActivity(context: TurnContext): boolean {
         if (super.isValidActivity(context)) {
-            console.warn("TeamsSsoSetting does not support Adaptive Card authentication yet. Please use OAuthSetting instead.")
+            console.warn(
+                'TeamsSsoSetting does not support Adaptive Card authentication yet. Please use OAuthSetting instead.'
+            );
         }
         return false;
     }

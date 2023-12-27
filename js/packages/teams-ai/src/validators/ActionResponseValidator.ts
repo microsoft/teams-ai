@@ -1,10 +1,10 @@
-import { TurnContext } from "botbuilder";
-import { ChatCompletionAction, PromptResponse } from "../models";
-import { JSONResponseValidator } from "./JSONResponseValidator";
-import { PromptResponseValidator, Validation } from "./PromptResponseValidator";
-import { Tokenizer } from "../tokenizers";
-import { Message } from "../prompts";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { ChatCompletionAction, PromptResponse } from '../models';
+import { JSONResponseValidator } from './JSONResponseValidator';
+import { PromptResponseValidator, Validation } from './PromptResponseValidator';
+import { Tokenizer } from '../tokenizers';
+import { Message } from '../prompts';
+import { Memory } from '../MemoryFork';
 
 /**
  * A validated action call.
@@ -37,7 +37,12 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
      * @param noun Optional. Name of the action to use in feedback messages. Defaults to `action`.
      * @param Noun Optional. Name of the action to use in feedback messages. Defaults to `Action`.
      */
-    public constructor(actions: ChatCompletionAction[], isRequired: boolean, noun: string = 'action', Noun: string = 'Action') {
+    public constructor(
+        actions: ChatCompletionAction[],
+        isRequired: boolean,
+        noun: string = 'action',
+        Noun: string = 'Action'
+    ) {
         for (const action of actions) {
             this._actions.set(action.name, action);
         }
@@ -51,7 +56,7 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
      */
     public get actions(): ChatCompletionAction[] {
         const list: ChatCompletionAction[] = [];
-        this._actions.forEach(fn => list.push(fn));
+        this._actions.forEach((fn) => list.push(fn));
         return list;
     }
 
@@ -64,7 +69,13 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
      * @param remaining_attempts Number of remaining attempts to validate the response.
      * @returns A `Validation` object.
      */
-    public async validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<ValidatedChatCompletionAction>> {
+    public async validateResponse(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        response: PromptResponse<string>,
+        remaining_attempts: number
+    ): Promise<Validation<ValidatedChatCompletionAction>> {
         if (typeof response.message == 'object' && response.message.function_call) {
             // Ensure name is specified
             const function_call = response.message.function_call;
@@ -94,9 +105,15 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
                     `No arguments were sent with called ${this._noun}. Call the "${function_call.name}" ${this._noun} with required arguments as a valid JSON object.`,
                     `The ${this._noun} arguments had errors. Apply these fixes and call "${function_call.name}" ${this._noun} again:`
                 );
-                const args = function_call.arguments === '{}' ? undefined : function_call.arguments ?? '{}'
+                const args = function_call.arguments === '{}' ? undefined : function_call.arguments ?? '{}';
                 const message: Message = { role: 'assistant', content: args };
-                const result = await validator.validateResponse(context, memory, tokenizer, { status: 'success', message }, remaining_attempts);
+                const result = await validator.validateResponse(
+                    context,
+                    memory,
+                    tokenizer,
+                    { status: 'success', message },
+                    remaining_attempts
+                );
                 if (!result.valid) {
                     return result as Validation<ValidatedChatCompletionAction>;
                 } else {

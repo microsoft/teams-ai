@@ -19,9 +19,9 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.0.0",
-        "botbuilder": "^4.21.2",
-        "botbuilder-dialogs": "^4.21.2",
+        "@microsoft/teams-ai": "~1.0.1",
+        "botbuilder": "^4.21.3",
+        "botbuilder-dialogs": "^4.21.3",
         "dotenv": "^16.3.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0"
@@ -29,11 +29,11 @@
     "devDependencies": {
         "@types/dotenv": "8.2.0",
         "@types/jsonwebtoken": "^8.5.4",
-        "@types/restify": "8.5.11",
+        "@types/restify": "8.5.12",
         "nodemon": "~3.0.1",
         "rimraf": "^5.0.5",
-        "ts-node": "^10.9.1",
+        "ts-node": "^10.9.2",
         "tsc-watch": "^6.0.4",
-        "typescript": "^5.3.2"
+        "typescript": "^5.3.3"
     }
 }

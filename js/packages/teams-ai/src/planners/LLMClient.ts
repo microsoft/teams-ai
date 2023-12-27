@@ -6,13 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from "../prompts";
-import { PromptResponse, PromptCompletionModel } from "../models";
-import { Validation, PromptResponseValidator, DefaultResponseValidator } from "../validators";
-import { Memory, MemoryFork } from "../MemoryFork";
-import { Colorize } from "../internals";
-import { TurnContext } from "botbuilder";
-import { GPT3Tokenizer, Tokenizer } from "../tokenizers";
+import { ConversationHistory, Message, Prompt, PromptFunctions, PromptTemplate } from '../prompts';
+import { PromptResponse, PromptCompletionModel } from '../models';
+import { Validation, PromptResponseValidator, DefaultResponseValidator } from '../validators';
+import { Memory, MemoryFork } from '../MemoryFork';
+import { Colorize } from '../internals';
+import { TurnContext } from 'botbuilder';
+import { GPT3Tokenizer, Tokenizer } from '../tokenizers';
 
 /**
  * Options for an LLMClient instance.
@@ -133,7 +133,6 @@ export interface ConfiguredLLMClientOptions<TContent = any> {
 
 /**
  * LLMClient class that's used to complete prompts.
- *
  * @remarks
  * Each wave, at a minimum needs to be configured with a `client`, `prompt`, and `prompt_options`.
  *
@@ -191,13 +190,16 @@ export class LLMClient<TContent = any> {
      * @param options Options to configure the instance with.
      */
     public constructor(options: LLMClientOptions<TContent>) {
-        this.options = Object.assign({
-            history_variable: 'conversation.history',
-            input_variable: 'temp.input',
-            max_history_messages: 10,
-            max_repair_attempts: 3,
-            logRepairs: false
-        }, options) as ConfiguredLLMClientOptions<TContent>;
+        this.options = Object.assign(
+            {
+                history_variable: 'conversation.history',
+                input_variable: 'temp.input',
+                max_history_messages: 10,
+                max_repair_attempts: 3,
+                logRepairs: false
+            },
+            options
+        ) as ConfiguredLLMClientOptions<TContent>;
 
         // Create validator to use
         if (!this.options.validator) {
@@ -219,8 +221,8 @@ export class LLMClient<TContent = any> {
     public addFunctionResultToHistory(memory: Memory, name: string, results: any): void {
         // Convert content to string
         let content = '';
-        if (typeof results === "object") {
-            if (typeof results.toISOString == "function") {
+        if (typeof results === 'object') {
+            if (typeof results.toISOString == 'function') {
                 content = results.toISOString();
             } else {
                 content = JSON.stringify(results);
@@ -273,12 +275,23 @@ export class LLMClient<TContent = any> {
      * @param functions Functions to use when rendering the prompt.
      * @returns A `PromptResponse` with the status and message.
      */
-    public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions): Promise<PromptResponse<TContent>> {
-        const { model, template, tokenizer, validator, max_repair_attempts, history_variable, input_variable } = this.options;
+    public async completePrompt(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions
+    ): Promise<PromptResponse<TContent>> {
+        const { model, template, tokenizer, validator, max_repair_attempts, history_variable, input_variable } =
+            this.options;
 
         try {
             // Ask client to complete prompt
-            const response = await model.completePrompt(context, memory, functions, tokenizer, template) as PromptResponse<TContent>;
+            const response = (await model.completePrompt(
+                context,
+                memory,
+                functions,
+                tokenizer,
+                template
+            )) as PromptResponse<TContent>;
             if (response.status !== 'success') {
                 // The response isn't valid so we don't care that the messages type is potentially incorrect.
                 return response;
@@ -292,7 +305,13 @@ export class LLMClient<TContent = any> {
             }
 
             // Validate response
-            const validation = await validator.validateResponse(context, memory, tokenizer, response as PromptResponse<string>, max_repair_attempts);
+            const validation = await validator.validateResponse(
+                context,
+                memory,
+                tokenizer,
+                response as PromptResponse<string>,
+                max_repair_attempts
+            );
             if (validation.valid) {
                 // Update content
                 if (validation.hasOwnProperty('value')) {
@@ -320,7 +339,14 @@ export class LLMClient<TContent = any> {
             }
 
             // Attempt to repair response
-            const repair = await this.repairResponse(context, fork, functions, response, validation, max_repair_attempts);
+            const repair = await this.repairResponse(
+                context,
+                fork,
+                functions,
+                response,
+                validation,
+                max_repair_attempts
+            );
 
             // Log repair success
             if (this.options.logRepairs) {
@@ -351,6 +377,9 @@ export class LLMClient<TContent = any> {
     }
 
     /**
+     * @param memory
+     * @param variable
+     * @param input
      * @private
      */
     private addInputToHistory(memory: Memory, variable: string, input: Message<any>): void {
@@ -365,6 +394,9 @@ export class LLMClient<TContent = any> {
     }
 
     /**
+     * @param memory
+     * @param variable
+     * @param message
      * @private
      */
     private addResponseToHistory(memory: Memory, variable: string, message: Message<TContent>): void {
@@ -379,9 +411,22 @@ export class LLMClient<TContent = any> {
     }
 
     /**
+     * @param context
+     * @param fork
+     * @param functions
+     * @param response
+     * @param validation
+     * @param remaining_attempts
      * @private
      */
-    private async repairResponse(context: TurnContext, fork: MemoryFork, functions: PromptFunctions, response: PromptResponse<TContent>, validation: Validation, remaining_attempts: number): Promise<PromptResponse<TContent>> {
+    private async repairResponse(
+        context: TurnContext,
+        fork: MemoryFork,
+        functions: PromptFunctions,
+        response: PromptResponse<TContent>,
+        validation: Validation,
+        remaining_attempts: number
+    ): Promise<PromptResponse<TContent>> {
         const { model, template, tokenizer, validator, history_variable } = this.options;
 
         // Add response and feedback to repair history
@@ -391,12 +436,8 @@ export class LLMClient<TContent = any> {
 
         // Append repair history to prompt
         const repairTemplate = Object.assign({}, template, {
-            prompt: new Prompt([
-                template.prompt,
-                new ConversationHistory(`${history_variable}-repair`)
-            ])
+            prompt: new Prompt([template.prompt, new ConversationHistory(`${history_variable}-repair`)])
         });
-
 
         // Log the repair
         if (this.options.logRepairs) {
@@ -404,13 +445,25 @@ export class LLMClient<TContent = any> {
         }
 
         // Ask client to complete prompt
-        const repairResponse = await model.completePrompt(context, fork, functions, tokenizer, repairTemplate) as PromptResponse<TContent>;
+        const repairResponse = (await model.completePrompt(
+            context,
+            fork,
+            functions,
+            tokenizer,
+            repairTemplate
+        )) as PromptResponse<TContent>;
         if (repairResponse.status !== 'success') {
             return repairResponse as PromptResponse<TContent>;
         }
 
         // Validate response
-        validation = await validator.validateResponse(context, fork, tokenizer, repairResponse as PromptResponse<string>, remaining_attempts);
+        validation = await validator.validateResponse(
+            context,
+            fork,
+            tokenizer,
+            repairResponse as PromptResponse<string>,
+            remaining_attempts
+        );
         if (validation.valid) {
             // Update content
             if (validation.hasOwnProperty('value')) {

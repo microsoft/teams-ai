@@ -95,7 +95,7 @@ describe('Authentication', () => {
                 auth: {
                     clientId: 'id',
                     clientSecret: 'secret',
-                    authority: 'authority',
+                    authority: 'authority'
                 }
             }
         } as TeamsSsoSettings;

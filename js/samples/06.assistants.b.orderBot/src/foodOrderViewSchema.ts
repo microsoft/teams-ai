@@ -7,10 +7,9 @@ export type OrderItem = Pizza | Beer | Salad | NamedPizza;
 
 // Use this type for order items that match nothing else
 export interface UnknownText {
-    itemType: 'unknown',
+    itemType: 'unknown';
     text: string; // The text that wasn't understood
 }
-
 
 export type Pizza = {
     itemType: 'pizza';
@@ -23,11 +22,10 @@ export type Pizza = {
     // default: 1
     quantity?: number;
     // used if the requester references a pizza by name
-    name?: "Hawaiian" | "Yeti" | "Pig In a Forest" | "Cherry Bomb";
+    name?: 'Hawaiian' | 'Yeti' | 'Pig In a Forest' | 'Cherry Bomb';
 };
 
-export interface NamedPizza extends Pizza {
-}
+export interface NamedPizza extends Pizza {}
 
 export type Beer = {
     itemType: 'beer';
@@ -54,4 +52,3 @@ export type Salad = {
     // default: 1
     quantity?: number;
 };
-

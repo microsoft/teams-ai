@@ -15,7 +15,7 @@ export interface EmbeddingsModel {
      * @param inputs Text inputs to create embeddings for.
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
-    createEmbeddings(inputs: string|string[]): Promise<EmbeddingsResponse>;
+    createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse>;
 }
 
 /**

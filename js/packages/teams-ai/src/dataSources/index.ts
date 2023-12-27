@@ -6,5 +6,5 @@
  * Licensed under the MIT License.
  */
 
-export * from "./DataSource";
-export * from "./TextDataSource";
+export * from './DataSource';
+export * from './TextDataSource';

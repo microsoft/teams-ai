@@ -28,9 +28,14 @@ export class TestPromptManager extends PromptManager {
      * @param options Optional. Options used to configure the prompt manager.
      */
     public constructor(options: Partial<TestPromptManagerOptions> = {}) {
-        super(Object.assign({
-            promptsFolder: 'test',
-        } as PromptManagerOptions, options));
+        super(
+            Object.assign(
+                {
+                    promptsFolder: 'test'
+                } as PromptManagerOptions,
+                options
+            )
+        );
 
         // Add any pre-defined prompts
         if (Array.isArray(options.prompts)) {
@@ -39,6 +44,7 @@ export class TestPromptManager extends PromptManager {
     }
 
     /**
+     * @param name
      * @private
      */
     public override getPrompt(name: string): Promise<PromptTemplate> {
@@ -48,4 +54,3 @@ export class TestPromptManager extends PromptManager {
         return super.getPrompt(name);
     }
 }
-

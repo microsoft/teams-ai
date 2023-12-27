@@ -6,13 +6,13 @@
  * Licensed under the MIT License.
  */
 
-import { Message, FunctionCall } from "./Message";
-import { PromptFunctions } from "./PromptFunctions";
-import { RenderedPromptSection } from "./PromptSection";
-import { PromptSectionBase } from "./PromptSectionBase";
-import { TurnContext } from "botbuilder";
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
+import { Message, FunctionCall } from './Message';
+import { PromptFunctions } from './PromptFunctions';
+import { RenderedPromptSection } from './PromptSection';
+import { PromptSectionBase } from './PromptSectionBase';
+import { TurnContext } from 'botbuilder';
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * An `assistant` message containing a function to call.
@@ -40,15 +40,31 @@ export class FunctionCallMessage extends PromptSectionBase {
     }
 
     /**
+     * @param context
+     * @param memory
+     * @param functions
+     * @param tokenizer
+     * @param maxTokens
      * @private
      */
-    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>> {
+    public async renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message[]>> {
         // Calculate and cache response text and length
         if (this._length < 0) {
             this._length = tokenizer.encode(JSON.stringify(this.function_call)).length;
         }
 
         // Return output
-        return this.returnMessages([{ role: 'assistant', content: undefined, function_call: this.function_call }], this._length, tokenizer, maxTokens);
+        return this.returnMessages(
+            [{ role: 'assistant', content: undefined, function_call: this.function_call }],
+            this._length,
+            tokenizer,
+            maxTokens
+        );
     }
 }

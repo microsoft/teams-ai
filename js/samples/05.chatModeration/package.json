@@ -19,9 +19,9 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.0.0",
+        "@microsoft/teams-ai": "~1.0.1",
         "axios": "^1.6.2",
-        "botbuilder": "^4.21.2",
+        "botbuilder": "^4.21.3",
         "dotenv": "^16.3.1",
         "jsonwebtoken": "^9.0.2",
         "replace": "~1.2.0",
@@ -30,10 +30,10 @@
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/jsonwebtoken": "^9.0.4",
-        "@types/restify": "8.5.11",
+        "@types/restify": "8.5.12",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
-        "ts-node": "^10.9.1",
-        "typescript": "^5.3.2"
+        "ts-node": "^10.9.2",
+        "typescript": "^5.3.3"
     }
 }

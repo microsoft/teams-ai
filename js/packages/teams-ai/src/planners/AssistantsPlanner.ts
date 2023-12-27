@@ -75,10 +75,13 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @param options Options for configuring the AssistantsPlanner.
      */
     public constructor(options: AssistantsPlannerOptions) {
-        this._options = Object.assign({
-            polling_interval: DEFAULT_POLLING_INTERVAL,
-            assistants_state_variable: DEFAULT_ASSISTANTS_STATE_VARIABLE
-        }, options);
+        this._options = Object.assign(
+            {
+                polling_interval: DEFAULT_POLLING_INTERVAL,
+                assistants_state_variable: DEFAULT_ASSISTANTS_STATE_VARIABLE
+            },
+            options
+        );
         this._openai = new OpenAI({
             apiKey: this._options.apiKey
         });
@@ -146,7 +149,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
      * @param request Definition of the assistant to create.
      * @returns The created assistant.
      */
-    public static async createAssistant(apiKey: string, request: OpenAI.Beta.Assistants.AssistantCreateParams): Promise<OpenAI.Beta.Assistants.Assistant> {
+    public static async createAssistant(
+        apiKey: string,
+        request: OpenAI.Beta.Assistants.AssistantCreateParams
+    ): Promise<OpenAI.Beta.Assistants.Assistant> {
         const openai = new OpenAI({
             apiKey
         });
@@ -168,14 +174,20 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
+     * @param body
      * @private
      * Exposed for unit testing.
      */
-    protected async createMessage(thread_id: string, body: OpenAI.Beta.Threads.Messages.MessageCreateParams): Promise<OpenAI.Beta.Threads.Messages.ThreadMessage> {
+    protected async createMessage(
+        thread_id: string,
+        body: OpenAI.Beta.Threads.Messages.MessageCreateParams
+    ): Promise<OpenAI.Beta.Threads.Messages.ThreadMessage> {
         return await this.openai.beta.threads.messages.create(thread_id, body);
     }
 
     /**
+     * @param request
      * @private
      * Exposed for unit testing.
      */
@@ -184,6 +196,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
      * @private
      * Exposed for unit testing.
      */
@@ -192,34 +205,32 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
      * @private
      * Exposed for unit testing.
      */
     protected async createRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run> {
-        return await this.openai.beta.threads.runs.create(
-            thread_id,
-            {
-              assistant_id: this._options.assistant_id
-            }
-        );
+        return await this.openai.beta.threads.runs.create(thread_id, {
+            assistant_id: this._options.assistant_id
+        });
     }
 
     /**
+     * @param thread_id
+     * @param run_id
      * @private
      * Exposed for unit testing.
      */
     protected async retrieveRun(thread_id: string, run_id: string): Promise<OpenAI.Beta.Threads.Runs.Run> {
-        return await this.openai.beta.threads.runs.retrieve(
-            thread_id,
-            run_id
-        );
+        return await this.openai.beta.threads.runs.retrieve(thread_id, run_id);
     }
 
     /**
+     * @param thread_id
      * @private
      * Exposed for unit testing.
      */
-    protected async retrieveLastRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run|null> {
+    protected async retrieveLastRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run | null> {
         const list = await this.openai.beta.threads.runs.list(thread_id, { limit: 1 });
         if (list.data.length > 0) {
             return list.data[0];
@@ -229,14 +240,22 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
+     * @param run_id
+     * @param tool_outputs
      * @private
      * Exposed for unit testing.
      */
-    protected async submitToolOutputs(thread_id: string, run_id: string, tool_outputs: OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams): Promise<OpenAI.Beta.Threads.Runs.Run> {
+    protected async submitToolOutputs(
+        thread_id: string,
+        run_id: string,
+        tool_outputs: OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams
+    ): Promise<OpenAI.Beta.Threads.Runs.Run> {
         return await this.openai.beta.threads.runs.submitToolOutputs(thread_id, run_id, tool_outputs);
     }
 
     /**
+     * @param run
      * @private
      */
     private isRunCompleted(run: OpenAI.Beta.Threads.Runs.Run): boolean {
@@ -252,12 +271,19 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
+     * @param run_id
+     * @param handleActions
      * @private
      */
-    private async waitForRun(thread_id: string, run_id: string, handleActions = false): Promise<OpenAI.Beta.Threads.Runs.Run> {
+    private async waitForRun(
+        thread_id: string,
+        run_id: string,
+        handleActions = false
+    ): Promise<OpenAI.Beta.Threads.Runs.Run> {
         // Wait for the run to complete
         while (true) {
-            await new Promise(resolve => setTimeout(resolve, this._options.polling_interval));
+            await new Promise((resolve) => setTimeout(resolve, this._options.polling_interval));
 
             const run = await this.retrieveRun(thread_id, run_id);
             switch (run.status) {
@@ -276,6 +302,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param context
+     * @param state
+     * @param ai
      * @private
      */
     private async submitActionResults(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
@@ -284,7 +313,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
         // Map the action outputs to tool outputs
         const actionOutputs = state.temp.actionOutputs;
-        const tool_map = state.getValue(SUBMIT_TOOL_OUTPUTS_MAP) as {[key: string]: string};
+        const tool_map = state.getValue(SUBMIT_TOOL_OUTPUTS_MAP) as { [key: string]: string };
         const tool_outputs: OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams.ToolOutput[] = [];
         for (const action in actionOutputs) {
             const output = actionOutputs[action];
@@ -312,7 +341,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             case 'cancelled':
                 return { type: 'plan', commands: [] };
             case 'expired':
-                return { type: 'plan', commands: [{type: 'DO', action: AI.TooManyStepsActionName} as PredictedDoCommand] };
+                return {
+                    type: 'plan',
+                    commands: [{ type: 'DO', action: AI.TooManyStepsActionName } as PredictedDoCommand]
+                };
             default:
                 throw new Error(
                     `Run failed ${results.status}. ErrorCode: ${results.last_error?.code}. ErrorMessage: ${results.last_error?.message}`
@@ -321,6 +353,9 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param context
+     * @param state
+     * @param ai
      * @private
      */
     private async submitUserInput(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan> {
@@ -349,7 +384,10 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             case 'cancelled':
                 return { type: 'plan', commands: [] };
             case 'expired':
-                return { type: 'plan', commands: [{type: 'DO', action: AI.TooManyStepsActionName} as PredictedDoCommand] };
+                return {
+                    type: 'plan',
+                    commands: [{ type: 'DO', action: AI.TooManyStepsActionName } as PredictedDoCommand]
+                };
             default:
                 throw new Error(
                     `Run failed ${results.status}. ErrorCode: ${results.last_error?.code}. ErrorMessage: ${results.last_error?.message}`
@@ -358,12 +396,14 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param state
+     * @param required_action
      * @private
      */
     private generatePlanFromTools(state: TState, required_action: OpenAI.Beta.Threads.Runs.Run.RequiredAction): Plan {
         const plan: Plan = { type: 'plan', commands: [] };
-        const tool_map: {[key: string]: string} = {};
-        required_action.submit_tool_outputs.tool_calls.forEach(tool_call => {
+        const tool_map: { [key: string]: string } = {};
+        required_action.submit_tool_outputs.tool_calls.forEach((tool_call) => {
             tool_map[tool_call.function.name] = tool_call.id;
             plan.commands.push({
                 type: 'DO',
@@ -376,6 +416,8 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
+     * @param last_message_id
      * @private
      */
     private async generatePlanFromMessages(thread_id: string, last_message_id: string): Promise<Plan> {
@@ -396,8 +438,8 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
 
         // Convert the messages to SAY commands
         const plan: Plan = { type: 'plan', commands: [] };
-        newMessages.forEach(message => {
-            message.content.forEach(content => {
+        newMessages.forEach((message) => {
+            message.content.forEach((content) => {
                 if (content.type == 'text') {
                     plan.commands.push({
                         type: 'SAY',
@@ -410,6 +452,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param state
      * @private
      */
     private ensureAssistantsState(state: TState): AssistantsState {
@@ -425,6 +468,8 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param state
+     * @param assistants_state
      * @private
      */
     private updateAssistantsState(state: TState, assistants_state: AssistantsState): void {
@@ -432,6 +477,8 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param state
+     * @param input
      * @private
      */
     private async ensureThreadCreated(state: TState, input: string): Promise<string> {
@@ -446,6 +493,7 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
     }
 
     /**
+     * @param thread_id
      * @private
      */
     private async blockOnInProgressRuns(thread_id: string): Promise<void> {
@@ -460,14 +508,13 @@ export class AssistantsPlanner<TState extends TurnState = TurnState> implements 
             await this.waitForRun(thread_id, run.id);
         }
     }
-
 }
 
 /**
  * @private
  */
 interface AssistantsState {
-    thread_id: string|null;
-    run_id: string|null;
-    last_message_id: string|null;
+    thread_id: string | null;
+    run_id: string | null;
+    last_message_id: string | null;
 }

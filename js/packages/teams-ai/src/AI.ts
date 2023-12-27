@@ -357,7 +357,7 @@ export class AI<TState extends TurnState = TurnState> {
                 const entry = this._actions.get(n);
                 if (entry!.allowOverrides) {
                     entry!.handler = handler;
-                    entry!.allowOverrides = false;  // Only override once
+                    entry!.allowOverrides = false; // Only override once
                 } else {
                     throw new Error(
                         `The AI.action() method was called with a previously registered action named "${n}".`

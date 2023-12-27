@@ -16,30 +16,28 @@ import {
     tokenExchangeOperationName,
     verifyStateOperationName,
     TokenResponse
-} from "botbuilder-core";
-import { DialogSet, DialogState, DialogTurnStatus } from "botbuilder-dialogs";
-import {
-    TeamsSsoPrompt
-} from "./TeamsBotSsoPrompt";
-import * as sinon from "sinon";
-import * as assert from "assert";
-import { promisify } from "util";
-import { AuthenticationResult, ConfidentialClientApplication } from "@azure/msal-node";
-import { TeamsSsoSettings } from "./TeamsSsoSettings";
+} from 'botbuilder-core';
+import { DialogSet, DialogState, DialogTurnStatus } from 'botbuilder-dialogs';
+import { TeamsSsoPrompt } from './TeamsBotSsoPrompt';
+import * as sinon from 'sinon';
+import * as assert from 'assert';
+import { promisify } from 'util';
+import { AuthenticationResult, ConfidentialClientApplication } from '@azure/msal-node';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
 
-describe("TeamsSsoPrompt", () => {
+describe('TeamsSsoPrompt', () => {
     const sleep = promisify(setTimeout);
 
-    const clientId = "fake_client_id";
-    const clientSecret = "fake_client_secret";
-    const tenantId = "fake_tenant";
-    const initiateLoginEndpoint = "fake_initiate_login_endpoint";
+    const clientId = 'fake_client_id';
+    const clientSecret = 'fake_client_secret';
+    const tenantId = 'fake_tenant';
+    const initiateLoginEndpoint = 'fake_initiate_login_endpoint';
 
-    const TeamsBotSsoPromptId = "TEAMS_BOT_SSO_PROMPT";
-    const requiredScopes: string[] = ["User.Read"];
-    const invokeResponseActivityType = "invokeResponse";
-    const id = "fake_id";
-    const exchangeToken = "fake_exchange_token";
+    const TeamsBotSsoPromptId = 'TEAMS_BOT_SSO_PROMPT';
+    const requiredScopes: string[] = ['User.Read'];
+    const invokeResponseActivityType = 'invokeResponse';
+    const id = 'fake_id';
+    const exchangeToken = 'fake_exchange_token';
 
     /**
      * {
@@ -62,22 +60,19 @@ describe("TeamsSsoPrompt", () => {
      */
     const ssoToken =
         // eslint-disable-next-line no-secrets/no-secrets
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ0ZXN0X2F1ZGllbmNlIiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5taWNyb3NvZnRvbmxpbmUuY29tL3Rlc3RfYWFkX2lkL3YyLjAiLCJpYXQiOjE1MzcyMzEwNDgsIm5iZiI6MTUzNzIzMTA0OCwiZXhwIjoxNTM3MjM0OTQ4LCJhaW8iOiJ0ZXN0X2FpbyIsIm5hbWUiOiJNT0RTIFRvb2xraXQgU0RLIFVuaXQgVGVzdCIsIm9pZCI6IjExMTExMTExLTIyMjItMzMzMy00NDQ0LTU1NTU1NTU1NTU1NSIsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RAbWljcm9zb2Z0LmNvbSIsInJoIjoidGVzdF9yaCIsInNjcCI6ImFjY2Vzc19hc191c2VyIiwic3ViIjoidGVzdF9zdWIiLCJ0aWQiOiJ0ZXN0X3RlbmFudF9pZCIsInV0aSI6InRlc3RfdXRpIiwidmVyIjoiMi4wIn0.SshbL1xuE1aNZD5swrWOQYgTR9QCNXkZqUebautBvKM";
-    const tokenExpiration = "2023-01-01T00:00:00.000Z";
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ0ZXN0X2F1ZGllbmNlIiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5taWNyb3NvZnRvbmxpbmUuY29tL3Rlc3RfYWFkX2lkL3YyLjAiLCJpYXQiOjE1MzcyMzEwNDgsIm5iZiI6MTUzNzIzMTA0OCwiZXhwIjoxNTM3MjM0OTQ4LCJhaW8iOiJ0ZXN0X2FpbyIsIm5hbWUiOiJNT0RTIFRvb2xraXQgU0RLIFVuaXQgVGVzdCIsIm9pZCI6IjExMTExMTExLTIyMjItMzMzMy00NDQ0LTU1NTU1NTU1NTU1NSIsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3RAbWljcm9zb2Z0LmNvbSIsInJoIjoidGVzdF9yaCIsInNjcCI6ImFjY2Vzc19hc191c2VyIiwic3ViIjoidGVzdF9zdWIiLCJ0aWQiOiJ0ZXN0X3RlbmFudF9pZCIsInV0aSI6InRlc3RfdXRpIiwidmVyIjoiMi4wIn0.SshbL1xuE1aNZD5swrWOQYgTR9QCNXkZqUebautBvKM';
+    const tokenExpiration = '2023-01-01T00:00:00.000Z';
     const timeoutValue = 50;
     const sleepTimeOffset: number = timeoutValue + 20;
     enum SsoLogInResult {
-        Success = "Success",
-        Fail = "Fail",
+        Success = 'Success',
+        Fail = 'Fail'
     }
     const sandbox = sinon.createSandbox();
 
     beforeEach(function () {
         // Mock onBehalfOfUserCredential implementation
-        const msal_acquireTokenOBO = sandbox.stub(
-            ConfidentialClientApplication.prototype,
-            "acquireTokenOnBehalfOf"
-        );
+        const msal_acquireTokenOBO = sandbox.stub(ConfidentialClientApplication.prototype, 'acquireTokenOnBehalfOf');
         msal_acquireTokenOBO.onCall(0).throws();
         msal_acquireTokenOBO.onCall(1).callsFake(async () => {
             return Promise.resolve({
@@ -91,13 +86,13 @@ describe("TeamsSsoPrompt", () => {
         sandbox.restore();
     });
 
-    it("teams bot sso prompt should be able to sign user in and get exchange tokens when consent", async function () {
+    it('teams bot sso prompt should be able to sign user in and get exchange tokens when consent', async function () {
         this.timeout(500);
 
         const adapter: TestAdapter = await initializeTestEnv();
 
         await adapter
-            .send("Hello")
+            .send('Hello')
             .assertReply((activity) => {
                 // Assert bot send out OAuthCard
                 assertTeamsSsoOauthCardActivity(activity);
@@ -111,7 +106,7 @@ describe("TeamsSsoPrompt", () => {
                 assert.strictEqual(activity.value.status, StatusCodes.PRECONDITION_FAILED);
                 assert.strictEqual(
                     activity.value.body.failureDetail,
-                    "The bot is unable to exchange token. Ask for user consent."
+                    'The bot is unable to exchange token. Ask for user consent.'
                 );
 
                 // Mock Teams sends signin/verifyState message after user consent back to the bot
@@ -142,15 +137,15 @@ describe("TeamsSsoPrompt", () => {
                 // Assert prompt result has exchanged token and sso token.
                 const result = JSON.parse(activity.text as string) as TokenResponse;
                 assert.strictEqual(result.token, exchangeToken);
-                assert.strictEqual(result.expiration, tokenExpiration)
+                assert.strictEqual(result.expiration, tokenExpiration);
             });
     });
 
-    it("teams bot sso prompt should timeout with teams verification invoke activity when wait a long time", async function () {
+    it('teams bot sso prompt should timeout with teams verification invoke activity when wait a long time', async function () {
         const adapter: TestAdapter = await initializeTestEnv(timeoutValue);
 
         await adapter
-            .send("Hello")
+            .send('Hello')
             .assertReply((activity) => {
                 // Assert bot send out OAuthCard
                 assertTeamsSsoOauthCardActivity(activity);
@@ -164,7 +159,7 @@ describe("TeamsSsoPrompt", () => {
                 assert.strictEqual(activity.value.status, StatusCodes.PRECONDITION_FAILED);
                 assert.strictEqual(
                     activity.value.body.failureDetail,
-                    "The bot is unable to exchange token. Ask for user consent."
+                    'The bot is unable to exchange token. Ask for user consent.'
                 );
 
                 await sleep(sleepTimeOffset);
@@ -177,11 +172,11 @@ describe("TeamsSsoPrompt", () => {
             .assertReply(SsoLogInResult.Fail);
     });
 
-    it("teams bot sso prompt should timeout with token exchange activity when wait a long time", async function () {
+    it('teams bot sso prompt should timeout with token exchange activity when wait a long time', async function () {
         const adapter: TestAdapter = await initializeTestEnv(timeoutValue);
 
         await adapter
-            .send("Hello")
+            .send('Hello')
             .assertReply(async (activity) => {
                 // Assert bot send out OAuthCard
                 assertTeamsSsoOauthCardActivity(activity);
@@ -194,11 +189,11 @@ describe("TeamsSsoPrompt", () => {
             .assertReply(SsoLogInResult.Fail);
     });
 
-    it("teams bot sso prompt should timeout with message activity when wait a long time", async function () {
+    it('teams bot sso prompt should timeout with message activity when wait a long time', async function () {
         const adapter: TestAdapter = await initializeTestEnv(timeoutValue);
 
         await adapter
-            .send("Hello")
+            .send('Hello')
             .assertReply(async (activity) => {
                 // Assert bot send out OAuthCard
                 assertTeamsSsoOauthCardActivity(activity);
@@ -207,41 +202,41 @@ describe("TeamsSsoPrompt", () => {
 
                 // Mock message activity sent to the bot
                 const messageActivity: Partial<Activity> = createReply(ActivityTypes.Message, activity);
-                messageActivity.text = "message sent to bot.";
+                messageActivity.text = 'message sent to bot.';
                 adapter.send(messageActivity);
             })
             .assertReply(SsoLogInResult.Fail);
     });
 
-    it("teams bot sso prompt should end on invalid message when endOnInvalidMessage default to true", async function () {
+    it('teams bot sso prompt should end on invalid message when endOnInvalidMessage default to true', async function () {
         const adapter: TestAdapter = await initializeTestEnv(undefined);
 
         await adapter
-            .send("Hello")
+            .send('Hello')
             .assertReply((activity) => {
                 // Assert bot send out OAuthCard
                 assertTeamsSsoOauthCardActivity(activity);
 
                 // Mock User send invalid message
                 const messageActivity = createReply(ActivityTypes.Message, activity);
-                messageActivity.text = "user sends invalid message during auth flow";
+                messageActivity.text = 'user sends invalid message during auth flow';
                 adapter.send(messageActivity);
             })
             .assertReply(SsoLogInResult.Fail);
     });
 
-    it("teams bot sso prompt should not end on invalid message when endOnInvalidMessage set to false", async function () {
+    it('teams bot sso prompt should not end on invalid message when endOnInvalidMessage set to false', async function () {
         const adapter: TestAdapter = await initializeTestEnv(undefined, false);
 
         await adapter
-            .send("Hello")
+            .send('Hello')
             .assertReply((activity) => {
                 // Assert bot send out OAuthCard
                 assertTeamsSsoOauthCardActivity(activity);
 
                 // Mock User send invalid message, wchich should be ignored.
                 const messageActivity = createReply(ActivityTypes.Message, activity);
-                messageActivity.text = "user sends invalid message during auth flow";
+                messageActivity.text = 'user sends invalid message during auth flow';
                 adapter.send(messageActivity);
 
                 // Mock Teams sends signin/tokenExchange message with SSO token back to the bot
@@ -253,7 +248,7 @@ describe("TeamsSsoPrompt", () => {
                 assert.strictEqual(activity.value.status, StatusCodes.PRECONDITION_FAILED);
                 assert.strictEqual(
                     activity.value.body.failureDetail,
-                    "The bot is unable to exchange token. Ask for user consent."
+                    'The bot is unable to exchange token. Ask for user consent.'
                 );
 
                 // Mock Teams sends signin/verifyState message after user consent back to the bot
@@ -284,21 +279,23 @@ describe("TeamsSsoPrompt", () => {
                 // Assert prompt result has exchanged token and sso token.
                 const result = JSON.parse(activity.text as string) as TokenResponse;
                 assert.strictEqual(result.token, exchangeToken);
-                assert.strictEqual(result.expiration, tokenExpiration)
+                assert.strictEqual(result.expiration, tokenExpiration);
             });
     });
 
-    it("teams bot sso prompt should only work in MS Teams Channel", async function () {
+    it('teams bot sso prompt should only work in MS Teams Channel', async function () {
         const adapter: TestAdapter = await initializeTestEnv(undefined, undefined, Channels.Test);
 
-        await adapter.send("Hello").catch((error) => {
-            assert.strictEqual(
-                error.message,
-                "Teams Bot SSO Prompt is only supported in MS Teams Channel"
-            );
+        await adapter.send('Hello').catch((error) => {
+            assert.strictEqual(error.message, 'Teams Bot SSO Prompt is only supported in MS Teams Channel');
         });
     });
 
+    /**
+     *
+     * @param type
+     * @param activity
+     */
     function createReply(type: ActivityTypes, activity: Partial<Activity>): Partial<Activity> {
         return {
             type: type,
@@ -311,12 +308,16 @@ describe("TeamsSsoPrompt", () => {
                 isGroup: activity.conversation!.isGroup,
                 id: activity.conversation!.id,
                 name: activity.conversation!.name,
-                conversationType: "personal",
-                tenantId: tenantId,
-            },
+                conversationType: 'personal',
+                tenantId: tenantId
+            }
         };
     }
 
+    /**
+     *
+     * @param activity
+     */
     function assertTeamsSsoOauthCardActivity(activity: Partial<Activity>): void {
         assert.equal(Array.isArray(activity.attachments), true);
         assert.strictEqual(activity.attachments?.length, 1);
@@ -324,16 +325,21 @@ describe("TeamsSsoPrompt", () => {
         assert.strictEqual(activity.inputHint, InputHints.AcceptingInput);
 
         assert.strictEqual(activity.attachments![0].content.buttons[0].type, ActionTypes.Signin);
-        assert.strictEqual(activity.attachments![0].content.buttons[0].title, "Teams SSO Sign In");
+        assert.strictEqual(activity.attachments![0].content.buttons[0].title, 'Teams SSO Sign In');
 
         assert.strictEqual(
             activity.attachments![0].content.buttons[0].value,
             `${initiateLoginEndpoint}?scope=${encodeURI(
-                requiredScopes.join(" ")
+                requiredScopes.join(' ')
             )}&clientId=${clientId}&tenantId=${tenantId}`
         );
     }
 
+    /**
+     *
+     * @param adapter
+     * @param activity
+     */
     function mockTeamsSendsTokenExchangeInvokeActivityWithSsoToken(
         adapter: TestAdapter,
         activity: Partial<Activity>
@@ -342,7 +348,7 @@ describe("TeamsSsoPrompt", () => {
         invokeActivity.name = tokenExchangeOperationName;
         invokeActivity.value = {
             id: id,
-            token: ssoToken,
+            token: ssoToken
         };
         adapter.send(invokeActivity);
     }
@@ -362,8 +368,7 @@ describe("TeamsSsoPrompt", () => {
         const convoState: ConversationState = new ConversationState(new MemoryStorage());
 
         // Create a DialogState property, DialogSet and TeamsBotSsoPrompt
-        const dialogState: StatePropertyAccessor<DialogState> =
-            convoState.createProperty("dialogState");
+        const dialogState: StatePropertyAccessor<DialogState> = convoState.createProperty('dialogState');
         const dialogs: DialogSet = new DialogSet(dialogState);
         const settings: TeamsSsoSettings = {
             scopes: requiredScopes,
@@ -376,11 +381,11 @@ describe("TeamsSsoPrompt", () => {
                 }
             },
             timeout: timeout_value,
-            endOnInvalidMessage: endOnInvalidMessage,
+            endOnInvalidMessage: endOnInvalidMessage
         };
 
         const msal = new ConfidentialClientApplication(settings.msalConfig);
-        dialogs.add(new TeamsSsoPrompt(TeamsBotSsoPromptId, "test_setting", settings, msal));
+        dialogs.add(new TeamsSsoPrompt(TeamsBotSsoPromptId, 'test_setting', settings, msal));
 
         // Initialize TestAdapter.
         const adapter: TestAdapter = new TestAdapter(async (turnContext) => {
