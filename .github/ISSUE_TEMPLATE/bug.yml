@@ -1,0 +1,53 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+projects: ["microsoft/719"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Please note: any submissions with insufficient reproducible information will be marked as 'Waiting for customer input' and may be closed is there is no response**
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      description: Which language are you using?
+      multiple: true
+      options:
+        - Javascript/Typescript
+        - C#
+        - Python
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version are you using?
+      placeholder: Version...
+      value: latest
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a clear and concise description of what the bug is.
+      placeholder: Description...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction Steps
+      description: How do you trigger this bug? Please walk us through it step by step.
+      value: |
+        1.
+        2.
+        3.
+        ...
+      render: bash
+    validations:
+      required: true
