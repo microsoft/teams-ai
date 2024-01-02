@@ -19,32 +19,74 @@ If you're migrating an existing project, switching to add on the Teams AI Librar
 In your existing Teams bot, you'll need to add the Teams AI Library SDK package and import it into your bot code.
 
 ```bash
-yarn add @microsoft/teams-ai
-#or
-npm install @microsoft/teams-ai
+dotnet add package Microsoft.TeamsAI
 ```
 
 Replace `BotActivityHandler` and `ApplicationTurnState` in your bot. Note that here, `TurnState` is constructed to include `ConversationState`, but can also have `UserState` and `TempState`.
 
-js `index.ts`:
+`State.cs`:
 
-```js
-// Old code:
-// const bot = BotActivityHandler();
-
-interface ConversationState {
-    count: number;
-}
-type ApplicationTurnState = TurnState<ConversationState>;
-
-const app =
-    new Application<ApplicationTurnState>()
+```c#
+namespace Application {
+    public class ApplicationTurnState : TurnState
     {
-        storage // in this case, MemoryStorage
-    };
+        public ApplicationTurnState()
+        {
+            ScopeDefaults[CONVERSATION_SCOPE] = new ConversationState();
+        }
+
+        public new ConversationState Conversation
+        {
+            get
+            {
+                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                return (ConversationState)scope.Value!;
+            }
+            set
+            {
+                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                scope.Replace(value!);
+            }
+        }
+    }
+
+    public class ConversationState : Record
+    {
+        public int Count
+        {
+            get => Get<int>("count");
+            set => Set("count", value);
+        }
+    }
+}
 ```
 
-The rest of the code, including `server.post` and `await app.run(context)` stays the same.
+`Program.cs`
+
+```c#
+using Application;
+
+...
+
+Application<ApplicationTurnState> app = new(new())
+{
+    Storage = new MemoryStorage()
+};
+```
+
+The rest of the code stays the same.
 
 That's it!
 
@@ -61,13 +103,21 @@ You can either copy-paste the code into your own project, or clone the repo and 
 ### Optional ApplicationBuilder Class
 
 You may also use the `ApplicationBuilder` class to instantiate your `Application` instance. This option provides greater readability and separates the management of the various configuration options (e.g., storage, turn state, AI module options, etc).
-```diff
-// Old method:
-// ApplicationOptions<TurnState, TurnStateManager> applicationOptions = new();
-// Application<TurnState, TurnStateManager> app = new(applicationOptions);
 
-var app = new ApplicationBuilder<TurnState, TurnStateManager>().Build(); // the Build() internally calls the Application constructor
+`Program.cs`:
+
+```c#
+// Old method:
+// Application<ApplicationTurnState> app = new()
+//    {
+//        storage
+//    };
+
+var app = new ApplicationBuilder<ApplicationTurnState>()
+    .WithStorage(storage)
+    .Build(); // this function internally calls the Application constructor
 ```
+
 ## AI Setup
 
 The detailed steps for setting up your bot to use AI are in the [AI Setup Guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/dotnet/01.AI-SETUP.md).
@@ -77,21 +127,33 @@ On top of your Microsoft App Id and password, you will need an OpenAI API key or
 ### AI Prompt Manager
 ### *IMPORTANT AI Prompt Manager code needs to be updated to C#
 
-```ts
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
+```c#
+PromptManager prompts = new(new()
+{
+    PromptFolder = "./Prompts"
+});
+
+ActionPlanner<ApplicationTurnState> planner = new(
+    options: new(
+        model: sp.GetService<OpenAIModel>()!,
+        prompts: prompts,
+        defaultPrompt: async (context, state, planner) =>
+        {
+            PromptTemplate template = prompts.GetPrompt("default");
+            return await Task.FromResult(template);
+        }
+    )
+    { LogRepairs = true }
+);
 
 // Define storage and application
 // - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
-const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
-    storage,
-    adapter,
-    botAppId: process.env.MicrosoftAppId,
-    ai: {
-        planner,
-        promptManager
-    }
-});
+MemoryStorage storage = new();
+Application<ApplicationTurnState> app = new()
+{
+    Storage = storage,
+    AI: new(planner)
+};
 ```
 
 For more information on how to create and use prompts, see [PROMPTS](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/how-conversation-ai-get-started?tabs=javascript4%2Cjavascript1%2Cjavascript3%2Cjavascript2#:~:text=VectraDataSource%20and%20OpenAIEmbeddings%3A-,Prompt,-Prompts%20are%20pieces) and look at the [samples](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples) numbered `04._.xxx`.
