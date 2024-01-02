@@ -293,6 +293,23 @@ describe('Application', () => {
             }
         }
 
+        it('should start signin flow', async () => {
+            const app = new Application({
+                adapter,
+                botAppId: 'botid',
+                authentication: authenticationSettings
+            });
+            await adapter.sendTextToBot('signin', async (context) => {
+                // Set MockUserTokenClient on TurnState
+                context.turnState.set(
+                    (context.adapter as CloudAdapterBase).UserTokenClientKey,
+                    new MockUserTokenClient()
+                );
+                const handled = await app.run(context);
+                assert.equal(handled, true);
+            });
+        });
+
         it('should skip signin flow when user is already signed in.', async () => {
             const app = new Application({
                 adapter,
