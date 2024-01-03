@@ -46,7 +46,7 @@ jobs:
           flag-name: javascript
           parallel: true
           files: js/coverage/lcov.info
-          carryforward: javascript
+          carryforward: dotnet
       - name: Lint
         run: yarn lint
       - name: Harden Runner

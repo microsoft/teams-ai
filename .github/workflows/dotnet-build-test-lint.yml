@@ -56,7 +56,7 @@ jobs:
           flag-name: dotnet
           parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
-          carryforward: dotnet
+          carryforward: javascript
       - name: Upload Tests
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
