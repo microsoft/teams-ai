@@ -17,6 +17,7 @@ jobs:
   build-test-lint:
     name: Build/Test/Lint
     runs-on: windows-latest
+    environment: main
     strategy:
       matrix:
         dotnet-version: ['6.0', '7.0']
@@ -47,8 +48,12 @@ jobs:
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
-          reporttypes: HtmlInline
+          reporttypes: 'HtmlInline;lcov'
           toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          files: ${{ env.SOLUTION_DIR }}TestResults/coverage
       - name: Upload Tests
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
