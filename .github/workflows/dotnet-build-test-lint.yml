@@ -50,10 +50,11 @@ jobs:
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
           reporttypes: 'HtmlInline;lcov'
           toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
-      - name: Coveralls GitHub Action
+      - name: Coveralls
         uses: coverallsapp/github-action@v2.2.3
         with:
           flag-name: C#
+          parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
       - name: Upload Tests
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
@@ -64,3 +65,15 @@ jobs:
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
           egress-policy: audit
+
+  finish:
+    needs: build-test-lint
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: 'Javascript,C#'
