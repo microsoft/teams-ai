@@ -43,7 +43,7 @@ jobs:
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v2.2.3
         with:
-          files: coverage/lcov.info
+          files: js/coverage/lcov.info
       - name: Lint
         run: yarn lint
       - name: Harden Runner
