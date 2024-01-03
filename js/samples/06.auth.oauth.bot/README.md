@@ -1,4 +1,4 @@
-# Teams SSO Bot
+# OAuth Bot
 
 This sample shows how to incorporate a basic conversational SSO flow into a Microsoft Teams application using [Bot Framework](https://dev.botframework.com) and the Teams AI SDK.
 
