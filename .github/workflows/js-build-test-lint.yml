@@ -44,11 +44,23 @@ jobs:
         uses: coverallsapp/github-action@v2.2.3
         with:
           flag-name: javascript
+          parallel: true
           files: js/coverage/lcov.info
-          carryforward: dotnet
       - name: Lint
         run: yarn lint
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
           egress-policy: audit
+
+  finish:
+    needs: build-test-lint
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: 'javascript,dotnet'
