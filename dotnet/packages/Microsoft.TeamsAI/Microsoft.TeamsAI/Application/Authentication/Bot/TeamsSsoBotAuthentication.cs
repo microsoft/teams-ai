@@ -5,7 +5,6 @@ using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Exceptions;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
-using System.ComponentModel.Design;
 
 namespace Microsoft.Teams.AI
 {
@@ -48,7 +47,7 @@ namespace Microsoft.Teams.AI
         /// <returns>Dialog turn result that contains token if sign in success</returns>
         public override async Task<DialogTurnResult> ContinueDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
-            IDialogContext dialogContext = await CreateSsoDialogContext(context, state, dialogStateProperty);
+            DialogContext dialogContext = await CreateSsoDialogContext(context, state, dialogStateProperty);
             return await dialogContext.ContinueDialogAsync();
         }
 
@@ -62,7 +61,7 @@ namespace Microsoft.Teams.AI
         /// <returns>Dialog turn result that contains token if sign in success</returns>
         public override async Task<DialogTurnResult> RunDialog(ITurnContext context, TState state, string dialogStateProperty, CancellationToken cancellationToken = default)
         {
-            IDialogContext dialogContext = await CreateSsoDialogContext(context, state, dialogStateProperty);
+            DialogContext dialogContext = await CreateSsoDialogContext(context, state, dialogStateProperty);
             DialogTurnResult result = await dialogContext.ContinueDialogAsync();
             if (result.Status == DialogTurnStatus.Empty)
             {
@@ -86,15 +85,10 @@ namespace Microsoft.Teams.AI
                 && this._tokenExchangeIdRegex.IsMatch(idStr);
         }
 
-        protected virtual IDialogSet CreateDialogSet(IStatePropertyAccessor<DialogState> dialogState)
-        {
-            return new DialogSetAdapter(dialogState);
-        }
-
-        private async Task<IDialogContext> CreateSsoDialogContext(ITurnContext context, TState state, string dialogStateProperty)
+        private async Task<DialogContext> CreateSsoDialogContext(ITurnContext context, TState state, string dialogStateProperty)
         {
             TurnStateProperty<DialogState> accessor = new(state, "conversation", dialogStateProperty);
-            IDialogSet dialogSet = CreateDialogSet(accessor);
+            DialogSet dialogSet = new(accessor);
             WaterfallDialog ssoDialog = new(SSO_DIALOG_ID);
 
             dialogSet.Add(this._prompt);
@@ -117,8 +111,6 @@ namespace Microsoft.Teams.AI
             }));
             return await dialogSet.CreateContextAsync(context);
         }
-
-
 
         private async Task<bool> ShouldDedup(ITurnContext context)
         {
@@ -177,61 +169,6 @@ namespace Microsoft.Teams.AI
         public TokenStoreItem(string etag)
         {
             ETag = etag;
-        }
-    }
-
-    internal interface IDialogSet
-    {
-        public DialogSetAdapter Add(Dialog dialog);
-
-        public Task<IDialogContext> CreateContextAsync(ITurnContext turnContext, CancellationToken cancellationToken = default);
-    }
-
-    internal class DialogSetAdapter : IDialogSet
-    {
-        private DialogSet _dialogSet;
-
-        public DialogSetAdapter(IStatePropertyAccessor<DialogState> dialogState)
-        {
-            _dialogSet = new DialogSet(dialogState);
-        }
-        
-        public DialogSetAdapter Add(Dialog dialog)
-        {
-            _dialogSet.Add(dialog);
-            return this;
-        }
-
-        public async Task<IDialogContext> CreateContextAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
-        {
-            return new DialogContextAdapter(await _dialogSet.CreateContextAsync(turnContext, cancellationToken));
-        }
-    }
-
-    internal interface IDialogContext
-    {
-        public Task<DialogTurnResult> BeginDialogAsync(string dialogId, object? options = null, CancellationToken cancellationToken = default);
-
-        public Task<DialogTurnResult> ContinueDialogAsync(CancellationToken cancellationToken = default);
-    }
-
-    internal class DialogContextAdapter : IDialogContext
-    {
-        private DialogContext _dialogContext;
-
-        public DialogContextAdapter(DialogContext dialogContext)
-        {
-            _dialogContext = dialogContext;
-        }
-
-        public async Task<DialogTurnResult> BeginDialogAsync(string dialogId, object? options = null, CancellationToken cancellationToken = default)
-        {
-            return await _dialogContext.BeginDialogAsync(dialogId, options, cancellationToken);
-        }
-
-        public async Task<DialogTurnResult> ContinueDialogAsync(CancellationToken cancellationToken = default)
-        {
-            return await _dialogContext.ContinueDialogAsync(cancellationToken);
         }
     }
 }

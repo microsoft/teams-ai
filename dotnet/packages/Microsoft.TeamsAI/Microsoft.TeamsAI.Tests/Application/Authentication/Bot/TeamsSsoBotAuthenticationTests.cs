@@ -14,24 +14,12 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
         internal class MockTeamsSsoBotAuthentication<TState> : TeamsSsoBotAuthentication<TState>
             where TState : TurnState, new()
         {
-            private IDialogSet? _dialogSet;
-
-            public MockTeamsSsoBotAuthentication(Application<TState> app, string name, TeamsSsoSettings settings, IDialogSet? mockDialogSet = null, TeamsSsoPrompt? mockPrompt = null, IStorage? storage = null) : base(app, name, settings, storage)
+            public MockTeamsSsoBotAuthentication(Application<TState> app, string name, TeamsSsoSettings settings, TeamsSsoPrompt? mockPrompt = null) : base(app, name, settings, null)
             {
-                _dialogSet = mockDialogSet;
                 if (mockPrompt != null)
                 {
                     _prompt = mockPrompt;
                 }
-            }
-
-            protected override IDialogSet CreateDialogSet(IStatePropertyAccessor<DialogState> dialogState)
-            {
-                if (_dialogSet != null)
-                {
-                    return _dialogSet;
-                }
-                return base.CreateDialogSet(dialogState);
             }
 
             public async Task<bool> TokenExchangeRouteSelectorPublic(ITurnContext context, CancellationToken cancellationToken)
@@ -40,6 +28,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             }
         }
 
+
         [Fact]
         public async void Test_RunDialog_BeginNew()
         {
@@ -47,26 +36,13 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
             var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
             var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
-            var turnContext = MockTurnContext();
-            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-
-            var mockDialogContext = new Mock<IDialogContext>();
-            mockDialogContext
-                .Setup(mock => mock.ContinueDialogAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Empty));
-            mockDialogContext
-                .Setup(mock => mock.BeginDialogAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Waiting));
-
-            var mockDialogSet = new Mock<IDialogSet>();
-            mockDialogSet
-                .Setup(mock => mock.CreateContextAsync(It.IsAny<ITurnContext>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockDialogContext.Object);
-
-            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "test", settings, mockDialogSet.Object);
+            var mockedPrompt = CreateTeamsSsoPromptMock(settings);
+            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "TokenName", settings, mockedPrompt.Object);
+            var messageContext = MockTurnContext();
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(messageContext);
 
             // act
-            var result = await botAuthentication.RunDialog(turnContext, turnState, "dialogStatePropertyName");
+            var result = await botAuthentication.RunDialog(messageContext, turnState, "dialogStateProperty");
 
             // assert
             Assert.Equal(DialogTurnStatus.Waiting, result.Status);
@@ -79,27 +55,20 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
             var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
             var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
-            var turnContext = MockTurnContext();
-            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-
-            var mockDialogContext = new Mock<IDialogContext>();
-            mockDialogContext
-                .Setup(mock => mock.ContinueDialogAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Complete));
-
-            var mockDialogSet = new Mock<IDialogSet>();
-            mockDialogSet
-                .Setup(mock => mock.CreateContextAsync(It.IsAny<ITurnContext>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockDialogContext.Object);
-
-            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "test", settings, mockDialogSet.Object);
+            var mockedPrompt = CreateTeamsSsoPromptMock(settings);
+            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "TokenName", settings, mockedPrompt.Object);
+            var messageContext = MockTurnContext();
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(messageContext);
+            await botAuthentication.RunDialog(messageContext, turnState, "dialogStateProperty"); // Begin new dialog first
 
             // act
-            var result = await botAuthentication.RunDialog(turnContext, turnState, "dialogStatePropertyName");
+            var tokenExchangeContext = MockTokenExchangeContext();
+            var result = await botAuthentication.RunDialog(tokenExchangeContext, turnState, "dialogStateProperty");
 
             // assert
             Assert.Equal(DialogTurnStatus.Complete, result.Status);
         }
+
 
         [Fact]
         public async void Test_ContinueDialog()
@@ -108,26 +77,18 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
             var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
             var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
-            var turnContext = MockTurnContext();
-            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
-
-            var mockDialogContext = new Mock<IDialogContext>();
-            mockDialogContext
-                .Setup(mock => mock.ContinueDialogAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Empty));
-
-            var mockDialogSet = new Mock<IDialogSet>();
-            mockDialogSet
-                .Setup(mock => mock.CreateContextAsync(It.IsAny<ITurnContext>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockDialogContext.Object);
-
-            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "test", settings, mockDialogSet.Object);
+            var mockedPrompt = CreateTeamsSsoPromptMock(settings);
+            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "TokenName", settings, mockedPrompt.Object);
+            var messageContext = MockTurnContext();
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(messageContext);
+            await botAuthentication.RunDialog(messageContext, turnState, "dialogStateProperty"); // Begin new dialog first
 
             // act
-            var result = await botAuthentication.ContinueDialog(turnContext, turnState, "dialogStatePropertyName");
+            var tokenExchangeContext = MockTokenExchangeContext();
+            var result = await botAuthentication.ContinueDialog(tokenExchangeContext, turnState, "dialogStateProperty");
 
             // assert
-            Assert.Equal(DialogTurnStatus.Empty, result.Status);
+            Assert.Equal(DialogTurnStatus.Complete, result.Status);
         }
 
         [Fact]
@@ -137,10 +98,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
             var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
             var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
-            var turnContext = MockTurnContext(ActivityTypes.Invoke, SignInConstants.TokenExchangeOperationName);
-            JObject activityValue = new();
-            activityValue["id"] = $"{Guid.NewGuid()}-test";
-            turnContext.Activity.Value = activityValue;
+            var turnContext = MockTokenExchangeContext("test");
 
             var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "test", settings);
 
@@ -158,10 +116,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
             var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
             var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
-            var turnContext = MockTurnContext(ActivityTypes.Invoke, SignInConstants.TokenExchangeOperationName);
-            JObject activityValue = new();
-            activityValue["id"] = $"{Guid.NewGuid()}-AnotherTokenName";
-            turnContext.Activity.Value = activityValue;
+            var turnContext = MockTokenExchangeContext("AnotherTokenName");
 
             var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "test", settings);
 
@@ -179,22 +134,13 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
             var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
             var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
-            var mockedPrompt = new Mock<TeamsSsoPrompt>("TeamsSsoPrompt", "TokenName", settings);
-            mockedPrompt
-                .Setup(mock => mock.BeginDialogAsync(It.IsAny<DialogContext>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Waiting));
-            mockedPrompt
-                .Setup(mock => mock.ContinueDialogAsync(It.IsAny<DialogContext>(), It.IsAny<CancellationToken>()))
-                .Returns(async (DialogContext dc, CancellationToken cancellationToken) =>
-                {
-                    return await dc.EndDialogAsync(new TokenResponse(token: "test token"));
-                });
-            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "TokenName", settings, mockPrompt: mockedPrompt.Object);
+            var mockedPrompt = CreateTeamsSsoPromptMock(settings);
+            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "TokenName", settings, mockedPrompt.Object);
 
             // act
             var messageContext = MockTurnContext();
             var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(messageContext);
-            var messageResult = await botAuthentication.RunDialog(messageContext, turnState, "dialogStateProperty");
+            await botAuthentication.RunDialog(messageContext, turnState, "dialogStateProperty");
             var tokenExchangeContext = MockTokenExchangeContext();
             var tokenExchangeResult = await botAuthentication.ContinueDialog(tokenExchangeContext, turnState, "dialogStateProperty");
 
@@ -210,29 +156,19 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
             Assert.Equal(DialogTurnStatus.Waiting, tokenExchangeResult.Status);
         }
 
-        [Fact]
-        public async void Test_RunDialog()
+        private static Mock<TeamsSsoPrompt> CreateTeamsSsoPromptMock(TeamsSsoSettings settings)
         {
-            // arrange
-            var app = new Application<TurnState>(new ApplicationOptions<TurnState>());
-            var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
-            var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
             var mockedPrompt = new Mock<TeamsSsoPrompt>("TeamsSsoPrompt", "TokenName", settings);
             mockedPrompt
                 .Setup(mock => mock.BeginDialogAsync(It.IsAny<DialogContext>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Waiting));
             mockedPrompt
                 .Setup(mock => mock.ContinueDialogAsync(It.IsAny<DialogContext>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Dialog.EndOfTurn);
-            var botAuthentication = new MockTeamsSsoBotAuthentication<TurnState>(app, "TokenName", settings, mockPrompt: mockedPrompt.Object);
-            var messageContext = MockTurnContext();
-            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(messageContext);
-
-            // act
-            var result = await botAuthentication.RunDialog(messageContext, turnState, "dialogStateProperty");
-
-            // assert
-            Assert.Equal(DialogTurnStatus.Waiting, result.Status);
+                .Returns(async (DialogContext dc, CancellationToken cancellationToken) =>
+                {
+                    return await dc.EndDialogAsync(new TokenResponse(token: "test token"));
+                });
+            return mockedPrompt;
         }
 
         private static TurnContext MockTurnContext(string type = ActivityTypes.Message, string? name = null)
