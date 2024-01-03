@@ -1,6 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Extensibility;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 
@@ -12,7 +11,9 @@ namespace Microsoft.Teams.AI
     public class TeamsSsoAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
-        private TeamsSsoBotAuthentication<TState>? _botAuth;
+        internal IConfidentialClientApplicationAdapter _msalAdapter;
+
+        internal TeamsSsoBotAuthentication<TState>? _botAuth;
         private TeamsSsoMessageExtensionsAuthentication? _messageExtensionsAuth;
         private TeamsSsoSettings _settings;
 
@@ -28,6 +29,7 @@ namespace Microsoft.Teams.AI
             _settings = settings;
             _botAuth = new TeamsSsoBotAuthentication<TState>(app, name, _settings, storage);
             _messageExtensionsAuth = new TeamsSsoMessageExtensionsAuthentication(_settings);
+            _msalAdapter = new ConfidentialClientApplicationAdapter(settings.MSAL);
         }
 
         /// <summary>
@@ -68,11 +70,7 @@ namespace Microsoft.Teams.AI
         {
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
 
-            ILongRunningWebApi? oboCca = _settings.MSAL as ILongRunningWebApi;
-            if (oboCca != null)
-            {
-                await oboCca.StopLongRunningProcessInWebApiAsync(homeAccountId, cancellationToken);
-            }
+            await _msalAdapter.StopLongRunningProcessInWebApiAsync(homeAccountId, cancellationToken);
         }
 
         /// <summary>
@@ -120,10 +118,7 @@ namespace Microsoft.Teams.AI
             string homeAccountId = $"{context.Activity.From.AadObjectId}.{context.Activity.Conversation.TenantId}";
             try
             {
-                AuthenticationResult result = await ((ILongRunningWebApi)_settings.MSAL).AcquireTokenInLongRunningProcess(
-                    _settings.Scopes,
-                            homeAccountId
-                        ).ExecuteAsync();
+                AuthenticationResult result = await _msalAdapter.AcquireTokenInLongRunningProcess(_settings.Scopes, homeAccountId);
                 return result.AccessToken;
             }
             catch (MsalClientException)
