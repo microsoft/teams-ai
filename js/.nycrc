@@ -9,7 +9,7 @@
         "**/*.spec.ts",
         "packages/**/src/**/index.ts"
     ],
-    "reporter": ["html", "text"],
+    "reporter": ["html", "text", "lcov"],
     "all": true,
     "cache": true
 }

@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['**']
-    paths: ['dotnet/**']
+    paths: ['.github/workflows/dotnet-*.yml', 'dotnet/**']
 
 permissions: read-all
 
