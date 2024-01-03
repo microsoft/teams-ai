@@ -44,7 +44,6 @@ jobs:
         uses: coverallsapp/github-action@v2.2.3
         with:
           flag-name: javascript
-          parallel: true
           files: js/coverage/lcov.info
           carryforward: dotnet
       - name: Lint

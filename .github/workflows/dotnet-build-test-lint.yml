@@ -54,7 +54,6 @@ jobs:
         uses: coverallsapp/github-action@v2.2.3
         with:
           flag-name: dotnet
-          parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
           carryforward: javascript
       - name: Upload Tests
