@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['**']
-    paths: ['dotnet/**']
+    paths: ['.github/workflows/dotnet-*.yml', 'dotnet/**']
 
 permissions: read-all
 
@@ -47,7 +47,7 @@ jobs:
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
-          reporttypes: HtmlInline
+          reporttypes: 'HtmlInline;lcov'
           toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
       - name: Upload Tests
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
