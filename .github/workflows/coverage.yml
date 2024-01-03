@@ -9,9 +9,8 @@ on:
   push:
     branches: ['main']
     paths: [
-        '.github/workflows/js-*.yml',
+        '.github/workflows/coverage.yml',
         'js/**',
-        .github/workflows/dotnet-*.yml,
         'dotnet/**'
     ]
 
@@ -83,7 +82,6 @@ jobs:
           flag-name: dotnet
           parallel: true
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
-          carryforward: dotnet
       - name: Upload Tests
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
