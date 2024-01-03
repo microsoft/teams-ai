@@ -17,6 +17,7 @@ jobs:
   build-test-lint:
     name: Build/Test/Lint
     runs-on: ubuntu-latest
+    environment: main
     strategy:
       matrix:
         node-version: [16.x, 18.x]
@@ -38,7 +39,9 @@ jobs:
       - name: Build
         run: yarn build
       - name: Test
-        run: yarn test
+        run: yarn test:nyc:report
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.2.3
       - name: Lint
         run: yarn lint
       - name: Harden Runner
