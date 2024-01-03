@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus  } from "./EmbeddingsModel";
+import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus } from './EmbeddingsModel';
 
 /**
  * A test model that can be used to test the prompt completion system.
@@ -15,7 +15,7 @@ export class TestEmbeddings implements EmbeddingsModel {
     /**
      * Default output to return for test embeddings.
      */
-    public static TEST_OUTPUT = [[1,2,3,4,5]];
+    public static TEST_OUTPUT = [[1, 2, 3, 4, 5]];
 
     /**
      *
@@ -23,7 +23,11 @@ export class TestEmbeddings implements EmbeddingsModel {
      * @param output Optional. Embeddings to generate. Defaults to `[[1,2,3,4,5]]`.
      * @param message Optional. Message to return with response.
      */
-    public constructor(status: EmbeddingsResponseStatus = 'success', output: number[][]|undefined = TestEmbeddings.TEST_OUTPUT, message?: string) {
+    public constructor(
+        status: EmbeddingsResponseStatus = 'success',
+        output: number[][] | undefined = TestEmbeddings.TEST_OUTPUT,
+        message?: string
+    ) {
         this.status = status;
         this.output = output;
     }
@@ -36,7 +40,7 @@ export class TestEmbeddings implements EmbeddingsModel {
     /**
      * Generated embeddings.
      */
-    public output: number[][]|undefined;
+    public output: number[][] | undefined;
 
     /**
      * Message to return with response.
@@ -59,7 +63,10 @@ export class TestEmbeddings implements EmbeddingsModel {
                 return Promise.resolve({ status: 'error', message: `Empty array passed to createEmbeddings()` });
             }
         } else {
-            return Promise.resolve({ status: 'error', message: `Invalid inputs of type '${typeof inputs}' passed to createEmbeddings()` });
+            return Promise.resolve({
+                status: 'error',
+                message: `Invalid inputs of type '${typeof inputs}' passed to createEmbeddings()`
+            });
         }
 
         // Return expected response

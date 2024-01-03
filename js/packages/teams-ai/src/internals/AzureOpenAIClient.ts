@@ -54,7 +54,7 @@ export class AzureOpenAIClient extends OpenAIClient {
 
     public createCompletion(request: CreateCompletionRequest): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
         const clone = Object.assign({}, request) as OpenAICreateCompletionRequest;
-        const deployment = this.removeModel(clone) ;
+        const deployment = this.removeModel(clone);
         const endpoint = (this.options as AzureOpenAIClientOptions).endpoint;
         const apiVersion = (this.options as AzureOpenAIClientOptions).apiVersion ?? '2022-12-01';
         const url = `${endpoint}/openai/deployments/${deployment}/completions?api-version=${apiVersion}`;

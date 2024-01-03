@@ -1,5 +1,5 @@
-import { Tokenizer } from "./tokenizers";
-import { stringify } from "yaml";
+import { Tokenizer } from './tokenizers';
+import { stringify } from 'yaml';
 
 /**
  * Utility functions for manipulating .
@@ -17,8 +17,8 @@ export class Utilities {
     public static toString(tokenizer: Tokenizer, value: any, asJSON: boolean = false): string {
         if (value === undefined || value === null) {
             return '';
-        } else if (typeof value === "object") {
-            if (typeof value.toISOString == "function") {
+        } else if (typeof value === 'object') {
+            if (typeof value.toISOString == 'function') {
                 return value.toISOString();
             } else if (asJSON) {
                 return JSON.stringify(value);

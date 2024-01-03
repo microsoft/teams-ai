@@ -1,23 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ActivityTypes, Storage, TokenResponse, TurnContext, tokenExchangeOperationName } from "botbuilder";
-import { Dialog, DialogContext, DialogTurnStatus } from "botbuilder-dialogs";
-import { Application } from "../Application";
-import { TurnState } from "../TurnState";
-import { BotAuthenticationBase } from "./BotAuthenticationBase";
-import { TeamsSsoPrompt } from "./TeamsBotSsoPrompt";
-import { DialogSet, DialogState, DialogTurnResult, WaterfallDialog } from "botbuilder-dialogs";
-import { TurnStateProperty } from "../TurnStateProperty";
-import { ConfidentialClientApplication } from "@azure/msal-node";
-import { TeamsSsoSettings } from "./TeamsSsoSettings";
+import { ActivityTypes, Storage, TokenResponse, TurnContext, tokenExchangeOperationName } from 'botbuilder';
+import {
+    Dialog,
+    DialogContext,
+    DialogTurnStatus,
+    DialogSet,
+    DialogState,
+    DialogTurnResult,
+    WaterfallDialog
+} from 'botbuilder-dialogs';
+import { Application } from '../Application';
+import { TurnState } from '../TurnState';
+import { BotAuthenticationBase } from './BotAuthenticationBase';
+import { TeamsSsoPrompt } from './TeamsBotSsoPrompt';
+import { TurnStateProperty } from '../TurnStateProperty';
+import { ConfidentialClientApplication } from '@azure/msal-node';
+import { TeamsSsoSettings } from './TeamsSsoSettings';
 
-const SSO_DIALOG_ID = "_TeamsSsoDialog";
-
+const SSO_DIALOG_ID = '_TeamsSsoDialog';
 
 /**
  * @internal
- * 
+ *
  * Handles authentication for Teams bots using Single Sign-On (SSO).
  * @template TState - The type of the turn state object.
  */
@@ -43,10 +49,12 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
         super(app, settingName, storage);
 
         this._prompt = new TeamsSsoPrompt('TeamsSsoPrompt', settingName, settings, msal);
-        this._tokenExchangeIdRegex = new RegExp(`[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-${this._settingName}`);
+        this._tokenExchangeIdRegex = new RegExp(
+            `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-${this._settingName}`
+        );
 
         // Do not save state for duplicate token exchange events to avoid eTag conflicts
-        app.turn("afterTurn", async (context, state) => {
+        app.turn('afterTurn', async (context, state) => {
             return state.temp.duplicateTokenExchange !== true;
         });
     }
@@ -58,7 +66,11 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      * @param dialogStateProperty - The name of the dialog state property.
      * @returns A promise that resolves to the dialog turn result containing the token response.
      */
-    public async runDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<TokenResponse>> {
+    public async runDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<TokenResponse>> {
         const dialogContext = await this.createSsoDialogContext(context, state, dialogStateProperty);
         let results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
@@ -74,7 +86,11 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      * @param dialogStateProperty - The name of the dialog state property.
      * @returns A promise that resolves to the dialog turn result containing the token response.
      */
-    public async continueDialog(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogTurnResult<TokenResponse>> {
+    public async continueDialog(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogTurnResult<TokenResponse>> {
         const dialogContext = await this.createSsoDialogContext(context, state, dialogStateProperty);
         return await dialogContext.continueDialog();
     }
@@ -85,7 +101,10 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      * @returns A promise that resolves to a boolean indicating whether the token exchange route should be processed by current class instance.
      */
     protected async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
-        return await super.tokenExchangeRouteSelector(context) && this._tokenExchangeIdRegex.test(context.activity.value.id);
+        return (
+            (await super.tokenExchangeRouteSelector(context)) &&
+            this._tokenExchangeIdRegex.test(context.activity.value.id)
+        );
     }
 
     /**
@@ -95,24 +114,30 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      * @param dialogStateProperty - The name of the dialog state property.
      * @returns A promise that resolves to the dialog context object.
      */
-    private async createSsoDialogContext(context: TurnContext, state: TState, dialogStateProperty: string): Promise<DialogContext> {
+    private async createSsoDialogContext(
+        context: TurnContext,
+        state: TState,
+        dialogStateProperty: string
+    ): Promise<DialogContext> {
         const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this._prompt);
-        dialogSet.add(new WaterfallDialog(SSO_DIALOG_ID, [
-            async (step) => {
-                return await step.beginDialog(this._prompt.id);
-            },
-            async (step) => {
-                const tokenResponse = step.result;
-                // Dedup token exchange responses
-                if (tokenResponse && await this.shouldDedup(context)) {
-                    state.temp.duplicateTokenExchange = true
-                    return Dialog.EndOfTurn;
+        dialogSet.add(
+            new WaterfallDialog(SSO_DIALOG_ID, [
+                async (step) => {
+                    return await step.beginDialog(this._prompt.id);
+                },
+                async (step) => {
+                    const tokenResponse = step.result;
+                    // Dedup token exchange responses
+                    if (tokenResponse && (await this.shouldDedup(context))) {
+                        state.temp.duplicateTokenExchange = true;
+                        return Dialog.EndOfTurn;
+                    }
+                    return await step.endDialog(step.result);
                 }
-                return await step.endDialog(step.result);
-            }
-        ]));
+            ])
+        );
         return await dialogSet.createContext(context);
     }
 
@@ -123,7 +148,7 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      */
     private async shouldDedup(context: TurnContext): Promise<boolean> {
         const storeItem = {
-            eTag: context.activity.value.id,
+            eTag: context.activity.value.id
         };
 
         const key = this.getStorageKey(context);
@@ -132,7 +157,7 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
         try {
             await this._storage.write(storeItems);
         } catch (err) {
-            if (err instanceof Error && err.message.indexOf("eTag conflict")) {
+            if (err instanceof Error && err.message.indexOf('eTag conflict')) {
                 return true;
             }
             throw err;
@@ -148,24 +173,17 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
      */
     private getStorageKey(context: TurnContext): string {
         if (!context || !context.activity || !context.activity.conversation) {
-            throw new Error("Invalid context, can not get storage key!");
+            throw new Error('Invalid context, can not get storage key!');
         }
         const activity = context.activity;
         const channelId = activity.channelId;
         const conversationId = activity.conversation.id;
-        if (
-            activity.type !== ActivityTypes.Invoke ||
-            activity.name !== tokenExchangeOperationName
-        ) {
-            throw new Error(
-                "TokenExchangeState can only be used with Invokes of signin/tokenExchange."
-            );
+        if (activity.type !== ActivityTypes.Invoke || activity.name !== tokenExchangeOperationName) {
+            throw new Error('TokenExchangeState can only be used with Invokes of signin/tokenExchange.');
         }
         const value = activity.value;
         if (!value || !value.id) {
-            throw new Error(
-                "Invalid signin/tokenExchange. Missing activity.value.id."
-            );
+            throw new Error('Invalid signin/tokenExchange. Missing activity.value.id.');
         }
         return `${channelId}/${conversationId}/${value.id}`;
     }

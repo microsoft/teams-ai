@@ -206,7 +206,8 @@ export class MessageExtensions<TState extends TurnState> {
                 async (context, state) => {
                     // Insure that we're in an invoke as expected
                     if (
-                        context?.activity?.type !== ActivityTypes.Invoke || context?.activity?.name !== SUBMIT_ACTION_INVOKE ||
+                        context?.activity?.type !== ActivityTypes.Invoke ||
+                        context?.activity?.name !== SUBMIT_ACTION_INVOKE ||
                         context?.activity?.value?.botMessagePreviewAction !== 'send'
                     ) {
                         throw new Error(

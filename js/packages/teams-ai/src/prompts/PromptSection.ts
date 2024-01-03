@@ -36,7 +36,13 @@ export interface PromptSection {
      * @param tokenizer Tokenizer to use when rendering the section.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      */
-    renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    renderAsText(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>>;
 
     /**
      * Renders the section as a list of messages.
@@ -46,7 +52,13 @@ export interface PromptSection {
      * @param tokenizer Tokenizer to use when rendering the section.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      */
-    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message[]>>;
 }
 
 /**

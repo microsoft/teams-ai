@@ -6,10 +6,10 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { Tokenizer } from "../tokenizers";
-import { RenderedPromptSection } from "../prompts";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { Tokenizer } from '../tokenizers';
+import { RenderedPromptSection } from '../prompts';
+import { Memory } from '../MemoryFork';
 
 /**
  * A data source that can be used to render text that's added to a prompt.
@@ -28,5 +28,10 @@ export interface DataSource {
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      * @returns The text to inject into the prompt as a `RenderedPromptSection` object.
      */
-    renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    renderData(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>>;
 }

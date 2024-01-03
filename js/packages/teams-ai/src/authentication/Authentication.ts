@@ -408,10 +408,10 @@ export class AuthError extends Error {
 
 /**
  * Cause of an authentication error.
-     * @remarks
-     * `invalidActivity` - The activity is not a valid activity to initiate authentication flow.
-     * `completionWithoutToken` - The authentication flow completed without a token.
-     * `other` - Other error.
+ * @remarks
+ * `invalidActivity` - The activity is not a valid activity to initiate authentication flow.
+ * `completionWithoutToken` - The authentication flow completed without a token.
+ * `other` - Other error.
  */
 export type AuthErrorReason = 'invalidActivity' | 'completionWithoutToken' | 'other';
 

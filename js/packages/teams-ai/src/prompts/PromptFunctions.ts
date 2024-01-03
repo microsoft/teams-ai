@@ -6,9 +6,9 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * A collection of functions that can be called from a prompt template string.
@@ -38,7 +38,13 @@ export interface PromptFunctions {
      * @param tokenizer Tokenizer used to encode/decode strings.
      * @param args Arguments to pass to the function as an array of strings.
      */
-    invokeFunction(name: string, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: string[]): Promise<any>;
+    invokeFunction(
+        name: string,
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        args: string[]
+    ): Promise<any>;
 }
 
 /**
@@ -49,4 +55,10 @@ export interface PromptFunctions {
  * @param tokenizer Tokenizer used to encode/decode strings.
  * @param args Arguments to the function as an array of strings.
  */
-export type PromptFunction = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, args: string[]) => Promise<any>;
+export type PromptFunction = (
+    context: TurnContext,
+    memory: Memory,
+    functions: PromptFunctions,
+    tokenizer: Tokenizer,
+    args: string[]
+) => Promise<any>;

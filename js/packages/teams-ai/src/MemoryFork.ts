@@ -1,4 +1,3 @@
-
 /**
  * @module teams-ai
  */
@@ -73,7 +72,7 @@ export class MemoryFork implements Memory {
      * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
      */
     public deleteValue(path: string): void {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         if (this._fork.hasOwnProperty(scope) && this._fork[scope].hasOwnProperty(name)) {
             delete this._fork[scope][name];
         }
@@ -87,7 +86,7 @@ export class MemoryFork implements Memory {
      * @returns True if the value exists, false otherwise.
      */
     public hasValue(path: string): boolean {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         if (this._fork.hasOwnProperty(scope)) {
             return this._fork[scope].hasOwnProperty(name);
         } else {
@@ -103,7 +102,7 @@ export class MemoryFork implements Memory {
      * @returns The value or undefined if not found.
      */
     public getValue<TValue = unknown>(path: string): TValue {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         if (this._fork.hasOwnProperty(scope)) {
             if (this._fork[scope].hasOwnProperty(name)) {
                 return this._fork[scope][name] as TValue;
@@ -121,7 +120,7 @@ export class MemoryFork implements Memory {
      * @param value Value to assign.
      */
     public setValue(path: string, value: unknown): void {
-        const {scope, name} = this.getScopeAndName(path);
+        const { scope, name } = this.getScopeAndName(path);
         if (!this._fork.hasOwnProperty(scope)) {
             this._fork[scope] = {};
         }
@@ -130,6 +129,7 @@ export class MemoryFork implements Memory {
     }
 
     /**
+     * @param path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
      * @private
      */
     private getScopeAndName(path: string): { scope: string; name: string } {

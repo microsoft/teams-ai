@@ -6,7 +6,6 @@ import { MessageExtensionsInvokeNames } from '../MessageExtensions';
  * Base class to handle authentication for Teams Message Extension.
  */
 export abstract class MessageExtensionAuthenticationBase {
-
     /**
      * Authenticates the user.
      * @param {TurnContext} context - The turn context.
@@ -102,9 +101,7 @@ export abstract class MessageExtensionAuthenticationBase {
      * @param {TurnContext} context - The turn context.
      * @returns {Promise<TokenResponse | undefined>} - A promise that resolves to the token response or undefined if token exchange failed.
      */
-    public abstract handleSsoTokenExchange(
-        context: TurnContext
-    ): Promise<TokenResponse | undefined>
+    public abstract handleSsoTokenExchange(context: TurnContext): Promise<TokenResponse | undefined>;
 
     /**
      * Handles the user sign-in.
@@ -112,12 +109,12 @@ export abstract class MessageExtensionAuthenticationBase {
      * @param {string} magicCode - The magic code from user sign-in.
      * @returns {Promise<TokenResponse | undefined>} - A promise that resolves to the token response or undefined if failed to verify the magic code.
      */
-    public abstract handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined>
+    public abstract handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined>;
 
     /**
      * Gets the sign-in link for the user.
      * @param {TurnContext} context - The turn context.
      * @returns {Promise<string | undefined>} - A promise that resolves to the sign-in link or undefined if no sign-in link available.
      */
-    public abstract getSignInLink(context: TurnContext): Promise<string | undefined>
+    public abstract getSignInLink(context: TurnContext): Promise<string | undefined>;
 }
