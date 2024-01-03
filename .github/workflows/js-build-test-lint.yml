@@ -43,6 +43,7 @@ jobs:
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v2.2.3
         with:
+          flag-name: Javascript
           files: js/coverage/lcov.info
       - name: Lint
         run: yarn lint

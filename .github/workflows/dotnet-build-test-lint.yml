@@ -53,6 +53,7 @@ jobs:
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v2.2.3
         with:
+          flag-name: C#
           files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
       - name: Upload Tests
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
