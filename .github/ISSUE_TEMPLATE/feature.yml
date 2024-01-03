@@ -1,0 +1,34 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature Request]: "
+labels: ["enhancement"]
+projects: ["microsoft/719"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Please note: any submissions with insufficient reproducible information will be marked as 'Waiting for customer input' and may be closed is there is no response**
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario
+      description: Provide a clear and concise description of what the problem is. Ex. I'm always frustrated when [...].
+      placeholder: Scenario...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution
+      description: Provide a clear and concise description of what you want to happen, with code snippets or pseudo code as applicable.
+      placeholder: Solution...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context or screenshots about the feature request here.
+      placeholder: Additional Context...
+    validations:
+      required: false
