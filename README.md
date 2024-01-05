@@ -19,7 +19,7 @@ The SDK is currently available for JavaScript/TypeScript applications in the [`j
 
 This SDK is now generally available. We welcome your feedback and contributions!
 
-**To get started, head over to the [Getting Started Guide](getting-started/README.md).**
+**To get started, head over to the [Getting Started Guide](getting-started/00.OVERVIEW.md).**
 
 ## Capabilities
 
