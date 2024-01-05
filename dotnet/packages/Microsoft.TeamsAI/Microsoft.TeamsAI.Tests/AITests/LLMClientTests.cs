@@ -356,6 +356,89 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
+        [Fact]
+        public async Task Test_CompletePromptAsync_PromptResponse_DisableHistory()
+        {
+            // Arrange
+            var promptCompletionModel = new TestPromptCompletionModel();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
+            {
+                HistoryVariable = string.Empty,
+                InputVariable = string.Empty
+            };
+            LLMClient<object> client = new(options, null);
+            TestMemory memory = new();
+            promptCompletionModel.Results.Enqueue(new()
+            {
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.Assistant)
+                {
+                    Content = "welcome"
+                }
+            });
+
+            // Act
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager());
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(PromptResponseStatus.Success, response.Status);
+            Assert.Null(response.Error);
+            Assert.NotNull(response.Message);
+            Assert.Equal(ChatRole.Assistant, response.Message.Role);
+            Assert.Equal("welcome", response.Message.Content);
+            Assert.Equal(0, memory.Values.Count);
+        }
+
+        [Fact]
+        public async Task Test_CompletePromptAsync_PromptResponse_DisableRepair()
+        {
+            // Arrange
+            var promptCompletionModel = new TestPromptCompletionModel();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            var validator = new TestValidator();
+            LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
+            {
+                LogRepairs = true,
+                MaxRepairAttempts = 0,
+                Validator = validator
+            };
+            LLMClient<object> client = new(options, new TestLoggerFactory());
+            TestMemory memory = new();
+            promptCompletionModel.Results.Enqueue(new()
+            {
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.Assistant)
+                {
+                    Content = "welcome"
+                }
+            });
+            validator.Results.Enqueue(new()
+            {
+                Valid = false
+            });
+
+            // Act
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(PromptResponseStatus.Success, response.Status);
+            Assert.Null(response.Error);
+            Assert.NotNull(response.Message);
+            Assert.Equal(ChatRole.Assistant, response.Message.Role);
+            Assert.Equal("welcome", response.Message.Content);
+            Assert.Equal(1, memory.Values.Count);
+            Assert.Equal("hello", memory.Values[options.InputVariable]);
+        }
+
         private sealed class TestMemory : IMemory
         {
             public Dictionary<string, object> Values { get; set; } = new Dictionary<string, object>();
