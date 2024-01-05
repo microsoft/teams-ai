@@ -6,6 +6,7 @@ using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.AI.Validators;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 
 namespace Microsoft.Teams.AI.Tests.AITests
@@ -147,6 +148,28 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
+        public async Task Test_CompletePromptAsync_PromptResponse_Exception()
+        {
+            // Arrange
+            var promptCompletionModelMock = new Mock<IPromptCompletionModel>();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            LLMClientOptions<object> options = new(promptCompletionModelMock.Object, promptTemplate);
+            LLMClient<object> client = new(options, null);
+            TestMemory memory = new();
+
+            // Act
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(PromptResponseStatus.Error, response.Status);
+            Assert.NotNull(response.Error);
+        }
+
+        [Fact]
         public async Task Test_CompletePromptAsync_PromptResponse_Repair()
         {
             // Arrange
@@ -158,9 +181,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var validator = new TestValidator();
             LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
             {
+                LogRepairs = true,
                 Validator = validator
             };
-            LLMClient<object> client = new(options, null);
+            LLMClient<object> client = new(options, new TestLoggerFactory());
             TestMemory memory = new();
             promptCompletionModel.Results.Enqueue(new()
             {
@@ -203,6 +227,69 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
+        public async Task Test_CompletePromptAsync_PromptResponse_RepairNotSuccess()
+        {
+            // Arrange
+            var promptCompletionModel = new TestPromptCompletionModel();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            var validator = new TestValidator();
+            LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
+            {
+                LogRepairs = true,
+                Validator = validator
+            };
+            LLMClient<object> client = new(options, new TestLoggerFactory());
+            TestMemory memory = new();
+            promptCompletionModel.Results.Enqueue(new()
+            {
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.Assistant)
+                {
+                    Content = "welcome"
+                }
+            });
+            promptCompletionModel.Results.Enqueue(new()
+            {
+                Status = PromptResponseStatus.Success,
+                Message = new(ChatRole.Assistant)
+                {
+                    Content = "welcome-repair"
+                }
+            });
+            promptCompletionModel.Results.Enqueue(new()
+            {
+                Status = PromptResponseStatus.Error,
+                Error = new("test")
+            });
+            validator.Results.Enqueue(new()
+            {
+                Valid = false
+            });
+            validator.Results.Enqueue(new()
+            {
+                Valid = false
+            });
+            validator.Results.Enqueue(new()
+            {
+                Valid = true
+            });
+
+            // Act
+            var response = await client.CompletePromptAsync(new Mock<ITurnContext>().Object, memory, new PromptManager(), "hello");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(PromptResponseStatus.Error, response.Status);
+            Assert.NotNull(response.Error);
+            Assert.Equal("test", response.Error.Message);
+            Assert.Equal(1, memory.Values.Count);
+            Assert.Equal("hello", memory.Values[options.InputVariable]);
+        }
+
+        [Fact]
         public async Task Test_CompletePromptAsync_PromptResponse_Repair_ExceedMaxRepairAttempts()
         {
             // Arrange
@@ -214,10 +301,11 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var validator = new TestValidator();
             LLMClientOptions<object> options = new(promptCompletionModel, promptTemplate)
             {
+                LogRepairs = true,
                 Validator = validator,
                 MaxRepairAttempts = 1
             };
-            LLMClient<object> client = new(options, null);
+            LLMClient<object> client = new(options, new TestLoggerFactory());
             TestMemory memory = new();
             promptCompletionModel.Results.Enqueue(new()
             {
@@ -268,7 +356,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }
 
-        private class TestMemory : IMemory
+        private sealed class TestMemory : IMemory
         {
             public Dictionary<string, object> Values { get; set; } = new Dictionary<string, object>();
 
@@ -293,7 +381,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
         }
 
-        private class TestPromptCompletionModel : IPromptCompletionModel
+        private sealed class TestPromptCompletionModel : IPromptCompletionModel
         {
             public Queue<PromptResponse> Results { get; set; } = new Queue<PromptResponse>();
 
@@ -303,7 +391,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             }
         }
 
-        private class TestValidator : IPromptResponseValidator
+        private sealed class TestValidator : IPromptResponseValidator
         {
 
             public Queue<Validation> Results { get; set; } = new Queue<Validation>();
