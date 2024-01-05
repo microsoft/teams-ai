@@ -115,7 +115,7 @@ Alternatively, you can learn more about deploying a bot to Azure manually in the
 
 ## Further reading
 
--   [Getting started with Teams AI](../../../getting-started/README.md)
+-   [Getting started with Teams AI](../../../getting-started/00.OVERVIEW.md)
    - Introduces the Teams AI Library and reviews bot and AI-related concepts
 -   [Teams Toolkit overview](https://learn.microsoft.com/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 -   [How Microsoft Teams bots work](https://docs.microsoft.com/azure/bot-service/bot-builder-basics-teams?view=azure-bot-service-4.0&tabs=javascript)
