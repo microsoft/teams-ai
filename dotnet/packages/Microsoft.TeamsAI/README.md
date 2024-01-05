@@ -11,4 +11,4 @@ Requirements:
 
 ## Getting Started: Migration vs New Project
 
-If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/02.DOTNET.md). The basics are listed below.
+If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/02.DOTNET.md).
