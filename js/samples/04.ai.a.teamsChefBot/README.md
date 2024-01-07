@@ -147,9 +147,9 @@ Notice that the bot remembered Dave's first message when responding to the secon
     ```
 4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.a.teamsChefBot` folder. Rename the file to `.env`. 
 
-5. Add in your `OPENAI_KEY` key.
+5. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately.
 
-6. Update `config.json` and `index.ts` with your model deployment name.
+7. Update `config.json` and `index.ts` with your model deployment name.
 
 ## Multiple ways to test
 
