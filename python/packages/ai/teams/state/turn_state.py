@@ -3,25 +3,41 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from .default_conversation_state import DefaultConversationState
-from .default_user_state import DefaultUserState
 from .default_temp_state import DefaultTempState
+from .turn_state_entry import TurnStateEntry
 from .memory import Memory
 from typing import TypeVar, Generic, Optional, Callable, Awaitable, Dict, List, Any
 
 from botbuilder.core import TurnContext, Storage
 
-TConversationState = TypeVar("TConversationState", bound=DefaultConversationState)
-TUserState = TypeVar("TUserState", bound=DefaultUserState)
-TTempState = TypeVar("TTempState", bound=DefaultTempState)
 
 CONVERSATION_SCOPE = 'conversation'
 USER_SCOPE = 'user'
 TEMP_SCOPE = 'temp'
 
-class TurnState(Memory, Generic[TConversationState, TUserState, TTempState]):
+class TurnState(Memory):
+    _scopes: Dict[str, TurnStateEntry] = Dict[str, TurnStateEntry]()
     _is_loaded: bool = False
-    _loading_callable: Optional[Callable[[],Awaitable[bool]]]
+    _loading_callable: Optional[Callable[[],Awaitable[bool]]] = None
+
+    @property
+    def conversation(self) -> Dict[str,Any]:
+        scope = self.get_scope(CONVERSATION_SCOPE)
+        if not scope:
+            raise Exception("TurnState hasn't been loaded. Call loadState() first.")
+        
+        return scope.value
+
+    @property
+    def temp(self) -> DefaultTempState:
+        scope = self.get_scope(TEMP_SCOPE)
+        if not scope:
+            raise Exception("TurnState hasn't been loaded. Call loadState() first.")
+        
+        return DefaultTempState(scope.value)
+
+    def get_scope(self, scope: str) -> Optional[TurnStateEntry]:
+        return self._scopes.get(scope, None)
 
     async def load(self, context: TurnContext, storage: Optional[Storage]) -> bool:
         # Only load on first call
@@ -47,10 +63,18 @@ class TurnState(Memory, Generic[TConversationState, TUserState, TTempState]):
                     # Create scopes for items
                     for key in scopes:
                         storage_key = scopes[key]
- 
+                        value = items[storage_key]
+                        self._scopes[key] = TurnStateEntry(value, storage_key)
 
+                    # Add the temp scope
+                    self._scopes[TEMP_SCOPE] = TurnStateEntry(Dict[str, Any]())
+
+                    # Clear loading promise
+                    self._is_loaded = True
+                    self._loading_callable = None
                     return True
                 except Exception as e:
+                    self._loading_callable = None
                     raise e
 
             self._loading_callable = load_state

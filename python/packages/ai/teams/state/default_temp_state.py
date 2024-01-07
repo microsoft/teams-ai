@@ -3,12 +3,10 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
 from ..input_file import InputFile
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, TypedDict
 
-@dataclass
-class DefaultTempState:
+class DefaultTempState(TypedDict):
     input: str
     input_files: List[InputFile]
     last_output: str
