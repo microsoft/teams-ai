@@ -10,8 +10,7 @@ It is recommended to use the Teams Toolkit for Visual Studio Code way to test a 
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
-Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-BotFramework-emulator) section.
-
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](#testing-in-botframework-emulator) section.
 #### Using Teams Toolkit for Visual Studio Code 
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
