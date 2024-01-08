@@ -16,7 +16,24 @@ namespace Microsoft.Teams.AI.Tests.AITests
     public class OpenAIModelTests
     {
         [Fact]
-        public void Test_Constructor_InvalidAzureEndpoint()
+        public void Test_Constructor_OpenAI()
+        {
+            // Arrange
+            var options = new OpenAIModelOptions("test-key", "test-model");
+
+            // Act
+            try
+            {
+                new OpenAIModel(options);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Expected no exception, but got: {ex.Message}");
+            }
+        }
+
+        [Fact]
+        public void Test_Constructor_AzureOpenAI_InvalidAzureEndpoint()
         {
             // Arrange
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
@@ -30,7 +47,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
         }
 
         [Fact]
-        public void Test_Constructor_InvalidAzureApiVersion()
+        public void Test_Constructor_AzureOpenAI_InvalidAzureApiVersion()
         {
             // Arrange
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/");
@@ -43,7 +60,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             foreach (var version in versions)
             {
                 options.AzureApiVersion = version;
-                new OpenAIModel(options);
+                try
+                {
+                    new OpenAIModel(options);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail($"Expected no exception, but got: {ex.Message}");
+                }
             }
             options.AzureApiVersion = "2023-12-01-preview";
             Exception exception = Assert.Throws<ArgumentException>(() => new OpenAIModel(options));
