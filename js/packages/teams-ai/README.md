@@ -9,3 +9,12 @@ Requirements:
 -   node v18.x
 
 To get started with the SDK [see](../../../getting-started/00.OVERVIEW.md). 
+
+
+## Getting Started
+
+To get started, take a look at the [getting started docs](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.OVERVIEW.md).
+
+## Migration
+
+If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/02.JS.md).
