@@ -9,6 +9,11 @@ Requirements:
 *   [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 *   (Optional) [Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service) resource or an account with [OpenAI](https://platform.openai.com/)
 
-## Getting Started: Migration vs New Project
+
+## Getting Started
+
+To get started, take a look at the [getting started docs](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.OVERVIEW.md).
+
+## Migration
 
 If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/02.DOTNET.md).

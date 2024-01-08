@@ -28,7 +28,7 @@ There are a few ways to get the application up and running. The latest way is us
 #### Steps
 
 1. Open the solution in Visual Studio. (For example `EchoBot.sln`).
-   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section. If you can't find this section, then it means that the bot does not need them.
+   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section. If you can't find this section, then it means there is no required config values to set.
 2. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (Tunnel type: `Persistent` & Access: `Public`) or select an existing public dev tunnel.
 
    ![image](https://github.com/microsoft/teams-ai/assets/115390646/d7246d38-8276-4b2a-bc22-b72f36aa41b9)
