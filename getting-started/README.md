@@ -1,16 +1,16 @@
-# Overview
+# Getting Started
 
 _**Navigation**_
-- [**00.OVERVIEW**](./00.OVERVIEW.md)
-- [01.QUICKSTART](./01.QUICKSTART.md)
-- [02.SAMPLES](./02.SAMPLES.md)
+- [**00.OVERVIEW**](./README.md)
+- [01.QUICKSTART](./QUICKSTART.md)
+- [02.SAMPLES](./SAMPLES.md)
 ___
 
 Get started with the Teams AI Library.
 
-The first step is to get a basic bot running E2E through the [Quickstart](./01.QUICKSTART.md) guide. After that see all the [samples](02.SAMPLES.md) available.
+The first step is to get a basic bot running E2E through the [Quickstart](./QUICKSTART.md) guide. After that see all the [samples](./SAMPLES.md) available.
 
-If you have a bot built using the BotFramework SDK and want to migrate to the Teams AI library, see [Migration](./MIGRATION/00.OVERVIEW.md).
+If you have a bot built using the BotFramework SDK and want to migrate to the Teams AI library, see [Migration](./MIGRATION/README.md).
 
 ### Useful links
 

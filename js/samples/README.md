@@ -1,6 +1,6 @@
 # Samples
 
-In this folder you will find various examples showcasing the different capabilities of the JS Teams AI Library. Click on the sample folder to see set up and testing instructions. The learn more about all the different samples supported see the [getting started](../../getting-started/02.SAMPLES.md).
+In this folder you will find various examples showcasing the different capabilities of the JS Teams AI Library. Click on the sample folder to see set up and testing instructions. To learn more about all the different samples supported see the [getting started](../../getting-started/SAMPLES.md).
 
 ## Appendix
 

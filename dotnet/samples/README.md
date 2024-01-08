@@ -96,7 +96,7 @@ There are a few ways to get the application up and running. The latest way is us
 
 ## List of Samples
 
-You can find the list of samples in the [getting started docs](../../getting-started/02.SAMPLES.md).
+You can find the list of samples in the [getting started docs](../../getting-started/SAMPLES.md).
 
 ## Miscellanous Resources
 

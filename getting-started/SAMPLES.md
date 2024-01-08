@@ -1,9 +1,9 @@
 # Samples
 
 _**Navigation**_
-- [00.OVERVIEW](./00.OVERVIEW.md)
-- [01.QUICKSTART](./01.QUICKSTART.md)
-- [**02.SAMPLES**](./02.SAMPLES.md)
+- [00.OVERVIEW](./README.md)
+- [01.QUICKSTART](./QUICKSTART.md)
+- [**02.SAMPLES**](./SAMPLES.md)
 ___
 
 

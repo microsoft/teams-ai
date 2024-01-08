@@ -8,12 +8,12 @@ Requirements:
 -   node v16.x
 -   node v18.x
 
-To get started with the SDK [see](../../../getting-started/00.OVERVIEW.md). 
+To get started with the SDK [see](../../../getting-started/README.md). 
 
 
 ## Getting Started
 
-To get started, take a look at the [getting started docs](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.OVERVIEW.md).
+To get started, take a look at the [getting started docs](https://github.com/microsoft/teams-ai/blob/main/getting-started/README.md).
 
 ## Migration
 

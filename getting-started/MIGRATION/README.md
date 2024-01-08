@@ -1,9 +1,9 @@
 # Migration
 
 _**Navigation**_
-- [**00.OVERVIEW**](./00.OVERVIEW.md)
-- [01.JS](./01.JS.md)
-- [02.DOTNET](./02.DOTNET.md)
+- [**00.OVERVIEW**](./README.md)
+- [01.JS](./JS.md)
+- [02.DOTNET](./DOTNET.md)
 ___
 
 ### Why you should migrate to the Teams AI library
@@ -25,5 +25,5 @@ This library provides the `Application` object which replaces the traditional `A
 
 Here are the guides on how to migrate from the BotFramework SDK:
 
-1. [JS Migration](01.JS.md)
-2. [C# Migration](02.DOTNET.md)
+1. [JS Migration](JS.md)
+2. [C# Migration](DOTNET.md)

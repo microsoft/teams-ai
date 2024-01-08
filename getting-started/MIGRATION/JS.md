@@ -1,16 +1,16 @@
 # Migrating from the BotFramework SDK (Javascript)
 
 _**Navigation**_
-- [00.OVERVIEW](./00.OVERVIEW.md)
-- [**01.JS**](./01.JS.md)
-- [02.DOTNET](./02.DOTNET.md)
+- [00.OVERVIEW](./README.md)
+- [**01.JS**](./JS.md)
+- [02.DOTNET](./DOTNET.md)
 ___
 
 If you have a bot built using the JS BotFramework SDK, the following will help you update your bot to the Teams AI library.
 
 ## New Project or Migrate existing app
 
-Since the library builds on top of the BF SDK, much of the bot logic can be directly carried over to the Teams AI app. If you want to start with a new project, set up the Echo bot sample in the [quick start](../.01.QUICKSTART.md) guide and jump directly to [step 2](#2-replace-the-activity-handler-implementations-with-specific-route-handlers).
+Since the library builds on top of the BF SDK, much of the bot logic can be directly carried over to the Teams AI app. If you want to start with a new project, set up the Echo bot sample in the [quick start](../.QUICKSTART.md) guide and jump directly to [step 2](#2-replace-the-activity-handler-implementations-with-specific-route-handlers).
 
 If you want to migrate your existing app start with [step 1](#1-replace-the-activityhandler-with-the-application-object).
 
