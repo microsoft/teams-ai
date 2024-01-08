@@ -1,8 +1,8 @@
-import assert from "assert";
-import { OpenAIClient, OpenAIClientOptions } from "./OpenAIClient";
-import { CreateChatCompletionRequest, CreateEmbeddingRequest, CreateModerationRequest } from "./types";
-import sinon, { SinonStub } from "sinon";
-import axios from "axios";
+import assert from 'assert';
+import { OpenAIClient, OpenAIClientOptions } from './OpenAIClient';
+import { CreateChatCompletionRequest, CreateEmbeddingRequest, CreateModerationRequest } from './types';
+import sinon, { SinonStub } from 'sinon';
+import axios from 'axios';
 
 describe('OpenAIClient', () => {
     const mockAxios = axios;
@@ -11,76 +11,77 @@ describe('OpenAIClient', () => {
     let createStub: SinonStub;
 
     const options: OpenAIClientOptions = {
-        apiKey: "mock-key",
+        apiKey: 'mock-key'
     };
     const optionsWithInvalidEndpoint: OpenAIClientOptions = {
-        apiKey: "mock-key",
-        endpoint: "www.",
+        apiKey: 'mock-key',
+        endpoint: 'www.'
     };
     const optionsWithEmptyAPIKey: OpenAIClientOptions = {
-        apiKey: "",
+        apiKey: ''
     };
     const optionsWithAllFields: OpenAIClientOptions = {
-        apiKey: "mock-key",
-        organization: "org",
-        endpoint: "https://api.openai.com",
-        headerKey: "456",
+        apiKey: 'mock-key',
+        organization: 'org',
+        endpoint: 'https://api.openai.com',
+        headerKey: '456'
     };
-    const header = { 
+    const header = {
         headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Microsoft Teams Conversational AI SDK',
-        Authorization: `Bearer ${options.apiKey}`
-    }};
-    const headerWithAllFields = { 
+            'Content-Type': 'application/json',
+            'User-Agent': 'Microsoft Teams Conversational AI SDK',
+            Authorization: `Bearer ${options.apiKey}`
+        }
+    };
+    const headerWithAllFields = {
         headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Microsoft Teams Conversational AI SDK',
-        Authorization:`Bearer ${optionsWithAllFields.apiKey}`,
-        'OpenAI-Organization': `${optionsWithAllFields.organization}`
-    }};
+            'Content-Type': 'application/json',
+            'User-Agent': 'Microsoft Teams Conversational AI SDK',
+            Authorization: `Bearer ${optionsWithAllFields.apiKey}`,
+            'OpenAI-Organization': `${optionsWithAllFields.organization}`
+        }
+    };
     const chatCompletionRequest: CreateChatCompletionRequest = {
-        model: "gpt-3.5-turbo",
+        model: 'gpt-3.5-turbo',
         messages: [
-          {
-            "role": "system",
-            "content": "You are a helpful assistant."
-          },
-          {
-            "role": "user",
-            "content": "Hello!"
-          }
+            {
+                role: 'system',
+                content: 'You are a helpful assistant.'
+            },
+            {
+                role: 'user',
+                content: 'Hello!'
+            }
         ]
     };
     const chatCompletionResponse = {
-        status: "200",
-        statusText: "OK", 
-        data: { object: "chat.completion" },
+        status: '200',
+        statusText: 'OK',
+        data: { object: 'chat.completion' }
     };
     const embeddingRequest: CreateEmbeddingRequest = {
-        model: "text-embedding-ada-002",
-        input: "The food was delicious and the waiter...",
+        model: 'text-embedding-ada-002',
+        input: 'The food was delicious and the waiter...'
     };
     const embeddingResponse = {
-        status: "200",
-        statusText: "OK", 
-        data: { object: "list" },
+        status: '200',
+        statusText: 'OK',
+        data: { object: 'list' }
     };
     const moderationRequest: CreateModerationRequest = {
-        input: "I want to eat",
+        input: 'I want to eat'
     };
     const moderationResponse = {
-        status: "200",
-        statusText: "OK",
+        status: '200',
+        statusText: 'OK',
         data: {
             blocklistsMatch: [],
-            categoriesAnalysis:
-                [
-                    {
-                        category: "Hate",
-                        severity: 0
-                    }
-                ]
+            categoriesAnalysis: [
+                {
+                    category: 'Hate',
+                    severity: 0
+                }
+            ]
         }
     };
 
@@ -104,13 +105,19 @@ describe('OpenAIClient', () => {
         });
 
         it('should throw error due to invalid endpoint', () => {
-            assert.throws(() => new OpenAIClient(optionsWithInvalidEndpoint), 
-            new Error(`OpenAIClient initialized with an invalid endpoint of '${optionsWithInvalidEndpoint.endpoint}'. The endpoint must be a valid HTTPS url.`));
+            assert.throws(
+                () => new OpenAIClient(optionsWithInvalidEndpoint),
+                new Error(
+                    `OpenAIClient initialized with an invalid endpoint of '${optionsWithInvalidEndpoint.endpoint}'. The endpoint must be a valid HTTPS url.`
+                )
+            );
         });
 
         it('should throw error due to invalid api key', () => {
-            assert.throws(() => new OpenAIClient(optionsWithEmptyAPIKey), 
-            new Error(`OpenAIClient initialized without an 'apiKey'.`));
+            assert.throws(
+                () => new OpenAIClient(optionsWithEmptyAPIKey),
+                new Error(`OpenAIClient initialized without an 'apiKey'.`)
+            );
         });
 
         it('should create a valid OpenAIClient with all fields', () => {
@@ -134,9 +141,9 @@ describe('OpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, chatCompletionRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "chat.completion");
+            assert.equal(response.data?.object, 'chat.completion');
         });
         it('creates valid chat completion response with valid endpoint', async () => {
             const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
@@ -146,9 +153,9 @@ describe('OpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, chatCompletionRequest, headerWithAllFields), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "chat.completion");
+            assert.equal(response.data?.object, 'chat.completion');
         });
     });
 
@@ -161,9 +168,9 @@ describe('OpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, embeddingRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "list");
+            assert.equal(response.data?.object, 'list');
         });
 
         it('creates valid embedding response with valid endpoint', async () => {
@@ -174,9 +181,9 @@ describe('OpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, embeddingRequest, headerWithAllFields), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "list");
+            assert.equal(response.data?.object, 'list');
         });
     });
 
@@ -189,18 +196,18 @@ describe('OpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, moderationRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
         });
 
         it('creates valid moderation response with valid endpoint', async () => {
             const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
             const url = `${optionsWithAllFields.endpoint}/v1/moderations`;
             const response = await clientWithAllFields.createModeration(moderationRequest);
-            
+
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, moderationRequest, headerWithAllFields), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
         });
     });
 });

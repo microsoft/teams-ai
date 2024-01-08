@@ -14,7 +14,7 @@ import {
     Colorize,
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
-    OpenAICreateChatCompletionRequest,
+    OpenAICreateChatCompletionRequest
 } from '../internals';
 import { Tokenizer } from '../tokenizers';
 import { TurnContext } from 'botbuilder';
@@ -194,93 +194,87 @@ export class OpenAIModel implements PromptCompletionModel {
             (this._useAzure
                 ? (this.options as AzureOpenAIModelOptions).azureDefaultDeployment
                 : (this.options as OpenAIModelOptions).defaultModel);
-            // Render prompt
-            const result = await template.prompt.renderAsMessages(
-                context,
-                memory,
-                functions,
-                tokenizer,
-                max_input_tokens
-            );
-            if (result.tooLong) {
-                return {
-                    status: 'too_long',
-                    input: undefined,
-                    error: new Error(
-                        `The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`
-                    )
-                };
-            }
-            if (!this.options.useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
-                result.output[0].role = 'user';
-            }
+        // Render prompt
+        const result = await template.prompt.renderAsMessages(context, memory, functions, tokenizer, max_input_tokens);
+        if (result.tooLong) {
+            return {
+                status: 'too_long',
+                input: undefined,
+                error: new Error(
+                    `The generated chat completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`
+                )
+            };
+        }
+        if (!this.options.useSystemMessages && result.output.length > 0 && result.output[0].role == 'system') {
+            result.output[0].role = 'user';
+        }
+        if (this.options.logRequests) {
+            console.log(Colorize.title('CHAT PROMPT:'));
+            console.log(Colorize.output(result.output));
+        }
+
+        // Get input message
+        // - we're doing this here because the input message can be complex and include images.
+        let input: Message<any> | undefined;
+        const last = result.output.length - 1;
+        if (last > 0 && result.output[last].role == 'user') {
+            input = result.output[last];
+        }
+
+        // Call chat completion API
+        const request: CreateChatCompletionRequest = this.copyOptionsToRequest<CreateChatCompletionRequest>(
+            {
+                messages: result.output as ChatCompletionRequestMessage[]
+            },
+            template.config.completion,
+            [
+                'max_tokens',
+                'temperature',
+                'top_p',
+                'n',
+                'stream',
+                'logprobs',
+                'echo',
+                'stop',
+                'presence_penalty',
+                'frequency_penalty',
+                'best_of',
+                'logit_bias',
+                'user',
+                'functions',
+                'function_call'
+            ]
+        );
+        const response = await this.createChatCompletion(request, model);
+        if (this.options.logRequests) {
+            console.log(Colorize.title('CHAT RESPONSE:'));
+            console.log(Colorize.value('status', response.status));
+            console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+            console.log(Colorize.output(response.data));
+        }
+
+        // Process response
+        if (response.status < 300) {
+            const completion = response.data.choices[0];
+            return { status: 'success', input, message: completion.message ?? { role: 'assistant', content: '' } };
+        } else if (response.status == 429) {
             if (this.options.logRequests) {
-                console.log(Colorize.title('CHAT PROMPT:'));
-                console.log(Colorize.output(result.output));
+                console.log(Colorize.title('HEADERS:'));
+                console.log(Colorize.output(response.headers));
             }
-
-            // Get input message
-            // - we're doing this here because the input message can be complex and include images.
-            let input: Message<any> | undefined;
-            const last = result.output.length - 1;
-            if (last > 0 && result.output[last].role == 'user') {
-                input = result.output[last];
-            }
-
-            // Call chat completion API
-            const request: CreateChatCompletionRequest = this.copyOptionsToRequest<CreateChatCompletionRequest>(
-                {
-                    messages: result.output as ChatCompletionRequestMessage[]
-                },
-                template.config.completion,
-                [
-                    'max_tokens',
-                    'temperature',
-                    'top_p',
-                    'n',
-                    'stream',
-                    'logprobs',
-                    'echo',
-                    'stop',
-                    'presence_penalty',
-                    'frequency_penalty',
-                    'best_of',
-                    'logit_bias',
-                    'user',
-                    'functions',
-                    'function_call'
-                ]
-            );
-            const response = await this.createChatCompletion(request, model);
-            if (this.options.logRequests) {
-                console.log(Colorize.title('CHAT RESPONSE:'));
-                console.log(Colorize.value('status', response.status));
-                console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
-                console.log(Colorize.output(response.data));
-            }
-
-            // Process response
-            if (response.status < 300) {
-                const completion = response.data.choices[0];
-                return { status: 'success', input, message: completion.message ?? { role: 'assistant', content: '' } };
-            } else if (response.status == 429) {
-                if (this.options.logRequests) {
-                    console.log(Colorize.title('HEADERS:'));
-                    console.log(Colorize.output(response.headers));
-                }
-                return {
-                    status: 'rate_limited',
-                    input: undefined,
-                    error: new Error(`The chat completion API returned a rate limit error.`)
-                };
-            } else {
-                return {
-                    status: 'error',
-                    input: undefined,
-                    error: new Error(
-                        `The chat completion API returned an error status of ${response.status}: ${response.statusText}`
-                    )
-                };
+            return {
+                status: 'rate_limited',
+                input: undefined,
+                error: new Error(`The chat completion API returned a rate limit error.`)
+            };
+        } else {
+            return {
+                status: 'error',
+                input: undefined,
+                error: new Error(
+                    `The chat completion API returned an error status of ${response.status}: ${response.statusText}`
+                )
+            };
         }
     }
 

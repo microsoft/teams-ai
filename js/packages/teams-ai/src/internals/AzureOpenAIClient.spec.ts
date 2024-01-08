@@ -1,8 +1,8 @@
-import assert from "assert";
-import { AzureOpenAIClient, AzureOpenAIClientOptions } from "./AzureOpenAIClient";
-import { CreateChatCompletionRequest, CreateEmbeddingRequest, ModerationInput } from "./types";
-import sinon, { SinonStub } from "sinon";
-import axios from "axios";
+import assert from 'assert';
+import { AzureOpenAIClient, AzureOpenAIClientOptions } from './AzureOpenAIClient';
+import { CreateChatCompletionRequest, CreateEmbeddingRequest, ModerationInput } from './types';
+import sinon, { SinonStub } from 'sinon';
+import axios from 'axios';
 
 describe('AzureOpenAIClient', () => {
     const mockAxios = axios;
@@ -12,29 +12,29 @@ describe('AzureOpenAIClient', () => {
     let createStub: SinonStub;
 
     const options: AzureOpenAIClientOptions = {
-        apiKey: "mock-key",
-        endpoint: "https://mock.openai.azure.com/",
+        apiKey: 'mock-key',
+        endpoint: 'https://mock.openai.azure.com/'
     };
     const optionsWithApiVersion: AzureOpenAIClientOptions = {
-        apiKey: "mock-key",
-        endpoint: "https://mock.openai.azure.com/",
-        apiVersion: "2023-03-15-preview",
+        apiKey: 'mock-key',
+        endpoint: 'https://mock.openai.azure.com/',
+        apiVersion: '2023-03-15-preview'
     };
     const optionsMissingEndpoint: AzureOpenAIClientOptions = {
-        apiKey: "mock-key",
-        endpoint: "",
-    }
+        apiKey: 'mock-key',
+        endpoint: ''
+    };
     const cognitiveServiceOptions: AzureOpenAIClientOptions = {
-        apiKey: "mock-key",
-        endpoint: "https://mock-content-safety.cognitiveservices.azure.com/",
-        apiVersion: "2023-10-01",
-        ocpApimSubscriptionKey: "mock-key-2",
-    }
+        apiKey: 'mock-key',
+        endpoint: 'https://mock-content-safety.cognitiveservices.azure.com/',
+        apiVersion: '2023-10-01',
+        ocpApimSubscriptionKey: 'mock-key-2'
+    };
     const header = {
         headers: {
             'Content-Type': 'application/json',
             'User-Agent': 'Microsoft Teams Conversational AI SDK',
-            'api-key': `${options.apiKey}`,
+            'api-key': `${options.apiKey}`
         }
     };
     const cognitiveServiceHeader = {
@@ -42,59 +42,58 @@ describe('AzureOpenAIClient', () => {
             'Content-Type': 'application/json',
             'User-Agent': 'Microsoft Teams Conversational AI SDK',
             'api-key': `${cognitiveServiceOptions.apiKey}`,
-            'Ocp-Apim-Subscription-Key': `${cognitiveServiceOptions.ocpApimSubscriptionKey}`,
+            'Ocp-Apim-Subscription-Key': `${cognitiveServiceOptions.ocpApimSubscriptionKey}`
         }
     };
     const chatCompletionRequest: CreateChatCompletionRequest = {
-        model: "gpt-35-turbo",
+        model: 'gpt-35-turbo',
         messages: [
             {
-                "role": "system",
-                "content": "You are a helpful assistant."
+                role: 'system',
+                content: 'You are a helpful assistant.'
             },
             {
-                "role": "user",
-                "content": "Does Azure OpenAI support customer managed keys?"
+                role: 'user',
+                content: 'Does Azure OpenAI support customer managed keys?'
             },
             {
-                "role": "assistant",
-                "content": "Yes, customer managed keys are supported by Azure OpenAI."
+                role: 'assistant',
+                content: 'Yes, customer managed keys are supported by Azure OpenAI.'
             },
             {
-                "role": "user",
-                "content": "Do other Azure AI services support this too?"
+                role: 'user',
+                content: 'Do other Azure AI services support this too?'
             }
         ]
     };
     const chatCompletionResponse = {
-        status: "200",
-        statusText: "OK",
-        data: { object: "chat.completion" },
+        status: '200',
+        statusText: 'OK',
+        data: { object: 'chat.completion' }
     };
     const embeddingRequest: CreateEmbeddingRequest = {
-        model: "text-embedding-ada-002",
-        input: "The food was delicious and the waiter...",
+        model: 'text-embedding-ada-002',
+        input: 'The food was delicious and the waiter...'
     };
     const embeddingResponse = {
-        status: "200",
-        statusText: "OK",
-        data: { object: "list" },
+        status: '200',
+        statusText: 'OK',
+        data: { object: 'list' }
     };
     const moderationRequest: ModerationInput = {
-        text: "I want to eat",
+        text: 'I want to eat'
     };
     const moderationResponse = {
-        status: "200",
-        statusText: "OK",
+        status: '200',
+        statusText: 'OK',
         data: {
             blocklistsMatch: [],
-            categoriesAnalysis:
-                [
-                    {
-                        category: "Hate",
-                        severity: 0
-                    }
-                ]
+            categoriesAnalysis: [
+                {
+                    category: 'Hate',
+                    severity: 0
+                }
+            ]
         }
     };
 
@@ -119,8 +118,10 @@ describe('AzureOpenAIClient', () => {
         });
 
         it('should throw error due to invalid endpoint', () => {
-            assert.throws(() => new AzureOpenAIClient(optionsMissingEndpoint),
-                new Error(`AzureOpenAIClient initialized without an 'endpoint'.`));
+            assert.throws(
+                () => new AzureOpenAIClient(optionsMissingEndpoint),
+                new Error(`AzureOpenAIClient initialized without an 'endpoint'.`)
+            );
         });
 
         it('should create a valid OpenAIClient with added apiVersion field', () => {
@@ -143,9 +144,9 @@ describe('AzureOpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, chatCompletionRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "chat.completion");
+            assert.equal(response.data?.object, 'chat.completion');
         });
 
         it('creates valid chat completion response, with api version specified', async () => {
@@ -156,9 +157,9 @@ describe('AzureOpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, chatCompletionRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "chat.completion");
+            assert.equal(response.data?.object, 'chat.completion');
         });
     });
 
@@ -171,9 +172,9 @@ describe('AzureOpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, embeddingRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "list");
+            assert.equal(response.data?.object, 'list');
         });
 
         it('creates valid embedding response with api version specified', async () => {
@@ -184,9 +185,9 @@ describe('AzureOpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, embeddingRequest, header), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
-            assert.equal(response.data?.object, "list");
+            assert.equal(response.data?.object, 'list');
         });
     });
 
@@ -199,7 +200,7 @@ describe('AzureOpenAIClient', () => {
             assert.equal(postStub.calledOnce, true);
             assert.equal(postStub.calledOnceWith(url, moderationRequest, cognitiveServiceHeader), true);
             assert.equal(response.status, 200);
-            assert.equal(response.statusText, "OK");
+            assert.equal(response.statusText, 'OK');
             assert.notEqual(response.data, undefined);
         });
     });

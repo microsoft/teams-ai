@@ -49,8 +49,7 @@ export declare type CreateChatCompletionRequestFunctionCall = CreateChatCompleti
 /**
  * @private
  */
-export interface CreateChatCompletionTool
-{
+export interface CreateChatCompletionTool {
     type: 'function';
     function: ChatCompletionAction;
 }
@@ -72,8 +71,7 @@ export interface OpenAICreateChatCompletionRequest extends CreateChatCompletionR
 /**
  * @private
  */
-export interface ChatCompletionRequestMessageToolCall
-{
+export interface ChatCompletionRequestMessageToolCall {
     id: string;
     type: 'function';
     function: ChatCompletionRequestMessageFunctionCall;
@@ -86,7 +84,7 @@ export interface ChatCompletionRequestMessage {
     role: 'system' | 'user' | 'assistant' | 'tool';
     content: string;
     name?: string;
-    tool_calls?: Array<ChatCompletionRequestMessageToolCall>
+    tool_calls?: Array<ChatCompletionRequestMessageToolCall>;
     tool_call_id?: string;
 }
 
@@ -119,7 +117,7 @@ export interface CreateChatCompletionResponseChoicesInner {
 export interface ChatCompletionResponseMessage {
     role: 'system' | 'user' | 'assistant';
     content: string | undefined;
-    tool_calls?: Array<ChatCompletionRequestMessageToolCall>
+    tool_calls?: Array<ChatCompletionRequestMessageToolCall>;
 }
 
 /**
