@@ -1,12 +1,15 @@
 ﻿using Azure;
 using Azure.AI.OpenAI;
+using Azure.Core;
 using Microsoft.Bot.Builder;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.AI.Prompts.Sections;
 using Microsoft.Teams.AI.AI.Tokenizers;
 using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 using ChatRole = Microsoft.Teams.AI.AI.Models.ChatRole;
@@ -22,14 +25,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var options = new OpenAIModelOptions("test-key", "test-model");
 
             // Act
-            try
-            {
-                new OpenAIModel(options);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Expected no exception, but got: {ex.Message}");
-            }
+            new OpenAIModel(options);
         }
 
         [Fact]
@@ -60,14 +56,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             foreach (var version in versions)
             {
                 options.AzureApiVersion = version;
-                try
-                {
-                    new OpenAIModel(options);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail($"Expected no exception, but got: {ex.Message}");
-                }
+                new OpenAIModel(options);
             }
             options.AzureApiVersion = "2023-12-01-preview";
             Exception exception = Assert.Throws<ArgumentException>(() => new OpenAIModel(options));
@@ -90,9 +79,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Text
+                CompletionType = CompletionConfiguration.CompletionType.Text,
+                LogRequests = true
             };
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
 
             // Act
             var result = await openAIModel.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, new PromptManager(), new GPTTokenizer(), promptTemplate);
@@ -117,12 +107,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Text
+                CompletionType = CompletionConfiguration.CompletionType.Text,
+                LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var exception = new RequestFailedException(429, "exception");
+            var response = new TestResponse(429, "exception");
+            var exception = new RequestFailedException(response);
             clientMock.Setup((client) => client.GetCompletionsAsync(It.IsAny<CompletionsOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
             openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
 
             // Act
@@ -148,12 +140,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Text
+                CompletionType = CompletionConfiguration.CompletionType.Text,
+                LogRequests = true,
             };
             var clientMock = new Mock<OpenAIClient>();
-            var exception = new RequestFailedException(500, "exception");
+            var response = new TestResponse(500, "exception");
+            var exception = new RequestFailedException(response);
             clientMock.Setup((client) => client.GetCompletionsAsync(It.IsAny<CompletionsOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
             openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
 
             // Act
@@ -162,7 +156,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.Equal(PromptResponseStatus.Error, result.Status);
             Assert.NotNull(result.Error);
-            Assert.Equal("The text completion API returned an error status of InternalServerError: exception", result.Error.Message);
+            Assert.Equal("The text completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)\r\n\r\nHeaders:\r\n", result.Error.Message);
         }
 
         [Fact]
@@ -179,15 +173,16 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Text
+                CompletionType = CompletionConfiguration.CompletionType.Text,
+                LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
             var choice = CreateChoice("test-choice", 0, null, null);
             var usage = CreateCompletionsUsage(0, 0, 0);
             var completions = CreateCompletions("test-id", DateTimeOffset.UtcNow, new List<Choice> { choice }, usage);
-            Response? response = null;
-            clientMock.Setup((client) => client.GetCompletionsAsync(It.IsAny<CompletionsOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(completions, response!));
-            var openAIModel = new OpenAIModel(options);
+            Response response = new TestResponse(200, string.Empty);
+            clientMock.Setup((client) => client.GetCompletionsAsync(It.IsAny<CompletionsOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(completions, response));
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
             openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
 
             // Act
@@ -215,9 +210,10 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Chat
+                CompletionType = CompletionConfiguration.CompletionType.Chat,
+                LogRequests = true,
             };
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
 
             // Act
             var result = await openAIModel.CompletePromptAsync(turnContextMock.Object, turnStateMock.Object, new PromptManager(), new GPTTokenizer(), promptTemplate);
@@ -242,12 +238,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Chat
+                CompletionType = CompletionConfiguration.CompletionType.Chat,
+                LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var exception = new RequestFailedException(429, "exception");
+            var response = new TestResponse(429, "exception");
+            var exception = new RequestFailedException(response);
             clientMock.Setup((client) => client.GetChatCompletionsAsync(It.IsAny<ChatCompletionsOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
             openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
 
             // Act
@@ -273,12 +271,14 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Chat
+                CompletionType = CompletionConfiguration.CompletionType.Chat,
+                LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var exception = new RequestFailedException(500, "exception");
+            var response = new TestResponse(500, "exception");
+            var exception = new RequestFailedException(response);
             clientMock.Setup((client) => client.GetChatCompletionsAsync(It.IsAny<ChatCompletionsOptions>(), It.IsAny<CancellationToken>())).ThrowsAsync(exception);
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
             openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
 
             // Act
@@ -287,7 +287,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             // Assert
             Assert.Equal(PromptResponseStatus.Error, result.Status);
             Assert.NotNull(result.Error);
-            Assert.Equal("The chat completion API returned an error status of InternalServerError: exception", result.Error.Message);
+            Assert.Equal("The chat completion API returned an error status of InternalServerError: Service request failed.\r\nStatus: 500 (exception)\r\n\r\nHeaders:\r\n", result.Error.Message);
         }
 
         [Fact]
@@ -304,15 +304,16 @@ namespace Microsoft.Teams.AI.Tests.AITests
             var promptTemplate = new PromptTemplate("test-prompt", promptMock.Object);
             var options = new AzureOpenAIModelOptions("test-key", "test-deployment", "https://test.openai.azure.com/")
             {
-                CompletionType = CompletionConfiguration.CompletionType.Chat
+                CompletionType = CompletionConfiguration.CompletionType.Chat,
+                LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
             var chatChoice = CreateChatChoice(new Azure.AI.OpenAI.ChatMessage(Azure.AI.OpenAI.ChatRole.Assistant, "test-choice"), 0, null, null, null);
             var usage = CreateCompletionsUsage(0, 0, 0);
             var chatCompletions = CreateChatCompletions("test-id", DateTimeOffset.UtcNow, new List<ChatChoice> { chatChoice }, usage);
-            Response? response = null;
+            Response response = new TestResponse(200, string.Empty);
             clientMock.Setup((client) => client.GetChatCompletionsAsync(It.IsAny<ChatCompletionsOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(chatCompletions, response!));
-            var openAIModel = new OpenAIModel(options);
+            var openAIModel = new OpenAIModel(options, loggerFactory: new TestLoggerFactory());
             openAIModel.GetType().GetField("_openAIClient", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(openAIModel, clientMock.Object);
 
             // Act
@@ -367,6 +368,68 @@ namespace Microsoft.Teams.AI.Tests.AITests
             ConstructorInfo info = type.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, paramTypes, null)!;
 
             return (T)info.Invoke(paramValues);
+        }
+    }
+
+    public class TestResponse : Response
+    {
+        private readonly Dictionary<string, List<string>> _headers = new(StringComparer.OrdinalIgnoreCase);
+
+        public TestResponse(int status, string reasonPhrase)
+        {
+            Status = status;
+            ReasonPhrase = reasonPhrase;
+            ClientRequestId = string.Empty;
+        }
+
+        public override int Status { get; }
+
+        public override string ReasonPhrase { get; }
+
+        public override Stream? ContentStream { get; set; }
+
+        public override string ClientRequestId { get; set; }
+
+        private bool? _isError;
+        public override bool IsError { get => _isError ?? base.IsError; }
+        public void SetIsError(bool value) => _isError = value;
+
+        public bool IsDisposed { get; private set; }
+
+        protected override bool TryGetHeader(string name, [NotNullWhen(true)] out string? value)
+        {
+            if (_headers.TryGetValue(name, out List<string>? values))
+            {
+                value = JoinHeaderValue(values);
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+
+        protected override bool TryGetHeaderValues(string name, [NotNullWhen(true)] out IEnumerable<string>? values)
+        {
+            var result = _headers.TryGetValue(name, out List<string>? valuesList);
+            values = valuesList;
+            return result;
+        }
+
+        protected override bool ContainsHeader(string name)
+        {
+            return TryGetHeaderValues(name, out _);
+        }
+
+        protected override IEnumerable<HttpHeader> EnumerateHeaders() => _headers.Select(h => new HttpHeader(h.Key, JoinHeaderValue(h.Value)));
+
+        private static string JoinHeaderValue(IEnumerable<string> values)
+        {
+            return string.Join(",", values);
+        }
+
+        public override void Dispose()
+        {
+            IsDisposed = true;
         }
     }
 }
