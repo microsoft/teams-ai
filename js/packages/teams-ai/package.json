@@ -23,9 +23,9 @@
     "types": "./lib/index.d.ts",
     "dependencies": {
         "@azure/msal-node": "^2.6.0",
-        "axios": "^1.6.3",
-        "botbuilder": "^4.21.3",
-        "botbuilder-dialogs": "^4.21.3",
+        "axios": "^1.6.5",
+        "botbuilder": "^4.21.4",
+        "botbuilder-dialogs": "^4.21.4",
         "gpt-3-encoder": "^1.1.4",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
