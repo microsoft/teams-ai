@@ -14,10 +14,7 @@ import {
     Colorize,
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
-    CreateCompletionRequest,
-    CreateCompletionResponse,
     OpenAICreateChatCompletionRequest,
-    OpenAICreateCompletionRequest
 } from '../internals';
 import { Tokenizer } from '../tokenizers';
 import { TurnContext } from 'botbuilder';
@@ -27,11 +24,6 @@ import { Memory } from '../MemoryFork';
  * Base model options common to both OpenAI and Azure OpenAI services.
  */
 export interface BaseOpenAIModelOptions {
-    /**
-     * Optional. Type of completion to use for the default model. Defaults to 'chat'.
-     */
-    completion_type?: 'chat' | 'text';
-
     /**
      * Optional. Whether to log requests to the console.
      * @remarks
@@ -197,87 +189,11 @@ export class OpenAIModel implements PromptCompletionModel {
     ): Promise<PromptResponse<string>> {
         const startTime = Date.now();
         const max_input_tokens = template.config.completion.max_input_tokens;
-        const completion_type = template.config.completion.completion_type ?? this.options.completion_type;
         const model =
             template.config.completion.model ??
             (this._useAzure
                 ? (this.options as AzureOpenAIModelOptions).azureDefaultDeployment
                 : (this.options as OpenAIModelOptions).defaultModel);
-        if (completion_type == 'text') {
-            // Render prompt
-            const result = await template.prompt.renderAsText(context, memory, functions, tokenizer, max_input_tokens);
-            if (result.tooLong) {
-                return {
-                    status: 'too_long',
-                    input: undefined,
-                    error: new Error(
-                        `The generated text completion prompt had a length of ${result.length} tokens which exceeded the max_input_tokens of ${max_input_tokens}.`
-                    )
-                };
-            }
-            if (this.options.logRequests) {
-                console.log(Colorize.title('PROMPT:'));
-                console.log(Colorize.output(result.output));
-            }
-
-            // Call text completion API
-            const request: CreateCompletionRequest = this.copyOptionsToRequest<CreateCompletionRequest>(
-                {
-                    prompt: result.output
-                },
-                template.config.completion,
-                [
-                    'max_tokens',
-                    'temperature',
-                    'top_p',
-                    'n',
-                    'stream',
-                    'logprobs',
-                    'echo',
-                    'stop',
-                    'presence_penalty',
-                    'frequency_penalty',
-                    'best_of',
-                    'logit_bias',
-                    'user'
-                ]
-            );
-            const response = await this.createCompletion(request, model);
-            if (this.options.logRequests) {
-                console.log(Colorize.title('RESPONSE:'));
-                console.log(Colorize.value('status', response.status));
-                console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
-                console.log(Colorize.output(response.data));
-            }
-
-            // Process response
-            if (response.status < 300) {
-                const completion = response.data.choices[0];
-                return {
-                    status: 'success',
-                    input: undefined,
-                    message: { role: 'assistant', content: completion.text ?? '' }
-                };
-            } else if (response.status == 429) {
-                if (this.options.logRequests) {
-                    console.log(Colorize.title('HEADERS:'));
-                    console.log(Colorize.output(response.headers));
-                }
-                return {
-                    status: 'rate_limited',
-                    input: undefined,
-                    error: new Error(`The text completion API returned a rate limit error.`)
-                };
-            } else {
-                return {
-                    status: 'error',
-                    input: undefined,
-                    error: new Error(
-                        `The text completion API returned an error status of ${response.status}: ${response.statusText}`
-                    )
-                };
-            }
-        } else {
             // Render prompt
             const result = await template.prompt.renderAsMessages(
                 context,
@@ -365,7 +281,6 @@ export class OpenAIModel implements PromptCompletionModel {
                         `The chat completion API returned an error status of ${response.status}: ${response.statusText}`
                     )
                 };
-            }
         }
     }
 
@@ -383,29 +298,6 @@ export class OpenAIModel implements PromptCompletionModel {
         }
 
         return target as TRequest;
-    }
-
-    /**
-     * @param request
-     * @param model
-     * @private
-     */
-    protected createCompletion(
-        request: CreateCompletionRequest,
-        model: string
-    ): Promise<AxiosResponse<CreateCompletionResponse>> {
-        if (this._useAzure) {
-            const options = this.options as AzureOpenAIModelOptions;
-            const url = `${
-                options.azureEndpoint
-            }/openai/deployments/${model}/completions?api-version=${options.azureApiVersion!}`;
-            return this.post(url, request);
-        } else {
-            const options = this.options as OpenAIModelOptions;
-            const url = `${options.endpoint ?? 'https://api.openai.com'}/v1/completions`;
-            (request as OpenAICreateCompletionRequest).model = model;
-            return this.post(url, request);
-        }
     }
 
     /**

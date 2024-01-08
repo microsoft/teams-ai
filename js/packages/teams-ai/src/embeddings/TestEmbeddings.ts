@@ -49,10 +49,11 @@ export class TestEmbeddings implements EmbeddingsModel {
 
     /**
      * Returns a generated set of test embeddings
+     * @param model Name of the model to use (or deployment for Azure).
      * @param inputs Input to generate embeddings for.
      * @returns The generated embeddings.
      */
-    public createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
+    public createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse> {
         // Validate inputs
         if (typeof inputs == 'string') {
             if (inputs.trim().length == 0) {

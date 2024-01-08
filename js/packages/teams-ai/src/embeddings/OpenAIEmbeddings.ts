@@ -156,7 +156,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
      * @param inputs Text inputs to create embeddings for.
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
-    public async createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
+    public async createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse> {
         if (this.options.logRequests) {
             console.log(Colorize.title('EMBEDDINGS REQUEST:'));
             console.log(Colorize.output(inputs));
@@ -164,6 +164,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         const startTime = Date.now();
         const response = await this.createEmbeddingRequest({
+            model: model,
             input: inputs
         });
 
