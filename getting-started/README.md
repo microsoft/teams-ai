@@ -12,6 +12,8 @@ The first step is to get a basic bot running E2E through the [Quickstart](./QUIC
 
 If you have a bot built using the BotFramework SDK and want to migrate to the Teams AI library, see [Migration](./MIGRATION/README.md).
 
+To dive deeper into the library, see [Concepts](./CONCEPTS/README.md)
+
 ### Useful links
 
 - [Microsoft Learn Docs](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview)
