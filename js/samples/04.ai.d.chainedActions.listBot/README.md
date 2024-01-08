@@ -7,8 +7,8 @@ ListBot: Your Ultimate List Management Companion. Powered by advanced AI capabil
 <!-- code_chunk_output -->
 
 - [AI in Microsoft Teams: List Bot](#ai-in-microsoft-teams-list-bot)
-  - [Setting up the sample](#setting-up-the-sample)
   - [Interacting with the bot](#interacting-with-the-bot)
+  - [Setting up the sample](#setting-up-the-sample)
   - [Testing the sample](#testing-the-sample)
     - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
@@ -96,6 +96,10 @@ app.ai.action('findItem', async (context: TurnContext, state: ApplicationTurnSta
 
 This sample shows how to incorporate basic conversational flow into a Teams application. It also illustrates a few of the Teams specific calls you can make from your bot.
 
+## Interacting with the bot
+
+You can interact with the bot by asking for a summary of the list, adding new items to the list, or removing them. You can also ask the bot to find an item in the list.
+
 ## Setting up the sample
 
 1. Clone the repository
@@ -119,10 +123,6 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
 
 5. Update `config.json` and `index.ts` with your model deployment name.
 
-## Interacting with the bot
-
-You can interact with the bot by asking for a summary of the list, adding new items to the list, or removing them. You can also ask the bot to find an item in the list.
-
 ## Testing the sample
 
 The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
@@ -139,7 +139,7 @@ The simplest way to run this sample in Teams is to use Teams Toolkit for Visual 
 1. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
 1. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
 1. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
-1. Update the `.env` file and provide your [OpenAI Key](https://openai.com/api/) key for leveraging GPT
+1. Ensure that you have set up the sample from the previous step.
 1. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
 1. In the browser that launches, select the **Add** button to install the app to Teams.
 
