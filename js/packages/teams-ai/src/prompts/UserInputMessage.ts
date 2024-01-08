@@ -87,7 +87,7 @@ export class UserInputMessage extends PromptSectionBase {
 
             // Add image
             const url = `data:${image.contentType};base64,${image.content.toString('base64')}`;
-            message.content!.push({ type: 'image', image_url: { url } });
+            message.content!.push({ type: 'image_url', image_url: { url } });
             length += 85;
             budget -= 85;
         }

@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['**']
-    paths: ['js/**']
+    paths: ['.github/workflows/js-*.yml', 'js/**']
 
 permissions: read-all
 
