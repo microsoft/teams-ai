@@ -268,7 +268,8 @@ export class Application<TState extends TurnState = TurnState> {
         this._options = {
             ...options,
             turnStateFactory: options?.turnStateFactory || (() => new TurnState() as TState),
-            removeRecipientMention: options?.removeRecipientMention !== undefined ? options.removeRecipientMention : true,
+            removeRecipientMention:
+                options?.removeRecipientMention !== undefined ? options.removeRecipientMention : true,
             startTypingTimer: options?.startTypingTimer !== undefined ? options.startTypingTimer : true,
             longRunningMessages: options?.longRunningMessages !== undefined ? options.longRunningMessages : false
         };
@@ -276,17 +277,19 @@ export class Application<TState extends TurnState = TurnState> {
         this._adapter = this._options.adapter;
 
         if (!this._adapter && this._options.botAuthentication) {
-            this._adapter = new CloudAdapter(new ConfigurationBotFrameworkAuthentication(
-                this._options.botAuthentication.botFrameworkAuthConfig || { },
-                this._options.botAuthentication.credentialsFactory,
-                this._options.botAuthentication.authConfiguration,
-                this._options.botAuthentication.botFrameworkClientFetch,
-                {
-                    ...(this._options.botAuthentication.connectorClientOptions || { }),
-                    userAgent: USER_AGENT,
-                    userAgentHeaderName: undefined
-                }
-            ));
+            this._adapter = new CloudAdapter(
+                new ConfigurationBotFrameworkAuthentication(
+                    this._options.botAuthentication.botFrameworkAuthConfig || {},
+                    this._options.botAuthentication.credentialsFactory,
+                    this._options.botAuthentication.authConfiguration,
+                    this._options.botAuthentication.botFrameworkClientFetch,
+                    {
+                        ...(this._options.botAuthentication.connectorClientOptions || {}),
+                        userAgent: USER_AGENT,
+                        userAgentHeaderName: undefined
+                    }
+                )
+            );
         }
 
         if (this._adapter) {
