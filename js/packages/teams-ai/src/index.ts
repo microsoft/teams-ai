@@ -19,6 +19,7 @@ export * from './validators';
 export * from './AdaptiveCards';
 export * from './AI';
 export * from './Application';
+export * from './ApplicationBuilder';
 export * from './InputFileDownloader';
 export * from './MemoryFork';
 export * from './MessageExtensions';
