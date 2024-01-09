@@ -404,7 +404,7 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
-     * Sets the bots error handler
+     * Sets the bot's error handler
      * @param handler Function to call when an error is encountered.
      * @returns {this} The application instance for chaining purposes.
      */
