@@ -5,101 +5,16 @@ Welcome to the Teams AI Library JavaScript package!
 This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information, and .Net support is available via the [dotnet](https://github.com/microsoft/teams-ai/tree/main/dotnet) folder.
 
 Requirements:
-
 -   node v16.x
 -   node v18.x
 
-## Getting Started: Migration v.s. New Project
+To get started with the SDK [see](../../../getting-started/README.md). 
 
-If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. For a more-detailed walkthrough, see the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/00.MIGRATION.md). The basics are listed below.
 
-### Migration
+## Getting Started
 
-In your existing Teams bot, you'll need to add the Teams AI Library SDK package and import it into your bot code.
+To get started, take a look at the [getting started docs](https://github.com/microsoft/teams-ai/blob/main/getting-started/README.md).
 
-```bash
-yarn add @microsoft/teams-ai
-#or
-npm install @microsoft/teams-ai
-```
+## Migration
 
-Replace `BotActivityHandler` and `ApplicationTurnState` in your bot. Note that here, `TurnState` is constructed to include `ConversationState`, but can also have `UserState` and `TempState`.
-
-js `index.ts`:
-
-```js
-// Old code:
-// const bot = BotActivityHandler();
-
-interface ConversationState {
-    count: number;
-}
-type ApplicationTurnState = TurnState<ConversationState>;
-
-const app =
-    new Application<ApplicationTurnState>()
-    {
-        storage // in this case, MemoryStorage
-    };
-```
-
-The rest of the code, including `server.post` and `await app.run(context)` stays the same.
-
-That's it!
-
-Run your bot (with ngrok) and sideload your manifest to test.
-
-For migrating specific features such as Message Extension and Adaptive Card capabilities, please see the [Migration Guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/00.MIGRATION.md).
-
-### New Project
-
-If you are starting a new project, you can use the [Teams AI SDK echobot sample](https://github.com/microsoft/teams-ai/tree/main/js/samples/01.messaging.a.echoBot) as a starting point. You don't need to make any changes to the sample to get it running, but you can use it as your base setup. Echo Bot supports the Teams AI SDK out of the box.
-
-You can either copy-paste the code into your own project, or clone the repo and run the Teams Toolkit features to explore.
-
-### Optional ApplicationBuilder Class
-
-You may also use the `ApplicationBuilder` class to instantiate your `Application` instance. This option provides greater readability and separates the management of the various configuration options (e.g., storage, turn state, AI module options, etc).
-
-js `index.ts`:
-
-```js
-// Old method:
-// const app = new Application()<ApplicationTurnState>
-//    {
-//        storage
-//    };
-
-const app = new ApplicationBuilder()<ApplicationTurnState>
-    .withStorage(storage)
-    .build(); // this function internally calls the Application constructor
-```
-
-## AI Setup
-
-The detailed steps for setting up your bot to use AI are in the [GPT Setup Guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/js/01.AI-SETUP.md).
-
-On top of your Microsoft App Id and password, you will need an Azure OpenAI or OpenAI API key. You can get one from the [OpenAI platform](https://platform.openai.com/). Once you have your key, add it to your `.env` file as `OPEN_AI_KEY`
-
-### AI Prompt Manager
-
-```ts
-const promptManager = new DefaultPromptManager<ApplicationTurnState>(path.join(__dirname, '../src/prompts'));
-
-// Define storage and application
-// - Note that we're not passing a prompt for our AI options as we won't be chatting with the app.
-const storage = new MemoryStorage();
-const app = new Application<ApplicationTurnState>({
-    storage,
-    adapter,
-    botAppId: process.env.MicrosoftAppId,
-    ai: {
-        planner,
-        promptManager
-    }
-});
-```
-
-For more information on how to create and use prompts, see [PROMPTS](https://github.com/microsoft/teams-ai/blob/main/getting-started/00.PROMPTS.md) and look at the [samples](https://github.com/microsoft/teams-ai/tree/main/js/samples) numbered `04._.xxx`.
-
-Happy coding!
+If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/02.JS.md).

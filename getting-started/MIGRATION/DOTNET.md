@@ -1,0 +1,244 @@
+# Migrating from the BotFramework SDK (C#)
+
+_**Navigation**_
+- [00.OVERVIEW](./README.md)
+- [01.JS](./JS.md)
+- [**02.DOTNET**](./DOTNET.md)
+___
+
+If you have a bot built using the C# BF SDK, the following will help you update your bot to the Teams AI library.
+
+## New Project or Migrate existing app
+
+Since the library builds on top of the BF SDK, much of the bot logic can be directly carried over to the Teams AI app. If you want to start with a new project, set up the Echo bot sample in the [quick start](../.QUICKSTART.md) guide and jump directly to [step 2](#2-replace-the-activity-handler-implementations-with-specific-route-handlers).
+
+If you want to migrate your existing app start with [step 1](#1-replace-the-activityhandler-with-the-application-object).
+
+## 1. Replace the ActivityHandler with the Application object
+
+To understand how to replace the `ActivityHandler` with the `Application` object, let's look at the Echo bot sample from the BF SDK and the Teams AI library.
+
+**BF SDK [Echo bot](https://github.com/microsoft/BotBuilder-Samples/tree/main/samples/csharp_dotnetcore/02.echo-bot)**
+
+[`Startup.cs`](https://github.com/microsoft/BotBuilder-Samples/blob/main/samples/csharp_dotnetcore/02.echo-bot/Startup.cs)
+
+```cs
+// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+services.AddTransient<IBot, EchoBot>();
+```
+
+[`EchoBot.cs`](https://github.com/microsoft/BotBuilder-Samples/blob/main/samples/csharp_dotnetcore/02.echo-bot/Bots/EchoBot.cs)
+
+```cs
+public class EchoBot : ActivityHandler
+{
+    protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+    {
+        var replyText = $"Echo: {turnContext.Activity.Text}";
+        await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
+     }
+}
+```
+
+> Note that `Echobot` derives from the `ActivityHandler` class.
+
+**Teams AI library [Echo bot](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/01.messaging.echoBot)**
+
+[`Program.cs`](https://github.com/microsoft/teams-ai/blob/main/dotnet/samples/01.messaging.echoBot/Program.cs)
+
+```cs
+// Create the storage to persist turn state
+builder.Services.AddSingleton<IStorage, MemoryStorage>();
+
+// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+builder.Services.AddTransient<IBot>(sp =>
+{
+    IStorage storage = sp.GetService<IStorage>();
+    ApplicationOptions<AppState> applicationOptions = new()
+    {
+        Storage = storage,
+        TurnStateFactory = () =>
+        {
+            return new AppState();
+        }
+    };
+
+    Application<AppState> app = new(applicationOptions);
+
+    // Listen for user to say "/reset" and then delete conversation state
+    app.OnMessage("/reset", ActivityHandlers.ResetMessageHandler);
+
+    // Listen for ANY message to be received. MUST BE AFTER ANY OTHER MESSAGE HANDLERS
+    app.OnActivity(ActivityTypes.Message, ActivityHandlers.MessageHandler);
+
+    return app;
+});
+```
+
+[`ActivityHandlers.cs`](https://github.com/microsoft/teams-ai/blob/main/dotnet/samples/01.messaging.echoBot/ActivityHandlers.cs)
+
+```cs
+    /// <summary>
+    /// Defines the activity handlers.
+    /// </summary>
+    public static class ActivityHandlers
+    {
+        /// <summary>
+        /// Handles "/reset" message.
+        /// </summary>
+        public static RouteHandler<AppState> ResetMessageHandler = async (ITurnContext turnContext, AppState turnState, CancellationToken cancellationToken) =>
+        {
+            turnState.DeleteConversationState();
+            await turnContext.SendActivityAsync("Ok I've deleted the current conversation state", cancellationToken: cancellationToken);
+        };
+
+        /// <summary>
+        /// Handles messages except "/reset".
+        /// </summary>
+        public static RouteHandler<AppState> MessageHandler = async (ITurnContext turnContext, AppState turnState, CancellationToken cancellationToken) =>
+        {
+            int count = turnState.Conversation.MessageCount;
+
+            // Increment count state.
+            turnState.Conversation.MessageCount = ++count;
+
+            await turnContext.SendActivityAsync($"[{count}] you said: {turnContext.Activity.Text}", cancellationToken: cancellationToken);
+        };
+    }
+```
+
+#### Optional ApplicationBuilder Class
+
+You may also use the `ApplicationBuilder` class to build your `Application`. This option provides greater readability and separates the management of the various configuration options (e.g., storage, turn state, AI options, etc).
+
+```cs
+//// Constructor initialization method
+// Application<TurnState> app = new()
+// {
+//    storage
+// };
+
+// Build pattern method
+var applicationBuilder = new ApplicationBuilder<TurnState>()
+    .WithStorage(storage);
+
+// Create Application
+Application<TurnState> app = applicationBuilder.Build();
+```
+
+## 2. Replace the activity handler implementations with specific route handlers
+
+The `EchoBot` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route handler in the `Application` object. Here's a simple example:
+
+Given the `EchoBot` implementation:
+
+```cs
+public class EchoBot : ActivityHandler
+{
+    protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+    {
+        var replyText = $"Echo: {turnContext.Activity.Text}";
+        await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
+     }
+}
+```
+
+This is how a route should be added to the `Application` object:
+
+```cs
+app.OnActivity(ActivityTypes.Message, async (ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken) =>
+{
+    var replyText = $"Echo: {turnContext.Activity.Text}";
+    await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
+});
+```
+
+> The `OnActivity` method allows you to register a possible route for the incomming activity. For each method in the `ActivityHandler` or `TeamsActivityHandler` class, there is an equivalent route registration method.
+
+If your bot derives from  `ActivityHandler` or the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route registration method.
+
+## Activity Handler Methods
+
+If your bot derives from the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route handler.
+
+#### Invoke Activities
+
+| `TeamsActivityHandler` method                                | `Application` route handler                                                                     |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `OnTeamsO365ConnectorCardActionAsync`                        | `OnO365ConnectorCardAction` (usage: `app.OnO365ConnectorCardAction(...)`)                       |
+| `OnTeamsFileConsentAsync`                                    | Either `OnFileConsentAccept` or `OnFileConsentDecline`                                          |
+| `OnTeamsConfigFetchAsync`                                    | `OnConfigFetch`                                                                                 |
+| `OnTeamsConfigSubmitAsync`                                    | `OnConfigSubmit`                                                                                |
+| `OnTeamsTaskModuleFetchAsync`                                | `TaskModules.OnFetch` (usage: `app.TaskModules.Fetch(...)`)                                     |
+| `OnTeamsTaskModuleSubmitAsync`                               | `TaskModules.OnSubmit`                                                                          |
+| `OnTeamsConfigSubmitAsync`                                   | `MessageExtensions.OnQueryLink` (usage: `app.MessageExtensions.OnQueryLink(...)`)               |
+| `OnTeamsAnonymousAppBasedLinkQueryAsync`                     | `MessageExtensions.OnAnonymousQueryLink`                                                        |
+| `OnTeamsMessagingExtensionQueryAsync`                        | `MessageExtensions.OnQuery`                                                                     |
+| `OnTeamsMessagingExtensionSelectItemAsync`                   | `MessageExtensions.OnSelectItem`                                                                |
+| `OnTeamsMessagingExtensionSubmitActionDispatchAsync`         | `MessageExtensions.OnSubmitAction`                                                              |
+| `OnTeamsMessagingExtensionFetchTaskAsync`                    | `MessageExtensions.OnFetchTask`                                                                 |
+| `OnTeamsMessagingExtensionConfigurationQuerySettingUrlAsync` | `MessageExtensions.OnQueryUrlSetting`                                                           |
+| `OnTeamsMessagingExtensionConfigurationSettingAsync`         | `MessageExtensions.OnConfigureSettings`                                                         |
+| `OnTeamsMessagingExtensionCardButtonClickedAsync`            | `MessageExtensions.OnCardButtonClicked`                                                         |
+| `OnTeamsSigninVerifyStateAsync`                              | N/A (you should use the built-in user authentication feature instead of handling this manually) |
+
+#### Conversation Update Activities
+
+These are the following methods from the `TeamsActivityHandler`:
+
+- `onTeamsChannelCreatedAsync`
+- `onTeamsChannelDeletedAsync`
+- `onTeamsChannelRenamedAsync`
+- `onTeamsTeamArchivedAsync`
+- `onTeamsTeamDeletedAsync`
+- `onTeamsTeamHardDeletedAsync`
+- `onTeamsChannelRestoredAsync`
+- `onTeamsTeamRenamedAsync`
+- `onTeamsTeamRestoredAsync`
+- `onTeamsTeamUnarchivedAsync`
+
+These activities can be handled using the `Application.OnConversationUpdate` method.
+
+For example in the `TeamsActivityHandler`:
+
+```cs
+protected virtual Task OnTeamsChannelCreatedAsync(ChannelInfo channelInfo, TeamInfo teamInfo, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+{
+   // Handle channel created activity
+}
+```
+
+The `Application` equivalent:
+
+```cs
+app.OnConversationUpdate(ConversationUpdateEvents.ChannelCreated, async (ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken) =>
+{
+    // Handle channel created activity
+});
+```
+
+> Note that the first parameter `event` specifies which conversation update event to handle.
+
+#### Message Activites
+
+| `TeamsActivityHandler` method    | `Application` route handler                              |
+| -------------------------------- | -------------------------------------------------------- |
+| `OnMessage`                      | `OnMessage` (usage: `app.OnMessage(...)`)                |
+| `OnTeamsMessageEditAsync`        | `OnMessageEdit`                                          |
+| `OnTeamsMessageUndeletedAsync`   | `OnMessageUndelete`                                      |
+| `OnTeamsMessageSoftDeleteAsync`  | `OnMessageDelete`                                        |
+| `OnMessageReactionActivityAsync` | `OnMessageReactionsAdded` or `OnMessageReactionsRemoved` |
+| `OnTeamsReadRecieptAsync`        | `OnTeamsReadReceipt`                                     |
+
+#### Meeting Activities
+
+| `TeamsActivityHandler` method          | `Application` route handler                             |
+| -------------------------------------- | ------------------------------------------------------- |
+| `OnTeamsMeetingStartAsync`             | `Meetings.OnStart` (usage: `app.Meetings.OnStart(...)`) |
+| `OnTeamsMeetingEndAsync`               | `Meetings.OnEnd`                                        |
+| `OnTeamsMeetingParticipantsJoinAsync`  | `Meetings.OnParticipantsJoin`                           |
+| `OnTeamsMeetingParticipantsLeaveAsync` | `Meetings.OnParticipantsLeave`                          |
+
+#### Other Activities
+
+If there are activities for which there isn't a corresponding route handler, you can use the generic route handler `Application.OnActivity` and specify a custom selector function given the activity object as input.
