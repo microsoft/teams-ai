@@ -11,6 +11,9 @@ import {
     Activity,
     ActivityTypes,
     BotAdapter,
+    CloudAdapter,
+    ConfigurationBotFrameworkAuthentication,
+    ConfigurationBotFrameworkAuthenticationOptions,
     ConversationReference,
     FileConsentCardResponse,
     O365ConnectorCardActionQuery,
@@ -18,8 +21,15 @@ import {
     Storage,
     TurnContext
 } from 'botbuilder';
-import { ReadReceiptInfo } from 'botframework-connector';
 
+import {
+    AuthenticationConfiguration,
+    ConnectorClientOptions,
+    ReadReceiptInfo,
+    ServiceClientCredentialsFactory
+} from 'botframework-connector';
+
+import packageInfo from '../package.json';
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
 import { Meetings } from './Meetings';
@@ -39,6 +49,11 @@ import {
  * @private
  */
 const TYPING_TIMER_DELAY = 1000;
+
+/**
+ * @private
+ */
+const USER_AGENT = `${packageInfo.name}/${packageInfo.version}`;
 
 /**
  * Query arguments for a search-based message extension.
@@ -68,6 +83,8 @@ export interface Query<TParams extends Record<string, any>> {
 export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. Bot adapter being used.
+     * @deprecated
+     * since version 1.0.2, use `botAuthentication` instead
      * @remarks
      * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
      * this property is required.
@@ -86,6 +103,17 @@ export interface ApplicationOptions<TState extends TurnState> {
      * this property is required.
      */
     botAppId?: string;
+
+    /**
+     * Optional. Bot authentication configuration
+     */
+    botAuthentication?: {
+        botFrameworkAuthConfig?: ConfigurationBotFrameworkAuthenticationOptions;
+        credentialsFactory?: ServiceClientCredentialsFactory;
+        authConfiguration?: AuthenticationConfiguration;
+        botFrameworkClientFetch?: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+        connectorClientOptions?: ConnectorClientOptions;
+    };
 
     /**
      * Optional. Storage provider to use for the application.
@@ -226,6 +254,7 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
+    private _error?: (context: TurnContext, error: Error) => void | Promise<void>;
     private readonly _authentication?: AuthenticationManager<TState>;
     private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
@@ -236,22 +265,36 @@ export class Application<TState extends TurnState = TurnState> {
      * @param {ApplicationOptions<TState>} options Optional. Options used to configure the application.
      */
     public constructor(options?: Partial<ApplicationOptions<TState>>) {
-        this._options = Object.assign(
-            {
-                removeRecipientMention: true,
-                startTypingTimer: true,
-                longRunningMessages: false
-            } as ApplicationOptions<TState>,
-            options
-        ) as ApplicationOptions<TState>;
+        this._options = {
+            ...options,
+            turnStateFactory: options?.turnStateFactory || (() => new TurnState() as TState),
+            removeRecipientMention: options?.removeRecipientMention !== undefined ? options.removeRecipientMention : true,
+            startTypingTimer: options?.startTypingTimer !== undefined ? options.startTypingTimer : true,
+            longRunningMessages: options?.longRunningMessages !== undefined ? options.longRunningMessages : false
+        };
 
         this._adapter = this._options.adapter;
 
-        this._adapter = this._options.adapter;
+        if (!this._adapter && this._options.botAuthentication) {
+            this._adapter = new CloudAdapter(new ConfigurationBotFrameworkAuthentication(
+                this._options.botAuthentication.botFrameworkAuthConfig || { },
+                this._options.botAuthentication.credentialsFactory,
+                this._options.botAuthentication.authConfiguration,
+                this._options.botAuthentication.botFrameworkClientFetch,
+                {
+                    ...(this._options.botAuthentication.connectorClientOptions || { }),
+                    userAgent: USER_AGENT,
+                    userAgentHeaderName: undefined
+                }
+            ));
+        }
 
-        // Create turn state factory
-        if (!this._options.turnStateFactory) {
-            this._options.turnStateFactory = () => new TurnState() as TState;
+        if (this._adapter) {
+            this._adapter.onTurnError = async (context: TurnContext, error: Error) => {
+                if (this._error) {
+                    this._error(context, error);
+                }
+            };
         }
 
         // Create AI component if configured with a planner
@@ -364,6 +407,16 @@ export class Application<TState extends TurnState = TurnState> {
      */
     public get taskModules(): TaskModules<TState> {
         return this._taskModules;
+    }
+
+    /**
+     * Sets the bots error handler
+     * @param handler Function to call when an error is encountered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public error(handler: (context: TurnContext, error: Error) => void | Promise<void>): this {
+        this._error = handler;
+        return this;
     }
 
     /**
