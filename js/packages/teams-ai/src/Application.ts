@@ -254,7 +254,6 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _ai?: AI<TState>;
     private readonly _beforeTurn: ApplicationEventHandler<TState>[] = [];
     private readonly _afterTurn: ApplicationEventHandler<TState>[] = [];
-    private _error?: (context: TurnContext, error: Error) => void | Promise<void>;
     private readonly _authentication?: AuthenticationManager<TState>;
     private readonly _adapter?: BotAdapter;
     private _typingTimer: any;
@@ -290,14 +289,6 @@ export class Application<TState extends TurnState = TurnState> {
                     }
                 )
             );
-        }
-
-        if (this._adapter) {
-            this._adapter.onTurnError = async (context: TurnContext, error: Error) => {
-                if (this._error) {
-                    this._error(context, error);
-                }
-            };
         }
 
         // Create AI component if configured with a planner
@@ -417,8 +408,11 @@ export class Application<TState extends TurnState = TurnState> {
      * @param handler Function to call when an error is encountered.
      * @returns {this} The application instance for chaining purposes.
      */
-    public error(handler: (context: TurnContext, error: Error) => void | Promise<void>): this {
-        this._error = handler;
+    public error(handler: (context: TurnContext, error: Error) => Promise<void>): this {
+        if (this._adapter) {
+            this._adapter.onTurnError = handler;
+        }
+        
         return this;
     }
 
