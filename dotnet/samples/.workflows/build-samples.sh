@@ -63,7 +63,7 @@ dotnet nuget locals global-packages -c
 
 # If var is empty, conditions is true
 if [ -z $SAMPLE_FOLDER ]; then
-  for p in $(find . -name "*.csproj"); do dotnet build $p; done
+  for p in $(find . -name "*.csproj"); do dotnet build -c Debug $p; done
 else
   dotnet build $SAMPLE_FOLDER;
 fi
