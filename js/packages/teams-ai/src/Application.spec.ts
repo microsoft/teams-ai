@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { Activity, ActivityTypes, Channels, MemoryStorage, MessageReactionTypes, TestAdapter } from 'botbuilder';
+import { Activity, ActivityTypes, Channels, CloudAdapter, MemoryStorage, MessageReactionTypes, TestAdapter } from 'botbuilder';
 import {
     Application,
     ApplicationBuilder,
@@ -120,6 +120,17 @@ describe('Application', () => {
             assert.throws(() => {
                 new ApplicationBuilder().withLongRunningMessages(adapter, '').build();
             });
+        });
+    });
+
+    describe('botAuthentication', () => {
+        const app = new Application({
+            botAuthentication: { }
+        });
+
+        it('should initialize `CloudAdapter`', () => {
+            assert.doesNotThrow(() => app.adapter);
+            assert.equal(app.adapter instanceof CloudAdapter, true);
         });
     });
 
