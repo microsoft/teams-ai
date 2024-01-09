@@ -18,6 +18,12 @@ export interface VectraDataSourceOptions {
     apiKey: string;
 
     /**
+     * Azure OpenAI API key to use as alternative way for generating embeddings.
+     */
+    azureApiKey: string;
+    azureEndpoint: string;
+
+    /**
      * Path to the folder containing the local index.
      * @remarks
      * This should be the root folder for all local indexes and the index itself
@@ -72,7 +78,12 @@ export class VectraDataSource implements DataSource {
         // Create embeddings model
         const embeddings = new OpenAIEmbeddings({
             model: 'text-embedding-ada-002',
-            apiKey: options.apiKey
+            apiKey: options.apiKey,
+            
+            // Azure OpenAI Support
+            azureApiKey: options.azureApiKey,
+            azureDeployment: 'embedding',
+            azureEndpoint: options.azureEndpoint,
         });
 
         // Create local index
