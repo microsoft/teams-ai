@@ -105,7 +105,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     botAppId?: string;
 
     /**
-     * Optional. Bot authentication configuration
+     * Optional. Bot authentication configuration for initializing the bot adapter
      */
     botAuthentication?: {
         botFrameworkAuthConfig?: ConfigurationBotFrameworkAuthenticationOptions;

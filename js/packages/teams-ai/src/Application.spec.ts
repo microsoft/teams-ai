@@ -1,11 +1,14 @@
 import { strict as assert } from 'assert';
-import { Activity, ActivityTypes, Channels, CloudAdapter, MemoryStorage, MessageReactionTypes, TestAdapter } from 'botbuilder';
 import {
-    Application,
-    ConversationUpdateEvents,
-    MessageReactionEvents,
-    TeamsMessageEvents
-} from './Application';
+    Activity,
+    ActivityTypes,
+    Channels,
+    CloudAdapter,
+    MemoryStorage,
+    MessageReactionTypes,
+    TestAdapter
+} from 'botbuilder';
+import { Application, ConversationUpdateEvents, MessageReactionEvents, TeamsMessageEvents } from './Application';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
 import { TaskModulesOptions } from './TaskModules';
@@ -69,7 +72,7 @@ describe('Application', () => {
 
     describe('botAuthentication', () => {
         const app = new Application({
-            botAuthentication: { }
+            botAuthentication: {}
         });
 
         it('should initialize `CloudAdapter`', () => {
