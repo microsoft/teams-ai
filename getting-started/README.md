@@ -6,13 +6,21 @@ _**Navigation**_
 - [02.SAMPLES](./SAMPLES.md)
 ___
 
-Get started with the Teams AI Library.
+### Get started with the Teams AI Library 
 
-The first step is to get a basic bot running E2E through the [Quickstart](./QUICKSTART.md) guide. After that see all the [samples](./SAMPLES.md) available.
+The first step is to get a basic bot running E2E through the [Quickstart](./QUICKSTART.md) guide to build Echo bot, which echoes back any message sent to it. This simple bot helps to familiarize yourself with the Teams AI Library and ensures your system is set up correctly to move onto the AI powered samples.
+
+If you would rather dive into an AI sample first, check out the fully conversational Teams Chef Bot sample on the [samples](./SAMPLES.md) page. 
+
+There are numerous samples to try showcasing the different capabilities of the Teams AI Library.
+
+### Migration
 
 If you have a bot built using the BotFramework SDK and want to migrate to the Teams AI library, see [Migration](./MIGRATION/README.md).
 
-To dive deeper into the library, see [Concepts](./CONCEPTS/README.md).
+### Concepts
+
+To dive deeper into the library learning more about its AI components and concepts, see [Concepts](./CONCEPTS/README.md).
 
 ### Useful links
 

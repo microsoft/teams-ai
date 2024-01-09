@@ -6,7 +6,7 @@ _**Navigation**_
 - [02.SAMPLES](./SAMPLES.md)
 ___
 
-In this quickstart we will show you how to get the Echo bot up and running.
+In this quickstart we will show you how to get the Echo bot up and running. The Echo bot echoes back messages sent to it while keeping track of the number of messages sent by the user.
 
 
 * [C# Quickstart](#c-quickstart)
