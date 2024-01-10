@@ -262,7 +262,7 @@ export class Application<TState extends TurnState = TurnState> {
         // Validate long running messages configuration
         if (this._options.longRunningMessages && !this._options.adapter?.appId) {
             throw new Error(
-                `The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`
+                `The Application.longRunningMessages property is unavailable because no adapter.appId was configured.`
             );
         }
     }
@@ -452,7 +452,7 @@ export class Application<TState extends TurnState = TurnState> {
      * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      * @remarks
-     * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
+     * Use of the method requires configuration of the Application with the `adapter.appId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bot's logic that should be run using the new proactive turn context.
@@ -481,7 +481,7 @@ export class Application<TState extends TurnState = TurnState> {
 
         if (!this._options.adapter?.appId) {
             console.warn(
-                `Calling Application.continueConversationAsync() without a configured 'botAppId'. In production environments a 'botAppId' is required.`
+                `Calling Application.continueConversationAsync() without a configured 'adapter.appId'. In production environments an 'adapter.appId' is required.`
             );
         }
 
@@ -772,7 +772,7 @@ export class Application<TState extends TurnState = TurnState> {
      * @remarks
      * This method provides a simple way to send a proactive message to a conversation the bot is a member of.
      *
-     * Use of the method requires you configure the Application with the `adapter` and `botAppId`
+     * Use of the method requires you configure the Application with the `adapter.appId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param activityOrText Activity or message to send to the conversation.

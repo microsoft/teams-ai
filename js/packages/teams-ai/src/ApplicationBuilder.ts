@@ -23,13 +23,12 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
     /**
      * Configures the application to use long running messages.
      * Default state for longRunningMessages is false
-     * @param {string} botAppId The Microsoft App ID for the bot.
      * @returns {this} The ApplicationBuilder instance.
      */
     public withLongRunningMessages(): this {
         if (!this._options.adapter?.appId) {
             throw new Error(
-                `The Application.longRunningMessages property is unavailable because botAppId cannot be null or undefined.`
+                `The Application.longRunningMessages property is unavailable because adapter.appId cannot be null or undefined.`
             );
         }
 
