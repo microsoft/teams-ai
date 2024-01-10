@@ -1,3 +1,12 @@
+/**
+ * @module teams-ai
+ */
+
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 import { CallerIdConstants } from 'botframework-schema';
 import {
     ConnectorClientOptions,
@@ -36,6 +45,11 @@ const DEFAULTS = {
 };
 
 export class TeamsBotFrameworkAuthentication extends ParameterizedBotFrameworkAuthentication {
+    public get connectedClientOptions(): ConnectorClientOptions {
+        return this._connectedClientOptions;
+    }
+    private readonly _connectedClientOptions: ConnectorClientOptions;
+
     constructor(args: {
         channelService?: string;
         validateAuthority?: boolean;
@@ -57,6 +71,12 @@ export class TeamsBotFrameworkAuthentication extends ParameterizedBotFrameworkAu
             throw new Error('The provided ChannelService value is not supported.');
         }
 
+        const connectedClientOptions = {
+            ...(args.connectorClientOptions || {}),
+            userAgent: USER_AGENT,
+            userAgentHeaderName: undefined
+        };
+
         super(
             args.validateAuthority !== undefined ? args.validateAuthority : DEFAULTS[defaultsKey].validateAuthority,
             args.toChannelFromBotLoginUrl || DEFAULTS[defaultsKey].toChannelFromBotLoginUrl,
@@ -69,11 +89,9 @@ export class TeamsBotFrameworkAuthentication extends ParameterizedBotFrameworkAu
             args.credentialsFactory,
             args.authConfiguration || { requiredEndorsements: [] },
             args.botFrameworkClientFetch,
-            {
-                ...(args.connectorClientOptions || {}),
-                userAgent: USER_AGENT,
-                userAgentHeaderName: undefined
-            }
+            connectedClientOptions
         );
+
+        this._connectedClientOptions = connectedClientOptions;
     }
 }
