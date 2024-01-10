@@ -6,7 +6,7 @@ _**Navigation**_
 - [02.SAMPLES](./SAMPLES.md)
 ___
 
-In this quickstart we will show you how to get the Echo bot up and running. The Echo bot echoes back messages sent to it while keeping track of the number of messages sent by the user.
+In this quickstart we will show you how to get the Echo Bot up and running. The Echo Bot echoes back messages sent to it while keeping track of the number of messages sent by the user.
 
 
 * [C# Quickstart](#c-quickstart)
@@ -15,7 +15,7 @@ In this quickstart we will show you how to get the Echo bot up and running. The 
 
 ## C# Quickstart
 
-This guide will show you have the set up the Echo bot using the C# library.
+This guide will show you have the set up the Echo Bot using the C# library.
 
 ### Prerequisites
 
@@ -73,7 +73,7 @@ To get started, ensure that you have the following tools:
 
 ## Javascript
 
-This guide will show you have the set up the Echo bot using the JS library.
+This guide will show you have the set up the Echo Bot using the JS library.
 
 ### Prerequisite
 
