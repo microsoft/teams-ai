@@ -1,5 +1,6 @@
 import { strict as assert } from 'assert';
-import { MemoryStorage, TestAdapter } from 'botbuilder';
+import { MemoryStorage } from 'botbuilder';
+import { PasswordServiceClientCredentialFactory } from 'botframework-connector';
 
 import { ApplicationBuilder } from './ApplicationBuilder';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
@@ -7,14 +8,19 @@ import { AIOptions } from './AI';
 import { TurnState } from './TurnState';
 import { TestPlanner } from './planners';
 import { TaskModulesOptions } from './TaskModules';
+import { BotAdapterOptions } from './BotAdapterOptions';
+import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
 
 describe('ApplicationBuilder', () => {
-    const adapter = new TestAdapter();
-    const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
-    const ai: AIOptions<TurnState> = {
-        planner: new TestPlanner()
+    const adapter: BotAdapterOptions = {
+        appId: 'testBot',
+        authentication: new TeamsBotFrameworkAuthentication({
+            credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
+        })
     };
-    const botAppId = 'testBot';
+
+    const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
+    const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
     const longRunningMessages = true;
     const removeRecipientMention = false;
     const startTypingTimer = false;
@@ -33,7 +39,6 @@ describe('ApplicationBuilder', () => {
         const app = new ApplicationBuilder().build();
         assert.notEqual(app.options, undefined);
         assert.equal(app.options.adapter, undefined);
-        assert.equal(app.options.botAppId, undefined);
         assert.equal(app.options.storage, undefined);
         assert.equal(app.options.ai, undefined);
         assert.equal(app.options.authentication, undefined);
@@ -49,15 +54,15 @@ describe('ApplicationBuilder', () => {
             .setRemoveRecipientMention(removeRecipientMention)
             .withStorage(storage)
             .withAIOptions(ai)
-            .withLongRunningMessages(adapter, botAppId)
+            .withAdapterOptions(adapter)
+            .withLongRunningMessages()
             .withAdaptiveCardOptions(adaptiveCards)
-            .withAuthentication(adapter, authenticationSettings)
+            .withAuthentication(authenticationSettings)
             .withTaskModuleOptions(taskModules)
             .setStartTypingTimer(startTypingTimer)
             .build();
         assert.notEqual(app.options, undefined);
         assert.equal(app.options.adapter, adapter);
-        assert.equal(app.options.botAppId, botAppId);
         assert.equal(app.options.storage, storage);
         assert.equal(app.options.ai, ai);
         assert.equal(app.options.adaptiveCards, adaptiveCards);
@@ -70,7 +75,7 @@ describe('ApplicationBuilder', () => {
 
     it('should throw an exception if botId is an empty string for longRunningMessages', () => {
         assert.throws(() => {
-            new ApplicationBuilder().withLongRunningMessages(adapter, '').build();
+            new ApplicationBuilder().withAdapterOptions({ appId: '' }).withLongRunningMessages().build();
         });
     });
 });

@@ -1,4 +1,6 @@
 import { strict as assert } from 'assert';
+import sinon from 'sinon';
+
 import {
     Activity,
     ActivityTypes,
@@ -8,6 +10,9 @@ import {
     MessageReactionTypes,
     TestAdapter
 } from 'botbuilder';
+
+import { PasswordServiceClientCredentialFactory } from 'botframework-connector';
+
 import { Application, ConversationUpdateEvents, MessageReactionEvents, TeamsMessageEvents } from './Application';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
@@ -15,14 +20,14 @@ import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
 import { createTestConversationUpdate } from './internals';
 import { TestPlanner } from './planners/TestPlanner';
+import { BotAdapterOptions } from './BotAdapterOptions';
+import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
 
 describe('Application', () => {
-    const adapter = new TestAdapter();
+    const testAdapter = new TestAdapter();
+    const adapter: BotAdapterOptions = { appId: 'testBot' };
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
-    const ai: AIOptions<TurnState> = {
-        planner: new TestPlanner()
-    };
-    const botAppId = 'testBot';
+    const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
     const longRunningMessages = true;
     const removeRecipientMention = false;
     const startTypingTimer = false;
@@ -32,11 +37,12 @@ describe('Application', () => {
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
             const app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.ai, undefined);
-            assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.longRunningMessages, false);
             assert.equal(app.options.removeRecipientMention, true);
             assert.equal(app.options.startTypingTimer, true);
@@ -50,7 +56,6 @@ describe('Application', () => {
                 adapter,
                 adaptiveCards,
                 ai,
-                botAppId,
                 longRunningMessages,
                 removeRecipientMention,
                 startTypingTimer,
@@ -61,7 +66,6 @@ describe('Application', () => {
             assert.equal(app.options.adapter, adapter);
             assert.deepEqual(app.options.adaptiveCards, adaptiveCards);
             assert.deepEqual(app.options.ai, ai);
-            assert.equal(app.options.botAppId, botAppId);
             assert.equal(app.options.longRunningMessages, longRunningMessages);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);
             assert.equal(app.options.startTypingTimer, startTypingTimer);
@@ -72,7 +76,11 @@ describe('Application', () => {
 
     describe('botAuthentication', () => {
         const app = new Application({
-            botAuthentication: {}
+            adapter: {
+                authentication: new TeamsBotFrameworkAuthentication({
+                    credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
+                })
+            }
         });
 
         it('should initialize `CloudAdapter`', () => {
@@ -117,16 +125,23 @@ describe('Application', () => {
     });
 
     describe('activity', () => {
+        let app = new Application();
+
+        beforeEach(() => {
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+        });
+
         it('should route to an activity handler', async () => {
             let called = false;
-            const app = new Application();
+
             app.activity(ActivityTypes.Message, async (context, state) => {
                 assert.notEqual(context, undefined);
                 assert.notEqual(state, undefined);
                 called = true;
             });
 
-            await adapter.sendTextToBot('test', async (context) => {
+            await (app.adapter as TestAdapter).sendTextToBot('test', async (context) => {
                 const handled = await app.run(context);
                 assert.equal(called, true);
                 assert.equal(handled, true);
@@ -134,8 +149,7 @@ describe('Application', () => {
         });
 
         it("should not route activity if there's no handler", async () => {
-            const app = new Application();
-            await adapter.sendTextToBot('test', async (context) => {
+            await (app.adapter as TestAdapter).sendTextToBot('test', async (context) => {
                 const handled = await app.run(context);
                 assert.equal(handled, false);
             });
@@ -143,7 +157,7 @@ describe('Application', () => {
 
         it('should route to first registered activity handler', async () => {
             let called = false;
-            const app = new Application();
+
             app.activity(ActivityTypes.Message, async (context, state) => {
                 called = true;
             });
@@ -151,7 +165,7 @@ describe('Application', () => {
                 assert.fail('should not be called');
             });
 
-            await adapter.sendTextToBot('test', async (context) => {
+            await (app.adapter as TestAdapter).sendTextToBot('test', async (context) => {
                 const handled = await app.run(context);
                 assert.equal(called, true);
                 assert.equal(handled, true);
@@ -160,16 +174,16 @@ describe('Application', () => {
     });
 
     describe('conversationUpdate', () => {
-        // Optional pre-configured mock Application using Test Adapter. If other mocks are needed, feel free to ignore mockApp and create your own.
-        let mockApp: Application;
+        let app = new Application();
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to an instantiated conversationUpdate handler when channelId is Teams', async () => {
             let handlerCalled = false;
-            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+            app.conversationUpdate('membersAdded', async (context, _state) => {
                 handlerCalled = true;
                 assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
             });
@@ -181,15 +195,15 @@ describe('Application', () => {
                 { id: '42', name: "Don't Panic" }
             ];
 
-            await adapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
+            await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
 
         it('should route to an instantiated conversationUpdate handler when channelId is not defined', async () => {
             let handlerCalled = false;
-            mockApp.conversationUpdate('membersAdded', async (context, _state) => {
+            app.conversationUpdate('membersAdded', async (context, _state) => {
                 handlerCalled = true;
                 assert.equal(context.activity.membersAdded && context.activity.membersAdded.length, 2);
             });
@@ -200,8 +214,8 @@ describe('Application', () => {
                 { id: '42', name: "Don't Panic" }
             ];
 
-            await adapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
+            await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
@@ -236,7 +250,7 @@ describe('Application', () => {
         for (const { event, channelData } of testData) {
             it(`should route to correct handler for '${event}'`, async () => {
                 let handlerCalled = false;
-                mockApp.conversationUpdate(event as ConversationUpdateEvents, async (context, _state) => {
+                app.conversationUpdate(event as ConversationUpdateEvents, async (context, _state) => {
                     handlerCalled = true;
                     assert.equal(context.activity.channelData.eventType, event);
                     assert.deepEqual(context.activity.channelData, channelData);
@@ -244,8 +258,8 @@ describe('Application', () => {
 
                 const activity = createTestConversationUpdate(channelData);
                 activity.channelId = Channels.Msteams;
-                await adapter.processActivity(activity, async (context) => {
-                    await mockApp.run(context);
+                await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+                    await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
             });
@@ -258,7 +272,7 @@ describe('Application', () => {
             const activity = createTestConversationUpdate({ channel, eventType: 'channelCreated', team });
             activity.channelId = Channels.Msteams;
 
-            mockApp.conversationUpdate('channelCreated', async (context, _state) => {
+            app.conversationUpdate('channelCreated', async (context, _state) => {
                 handlerCalled = true;
                 assert.equal(typeof context.activity.channelData, 'object');
                 assert.equal(context.activity.channelData.eventType, 'channelCreated');
@@ -266,15 +280,15 @@ describe('Application', () => {
                 assert.deepEqual(context.activity.channelData.team, team);
             });
 
-            await adapter.processActivity(activity, async (context) => {
-                await mockApp.run(context);
+            await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });
 
         it('should throw an error if handler is not a function', () => {
             assert.throws(
-                () => mockApp.conversationUpdate('membersRemoved', {} as any),
+                () => app.conversationUpdate('membersRemoved', {} as any),
                 new Error(
                     `ConversationUpdate 'handler' for membersRemoved is object. Type of 'handler' must be a function.`
                 )
@@ -283,11 +297,13 @@ describe('Application', () => {
     });
 
     describe('messageReactions', () => {
-        let mockApp: Application;
+        let app = new Application();
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
         });
+
         const messageReactions: { event: MessageReactionEvents; testActivity: Partial<Activity> }[] = [
             {
                 event: 'reactionsAdded',
@@ -308,7 +324,7 @@ describe('Application', () => {
         for (const { event, testActivity } of messageReactions) {
             it(`should route to correct handler for ${event}`, async () => {
                 let handlerCalled = false;
-                mockApp.messageReactions(event, async (context, _state) => {
+                app.messageReactions(event, async (context, _state) => {
                     handlerCalled = true;
                     assert.equal(context.activity.type, ActivityTypes.MessageReaction);
                     switch (event) {
@@ -323,8 +339,8 @@ describe('Application', () => {
                     }
                 });
 
-                await adapter.processActivity(testActivity, async (context) => {
-                    await mockApp.run(context);
+                await (app.adapter as TestAdapter).processActivity(testActivity, async (context) => {
+                    await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
             });
@@ -333,7 +349,7 @@ describe('Application', () => {
         it(`should throw an error when event is not known case`, () => {
             assert.throws(
                 () =>
-                    mockApp.messageEventUpdate('test' as any, async (_context, _state) => {
+                    app.messageEventUpdate('test' as any, async (_context, _state) => {
                         assert.fail('should not be called');
                     }),
                 new Error(`Invalid TeamsMessageEvent type: test`)
@@ -342,11 +358,13 @@ describe('Application', () => {
     });
 
     describe('messageUpdate', () => {
-        let mockApp: Application;
+        let app = new Application();
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
         });
+
         const messageUpdateEvents: { event: TeamsMessageEvents; testActivity: Partial<Activity> }[] = [
             {
                 event: 'editMessage',
@@ -374,7 +392,7 @@ describe('Application', () => {
         for (const { event, testActivity } of messageUpdateEvents) {
             it(`should route to correct handler for ${event}`, async () => {
                 let handlerCalled = false;
-                mockApp.messageEventUpdate(event, async (context, _state) => {
+                app.messageEventUpdate(event, async (context, _state) => {
                     handlerCalled = true;
                     switch (event) {
                         case 'editMessage':
@@ -391,8 +409,8 @@ describe('Application', () => {
                     }
                 });
 
-                await adapter.processActivity(testActivity, async (context) => {
-                    await mockApp.run(context);
+                await (app.adapter as TestAdapter).processActivity(testActivity, async (context) => {
+                    await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
             });
@@ -400,22 +418,23 @@ describe('Application', () => {
 
         it('should throw an error when handler is not a function', () => {
             assert.throws(
-                () => mockApp.messageEventUpdate('editMessage', 1 as any),
+                () => app.messageEventUpdate('editMessage', 1 as any),
                 new Error(`MessageUpdate 'handler' for editMessage is number. Type of 'handler' must be a function.`)
             );
         });
     });
 
     describe('teamsReadReceipt', () => {
-        let mockApp: Application;
+        let app = new Application();
 
         beforeEach(() => {
-            mockApp = new Application({ adapter });
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to correct handler for teamsReadReceipt', async () => {
             let handlerCalled = false;
-            mockApp.teamsReadReceipt(async (context, _state, readReceiptInfo) => {
+            app.teamsReadReceipt(async (context, _state, readReceiptInfo) => {
                 handlerCalled = true;
                 assert.equal(context.activity.type, ActivityTypes.Event);
                 assert.equal(context.activity.name, 'application/vnd.microsoft/readReceipt');
@@ -430,8 +449,8 @@ describe('Application', () => {
                 }
             };
 
-            await adapter.processActivity(testActivity, async (context) => {
-                await mockApp.run(context);
+            await (app.adapter as TestAdapter).processActivity(testActivity, async (context) => {
+                await app.run(context);
                 assert.equal(handlerCalled, true);
             });
         });

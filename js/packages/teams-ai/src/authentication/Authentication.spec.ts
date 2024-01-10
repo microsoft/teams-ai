@@ -63,7 +63,8 @@ describe('Authentication', () => {
     };
 
     beforeEach(() => {
-        app = new Application({ adapter });
+        app = new Application();
+        sinon.stub(app, 'adapter').get(() => adapter);
         appStub = sinon.stub(app);
         settings = {
             title: 'test',
@@ -439,7 +440,8 @@ describe('AuthenticationManager', () => {
     };
 
     beforeEach(() => {
-        app = new Application({ adapter });
+        app = new Application();
+        sinon.stub(app, 'adapter').get(() => adapter);
         appStub = sinon.stub(app);
     });
 
