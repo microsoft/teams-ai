@@ -24,7 +24,7 @@ class _GetScopeAndNameResult:
     name: str
 
 class TurnState(Memory):
-    _scopes: Dict[str, TurnStateEntry] = Dict[str, TurnStateEntry]()
+    _scopes: Dict[str, TurnStateEntry] = dict()
     _is_loaded: bool = False
     _loading_callable: Optional[Callable[[],Awaitable[bool]]] = None
 

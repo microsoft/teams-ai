@@ -11,9 +11,9 @@ class TurnStateEntry:
     _hash: str
 
     def __init__(self, value: Optional[Dict[str, Any]] = None, storage_key: Optional[str] = None):
-        self._value = value or Dict[str, Any]()
+        self._value = value or dict()
         self._storage_key = storage_key
-        self._hash = str(value)
+        self._hash = str(self._value)
 
     @property
     def has_changed(self) -> bool:
@@ -27,7 +27,7 @@ class TurnStateEntry:
     def value(self) -> Dict[str, Any]:
         if self._deleted:
             # Switch to a replace scenario
-            self._value = Dict[str, Any]()
+            self._value = dict()
             self._deleted = False
 
         return self._value
@@ -39,7 +39,7 @@ class TurnStateEntry:
     def delete(self) -> None:
         self._deleted = True
 
-    def replace(self, value: Optional[Dict[str, Any]]) -> None:
-        self._value = value or Dict[str, Any]()
+    def replace(self, value: Optional[Dict[str, Any]] = None) -> None:
+        self._value = value or dict()
 
     
