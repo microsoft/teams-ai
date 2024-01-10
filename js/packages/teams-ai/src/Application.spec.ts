@@ -294,19 +294,21 @@ describe('Application', () => {
         }
 
         it('should start signin flow', async () => {
+            const authSettings = { ...authenticationSettings, autoSignIn: true };
             const app = new Application({
                 adapter,
                 botAppId: 'botid',
-                authentication: authenticationSettings
+                authentication: authSettings
             });
             await adapter.sendTextToBot('signin', async (context) => {
                 // Set MockUserTokenClient on TurnState
                 context.turnState.set(
                     (context.adapter as CloudAdapterBase).UserTokenClientKey,
-                    new MockUserTokenClient()
+                    new MockUserTokenClient(false)
                 );
                 const handled = await app.run(context);
-                assert.equal(handled, true);
+                // Returns false because of 'pending' in response.status
+                assert.equal(handled, false);
             });
         });
 
