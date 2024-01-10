@@ -39,4 +39,7 @@ class TurnStateEntry:
     def delete(self) -> None:
         self._deleted = True
 
+    def replace(self, value: Optional[Dict[str, Any]]) -> None:
+        self._value = value or Dict[str, Any]()
+
     
