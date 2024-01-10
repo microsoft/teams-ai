@@ -13,6 +13,19 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
     public class SequenceAugmentationTests
     {
         [Fact]
+        public void Test_CreatePromptSection_NotNull()
+        {
+            // Arrange
+            SequenceAugmentation augmentation = new(new());
+
+            // Act
+            var section = augmentation.CreatePromptSection();
+
+            // Assert
+            Assert.NotNull(section);
+        }
+
+        [Fact]
         public async Task Test_CreatePlanFromResponseAsync_ValidPlan_ShouldSucceed()
         {
             // Arrange
@@ -50,6 +63,25 @@ namespace Microsoft.Teams.AI.Tests.AITests.Augmentations
             Assert.Equal("test", (plan.Commands[0] as PredictedDoCommand)?.Action);
             Assert.Equal("SAY", plan.Commands[1].Type);
             Assert.Equal("hello", (plan.Commands[1] as PredictedSayCommand)?.Response);
+        }
+
+        [Fact]
+        public async Task Test_CreatePlanFromResponseAsync_EmptyResponse_ReturnsNull()
+        {
+            // Arrange
+            Mock<ITurnContext> context = new();
+            MemoryFork memory = new();
+            SequenceAugmentation augmentation = new(new());
+            PromptResponse promptResponse = new()
+            {
+                Status = PromptResponseStatus.Success
+            };
+
+            // Act
+            var plan = await augmentation.CreatePlanFromResponseAsync(context.Object, memory, promptResponse);
+
+            // Assert
+            Assert.Null(plan);
         }
 
         [Fact]
