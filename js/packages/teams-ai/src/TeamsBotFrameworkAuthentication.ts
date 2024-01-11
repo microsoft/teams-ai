@@ -44,6 +44,9 @@ const DEFAULTS = {
     }
 };
 
+/**
+ * Used to authenticate Bot Framework Protocol network calls
+ */
 export class TeamsBotFrameworkAuthentication extends ParameterizedBotFrameworkAuthentication {
     public get connectedClientOptions(): ConnectorClientOptions {
         return this._connectedClientOptions;
