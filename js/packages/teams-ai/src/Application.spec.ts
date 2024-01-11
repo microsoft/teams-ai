@@ -24,6 +24,45 @@ import { TurnState } from './TurnState';
 import { createTestConversationUpdate, createTestInvoke } from './internals';
 import { TestPlanner } from './planners/TestPlanner';
 
+class MockUserTokenClient {
+    /**
+     * Creates a new MockUserTokenClient.
+     * @param {boolean} returnMockToken returns a mock TokenResponse when true, undefined when false
+     * @param {boolean} getUserTokenError getUserToken throws an error when true
+     */
+    constructor(
+        readonly returnMockToken: boolean = true,
+        readonly getUserTokenError = false
+    ) {}
+    static readonly expectedToken = 'mockToken';
+    public async getUserToken(
+        _userId: string,
+        connectionName: string,
+        _channelId: string,
+        _magicCode: string
+    ): Promise<any> {
+        if (this.getUserTokenError) {
+            throw new Error('MockUserTokenClient.getUserTokenError is true.');
+        }
+        if (this.returnMockToken) {
+            return {
+                channelId: Channels.Msteams,
+                connectionName,
+                token: MockUserTokenClient.expectedToken,
+                expiration: '2050-01-01T00:00:00.000Z'
+            };
+        } else {
+            return undefined;
+        }
+    }
+    public async getSignInResource(_connectionName: string, _activity: Activity, _finalRediect: string): Promise<any> {
+        return {};
+    }
+    public async signOutUser(_userId: string, _connectionName: string, _channelId: string): Promise<void> {
+        return;
+    }
+}
+
 describe('Application', () => {
     const adapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
@@ -250,48 +289,6 @@ describe('Application', () => {
                 )
             );
         });
-        class MockUserTokenClient {
-            /**
-             * Creates a new MockUserTokenClient.
-             * @param {boolean} returnMockToken returns a mock TokenResponse when true, undefined when false
-             * @param {boolean} getUserTokenError getUserToken throws an error when true
-             */
-            constructor(
-                readonly returnMockToken: boolean = true,
-                readonly getUserTokenError = false
-            ) {}
-            static readonly expectedToken = 'mockToken';
-            public async getUserToken(
-                _userId: string,
-                connectionName: string,
-                _channelId: string,
-                _magicCode: string
-            ): Promise<any> {
-                if (this.getUserTokenError) {
-                    throw new Error('MockUserTokenClient.getUserTokenError is true.');
-                }
-                if (this.returnMockToken) {
-                    return {
-                        channelId: Channels.Msteams,
-                        connectionName,
-                        token: MockUserTokenClient.expectedToken,
-                        expiration: '2050-01-01T00:00:00.000Z'
-                    };
-                } else {
-                    return undefined;
-                }
-            }
-            public async getSignInResource(
-                _connectionName: string,
-                _activity: Activity,
-                _finalRediect: string
-            ): Promise<any> {
-                return {};
-            }
-            public async signOutUser(_userId: string, _connectionName: string, _channelId: string): Promise<void> {
-                return;
-            }
-        }
 
         it('should start signin flow', async () => {
             const authSettings = { ...authenticationSettings, autoSignIn: true };
