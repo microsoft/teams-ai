@@ -54,6 +54,7 @@ export class TeamsBotFrameworkAuthentication extends ParameterizedBotFrameworkAu
     private readonly _connectedClientOptions: ConnectorClientOptions;
 
     /**
+     * @param args BotFramework Authentication Arguments
      * @param args.validateAuthority The validate authority value to use.
      * @param args.toChannelFromBotLoginUrl The to Channel from bot login url.
      * @param args.toChannelFromBotOAuthScope The to Channel from bot oauth scope.
