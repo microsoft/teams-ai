@@ -53,6 +53,20 @@ export class TeamsBotFrameworkAuthentication extends ParameterizedBotFrameworkAu
     }
     private readonly _connectedClientOptions: ConnectorClientOptions;
 
+    /**
+     * @param args.validateAuthority The validate authority value to use.
+     * @param args.toChannelFromBotLoginUrl The to Channel from bot login url.
+     * @param args.toChannelFromBotOAuthScope The to Channel from bot oauth scope.
+     * @param args.toBotFromChannelTokenIssuer The to bot from Channel Token Issuer.
+     * @param args.oAuthUrl The OAuth url.
+     * @param args.toBotFromChannelOpenIdMetadataUrl The to bot from Channel Open Id Metadata url.
+     * @param args.toBotFromEmulatorOpenIdMetadataUrl The to bot from Emulator Open Id Metadata url.
+     * @param args.callerId The callerId set on an authenticated [Activities](xref:botframework-schema.Activity).
+     * @param args.credentialsFactory The [ServiceClientCredentialsFactory](xref:botframework-connector.ServiceClientCredentialsFactory) to use to create credentials.
+     * @param args.authConfiguration The [AuthenticationConfiguration](xref:botframework-connector.AuthenticationConfiguration) to use.
+     * @param args.botFrameworkClientFetch The fetch to use in BotFrameworkClient.
+     * @param args.connectorClientOptions The [ConnectorClientOptions](xref:botframework-connector.ConnectorClientOptions) to use when creating ConnectorClients.
+     */
     constructor(args: {
         channelService?: string;
         validateAuthority?: boolean;
