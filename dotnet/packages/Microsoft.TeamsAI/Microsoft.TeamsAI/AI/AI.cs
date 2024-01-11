@@ -14,7 +14,7 @@ namespace Microsoft.Teams.AI.AI
     /// </summary>
     /// <remarks>
     /// The AI system is responsible for generating plans, moderating input and output, and
-    /// generating prompts. It can be used free standing or routed to by the Application object.
+    /// generating prompts. It can be used free standing or routed to by the <see cref="Application{TState}"/> object.
     /// </remarks>
     /// <typeparam name="TState">Optional. Type of the turn state.</typeparam>
     public class AI<TState> where TState : TurnState
@@ -65,7 +65,7 @@ namespace Microsoft.Teams.AI.AI
         /// Registers a handler for a named action.
         /// </summary>
         /// <remarks>
-        /// The AI systems planner returns plans that are made up of a series of commands or actions
+        /// The AI system's planner returns plans that are made up of a series of commands or actions
         /// that should be performed. Registering a handler lets you provide code that should be run in
         /// response to one of the predicted actions.
         /// 
@@ -112,7 +112,7 @@ namespace Microsoft.Teams.AI.AI
         /// Registers the default handler for a named action.
         /// </summary>
         /// <remarks>
-        /// Default handlers can be replaced by calling the RegisterAction() method with the same name.
+        /// Default handlers can be replaced by calling the <see cref="RegisterAction(string, IActionHandler{TState})"/> method with the same name.
         /// </remarks>
         /// <param name="name">The name of the action.</param>
         /// <param name="handler">The action handler function.</param>
