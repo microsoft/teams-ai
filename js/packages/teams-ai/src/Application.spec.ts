@@ -6,9 +6,12 @@ import {
     ActivityTypes,
     Channels,
     CloudAdapter,
+    CloudAdapterBase,
     MemoryStorage,
     MessageReactionTypes,
-    TestAdapter
+    TestAdapter,
+    O365ConnectorCardActionQuery,
+    FileConsentCardResponse
 } from 'botbuilder';
 
 import { PasswordServiceClientCredentialFactory } from 'botframework-connector';
@@ -18,10 +21,49 @@ import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
 import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
-import { createTestConversationUpdate } from './internals';
+import { createTestConversationUpdate, createTestInvoke } from './internals';
 import { TestPlanner } from './planners/TestPlanner';
 import { BotAdapterOptions } from './BotAdapterOptions';
 import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
+
+class MockUserTokenClient {
+    /**
+     * Creates a new MockUserTokenClient.
+     * @param {boolean} returnMockToken returns a mock TokenResponse when true, undefined when false
+     * @param {boolean} getUserTokenError getUserToken throws an error when true
+     */
+    constructor(
+        readonly returnMockToken: boolean = true,
+        readonly getUserTokenError = false
+    ) {}
+    static readonly expectedToken = 'mockToken';
+    public async getUserToken(
+        _userId: string,
+        connectionName: string,
+        _channelId: string,
+        _magicCode: string
+    ): Promise<any> {
+        if (this.getUserTokenError) {
+            throw new Error('MockUserTokenClient.getUserTokenError is true.');
+        }
+        if (this.returnMockToken) {
+            return {
+                channelId: Channels.Msteams,
+                connectionName,
+                token: MockUserTokenClient.expectedToken,
+                expiration: '2050-01-01T00:00:00.000Z'
+            };
+        } else {
+            return undefined;
+        }
+    }
+    public async getSignInResource(_connectionName: string, _activity: Activity, _finalRediect: string): Promise<any> {
+        return {};
+    }
+    public async signOutUser(_userId: string, _connectionName: string, _channelId: string): Promise<void> {
+        return;
+    }
+}
 
 describe('Application', () => {
     const testAdapter = new TestAdapter();
@@ -33,6 +75,14 @@ describe('Application', () => {
     const startTypingTimer = false;
     const storage = new MemoryStorage();
     const taskModules: TaskModulesOptions = { taskDataFilter: 'taskFilter' };
+    const authenticationSettings = {
+        settings: {
+            testSetting: {
+                connectionName: 'testConnectionName',
+                title: 'testTitle'
+            }
+        }
+    };
 
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
@@ -72,6 +122,33 @@ describe('Application', () => {
             assert.equal(app.options.storage, storage);
             assert.deepEqual(app.options.taskModules, taskModules);
         });
+
+        it('should throw an exception if botId is an empty string for longRunningMessages', () => {
+            assert.throws(
+                () =>
+                    new Application({
+                        adapter: {
+                            appId: ''
+                        },
+                        longRunningMessages: true
+                    }),
+                new Error(
+                    `The Application.longRunningMessages property is unavailable because no adapter.appId was configured.`
+                )
+            );
+        });
+
+        it('should throw an exception if adapter is not configured', () => {
+            const app = new Application({
+                adapter
+            });
+            assert.throws(
+                () => app.adapter,
+                new Error(
+                    `The Application.adapter property is unavailable because it was not configured when creating the Application.`
+                )
+            );
+        });
     });
 
     describe('botAuthentication', () => {
@@ -110,6 +187,39 @@ describe('Application', () => {
         });
     });
 
+    describe('message', () => {
+        it('should return the message property', () => {
+            const app = new Application();
+            assert.notEqual(app.message, undefined);
+        });
+
+        it("should not route activity if there's no handler", async () => {
+            const app = new Application();
+
+            app.message('/\\?/reset/i', async (context) => {
+                const handled = await app.run(context);
+                assert.equal(handled, false);
+            });
+        });
+
+        it('should route to an activity handler for an array of keywords', async () => {
+            const messages = ['hello', 'hi', 'who are you?'];
+            let called = false;
+            const app = new Application();
+            app.message(messages, async (context, state) => {
+                assert.notEqual(context, undefined);
+                assert.notEqual(state, undefined);
+                called = true;
+            });
+
+            await testAdapter.sendTextToBot('hello', async (context) => {
+                const handled = await app.run(context);
+                assert.equal(called, true);
+                assert.equal(handled, true);
+            });
+        });
+    });
+
     describe('messageExtensions', () => {
         it('should return the messageExtensions property', () => {
             const app = new Application();
@@ -121,6 +231,113 @@ describe('Application', () => {
         it('should return the taskModules property', () => {
             const app = new Application();
             assert.notEqual(app.taskModules, undefined);
+        });
+    });
+
+    describe('authentication', () => {
+        let app = new Application();
+
+        beforeEach(() => {
+            app = new Application({
+                adapter: {
+                    ...adapter,
+                    authentication: new TeamsBotFrameworkAuthentication({
+                        credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
+                    })
+                },
+                authentication: authenticationSettings
+            });
+
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+        });
+
+        it('should return the authentication property', () => {
+            assert.notEqual(app.authentication, undefined);
+        });
+
+        it('should throw an exception when getting authentication if it is not configured', () => {
+            const app = new Application({
+                adapter
+            });
+            assert.throws(
+                () => app.authentication,
+                new Error(
+                    `The Application.authentication property is unavailable because no authentication options were configured.`
+                )
+            );
+        });
+
+        it('should start signin flow', async () => {
+            const authSettings = { ...authenticationSettings, autoSignIn: true };
+            const app = new Application({
+                adapter: {
+                    ...adapter,
+                    authentication: new TeamsBotFrameworkAuthentication({
+                        credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
+                    })
+                },
+                authentication: authSettings
+            });
+
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+
+            await testAdapter.sendTextToBot('signin', async (context) => {
+                // Set MockUserTokenClient on TurnState
+                context.turnState.set(
+                    (context.adapter as CloudAdapterBase).UserTokenClientKey,
+                    new MockUserTokenClient(false)
+                );
+                const handled = await app.run(context);
+                // Returns false because of 'pending' in response.status
+                assert.equal(handled, false);
+            });
+        });
+
+        it('should skip signin flow when user is already signed in.', async () => {
+            // Register a message handler for the 'signin' Text Activity
+            // so that app.run() resolves to true.
+            // Additionally, check to see that the user's token was set in TState by setTokenInState.
+            let signinMessageHandlerCalled: boolean = false;
+            app.message('signin', async (_context, state) => {
+                assert.equal(state.temp.authTokens[app.authentication.default], MockUserTokenClient.expectedToken);
+                signinMessageHandlerCalled = true;
+            });
+            await testAdapter.sendTextToBot('signin', async (context) => {
+                // Set MockUserTokenClient on context.turnState.
+                // Otherwise UserTokenAccess will throw an "OAuth prompt not supported" error
+                // and the test will fail.
+                context.turnState.set(
+                    (context.adapter as CloudAdapterBase).UserTokenClientKey,
+                    new MockUserTokenClient()
+                );
+                const handled = await app.run(context);
+                assert.equal(handled, true);
+                assert.equal(signinMessageHandlerCalled, true);
+            });
+        });
+
+        it('should throw an error when Authentication.signUserIn() throws an error.', async () => {
+            await testAdapter.sendTextToBot('signin', async (context) => {
+                // Set MockUserTokenClient on context.turnState.
+                // Otherwise UserTokenAccess will throw an "OAuth prompt not supported" error
+                // and the test will fail.
+                context.turnState.set(
+                    (context.adapter as CloudAdapterBase).UserTokenClientKey,
+                    // The second constructor parameter is true, which causes getUserToken() to throw an error.
+                    new MockUserTokenClient(undefined, true)
+                );
+                await assert.rejects(
+                    () => app.run(context),
+                    new Error('MockUserTokenClient.getUserTokenError is true.')
+                );
+            });
+        });
+    });
+
+    describe('meetings', () => {
+        it('should return the meetings property', () => {
+            const app = new Application();
+            assert.notEqual(app.meetings, undefined);
         });
     });
 
@@ -141,7 +358,7 @@ describe('Application', () => {
                 called = true;
             });
 
-            await (app.adapter as TestAdapter).sendTextToBot('test', async (context) => {
+            await testAdapter.sendTextToBot('test', async (context) => {
                 const handled = await app.run(context);
                 assert.equal(called, true);
                 assert.equal(handled, true);
@@ -149,7 +366,7 @@ describe('Application', () => {
         });
 
         it("should not route activity if there's no handler", async () => {
-            await (app.adapter as TestAdapter).sendTextToBot('test', async (context) => {
+            await testAdapter.sendTextToBot('test', async (context) => {
                 const handled = await app.run(context);
                 assert.equal(handled, false);
             });
@@ -165,9 +382,36 @@ describe('Application', () => {
                 assert.fail('should not be called');
             });
 
-            await (app.adapter as TestAdapter).sendTextToBot('test', async (context) => {
+            await testAdapter.sendTextToBot('test', async (context) => {
                 const handled = await app.run(context);
                 assert.equal(called, true);
+                assert.equal(handled, true);
+            });
+        });
+
+        it('should create a route for an array of activity types', async () => {
+            let calledMessage = false;
+            let calledEvent = false;
+
+            app.activity([ActivityTypes.Message, ActivityTypes.ConversationUpdate], async (context) => {
+                if (context.activity.type === ActivityTypes.Message) {
+                    calledMessage = true;
+                }
+                if (context.activity.type === ActivityTypes.ConversationUpdate) {
+                    calledEvent = true;
+                }
+            });
+
+            await testAdapter.sendTextToBot('test', async (context) => {
+                const handled = await app.run(context);
+                assert.equal(calledMessage, true);
+                assert.equal(handled, true);
+            });
+            const eventActivity = createTestConversationUpdate();
+
+            await testAdapter.processActivity(eventActivity, async (context) => {
+                const handled = await app.run(context);
+                assert.equal(calledEvent, true);
                 assert.equal(handled, true);
             });
         });
@@ -195,7 +439,7 @@ describe('Application', () => {
                 { id: '42', name: "Don't Panic" }
             ];
 
-            await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+            await testAdapter.processActivity(activity, async (context) => {
                 await app.run(context);
                 assert.equal(handlerCalled, true);
             });
@@ -214,7 +458,7 @@ describe('Application', () => {
                 { id: '42', name: "Don't Panic" }
             ];
 
-            await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+            await testAdapter.processActivity(activity, async (context) => {
                 await app.run(context);
                 assert.equal(handlerCalled, true);
             });
@@ -258,7 +502,7 @@ describe('Application', () => {
 
                 const activity = createTestConversationUpdate(channelData);
                 activity.channelId = Channels.Msteams;
-                await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+                await testAdapter.processActivity(activity, async (context) => {
                     await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
@@ -280,7 +524,7 @@ describe('Application', () => {
                 assert.deepEqual(context.activity.channelData.team, team);
             });
 
-            await (app.adapter as TestAdapter).processActivity(activity, async (context) => {
+            await testAdapter.processActivity(activity, async (context) => {
                 await app.run(context);
                 assert.equal(handlerCalled, true);
             });
@@ -339,7 +583,7 @@ describe('Application', () => {
                     }
                 });
 
-                await (app.adapter as TestAdapter).processActivity(testActivity, async (context) => {
+                await testAdapter.processActivity(testActivity, async (context) => {
                     await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
@@ -354,6 +598,157 @@ describe('Application', () => {
                     }),
                 new Error(`Invalid TeamsMessageEvent type: test`)
             );
+        });
+    });
+
+    describe('fileConsentAccept', () => {
+        let app = new Application();
+        const fileConsentCardResponse: FileConsentCardResponse = {
+            action: 'accept',
+            context: {
+                theme: 'dark',
+                consentId: '1234567890'
+            },
+            uploadInfo: {
+                name: 'test.txt',
+                uploadUrl: 'https://test.com',
+                contentUrl: 'https://test.com',
+                uniqueId: '1234567890'
+            }
+        };
+
+        beforeEach(() => {
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+        });
+
+        it('should route to correct handler for fileConsentAccept', async () => {
+            let handlerCalled = false;
+
+            app.fileConsentAccept(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'accept');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await testAdapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should fail routing to handler for fileConsentAccept if declined', async () => {
+            let handlerCalled = false;
+            fileConsentCardResponse.action = 'decline';
+
+            app.fileConsentAccept(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'accept');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await testAdapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, false);
+            });
+        });
+    });
+
+    describe('fileConsentDecline', () => {
+        let app = new Application();
+        const fileConsentCardResponse: FileConsentCardResponse = {
+            action: 'decline',
+            context: {
+                theme: 'dark',
+                consentId: '1234567890'
+            },
+            uploadInfo: {
+                name: 'test.txt',
+                uploadUrl: 'https://test.com',
+                contentUrl: 'https://test.com',
+                uniqueId: '1234567890'
+            }
+        };
+
+        beforeEach(() => {
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+        });
+
+        it('should route to correct handler for fileConsentDecline', async () => {
+            let handlerCalled = false;
+
+            app.fileConsentDecline(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'decline');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await testAdapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
+        });
+
+        it('should fail routing to handler for fileConsentDecline if accepted', async () => {
+            let handlerCalled = false;
+            fileConsentCardResponse.action = 'accept';
+
+            app.fileConsentDecline(async (context, _state, fileConsentCardResponse) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'fileConsent/invoke');
+                assert.equal(fileConsentCardResponse.action, 'accept');
+            });
+
+            const activity = createTestInvoke('fileConsent/invoke', fileConsentCardResponse);
+
+            await testAdapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, false);
+            });
+        });
+    });
+
+    describe('O365ConnectorCardAction', () => {
+        let app = new Application();
+
+        beforeEach(() => {
+            app = new Application();
+            sinon.stub(app, 'adapter').get(() => testAdapter);
+        });
+
+        it('should route to correct handler for O365ConnectorCardAction', async () => {
+            let handlerCalled = false;
+
+            const o365ConnectorCardActionQuery: O365ConnectorCardActionQuery = {
+                body: 'some results',
+                actionId: 'actionId'
+            };
+
+            app.O365ConnectorCardAction(async (context, _state, O365ConnectorCardActionQuery) => {
+                handlerCalled = true;
+                assert.equal(context.activity.type, ActivityTypes.Invoke);
+                assert.equal(context.activity.name, 'actionableMessage/executeAction');
+                assert.equal(O365ConnectorCardActionQuery.body, 'some results');
+                assert.equal(O365ConnectorCardActionQuery.actionId, 'actionId');
+            });
+
+            const activity = createTestInvoke('actionableMessage/executeAction', o365ConnectorCardActionQuery);
+
+            await testAdapter.processActivity(activity, async (context) => {
+                await app.run(context);
+                assert.equal(handlerCalled, true);
+            });
         });
     });
 
@@ -409,7 +804,7 @@ describe('Application', () => {
                     }
                 });
 
-                await (app.adapter as TestAdapter).processActivity(testActivity, async (context) => {
+                await testAdapter.processActivity(testActivity, async (context) => {
                     await app.run(context);
                     assert.equal(handlerCalled, true);
                 });
@@ -449,7 +844,7 @@ describe('Application', () => {
                 }
             };
 
-            await (app.adapter as TestAdapter).processActivity(testActivity, async (context) => {
+            await testAdapter.processActivity(testActivity, async (context) => {
                 await app.run(context);
                 assert.equal(handlerCalled, true);
             });
