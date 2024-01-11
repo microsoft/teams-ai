@@ -24,9 +24,15 @@ class _GetScopeAndNameResult:
     name: str
 
 class TurnState(Memory):
-    _scopes: Dict[str, TurnStateEntry] = dict()
-    _is_loaded: bool = False
-    _loading_callable: Optional[Callable[[],Awaitable[bool]]] = None
+    _scopes: Dict[str, TurnStateEntry]
+    _is_loaded: bool
+    _loading_callable: Optional[Callable[[],Awaitable[bool]]]
+
+    def __init__(self):
+        super().__init__()
+        self._scopes = dict()
+        self._is_loaded = False
+        self._loading_callable = None
 
     @property
     def conversation(self) -> DefaultConversationState:
@@ -129,7 +135,7 @@ class TurnState(Memory):
         name = scope_and_name.name
         scope.value[name] = value
 
-    async def load(self, context: TurnContext, storage: Optional[Storage]) -> bool:
+    async def load(self, context: TurnContext, storage: Optional[Storage] = None) -> bool:
         # Only load on first call
         if self._is_loaded:
             return False
@@ -142,22 +148,22 @@ class TurnState(Memory):
                     self._is_loaded = True
 
                     # Compute state keys
-                    keys = List[str]()
+                    keys = list()
                     scopes = await self._on_compute_storage_keys(context)
                     for key in scopes:
                         keys.append(scopes[key])
 
                     # Read items from storage provider (if configured)
-                    items = await storage.read(keys) if storage else Dict[str, Any]()
+                    items = await storage.read(keys) if storage else dict()
 
                     # Create scopes for items
                     for key in scopes:
                         storage_key = scopes[key]
-                        value = items[storage_key]
+                        value = items.get(storage_key, dict())
                         self._scopes[key] = TurnStateEntry(value, storage_key)
 
                     # Add the temp scope
-                    self._scopes[TEMP_SCOPE] = TurnStateEntry(Dict[str, Any]())
+                    self._scopes[TEMP_SCOPE] = TurnStateEntry(dict())
 
                     # Clear loading promise
                     self._is_loaded = True
@@ -165,6 +171,7 @@ class TurnState(Memory):
                     return True
                 except Exception as e:
                     self._loading_callable = None
+                    self._is_loaded = False
                     raise e
 
             self._loading_callable = load_state
@@ -226,7 +233,7 @@ class TurnState(Memory):
         if not user_id:
             raise ValueError("missing activity.from_property.id")
         
-        keys = Dict[str, str]()
+        keys = dict()
         keys[CONVERSATION_SCOPE] = f"{channel_id}/{bot_id}/conversations/{conversation_id}"
         keys[USER_SCOPE] = f"{channel_id}/{bot_id}/users/{user_id}"
 
