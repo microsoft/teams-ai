@@ -13,6 +13,8 @@ Samples are E2E teams apps that are easy to set up locally. There are various sa
 
 The following is a list of all the samples we support organized into four categories. If you are new to the library it is recommended to start with the basic samples.
 
+When you are ready to dive into the AI Samples, try the fully conversational Teams Chef Bot sample that illustrates how to use Retrieval Augmentation Generation to ground the AI model’s answers in custom documents and datasets.
+
 - [Samples](#samples)
   - [Basic Samples](#basic-samples)
   - [AI Samples](#ai-samples)
