@@ -72,12 +72,20 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. Options used to initialize your `BotAdapter`
      */
-    adapter?: BotAdapterOptions;
+    adapter?: BotAdapter | BotAdapterOptions;
 
     /**
      * Optional. OAuth prompt settings to use for authentication.
      */
     authentication?: AuthenticationOptions;
+
+    /**
+     * Optional. Application ID of the bot.
+     * @remarks
+     * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
+     * this property is required.
+     */
+    botAppId?: string;
 
     /**
      * Optional. Storage provider to use for the application.
@@ -238,8 +246,14 @@ export class Application<TState extends TurnState = TurnState> {
         };
 
         // Create Adapter
-        if (this._options.adapter?.authentication) {
-            this._adapter = new CloudAdapter(this._options.adapter.authentication);
+        if (this._options.adapter) {
+            if ('authentication' in this._options.adapter) {
+                if (this._options.adapter?.authentication) {
+                    this._adapter = new CloudAdapter(this._options.adapter.authentication);
+                }
+            } else {
+                this._adapter = this._options.adapter as BotAdapter;
+            }
         }
 
         // Create AI component if configured with a planner
@@ -260,9 +274,9 @@ export class Application<TState extends TurnState = TurnState> {
         this._taskModules = new TaskModules<TState>(this);
 
         // Validate long running messages configuration
-        if (this._options.longRunningMessages && !this._options.adapter?.appId) {
+        if (this._options.longRunningMessages && !this._adapter && !this._options.botAppId) {
             throw new Error(
-                `The Application.longRunningMessages property is unavailable because no adapter.appId was configured.`
+                `The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`
             );
         }
     }
@@ -479,9 +493,9 @@ export class Application<TState extends TurnState = TurnState> {
             );
         }
 
-        if (!this._options.adapter?.appId) {
+        if (!this.options.botAppId) {
             console.warn(
-                `Calling Application.continueConversationAsync() without a configured 'adapter.appId'. In production environments an 'adapter.appId' is required.`
+                `Calling Application.continueConversationAsync() without a configured 'botAppId'. In production environments a 'botAppId' is required.`
             );
         }
 
@@ -495,7 +509,7 @@ export class Application<TState extends TurnState = TurnState> {
             reference = context as Partial<ConversationReference>;
         }
 
-        await this.adapter.continueConversationAsync(this._options.adapter?.appId ?? '', reference, logic);
+        await this.adapter.continueConversationAsync(this._options.botAppId ?? '', reference, logic);
     }
 
     /**

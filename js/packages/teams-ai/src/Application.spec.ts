@@ -23,7 +23,6 @@ import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
 import { createTestConversationUpdate, createTestInvoke } from './internals';
 import { TestPlanner } from './planners/TestPlanner';
-import { BotAdapterOptions } from './BotAdapterOptions';
 import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
 
 class MockUserTokenClient {
@@ -67,9 +66,9 @@ class MockUserTokenClient {
 
 describe('Application', () => {
     const testAdapter = new TestAdapter();
-    const adapter: BotAdapterOptions = { appId: 'testBot' };
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
     const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
+    const botAppId = 'testBot';
     const longRunningMessages = true;
     const removeRecipientMention = false;
     const startTypingTimer = false;
@@ -93,6 +92,7 @@ describe('Application', () => {
             assert.equal(app.options.adapter, undefined);
             assert.equal(app.options.adaptiveCards, undefined);
             assert.equal(app.options.ai, undefined);
+            assert.equal(app.options.botAppId, undefined);
             assert.equal(app.options.longRunningMessages, false);
             assert.equal(app.options.removeRecipientMention, true);
             assert.equal(app.options.startTypingTimer, true);
@@ -103,9 +103,9 @@ describe('Application', () => {
 
         it('should create an Application with custom options', () => {
             const app = new Application({
-                adapter,
                 adaptiveCards,
                 ai,
+                botAppId,
                 longRunningMessages,
                 removeRecipientMention,
                 startTypingTimer,
@@ -113,9 +113,9 @@ describe('Application', () => {
                 taskModules
             });
             assert.notEqual(app.options, undefined);
-            assert.equal(app.options.adapter, adapter);
             assert.deepEqual(app.options.adaptiveCards, adaptiveCards);
             assert.deepEqual(app.options.ai, ai);
+            assert.deepEqual(app.options.botAppId, botAppId);
             assert.equal(app.options.longRunningMessages, longRunningMessages);
             assert.equal(app.options.removeRecipientMention, removeRecipientMention);
             assert.equal(app.options.startTypingTimer, startTypingTimer);
@@ -127,21 +127,17 @@ describe('Application', () => {
             assert.throws(
                 () =>
                     new Application({
-                        adapter: {
-                            appId: ''
-                        },
+                        botAppId: '',
                         longRunningMessages: true
                     }),
                 new Error(
-                    `The Application.longRunningMessages property is unavailable because no adapter.appId was configured.`
+                    `The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`
                 )
             );
         });
 
         it('should throw an exception if adapter is not configured', () => {
-            const app = new Application({
-                adapter
-            });
+            const app = new Application();
             assert.throws(
                 () => app.adapter,
                 new Error(
@@ -240,7 +236,6 @@ describe('Application', () => {
         beforeEach(() => {
             app = new Application({
                 adapter: {
-                    ...adapter,
                     authentication: new TeamsBotFrameworkAuthentication({
                         credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
                     })
@@ -256,9 +251,7 @@ describe('Application', () => {
         });
 
         it('should throw an exception when getting authentication if it is not configured', () => {
-            const app = new Application({
-                adapter
-            });
+            const app = new Application();
             assert.throws(
                 () => app.authentication,
                 new Error(
@@ -271,7 +264,6 @@ describe('Application', () => {
             const authSettings = { ...authenticationSettings, autoSignIn: true };
             const app = new Application({
                 adapter: {
-                    ...adapter,
                     authentication: new TeamsBotFrameworkAuthentication({
                         credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
                     })

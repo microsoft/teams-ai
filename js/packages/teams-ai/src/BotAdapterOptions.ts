@@ -14,16 +14,8 @@ import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthenticati
  */
 export interface BotAdapterOptions {
     /**
-     * Optional. Application ID of the bot.
-     * @remarks
-     * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
-     * this property is required.
-     */
-    appId?: string;
-
-    /**
-     * Optional. Authentication options for initializing the `BotAdapter`.
+     * Authentication options for initializing the `BotAdapter`.
      * When `undefined` no adapter will be initialized.
      */
-    authentication?: TeamsBotFrameworkAuthentication;
+    authentication: TeamsBotFrameworkAuthentication;
 }

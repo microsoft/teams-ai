@@ -12,8 +12,8 @@ import { BotAdapterOptions } from './BotAdapterOptions';
 import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
 
 describe('ApplicationBuilder', () => {
+    const botAppId = 'testBot';
     const adapter: BotAdapterOptions = {
-        appId: 'testBot',
         authentication: new TeamsBotFrameworkAuthentication({
             credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
         })
@@ -54,10 +54,9 @@ describe('ApplicationBuilder', () => {
             .setRemoveRecipientMention(removeRecipientMention)
             .withStorage(storage)
             .withAIOptions(ai)
-            .withAdapterOptions(adapter)
-            .withLongRunningMessages()
+            .withLongRunningMessages(adapter, botAppId)
             .withAdaptiveCardOptions(adaptiveCards)
-            .withAuthentication(authenticationSettings)
+            .withAuthentication(adapter, authenticationSettings)
             .withTaskModuleOptions(taskModules)
             .setStartTypingTimer(startTypingTimer)
             .build();
@@ -75,7 +74,7 @@ describe('ApplicationBuilder', () => {
 
     it('should throw an exception if botId is an empty string for longRunningMessages', () => {
         assert.throws(() => {
-            new ApplicationBuilder().withAdapterOptions({ appId: '' }).withLongRunningMessages().build();
+            new ApplicationBuilder().withLongRunningMessages(adapter, '').build();
         });
     });
 });

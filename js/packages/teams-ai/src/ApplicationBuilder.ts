@@ -1,4 +1,4 @@
-import { Storage } from 'botbuilder';
+import { Storage, BotAdapter } from 'botbuilder';
 
 import { Application, ApplicationOptions } from './Application';
 import { BotAdapterOptions } from './BotAdapterOptions';
@@ -15,24 +15,23 @@ import { AuthenticationOptions } from './authentication';
 export class ApplicationBuilder<TState extends TurnState = TurnState> {
     private _options: Partial<ApplicationOptions<TState>> = {};
 
-    public withAdapterOptions(adapterOptions: BotAdapterOptions): this {
-        this._options.adapter = adapterOptions;
-        return this;
-    }
-
     /**
      * Configures the application to use long running messages.
      * Default state for longRunningMessages is false
+     * @param {BotAdapter | BotAdapterOptions} adapter The adapter to use for routing incoming requests.
+     * @param {string} botAppId The Microsoft App ID for the bot.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withLongRunningMessages(): this {
-        if (!this._options.adapter?.appId) {
+    public withLongRunningMessages(adapter: BotAdapter | BotAdapterOptions, botAppId: string): this {
+        if (!botAppId) {
             throw new Error(
-                `The Application.longRunningMessages property is unavailable because adapter.appId cannot be null or undefined.`
+                `The Application.longRunningMessages property is unavailable because botAppId cannot be null or undefined.`
             );
         }
 
         this._options.longRunningMessages = true;
+        this._options.adapter = adapter;
+        this._options.botAppId = botAppId;
         return this;
     }
 
@@ -78,19 +77,23 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
 
     /**
      * Configures user authentication settings.
-     * @param {BotAdapter} adapter The adapter to use for user authentication.
+     * @param {BotAdapter | BotAdapterOptions} adapter The adapter to use for user authentication.
      * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withAuthentication(authenticationOptions: AuthenticationOptions): this {
+    public withAuthentication(
+        adapter: BotAdapter | BotAdapterOptions,
+        authenticationOptions: AuthenticationOptions
+    ): this {
+        this._options.adapter = adapter;
         this._options.authentication = authenticationOptions;
         return this;
     }
 
     /**
      * Configures the turn state factory for managing the bot's turn state.
-     * @param turnStateFactory
-     * @returns
+     * @param {() => TState} turnStateFactory Factory used to create a custom turn state instance.
+     * @returns {this} The ApplicationBuilder instance.
      */
     public withTurnStateFactory(turnStateFactory: () => TState): this {
         this._options.turnStateFactory = turnStateFactory;
