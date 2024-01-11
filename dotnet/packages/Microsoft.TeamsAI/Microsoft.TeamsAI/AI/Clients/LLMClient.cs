@@ -13,9 +13,9 @@ namespace Microsoft.Teams.AI.AI.Clients
     /// LLMClient class that's used to complete prompts.
     /// </summary>
     /// <remarks>
-    /// Each wave, at a minimum needs to be configured with a `client`, `prompt`, and `prompt_options`.
+    /// Each LLMClient, at a minimum needs to be configured with a `model`, and `template`.
     ///
-    /// Configuring the wave to use a `validator` is optional but recommended. The primary benefit to
+    /// Configuring the LLMClient to use a `validator` is optional but recommended. The primary benefit to
     /// using LLMClient is it's response validation and automatic response repair features. The
     /// validator acts as guard and guarantees that you never get an malformed response back from the
     /// model. At least not without it being flagged as an `invalid_response`.
@@ -28,20 +28,20 @@ namespace Microsoft.Teams.AI.AI.Clients
     ///
     /// When a validator detects a bad response from the model, it gives the model "feedback" as to the
     /// problem it detected with its response and more importantly an instruction that tells the model
-    /// how it should repair the problem. This puts the wave into a special repair mode where it first
+    /// how it should repair the problem. This puts the LLMClient into a special repair mode where it first
     /// forks the memory for the conversation and then has a side conversation with the model in an
     /// effort to get it to repair its response. By forking the conversation, this isolates the bad
     /// response and prevents it from contaminating the main conversation history. If the response can
-    /// be repaired, the wave will un-fork the memory and use the repaired response in place of the
+    /// be repaired, the LLMClient will un-fork the memory and use the repaired response in place of the
     /// original bad response. To the model it's as if it never made a mistake which is important for
     /// future turns with the model. If the response can't be repaired, a response status of
     /// `invalid_response` will be returned.
     ///
-    /// When using a well designed validator, like the `JsonResponseValidator`, the wave can typically
+    /// When using a well designed validator, like the `JsonResponseValidator`, the LLMClient can typically
     /// repair a bad response in a single additional model call. Sometimes it takes a couple of calls
     /// to effect a repair and occasionally it won't be able to repair it at all. If your prompt is
     /// well designed and you only occasionally see failed repair attempts, I'd recommend just calling
-    /// the wave a second time. Given the stochastic nature of these models, there's a decent chance
+    /// the LLMClient a second time. Given the stochastic nature of these models, there's a decent chance
     /// it won't make the same mistake on the second call. A well designed prompt coupled with a well
     /// designed validator should get the reliability of calling these models somewhere close to 99%
     /// reliable.
@@ -120,7 +120,7 @@ namespace Microsoft.Teams.AI.AI.Clients
         /// conversation history and formatted like `{ role: 'user', content: input }`.
         ///
         /// It's important to note that if you want the users input sent to the model as part of the
-        /// prompt, you will need to add a `UserMessageSection` to your prompt. The wave does not do
+        /// prompt, you will need to add a `UserMessageSection` to your prompt. The LLMClient does not do
         /// anything to modify your prompt, except when performing repairs and those changes are
         /// temporary.
         ///
