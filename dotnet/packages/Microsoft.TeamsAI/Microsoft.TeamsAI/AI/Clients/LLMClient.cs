@@ -13,16 +13,16 @@ namespace Microsoft.Teams.AI.AI.Clients
     /// LLMClient class that's used to complete prompts.
     /// </summary>
     /// <remarks>
-    /// Each LLMClient, at a minimum needs to be configured with a `model`, and `template`.
+    /// Each LLMClient, at a minimum needs to be configured with a <see cref="LLMClientOptions{TContent}.Model"/> and <see cref="LLMClientOptions{TContent}.Template"/>.
     ///
-    /// Configuring the LLMClient to use a `validator` is optional but recommended. The primary benefit to
+    /// Configuring the LLMClient to use a <see cref="LLMClientOptions{TContent}.Validator"/> is optional but recommended. The primary benefit to
     /// using LLMClient is it's response validation and automatic response repair features. The
     /// validator acts as guard and guarantees that you never get an malformed response back from the
     /// model. At least not without it being flagged as an `invalid_response`.
     ///
-    /// Using the `JsonResponseValidator`, for example, guarantees that you only ever get a valid
-    /// object back from `CompletePromptAsync()`. In fact, you'll get back a fully parsed object and any
-    /// additional response text from the model will be dropped. If you give the `JsonResponseValidator`
+    /// Using the <see cref="JsonResponseValidator"/>, for example, guarantees that you only ever get a valid
+    /// object back from <see cref="CompletePromptAsync(ITurnContext, IMemory, IPromptFunctions{List{string}}, string?, CancellationToken)"/>. In fact, you'll get back a fully parsed object and any
+    /// additional response text from the model will be dropped. If you give the <see cref="JsonResponseValidator"/>
     /// a JSON Schema, you will get back a strongly typed and validated instance of an object in
     /// the returned `response.message.content`.
     ///
@@ -37,7 +37,7 @@ namespace Microsoft.Teams.AI.AI.Clients
     /// future turns with the model. If the response can't be repaired, a response status of
     /// `invalid_response` will be returned.
     ///
-    /// When using a well designed validator, like the `JsonResponseValidator`, the LLMClient can typically
+    /// When using a well designed validator, like the <see cref="JsonResponseValidator"/>, the LLMClient can typically
     /// repair a bad response in a single additional model call. Sometimes it takes a couple of calls
     /// to effect a repair and occasionally it won't be able to repair it at all. If your prompt is
     /// well designed and you only occasionally see failed repair attempts, I'd recommend just calling
@@ -49,13 +49,6 @@ namespace Microsoft.Teams.AI.AI.Clients
     /// This "feedback" technique works with all the GPT-3 generation of models and I've tested it with
     /// `text-davinci-003`, `gpt-3.5-turbo`, and `gpt-4`. There's a good chance it will work with other
     /// open source models like `LLaMA` and Googles `Bard` but I have yet to test it with those models.
-    ///
-    /// LLMClient supports OpenAI's functions feature and can validate the models response against the
-    /// schema for the supported functions. When an LLMClient is configured with both a `OpenAIModel`
-    /// and a `FunctionResponseValidator`, the model will be cloned and configured to send the
-    /// validators configured list of functions with the request. There's no need to separately
-    /// configure the models `functions` list, but if you do, the models functions list will be sent
-    /// instead.
     /// </remarks>
     /// <typeparam name="TContent">
     /// Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent.
