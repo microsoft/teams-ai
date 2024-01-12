@@ -20,7 +20,7 @@ import { ParameterizedBotFrameworkAuthentication } from 'botframework-connector/
 
 import packageInfo from '../package.json';
 
-const USER_AGENT = `${packageInfo.name}/${packageInfo.version}`;
+const USER_AGENT = `teamsai-js/${packageInfo.version}`;
 const DEFAULTS = {
     authentication: {
         validateAuthority: true,

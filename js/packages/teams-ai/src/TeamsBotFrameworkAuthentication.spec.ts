@@ -4,7 +4,7 @@ import { PasswordServiceClientCredentialFactory } from 'botframework-connector';
 import packageInfo from '../package.json';
 import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
 
-const USER_AGENT = `${packageInfo.name}/${packageInfo.version}`;
+const USER_AGENT = `teamsai-js/${packageInfo.version}`;
 
 describe('TeamsBotFrameworkAuthentication', () => {
     const auth = new TeamsBotFrameworkAuthentication({
