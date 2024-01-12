@@ -83,6 +83,14 @@ describe('Application', () => {
         }
     };
 
+    beforeEach(() => {
+        sinon.createSandbox();
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
             const app = new Application();
