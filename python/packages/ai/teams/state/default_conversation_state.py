@@ -3,7 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
+
 
 class DefaultConversationState:
     _dict: Dict[str, Any]

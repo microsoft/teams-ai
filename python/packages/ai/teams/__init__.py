@@ -8,6 +8,6 @@ from .ai import *
 from .app import Application
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
+from .input_file import InputFile
 from .message_extensions import MessagePreviewAction
 from .query import Query
-from .input_file import InputFile

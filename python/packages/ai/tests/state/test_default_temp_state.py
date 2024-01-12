@@ -5,8 +5,9 @@ Licensed under the MIT License.
 
 from unittest import TestCase
 
-from teams.state import DefaultTempState
 from teams import InputFile
+from teams.state import DefaultTempState
+
 
 class TestDefaultTempState(TestCase):
     def setUp(self):
@@ -16,7 +17,7 @@ class TestDefaultTempState(TestCase):
             DefaultTempState.LAST_OUTPUT: "test output",
             DefaultTempState.ACTION_OUTPUTS: {"action1": "output1"},
             DefaultTempState.AUTH_TOKENS: {"token1": "auth1"},
-            DefaultTempState.DUPLICATE_TOKEN_EXCHANGE: True
+            DefaultTempState.DUPLICATE_TOKEN_EXCHANGE: True,
         }
         self.temp_state = DefaultTempState(self.data)
 
@@ -26,7 +27,9 @@ class TestDefaultTempState(TestCase):
         self.assertEqual(self.temp_state.input, "new input")
 
     def test_input_files(self):
-        self.assertEqual(self.temp_state.input_files, [InputFile("test_file", "test_path", "test_url")])
+        self.assertEqual(
+            self.temp_state.input_files, [InputFile("test_file", "test_path", "test_url")]
+        )
         new_files = [InputFile("new_file", "new_path", "new_url")]
         self.temp_state.input_files = new_files
         self.assertEqual(self.temp_state.input_files, new_files)

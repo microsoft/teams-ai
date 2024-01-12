@@ -3,18 +3,20 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from typing import Any, Dict, List, Optional
+
 from ..input_file import InputFile
-from typing import List, Dict, Optional, Any
+
 
 class DefaultTempState:
     _dict: Dict[str, Any]
 
-    INPUT = 'input'
-    INPUT_FILES = 'input_files'
-    LAST_OUTPUT = 'last_output'
-    ACTION_OUTPUTS = 'action_outputs'
-    AUTH_TOKENS = 'auth_tokens'
-    DUPLICATE_TOKEN_EXCHANGE = 'duplicate_token_exchange'
+    INPUT = "input"
+    INPUT_FILES = "input_files"
+    LAST_OUTPUT = "last_output"
+    ACTION_OUTPUTS = "action_outputs"
+    AUTH_TOKENS = "auth_tokens"
+    DUPLICATE_TOKEN_EXCHANGE = "duplicate_token_exchange"
 
     def __init__(self, data: Dict[str, Any]):
         self._dict = data

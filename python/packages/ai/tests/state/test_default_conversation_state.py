@@ -7,6 +7,7 @@ from unittest import TestCase
 
 from teams.state import DefaultConversationState
 
+
 class TestDefaultConversationState(TestCase):
     def setUp(self):
         self.data = {"key1": "value1", "key2": "value2"}

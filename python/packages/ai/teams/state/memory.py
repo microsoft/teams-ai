@@ -6,8 +6,8 @@ Licensed under the MIT License.
 from abc import ABC, abstractmethod
 from typing import Any
 
-class Memory(ABC):
 
+class Memory(ABC):
     @abstractmethod
     def delete_value(self, path: str) -> None:
         """
