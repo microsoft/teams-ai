@@ -276,7 +276,7 @@ export class AuthenticationManager<TState extends TurnState> {
             settingName = this.default;
         }
 
-        // Get authentication instace
+        // Get authentication instance
         const auth: Authentication<TState> = this.get(settingName);
         let status: 'pending' | 'complete' | 'error';
 

@@ -322,7 +322,7 @@ export class Application<TState extends TurnState = TurnState> {
      * @description
      * This property is only available if the Application was configured with `authentication` options. An
      * exception will be thrown if you attempt to access it otherwise.
-     * @returns {Authentication<TState>} The Authentication instance.
+     * @returns {AuthenticationManager<TState>} The Authentication instance.
      */
     public get authentication(): AuthenticationManager<TState> {
         if (!this._authentication) {
@@ -1136,8 +1136,8 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
 
     /**
      * Configures the turn state factory for managing the bot's turn state.
-     * @param turnStateFactory
-     * @returns
+     * @param {() => TState} turnStateFactory Factory used to create a custom turn state instance.
+     * @returns {this} The ApplicationBuilder instance.
      */
     public withTurnStateFactory(turnStateFactory: () => TState): this {
         this._options.turnStateFactory = turnStateFactory;
