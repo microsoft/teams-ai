@@ -178,7 +178,7 @@ class TurnState(Memory):
 
         return await self._loading_callable()
 
-    async def save(self, context: TurnContext, storage: Optional[Storage]) -> None:
+    async def save(self, context: TurnContext, storage: Optional[Storage] = None) -> None:
         # Check for existing load operation
         if not self._is_loaded and self._loading_callable is not None:
             # Wait for load to finish

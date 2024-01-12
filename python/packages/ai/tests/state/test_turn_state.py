@@ -5,32 +5,9 @@ Licensed under the MIT License.
 
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock
-from teams.state import TurnState, DefaultConversationState, DefaultUserState, DefaultTempState
+from teams.state import TurnState, DefaultConversationState, DefaultUserState, DefaultTempState, TurnStateEntry
+from teams.state.turn_state import CONVERSATION_SCOPE, USER_SCOPE, TEMP_SCOPE
 from botbuilder.core import MemoryStorage
-
-class TestConversationState(DefaultConversationState):
-    def __init__(self):
-        super().__init__()
-        
-    @property
-    def property1(self):
-        return self._dict.get("property1", None)
-    
-    @property1.setter
-    def property1(self, value):
-        self._dict["property1"] = value
-
-class TestUserState(DefaultUserState):
-    def __init__(self):
-        super().__init__()
-
-    @property
-    def property2(self):
-        return self._dict.get("property2", None)
-    
-    @property2.setter
-    def property2(self, value):
-        self._dict["property2"] = value
 
 class TestTurnState(IsolatedAsyncioTestCase):
     def setUp(self):
@@ -110,12 +87,14 @@ class TestTurnState(IsolatedAsyncioTestCase):
 
     async def test_conversation_property_not_loaded(self):
         # Test getter when TurnState hasn't been loaded
-        with self.assertRaisesRegex(Exception, "TurnState hasn't been loaded\. Call loadState\(\) first\."):
+        with self.assertRaises(Exception) as context:
             conversation_state = self.turn_state.conversation
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
 
         # Test setter when TurnState hasn't been loaded
-        with self.assertRaisesRegex(Exception, "TurnState hasn't been loaded\. Call loadState\(\) first\."):
+        with self.assertRaises(Exception) as context:
             self.turn_state.conversation = DefaultConversationState({})
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
 
     async def test_conversation_property_loaded(self):
         # Load the TurnState
@@ -144,12 +123,14 @@ class TestTurnState(IsolatedAsyncioTestCase):
 
     async def test_user_property_not_loaded(self):
         # Test getter when TurnState hasn't been loaded
-        with self.assertRaisesRegex(Exception, "TurnState hasn't been loaded\. Call loadState\(\) first\."):
+        with self.assertRaises(Exception) as context:
             user_state = self.turn_state.user
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
 
         # Test setter when TurnState hasn't been loaded
-        with self.assertRaisesRegex(Exception, "TurnState hasn't been loaded\. Call loadState\(\) first\."):
+        with self.assertRaises(Exception) as context:
             self.turn_state.user = DefaultUserState({})
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
 
     async def test_user_property_loaded(self):
         # Load the TurnState
@@ -170,12 +151,14 @@ class TestTurnState(IsolatedAsyncioTestCase):
 
     async def test_temp_property_not_loaded(self):
         # Test getter when TurnState hasn't been loaded
-        with self.assertRaisesRegex(Exception, "TurnState hasn't been loaded\. Call loadState\(\) first\."):
-            temp_state = self.turn_state.temp
+        with self.assertRaises(Exception) as context:
+            user_state = self.turn_state.temp
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
 
         # Test setter when TurnState hasn't been loaded
-        with self.assertRaisesRegex(Exception, "TurnState hasn't been loaded\. Call loadState\(\) first\."):
+        with self.assertRaises(Exception) as context:
             self.turn_state.temp = DefaultTempState({})
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
 
     async def test_temp_property_loaded(self):
         # Load the TurnState
@@ -200,6 +183,20 @@ class TestTurnState(IsolatedAsyncioTestCase):
             await self.turn_state.save(context, self.storage)
         self.assertTrue("TurnState hasn't been loaded. Call loadState() first." in str(context.exception))
 
+    async def test_save_when_loading(self):
+        self.turn_state._is_loaded = False
+        async def mock_loading_callable():
+            self.turn_state._is_loaded = True
+            self.turn_state._scopes[CONVERSATION_SCOPE] = TurnStateEntry({}, "conversation_key")
+            self.turn_state._scopes[USER_SCOPE] = TurnStateEntry({}, "user_key")
+            self.turn_state._scopes[TEMP_SCOPE] = TurnStateEntry({}, "temp_key")
+        self.turn_state._loading_callable = mock_loading_callable
+        context = self.create_mock_context()
+        try:
+            await self.turn_state.save(context, self.storage)
+        except Exception as e:
+            self.fail("self.turn_state.save raised Exception unexpectedly!"+str(e))
+
     async def test_save_with_changes(self):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
@@ -217,3 +214,160 @@ class TestTurnState(IsolatedAsyncioTestCase):
         conversation_key = f"{context.activity.channel_id}/{context.activity.recipient.id}/conversations/{context.activity.conversation.id}"
         user_key = f"{context.activity.channel_id}/{context.activity.recipient.id}/users/{context.activity.from_property.id}"
         self.assertEqual(await self.storage.read([conversation_key, user_key]), {})
+
+    async def test_save_with_deletions(self):
+        context = self.create_mock_context()
+        conversation_key = f"{context.activity.channel_id}/{context.activity.recipient.id}/conversations/{context.activity.conversation.id}"
+        user_key = f"{context.activity.channel_id}/{context.activity.recipient.id}/users/{context.activity.from_property.id}"
+        await self.storage.write({
+            conversation_key: {"property1": "value1"},
+            user_key: {"property2": "value2"}
+        })  # populate some data first
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.delete_conversation_state()
+        self.turn_state.delete_user_state()
+        await self.turn_state.save(context, self.storage)
+        self.assertEqual(await self.storage.read([conversation_key, user_key]), {})
+
+    async def test_save_with_no_storage(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        try:
+            await self.turn_state.save(context)
+        except Exception as e:
+            self.fail("self.turn_state.save raised Exception unexpectedly!"+str(e))
+
+    async def test_delete_conversation_state(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.delete_conversation_state()
+        self.assertTrue(self.turn_state._scopes[CONVERSATION_SCOPE].is_deleted)
+
+    async def test_delete_conversation_state_not_loaded(self):
+        with self.assertRaises(Exception) as context:
+            self.turn_state.delete_conversation_state()
+        self.assertEqual(str(context.exception),  "TurnState hasn't been loaded. Call loadState() first.")
+
+    async def test_delete_user_state(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.delete_user_state()
+        self.assertTrue(self.turn_state._scopes[USER_SCOPE].is_deleted)
+
+    async def test_delete_user_state_not_loaded(self):
+        with self.assertRaises(Exception) as context:
+            self.turn_state.delete_user_state()
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
+
+    async def test_delete_temp_state(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.delete_temp_state()
+        self.assertTrue(self.turn_state._scopes[TEMP_SCOPE].is_deleted)
+
+    async def test_delete_temp_state_not_loaded(self):
+        with self.assertRaises(Exception) as context:
+            self.turn_state.delete_temp_state()
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call loadState() first.")
+
+    async def test_delete_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.conversation.get_dict()["property1"] = "new value1"
+        self.turn_state.user.get_dict()["property2"] = "new value2"
+        self.turn_state.temp.get_dict()["property3"] = "new value3"
+        self.turn_state.delete_value(f'{CONVERSATION_SCOPE}.property1')
+        self.turn_state.delete_value(f'{USER_SCOPE}.property2')
+        self.turn_state.delete_value(f'{TEMP_SCOPE}.property3')
+        self.assertEqual(self.turn_state.conversation.get_dict(), {})
+        self.assertEqual(self.turn_state.user.get_dict(), {})
+        self.assertEqual(self.turn_state.temp.get_dict(), {})
+
+    async def test_delete_non_exist_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        try:
+            self.turn_state.delete_value(f'{CONVERSATION_SCOPE}.property1')
+            self.turn_state.delete_value(f'{USER_SCOPE}.property2')
+            self.turn_state.delete_value(f'{TEMP_SCOPE}.property3')
+        except Exception as e:
+            self.fail("self.turn_state.delete_value raised Exception unexpectedly!"+str(e))
+
+    async def test_has_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.conversation.get_dict()["property1"] = "new value1"
+        self.turn_state.user.get_dict()["property2"] = "new value2"
+        self.turn_state.temp.get_dict()["property3"] = "new value3"
+        self.assertTrue(self.turn_state.has_value(f'{CONVERSATION_SCOPE}.property1'))
+        self.assertTrue(self.turn_state.has_value(f'{USER_SCOPE}.property2'))
+        self.assertTrue(self.turn_state.has_value(f'{TEMP_SCOPE}.property3'))
+
+    async def test_has_no_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.assertFalse(self.turn_state.has_value(f'{CONVERSATION_SCOPE}.property1'))
+        self.assertFalse(self.turn_state.has_value(f'{USER_SCOPE}.property2'))
+        self.assertFalse(self.turn_state.has_value(f'{TEMP_SCOPE}.property3'))
+    
+    async def test_get_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.conversation.get_dict()["property1"] = "new value1"
+        self.turn_state.user.get_dict()["property2"] = "new value2"
+        self.turn_state.temp.get_dict()["property3"] = "new value3"
+        self.assertEqual(self.turn_state.get_value(f'{CONVERSATION_SCOPE}.property1'), "new value1")
+        self.assertEqual(self.turn_state.get_value(f'{USER_SCOPE}.property2'), "new value2")
+        self.assertEqual(self.turn_state.get_value(f'{TEMP_SCOPE}.property3'), "new value3")
+
+    async def test_get_non_exist_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.assertIsNone(self.turn_state.get_value(f'{CONVERSATION_SCOPE}.property1'))
+        self.assertIsNone(self.turn_state.get_value(f'{USER_SCOPE}.property2'))
+        self.assertIsNone(self.turn_state.get_value(f'{TEMP_SCOPE}.property3'))
+
+    async def test_set_value(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.set_value(f'{CONVERSATION_SCOPE}.property1', "new value1")
+        self.turn_state.set_value(f'{USER_SCOPE}.property2', "new value2")
+        self.turn_state.set_value(f'{TEMP_SCOPE}.property3', "new value3")
+        self.assertEqual(self.turn_state.get_value(f'{CONVERSATION_SCOPE}.property1'), "new value1")
+        self.assertEqual(self.turn_state.get_value(f'{USER_SCOPE}.property2'), "new value2")
+        self.assertEqual(self.turn_state.get_value(f'{TEMP_SCOPE}.property3'), "new value3")
+
+    async def test_set_value_overwrite(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.set_value(f'{CONVERSATION_SCOPE}.property1', "old value1")
+        self.turn_state.set_value(f'{USER_SCOPE}.property2', "old value2")
+        self.turn_state.set_value(f'{TEMP_SCOPE}.property3', "old value3")
+        self.turn_state.set_value(f'{CONVERSATION_SCOPE}.property1', "new value1")
+        self.turn_state.set_value(f'{USER_SCOPE}.property2', "new value2")
+        self.turn_state.set_value(f'{TEMP_SCOPE}.property3', "new value3")
+        self.assertEqual(self.turn_state.get_value(f'{CONVERSATION_SCOPE}.property1'), "new value1")
+        self.assertEqual(self.turn_state.get_value(f'{USER_SCOPE}.property2'), "new value2")
+        self.assertEqual(self.turn_state.get_value(f'{TEMP_SCOPE}.property3'), "new value3")
+
+    async def test_get_value_invalid_path(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        with self.assertRaises(Exception) as context:
+            self.turn_state.get_value('invalid.scope.property')
+        self.assertIn('Invalid state path: invalid.scope.property', str(context.exception))
+
+    async def test_get_value_invalid_scope(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        with self.assertRaises(Exception) as context:
+            self.turn_state.get_value('invalid.property')
+        self.assertIn('Invalid state scope: invalid', str(context.exception))
+
+    async def test_get_value_default_scope(self):
+        context = self.create_mock_context()
+        await self.turn_state.load(context, self.storage)
+        self.turn_state.set_value(f'{CONVERSATION_SCOPE}.property1', "new value1")
+        self.turn_state.set_value(f'{USER_SCOPE}.property2', "new value2")
+        self.turn_state.set_value(f'{TEMP_SCOPE}.property3', "new value3")
+        self.assertEqual(self.turn_state.get_value('property3'), "new value3")
