@@ -65,6 +65,7 @@ class MockUserTokenClient {
 }
 
 describe('Application', () => {
+    let sandbox: sinon.SinonSandbox;
     const testAdapter = new TestAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
     const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
@@ -84,17 +85,17 @@ describe('Application', () => {
     };
 
     beforeEach(() => {
-        sinon.createSandbox();
+        sandbox = sinon.createSandbox();
     });
 
     afterEach(() => {
-        sinon.restore();
+        sandbox.restore();
     });
 
     describe('constructor()', () => {
         it('should create an Application with default options', () => {
             const app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
 
             assert.notEqual(app.options, undefined);
             assert.equal(app.options.adapter, undefined);
@@ -251,7 +252,7 @@ describe('Application', () => {
                 authentication: authenticationSettings
             });
 
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should return the authentication property', () => {
@@ -279,7 +280,7 @@ describe('Application', () => {
                 authentication: authSettings
             });
 
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
 
             await testAdapter.sendTextToBot('signin', async (context) => {
                 // Set MockUserTokenClient on TurnState
@@ -346,7 +347,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to an activity handler', async () => {
@@ -422,7 +423,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to an instantiated conversationUpdate handler when channelId is Teams', async () => {
@@ -545,7 +546,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         const messageReactions: { event: MessageReactionEvents; testActivity: Partial<Activity> }[] = [
@@ -619,7 +620,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to correct handler for fileConsentAccept', async () => {
@@ -678,7 +679,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to correct handler for fileConsentDecline', async () => {
@@ -724,7 +725,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to correct handler for O365ConnectorCardAction', async () => {
@@ -757,7 +758,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         const messageUpdateEvents: { event: TeamsMessageEvents; testActivity: Partial<Activity> }[] = [
@@ -824,7 +825,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application();
-            sinon.stub(app, 'adapter').get(() => testAdapter);
+            sandbox.stub(app, 'adapter').get(() => testAdapter);
         });
 
         it('should route to correct handler for teamsReadReceipt', async () => {
