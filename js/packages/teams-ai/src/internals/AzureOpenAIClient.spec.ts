@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { AzureOpenAIClient, AzureOpenAIClientOptions } from './AzureOpenAIClient';
 import { CreateChatCompletionRequest, CreateEmbeddingRequest, ModerationInput } from './types';
-import sinon, { SinonStub } from 'sinon';
+import sinon, { createSandbox } from 'sinon';
 import axios from 'axios';
 
 describe('AzureOpenAIClient', () => {
@@ -9,7 +9,8 @@ describe('AzureOpenAIClient', () => {
     let client: AzureOpenAIClient;
     let clientWithApiVersion: AzureOpenAIClient;
     let cognitiveServiceClient: AzureOpenAIClient;
-    let createStub: SinonStub;
+    let sinonSandbox: sinon.SinonSandbox;
+    let createStub: sinon.SinonStub;
 
     const options: AzureOpenAIClientOptions = {
         apiKey: 'mock-key',
@@ -98,14 +99,16 @@ describe('AzureOpenAIClient', () => {
     };
 
     beforeEach(() => {
-        createStub = sinon.stub(axios, 'create').returns(mockAxios);
+        sinonSandbox = createSandbox();
+        createStub = sinonSandbox.stub(axios, 'create').returns(mockAxios);
+
         client = new AzureOpenAIClient(options);
         clientWithApiVersion = new AzureOpenAIClient(optionsWithApiVersion);
         cognitiveServiceClient = new AzureOpenAIClient(cognitiveServiceOptions);
     });
 
     afterEach(() => {
-        sinon.restore();
+        sinonSandbox.restore();
     });
 
     describe('constructor', () => {
@@ -137,7 +140,7 @@ describe('AzureOpenAIClient', () => {
 
     describe('createChatCompletion', () => {
         it('creates valid chat completion response', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
             const url = `${options.endpoint}/openai/deployments/${chatCompletionRequest.model}/chat/completions?api-version=2023-03-15-preview`;
             const response = await client.createChatCompletion(chatCompletionRequest);
 
@@ -150,7 +153,7 @@ describe('AzureOpenAIClient', () => {
         });
 
         it('creates valid chat completion response, with api version specified', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
             const url = `${optionsWithApiVersion.endpoint}/openai/deployments/${chatCompletionRequest.model}/chat/completions?api-version=${optionsWithApiVersion.apiVersion}`;
             const response = await clientWithApiVersion.createChatCompletion(chatCompletionRequest);
 
@@ -165,7 +168,7 @@ describe('AzureOpenAIClient', () => {
 
     describe('createEmbedding', () => {
         it('creates valid embedding response', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
             const url = `${options.endpoint}/openai/deployments/${embeddingRequest.model}/embeddings?api-version=2022-12-01`;
             const response = await client.createEmbedding(embeddingRequest);
 
@@ -178,7 +181,7 @@ describe('AzureOpenAIClient', () => {
         });
 
         it('creates valid embedding response with api version specified', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
             const url = `${optionsWithApiVersion.endpoint}/openai/deployments/${embeddingRequest.model}/embeddings?api-version=${optionsWithApiVersion.apiVersion}`;
             const response = await clientWithApiVersion.createEmbedding(embeddingRequest);
 
@@ -193,7 +196,7 @@ describe('AzureOpenAIClient', () => {
 
     describe('createModeration', () => {
         it('creates valid moderation response', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
             const url = `${cognitiveServiceOptions.endpoint}/contentsafety/text:analyze?api-version=${cognitiveServiceOptions.apiVersion}`;
             const response = await cognitiveServiceClient.createModeration(moderationRequest);
 

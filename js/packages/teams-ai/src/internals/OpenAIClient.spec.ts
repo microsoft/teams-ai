@@ -1,14 +1,15 @@
 import assert from 'assert';
 import { OpenAIClient, OpenAIClientOptions } from './OpenAIClient';
 import { CreateChatCompletionRequest, CreateEmbeddingRequest, CreateModerationRequest } from './types';
-import sinon, { SinonStub } from 'sinon';
+import sinon, { createSandbox } from 'sinon';
 import axios from 'axios';
 
 describe('OpenAIClient', () => {
     const mockAxios = axios;
     let client: OpenAIClient;
     let clientWithAllFields: OpenAIClient;
-    let createStub: SinonStub;
+    let sinonSandbox: sinon.SinonSandbox;
+    let createStub: sinon.SinonStub;
 
     const options: OpenAIClientOptions = {
         apiKey: 'mock-key'
@@ -86,13 +87,14 @@ describe('OpenAIClient', () => {
     };
 
     beforeEach(() => {
-        createStub = sinon.stub(axios, 'create').returns(mockAxios);
+        sinonSandbox = createSandbox();
+        createStub = sinonSandbox.stub(axios, 'create').returns(mockAxios);
         client = new OpenAIClient(options);
         clientWithAllFields = new OpenAIClient(optionsWithAllFields);
     });
 
     afterEach(() => {
-        sinon.restore();
+        sinonSandbox.restore();
     });
 
     describe('constructor', () => {
@@ -134,7 +136,7 @@ describe('OpenAIClient', () => {
 
     describe('createChatCompletion', () => {
         it('creates valid chat completion response with no endpoint', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
             const url = `https://api.openai.com/v1/chat/completions`;
             const response = await client.createChatCompletion(chatCompletionRequest);
 
@@ -146,7 +148,7 @@ describe('OpenAIClient', () => {
             assert.equal(response.data?.object, 'chat.completion');
         });
         it('creates valid chat completion response with valid endpoint', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(chatCompletionResponse));
             const url = `${optionsWithAllFields.endpoint}/v1/chat/completions`;
             const response = await clientWithAllFields.createChatCompletion(chatCompletionRequest);
 
@@ -161,7 +163,7 @@ describe('OpenAIClient', () => {
 
     describe('createEmbedding', () => {
         it('creates valid embedding response with no endpoint', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
             const url = `https://api.openai.com/v1/embeddings`;
             const response = await client.createEmbedding(embeddingRequest);
 
@@ -174,7 +176,7 @@ describe('OpenAIClient', () => {
         });
 
         it('creates valid embedding response with valid endpoint', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(embeddingResponse));
             const url = `${optionsWithAllFields.endpoint}/v1/embeddings`;
             const response = await clientWithAllFields.createEmbedding(embeddingRequest);
 
@@ -189,7 +191,7 @@ describe('OpenAIClient', () => {
 
     describe('createModeration', () => {
         it('creates valid moderation response with no endpoint', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
             const url = `https://api.openai.com/v1/moderations`;
             const response = await client.createModeration(moderationRequest);
 
@@ -200,7 +202,7 @@ describe('OpenAIClient', () => {
         });
 
         it('creates valid moderation response with valid endpoint', async () => {
-            const postStub = sinon.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
+            const postStub = sinonSandbox.stub(mockAxios, 'post').returns(Promise.resolve(moderationResponse));
             const url = `${optionsWithAllFields.endpoint}/v1/moderations`;
             const response = await clientWithAllFields.createModeration(moderationRequest);
 
