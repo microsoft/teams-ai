@@ -10,18 +10,16 @@ namespace Microsoft.Teams.AI
     /// Meetings class to enable fluent style registration of handlers related to Microsoft Teams Meetings.
     /// </summary>
     /// <typeparam name="TState">The type of the turn state object used by the application.</typeparam>
-    /// <typeparam name="TTurnStateManager">The type of the turn state manager object used by the application.</typeparam>
-    public class Meetings<TState, TTurnStateManager>
-        where TState : ITurnState<StateBase, StateBase, TempState>
-        where TTurnStateManager : ITurnStateManager<TState>, new()
+    public class Meetings<TState>
+        where TState : TurnState, new()
     {
-        private readonly Application<TState, TTurnStateManager> _app;
+        private readonly Application<TState> _app;
 
         /// <summary>
         /// Creates a new instance of the Meetings class.
         /// </summary>
         /// <param name="app"></param> The top level application class to register handlers with.
-        public Meetings(Application<TState, TTurnStateManager> app)
+        public Meetings(Application<TState> app)
         {
             this._app = app;
         }
@@ -31,10 +29,10 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when a Microsoft Teams meeting start event activity is received from the connector.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnStart(MeetingStartHandler<TState> handler)
+        public Application<TState> OnStart(MeetingStartHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
@@ -54,10 +52,10 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when a Microsoft Teams meeting end event activity is received from the connector.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnEnd(MeetingEndHandler<TState> handler)
+        public Application<TState> OnEnd(MeetingEndHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
@@ -77,10 +75,10 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when a Microsoft Teams meeting participants join event activity is received from the connector.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnParticipantsJoin(MeetingParticipantsEventHandler<TState> handler)
+        public Application<TState> OnParticipantsJoin(MeetingParticipantsEventHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)
@@ -100,10 +98,10 @@ namespace Microsoft.Teams.AI
         /// </summary>
         /// <param name="handler">Function to call when a Microsoft Teams meeting participants leave event activity is received from the connector.</param>
         /// <returns>The application instance for chaining purposes.</returns>
-        public Application<TState, TTurnStateManager> OnParticipantsLeave(MeetingParticipantsEventHandler<TState> handler)
+        public Application<TState> OnParticipantsLeave(MeetingParticipantsEventHandler<TState> handler)
         {
             Verify.ParamNotNull(handler);
-            RouteSelector routeSelector = (context, _) => Task.FromResult
+            RouteSelectorAsync routeSelector = (context, _) => Task.FromResult
             (
                 string.Equals(context.Activity?.Type, ActivityTypes.Event, StringComparison.OrdinalIgnoreCase)
                 && string.Equals(context.Activity?.ChannelId, Channels.Msteams)

@@ -1,26 +1,28 @@
-# <image src="https://github.com/microsoft/teams-ai/assets/14900841/972a9a1b-679a-4725-bfc0-a1e76151a78a" height="10%" width="10%" /> Teams AI Library
+# ![teams logo](https://github.com/microsoft/teams-ai/assets/14900841/10a0fbac-9d31-46d5-ad65-0eeb33b787a8) Teams AI Library
 
-[![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main)
+[![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
+
+| Name          | Status                |
+|---------------|-----------------------|
+| Javascript    | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) |
+| C#            | [![C# Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.dotnet?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main) |
 
 Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 
-<p>
-<figure>
-<img src="https://github.com/microsoft/teams-ai/assets/14900841/154353ff-bafe-4423-abcd-6dc5a8680fe9" />
-<figcaption>This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.</figcaption>
-</figure>
-</p>
-The SDK is currently available for JavaScript/TypeScript applications in the <a href="./js" ><code>js</code></a> folder and via the <a href="https://www.npmjs.com/package/@microsoft/teams-ai">teams-ai package on NPM</a>. We are actively developing parity for .NET, which will be available soon.
+![Teams AI flow diagram](https://github.com/microsoft/teams-ai/assets/14900841/154353ff-bafe-4423-abcd-6dc5a8680fe9)
+This is a diagram of the Teams-AI flow. Teams AI Library SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.
+
+The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). .NET support is available in the [`dotnet`](./dotnet) folder and via the [teams-ai package on NuGet](https://www.nuget.org/packages/Microsoft.Teams.AI).
 
 ## Getting Started
 
 > ### 🖇️ Jump right in❗️ 📎
 >
-> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.teamsChefBot) sample. This sample is a simple bot that uses the OpenAI GPT model to build a Teams app. Just load it up in Visual Code and hit F5! 🎉
+> If you want to jump immediately into AI, try out the [04.ai.a.teamsChefbot](./js/samples/04.ai.a.teamsChefBot) sample. This sample is a simple bot that uses the OpenAI GPT model to build a Teams app. Just load it up in Visual Studio Code, rename the sample.env file to .env, add in your OpenAI key or Azure OpenAI key and endpoint in the .env file, and hit F5! 🎉
 
 ### Start with our getting started guides
 
-This SDK is under private preview and is subject to change. We welcome your feedback and contributions!
+This SDK is now generally available. We welcome your feedback and contributions!
 
 **To get started, head over to the [Getting Started Guide](getting-started/README.md).**
 
@@ -28,7 +30,7 @@ This SDK is under private preview and is subject to change. We welcome your feed
 
 ### Teams-centric component scaffolding
 
-> For examples of the below, browse through the [JS](./js/samples/) folders.
+> For examples of the below, browse through the [`js`](./js/samples/) sample folders or the [`dotnet`](./dotnet/samples) sample folders.
 > Simple scaffolding for any conversational app component, including:
 
 - Chat bots
@@ -46,7 +48,9 @@ With a simple text file written in human language, you can describe the function
 
 ### Moderation
 
-A configurable API call to filter inappropriate content for input content, output content, or both. (See [OpenAIModerator.ts](./js/src/openai/OpenAIModerator.ts))
+A configurable API call to filter inappropriate content for input content, output content, or both. 
+
+(Moderators are available whether you decide to you OpenAI or Azure OpenAI for your models. If using OpenAI see [OpenAIModerator.ts](./js/packages/teams-ai/src/moderators/OpenAIModerator.ts) or [OpenAIModerator.cs](https://github.com/microsoft/teams-ai/blob/46042530f43058a815df4376f0f068f9d8d2e144/dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/AI/Moderator/OpenAIModerator.cs) and for Azure's moderator see [AzureContentSaftyModerator.ts](./js/packages/teams-ai/src/moderators/AzureContentSafetyModerator.ts). Azure's moderator for C# is in development)
 
 ### Predictive Engine to Map Intents to Actions
 
@@ -77,7 +81,7 @@ This SDK is licensed under the MIT License. This SDK includes tools to use APIs 
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+the rights to use your contribution. For details, visit [https://cla.opensource.microsoft.com](https://cla.opensource.microsoft.com).
 
 For more details, see [./CONTRIBUTING.md](./CONTRIBUTING.md).
 

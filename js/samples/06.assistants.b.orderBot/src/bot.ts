@@ -1,8 +1,4 @@
-import {
-    Application,
-    preview,
-    AI
-} from '@microsoft/teams-ai';
+import { Application, preview, AI } from '@microsoft/teams-ai';
 import { CardFactory, MemoryStorage, MessageFactory, TurnContext } from 'botbuilder';
 import { Order } from './foodOrderViewSchema';
 import { generateCardForOrder } from './foodOrderCard';
@@ -13,11 +9,11 @@ if (!process.env.OPENAI_KEY) {
 
 const { AssistantsPlanner } = preview;
 
-// Create Assistant if no ID is provided
+// Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
     (async () => {
         const assistant = await AssistantsPlanner.createAssistant(process.env.OPENAI_KEY!, {
-            name: "Order Bot",
+            name: 'Order Bot',
             instructions: [
                 `You are a food ordering bot for a restaurant named The Pub.`,
                 `The customer can order pizza, beer, or salad.`,
@@ -26,15 +22,15 @@ if (!process.env.ASSISTANT_ID) {
             ].join('\n'),
             tools: [
                 {
-                    type: "function",
+                    type: 'function',
                     function: {
-                        name: "place_order",
-                        description: "Creates or updates a food order.",
+                        name: 'place_order',
+                        description: 'Creates or updates a food order.',
                         parameters: require('../src/foodOrderViewSchema.json')
                     }
                 }
             ],
-            model: "gpt-4-1106-preview"
+            model: 'gpt-4-1106-preview'
         });
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);

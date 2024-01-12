@@ -18,6 +18,12 @@ export interface VectraDataSourceOptions {
     apiKey: string;
 
     /**
+     * Azure OpenAI API key to use as alternative way for generating embeddings.
+     */
+    azureApiKey: string;
+    azureEndpoint: string;
+
+    /**
      * Path to the folder containing the local index.
      * @remarks
      * This should be the root folder for all local indexes and the index itself
@@ -73,12 +79,17 @@ export class VectraDataSource implements DataSource {
         const embeddings = new OpenAIEmbeddings({
             model: 'text-embedding-ada-002',
             apiKey: options.apiKey,
+
+            // Azure OpenAI Support
+            azureApiKey: options.azureApiKey,
+            azureDeployment: 'embedding',
+            azureEndpoint: options.azureEndpoint
         });
 
         // Create local index
         this._index = new LocalDocumentIndex({
             embeddings,
-            folderPath: path.join(options.indexFolder, options.name),
+            folderPath: path.join(options.indexFolder, options.name)
         });
     }
 
@@ -89,12 +100,17 @@ export class VectraDataSource implements DataSource {
      * @param tokenizer Tokenizer to use when rendering the data source.
      * @param maxTokens Maximum number of tokens allowed to be rendered.
      */
-    public async renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderData(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>> {
         // Query index
         const query = memory.getValue('temp.input') as string;
         const results = await this._index.queryDocuments(query, {
             maxDocuments: this._options.maxDocuments ?? 5,
-            maxChunks: this._options.maxChunks ?? 50,
+            maxChunks: this._options.maxChunks ?? 50
         });
 
         // Add documents until you run out of tokens
@@ -111,7 +127,10 @@ export class VectraDataSource implements DataSource {
             }
 
             // Render document section
-            const sections = await result.renderSections(Math.min(remainingTokens, this._options.maxTokensPerDocument ?? 600), 1);
+            const sections = await result.renderSections(
+                Math.min(remainingTokens, this._options.maxTokensPerDocument ?? 600),
+                1
+            );
             docLength += sections[0].tokenCount;
             doc += sections[0].text;
 
@@ -123,5 +142,4 @@ export class VectraDataSource implements DataSource {
 
         return { output, length, tooLong: length > maxTokens };
     }
-
 }

@@ -1,47 +1,31 @@
 # Getting Started
 
-1. [Prompts](./00.PROMPTS.md)
-2. [Prompt Template](./01.PROMPT-TEMPLATES.md)
-3. [Planner](./02.PLANNER.md)
-4. [Actions](./03.ACTIONS.md)
-5. [Chain](./04.CHAIN.md)
-6. [Turns](./05.TURNS.md)
-7. [Other](./OTHER/README.md)
+_**Navigation**_
+- [**00.OVERVIEW**](./README.md)
+- [01.QUICKSTART](./QUICKSTART.md)
+- [02.SAMPLES](./SAMPLES.md)
+___
 
-## Migration Documentation
+### Get started with the Teams AI Library 
 
-Welcome to the migration docs! Please note that we currently have two sections:
+The first step is to get a basic bot running E2E through the [Quickstart](./QUICKSTART.md) guide to build Echo Bot, which echoes back any message sent to it. This simple bot helps to familiarize yourself with the Teams AI Library and ensures your system is set up correctly to move onto the AI powered samples.
 
-1. [`js` guidance](./js/)
-1. [`dotnet` guidance](./dotnet/)
+If you would rather dive into an AI sample first, check out the fully conversational Teams Chef Bot sample on the [samples](./SAMPLES.md) page. 
+
+There are numerous samples to try showcasing the different capabilities of the Teams AI Library.
 
 ### Migration
 
-If you are migrating your existing bot, we recommend starting with the respective 00.MIGRATION in the programming language of your bot. Please note that while the content of both sections will be extremely similar, our goal is to provide code examples in the corresponding language.
+If you have a bot built using the BotFramework SDK and want to migrate to the Teams AI library, see [Migration](./MIGRATION/README.md).
 
-- [js](./js/00.MIGRATION.md)
-- [dotnet](./dotnet/00.MIGRATION.md)
+### Concepts
 
-### Using samples with Azure Open AI or OpenAI
+To dive deeper into the library learning more about its AI components and concepts, see [Concepts](./CONCEPTS/README.md).
 
-To use the samples with Azure Open AI, update OpenAIPlanner to AzureOpenAIPlanner
-AzureOpenAIPlanner expects an endpoint property, which can be found in the Azure portal
+### Useful links
 
-```typescript
-const planner = new AzureOpenAIPlanner({
-  apiKey: process.env.AZURE_OPENAI_KEY,
-  endpoint: process.env.AZURE_OPENAI_ENDPOINT, // Note: Azure OpenAI requires the endpoint property, but is not required for OpenAI.
-  defaultModel: "gpt-35-turbo", // Note that the developer chooses the name of the deployment, so this may be different for you
-  logRequests: true
-});
-```
-
-To use the samples with OpenAI, you will need to update the OpenAIPlanner to use the OpenAI API key
-
-```typescript
-const planner = new OpenAIPlanner({
-  apiKey: process.env.OPENAI_KEY,
-  defaultModel: "gpt-3.5-turbo",
-  logRequests: true
-});
-```
+- [Microsoft Learn Docs](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/teams%20conversational%20ai/teams-conversation-ai-overview)
+- [C# samples folder](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples)
+- [JS samples folder](https://github.com/microsoft/teams-ai/tree/main/js/samples)
+- [@microsoft/teams-ai package on npm](https://www.npmjs.com/package/@microsoft/teams-ai)
+- [Microsoft.Teams.AI on nuget.org](https://www.nuget.org/packages/Microsoft.Teams.AI)

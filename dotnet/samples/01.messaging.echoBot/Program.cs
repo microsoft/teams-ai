@@ -35,12 +35,16 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>();
-    ApplicationOptions<AppState, AppStateManager> applicationOptions = new()
+    ApplicationOptions<AppState> applicationOptions = new()
     {
         Storage = storage,
+        TurnStateFactory = () =>
+        {
+            return new AppState();
+        }
     };
 
-    Application<AppState, AppStateManager> app = new(applicationOptions);
+    Application<AppState> app = new(applicationOptions);
 
     // Listen for user to say "/reset" and then delete conversation state
     app.OnMessage("/reset", ActivityHandlers.ResetMessageHandler);

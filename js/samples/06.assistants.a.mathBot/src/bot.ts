@@ -7,14 +7,14 @@ if (!process.env.OPENAI_KEY) {
 
 const { AssistantsPlanner } = preview;
 
-// Create Assistant if no ID is provided
+// Create Assistant if no ID is provided, this will require you to restart the program and fill in the process.env.ASSISTANT_ID afterwards.
 if (!process.env.ASSISTANT_ID) {
     (async () => {
         const assistant = await AssistantsPlanner.createAssistant(process.env.OPENAI_KEY!, {
-            name: "Math Tutor",
-            instructions: "You are a personal math tutor. Write and run code to answer math questions.",
-            tools: [{ type: "code_interpreter" }],
-            model: "gpt-4-1106-preview"
+            name: 'Math Tutor',
+            instructions: 'You are a personal math tutor. Write and run code to answer math questions.',
+            tools: [{ type: 'code_interpreter' }],
+            model: 'gpt-4-1106-preview'
         });
 
         console.log(`Created a new assistant with an ID of: ${assistant.id}`);

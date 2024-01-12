@@ -19,7 +19,7 @@ export interface Message<TContent = string> {
     /**
      * Text of the message.
      */
-    content: TContent|undefined;
+    content: TContent | undefined;
 
     /**
      * Optional. A named function to call.
@@ -45,4 +45,30 @@ export interface FunctionCall {
      * Optional. Arguments to pass to the function. Must be deserialized.
      */
     arguments?: string;
+}
+
+export type MessageContentParts = TextContentPart | ImageContentPart;
+
+export interface TextContentPart {
+    /**
+     * Type of the message content. Should always be 'text'.
+     */
+    type: 'text';
+
+    /**
+     * The text of the message.
+     */
+    text: string;
+}
+
+export interface ImageContentPart {
+    /**
+     * Type of the message content. Should always be 'image_url'.
+     */
+    type: 'image_url';
+
+    /**
+     * The URL of the image.
+     */
+    image_url: string | { url: string };
 }

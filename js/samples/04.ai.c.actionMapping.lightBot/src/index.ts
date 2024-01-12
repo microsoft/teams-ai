@@ -113,7 +113,7 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'sequence',
+    defaultPrompt: 'sequence'
 });
 
 // Define storage and application

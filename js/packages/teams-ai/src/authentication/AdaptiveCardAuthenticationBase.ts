@@ -26,11 +26,10 @@ export interface AdaptiveCardLoginRequest {
 
 /**
  * @internal
- * 
+ *
  * Base class to handle adaptive card authentication.
  */
 export abstract class AdaptiveCardAuthenticationBase {
-
     /**
      * Authenticates the user.
      * @param {TurnContext} context - The turn context.
@@ -38,7 +37,7 @@ export abstract class AdaptiveCardAuthenticationBase {
      */
     public async authenticate(context: TurnContext): Promise<string | undefined> {
         const value = context.activity.value;
-        
+
         const tokenExchangeRequest = value.authentication;
 
         // Token Exchange
@@ -85,7 +84,6 @@ export abstract class AdaptiveCardAuthenticationBase {
             }
         }
 
-
         // There is no token, so the user has not signed in yet.
         const response = await this.getLoginRequest(context);
 
@@ -112,9 +110,7 @@ export abstract class AdaptiveCardAuthenticationBase {
      * @param context - The turn context.
      * @returns A promise that resolves to the token response or undefined if token exchange failed.
      */
-    public abstract handleSsoTokenExchange(
-        context: TurnContext
-    ): Promise<TokenResponse | undefined>
+    public abstract handleSsoTokenExchange(context: TurnContext): Promise<TokenResponse | undefined>;
 
     /**
      * Handles the user sign-in.
@@ -122,12 +118,12 @@ export abstract class AdaptiveCardAuthenticationBase {
      * @param magicCode - The magic code from user sign-in.
      * @returns A promise that resolves to the token response or undefined if failed to verify the magic code.
      */
-    public abstract handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined>
+    public abstract handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined>;
 
     /**
      * Gets the login request for Adaptive Card authentication.
      * @param context - The turn context.
      * @returns A promise that resolves to the login request.
      */
-    public abstract getLoginRequest(context: TurnContext): Promise<AdaptiveCardLoginRequest>
+    public abstract getLoginRequest(context: TurnContext): Promise<AdaptiveCardLoginRequest>;
 }

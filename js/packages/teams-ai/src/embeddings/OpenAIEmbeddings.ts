@@ -7,9 +7,8 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { EmbeddingsModel, EmbeddingsResponse } from "./EmbeddingsModel";
-import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "../internals";
-import { Colorize } from "../internals";
+import { EmbeddingsModel, EmbeddingsResponse } from './EmbeddingsModel';
+import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest, Colorize } from '../internals';
 
 /**
  * Base model options common to both OpenAI and Azure OpenAI services.
@@ -104,20 +103,23 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions;
+    public readonly options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions;
 
     /**
      * Creates a new `OpenAIEmbeddings` instance.
      * @param options Options for configuring the embeddings client.
      */
-    public constructor(options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions) {
+    public constructor(options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions) {
         // Check for azure config
         if ((options as AzureOpenAIEmbeddingsOptions).azureApiKey) {
             this._useAzure = true;
-            this.options = Object.assign({
-                retryPolicy: [2000, 5000],
-                azureApiVersion: '2023-05-15',
-            }, options) as AzureOpenAIEmbeddingsOptions;
+            this.options = Object.assign(
+                {
+                    retryPolicy: [2000, 5000],
+                    azureApiVersion: '2023-05-15'
+                },
+                options
+            ) as AzureOpenAIEmbeddingsOptions;
 
             // Cleanup and validate endpoint
             let endpoint = this.options.azureEndpoint.trim();
@@ -126,15 +128,20 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             }
 
             if (!endpoint.toLowerCase().startsWith('https://')) {
-                throw new Error(`Client created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`);
+                throw new Error(
+                    `Client created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`
+                );
             }
 
             this.options.azureEndpoint = endpoint;
         } else {
             this._useAzure = false;
-            this.options = Object.assign({
-                retryPolicy: [2000, 5000]
-            }, options) as OpenAIEmbeddingsOptions;
+            this.options = Object.assign(
+                {
+                    retryPolicy: [2000, 5000]
+                },
+                options
+            ) as OpenAIEmbeddingsOptions;
         }
 
         // Create client
@@ -149,7 +156,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
      * @param inputs Text inputs to create embeddings for.
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
-    public async createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
+    public async createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse> {
         if (this.options.logRequests) {
             console.log(Colorize.title('EMBEDDINGS REQUEST:'));
             console.log(Colorize.output(inputs));
@@ -157,7 +164,8 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         const startTime = Date.now();
         const response = await this.createEmbeddingRequest({
-            input: inputs,
+            model: model,
+            input: inputs
         });
 
         if (this.options.logRequests) {
@@ -167,24 +175,32 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             console.log(Colorize.output(response.data));
         }
 
-
         // Process response
         if (response.status < 300) {
-            return { status: 'success', output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
+            return {
+                status: 'success',
+                output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding)
+            };
         } else if (response.status == 429) {
-            return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` }
+            return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` };
         } else {
-            return { status: 'error', message: `The embeddings API returned an error status of ${response.status}: ${response.statusText}` };
+            return {
+                status: 'error',
+                message: `The embeddings API returned an error status of ${response.status}: ${response.statusText}`
+            };
         }
     }
 
     /**
+     * @param request
      * @private
      */
     protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>> {
         if (this._useAzure) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
-            const url = `${options.azureEndpoint}/openai/deployments/${options.azureDeployment}/embeddings?api-version=${options.azureApiVersion!}`;
+            const url = `${options.azureEndpoint}/openai/deployments/${
+                options.azureDeployment
+            }/embeddings?api-version=${options.azureApiVersion!}`;
             return this.post(url, request);
         } else {
             const options = this.options as OpenAIEmbeddingsOptions;
@@ -195,6 +211,9 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     }
 
     /**
+     * @param url
+     * @param body
+     * @param retryCount
      * @private
      */
     protected async post<TData>(url: string, body: object, retryCount = 0): Promise<AxiosResponse<TData>> {
@@ -226,7 +245,11 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
         const response = await this._httpClient.post(url, body, requestConfig);
 
         // Check for rate limit error
-        if (response.status == 429 && Array.isArray(this.options.retryPolicy) && retryCount < this.options.retryPolicy.length) {
+        if (
+            response.status == 429 &&
+            Array.isArray(this.options.retryPolicy) &&
+            retryCount < this.options.retryPolicy.length
+        ) {
             const delay = this.options.retryPolicy[retryCount];
             await new Promise((resolve) => setTimeout(resolve, delay));
             return this.post(url, body, retryCount + 1);

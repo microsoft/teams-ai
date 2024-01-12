@@ -3,8 +3,9 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Teams.AI;
+using Microsoft.Teams.AI.AI.Planners;
+using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.Exceptions;
-using Microsoft.Teams.AI.State;
 using Newtonsoft.Json.Linq;
 using System.Net;
 
@@ -15,19 +16,21 @@ namespace GPT
     /// </summary>
     public class ActivityHandlers
     {
-        private readonly Application<TurnState, TurnStateManager> _app;
+        private readonly ActionPlanner<AppState> _planner;
+        private readonly PromptManager _prompts;
         private readonly bool _previewMode;
 
-        public ActivityHandlers(Application<TurnState, TurnStateManager> app, bool previewMode = false)
+        public ActivityHandlers(ActionPlanner<AppState> planner, PromptManager prompts, bool previewMode = false)
         {
-            _app = app;
+            _planner = planner;
+            _prompts = prompts;
             _previewMode = previewMode;
         }
 
         /// <summary>
         /// Handles Message Extension fetchTask events.
         /// </summary>
-        public FetchTaskHandler<TurnState> FetchTaskHandler => async (ITurnContext turnContext, TurnState turnState, CancellationToken cancellationToken) =>
+        public FetchTaskHandlerAsync<AppState> FetchTaskHandler => async (turnContext, turnState, cancellationToken) =>
         {
             // Return card as a TaskInfo object
             Attachment card = await CardBuilder.NewInitialViewAttachment(cancellationToken);
@@ -40,7 +43,7 @@ namespace GPT
         /// <summary>
         /// Handles Message Extension submitAction events.
         /// </summary>
-        public SubmitActionHandler<TurnState> SubmitActionHandler => async (ITurnContext turnContext, TurnState turnState, object data, CancellationToken cancellationToken) =>
+        public SubmitActionHandlerAsync<AppState> SubmitActionHandler => async (turnContext, turnState, data, cancellationToken) =>
         {
             SubmitData submitData = (data as JObject)?.ToObject<SubmitData>() ?? throw new Exception("Incorrect submit data format"); ;
             switch (submitData.Verb)
@@ -48,7 +51,7 @@ namespace GPT
                 case "generate":
                 {
                     // Call GPT and return response view
-                    string post = await GetGPTPost(turnContext, turnState, "Generate", submitData, cancellationToken);
+                    string post = await UpdatePost(turnContext, turnState, "Generate", submitData, cancellationToken);
                     Attachment card = await CardBuilder.NewEditViewAttachment(post, _previewMode, cancellationToken);
                     return new MessagingExtensionActionResponse
                     {
@@ -58,7 +61,7 @@ namespace GPT
                 case "update":
                 {
                     // Call GPT and return an updated response view
-                    string post = await GetGPTPost(turnContext, turnState, "Update", submitData, cancellationToken);
+                    string post = await UpdatePost(turnContext, turnState, "Update", submitData, cancellationToken);
                     Attachment card = await CardBuilder.NewEditViewAttachment(post, _previewMode, cancellationToken);
                     return new MessagingExtensionActionResponse
                     {
@@ -103,7 +106,7 @@ namespace GPT
         /// <summary>
         /// Handles Message Extension botMessagePreview edit events.
         /// </summary>
-        public BotMessagePreviewEditHandler<TurnState> BotMessagePreviewEditHandler => async (ITurnContext turnContext, TurnState turnState, Activity activityPreview, CancellationToken cancellationToken) =>
+        public BotMessagePreviewEditHandlerAsync<AppState> BotMessagePreviewEditHandler => async (turnContext, turnState, activityPreview, cancellationToken) =>
         {
             // Get post text from previewed card
             PreviewCard previewCard =
@@ -121,7 +124,7 @@ namespace GPT
         /// <summary>
         /// Handles Message Extension botMessagePreview send events.
         /// </summary>
-        public BotMessagePreviewSendHandler<TurnState> BotMessagePreviewSendHandler => async (ITurnContext turnContext, TurnState turnState, Activity activityPreview, CancellationToken cancellationToken) =>
+        public BotMessagePreviewSendHandler<AppState> BotMessagePreviewSendHandler => async (turnContext, turnState, activityPreview, cancellationToken) =>
         {
             // Create a new activity using the card in the preview activity
             Attachment card = activityPreview?.Attachments.FirstOrDefault() ?? throw new Exception("No card found in preview activity");
@@ -148,15 +151,21 @@ namespace GPT
             await turnContext.SendActivityAsync(activity, cancellationToken);
         };
 
-        private async Task<string> GetGPTPost(ITurnContext turnContext, TurnState turnState, string prompt, SubmitData data, CancellationToken cancellationToken)
+        private async Task<string> UpdatePost(ITurnContext context, AppState state, string prompt, SubmitData data, CancellationToken cancellationToken)
         {
-            // Set prompt variables
-            _app.AI.Prompts.Variables.Add("prompt", data.Prompt ?? string.Empty);
-            _app.AI.Prompts.Variables.Add("post", data.Post ?? string.Empty);
+            state.Temp.Post = data.Post ?? string.Empty;
+            state.Temp.Prompt = data.Prompt ?? string.Empty;
 
             try
             {
-                return await _app.AI.CompletePromptAsync(turnContext, turnState, prompt, null, cancellationToken);
+                var res = await _planner.CompletePromptAsync(context, state, _prompts.GetPrompt(prompt), null, cancellationToken);
+
+                if (res?.Status != PromptResponseStatus.Success)
+                {
+                    throw new Exception($"The LLM request had the following error: {res?.Error?.Message}");
+                }
+
+                return res?.Message?.Content ?? string.Empty;
             }
             catch (HttpOperationException e) when (e.StatusCode == HttpStatusCode.TooManyRequests)
             {

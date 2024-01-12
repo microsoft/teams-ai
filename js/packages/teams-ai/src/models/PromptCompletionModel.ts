@@ -24,7 +24,13 @@ export interface PromptCompletionModel {
      * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>>;
+    completePrompt(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        template: PromptTemplate
+    ): Promise<PromptResponse<string>>;
 }
 
 /**
@@ -47,6 +53,11 @@ export interface PromptResponse<TContent = unknown> {
      * Status of the prompt response.
      */
     status: PromptResponseStatus;
+
+    /**
+     * User input message sent to the model. `undefined` if no input was sent.
+     */
+    input?: Message<any>;
 
     /**
      * Message returned.

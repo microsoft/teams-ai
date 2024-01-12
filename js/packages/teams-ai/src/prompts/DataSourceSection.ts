@@ -6,14 +6,14 @@
  * Licensed under the MIT License.
  */
 
-import { Message } from "./Message";
-import { PromptFunctions } from "./PromptFunctions";
-import { RenderedPromptSection } from "./PromptSection";
-import { PromptSectionBase } from "./PromptSectionBase";
+import { Message } from './Message';
+import { PromptFunctions } from './PromptFunctions';
+import { RenderedPromptSection } from './PromptSection';
+import { PromptSectionBase } from './PromptSectionBase';
 import { TurnContext } from 'botbuilder';
-import { Tokenizer } from "../tokenizers";
-import { DataSource } from "../dataSources";
-import { Memory } from "../MemoryFork";
+import { Tokenizer } from '../tokenizers';
+import { DataSource } from '../dataSources';
+import { Memory } from '../MemoryFork';
 
 /**
  * A section that renders a data source to a prompt.
@@ -32,9 +32,20 @@ export class DataSourceSection extends PromptSectionBase {
     }
 
     /**
+     * @param context
+     * @param memory
+     * @param functions
+     * @param tokenizer
+     * @param maxTokens
      * @private
      */
-    public async renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>> {
+    public async renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message<string>[]>> {
         // Render data source
         const budget = this.getTokenBudget(maxTokens);
         const rendered = await this._dataSource.renderData(context, memory, tokenizer, budget);

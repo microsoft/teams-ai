@@ -2,15 +2,10 @@
 
 <small>Getting started directory</small>
 
-1. [Migration](./00.MIGRATION.md)
-2. [AI Setup](./01.AI-SETUP.md)
-3. [Activity Routing](./02.ACTIVITY-ROUTING.md)
-4. [QNA](./03.QNA.md)
-5. [Other](../OTHER/TEAMS-TOOLKIT.md)
-   - [**Bot Framework Emulator**](./BOTFRAMEWORK-EMULATOR.md)
-   - [Manual resource setup](./MANUAL-RESOURCE-SETUP.md)
-   - [Teams Toolkit extra information](./TEAMS-TOOLKIT.md)
-   - [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
+- [**Bot Framework Emulator**](./BOTFRAMEWORK-EMULATOR.md)
+- [Manual resource setup](./MANUAL-RESOURCE-SETUP.md)
+- [Teams Toolkit extra information](./TEAMS-TOOLKIT.md)
+- [Teams Toolkit CLI](./TEAMS-TOOLKIT-CLI.md)
 
 [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator) allows testing bots independently from Channels when developing your bot. If you do not wish to use Teams Toolkit, please follow the steps below to test your bot in Emulator.
 

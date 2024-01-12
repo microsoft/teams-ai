@@ -67,15 +67,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
 
-import {
-    AI,
-    Application,
-    ActionPlanner,
-    OpenAIModerator,
-    OpenAIModel,
-    PromptManager,
-    TurnState
-} from '@microsoft/teams-ai';
+import { AI, Application, ActionPlanner, OpenAIModel, PromptManager, TurnState } from '@microsoft/teams-ai';
 import { addResponseFormatter } from './responseFormatter';
 import { VectraDataSource } from './VectraDataSource';
 
@@ -110,30 +102,28 @@ const prompts = new PromptManager({
 const planner = new ActionPlanner({
     model,
     prompts,
-    defaultPrompt: 'chat',
+    defaultPrompt: 'chat'
 });
-
-// const moderator = new OpenAIModerator({
-//     apiKey: process.env.OPENAI_API_KEY || '',
-//     moderate: 'both'
-// });
 
 // Define storage and application
 const storage = new MemoryStorage();
 const app = new Application<ApplicationTurnState>({
     storage,
     ai: {
-        planner,
-        // moderator
+        planner
     }
 });
 
 // Register your data source with planner
-planner.prompts.addDataSource(new VectraDataSource({
-    name: 'teams-ai',
-    apiKey:  process.env.OPENAI_API_KEY!,
-    indexFolder: path.join(__dirname, '../index'),
-}));
+planner.prompts.addDataSource(
+    new VectraDataSource({
+        name: 'teams-ai',
+        apiKey: process.env.OPENAI_KEY!,
+        azureApiKey: process.env.AZURE_OPENAI_KEY!,
+        azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+        indexFolder: path.join(__dirname, '../index')
+    })
+);
 
 // Add a custom response formatter to convert markdown code blocks to <pre> tags
 addResponseFormatter(app);

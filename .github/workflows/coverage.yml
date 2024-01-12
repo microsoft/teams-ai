@@ -1,0 +1,101 @@
+#
+# This workflow will run a coverage report
+#
+
+name: Coverage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    paths: [
+        '.github/workflows/coverage.yml',
+        'js/**',
+        'dotnet/**'
+    ]
+
+permissions: read-all
+
+jobs:
+  javascript:
+    name: Javascript
+    runs-on: ubuntu-latest
+    environment: main
+    env:
+      node-version: 18.x
+    defaults:
+      run:
+        shell: bash
+        working-directory: js/
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup NodeJS ${{ env.node-version }}
+        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Test
+        run: yarn test:nyc:report
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          flag-name: javascript
+          parallel: true
+          files: js/coverage/lcov.info
+
+  dotnet:
+    name: DotNet
+    runs-on: windows-latest
+    environment: main
+    env:
+      dotnet-version: 7.0
+      SOLUTION_DIR: dotnet/packages/Microsoft.TeamsAI/
+    defaults:
+      run:
+        shell: bash
+        working-directory: dotnet/packages/Microsoft.TeamsAI/
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup .NET ${{ env.dotnet-version }}
+        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
+        with:
+          dotnet-version: ${{ env.dotnet-version }}
+      - name: Test
+        run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
+      - name: Coverage
+        uses: danielpalme/ReportGenerator-GitHub-Action@4d510cbed8a05af5aefea46c7fd6e05b95844c89 # 5.2.0
+        with:
+          reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
+          targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
+          reporttypes: 'HtmlInline;lcov'
+          toolpath: ${{ env.SOLUTION_DIR }}report-generator-tool
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          flag-name: dotnet
+          parallel: true
+          files: ${{ env.SOLUTION_DIR }}TestResults/coverage/lcov.info
+      - name: Upload Tests
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        with:
+          name: testresults-dotnet-${{ env.dotnet-version }}
+          path: ${{ env.SOLUTION_DIR }}TestResults
+
+  finish:
+    needs: [javascript, dotnet]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: 'javascript,dotnet'

@@ -6,12 +6,12 @@
  * Licensed under the MIT License.
  */
 
-import { Message } from "./Message";
-import { PromptFunctions } from "./PromptFunctions";
-import { PromptSection, RenderedPromptSection } from "./PromptSection";
+import { Message, MessageContentParts } from './Message';
+import { PromptFunctions } from './PromptFunctions';
+import { PromptSection, RenderedPromptSection } from './PromptSection';
 import { TurnContext } from 'botbuilder';
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * Abstract Base class for most prompt sections.
@@ -32,7 +32,12 @@ export abstract class PromptSectionBase implements PromptSection {
      * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
      * @param textPrefix Optional. Prefix to use for text output. Defaults to `undefined`.
      */
-    public constructor(tokens: number = -1, required: boolean = true, separator: string = '\n', textPrefix: string = '') {
+    public constructor(
+        tokens: number = -1,
+        required: boolean = true,
+        separator: string = '\n',
+        textPrefix: string = ''
+    ) {
         this.required = required;
         this.tokens = tokens;
         this.separator = separator;
@@ -48,7 +53,13 @@ export abstract class PromptSectionBase implements PromptSection {
      * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
      * @returns The rendered prompt section.
      */
-    public async renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>> {
+    public async renderAsText(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<string>> {
         // Render as messages
         const asMessages = await this.renderAsMessages(context, memory, functions, tokenizer, maxTokens);
         if (asMessages.output.length === 0) {
@@ -61,7 +72,7 @@ export abstract class PromptSectionBase implements PromptSection {
         // Calculate length
         const prefixLength = tokenizer.encode(this.textPrefix).length;
         const separatorLength = tokenizer.encode(this.separator).length;
-        let length = prefixLength + asMessages.length + ((asMessages.output.length - 1) * separatorLength);
+        let length = prefixLength + asMessages.length + (asMessages.output.length - 1) * separatorLength;
 
         // Truncate if fixed length
         text = this.textPrefix + text;
@@ -85,7 +96,13 @@ export abstract class PromptSectionBase implements PromptSection {
      * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
      * @returns The rendered prompt section.
      */
-    public abstract renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    public abstract renderAsMessages(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): Promise<RenderedPromptSection<Message<any>[]>>;
 
     /**
      * Calculates the token budget for the prompt section.
@@ -110,7 +127,12 @@ export abstract class PromptSectionBase implements PromptSection {
      * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
      * @returns The rendered prompt section.
      */
-    protected returnMessages(output: Message[], length: number, tokenizer: Tokenizer, maxTokens: number): RenderedPromptSection<Message[]> {
+    protected returnMessages(
+        output: Message[],
+        length: number,
+        tokenizer: Tokenizer,
+        maxTokens: number
+    ): RenderedPromptSection<Message[]> {
         // Truncate if fixed length
         if (this.tokens > 1.0) {
             while (length > this.tokens) {
@@ -135,8 +157,13 @@ export abstract class PromptSectionBase implements PromptSection {
      * @returns The message content as a string.
      */
     public static getMessageText(message: Message): string {
-        let text = message.content ?? '';
-        if (message.function_call) {
+        let text: MessageContentParts[] | string = message.content ?? '';
+        if (Array.isArray(text)) {
+            text = text
+                .filter((part) => part.type === 'text')
+                .map((part) => part.text)
+                .join(' ');
+        } else if (message.function_call) {
             text = JSON.stringify(message.function_call);
         } else if (message.name) {
             text = `${message.name} returned ${text}`;

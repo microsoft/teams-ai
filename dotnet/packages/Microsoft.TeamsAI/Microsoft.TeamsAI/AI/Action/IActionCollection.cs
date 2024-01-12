@@ -2,7 +2,7 @@
 
 namespace Microsoft.Teams.AI.AI.Action
 {
-    internal interface IActionCollection<TState> where TState : ITurnState<StateBase, StateBase, TempState>
+    internal interface IActionCollection<TState> where TState : TurnState
     {
         /// <summary>
         /// Get an action from the collection.

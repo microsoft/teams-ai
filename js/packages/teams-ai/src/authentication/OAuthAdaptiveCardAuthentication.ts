@@ -8,11 +8,10 @@ import * as UserTokenAccess from './UserTokenAccess';
 
 /**
  * @internal
- * 
+ *
  * Handles authentication for Adaptive Cards in Teams.
  */
 export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationBase {
-
     /**
      * Creates a new instance of OAuthAdaptiveCardAuthentication.
      * @param settings The OAuthSettings.

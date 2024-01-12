@@ -6,11 +6,11 @@
  * Licensed under the MIT License.
  */
 
-import { TurnContext } from "botbuilder";
-import { Message, PromptFunctions, PromptTemplate } from "../prompts";
-import { PromptCompletionModel, PromptResponse, PromptResponseStatus } from "./PromptCompletionModel";
-import { Tokenizer } from "../tokenizers";
-import { Memory } from "../MemoryFork";
+import { TurnContext } from 'botbuilder';
+import { Message, PromptFunctions, PromptTemplate } from '../prompts';
+import { PromptCompletionModel, PromptResponse, PromptResponseStatus } from './PromptCompletionModel';
+import { Tokenizer } from '../tokenizers';
+import { Memory } from '../MemoryFork';
 
 /**
  * A test model that can be used to test the prompt completion system.
@@ -22,7 +22,11 @@ export class TestModel implements PromptCompletionModel {
      * @param response Optional. Response to the prompt. Defaults to `{ role: 'assistant', content: 'Hello World' }`.
      * @param error Optional. Error to return. Defaults to `undefined`.
      */
-    public constructor(status: PromptResponseStatus = 'success', response: Message = { role: 'assistant', content: "Hello World" }, error?: Error) {
+    public constructor(
+        status: PromptResponseStatus = 'success',
+        response: Message = { role: 'assistant', content: 'Hello World' },
+        error?: Error
+    ) {
         this.status = status;
         this.response = response;
         this.error = error;
@@ -43,7 +47,6 @@ export class TestModel implements PromptCompletionModel {
      */
     public error?: Error;
 
-
     /**
      * Completes a prompt.
      * @param context Current turn context.
@@ -53,11 +56,17 @@ export class TestModel implements PromptCompletionModel {
      * @param template Prompt template to complete.
      * @returns A `PromptResponse` with the status and message.
      */
-    public async completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>> {
+    public async completePrompt(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        template: PromptTemplate
+    ): Promise<PromptResponse<string>> {
         if (this.error) {
-            return { status: this.status, error: this.error };
+            return { status: this.status, input: undefined, error: this.error };
         } else {
-            return { status: this.status, message: this.response };
+            return { status: this.status, input: undefined, message: this.response };
         }
     }
 }

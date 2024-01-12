@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Activity, ActivityTypes, TestAdapter, TurnContext } from "botbuilder";
-import { TurnState } from "../TurnState";
-import { TeamsSsoMessageExtensionAuthentication } from "./TeamsSsoMessageExtensionAuthentication";
-import { ConfidentialClientApplication } from "@azure/msal-node";
+import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
+import { TurnState } from '../TurnState';
+import { TeamsSsoMessageExtensionAuthentication } from './TeamsSsoMessageExtensionAuthentication';
+import { ConfidentialClientApplication } from '@azure/msal-node';
 import assert from 'assert';
 import * as sinon from 'sinon';
 
@@ -46,7 +46,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
@@ -56,7 +56,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
     };
 
     describe('isValidActivity()', async () => {
-        it("only support composeExtension/query activity", async () => {
+        it('only support composeExtension/query activity', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
@@ -90,12 +90,11 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
     });
 
     describe('handleSsoTokenExchange()', async () => {
-
         afterEach(() => {
             sinon.restore();
         });
 
-        it("should return undefined if value does not contain authentication property", async () => {
+        it('should return undefined if value does not contain authentication property', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query',
@@ -109,7 +108,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             assert.equal(result, undefined);
         });
 
-        it("should return undefined if authentication property does not contain token", async () => {
+        it('should return undefined if authentication property does not contain token', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query',
@@ -125,7 +124,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             assert.equal(result, undefined);
         });
 
-        it("should return undefined if token is empty", async () => {
+        it('should return undefined if token is empty', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query',
@@ -143,7 +142,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             assert.equal(result, undefined);
         });
 
-        it("should return undefined if MSAL returns null", async () => {
+        it('should return undefined if MSAL returns null', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query',
@@ -163,7 +162,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             assert.equal(result, undefined);
         });
 
-        it("should return token response if MSAL returns token", async () => {
+        it('should return token response if MSAL returns token', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query',
@@ -201,10 +200,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
     });
 
     describe('handleUserSignIn()', async () => {
-
-
-
-        it("should return undefined", async () => {
+        it('should return undefined', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
@@ -219,12 +215,11 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
     });
 
     describe('getSignInLink()', async () => {
-
         afterEach(() => {
             sinon.restore();
         });
 
-        it("should return sign in link", async () => {
+        it('should return sign in link', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
@@ -237,7 +232,7 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read&clientId=test&tenantId=common');
         });
 
-        it("should concat scope with space", async () => {
+        it('should concat scope with space', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
@@ -259,10 +254,13 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
-            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common');
+            assert.equal(
+                result,
+                'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common'
+            );
         });
 
-        it("should use default authority if not specified", async () => {
+        it('should use default authority if not specified', async () => {
             const [context, _] = await createTurnContextAndState({
                 type: ActivityTypes.Invoke,
                 name: 'composeExtension/query'
@@ -283,7 +281,10 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
 
             const result = await auth.getSignInLink(context);
-            assert.equal(result, 'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common');
+            assert.equal(
+                result,
+                'https://localhost/auth-start.html?scope=User.Read%20User.Write&clientId=test&tenantId=common'
+            );
         });
     });
 });

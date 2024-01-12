@@ -18,7 +18,7 @@ import { TurnStateProperty } from '../TurnStateProperty';
 
 /**
  * @internal
- * 
+ *
  * Handles authentication for Teams bots.
  * @template TState - The type of the turn state object.
  */
@@ -67,7 +67,6 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
         return results;
     }
 
-    
     /**
      * Continue the OAuthPrompt dialog and returns the result.
      * @param context - The turn context object.
@@ -107,7 +106,7 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
  * @internal
  * SSO Token Exchange Middleware for Teams that filters based on the connection name.
  */
-class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {
+export class FilteredTeamsSSOTokenExchangeMiddleware extends TeamsSSOTokenExchangeMiddleware {
     private readonly _oauthConnectionName: string;
 
     public constructor(storage: Storage, oauthConnectionName: string) {

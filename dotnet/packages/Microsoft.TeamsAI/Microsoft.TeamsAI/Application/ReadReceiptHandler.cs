@@ -13,5 +13,5 @@ namespace Microsoft.Teams.AI
     /// <param name="data">The read receipt data.</param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <returns></returns>
-    public delegate Task ReadReceiptHandler<TState>(ITurnContext turnContext, TState turnState, ReadReceiptInfo data, CancellationToken cancellationToken) where TState : ITurnState<StateBase, StateBase, TempState>;
+    public delegate Task ReadReceiptHandler<TState>(ITurnContext turnContext, TState turnState, ReadReceiptInfo data, CancellationToken cancellationToken) where TState : TurnState;
 }

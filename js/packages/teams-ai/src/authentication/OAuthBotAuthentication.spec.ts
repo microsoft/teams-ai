@@ -1,13 +1,21 @@
 /* eslint-disable security/detect-object-injection */
-import { Activity, TestAdapter, TurnContext } from 'botbuilder';
+import { Activity, MemoryStorage, TestAdapter, TurnContext } from 'botbuilder';
 import { Application, RouteSelector } from '../Application';
-import { DialogTurnResult, DialogTurnStatus, OAuthPromptSettings } from 'botbuilder-dialogs';
+import {
+    DialogSet,
+    DialogState,
+    DialogTurnResult,
+    DialogTurnStatus,
+    OAuthPrompt,
+    OAuthPromptSettings
+} from 'botbuilder-dialogs';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import * as sinon from 'sinon';
 import assert from 'assert';
 import { TurnState } from '../TurnState';
 import { AuthError } from './Authentication';
-import { OAuthBotAuthentication } from './OAuthBotAuthentication';
+import { FilteredTeamsSSOTokenExchangeMiddleware, OAuthBotAuthentication } from './OAuthBotAuthentication';
+import { TurnStateProperty } from '../TurnStateProperty';
 
 describe('BotAuthentication', () => {
     const adapter = new TestAdapter();
@@ -39,7 +47,7 @@ describe('BotAuthentication', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
@@ -308,5 +316,77 @@ describe('BotAuthentication', () => {
             assert(error.cause == 'completionWithoutToken');
             assert(error.message == 'Authentication flow completed without a token.');
         });
+    });
+
+    describe('runDialog', () => {
+        beforeEach(() => {
+            sinon.reset();
+        });
+
+        it('should begin dialog if status is empty', async () => {
+            const [context, state] = await createTurnContextAndState({
+                type: 'message',
+                from: {
+                    id: 'test',
+                    name: 'test'
+                }
+            });
+            const dialogStateProperty = 'dialogStateProperty';
+            const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
+            const dialogSet = new DialogSet(accessor);
+            dialogSet.add(new OAuthPrompt('OAuthPrompt', settings));
+            const dialogContext = await dialogSet.createContext(context);
+            const beginDialogStub = sinon.stub(dialogContext, 'beginDialog');
+            const continueDialogStub = sinon
+                .stub(dialogContext, 'continueDialog')
+                .returns(Promise.resolve({ status: DialogTurnStatus.empty }));
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+            const createDialogContextStub = sinon.stub(botAuth, <any>'createDialogContext').returns(dialogContext);
+
+            const result = await botAuth.runDialog(context, state, dialogStateProperty);
+
+            assert(result == undefined);
+            assert(beginDialogStub.calledOnce);
+            assert(continueDialogStub.calledOnce);
+            assert(createDialogContextStub.calledOnce);
+        });
+
+        it('calling run dialog for the first time should return status waiting', async () => {
+            const [context, state] = await createTurnContextAndState({
+                type: 'message',
+                from: {
+                    id: 'test',
+                    name: 'test'
+                }
+            });
+            const dialogStateProperty = 'dialogStateProperty2';
+            const botAuth = new OAuthBotAuthentication(app, settings, settingName);
+
+            const result = await botAuth.runDialog(context, state, dialogStateProperty);
+
+            assert(result.status == DialogTurnStatus.waiting);
+        });
+    });
+});
+
+describe('FilteredTeamsSSOTokenExchangeMiddleware', () => {
+    it('should call next() if activity.value.connectionName is not equal to connectionName', async () => {
+        const middleware = new FilteredTeamsSSOTokenExchangeMiddleware(new MemoryStorage(), 'connectionName');
+
+        const context = new TurnContext(new TestAdapter(), {
+            type: 'invoke',
+            name: 'signin/tokenExchange',
+            value: {
+                connectionName: 'otherConnectionName'
+            }
+        });
+
+        let nextCalled = false;
+        middleware.onTurn(context, () => {
+            nextCalled = true;
+            return Promise.resolve();
+        });
+
+        assert(nextCalled);
     });
 });

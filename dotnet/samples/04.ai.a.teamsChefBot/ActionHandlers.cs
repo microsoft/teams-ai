@@ -8,18 +8,18 @@ namespace TeamsChefBot
     public class ActionHandlers
     {
         [Action(AIConstants.FlaggedInputActionName)]
-        public async Task<bool> OnFlaggedInput([ActionTurnContext] ITurnContext turnContext, [ActionEntities] Dictionary<string, object> entities)
+        public async Task<string> OnFlaggedInput([ActionTurnContext] ITurnContext turnContext, [ActionParameters] Dictionary<string, object> entities)
         {
             string entitiesJsonString = JsonSerializer.Serialize(entities);
             await turnContext.SendActivityAsync($"I'm sorry your message was flagged: {entitiesJsonString}");
-            return false;
+            return "";
         }
 
         [Action(AIConstants.FlaggedOutputActionName)]
-        public async Task<bool> OnFlaggedOutput([ActionTurnContext] ITurnContext turnContext)
+        public async Task<string> OnFlaggedOutput([ActionTurnContext] ITurnContext turnContext)
         {
             await turnContext.SendActivityAsync("I'm not allowed to talk about such things.");
-            return false;
+            return "";
         }
     }
 }

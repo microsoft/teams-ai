@@ -6,9 +6,9 @@
  * Licensed under the MIT License.
  */
 
-import { PromptSection } from "./PromptSection";
+import { PromptSection } from './PromptSection';
 import { ChatCompletionAction } from '../models';
-import { Augmentation } from "../augmentations";
+import { Augmentation } from '../augmentations';
 
 /**
  * Prompt template cached by the prompt manager.
@@ -113,6 +113,14 @@ export interface CompletionConfig {
      * Defaults to true.
      */
     include_input: boolean;
+
+    /**
+     * If true, the prompt will be augmented with any images uploaded by the user.
+     * @remarks
+     * New in schema version 1.1.
+     * Defaults to false.
+     */
+    include_images: boolean;
 
     /**
      * The maximum number of tokens to generate.

@@ -57,10 +57,5 @@
             "files": ["bin/*.js", "lib/*.js"]
         }
     ],
-    "ignorePatterns": ["node_modules/*"],
-    "settings": {
-        // "react": {
-        //     "version": "detect"
-        // }
-    }
+    "ignorePatterns": ["node_modules/*"]
 }

@@ -28,22 +28,22 @@ There are a few ways to get the application up and running. The latest way is us
 #### Steps
 
 1. Open the solution in Visual Studio. (For example `EchoBot.sln`).
-   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section. If you can't find this section, then it means that the bot does not need them.
-1. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (set authentication type to Public) or select an existing public dev tunnel.
+   - Ensure that you set the appropriate config values (ex Azure OpenAI API key). You can find specific instructions in the sample readme under the `Set up instructions` section. If you can't find this section, then it means there is no required config values to set.
+2. In the debug dropdown menu, select `Dev Tunnels > Create A Tunnel` (Tunnel type: `Persistent` & Access: `Public`) or select an existing public dev tunnel.
 
    ![image](https://github.com/microsoft/teams-ai/assets/115390646/d7246d38-8276-4b2a-bc22-b72f36aa41b9)
 
-1. Right-click your project and select `Teams Toolkit > Prepare Teams App Dependencies`
-1. If prompted, sign in with a Microsoft 365 account for the Teams organization you want
+3. Right-click your project and select `Teams Toolkit > Prepare Teams App Dependencies`
+4. If prompted, sign in with a Microsoft 365 account for the Teams organization you want
    to install the app to.
 
 > If you do not have permission to upload custom apps (sideloading), Teams Toolkit will
 > recommend creating and using a [Microsoft 365 Developer Program](https://developer.microsoft.com/microsoft-365/dev-program) account -
 > a free program to get your own dev environment sandbox that includes Teams.
 
-4. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio
-5. In the launched browser, select the `Add` button to load the app in Teams
-6. This should redirect you to a chat window with the bot.
+5. Press F5, or select the `Debug > Start` Debugging menu in Visual Studio. If step 3 was completed correctly then this should launch a browser.
+6. In the launched browser, select the `Add` button to load the app in Teams.
+7. This should redirect you to a chat window with the bot.
 </details>
 
 <details>
@@ -96,65 +96,7 @@ There are a few ways to get the application up and running. The latest way is us
 
 ## List of Samples
 
-Follow the above instructions to run the C# .NET samples. Here's a list of the samples:
-
-### Basic Conversational Experience
-
-#### [Echo Bot](/dotnet/samples/01.echoBot/)
-
-A conversational bot that listens for specific commands and offers a simple conversational flow: echoing the user's message back to them.
-
-This sample illustrates basic conversational bot behavior in Microsoft Teams and shows the Teams AI SDK's ability to scaffold conversational bot components.
-
-#### [Search Command](/dotnet/samples/02.messageExtensions.a.searchCommand/)
-
-A Message Extension (ME) built to search NuGet for a specific package and return the result as an Adaptive Card.
-
-This sample illustrates the Teams AI SDK's ability to scaffold search-based Message Extensions and return Adaptive Card components.
-
-#### [Type Ahead Bot](/dotnet/samples/03.adaptiveCards.a.typeAheadBot/)
-
-A conversational bot that uses dynamic search to generate Adaptive Cards in Microsoft Teams.
-
-This sample illustrates the Teams AI SDK's ability to scaffold conversational bot and Adaptive Card components.
-
-### AI-Powered Experiences
-
-#### [Chef Bot](/dotnet/samples/04.ai.a.teamsChefBot/)
-
-A conversational bot for Microsoft Teams, designed as a helper bot for building Teams app. The bot uses the text-davinci-003 model to chat with Teams users and respond in a polite and respectful manner, staying within the scope of the conversation.
-
-This sample illustrates basic conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf, using only a natural language prompt file to guide it.
-
-#### [GPT ME](/dotnet/samples/04.ai.b.messageExtensions.gptME/)
-
-A Message Extension (ME) for Microsoft Teams that leverages the text-davinci-003 model to help users generate and update posts. The extension is designed to assist users in creating posts that are appropriate for a business environment.
-
-This sample illustrates basic ME behavior in Microsoft Teams. The ME is built to allow GPT to facilitate the conversation by generating posts based on what the user requires. e.g., "Make my post sound more professional."
-
-#### [Light Bot](/dotnet/samples/04.ai.c.actionMapping.lightBot/)
-
-A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
-
-This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
-
-#### [List Generator AI Assistant](/dotnet/samples/04.ai.d.chainedActions.listBot/)
-
-Similar to the Light On/Off sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
-
-This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
-
-#### [DevOps AI Assistant](/dotnet/samples/04.ai.e.chainedActions.devOpsBot/)
-
-Similar to the List Generator AI Assistant sample, this is a conversational bot for Microsoft Teams, designed as an AI assistant. This bot showcases how to map intents to actions, but instead of returning text, it generates dynamically created Adaptive Cards as a response.
-
-This sample illustrates complex conversational bot behavior in Microsoft Teams and showcases the richness of possibilities for responses.
-
-#### [Twenty Questions](/dotnet/samples/04.e.twentyQuestions/)
-
-A conversational bot for Microsoft Teams, designed as an AI assistant of the Ultimate Guessing Game!
-
-This sample showcases the incredible capabilities of language models and the concept of user intent. Challenge your skills as the human player and try to guess a secret within 20 questions, while the AI-powered bot answers your queries about the secret.
+You can find the list of samples in the [getting started docs](../../getting-started/SAMPLES.md).
 
 ## Miscellanous Resources
 

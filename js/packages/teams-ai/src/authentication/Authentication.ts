@@ -120,9 +120,9 @@ export class Authentication<TState extends TurnState> {
 
         // Signout flow is agnostic of the activity type.
         if (this.isOAuthSettings(this.settings)) {
-            return UserTokenAccess.signOutUser(context, this.settings);
+            return await UserTokenAccess.signOutUser(context, this.settings);
         } else {
-            return this.removeTokenFromMsalCache(context);
+            return await this.removeTokenFromMsalCache(context);
         }
     }
 
@@ -276,7 +276,7 @@ export class AuthenticationManager<TState extends TurnState> {
             settingName = this.default;
         }
 
-        // Get authentication instace
+        // Get authentication instance
         const auth: Authentication<TState> = this.get(settingName);
         let status: 'pending' | 'complete' | 'error';
 
@@ -408,10 +408,10 @@ export class AuthError extends Error {
 
 /**
  * Cause of an authentication error.
-     * @remarks
-     * `invalidActivity` - The activity is not a valid activity to initiate authentication flow.
-     * `completionWithoutToken` - The authentication flow completed without a token.
-     * `other` - Other error.
+ * @remarks
+ * `invalidActivity` - The activity is not a valid activity to initiate authentication flow.
+ * `completionWithoutToken` - The authentication flow completed without a token.
+ * `other` - Other error.
  */
 export type AuthErrorReason = 'invalidActivity' | 'completionWithoutToken' | 'other';
 

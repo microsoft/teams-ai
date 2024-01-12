@@ -34,7 +34,7 @@ describe('AdaptiveCardAuthenticaion', () => {
         await state.load(context);
         state.temp = {
             input: '',
-            history: '',
+            inputFiles: [],
             lastOutput: '',
             actionOutputs: {},
             authTokens: {}
@@ -317,6 +317,47 @@ describe('AdaptiveCardAuthenticaion', () => {
             const result = acAuth.isValidActivity(context);
 
             assert(!result);
+        });
+    });
+
+    describe('handleSsoTokenExchange()', () => {
+        it('should perform token exchange if the activity.value.authentication exists', async () => {
+            const tokenResponse = {
+                token: 'token',
+                connectionName: 'connectionName',
+                expiration: 'expiration'
+            };
+            const exchangeTokenStub = sinon
+                .stub(UserTokenAccess, 'exchangeToken')
+                .returns(Promise.resolve(tokenResponse));
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'adaptiveCard/action',
+                value: {
+                    authentication: {
+                        token: 'token'
+                    }
+                }
+            });
+
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
+            const response = await acAuth.handleSsoTokenExchange(context);
+
+            assert(exchangeTokenStub.calledOnce);
+            assert(response == tokenResponse);
+        });
+
+        it('should not perform token exchange if the activity.value.authentication does not exist', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'adaptiveCard/action',
+                value: {}
+            });
+
+            const acAuth = new OAuthAdaptiveCardAuthentication(settings);
+            const response = await acAuth.handleSsoTokenExchange(context);
+
+            assert(response == undefined);
         });
     });
 });

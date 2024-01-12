@@ -22,10 +22,12 @@ import { ReadReceiptInfo } from 'botframework-connector';
 
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
 import { AI, AIOptions } from './AI';
+import { Meetings } from './Meetings';
 import { MessageExtensions } from './MessageExtensions';
 import { TaskModules, TaskModulesOptions } from './TaskModules';
 import { AuthenticationManager, AuthenticationOptions } from './authentication/Authentication';
 import { TurnState } from './TurnState';
+import { InputFileDownloader } from './InputFileDownloader';
 import {
     deleteUserInSignInFlow,
     setTokenInState,
@@ -132,6 +134,11 @@ export interface ApplicationOptions<TState extends TurnState> {
      * Optional. Factory used to create a custom turn state instance.
      */
     turnStateFactory: () => TState;
+
+    /**
+     * Optional. Array of input file download plugins to use.
+     */
+    fileDownloaders?: InputFileDownloader<TState>[];
 }
 
 /**
@@ -213,6 +220,7 @@ export class Application<TState extends TurnState = TurnState> {
     private readonly _routes: AppRoute<TState>[] = [];
     private readonly _invokeRoutes: AppRoute<TState>[] = [];
     private readonly _adaptiveCards: AdaptiveCards<TState>;
+    private readonly _meetings: Meetings<TState>;
     private readonly _messageExtensions: MessageExtensions<TState>;
     private readonly _taskModules: TaskModules<TState>;
     private readonly _ai?: AI<TState>;
@@ -260,6 +268,7 @@ export class Application<TState extends TurnState = TurnState> {
 
         this._adaptiveCards = new AdaptiveCards<TState>(this);
         this._messageExtensions = new MessageExtensions<TState>(this);
+        this._meetings = new Meetings<TState>(this);
         this._taskModules = new TaskModules<TState>(this);
 
         // Validate long running messages configuration
@@ -313,7 +322,7 @@ export class Application<TState extends TurnState = TurnState> {
      * @description
      * This property is only available if the Application was configured with `authentication` options. An
      * exception will be thrown if you attempt to access it otherwise.
-     * @returns {Authentication<TState>} The Authentication instance.
+     * @returns {AuthenticationManager<TState>} The Authentication instance.
      */
     public get authentication(): AuthenticationManager<TState> {
         if (!this._authentication) {
@@ -331,6 +340,14 @@ export class Application<TState extends TurnState = TurnState> {
      */
     public get messageExtensions(): MessageExtensions<TState> {
         return this._messageExtensions;
+    }
+
+    /**
+     * Fluent interface for accessing Meetings specific features.
+     * @returns {Meetings<TState>} The Meetings instance.
+     */
+    public get meetings(): Meetings<TState> {
+        return this._meetings;
     }
 
     /**
@@ -655,6 +672,27 @@ export class Application<TState extends TurnState = TurnState> {
                     //   allows the dialog system to be used before the AI system is called.
                     await state.save(context, storage);
                     return false;
+                }
+
+                // Populate {{$temp.input}}
+                if (typeof state.temp.input != 'string') {
+                    // Use the received activity text
+                    state.temp.input = context.activity.text;
+                }
+
+                // Download any input files
+                if (Array.isArray(this._options.fileDownloaders) && this._options.fileDownloaders.length > 0) {
+                    const inputFiles = state.temp.inputFiles ?? [];
+                    for (let i = 0; i < this._options.fileDownloaders.length; i++) {
+                        const files = await this._options.fileDownloaders[i].downloadFiles(context, state);
+                        inputFiles.push(...files);
+                    }
+                    state.temp.inputFiles = inputFiles;
+                }
+
+                // Initialize {{$allOutputs}}
+                if (state.temp.actionOutputs == undefined) {
+                    state.temp.actionOutputs = {};
                 }
 
                 // Run any RouteSelectors in this._invokeRoutes first if the incoming Teams activity.type is "Invoke".
@@ -1098,8 +1136,8 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
 
     /**
      * Configures the turn state factory for managing the bot's turn state.
-     * @param turnStateFactory
-     * @returns
+     * @param {() => TState} turnStateFactory Factory used to create a custom turn state instance.
+     * @returns {this} The ApplicationBuilder instance.
      */
     public withTurnStateFactory(turnStateFactory: () => TState): this {
         this._options.turnStateFactory = turnStateFactory;

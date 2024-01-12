@@ -1,0 +1,76 @@
+[
+  {
+    "name": "CreateList",
+    "description": "Creates a new list with an optional set of initial items",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "string",
+          "description": "The name of the list to create"
+        }
+      },
+      "required": [
+        "list"
+      ]
+    }
+  },
+  {
+    "name": "DeleteList",
+    "description": "Deletes a list",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "string",
+          "description": "The name of the list to delete"
+        }
+      },
+      "required": [
+        "list"
+      ]
+    }
+  },
+  {
+    "name": "AddItem",
+    "description": "Adds one item to a list",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "string",
+          "description": "The name of the list to add the item to"
+        },
+        "item": {
+          "type": "string",
+          "description": "The item to add to the list"
+        }
+      },
+      "required": [
+        "list",
+        "item"
+      ]
+    }
+  },
+  {
+    "name": "RemoveItem",
+    "description": "Removes one item from a list",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "string",
+          "description": "The name of the list to remove the item from"
+        },
+        "items": {
+          "type": "string",
+          "description": "The item to remove from the list"
+        }
+      },
+      "required": [
+        "list",
+        "item"
+      ]
+    }
+  }
+]

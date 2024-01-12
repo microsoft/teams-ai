@@ -2,30 +2,52 @@
 
 namespace ListBot.Model
 {
-    public class ListState : TurnState<ConversationState, StateBase, TempState> { }
-
-    public class ConversationState : StateBase
+    public class ListState : TurnState
     {
-        private const string _greetedKey = "greetedKey";
-        private const string _listNamesKey = "listNamesKey";
-        private const string _listsKey = "listsKey";
+        public ListState()
+        {
+            ScopeDefaults[CONVERSATION_SCOPE] = new ConversationState();
+        }
 
+        public new ConversationState Conversation
+        {
+            get
+            {
+                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                return (ConversationState)scope.Value!;
+            }
+            set
+            {
+                TurnStateEntry? scope = GetScope(CONVERSATION_SCOPE);
+
+                if (scope == null)
+                {
+                    throw new ArgumentException("TurnState hasn't been loaded. Call LoadStateAsync() first.");
+                }
+
+                scope.Replace(value!);
+            }
+        }
+    }
+
+    public class ConversationState : Record
+    {
         public bool Greeted
         {
-            get => Get<bool>(_greetedKey);
-            set => Set(_greetedKey, value);
+            get => Get<bool>("greeted");
+            set => Set("greeted", value);
         }
 
-        public IList<string>? ListNames
+        public Dictionary<string, IList<string>> Lists
         {
-            get => Get<IList<string>>(_listNamesKey);
-            set => Set(_listNamesKey, value);
-        }
-
-        public Dictionary<string, IList<string>>? Lists
-        {
-            get => Get<Dictionary<string, IList<string>>>(_listsKey);
-            set => Set(_listsKey, value);
+            get => Get<Dictionary<string, IList<string>>>("lists") ?? new();
+            set => Set("lists", value);
         }
     }
 }
