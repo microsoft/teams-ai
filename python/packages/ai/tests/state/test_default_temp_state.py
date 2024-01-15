@@ -12,12 +12,12 @@ from teams.state import DefaultTempState
 class TestDefaultTempState(TestCase):
     def setUp(self):
         self.data = {
-            DefaultTempState.INPUT: "test input",
-            DefaultTempState.INPUT_FILES: [InputFile("test_file", "test_path", "test_url")],
-            DefaultTempState.LAST_OUTPUT: "test output",
-            DefaultTempState.ACTION_OUTPUTS: {"action1": "output1"},
-            DefaultTempState.AUTH_TOKENS: {"token1": "auth1"},
-            DefaultTempState.DUPLICATE_TOKEN_EXCHANGE: True,
+            DefaultTempState._INPUT: "test input",
+            DefaultTempState._INPUT_FILES: [InputFile("test_file", "test_path", "test_url")],
+            DefaultTempState._LAST_OUTPUT: "test output",
+            DefaultTempState._ACTION_OUTPUTS: {"action1": "output1"},
+            DefaultTempState._AUTH_TOKENS: {"token1": "auth1"},
+            DefaultTempState._DUPLICATE_TOKEN_EXCHANGE: True,
         }
         self.temp_state = DefaultTempState(self.data)
 

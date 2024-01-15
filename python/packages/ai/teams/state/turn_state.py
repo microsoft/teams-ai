@@ -28,11 +28,48 @@ class _GetScopeAndNameResult:
 
 
 class TurnState(Memory):
+    """
+    Base class defining a collection of turn state scopes.
+
+    Developers can create a derived class that extends `TurnState` to add additional state scopes.
+    Example:
+        ```python
+        class CustomTurnState(TurnState):
+            CUSTOM_SCOPE = "custom"
+
+            @property
+            def custom(self) -> DefaultCustomState:
+                scope = self.get_scope(self.CUSTOM_SCOPE)
+                if not scope:
+                    raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+
+                return DefaultCustomState(scope.value)
+
+            @custom.setter
+            def custom(self, value: DefaultCustomState):
+                scope = self.get_scope(self.CUSTOM_SCOPE)
+                if not scope:
+                    raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+
+                scope.replace(value.get_dict())
+
+            async def _on_compute_storage_keys(self, context: TurnContext) -> Dict[str, str]:
+                # Call the parent class's method first to get the existing keys
+                keys = await super()._on_compute_storage_keys(context)
+
+                # Add the new scope to the keys dictionary
+                keys[self.CUSTOM_SCOPE] = "my_scope_key"
+
+                return keys
+        ```
+    """
+
     _scopes: Dict[str, TurnStateEntry]
     _is_loaded: bool
     _loading_callable: Optional[Callable[[], Awaitable[bool]]]
 
     def __init__(self):
+        """Initialize the class."""
         super().__init__()
         self._scopes = {}
         self._is_loaded = False
@@ -40,6 +77,14 @@ class TurnState(Memory):
 
     @property
     def conversation(self) -> DefaultConversationState:
+        """Accessor for the conversation state.
+
+        Returns:
+            DefaultConversationState: The current conversation state.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(CONVERSATION_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -48,6 +93,14 @@ class TurnState(Memory):
 
     @conversation.setter
     def conversation(self, value: DefaultConversationState):
+        """Replaces the conversation state with a new value.
+
+        Args:
+            value (DefaultConversationState): New value to replace the conversation state with.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(CONVERSATION_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -56,10 +109,23 @@ class TurnState(Memory):
 
     @property
     def is_loaded(self) -> bool:
+        """Gets a value indicating whether the applications turn state has been loaded.
+
+        Returns:
+            bool: True if the state is loaded, False otherwise.
+        """
         return self._is_loaded
 
     @property
     def temp(self) -> DefaultTempState:
+        """Accessor for the temp state.
+
+        Returns:
+            DefaultTempState: The current temporary state.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(TEMP_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -68,6 +134,14 @@ class TurnState(Memory):
 
     @temp.setter
     def temp(self, value: DefaultTempState):
+        """Replaces the temp state with a new value.
+
+        Args:
+            value (DefaultTempState): New value to replace the temp state with.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(TEMP_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -76,6 +150,14 @@ class TurnState(Memory):
 
     @property
     def user(self) -> DefaultUserState:
+        """Accessor for the user state.
+
+        Returns:
+            DefaultUserState: The current user state.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(USER_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -84,6 +166,14 @@ class TurnState(Memory):
 
     @user.setter
     def user(self, value: DefaultUserState):
+        """Replaces the user state with a new value.
+
+        Args:
+            value (DefaultUserState): New value to replace the user state with.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(USER_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -91,6 +181,11 @@ class TurnState(Memory):
         scope.replace(value.get_dict())
 
     def delete_conversation_state(self) -> None:
+        """Deletes the state object for the current conversation from storage.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(CONVERSATION_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -98,6 +193,11 @@ class TurnState(Memory):
         scope.delete()
 
     def delete_temp_state(self) -> None:
+        """Deletes the temp state object.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(TEMP_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -105,6 +205,11 @@ class TurnState(Memory):
         scope.delete()
 
     def delete_user_state(self) -> None:
+        """Deletes the state object for the current user from storage.
+
+        Raises:
+            ApplicationError: If the state has not been loaded.
+        """
         scope = self.get_scope(USER_SCOPE)
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
@@ -112,9 +217,23 @@ class TurnState(Memory):
         scope.delete()
 
     def get_scope(self, scope: str) -> Optional[TurnStateEntry]:
+        """Gets a state scope by name.
+
+        Args:
+            scope (str): Name of the state scope to return. (i.e. 'conversation', 'user', or 'temp')
+
+        Returns:
+            Optional[TurnStateEntry]: The state scope or None if not found.
+        """
         return self._scopes.get(scope, None)
 
     def delete_value(self, path: str) -> None:
+        """Deletes a value from the memory.
+
+        Args:
+            path (str): Path to the value to delete in the form of `[scope].property`.
+              If scope is omitted, the value is deleted from the temporary scope.
+        """
         scope_and_name = self._get_scope_and_name(path)
         scope = scope_and_name.scope
         name = scope_and_name.name
@@ -122,24 +241,58 @@ class TurnState(Memory):
             del scope.value[name]
 
     def has_value(self, path: str) -> bool:
+        """Checks if a value exists in the memory.
+
+        Args:
+            path (str): Path to the value to check in the form of `[scope].property`.
+              If scope is omitted, the value is checked in the temporary scope.
+
+        Returns:
+            bool: True if the value exists, False otherwise.
+        """
         scope_and_name = self._get_scope_and_name(path)
         scope = scope_and_name.scope
         name = scope_and_name.name
         return name in scope.value
 
     def get_value(self, path: str) -> Optional[Any]:
+        """Retrieves a value from the memory.
+
+        Args:
+            path (str): Path to the value to retrieve in the form of `[scope].property`.
+              If scope is omitted, the value is retrieved from the temporary scope.
+
+        Returns:
+            Optional[Any]: The value or None if not found.
+        """
         scope_and_name = self._get_scope_and_name(path)
         scope = scope_and_name.scope
         name = scope_and_name.name
         return scope.value[name] if name in scope.value else None
 
     def set_value(self, path: str, value: Any) -> None:
+        """Assigns a value to the memory.
+
+        Args:
+            path (str): Path to the value to assign in the form of `[scope].property`.
+              If scope is omitted, the value is assigned to the temporary scope.
+            value (Any): Value to assign.
+        """
         scope_and_name = self._get_scope_and_name(path)
         scope = scope_and_name.scope
         name = scope_and_name.name
         scope.value[name] = value
 
     async def load(self, context: TurnContext, storage: Optional[Storage] = None) -> bool:
+        """Loads all of the state scopes for the current turn.
+
+        Args:
+            context (TurnContext): Context for the current turn of conversation with the user.
+            storage (Optional[Storage]): Storage provider to load state scopes from.
+
+        Returns:
+            bool: True if the states needed to be loaded.
+        """
         # Only load on first call
         if self._is_loaded:
             return False
@@ -184,6 +337,15 @@ class TurnState(Memory):
         return await self._loading_callable()
 
     async def save(self, _context: TurnContext, storage: Optional[Storage] = None) -> None:
+        """Saves all of the state scopes for the current turn.
+
+        Args:
+            _context (TurnContext): Context for the current turn of conversation with the user.
+            storage (Optional[Storage]): Storage provider to save state scopes to.
+
+        Raises:
+            ApplicationError: If the state hasn't been loaded before the save operation.
+        """
         # Check for existing load operation
         if not self._is_loaded and self._loading_callable is not None:
             # Wait for load to finish

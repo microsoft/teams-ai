@@ -9,6 +9,14 @@ from typing import Optional
 
 @dataclass
 class InputFile:
+    """A file sent by the user to the bot.
+
+    Attributes:
+        content (bytes): The downloaded content of the file.
+        content_type (str): The content type of the file.
+        content_url (Optional[str]): Optional. URL to the content of the file.
+    """
+
     content: bytes
     content_type: str
     content_url: Optional[str]
