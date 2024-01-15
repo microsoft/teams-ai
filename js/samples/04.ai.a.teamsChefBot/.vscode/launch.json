@@ -90,6 +90,18 @@
                 "order": 2
             },
             "stopAll": true
+        },
+        {
+            "name": "Debug Local",
+            "configurations": [
+                "Attach to Local Service"
+            ],
+            "preLaunchTask": "Start application",
+            "presentation": {
+                "group": "all",
+                "order": 2
+            },
+            "stopAll": true
         }
     ]
 }
