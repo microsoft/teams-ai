@@ -48,7 +48,7 @@ async def on_message(context: TurnContext, state: TurnState):
 
 ### Turn State
 
-The turn state object stores cookie-like data for the current turn. Just like the turn context, it is carried through the entire application logic, including the activity handlers and the AI module. Unlike the turn context, the turn state is not a fixed and is meant to be configured to each application specific use cases.
+The turn state object stores cookie-like data for the current turn. Just like the turn context, it is carried through the entire application logic, including the activity handlers and the AI System. Unlike the turn context, the turn state is not a fixed and is meant to be configured to each application specific use cases.
 
 It is used to store information like the user's message, the conversation history, and any custom data configured by the application code.
 

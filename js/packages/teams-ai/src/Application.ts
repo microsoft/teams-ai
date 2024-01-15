@@ -738,7 +738,7 @@ export class Application<TState extends TurnState = TurnState> {
                     }
                 }
 
-                // Call AI module if configured
+                // Call AI System if configured
                 if (this._ai && context.activity.type == ActivityTypes.Message && context.activity.text) {
                     await this._ai.run(context, state);
 
