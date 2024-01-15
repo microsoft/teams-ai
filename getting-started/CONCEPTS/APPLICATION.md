@@ -35,11 +35,11 @@ The `Application` groups the route registration methods based on the specific fe
 
 | **Feature**       | **Description**                                                                         |
 |-------------------|-----------------------------------------------------------------------------------------|
-| Task Modules      | route registration methods for task module related activities like `task/fetch`.        |
-| Message Extension | route registration methods for message extension activities like `composeExtension/query`.      |
-| Meetings          | route registration methods for meeting activites like `application/vnd.microsoft.meetingStart`. |
-| AdaptiveCards     | route registration methods for adaptive card activities like `adaptiveCard/action`.             |
-| General           | route registration methods for generic activites like `message`.                        |
+| Task Modules      | Task module related activities like `task/fetch`.        |
+| Message Extension | Message extension activities like `composeExtension/query`.      |
+| Meetings          | Meeting activites like `application/vnd.microsoft.meetingStart`. |
+| AdaptiveCards     | Adaptive card activities like `adaptiveCard/action`.             |
+| General           | Generic activites like `message`.                        |
 
 > To see all the route registration methods supported, see the migration docs ([JS](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/JS.md#activity-handler-methods)/[C#](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/DOTNET.md#activity-handler-methods)).
 
