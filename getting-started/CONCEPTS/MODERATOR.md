@@ -1,4 +1,4 @@
-## Moderator
+# Moderator
 
 The `Moderator` is responsible for reviewing the input prompt and approving the AI generated plans. It is configured when orchestrating the `Application` class. Here's an example of configuring the `OpenAIModerator`.
 
