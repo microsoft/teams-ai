@@ -27,8 +27,8 @@ app.OnMessage("/login", async (ITurnContext turnContext, TurnState turnState, Ca
         // start signin flow
 });
 ```
-> The `turnContext` and `turnState` parameters are present in every route handler. To learn more about them see [TURNS](TURNS.md).
 > The `message` and `OnMessage` methods are referred to as activity or *route registration* method. 
+> The `turnContext` and `turnState` parameters are present in every route handler. To learn more about them see [TURNS](TURNS.md).
 
 The `Application` groups the route registration methods based on the specific feature groups: 
 
@@ -50,7 +50,7 @@ The AI Module is an optional component used to plug in LLM powered experiences l
 
 ## The Routing Logic
 
-When an incoming activity reaches the server, the bot adapter handles the necessary authentication and creates a turn context object that encapsulates the activity details. It then calls `Application`'s main method (`run()` in Javscript. `OnTurnAsync()` in C#). It is called for every incomming activity. Here's what happens:
+When an incoming activity reaches the server, the bot adapter handles the necessary authentication and creates a turn context object that encapsulates the activity details. Then the `Application`'s main method (`run()` in Javscript. `OnTurnAsync()` in C#) is called. It's logic can be broken down into these eight steps. 
 
 1. If configured in the application options, pulses of the `Typing` activity are sent to the user.
 2. If configured in the application options, the @mention is removed from the incoming message activity.
@@ -60,5 +60,8 @@ When an incoming activity reaches the server, the bot adapter handles the necess
 6. All the routes are iterated over and if a selector function is triggered, then the corresponding route handler is executed.
 7. If no route is triggered, the incomming activity is a message, and the AI module is configured, then it is invoked by calling the `AI.run()` method.
 8. The `AfterTurnAsync` activity handler is executed. If it return true, save turn state to storage.
+
+
+> Note: _End the turn_ means that the main method has terminated execution and so the application has completed processing the incomming activity. 
 
 > Note: To learn about what a *turn* is, see [TURNS](TURNS.md).
