@@ -1,9 +1,9 @@
 # The `Application` class
 
-The `Application` class encapsulates all the business logic for of application and it comprises of two major components, the Activity Handler system and the AI module.
+The `Application` class encapsulates all the business logic for of application and it comprises of two major components, the _Activity Handler System_ and the _AI Module_.
 
 
-## The Activity Handler system
+## The Activity Handler System
 
 The activity handler system is the set of methods and configuration that allows you to register callbacks (known as route handlers) which will trigger based on the incomming activity. These can be in the form of a message, message reaction, or virtually any interaction with the Teams app. The method determines the incomming activity for which the callback would be triggered.
 
@@ -46,7 +46,7 @@ The `Application` groups the route registration methods based on the specific fe
 In general, the activity handler system is all that is needed to have a functional bot or message extension. 
 
 ## The AI Module
-The AI module is an optional component used to plug in LLM powered experiences like user intent mapping, chaining...etc. It is configured once when orchestrating the application class. To learn more about it see [The AI Module](.AI-MODULE.md).
+The AI Module is an optional component used to plug in LLM powered experiences like user intent mapping, chaining...etc. It is configured once when orchestrating the application class. To learn more about it see [The AI Module](.AI-MODULE.md).
 
 ## The Routing Logic
 
