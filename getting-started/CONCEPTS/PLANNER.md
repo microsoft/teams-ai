@@ -1,4 +1,4 @@
-# AI System: Planner
+# AI System - Planner
 
 A planner is a object that takes in a user's ask and returns back a plan on how to accomplish the request. The user's ask is in the form of a prompt or prompt template. It does this by using AI to mix and match atomic functions (called _actions_) registered to the AI system so that it can recombine them into series of steps that complete a goal.
 
