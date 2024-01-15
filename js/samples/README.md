@@ -114,7 +114,7 @@ You can also use the Teams Toolkit CLI to run this sample.
 
 1. Download and install [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator)
 2. Launch Bot Framework Emulator
-3. Run the app you are in the directory for.
+3. Run the app you are in the directory for. Make sure [Auto Attach](https://code.visualstudio.com/docs/nodejs/nodejs-debugging#_auto-attach) is set to `Smart` or `Always` to debug locally.
 
 ```bash
 yarn start
