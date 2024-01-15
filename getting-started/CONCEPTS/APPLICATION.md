@@ -1,6 +1,6 @@
 # The `Application` class
 
-The `Application` class encapsulates all the business logic for the application and it comprises of two major components, the Activity Handler system and the AI module.
+The `Application` class encapsulates all the business logic for of application and it comprises of two major components, the Activity Handler system and the AI module.
 
 
 ## The Activity Handler system
