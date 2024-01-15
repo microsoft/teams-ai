@@ -31,7 +31,7 @@ public bool CreateList([ActionTurnState] ListState turnState, [ActionParameters]
 ```typescript
 app.ai.action("createList", async (context: TurnContext, state: ApplicationTurnState, parameters: ListAndItems) => {
   // Ex. create a list with name "Grocery Shopping".
-ensureListExists(state, parameters.list);
+  ensureListExists(state, parameters.list);
 
   // Continues exectuion of next command in the plan.
   return true;
