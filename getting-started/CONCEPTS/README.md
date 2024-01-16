@@ -30,4 +30,4 @@ Here you will find short guides on features available in the library.
 | --------------------------------------- | ------------------------------------------------- |
 | [The Action Planner](ACTION-PLANNER.md) | Describes the Action Planner. |
 | [Prompt Management](PROMPTS.md) | Prompts, prompt templates, and creating prompt templates. |
-| [Augmentation](AUGMENTATIONS.md) | Monologue and sequence augmentations. |
+| [Augmentations](AUGMENTATIONS.md) | Monologue and sequence augmentations. |
