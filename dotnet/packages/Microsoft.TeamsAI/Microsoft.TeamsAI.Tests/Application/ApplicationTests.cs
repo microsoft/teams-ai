@@ -43,7 +43,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             bool longRunningMessages = true;
             string botAppId = "testBot";
             IStorage storage = new MemoryStorage();
-            BotAdapter adapter = new SimpleAdapter();
+            SimpleAdapter adapter = new();
             TestLoggerFactory loggerFactory = new();
             Func<TurnState> turnStateFactory = () => new TurnState();
             AdaptiveCardsOptions adaptiveCardOptions = new()

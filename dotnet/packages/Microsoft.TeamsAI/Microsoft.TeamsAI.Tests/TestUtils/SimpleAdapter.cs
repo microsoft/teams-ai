@@ -6,27 +6,27 @@ using Microsoft.Bot.Schema;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
 {
-    public class SimpleAdapter : BotAdapter
+    public class SimpleAdapter : TeamsAdapter
     {
         private readonly Action<Activity[]>? _callOnSend;
         private readonly Action<Activity>? _callOnUpdate;
         private readonly Action<ConversationReference>? _callOnDelete;
 
-        public SimpleAdapter()
+        public SimpleAdapter() : base()
         {
         }
 
-        public SimpleAdapter(Action<Activity[]> callOnSend)
+        public SimpleAdapter(Action<Activity[]> callOnSend) : base()
         {
             _callOnSend = callOnSend;
         }
 
-        public SimpleAdapter(Action<Activity> callOnUpdate)
+        public SimpleAdapter(Action<Activity> callOnUpdate) : base()
         {
             _callOnUpdate = callOnUpdate;
         }
 
-        public SimpleAdapter(Action<ConversationReference> callOnDelete)
+        public SimpleAdapter(Action<ConversationReference> callOnDelete) : base()
         {
             _callOnDelete = callOnDelete;
         }
