@@ -57,11 +57,13 @@ describe('BotAuthentication', () => {
     };
 
     beforeEach(() => {
-        app = new Application({ adapter });
+        app = new Application();
         settings = {
             connectionName: 'test',
             title: 'test'
         };
+
+        sinon.stub(app, 'adapter').get(() => adapter);
     });
 
     describe('constructor()', () => {
