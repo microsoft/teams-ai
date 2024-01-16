@@ -46,7 +46,7 @@ The `Application` groups the route registration methods based on the specific fe
 In general, the activity handler system is all that is needed to have a functional bot or message extension. 
 
 ## The AI System
-The AI System is an optional component used to plug in LLM powered experiences like user intent mapping, chaining...etc. It is configured once when orchestrating the application class. To learn more about it see [The AI System](.AI-SYSTEM.md).
+The AI System is an optional component used to plug in LLM powered experiences like user intent mapping, chaining...etc. It is configured once when orchestrating the application class. To learn more about it see [The AI System](./AI-SYSTEM.md).
 
 ## The Routing Logic
 
