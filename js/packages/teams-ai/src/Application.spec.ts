@@ -152,6 +152,14 @@ describe('Application', () => {
                 )
             );
         });
+
+        it('should have a configured adapter', () => {
+            const app = new Application({
+                adapter: new TeamsAdapter(undefined, undefined, undefined, {})
+            });
+
+            assert.doesNotThrow(() => app.adapter);
+        });
     });
 
     describe('botAuthentication', () => {
