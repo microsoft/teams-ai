@@ -21,7 +21,7 @@ Some possible name suggestions for a pet golden retriever are:
 - Cooper
 ```
 
-## Prompt Template
+# Prompt Template
 
 Prompt templates are a simple and powerful way to
 define and compose AI functions **using plain text**.
@@ -42,7 +42,7 @@ Give me 3 name suggestions for my pet {{ $petName }}.
 
 `$petName` is a variable that is populated on runtime when the template is rendered.
 
-### Prompt Template Language
+## Prompt Template Language
 
 You don't need to write any code or import any external libraries, just use the
 curly braces {{...}} to embed expressions in your prompts.
@@ -50,7 +50,7 @@ Teams AI will parse your template and execute the logic behind it.
 This way, you can easily integrate AI into your apps with minimal effort and
 maximum flexibility.
 
-#### Variables
+### Variables
 
 To include a variable value in your text, use the `{{$variableName}}` syntax. For example, if you have a variable called name that holds the user's name, you can write:
 
@@ -103,7 +103,7 @@ The following are variables accesible in the prompt template without having to m
 | `input`       | Input passed from the user to the AI Library. |
 | `lastOutput`      | Output returned from the last executed action.            |
 
-#### Function calls
+### Function calls
 
 To call an external function and embed the result in your text, use the `{{ functionName }}` syntax. For example if you have a function called `diceRoll` that returns a random number between 1 and 6, you can write:
 
@@ -130,7 +130,7 @@ prompts.addFunction('diceRoll', async (context, state, functions, tokenizer, arg
 });
 ```
 
-## Creating Prompt Templates
+# Creating Prompt Templates
 
 Each prompt template is a folder with two files, `skprompt.txt` and `config.json`. The folder name is the prompt template's name that can be referred in code. The `skprompt.txt` file contains the prompt's text, which can contain natural language or prompt template syntax as defined in the previous section. The `config.json` file specifies the prompt completion configuration.
 
