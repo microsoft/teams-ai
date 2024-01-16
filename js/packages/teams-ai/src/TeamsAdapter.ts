@@ -1,3 +1,17 @@
+/**
+ * @module teams-ai
+ */
+
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
+/**
+ * Note: this class should never modify the way `CloudAdapter` is
+ * intended to work.
+ */
+
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,

@@ -1,9 +1,10 @@
-﻿using Json.More;
-using Microsoft.Bot.Builder.Integration.AspNet.Core;
+﻿using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Reflection;
+
+// Note: this class should never modify the way `CloudAdapter` is intended to work.
 
 namespace Microsoft.Teams.AI
 {
