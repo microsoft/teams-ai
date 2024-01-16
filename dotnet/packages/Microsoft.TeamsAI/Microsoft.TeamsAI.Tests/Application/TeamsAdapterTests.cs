@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Teams.AI.Tests.Application
 {
@@ -23,7 +24,8 @@ namespace Microsoft.Teams.AI.Tests.Application
         {
             string version = Assembly.GetAssembly(typeof(TeamsAdapter))?.GetName().Version?.ToString() ?? "";
             ProductInfoHeaderValue productInfo = new("teamsai-dotnet", version);
-            TeamsAdapter adapter = new(new TeamsHttpClientFactory());
+            ConfigurationBuilder config = new();
+            TeamsAdapter adapter = new(config.Build(), new TeamsHttpClientFactory());
             Assert.NotNull(adapter.HttpClientFactory);
 
             HttpClient client = adapter.HttpClientFactory.CreateClient();

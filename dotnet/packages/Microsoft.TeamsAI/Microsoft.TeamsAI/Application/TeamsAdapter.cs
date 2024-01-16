@@ -20,9 +20,9 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Initializes a new instance of the <see cref="TeamsAdapter"/> class. (Public cloud. No auth. For testing.)
         /// </summary>
-        public TeamsAdapter(IHttpClientFactory? httpClientFactory = null) : base()
+        public TeamsAdapter() : base()
         {
-            HttpClientFactory = new TeamsHttpClientFactory(httpClientFactory);
+            HttpClientFactory = new TeamsHttpClientFactory();
         }
 
         /// <summary>
