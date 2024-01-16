@@ -1,3 +1,4 @@
+import sinon from 'sinon';
 import { strict as assert } from 'assert';
 import { Application } from './Application';
 import { createTestInvoke } from './internals';
@@ -24,7 +25,8 @@ describe('TaskModules', () => {
 
     let mockApp: Application;
     beforeEach(() => {
-        mockApp = new Application({ adapter });
+        mockApp = new Application();
+        sinon.stub(mockApp, 'adapter').get(() => adapter);
     });
 
     const createExpected200Response = (taskModuleResponse: TaskModuleContinueResponse | TaskModuleMessageResponse) => {

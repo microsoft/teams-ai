@@ -11,6 +11,7 @@ import {
     Activity,
     ActivityTypes,
     BotAdapter,
+    CloudAdapter,
     ConversationReference,
     FileConsentCardResponse,
     O365ConnectorCardActionQuery,
@@ -18,6 +19,7 @@ import {
     Storage,
     TurnContext
 } from 'botbuilder';
+
 import { ReadReceiptInfo } from 'botframework-connector';
 
 import { AdaptiveCards, AdaptiveCardsOptions } from './AdaptiveCards';
@@ -34,6 +36,7 @@ import {
     setUserInSignInFlow,
     userInSignInFlow
 } from './authentication/BotAuthenticationBase';
+import { BotAdapterOptions } from './BotAdapterOptions';
 
 /**
  * @private
@@ -67,12 +70,9 @@ export interface Query<TParams extends Record<string, any>> {
  */
 export interface ApplicationOptions<TState extends TurnState> {
     /**
-     * Optional. Bot adapter being used.
-     * @remarks
-     * If using the `longRunningMessages` option or calling the continueConversationAsync() method,
-     * this property is required.
+     * Optional. Options used to initialize your `BotAdapter`
      */
-    adapter?: BotAdapter;
+    adapter?: BotAdapter | BotAdapterOptions;
 
     /**
      * Optional. OAuth prompt settings to use for authentication.
@@ -236,22 +236,24 @@ export class Application<TState extends TurnState = TurnState> {
      * @param {ApplicationOptions<TState>} options Optional. Options used to configure the application.
      */
     public constructor(options?: Partial<ApplicationOptions<TState>>) {
-        this._options = Object.assign(
-            {
-                removeRecipientMention: true,
-                startTypingTimer: true,
-                longRunningMessages: false
-            } as ApplicationOptions<TState>,
-            options
-        ) as ApplicationOptions<TState>;
+        this._options = {
+            ...options,
+            turnStateFactory: options?.turnStateFactory || (() => new TurnState() as TState),
+            removeRecipientMention:
+                options?.removeRecipientMention !== undefined ? options.removeRecipientMention : true,
+            startTypingTimer: options?.startTypingTimer !== undefined ? options.startTypingTimer : true,
+            longRunningMessages: options?.longRunningMessages !== undefined ? options.longRunningMessages : false
+        };
 
-        this._adapter = this._options.adapter;
-
-        this._adapter = this._options.adapter;
-
-        // Create turn state factory
-        if (!this._options.turnStateFactory) {
-            this._options.turnStateFactory = () => new TurnState() as TState;
+        // Create Adapter
+        if (this._options.adapter) {
+            if ('authentication' in this._options.adapter) {
+                if (this._options.adapter?.authentication) {
+                    this._adapter = new CloudAdapter(this._options.adapter.authentication);
+                }
+            } else {
+                this._adapter = this._options.adapter as BotAdapter;
+            }
         }
 
         // Create AI component if configured with a planner
@@ -272,7 +274,7 @@ export class Application<TState extends TurnState = TurnState> {
         this._taskModules = new TaskModules<TState>(this);
 
         // Validate long running messages configuration
-        if (this._options.longRunningMessages && (!this._options.adapter || !this._options.botAppId)) {
+        if (this._options.longRunningMessages && !this._adapter && !this._options.botAppId) {
             throw new Error(
                 `The Application.longRunningMessages property is unavailable because no adapter or botAppId was configured.`
             );
@@ -367,6 +369,19 @@ export class Application<TState extends TurnState = TurnState> {
     }
 
     /**
+     * Sets the bot's error handler
+     * @param handler Function to call when an error is encountered.
+     * @returns {this} The application instance for chaining purposes.
+     */
+    public error(handler: (context: TurnContext, error: Error) => Promise<void>): this {
+        if (this._adapter) {
+            this._adapter.onTurnError = handler;
+        }
+
+        return this;
+    }
+
+    /**
      * Adds a new route to the application.
      * @remarks
      * Developers won't typically need to call this method directly as it's used internally by all
@@ -451,7 +466,7 @@ export class Application<TState extends TurnState = TurnState> {
      * @private
      * Starts a new "proactive" session with a conversation the bot is already a member of.
      * @remarks
-     * Use of the method requires configuration of the Application with the `adapter` and `botAppId`
+     * Use of the method requires configuration of the Application with the `adapter.appId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param logic The bot's logic that should be run using the new proactive turn context.
@@ -472,13 +487,13 @@ export class Application<TState extends TurnState = TurnState> {
         context: TurnContext | Partial<ConversationReference> | Partial<Activity>,
         logic: (context: TurnContext) => Promise<void>
     ): Promise<void> {
-        if (!this._options.adapter) {
+        if (!this._adapter) {
             throw new Error(
                 `You must configure the Application with an 'adapter' before calling Application.continueConversationAsync()`
             );
         }
 
-        if (!this._options.botAppId) {
+        if (!this.options.botAppId) {
             console.warn(
                 `Calling Application.continueConversationAsync() without a configured 'botAppId'. In production environments a 'botAppId' is required.`
             );
@@ -494,7 +509,7 @@ export class Application<TState extends TurnState = TurnState> {
             reference = context as Partial<ConversationReference>;
         }
 
-        await this._options.adapter.continueConversationAsync(this._options.botAppId ?? '', reference, logic);
+        await this.adapter.continueConversationAsync(this._options.botAppId ?? '', reference, logic);
     }
 
     /**
@@ -771,7 +786,7 @@ export class Application<TState extends TurnState = TurnState> {
      * @remarks
      * This method provides a simple way to send a proactive message to a conversation the bot is a member of.
      *
-     * Use of the method requires you configure the Application with the `adapter` and `botAppId`
+     * Use of the method requires you configure the Application with the `adapter.appId`
      * options. An exception will be thrown if either is missing.
      * @param context Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.
      * @param activityOrText Activity or message to send to the conversation.
@@ -1052,126 +1067,6 @@ export class Application<TState extends TurnState = TurnState> {
         if (response.status == 'pending') {
             return;
         }
-    }
-}
-
-/**
- * A builder class for simplifying the creation of an Application instance.
- * @template TState Optional. Type of the turn state. This allows for strongly typed access to the turn state.
- */
-export class ApplicationBuilder<TState extends TurnState = TurnState> {
-    private _options: Partial<ApplicationOptions<TState>> = {};
-
-    /**
-     * Configures the application to use long running messages.
-     * Default state for longRunningMessages is false
-     * @param {BotAdapter} adapter The adapter to use for routing incoming requests.
-     * @param {string} botAppId The Microsoft App ID for the bot.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withLongRunningMessages(adapter: BotAdapter, botAppId: string): this {
-        if (!botAppId) {
-            throw new Error(
-                `The Application.longRunningMessages property is unavailable because botAppId cannot be null or undefined.`
-            );
-        }
-
-        this._options.longRunningMessages = true;
-        this._options.adapter = adapter;
-        this._options.botAppId = botAppId;
-        return this;
-    }
-
-    /**
-     * Configures the storage system to use for storing the bot's state.
-     * @param {Storage} storage The storage system to use.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withStorage(storage: Storage): this {
-        this._options.storage = storage;
-        return this;
-    }
-
-    /**
-     * Configures the AI system to use for processing incoming messages.
-     * @param {AIOptions<TState>} aiOptions The options for the AI system.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withAIOptions(aiOptions: AIOptions<TState>): this {
-        this._options.ai = aiOptions;
-        return this;
-    }
-
-    /**
-     * Configures the processing of Adaptive Card requests.
-     * @param {AdaptiveCardsOptions} adaptiveCardOptions The options for the Adaptive Cards.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withAdaptiveCardOptions(adaptiveCardOptions: AdaptiveCardsOptions): this {
-        this._options.adaptiveCards = adaptiveCardOptions;
-        return this;
-    }
-
-    /**
-     * Configures the processing of Task Module requests.
-     * @param {TaskModulesOptions} taskModuleOptions The options for the Task Modules.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withTaskModuleOptions(taskModuleOptions: TaskModulesOptions): this {
-        this._options.taskModules = taskModuleOptions;
-        return this;
-    }
-
-    /**
-     * Configures user authentication settings.
-     * @param {BotAdapter} adapter The adapter to use for user authentication.
-     * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withAuthentication(adapter: BotAdapter, authenticationOptions: AuthenticationOptions): this {
-        this._options.adapter = adapter;
-        this._options.authentication = authenticationOptions;
-        return this;
-    }
-
-    /**
-     * Configures the turn state factory for managing the bot's turn state.
-     * @param {() => TState} turnStateFactory Factory used to create a custom turn state instance.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public withTurnStateFactory(turnStateFactory: () => TState): this {
-        this._options.turnStateFactory = turnStateFactory;
-        return this;
-    }
-
-    /**
-     * Configures the removing of mentions of the bot's name from incoming messages.
-     * Default state for removeRecipientMention is true
-     * @param {boolean} removeRecipientMention The boolean for removing reciepient mentions.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public setRemoveRecipientMention(removeRecipientMention: boolean): this {
-        this._options.removeRecipientMention = removeRecipientMention;
-        return this;
-    }
-
-    /**
-     * Configures the typing timer when messages are received.
-     * Default state for startTypingTimer is true
-     * @param {boolean} startTypingTimer The boolean for starting the typing timer.
-     * @returns {this} The ApplicationBuilder instance.
-     */
-    public setStartTypingTimer(startTypingTimer: boolean): this {
-        this._options.startTypingTimer = startTypingTimer;
-        return this;
-    }
-
-    /**
-     * Builds and returns a new Application instance.
-     * @returns {Application<TState>} The Application instance.
-     */
-    public build(): Application<TState> {
-        return new Application(this._options);
     }
 }
 
