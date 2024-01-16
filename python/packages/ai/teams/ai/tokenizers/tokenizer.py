@@ -24,7 +24,6 @@ class Tokenizer(ABC):
         Returns:
             str: The decoded string.
         """
-        pass
 
     @abstractmethod
     def encode(self, text: str) -> List[int]:
@@ -36,4 +35,3 @@ class Tokenizer(ABC):
         Returns:
             List[int]: A list of integers representing the encoded text.
         """
-        pass
