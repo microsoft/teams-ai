@@ -21,3 +21,12 @@ Here you will find short guides on features available in the library.
 | [Planner](PLANNER.md) | Planner and plans. |
 | [Moderator](MODERATOR.md) | The moderator. |
 | [Actions](ACTIONS.md) | The action in the AI system. |
+
+<br>
+
+**Action Planner Concepts**
+| Name                                   | Description                                       |
+| --------------------------------------- | ------------------------------------------------- |
+| [The Action Planner](ACTION-PLANNER.md) | Describes the Action Planner. |
+| [Prompt Management](PROMPTS.md) | Prompts, prompt templates, and creating prompt templates. |
+| [Augmentation](AUGMENTATIONS.md) | Monologue and sequence augmentations. |
