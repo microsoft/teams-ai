@@ -229,10 +229,10 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-13.3.1.tgz#012465bf940d12375dc47387b754ccf9d6b92180"
   integrity sha512-Lrk1ozoAtaP/cp53May3v6HtcFSVxdFrg2Pa/1xu5oIvsIwhxW6zSPibKefCOVgd5osgykMi5jjcZHv8XkzZEQ==
 
-"@azure/msal-common@14.5.0":
-  version "14.5.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.5.0.tgz#5a891e5f8eaf23f598bdb4e285e938fb606cd716"
-  integrity sha512-Gx5rZbiZV/HiZ2nEKfjfAF/qDdZ4/QWxMvMo2jhIFVz528dVKtaZyFAOtsX2Ak8+TQvRsGCaEfuwJFuXB6tu1A==
+"@azure/msal-common@14.6.0":
+  version "14.6.0"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.6.0.tgz#3a565f94e810a67ecbaa2cd8250e658876af8329"
+  integrity sha512-AGusT/JvxdzJIYi5u0n97cmhd3pUT6UuI6rEkT5iDeT2FGcV0/EB8pk+dy6GLPpYg9vhDCuyoYrEZGd+2UeCCQ==
 
 "@azure/msal-common@^7.0.0":
   version "7.6.0"
@@ -248,12 +248,12 @@
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
-"@azure/msal-node@^2.6.0":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.6.0.tgz#44bad20a1523c92d79de24fb225da86abaeedb6c"
-  integrity sha512-RWAWCYYrSldIYC47oWtofIun41e6SB9TBYgGYsezq6ednagwo9ZRFyRsvl1NabmdTkdDDXRAABIdveeN2Gtd8w==
+"@azure/msal-node@^2.6.1":
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.6.1.tgz#097f2def63b70acb11a84ee74d6989ba2315f4af"
+  integrity sha512-wYwz83pWatTNWUCkTi3cAOXbchad5FnZz/pbZz7b8Z6FuEqohXcTtg6BLip9SmcjN6FlbwUdJIZYOof2v1Gnrg==
   dependencies:
-    "@azure/msal-common" "14.5.0"
+    "@azure/msal-common" "14.6.0"
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
@@ -7098,10 +7098,10 @@ openai@^3.2.1:
     axios "^0.26.0"
     form-data "^4.0.0"
 
-openai@^4.24.1:
-  version "4.24.1"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-4.24.1.tgz#3759001eca835228289fcf18c1bd8d35dae538ba"
-  integrity sha512-ezm/O3eiZMnyBqirUnWm9N6INJU1WhNtz+nK/Zj/2oyKvRz9pgpViDxa5wYOtyGYXPn1sIKBV0I/S4BDhtydqw==
+openai@^4.24.7:
+  version "4.24.7"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-4.24.7.tgz#65b206bcf15c11202f758b5e1e945ffa13fd6b7f"
+  integrity sha512-JUesECWPtsDHO0TlZGb6q73hnAmXUdzj9NrwgZeL4lqlRt/kR1sWrXoy8LocxN/6uOtitywvcJqe0O1PLkG45g==
   dependencies:
     "@types/node" "^18.11.18"
     "@types/node-fetch" "^2.6.4"
