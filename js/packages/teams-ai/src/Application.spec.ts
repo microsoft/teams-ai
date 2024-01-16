@@ -14,8 +14,6 @@ import {
     FileConsentCardResponse
 } from 'botbuilder';
 
-import { PasswordServiceClientCredentialFactory } from 'botframework-connector';
-
 import { Application, ConversationUpdateEvents, MessageReactionEvents, TeamsMessageEvents } from './Application';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
@@ -23,7 +21,7 @@ import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
 import { createTestConversationUpdate, createTestInvoke } from './internals';
 import { TestPlanner } from './planners/TestPlanner';
-import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
+import { TeamsAdapter } from './TeamsAdapter';
 
 class MockUserTokenClient {
     /**
@@ -158,11 +156,7 @@ describe('Application', () => {
 
     describe('botAuthentication', () => {
         const app = new Application({
-            adapter: {
-                authentication: new TeamsBotFrameworkAuthentication({
-                    credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
-                })
-            }
+            adapter: new TeamsAdapter()
         });
 
         it('should initialize `CloudAdapter`', () => {
@@ -244,11 +238,7 @@ describe('Application', () => {
 
         beforeEach(() => {
             app = new Application({
-                adapter: {
-                    authentication: new TeamsBotFrameworkAuthentication({
-                        credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
-                    })
-                },
+                adapter: new TeamsAdapter(),
                 authentication: authenticationSettings
             });
 
@@ -272,11 +262,7 @@ describe('Application', () => {
         it('should start signin flow', async () => {
             const authSettings = { ...authenticationSettings, autoSignIn: true };
             const app = new Application({
-                adapter: {
-                    authentication: new TeamsBotFrameworkAuthentication({
-                        credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
-                    })
-                },
+                adapter: new TeamsAdapter(),
                 authentication: authSettings
             });
 

@@ -1,6 +1,5 @@
 import { strict as assert } from 'assert';
 import { MemoryStorage } from 'botbuilder';
-import { PasswordServiceClientCredentialFactory } from 'botframework-connector';
 
 import { ApplicationBuilder } from './ApplicationBuilder';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
@@ -8,17 +7,11 @@ import { AIOptions } from './AI';
 import { TurnState } from './TurnState';
 import { TestPlanner } from './planners';
 import { TaskModulesOptions } from './TaskModules';
-import { BotAdapterOptions } from './BotAdapterOptions';
-import { TeamsBotFrameworkAuthentication } from './TeamsBotFrameworkAuthentication';
+import { TeamsAdapter } from './TeamsAdapter';
 
 describe('ApplicationBuilder', () => {
     const botAppId = 'testBot';
-    const adapter: BotAdapterOptions = {
-        authentication: new TeamsBotFrameworkAuthentication({
-            credentialsFactory: new PasswordServiceClientCredentialFactory('', '')
-        })
-    };
-
+    const adapter = new TeamsAdapter();
     const adaptiveCards: AdaptiveCardsOptions = { actionSubmitFilter: 'cardFilter' };
     const ai: AIOptions<TurnState> = { planner: new TestPlanner() };
     const longRunningMessages = true;

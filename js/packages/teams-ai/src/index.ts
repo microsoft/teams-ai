@@ -29,5 +29,4 @@ export * from './TestTurnState';
 export * from './TurnState';
 export * from './Utilities';
 export * from './authentication/TeamsBotSsoPrompt';
-export * from './TeamsBotFrameworkAuthentication';
-export * from './BotAdapterOptions';
+export * from './TeamsAdapter';

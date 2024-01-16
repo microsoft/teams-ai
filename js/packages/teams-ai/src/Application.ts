@@ -11,7 +11,6 @@ import {
     Activity,
     ActivityTypes,
     BotAdapter,
-    CloudAdapter,
     ConversationReference,
     FileConsentCardResponse,
     O365ConnectorCardActionQuery,
@@ -36,7 +35,7 @@ import {
     setUserInSignInFlow,
     userInSignInFlow
 } from './authentication/BotAuthenticationBase';
-import { BotAdapterOptions } from './BotAdapterOptions';
+import { TeamsAdapter } from './TeamsAdapter';
 
 /**
  * @private
@@ -72,7 +71,7 @@ export interface ApplicationOptions<TState extends TurnState> {
     /**
      * Optional. Options used to initialize your `BotAdapter`
      */
-    adapter?: BotAdapter | BotAdapterOptions;
+    adapter?: TeamsAdapter;
 
     /**
      * Optional. OAuth prompt settings to use for authentication.
@@ -247,13 +246,7 @@ export class Application<TState extends TurnState = TurnState> {
 
         // Create Adapter
         if (this._options.adapter) {
-            if ('authentication' in this._options.adapter) {
-                if (this._options.adapter?.authentication) {
-                    this._adapter = new CloudAdapter(this._options.adapter.authentication);
-                }
-            } else {
-                this._adapter = this._options.adapter as BotAdapter;
-            }
+            this._adapter = this._options.adapter;
         }
 
         // Create AI component if configured with a planner
