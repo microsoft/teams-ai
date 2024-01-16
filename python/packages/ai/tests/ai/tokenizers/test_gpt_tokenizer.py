@@ -13,16 +13,16 @@ class TestGPTTokenizer(unittest.TestCase):
         self.tokenizer = GPTTokenizer()
 
     def test_encode(self):
-        text = "hello world"
-        expected_result = [31373, 995]
+        text = "tiktoken is great!"
+        expected_result = [83, 1609, 5963, 374, 2294, 0]
         result = self.tokenizer.encode(text)
         self.assertEqual(
             result, expected_result, "Expected result does not match the encoded result"
         )
 
     def test_decode(self):
-        tokens = [31373, 995]
-        expected_result = "hello world"
+        tokens = [83, 1609, 5963, 374, 2294, 0]
+        expected_result = "tiktoken is great!"
         result = self.tokenizer.decode(tokens)
         self.assertEqual(
             result, expected_result, "Expected result does not match the decoded result"
