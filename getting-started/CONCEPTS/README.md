@@ -10,6 +10,7 @@ Here you will find short guides on features available in the library.
 | --------------------------------------- | ------------------------------------------------- |
 | [Turn Context and Turn State](TURNS.md) | Explains what the turn context and turn state is. |
 | [The Application class](APPLICATION.md) | What the `Application` class is and how it works. |
+| [User Authentication](USER-AUTH.md) | Describes user authentication features out of the box  |
 
 
 <br>
