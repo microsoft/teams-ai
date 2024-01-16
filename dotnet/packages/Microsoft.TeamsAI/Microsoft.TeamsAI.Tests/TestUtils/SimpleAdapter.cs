@@ -14,6 +14,7 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
         public SimpleAdapter() : base()
         {
+
         }
 
         public SimpleAdapter(Action<Activity[]> callOnSend) : base()

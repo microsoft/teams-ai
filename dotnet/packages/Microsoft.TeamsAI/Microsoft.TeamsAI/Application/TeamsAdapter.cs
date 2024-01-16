@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.Integration.AspNet.Core;
+﻿using Json.More;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
@@ -12,9 +13,17 @@ namespace Microsoft.Teams.AI
     public class TeamsAdapter : CloudAdapter
     {
         /// <summary>
+        /// The Http Client Factory
+        /// </summary>
+        public IHttpClientFactory HttpClientFactory { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TeamsAdapter"/> class. (Public cloud. No auth. For testing.)
         /// </summary>
-        public TeamsAdapter() : base() { }
+        public TeamsAdapter() : base()
+        {
+            HttpClientFactory = new TeamsHttpClientFactory();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TeamsAdapter"/> class.
@@ -30,7 +39,7 @@ namespace Microsoft.Teams.AI
                 new TeamsHttpClientFactory(httpClientFactory),
                 logger)
         {
-
+            HttpClientFactory = new TeamsHttpClientFactory(httpClientFactory);
         }
     }
 
