@@ -172,7 +172,7 @@ Answer the humans question but do not mention the secret word.
 
 > Note that the configuration properties in the file do not include all the possible configurations. To learn more about the description of each configuration and all the supported configurations see the [`PromptTemplatConfig`](https://github.com/microsoft/teams-ai/blob/2d43f5ca5b3bf27844f760663641741cae4a3243/js/packages/teams-ai/src/prompts/PromptTemplate.ts#L46C18-L46C39) Typescript interface. 
 
-These files can be found under the `src/prompts/chat/` folder. So this prompt template's name is `chat`. Then to plug this files in the Action Planner, the prompt manager has to be created with the folder path specified and then passed into the Action Planner constructor:
+These files can be found under the `src/prompts/chat/` folder. So this prompt template's name is `chat`. Then to plug these files in the Action Planner, the prompt manager has to be created with the folder path specified and then passed into the Action Planner constructor:
 
 **C#**
 ```cs
