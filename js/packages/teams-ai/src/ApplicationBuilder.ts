@@ -1,7 +1,7 @@
-import { Storage, BotAdapter } from 'botbuilder';
+import { Storage } from 'botbuilder';
 
 import { Application, ApplicationOptions } from './Application';
-import { BotAdapterOptions } from './BotAdapterOptions';
+import { TeamsAdapter } from './TeamsAdapter';
 import { AIOptions } from './AI';
 import { TurnState } from './TurnState';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
@@ -18,11 +18,11 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
     /**
      * Configures the application to use long running messages.
      * Default state for longRunningMessages is false
-     * @param {BotAdapter | BotAdapterOptions} adapter The adapter to use for routing incoming requests.
+     * @param {TeamsAdapter} adapter The adapter to use for routing incoming requests.
      * @param {string} botAppId The Microsoft App ID for the bot.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withLongRunningMessages(adapter: BotAdapter | BotAdapterOptions, botAppId: string): this {
+    public withLongRunningMessages(adapter: TeamsAdapter, botAppId: string): this {
         if (!botAppId) {
             throw new Error(
                 `The Application.longRunningMessages property is unavailable because botAppId cannot be null or undefined.`
@@ -77,14 +77,11 @@ export class ApplicationBuilder<TState extends TurnState = TurnState> {
 
     /**
      * Configures user authentication settings.
-     * @param {BotAdapter | BotAdapterOptions} adapter The adapter to use for user authentication.
+     * @param {TeamsAdapter} adapter The adapter to use for user authentication.
      * @param {AuthenticationOptions} authenticationOptions The options to configure the authentication manager.
      * @returns {this} The ApplicationBuilder instance.
      */
-    public withAuthentication(
-        adapter: BotAdapter | BotAdapterOptions,
-        authenticationOptions: AuthenticationOptions
-    ): this {
+    public withAuthentication(adapter: TeamsAdapter, authenticationOptions: AuthenticationOptions): this {
         this._options.adapter = adapter;
         this._options.authentication = authenticationOptions;
         return this;
