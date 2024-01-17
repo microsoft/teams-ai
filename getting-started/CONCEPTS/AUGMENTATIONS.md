@@ -44,7 +44,7 @@ Here's an example of the `actions.json` file from the [Light Bot](https://github
 
 It defines three actions, `LightsOn`, `LightsOff` and `Pause`. The `Pause` action requires the `time` parameter, while the other two doesn't.
 
-These actions are then used and appended to the prompt text in runtime. This is text added to end of the prompt text:
+These actions are then appended to the prompt text in runtime. This is text added to end of the prompt text:
 
 ```txt
 actions:
@@ -84,7 +84,7 @@ The first section lists the actions in yaml structure. The second sections tells
 
 ### Configuring your prompt
 
-To use sequence augmentation in your prompt there are two steps.
+There are two steps to use sequence augmentation in your prompt:
 
 1. Update the prompt's `config.json` by adding the `augmentation` property. 
 ```diff
