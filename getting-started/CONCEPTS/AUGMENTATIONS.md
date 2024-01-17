@@ -84,7 +84,7 @@ The first section lists the actions in yaml structure. The second sections tells
 
 ### Configuring your prompt
 
-To use sequence augmentation in your prompt there are two steps.
+There are two steps to use sequence augmentation in your prompt:
 
 1. Update the prompt's `config.json` by adding the `augmentation` property. 
 ```diff
