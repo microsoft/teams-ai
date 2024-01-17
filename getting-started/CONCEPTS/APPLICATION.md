@@ -65,3 +65,5 @@ When an incoming activity reaches the server, the bot adapter handles the necess
 > Note: _End the turn_ means that the main method has terminated execution and so the application has completed processing the incomming activity. 
 
 > Note: To learn about what a *turn* is, see [TURNS](TURNS.md).
+
+![the routing logic](../assets/routing-logic.png)
