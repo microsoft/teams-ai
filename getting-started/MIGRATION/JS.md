@@ -49,7 +49,7 @@ const app = new ApplicationBuilder()<TurnState>
 
 ## 2. Replace the activity handler implementations with specific route registration methods
 
-The `BotActivityHandler` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route registration method in the `Application` object. Here's a simple example:
+The `BotActivityHandler` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route registration method (`handler`) in the `Application` object. Here's a simple example:
 
 Given the `BotActivityHandler` implementation:
 

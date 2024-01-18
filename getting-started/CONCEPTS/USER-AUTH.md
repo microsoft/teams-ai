@@ -54,7 +54,7 @@ The `text` property is the titie and the `text` property is the body of the sign
 
 ### Auto sign in
 
-With this configuration, the bot will attempt to authenticate the user when they try to interact with it. To control when for which incomming activities the bot should authenticate the user, you can specify configure the auto sign in property in the options.
+With this configuration, the bot will attempt to authenticate the user when they try to interact with it. To control when for which incoming activities the bot should authenticate the user, you can specify configure the auto sign in property in the options.
 
 **C#**
 ```cs
@@ -70,7 +70,7 @@ options.AutoSignIn = (ITurnContext turnContext, CancellationToken cancellationTo
  };
 ```
 
-**Javascript**
+**JavaScript**
 ```ts
 .withAuthentication(adapter, {
     // settings: {
