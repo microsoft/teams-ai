@@ -7,6 +7,7 @@
  */
 
 import { Channels, TurnContext } from 'botbuilder';
+
 import { DefaultModerator } from './moderators';
 import { Moderator } from './moderators/Moderator';
 import { PredictedDoCommand, PredictedSayCommand, Planner, Plan } from './planners';
@@ -313,14 +314,14 @@ export class AI<TState extends TurnState = TurnState> {
      * Returns the moderator being used by the AI system.
      * @remarks
      * The default moderator simply allows all messages and plans through without intercepting them.
-     * @returns The AI's moderator
+     * @returns {Moderator} The AI's moderator
      */
     public get moderator(): Moderator<TState> {
         return this._options.moderator;
     }
 
     /**
-     * @returns Returns the planner being used by the AI system.
+     * @returns {Planner<TState>} Returns the planner being used by the AI system.
      */
     public get planner(): Planner<TState> {
         return this._options.planner;
@@ -342,9 +343,13 @@ export class AI<TState extends TurnState = TurnState> {
      * handler for them. The names of the built-in actions are available as static properties on
      * the AI class.
      * @template TParameters Optional. The type of parameters that the action handler expects.
-     * @param name Unique name of the action.
-     * @param handler Function to call when the action is triggered.
-     * @returns The AI system instance for chaining purposes.
+     * @param {string | string[]} name Unique name of the action.
+     * @callback handler
+     * @param {Function} handler The code to execute when the _ is triggered.
+     * @param {TurnContext} handler.context The current turn context for the handler callback.
+     * @param {TState} handler.state The current turn state for the handler callback.
+     * @param {TParameters} handler.parameters Optional. Entities to pass to the action.
+     * @returns {this} The AI system instance for chaining purposes.
      */
     public action<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
@@ -374,9 +379,12 @@ export class AI<TState extends TurnState = TurnState> {
      * @remarks
      * Default handlers can be replaced by calling the action() method with the same name.
      * @template TParameters Optional. The type of parameters that the action handler expects.
-     * @param name Unique name of the action.
-     * @param handler Function to call when the action is triggered.
-     * @returns The AI system instance for chaining purposes.
+     * @param {string | string[]} name Unique name of the action.
+     * @callback handler
+     * @param {Function} handler The code to execute when the _ is triggered.
+     * @param {TurnContext} handler.context The current turn context for the handler callback.
+     * @param {TState} handler.state The current turn state for the handler callback.
+     * @returns {this} The AI system instance for chaining purposes.
      */
     public defaultAction<TParameters extends Record<string, any> | undefined>(
         name: string | string[],
@@ -392,11 +400,11 @@ export class AI<TState extends TurnState = TurnState> {
     /**
      * Manually executes a named action.
      * @template TParameters Optional. Type of entities expected to be passed to the action.
-     * @param context Current turn context.
-     * @param state Current turn state.
-     * @param action Name of the action to execute.
-     * @param parameters Optional. Entities to pass to the action.
-     * @returns True if the action thinks other actions should be executed.
+     * @param {TurnContext} context Current turn context.
+     * @param {TState} state Current turn state.
+     * @param {string} action Name of the action to execute.
+     * @param {TParameters} parameters Optional. Entities to pass to the action.
+     * @returns {Promise<string>} The result of the action.
      */
     public async doAction<TParameters = Record<string, any>>(
         context: TurnContext,
@@ -414,8 +422,8 @@ export class AI<TState extends TurnState = TurnState> {
 
     /**
      * Checks to see if the AI system has a handler for a given action.
-     * @param action Name of the action to check.
-     * @returns True if the AI system has a handler for the given action.
+     * @param {string} action Name of the action to check.
+     * @returns {boolean} True if the AI system has a handler for the given action.
      */
     public hasAction(action: string): boolean {
         return this._actions.has(action);
@@ -427,11 +435,11 @@ export class AI<TState extends TurnState = TurnState> {
      * The moderator is called to review the input and output of the plan. If the moderator flags
      * the input or output then the appropriate action is called. If the moderator allows the input
      * and output then the plan is executed.
-     * @param context Current turn context.
-     * @param state Current turn state.
-     * @param start_time Optional. Time the AI system started running
-     * @param step_count Optional. Number of steps that have been executed.
-     * @returns True if the plan was completely executed, otherwise false.
+     * @param {TurnContext} context Current turn context.
+     * @param {TState} state Current turn state.
+     * @param {number} start_time Optional. Time the AI system started running
+     * @param {number} step_count Optional. Number of steps that have been executed.
+     * @returns {Promise<boolean>} True if the plan was completely executed, otherwise false.
      */
     public async run(context: TurnContext, state: TState, start_time?: number, step_count?: number): Promise<boolean> {
         // Initialize start time and action count

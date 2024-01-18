@@ -25,7 +25,8 @@ export interface TestPromptManagerOptions extends PromptManagerOptions {
 export class TestPromptManager extends PromptManager {
     /**
      * Creates a new `TestPromptManager` instance.
-     * @param options Optional. Options used to configure the prompt manager.
+     * @param {Partial<TestPromptManagerOptions>} options Optional. Options used to configure the prompt manager.
+     * @returns {TestPromptManager} A new `TestPromptManager` instance.
      */
     public constructor(options: Partial<TestPromptManagerOptions> = {}) {
         super(
@@ -44,7 +45,8 @@ export class TestPromptManager extends PromptManager {
     }
 
     /**
-     * @param name
+     * @param {string} name of the PromptTemplate to retrieve.
+     * @returns {Promise<PromptTemplate>} The PromptTemplate with the given name.
      * @private
      */
     public override getPrompt(name: string): Promise<PromptTemplate> {
