@@ -47,14 +47,14 @@ The user can register custom actions or override default actions in the system. 
 
 | Action                | Called when                                                                                     |
 | --------------------- | ----------------------------------------------------------------------------------------------- |
-| `___UnkownAction___`   | An unknown action is predicted by the planner.                                   |
+| `___UnknownAction___`   | An unknown action is predicted by the planner.                                   |
 | `___FlaggedInput___`  | The input is flagged by the moderator.                                            |
 | `___FlaggedOutput___` | The output is flagged by the moderator.                                           |
 | `___HttpError___`     | The planner encounters an HTTP response with status code >= `400`       |
 | `__TooManySteps__` | The planner task either executed too many steps or timed out. |
 | `___PlanReady___`     | The plan has been predicted by the planner and it has passed moderation. This can be overriden to mutate the plan before execution.           |
 | `___DO___`            | The AI system is executing a plan with the DO command. Overriding this action will change how _all_ DO commands are handled.   |
-| `___SAY___`           | The AI system is executing a plan wit the SAY command. Overriding this action will change how _all_ SAY commands are handled. By default this will send the `response` message back to the user. |
+| `___SAY___`           | The AI system is executing a plan with the SAY command. Overriding this action will change how _all_ SAY commands are handled. By default this will send the `response` message back to the user. |
 
 > Detailed description of each action can be found in the codebase.
 
