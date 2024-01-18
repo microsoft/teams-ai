@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import { strict as assert } from 'assert';
+
 import { Application, Query } from './Application';
 import { createTestInvoke } from './internals/testing/TestUtilities';
 import { MessageExtensions, MessageExtensionsInvokeNames } from './MessageExtensions';

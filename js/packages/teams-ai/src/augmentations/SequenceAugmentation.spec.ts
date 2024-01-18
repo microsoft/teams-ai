@@ -1,10 +1,11 @@
-import { TestAdapter } from 'botbuilder';
-import { TestPromptManager } from '../prompts';
-import { GPT3Tokenizer } from '../tokenizers';
 import assert from 'assert';
-import { ChatCompletionAction, PromptResponse } from '../models';
-import { SequenceAugmentation } from './SequenceAugmentation';
+import { TestAdapter } from 'botbuilder';
+
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
+import { ChatCompletionAction, PromptResponse } from '../models';
+import { GPT3Tokenizer } from '../tokenizers';
+import { SequenceAugmentation } from './SequenceAugmentation';
 
 describe('SequenceAugmentation', () => {
     const adapter = new TestAdapter();

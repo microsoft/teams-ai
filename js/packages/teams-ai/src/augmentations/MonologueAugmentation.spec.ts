@@ -1,5 +1,6 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
+
 import { GPT3Tokenizer } from '../tokenizers';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
