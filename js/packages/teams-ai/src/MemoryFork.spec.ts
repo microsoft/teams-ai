@@ -1,6 +1,7 @@
 import assert from 'assert';
+
+import { TestMemoryFork } from './internals/testing/TestMemoryFork';
 import { MemoryFork } from './MemoryFork';
-import { TestMemoryFork } from './TestMemoryFork';
 
 describe('MemoryFork', () => {
     let mockMemory: MemoryFork;

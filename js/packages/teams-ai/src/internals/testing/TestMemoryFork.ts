@@ -1,4 +1,4 @@
-import { Memory } from './MemoryFork';
+import { Memory } from '../../MemoryFork';
 
 /**
  * @private

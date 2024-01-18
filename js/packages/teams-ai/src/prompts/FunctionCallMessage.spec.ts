@@ -1,10 +1,10 @@
 import assert from 'assert';
+import { TestAdapter } from 'botbuilder-core';
 import { FunctionCallMessage } from './FunctionCallMessage';
 import { FunctionCall } from './Message';
-import { TestAdapter } from 'botbuilder-core';
-import { TestTurnState } from '../TestTurnState';
+import { TestTurnState } from '../internals/testing/TestTurnState';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestPromptManager } from './TestPromptManager';
 
 describe('FunctionCallMessage', () => {
     const functionCall: FunctionCall = {

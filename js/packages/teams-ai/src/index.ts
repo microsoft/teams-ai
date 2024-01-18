@@ -25,7 +25,6 @@ export * from './MemoryFork';
 export * from './MessageExtensions';
 export * from './TaskModules';
 export * from './TeamsAttachmentDownloader';
-export * from './TestTurnState';
 export * from './TurnState';
 export * from './Utilities';
 export * from './authentication/TeamsBotSsoPrompt';

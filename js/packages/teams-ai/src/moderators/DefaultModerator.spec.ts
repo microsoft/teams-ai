@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
-import { DefaultModerator } from './DefaultModerator';
 import { TestAdapter } from 'botbuilder';
-import { TestTurnState } from '../TestTurnState';
+import { DefaultModerator } from './DefaultModerator';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { Plan, PredictedDoCommand } from '../planners/Planner';
 
 describe('DefaultModerator', () => {

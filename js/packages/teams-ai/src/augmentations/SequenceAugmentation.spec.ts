@@ -4,7 +4,7 @@ import { GPT3Tokenizer } from '../tokenizers';
 import assert from 'assert';
 import { ChatCompletionAction, PromptResponse } from '../models';
 import { SequenceAugmentation } from './SequenceAugmentation';
-import { TestTurnState } from '../TestTurnState';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 
 describe('SequenceAugmentation', () => {
     const adapter = new TestAdapter();

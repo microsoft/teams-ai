@@ -1,4 +1,4 @@
-import { TurnState } from './TurnState';
+import { TurnState } from '../../TurnState';
 import { MemoryStorage, TurnContext } from 'botbuilder';
 
 /**
@@ -14,12 +14,12 @@ export class TestTurnState extends TurnState {
 
     /**
      * Creates a new `TestTurnState` instance.
-     * @param context Context for the current turn of conversation with the user.
-     * @param testState Optional. State to initialize the new instance with.
-     * @param testState.user
-     * @param testState.conversation
-     * @param testState.temp
-     * @returns Created `TestTurnState` instance.
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @param {TestTurnState} testState Optional. State to initialize the new instance with.
+     * @param {any} testState.user User state to initialize the new instance with.
+     * @param {any} testState.conversation Conversation state to initialize the new instance with.
+     * @param {any} testState.temp Temporary state to initialize the new instance with.
+     * @returns {Promise<TestTurnState>} Created `TestTurnState` instance.
      */
     public static async create(
         context: TurnContext,

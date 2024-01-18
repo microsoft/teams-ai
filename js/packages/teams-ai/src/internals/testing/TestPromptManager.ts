@@ -6,8 +6,8 @@
  * Licensed under the MIT License.
  */
 
-import { PromptManager, PromptManagerOptions } from './PromptManager';
-import { PromptTemplate } from './PromptTemplate';
+import { PromptManager, PromptManagerOptions } from '../../prompts/PromptManager';
+import { PromptTemplate } from '../../prompts/PromptTemplate';
 
 /**
  * Options used to configure a `TestPromptManager` instance.

@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert';
-import { TextSection } from './TextSection';
 import { TestAdapter } from 'botbuilder';
-import { TestPromptManager } from './TestPromptManager';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestTurnState } from '../TestTurnState';
+import { TextSection } from './TextSection';
 
 describe('TextSection', () => {
     const adapter = new TestAdapter();

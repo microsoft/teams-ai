@@ -1,9 +1,9 @@
 import assert from 'assert';
-import { DefaultAugmentation } from './DefaultAugmentation';
 import { TestAdapter } from 'botbuilder';
-import { TestTurnState } from '../TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { PromptResponse } from '../models';
+import { GPT3Tokenizer } from '../tokenizers';
+import { DefaultAugmentation } from './DefaultAugmentation';
 
 describe('DefaultAugmentation', () => {
     const adapter = new TestAdapter();

@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
-import { TestModel } from './TestModel';
 import { TestAdapter } from 'botbuilder';
-import { TestTurnState } from '../TestTurnState';
+import { TestModel } from './TestModel';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { GPT3Tokenizer } from '../tokenizers';
 import { PromptTemplate, SystemMessage, TestPromptManager } from '../prompts';
 
