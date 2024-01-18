@@ -70,7 +70,7 @@ options.AutoSignIn = (ITurnContext turnContext, CancellationToken cancellationTo
  };
 ```
 
-**Javascript**
+**JavaScript**
 ```ts
 .withAuthentication(adapter, {
     // settings: {
