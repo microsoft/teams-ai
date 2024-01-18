@@ -52,6 +52,8 @@ The `connectionName` property is what you configure in the Azure Bot Resource, s
 
 The `text` property is the titie and the `text` property is the body of the sign in card sent to the user.
 
+### Auto sign in
+
 With this configuration, the bot will attempt to authenticate the user when they try to interact with it. To control when for which incomming activities the bot should authenticate the user, you can specify configure the auto sign in property in the options.
 
 **C#**
@@ -92,7 +94,11 @@ options.AutoSignIn = (ITurnContext turnContext, CancellationToken cancellationTo
 
 The `autoSignIn` property takes a callback that triggers the sign in flow if it returns true. It depends on the turn context from which the incomming activity details can be extracted. In the above example, the library will not attempt to sign the user in if the incomming activity `commandId` is *"signOutCommand"*.
 
-This is useful if the user should be signed in by default before attempting to interacting with the bot in general. If the user should only be authenticated in certain scenarios then you can disable auto sign in by having the callback alway return false and trigger authentication manually.
+This is useful if the user should be signed in by default before attempting to interacting with the bot in general. 
+
+### Manual Sign In
+
+If the user should only be authenticated in certain scenarios then you can disable auto sign in by having the callback alway return false and trigger authentication manually.
 
 Here's an example of manually triggering sign in flow in an activity or action handler:
 
@@ -119,6 +125,8 @@ The `app.getTokenOrStartSignIn` method will attempt to get the access token if t
 If multiple settings are configured then the user can be authenticated into multiple services through the manual triggering of the sign in flow.
 
 **Note:** Once the sign in flow completes the application is NOT redirected back to it's previous task, when triggered from message activity or in action handler. This means that if user authentication is triggered through a message extension, then the same activity will be sent again to the bot after sign in completes. But if sign in is triggered when the incomming activity is a message then the same activitiy will NOT be sent again to the bot after sign in completes.
+
+### Handling sign in success or failure
 
 To handle the event when the user has signed successfully or failed to sign in simply register corresponding handler:
 
@@ -155,6 +163,8 @@ app.authentication.get('graph').onUserSignInFailure(async (context: TurnContext,
     await context.sendActivity(`Error message: ${error.message}`);
 });
 ```
+
+### Sign out a user
 
 You can also sign a user out of connection:
 
