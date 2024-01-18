@@ -438,8 +438,9 @@ export class TurnState<
     }
 
     /**
-     * @param path
      * @private
+     * @param {string} path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
+     * @returns {{ scope: TurnStateEntry; name: string }} Scope and name.
      */
     private getScopeAndName(path: string): { scope: TurnStateEntry; name: string } {
         // Get variable scope and name
@@ -461,7 +462,6 @@ export class TurnState<
 
 /**
  * Accessor class for managing an individual state scope.
- * @template TValue Optional. Strongly typed value of the state scope.
  */
 export class TurnStateEntry {
     private _value: Record<string, unknown>;
@@ -471,7 +471,7 @@ export class TurnStateEntry {
 
     /**
      * Creates a new instance of the `TurnStateEntry` class.
-     * @param {TValue} value Optional. Value to initialize the state scope with. The default is an {} object.
+     * @param {Record<string, unknown>} value Optional. Value to initialize the state scope with. The default is an {} object.
      * @param {string} storageKey Optional. Storage key to use when persisting the state scope.
      */
     public constructor(value?: Record<string, unknown>, storageKey?: string) {
