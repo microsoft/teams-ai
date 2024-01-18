@@ -10,8 +10,6 @@ import * as restify from 'restify';
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
     Attachment,
-    CloudAdapter,
-    ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     MessageFactory,
@@ -20,11 +18,27 @@ import {
     TurnContext
 } from 'botbuilder';
 
+import {
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
+    DefaultTempState,
+    DefaultConversationState,
+    DefaultUserState,
+    ApplicationBuilder,
+    TeamsAdapter
+} from '@microsoft/teams-ai';
+
+import { createInitialView, createEditView, createPostCard } from './cards';
+
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+// Create adapter.
+// See https://aka.ms/about-bot-adapter to learn more about how bots work.
+const adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
         MicrosoftAppId: process.env.BOT_ID,
@@ -32,10 +46,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
         MicrosoftAppType: 'MultiTenant'
     })
 );
-
-// Create adapter.
-// See https://aka.ms/about-bot-adapter to learn more about how bots work.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: any) => {
@@ -70,18 +80,6 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
-
-import {
-    ActionPlanner,
-    OpenAIModel,
-    PromptManager,
-    TurnState,
-    DefaultTempState,
-    DefaultConversationState,
-    DefaultUserState,
-    ApplicationBuilder
-} from '@microsoft/teams-ai';
-import { createInitialView, createEditView, createPostCard } from './cards';
 
 // This Message Extension can either drop the created card into the compose window (default.)
 // Or use Teams botMessagePreview feature to post the activity directly to the feed onBehalf of the user.
