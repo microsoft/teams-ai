@@ -23,7 +23,7 @@ public bool CreateList([ActionTurnState] ListState turnState, [ActionParameters]
 }
 ```
 
-> Adding the `Action` attribute marks the method as an action. To register it to the AI System you have pass the instance object containing this method to the `AI.ImportActions(instance)` method. Alternatively you can use the `AI.RegisterAction(name, handler)` to register a single action.
+> Adding the `Action` attribute marks the method as an action. To register it to the AI System you have pass the instance object containing this method to the `AI.ImportActions(instance)` method. Alternatively, you can use the `AI.RegisterAction(name, handler)` to register a single action.
 
 ### JS
 
