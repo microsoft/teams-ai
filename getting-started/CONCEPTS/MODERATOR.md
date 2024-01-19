@@ -4,11 +4,10 @@ The `Moderator` is responsible for reviewing the input prompt and approving the 
 
 The AI system is such that developers can create their own moderator class by simply implementing the moderator interface. The library has a few native moderators that can be used out of the box:
 
-| Name                        | Description                             |
-|-----------------------------|-----------------------------------------|
-| [OpenAIModerator](#openai-moderator)             | Wrapper around OpenAI's [Moderation API](https://platform.openai.com/docs/api-reference/moderations). |
+| Name                                                           | Description                                                                                                            |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [OpenAIModerator](#openai-moderator)                           | Wrapper around OpenAI's [Moderation API](https://platform.openai.com/docs/api-reference/moderations).                  |
 | [AzureContentSafetyModerator](#azure-content-safety-moderator) | Wrapper around [Azure Content Safety](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview) API |
-
 
 ## OpenAI Moderator
 
