@@ -120,7 +120,7 @@ if (!token) {
 }
 ```
 
-The `app.getTokenOrStartSignIn` method will attempt to get the access token if the user is already signed in. Otherwise, the sign in flow will be triggered. The string `'graph'` references the connection name set by the user in the `settings` object of the authentication options.
+The `app.getTokenOrStartSignIn` method will attempt to get the access token if the user is already signed in. Otherwise, the sign in flow will be triggered. The string `'graph'` below references the connection name set by the user in the `settings` object of the authentication options.
 
 If multiple settings are configured then the user can be authenticated into multiple services through the manual triggering of the sign in flow.
 
