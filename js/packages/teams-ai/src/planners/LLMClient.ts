@@ -479,7 +479,7 @@ export class LLMClient<TContent = any> {
             return {
                 status: 'invalid_response',
                 input: undefined,
-                error: new Error(validation.feedback ?? 'The response was invalid. Try another strategy.')
+                error: new Error(`Reached max model response repair attempts. Last feedback given to model: ${feedback}`)
             };
         }
 
