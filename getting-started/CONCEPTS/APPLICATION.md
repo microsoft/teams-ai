@@ -50,7 +50,7 @@ The AI System is an optional component used to plug in LLM powered experiences l
 
 ## The Routing Logic
 
-When an incoming activity reaches the server, the bot adapter handles the necessary authentication and creates a turn context object that encapsulates the activity details. Then the `Application`'s main method (`run()` in Javscript. `OnTurnAsync()` in C#) is called. It's logic can be broken down into these eight steps. 
+When an incoming activity reaches the server, the bot adapter handles the necessary authentication and creates a turn context object that encapsulates the activity details. Then the `Application`'s main method (`run()` in Javscript. `OnTurnAsync()` in C#) is called. Its logic can be broken down into these eight steps. 
 
 1. If configured in the application options, pulses of the `Typing` activity are sent to the user.
 2. If configured in the application options, the @mention is removed from the incoming message activity.
