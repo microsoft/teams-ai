@@ -122,7 +122,7 @@ if (!token) {
 
 The `app.getTokenOrStartSignIn` method will attempt to get the access token if the user is already signed in. Otherwise, the sign in flow will be triggered. The string `'graph'` below references the connection name set by the user in the `settings` object of the authentication options.
 
-If multiple settings are configured then the user can be authenticated into multiple services through the manual triggering of the sign in flow.
+If multiple settings are configured, then the user can be authenticated into multiple services through the manual triggering of the sign in flow.
 
 **Note:** Once the sign in flow completes the application is NOT redirected back to it's previous task, when triggered from message activity or in action handler. This means that if user authentication is triggered through a message extension, then the same activity will be sent again to the bot after sign in completes. But if sign in is triggered when the incomming activity is a message then the same activitiy will NOT be sent again to the bot after sign in completes.
 
