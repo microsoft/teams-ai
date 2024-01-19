@@ -117,7 +117,7 @@ The learn more about the action object schema see the corresponding typescript i
 
 ## Monologue Augmentation
 
-This augmentation adds support for an inner monologue to the prompt. The monologue helps the LLM to perform chain-of-thought reasoning across multiple turns of conversation. It does this by appending instructions to the prompt text in runtime. It tells the model to explicitly show it's thought, reasoning & plan in response to the user's message and predict the next action to execute. If looping is configured, then the predicted action can guide the model to predict the next action by returning the instruction as a string in the action handler callback. The loop will terminate as soon as the model predicts a *SAY* action, which sends the response back to the user.
+This augmentation adds support for an inner monologue to the prompt. The monologue helps the LLM perform chain-of-thought reasoning across multiple turns of conversation. It does this by appending instructions to the prompt text during runtime. It tells the model to explicitly show it's thought, reasoning and plan in response to the user's message, then predict the next action to execute. If looping is configured, then the predicted action can guide the model to predict the next action by returning the instruction as a string in the action handler callback. The loop will terminate as soon as the model predicts a *SAY* action, which sends the response back to the user.
 
 Using the `actions.json` example from abovce, the instructions appended to the prompt look like this:
 
