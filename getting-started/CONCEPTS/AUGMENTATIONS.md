@@ -13,7 +13,7 @@ This augmentation allows the model to return a sequence of actions to perform. I
 
 Here's an example of the `actions.json` file from the [Light Bot](https://github.com/microsoft/teams-ai/blob/77339da9e3e03bfd7f629fc796cfebdcd2891afb/js/samples/04.ai.c.actionMapping.lightBot/src/prompts/sequence/actions.json) sample:
 
-```js
+```json
 [
     {
         "name": "LightsOn",
