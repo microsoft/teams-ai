@@ -59,7 +59,7 @@ When an incoming activity reaches the server, the bot adapter handles the necess
 5. The `beforeTurn` activity handler is executed. If it returns false, save turn state to storage and end the turn.
 6. All the routes are iterated over and if a selector function is triggered, then the corresponding route handler is executed.
 7. If no route is triggered, the incoming activity is a message, and an AI System is configured, then it is invoked by calling the `AI.run()` method.
-8. The `AfterTurnAsync` activity handler is executed. If it return true, save turn state to storage.
+8. The `AfterTurnAsync` activity handler is executed. If it returns true, save turn state to storage.
 
 
 > Note: _End the turn_ means that the main method has terminated execution and so the application has completed processing the incomming activity. 
