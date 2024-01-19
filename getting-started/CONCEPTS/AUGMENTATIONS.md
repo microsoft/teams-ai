@@ -9,7 +9,7 @@ It is recommended to read the [AI System](./AI-SYSTEM.md) and [Action Planner](.
 
 ## Sequence Augmentation
 
-This augmentation allows the model to return a sequence of actions to perform. It does this by appending instructions to the prompt text in runtime. These instructions guide the model to generate a plan object that uses actions defined in the `actions.json` file from the prompt template folder. 
+This augmentation allows the model to return a sequence of actions to perform. It does this by appending instructions to the prompt text during runtime. These instructions guide the model to generate a plan object that uses actions defined in the `actions.json` file from the prompt template folder. 
 
 Here's an example of the `actions.json` file from the [Light Bot](https://github.com/microsoft/teams-ai/blob/77339da9e3e03bfd7f629fc796cfebdcd2891afb/js/samples/04.ai.c.actionMapping.lightBot/src/prompts/sequence/actions.json) sample:
 

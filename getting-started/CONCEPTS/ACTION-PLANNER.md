@@ -4,7 +4,7 @@ The Action Planner is a powerful planner that uses an LLM to generate plans. It 
 
 ### [Prompt Management](./PROMPTS.md)
 
-The Action Planner has a built-in prompt management system that supports creating prompt templates as folders in the file system. A prompt template is the prompt text along with all the configurations for completion with the LLM model. Dynamic prompts are also supported with template variables and functions.
+The Action Planner has a built-in prompt management system that supports creating prompt templates as folders in the file system. A prompt template is the prompt text along with all the configurations for completion with the LLM model. Dynamic prompts also support template variables and functions.
 
 ### [Augmentations](./AUGMENTATIONS.md)
 Augmentations virtually eliminate the need for prompt engineering. Prompts
