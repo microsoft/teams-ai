@@ -124,7 +124,7 @@ The `app.getTokenOrStartSignIn` method will attempt to get the access token if t
 
 If multiple settings are configured, then the user can be authenticated into multiple services through the manual triggering of the sign in flow.
 
-**Note:** Once the sign in flow completes the application is NOT redirected back to it's previous task, when triggered from message activity or in action handler. This means that if user authentication is triggered through a message extension, then the same activity will be sent again to the bot after sign in completes. But if sign in is triggered when the incomming activity is a message then the same activitiy will NOT be sent again to the bot after sign in completes.
+**Note:** Once the sign in flow completes when triggered from a message activity or an action handler, the application is NOT redirected back to its previous task. This means that if user authentication is triggered through a message extension, then the same activity will be sent again to the bot after sign in completes. But if sign in is triggered when the incoming activity is a message then the same activity will NOT be sent again to the bot after sign in completes.
 
 ### Handling sign in success or failure
 
