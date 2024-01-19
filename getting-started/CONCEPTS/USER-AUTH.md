@@ -128,7 +128,7 @@ If multiple settings are configured, then the user can be authenticated into mul
 
 ### Handling sign in success or failure
 
-To handle the event when the user has signed successfully or failed to sign in simply register corresponding handler:
+To handle the event when the user has signed in successfully or failed to sign in, simply register corresponding handler:
 
 **C#**
 ```cs
