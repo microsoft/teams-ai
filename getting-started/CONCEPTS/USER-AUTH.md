@@ -92,7 +92,7 @@ options.AutoSignIn = (ITurnContext turnContext, CancellationToken cancellationTo
 })
 ```
 
-The `autoSignIn` property takes a callback that triggers the sign in flow if it returns true. It depends on the turn context from which the incomming activity details can be extracted. In the above example, the library will not attempt to sign the user in if the incomming activity `commandId` is *"signOutCommand"*.
+The `autoSignIn` property takes a callback that triggers the sign in flow if it returns true. It depends on the turn context from which the incomming activity details can be extracted. In the above example, the library will not attempt to sign the user in if the incoming activity `commandId` is *"signOutCommand"*.
 
 This is useful if the user should be signed in by default before attempting to interacting with the bot in general. 
 
