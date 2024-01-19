@@ -68,7 +68,7 @@ Here's how to define variables in code:
 
 In an *action* or *route handler* where the turn state object is available:
 ```cs
-state.Temp.Post = "Lorem Ipsium..."
+state.Temp.Post = "Lorem Ipsum..."
 ```
 
 The usage in the prompt:
@@ -76,13 +76,13 @@ The usage in the prompt:
 This is the user's post: {{ $post }}
 ```
 
-> Note: The `turnState.Temp.Post = ...` updates a dictionary with the `post` key under the hood from the [GPT Message Extension sample](https://github.com/microsoft/teams-ai/blob/a20f8715d3fe81e11c330853e3930e22abe298af/dotnet/samples/04.ai.b.messageExtensions.gptME/ActivityHandlers.cs#L156).
+> Note: The `turnState.Temp.Post = ...` updates a dictionary with the `post` key under the hood from the [AI Message Extension sample](https://github.com/microsoft/teams-ai/blob/a20f8715d3fe81e11c330853e3930e22abe298af/dotnet/samples/04.ai.b.messageExtensions.gptME/ActivityHandlers.cs#L156).
 
 **Javascript**
 
 ```typescript
 app.beforeTurn((context, state) => {
-  state.temp.post = "Lorem Ipsium...";
+  state.temp.post = "Lorem Ipsum...";
 });
 ```
 
@@ -96,16 +96,16 @@ You can simply add to the `state.temp` object, and it will be accessible from th
 
 **Default Variables**
 
-The following are variables accesible in the prompt template without having to manually configure. These are pre-defined in the turn state and populated by the library. Users can override them by changing it in the turn state.
+The following are variables accessible in the prompt template without having to manually configure them. These are pre-defined in the turn state and populated by the library. Users can override them by changing it in the turn state.
 
-| Variable name | Description                                                       |
-| ------------- | ----------------------------------------------------------------- |
-| `input`       | Input passed from the user to the AI Library. |
-| `lastOutput`      | Output returned from the last executed action.            |
+| Variable name | Description                                    |
+| ------------- | ---------------------------------------------- |
+| `input`       | Input passed from the user to the AI Library.  |
+| `lastOutput`  | Output returned from the last executed action. |
 
 ### Function calls
 
-To call an external function and embed the result in your text, use the `{{ functionName }}` syntax. For example if you have a function called `diceRoll` that returns a random number between 1 and 6, you can write:
+To call an external function and embed the result in your text, use the `{{ functionName }}` syntax. For example, if you have a function called `diceRoll` that returns a random number between 1 and 6, you can write:
 
 `The dice roll has landed on: {{ diceRoll }}`
 
@@ -132,7 +132,7 @@ prompts.addFunction('diceRoll', async (context, state, functions, tokenizer, arg
 
 # Creating Prompt Templates
 
-Each prompt template is a folder with two files, `skprompt.txt` and `config.json`. The folder name is the prompt template's name that can be referred in code. The `skprompt.txt` file contains the prompt's text, which can contain natural language or prompt template syntax as defined in the previous section. The `config.json` file specifies the prompt completion configuration.
+Each prompt template is a folder with two files, `skprompt.txt` and `config.json`. The folder name is the prompt template's name which can be referred to in your code. The `skprompt.txt` file contains the prompt's text, which can contain natural language or prompt template syntax as defined in the previous section. The `config.json` file specifies the prompt completion configuration.
 
 Here's an example of a prompt template from the [Twenty Questions](https://github.com/microsoft/teams-ai/blob/c5ec11842b808e48cd214b3cb52da84e5811da33/js/samples/04.e.twentyQuestions) sample.
 
@@ -147,7 +147,7 @@ GuessCount: {{$conversation.guessCount}}
 RemainingGuesses: {{$conversation.remainingGuesses}}
 Secret: {{$conversation.secretWord}}
 
-Answer the humans question but do not mention the secret word.
+Answer the human's question but do not mention the secret word.
 ```
 
 *config.json*
@@ -172,7 +172,7 @@ Answer the humans question but do not mention the secret word.
 
 > Note that the configuration properties in the file do not include all the possible configurations. To learn more about the description of each configuration and all the supported configurations see the [`PromptTemplatConfig`](https://github.com/microsoft/teams-ai/blob/2d43f5ca5b3bf27844f760663641741cae4a3243/js/packages/teams-ai/src/prompts/PromptTemplate.ts#L46C18-L46C39) Typescript interface. 
 
-These files can be found under the `src/prompts/chat/` folder. So this prompt template's name is `chat`. Then to plug these files in the Action Planner, the prompt manager has to be created with the folder path specified and then passed into the Action Planner constructor:
+These files can be found under the `src/prompts/chat/` folder. So, this prompt template's name is `chat`. Then, to plug these files in the Action Planner, the prompt manager has to be created with the folder path specified and then passed into the Action Planner constructor:
 
 **C#**
 ```cs

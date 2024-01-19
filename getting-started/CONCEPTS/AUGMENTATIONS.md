@@ -9,11 +9,11 @@ It is recommended to read the [AI System](./AI-SYSTEM.md) and [Action Planner](.
 
 ## Sequence Augmentation
 
-This augmentation allows the model to return a sequence of actions to perform. It does this by appending instructions to the prompt text in runtime. These instructions guide the model to generate a plan object that uses actions defined in the `actions.json` file from the prompt template folder. 
+This augmentation allows the model to return a sequence of actions to perform. It does this by appending instructions to the prompt text during runtime. These instructions guide the model to generate a plan object that uses actions defined in the `actions.json` file from the prompt template folder. 
 
 Here's an example of the `actions.json` file from the [Light Bot](https://github.com/microsoft/teams-ai/blob/77339da9e3e03bfd7f629fc796cfebdcd2891afb/js/samples/04.ai.c.actionMapping.lightBot/src/prompts/sequence/actions.json) sample:
 
-```js
+```json
 [
     {
         "name": "LightsOn",
@@ -42,9 +42,9 @@ Here's an example of the `actions.json` file from the [Light Bot](https://github
 ]
 ```
 
-It defines three actions, `LightsOn`, `LightsOff` and `Pause`. The `Pause` action requires the `time` parameter, while the other two doesn't.
+It defines three actions, `LightsOn`, `LightsOff` and `Pause`. The `Pause` action requires the `time` parameter, while the other two don't.
 
-These actions are then appended to the prompt text in runtime. This is text added to end of the prompt text:
+These actions are then appended to the prompt text during runtime. This is text added to end of the prompt text:
 
 ```txt
 actions:
@@ -80,7 +80,7 @@ Use the actions above to create a plan in the following JSON format:
 ```
 > Note: When the prompt is rendered, the above text is compressed to reduce token usage.
 
-The first section lists the actions in yaml structure. The second sections tells the model to return a plan object of the following schema.
+The first section lists the actions in yaml structure. The second section tells the model to return a plan object of the following schema.
 
 ### Configuring your prompt
 
@@ -112,14 +112,14 @@ There are two steps to use sequence augmentation in your prompt:
 ]
 ```
 
-The learn more about the action object schema see the corresponding typescript interface [ChatCompletionAction](https://github.com/microsoft/teams-ai/blob/0fca2ed09d327ecdc682f2b15eb342a552733f5e/js/packages/teams-ai/src/models/ChatCompletionAction.ts#L14).
+To learn more about the action object schema see the corresponding typescript interface [ChatCompletionAction](https://github.com/microsoft/teams-ai/blob/0fca2ed09d327ecdc682f2b15eb342a552733f5e/js/packages/teams-ai/src/models/ChatCompletionAction.ts#L14).
 
 
 ## Monologue Augmentation
 
-This augmentation adds support for an inner monologue to the prompt. The monologue helps the LLM to perform chain-of-thought reasoning across multiple turns of conversation. It does this by appending instructions to the prompt text in runtime. It tells the model to explicitly show it's thought, reasoning & plan in response to the user's message and predict the next action to execute. If looping is configured, then the predicted action can guide the model to predict the next action by returning the instruction as a string in the action handler callback. The loop will terminate as soon as the model predicts a *SAY* action, which sends the response back to the user.
+This augmentation adds support for an inner monologue to the prompt. The monologue helps the LLM perform chain-of-thought reasoning across multiple turns of conversation. It does this by appending instructions to the prompt text during runtime. It tells the model to explicitly show it's thought, reasoning and plan in response to the user's message, then predict the next action to execute. If looping is configured, then the predicted action can guide the model to predict the next action by returning the instruction as a string in the action handler callback. The loop will terminate as soon as the model predicts a *SAY* action, which sends the response back to the user.
 
-Using the `actions.json` example from abovce, the instructions appended to the prompt look like this:
+Using the `actions.json` example from abovce, the instructions appended to the prompt look like the text below.
 
 These actions are then used and appended to the prompt text in runtime. This is text added to end of the prompt text:
 
@@ -160,7 +160,7 @@ Response Format:
 
 > Note: When the prompt is rendered, the above text is compressed to reduce token usage.
 
-The first section lists the actions in yaml structure. The second sections tells the model to return a plan object of the following schema.
+The first section lists the actions in yaml structure. The second section tells the model to return a plan object of the following schema.
 
 ### Configuring your prompt
 

@@ -1,10 +1,10 @@
 # Action Planner
 
-The Action Planner is a powerful planner that uses a LLM to generate plans. It can trigger parameterized actions and send text based responses to the user. It supports the following advanced features:
+The Action Planner is a powerful planner that uses an LLM to generate plans. It can trigger parameterized actions and send text-based responses to the user. It supports the following advanced features:
 
 ### [Prompt Management](./PROMPTS.md)
 
-The Action Planner has a built-in prompt management system that supports creating prompt templates as folders in the file system. A prompt template is the prompt text along with all the configurations for completion with the LLM model. Dynamic prompts are also supported with template variables and functions.
+The Action Planner has a built-in prompt management system that supports creating prompt templates as folders in the file system. A prompt template is the prompt text along with all the configurations for completion with the LLM model. Dynamic prompts also support template variables and functions.
 
 ### [Augmentations](./AUGMENTATIONS.md)
 Augmentations virtually eliminate the need for prompt engineering. Prompts
@@ -15,7 +15,7 @@ or create an AutoGPT style agent (monologue).
 ### Validations 
 Validators are used to validate the response returned by the LLM and can guarantee
 that the parameters passed to an action match a supplied schema. The validator used is automatically
-selected based on the augmentation being used. Validators also prevent hallucinated action names
+selected based on the augmentation being used. Validators also prevent hallucinated action names,
 making it impossible for the LLM to trigger an action that doesn't exist.
 
 ### Repair 
