@@ -138,7 +138,7 @@ namespace Microsoft.Teams.AI.AI
 
         /// <summary>
         /// Import a set of Actions from the given class instance. The functions must have the `Action` attribute.
-        /// Once these functions are imported, the AI module will have access to these functions.
+        /// Once these functions are imported, the AI System will have access to these functions.
         /// </summary>
         /// <param name="instance">Instance of a class containing these functions.</param>
         /// <returns>The current instance object.</returns>
