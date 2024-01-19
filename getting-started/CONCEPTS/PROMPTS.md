@@ -7,13 +7,13 @@ Here's a prompt that asks the LLM for name suggestions:
 
 _Input:_
 
-```prompt
+```
 Give me 3 name suggestions for my pet golden retriever.
 ```
 
 _Response:_
 
-```prompt
+```
 Some possible name suggestions for a pet golden retriever are:
 
 - Bailey
