@@ -5,7 +5,7 @@ The `Application` class encapsulates all the business logic for the application 
 
 ## The Activity Handler System
 
-The activity handler system is the primary way to implement bot or message extension application logic. It is a set of methods and configuration that allows you to register callbacks (known as route handlers) which will trigger based on the incomming activity. These can be in the form of a message, message reaction, or virtually any interaction with the Teams app.
+The activity handler system is the primary way to implement bot or message extension application logic. It is a set of methods and configurations that allows you to register callbacks (known as route handlers), which will trigger based on the incoming activity. These can be in the form of a message, message reaction, or virtually any interaction within the Teams app.
 
 Here's an example of registering a route handler that will run when the the user sends *"/login"* to the bot:
 
