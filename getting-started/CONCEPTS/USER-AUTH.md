@@ -98,7 +98,7 @@ This is useful if the user should be signed in by default before attempting to i
 
 ### Manual Sign In
 
-If the user should only be authenticated in certain scenarios then you can disable auto sign in by having the callback alway return false and trigger authentication manually.
+If the user should only be authenticated in certain scenarios, you can disable auto sign in by having the callback always return false and trigger authentication manually.
 
 Here's an example of manually triggering sign in flow in an activity or action handler:
 
