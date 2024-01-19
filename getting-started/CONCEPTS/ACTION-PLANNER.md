@@ -15,7 +15,7 @@ or create an AutoGPT style agent (monologue).
 ### Validations 
 Validators are used to validate the response returned by the LLM and can guarantee
 that the parameters passed to an action match a supplied schema. The validator used is automatically
-selected based on the augmentation being used. Validators also prevent hallucinated action names
+selected based on the augmentation being used. Validators also prevent hallucinated action names,
 making it impossible for the LLM to trigger an action that doesn't exist.
 
 ### Repair 
