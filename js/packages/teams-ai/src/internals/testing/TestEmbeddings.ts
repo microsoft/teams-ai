@@ -6,7 +6,7 @@
  * Licensed under the MIT License.
  */
 
-import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus } from './EmbeddingsModel';
+import { EmbeddingsModel, EmbeddingsResponse, EmbeddingsResponseStatus } from '../../embeddings/EmbeddingsModel';
 
 /**
  * A test model that can be used to test the prompt completion system.
@@ -19,9 +19,9 @@ export class TestEmbeddings implements EmbeddingsModel {
 
     /**
      *
-     * @param status Optional. Status of the embeddings response. Defaults to `success`.
-     * @param output Optional. Embeddings to generate. Defaults to `[[1,2,3,4,5]]`.
-     * @param message Optional. Message to return with response.
+     * @param {EmbeddingsResponseStatus} status Optional. Status of the embeddings response. Defaults to `success`.
+     * @param {number[][] | undefined} output Optional. Embeddings to generate. Defaults to `[[1,2,3,4,5]]`.
+     * @param {string} message Optional. Message to return with response.
      */
     public constructor(
         status: EmbeddingsResponseStatus = 'success',
@@ -49,9 +49,9 @@ export class TestEmbeddings implements EmbeddingsModel {
 
     /**
      * Returns a generated set of test embeddings
-     * @param model Name of the model to use (or deployment for Azure).
-     * @param inputs Input to generate embeddings for.
-     * @returns The generated embeddings.
+     * @param {string} model Name of the model to use (or deployment for Azure).
+     * @param {string | string[]} inputs Input to generate embeddings for.
+     * @returns {Promise<EmbeddingsResponse>} The generated embeddings.
      */
     public createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse> {
         // Validate inputs

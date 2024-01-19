@@ -1,10 +1,11 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
+
+import { PromptTemplate, SystemMessage } from '../../prompts';
+import { GPT3Tokenizer } from '../../tokenizers';
+import { TestTurnState } from './TestTurnState';
+import { TestPromptManager } from './TestPromptManager';
 import { TestModel } from './TestModel';
-import { TestTurnState } from '../internals/testing/TestTurnState';
-import { TestPromptManager } from '../internals/testing/TestPromptManager';
-import { GPT3Tokenizer } from '../tokenizers';
-import { PromptTemplate, SystemMessage } from '../prompts';
 
 describe('TestModel', () => {
     const adapter = new TestAdapter();
