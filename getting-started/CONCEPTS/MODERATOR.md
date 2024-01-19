@@ -45,7 +45,7 @@ var app = new ApplicationBuilder<TurnState>()
 .WithAIOptions(aIOptions)
 .Build();
 ```
-> This snippet is taken from the [Twenty Questions bot] sample
+> This snippet is taken from the [Twenty Questions bot] sample.
 > Note for C# application, the moderator should be registered to the Web app's service collection as a singleton.
 
 ## Azure Content Safety Moderator
