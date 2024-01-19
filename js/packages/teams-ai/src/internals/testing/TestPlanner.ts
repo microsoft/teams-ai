@@ -1,7 +1,7 @@
 import { TurnContext } from 'botbuilder';
-import { Plan, Planner, PredictedSayCommand } from './Planner';
-import { TurnState } from '../TurnState';
-import { AI } from '../AI';
+import { Plan, Planner, PredictedSayCommand } from '../../planners/Planner';
+import { TurnState } from '../../TurnState';
+import { AI } from '../../AI';
 
 /**
  * A planner used for testing.
@@ -9,8 +9,8 @@ import { AI } from '../AI';
 export class TestPlanner implements Planner<TurnState> {
     /**
      * Creates a new `TestPlanner` instance.
-     * @param beginPlan Optional. The plan to return when `beginTask()` is called. Defaults to a plan that says "Hello World".
-     * @param continuePlan Optional. The plan to return when `continueTask()` is called. Defaults to an empty plan.
+     * @param {Plan} beginPlan Optional. The plan to return when `beginTask()` is called. Defaults to a plan that says "Hello World".
+     * @param {Plan} continuePlan Optional. The plan to return when `continueTask()` is called. Defaults to an empty plan.
      */
     public constructor(beginPlan?: Plan, continuePlan?: Plan) {
         this.beginPlan = beginPlan || {
@@ -41,10 +41,10 @@ export class TestPlanner implements Planner<TurnState> {
      * there is no work to be performed.
      *
      * The planner should take the users input from `state.temp.input`.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param ai The AI system that is generating the plan.
-     * @returns The plan that was generated.
+     * @param {TurnContext} context Context for the current turn of conversation.
+     * @param {TurnState} state Application state for the current turn of conversation.
+     * @param {AI<TurnState>} ai The AI system that is generating the plan.
+     * @returns {Promise<Plan>} The plan that was generated.
      */
     public beginTask(context: TurnContext, state: TurnState, ai: AI<TurnState>): Promise<Plan> {
         return Promise.resolve(this.beginPlan);
@@ -59,10 +59,10 @@ export class TestPlanner implements Planner<TurnState> {
      * to be performed.
      *
      * The output from the last plan step that was executed is passed to the planner via `state.temp.input`.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
-     * @param ai The AI system that is generating the plan.
-     * @returns The plan that was generated.
+     * @param {TurnContext} context Context for the current turn of conversation.
+     * @param {TurnState} state Application state for the current turn of conversation.
+     * @param {AI<TurnState>} ai The AI system that is generating the plan.
+     * @returns {Promise<Plan>} The plan that was generated.
      */
     public continueTask(context: TurnContext, state: TurnState, ai: AI<TurnState>): Promise<Plan> {
         return Promise.resolve(this.continuePlan);

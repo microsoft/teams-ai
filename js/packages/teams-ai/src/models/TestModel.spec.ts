@@ -2,8 +2,9 @@ import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 import { TestModel } from './TestModel';
 import { TestTurnState } from '../internals/testing/TestTurnState';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { GPT3Tokenizer } from '../tokenizers';
-import { PromptTemplate, SystemMessage, TestPromptManager } from '../prompts';
+import { PromptTemplate, SystemMessage } from '../prompts';
 
 describe('TestModel', () => {
     const adapter = new TestAdapter();
