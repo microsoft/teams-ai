@@ -105,7 +105,7 @@ The following are variables accessible in the prompt template without having to 
 
 ### Function calls
 
-To call an external function and embed the result in your text, use the `{{ functionName }}` syntax. For example if you have a function called `diceRoll` that returns a random number between 1 and 6, you can write:
+To call an external function and embed the result in your text, use the `{{ functionName }}` syntax. For example, if you have a function called `diceRoll` that returns a random number between 1 and 6, you can write:
 
 `The dice roll has landed on: {{ diceRoll }}`
 
