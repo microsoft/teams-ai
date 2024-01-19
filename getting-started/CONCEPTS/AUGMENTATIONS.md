@@ -112,7 +112,7 @@ There are two steps to use sequence augmentation in your prompt:
 ]
 ```
 
-The learn more about the action object schema see the corresponding typescript interface [ChatCompletionAction](https://github.com/microsoft/teams-ai/blob/0fca2ed09d327ecdc682f2b15eb342a552733f5e/js/packages/teams-ai/src/models/ChatCompletionAction.ts#L14).
+To learn more about the action object schema see the corresponding typescript interface [ChatCompletionAction](https://github.com/microsoft/teams-ai/blob/0fca2ed09d327ecdc682f2b15eb342a552733f5e/js/packages/teams-ai/src/models/ChatCompletionAction.ts#L14).
 
 
 ## Monologue Augmentation
