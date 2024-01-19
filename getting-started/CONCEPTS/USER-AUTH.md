@@ -73,14 +73,7 @@ options.AutoSignIn = (ITurnContext turnContext, CancellationToken cancellationTo
 **JavaScript**
 ```ts
 .withAuthentication(adapter, {
-    // settings: {
-    //     graph: {
-    //         connectionName: process.env.OAUTH_CONNECTION_NAME ?? '',
-    //         title: 'Sign in',
-    //         text: 'Please sign in to use the bot.',
-    //         endOnInvalidMessage: true
-    //     }
-    // },
+    settings: { /* Settings options here... */ },
     autoSignIn: (context: TurnContext) => {
         const signOutActivity = context.activity?.value.commandId === 'signOutCommand';
         if (signOutActivity) {
