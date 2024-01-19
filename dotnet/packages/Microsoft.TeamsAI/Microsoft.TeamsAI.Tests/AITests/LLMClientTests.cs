@@ -351,7 +351,7 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.NotNull(response);
             Assert.Equal(PromptResponseStatus.InvalidResponse, response.Status);
             Assert.NotNull(response.Error);
-            Assert.Equal("The response was invalid. Try another strategy.", response.Error.Message);
+            Assert.Equal("Reached max model response repair attempts. Last feedback given to model: The response was invalid. Try another strategy.", response.Error.Message);
             Assert.Equal(1, memory.Values.Count);
             Assert.Equal("hello", memory.Values[options.InputVariable]);
         }

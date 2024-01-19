@@ -359,7 +359,7 @@ namespace Microsoft.Teams.AI.AI.Clients
                 return new()
                 {
                     Status = PromptResponseStatus.InvalidResponse,
-                    Error = new(feedback ?? "The response was invalid. Try another strategy.")
+                    Error = new($"Reached max model response repair attempts. Last feedback given to model: {feedback}")
                 };
             }
 
