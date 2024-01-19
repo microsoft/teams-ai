@@ -68,7 +68,7 @@ Here's how to define variables in code:
 
 In an *action* or *route handler* where the turn state object is available:
 ```cs
-state.Temp.Post = "Lorem Ipsium..."
+state.Temp.Post = "Lorem Ipsum..."
 ```
 
 The usage in the prompt:
