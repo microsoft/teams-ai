@@ -160,7 +160,7 @@ Response Format:
 
 > Note: When the prompt is rendered, the above text is compressed to reduce token usage.
 
-The first section lists the actions in yaml structure. The second sections tells the model to return a plan object of the following schema.
+The first section lists the actions in yaml structure. The second section tells the model to return a plan object of the following schema.
 
 ### Configuring your prompt
 
