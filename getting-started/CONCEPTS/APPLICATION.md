@@ -58,7 +58,7 @@ When an incoming activity reaches the server, the bot adapter handles the necess
 4. If user authentication is configured, then attempt to sign the user in. If the user is already signed in, retrieve the access token and continue to step 5. Otherwise, start the sign in flow and end the current turn.
 5. The `beforeTurn` activity handler is executed. If it returns false, save turn state to storage and end the turn.
 6. All the routes are iterated over and if a selector function is triggered, then the corresponding route handler is executed.
-7. If no route is triggered, the incomming activity is a message, and the AI System is configured, then it is invoked by calling the `AI.run()` method.
+7. If no route is triggered, the incoming activity is a message, and an AI System is configured, then it is invoked by calling the `AI.run()` method.
 8. The `AfterTurnAsync` activity handler is executed. If it return true, save turn state to storage.
 
 
