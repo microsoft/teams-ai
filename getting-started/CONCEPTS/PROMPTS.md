@@ -98,10 +98,10 @@ You can simply add to the `state.temp` object, and it will be accessible from th
 
 The following are variables accessible in the prompt template without having to manually configure them. These are pre-defined in the turn state and populated by the library. Users can override them by changing it in the turn state.
 
-| Variable name | Description                                                       |
-| ------------- | ----------------------------------------------------------------- |
-| `input`       | Input passed from the user to the AI Library. |
-| `lastOutput`      | Output returned from the last executed action.            |
+| Variable name | Description                                    |
+| ------------- | ---------------------------------------------- |
+| `input`       | Input passed from the user to the AI Library.  |
+| `lastOutput`  | Output returned from the last executed action. |
 
 ### Function calls
 
