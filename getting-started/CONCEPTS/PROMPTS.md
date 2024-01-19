@@ -45,7 +45,7 @@ Give me 3 name suggestions for my pet {{ $petName }}.
 ## Prompt Template Language
 
 You don't need to write any code or import any external libraries, just use the
-curly braces {{...}} to embed expressions in your prompts.
+double curly braces {{...}} to embed expressions in your prompts.
 Teams AI will parse your template and execute the logic behind it.
 This way, you can easily integrate AI into your apps with minimal effort and
 maximum flexibility.
