@@ -26,7 +26,7 @@ Some possible name suggestions for a pet golden retriever are:
 Prompt templates are a simple and powerful way to
 define and compose AI functions **using plain text**.
 You can use it to create natural language prompts, generate responses, extract
-information, **invoke other prompts** or perform any other task that can be
+information, **invoke other prompts,** or perform any other task that can be
 expressed with text.
 
 The language supports two basic features that allow you to include
@@ -45,7 +45,7 @@ Give me 3 name suggestions for my pet {{ $petName }}.
 ## Prompt Template Language
 
 You don't need to write any code or import any external libraries, just use the
-curly braces {{...}} to embed expressions in your prompts.
+double curly braces {{...}} to embed expressions in your prompts.
 Teams AI will parse your template and execute the logic behind it.
 This way, you can easily integrate AI into your apps with minimal effort and
 maximum flexibility.

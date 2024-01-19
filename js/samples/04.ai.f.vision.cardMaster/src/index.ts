@@ -10,19 +10,29 @@ import * as restify from 'restify';
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
     CardFactory,
-    CloudAdapter,
-    ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     MessageFactory,
     TurnContext
 } from 'botbuilder';
 
+import {
+    Application,
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
+    TeamsAttachmentDownloader,
+    TeamsAdapter
+} from '@microsoft/teams-ai';
+
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+// Create adapter.
+// See https://aka.ms/about-bot-adapter to learn more about how bots work.
+const adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
         MicrosoftAppId: process.env.BOT_ID,
@@ -30,10 +40,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
         MicrosoftAppType: 'MultiTenant'
     })
 );
-
-// Create adapter.
-// See https://aka.ms/about-bot-adapter to learn more about how bots work.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: any) => {
@@ -68,15 +74,6 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
-
-import {
-    Application,
-    ActionPlanner,
-    OpenAIModel,
-    PromptManager,
-    TurnState,
-    TeamsAttachmentDownloader
-} from '@microsoft/teams-ai';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ConversationState {}

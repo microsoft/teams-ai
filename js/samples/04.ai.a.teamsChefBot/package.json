@@ -20,7 +20,7 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "@microsoft/teams-ai": "~1.0.1",
+        "@microsoft/teams-ai": "~1.1.0",
         "@microsoft/teamsfx": "^2.3.0",
         "botbuilder": "^4.21.4",
         "dotenv": "^16.3.1",
@@ -31,7 +31,7 @@
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.12",
-        "@types/node": "^20.10.7",
+        "@types/node": "^20.11.4",
         "ts-node": "^10.9.2",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",

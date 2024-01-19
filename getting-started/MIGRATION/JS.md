@@ -36,13 +36,13 @@ You may also use the `ApplicationBuilder` class to build your `Application`. Thi
 
 ```js
 //// Constructor initialization method
-// const app = new Application()<TurnState>
+// const app = new Application<TurnState>()
 // {
 //    storage
 // };
 
 // Build pattern method
-const app = new ApplicationBuilder()<TurnState>
+const app = new ApplicationBuilder<TurnState>()
     .withStorage(storage)
     .build(); // this internally calls the Application constructor
 ```
