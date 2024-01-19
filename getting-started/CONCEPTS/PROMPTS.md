@@ -76,7 +76,7 @@ The usage in the prompt:
 This is the user's post: {{ $post }}
 ```
 
-> Note: The `turnState.Temp.Post = ...` updates a dictionary with the `post` key under the hood from the [GPT Message Extension sample](https://github.com/microsoft/teams-ai/blob/a20f8715d3fe81e11c330853e3930e22abe298af/dotnet/samples/04.ai.b.messageExtensions.gptME/ActivityHandlers.cs#L156).
+> Note: The `turnState.Temp.Post = ...` updates a dictionary with the `post` key under the hood from the [AI Message Extension sample](https://github.com/microsoft/teams-ai/blob/a20f8715d3fe81e11c330853e3930e22abe298af/dotnet/samples/04.ai.b.messageExtensions.gptME/ActivityHandlers.cs#L156).
 
 **Javascript**
 
