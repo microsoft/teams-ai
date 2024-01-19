@@ -82,7 +82,7 @@ This is the user's post: {{ $post }}
 
 ```typescript
 app.beforeTurn((context, state) => {
-  state.temp.post = "Lorem Ipsium...";
+  state.temp.post = "Lorem Ipsum...";
 });
 ```
 
