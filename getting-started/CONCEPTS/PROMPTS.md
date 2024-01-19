@@ -132,7 +132,7 @@ prompts.addFunction('diceRoll', async (context, state, functions, tokenizer, arg
 
 # Creating Prompt Templates
 
-Each prompt template is a folder with two files, `skprompt.txt` and `config.json`. The folder name is the prompt template's name that can be referred in code. The `skprompt.txt` file contains the prompt's text, which can contain natural language or prompt template syntax as defined in the previous section. The `config.json` file specifies the prompt completion configuration.
+Each prompt template is a folder with two files, `skprompt.txt` and `config.json`. The folder name is the prompt template's name which can be referred to in your code. The `skprompt.txt` file contains the prompt's text, which can contain natural language or prompt template syntax as defined in the previous section. The `config.json` file specifies the prompt completion configuration.
 
 Here's an example of a prompt template from the [Twenty Questions](https://github.com/microsoft/teams-ai/blob/c5ec11842b808e48cd214b3cb52da84e5811da33/js/samples/04.e.twentyQuestions) sample.
 
