@@ -18,7 +18,7 @@ public bool CreateList([ActionTurnState] ListState turnState, [ActionParameters]
 
     EnsureListExists(turnState, listName);
 
-  // Continues exectuion of next command in the plan.
+  // Continues execution of next command in the plan.
     return "";
 }
 ```
