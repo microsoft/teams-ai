@@ -2,7 +2,7 @@
 
 An action is an atomic function that is registered to the AI System. It is a fundamental building block of a plan.
 
-Here's an example of how an action to create a new list would look like in code. Call this action `createList`:
+Here's an example of what an action creating a new list would look like in code. Call this action `createList`:
 
 ### C#
 
