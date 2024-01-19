@@ -1,5 +1,5 @@
 # Data Sources
-Data sources allow the injection of relevant information from external sources into prompts, such as vector databases or cognitive search. A vector data source makes it easy to add RAG to any prompt, allowing for better and more accurate replies from the bot. 
+Data sources allow the injection of relevant information from external sources into prompts, such as vector databases or cognitive search. A vector data source makes it easy to add [RAG](https://en.wikipedia.org/wiki/Prompt_engineering#Retrieval-augmented_generation) to any prompt, allowing for better and more accurate replies from the bot. 
  
 Within each Action Planner’s prompt management system, a list of data sources can be registered. For each data source, a max number of tokens to use is specified, via `maxTokens`. 
 
@@ -36,7 +36,7 @@ planner.prompts.addDataSource(
     })
 );
 ```
-Inside the prompt's config.json
+Inside the prompt's config.json. Here, `teams-ai` denotes the name of the VectraDataSource, and 1200 is `maxTokens`.
 ```json
 "augmentation": {
     "augmentation_type": "none",
