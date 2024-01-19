@@ -42,7 +42,7 @@ Here's an example of the `actions.json` file from the [Light Bot](https://github
 ]
 ```
 
-It defines three actions, `LightsOn`, `LightsOff` and `Pause`. The `Pause` action requires the `time` parameter, while the other two doesn't.
+It defines three actions, `LightsOn`, `LightsOff` and `Pause`. The `Pause` action requires the `time` parameter, while the other two don't.
 
 These actions are then appended to the prompt text in runtime. This is text added to end of the prompt text:
 
