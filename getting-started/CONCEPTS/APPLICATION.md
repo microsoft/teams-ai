@@ -33,13 +33,13 @@ app.OnMessage("/login", async (ITurnContext turnContext, TurnState turnState, Ca
 The `Application` groups the route registration methods based on the specific feature groups: 
 
 
-| **Feature**       | **Description**                                                                         |
-|-------------------|-----------------------------------------------------------------------------------------|
-| Task Modules      | Task module related activities like `task/fetch`.        |
+| **Feature**       | **Description**                                                  |
+| ----------------- | ---------------------------------------------------------------- |
+| Task Modules      | Task module related activities like `task/fetch`.                |
 | Message Extension | Message extension activities like `composeExtension/query`.      |
 | Meetings          | Meeting activites like `application/vnd.microsoft.meetingStart`. |
 | AdaptiveCards     | Adaptive card activities like `adaptiveCard/action`.             |
-| General           | Generic activites like `message`.                        |
+| General           | Generic activites like `message`.                                |
 
 > To see all the route registration methods supported, see the migration docs ([JS](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/JS.md#activity-handler-methods)/[C#](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/DOTNET.md#activity-handler-methods)).
 
