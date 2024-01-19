@@ -62,7 +62,7 @@ When an incoming activity reaches the server, the bot adapter handles the necess
 8. The `AfterTurnAsync` activity handler is executed. If it returns true, save turn state to storage.
 
 
-> Note: _End the turn_ means that the main method has terminated execution and so the application has completed processing the incomming activity. 
+> Note: _End the turn_ means that the main method has terminated execution and so the application has completed processing the incoming activity. 
 
 > Note: To learn about what a *turn* is, see [TURNS](TURNS.md).
 
