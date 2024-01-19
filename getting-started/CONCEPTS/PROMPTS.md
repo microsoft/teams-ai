@@ -26,7 +26,7 @@ Some possible name suggestions for a pet golden retriever are:
 Prompt templates are a simple and powerful way to
 define and compose AI functions **using plain text**.
 You can use it to create natural language prompts, generate responses, extract
-information, **invoke other prompts** or perform any other task that can be
+information, **invoke other prompts,** or perform any other task that can be
 expressed with text.
 
 The language supports two basic features that allow you to include
