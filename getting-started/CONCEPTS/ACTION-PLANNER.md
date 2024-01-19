@@ -1,6 +1,6 @@
 # Action Planner
 
-The Action Planner is a powerful planner that uses a LLM to generate plans. It can trigger parameterized actions and send text based responses to the user. It supports the following advanced features:
+The Action Planner is a powerful planner that uses an LLM to generate plans. It can trigger parameterized actions and send text-based responses to the user. It supports the following advanced features:
 
 ### [Prompt Management](./PROMPTS.md)
 
