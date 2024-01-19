@@ -68,7 +68,7 @@ export class MemoryFork implements Memory {
      * Deletes a value from the memory.
      * @remarks
      * Only forked values will be deleted.
-     * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
+     * @param {string} path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
      */
     public deleteValue(path: string): void {
         const { scope, name } = this.getScopeAndName(path);

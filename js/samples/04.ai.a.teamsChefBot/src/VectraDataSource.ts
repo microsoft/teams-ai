@@ -69,7 +69,7 @@ export class VectraDataSource implements DataSource {
 
     /**
      * Creates a new `VectraDataSource` instance.
-     * @param options Options for creating the data source.
+     * @param {VectraDataSourceOptions} options Options for creating the data source.
      */
     public constructor(options: VectraDataSourceOptions) {
         this._options = options;
