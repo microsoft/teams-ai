@@ -28,6 +28,7 @@ public bool CreateList([ActionTurnState] ListState turnState, [ActionParameters]
 ### JS
 
 [List Bot sample](https://github.com/microsoft/teams-ai/blob/0fca2ed09d327ecdc682f2b15eb342a552733f5e/js/samples/04.ai.d.chainedActions.listBot/src/index.ts#L153)
+
 ```typescript
 app.ai.action("createList", async (context: TurnContext, state: ApplicationTurnState, parameters: ListAndItems) => {
   // Ex. create a list with name "Grocery Shopping".
