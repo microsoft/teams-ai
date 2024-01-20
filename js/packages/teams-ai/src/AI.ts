@@ -345,7 +345,7 @@ export class AI<TState extends TurnState = TurnState> {
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param {string | string[]} name Unique name of the action.
      * @callback handler
-     * @param {Function} handler The code to execute when the _ is triggered.
+     * @param {Function} handler The code to execute when the action's name is triggered.
      * @param {TurnContext} handler.context The current turn context for the handler callback.
      * @param {TState} handler.state The current turn state for the handler callback.
      * @param {TParameters} handler.parameters Optional. Entities to pass to the action.
@@ -381,7 +381,7 @@ export class AI<TState extends TurnState = TurnState> {
      * @template TParameters Optional. The type of parameters that the action handler expects.
      * @param {string | string[]} name Unique name of the action.
      * @callback handler
-     * @param {Function} handler The code to execute when the _ is triggered.
+     * @param {Function} handler The code to execute when the action's name is triggered.
      * @param {TurnContext} handler.context The current turn context for the handler callback.
      * @param {TState} handler.state The current turn state for the handler callback.
      * @returns {this} The AI system instance for chaining purposes.
