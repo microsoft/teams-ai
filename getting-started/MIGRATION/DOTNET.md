@@ -126,9 +126,9 @@ var applicationBuilder = new ApplicationBuilder<TurnState>()
 Application<TurnState> app = applicationBuilder.Build();
 ```
 
-## 2. Replace the activity handler implementations with specific route handlers
+## 2. Replace the activity handler implementations with specific route registration method.
 
-The `EchoBot` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route handler in the `Application` object. Here's a simple example:
+The `EchoBot` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route registration method in the `Application` object. Here's a simple example:
 
 Given the `EchoBot` implementation:
 
@@ -159,11 +159,11 @@ If your bot derives from  `ActivityHandler` or the `TeamsActivityHandler` refer 
 
 ## Activity Handler Methods
 
-If your bot derives from the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route handler.
+If your bot derives from the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route registration method.
 
 #### Invoke Activities
 
-| `TeamsActivityHandler` method                                | `Application` route handler                                                                     |
+| `TeamsActivityHandler` method                                | `Application` route registration method                                                                     |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | `OnTeamsO365ConnectorCardActionAsync`                        | `OnO365ConnectorCardAction` (usage: `app.OnO365ConnectorCardAction(...)`)                       |
 | `OnTeamsFileConsentAsync`                                    | Either `OnFileConsentAccept` or `OnFileConsentDecline`                                          |
@@ -221,7 +221,7 @@ app.OnConversationUpdate(ConversationUpdateEvents.ChannelCreated, async (ITurnCo
 
 #### Message Activites
 
-| `TeamsActivityHandler` method    | `Application` route handler                              |
+| `TeamsActivityHandler` method    | `Application` route registration method                              |
 | -------------------------------- | -------------------------------------------------------- |
 | `OnMessage`                      | `OnMessage` (usage: `app.OnMessage(...)`)                |
 | `OnTeamsMessageEditAsync`        | `OnMessageEdit`                                          |
@@ -232,7 +232,7 @@ app.OnConversationUpdate(ConversationUpdateEvents.ChannelCreated, async (ITurnCo
 
 #### Meeting Activities
 
-| `TeamsActivityHandler` method          | `Application` route handler                             |
+| `TeamsActivityHandler` method          | `Application` route registration method                             |
 | -------------------------------------- | ------------------------------------------------------- |
 | `OnTeamsMeetingStartAsync`             | `Meetings.OnStart` (usage: `app.Meetings.OnStart(...)`) |
 | `OnTeamsMeetingEndAsync`               | `Meetings.OnEnd`                                        |
@@ -241,4 +241,4 @@ app.OnConversationUpdate(ConversationUpdateEvents.ChannelCreated, async (ITurnCo
 
 #### Other Activities
 
-If there are activities for which there isn't a corresponding route handler, you can use the generic route handler `Application.OnActivity` and specify a custom selector function given the activity object as input.
+If there are activities for which there isn't a corresponding route registration method, you can use the generic route registration method `Application.OnActivity` and specify a custom selector function given the activity object as input.
