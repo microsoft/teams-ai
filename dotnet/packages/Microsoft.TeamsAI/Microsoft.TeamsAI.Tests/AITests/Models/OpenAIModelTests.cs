@@ -14,7 +14,7 @@ using System.Reflection;
 using ChatMessage = Microsoft.Teams.AI.AI.Models.ChatMessage;
 using ChatRole = Microsoft.Teams.AI.AI.Models.ChatRole;
 
-namespace Microsoft.Teams.AI.Tests.AITests
+namespace Microsoft.Teams.AI.Tests.AITests.Models
 {
     public class OpenAIModelTests
     {
