@@ -8,7 +8,7 @@ ___
 
 ### Why you should migrate to the Teams AI library
 
-Is your Teams App currently build using the [BotFramework (BF) SDK](https://github.com/microsoft/botframework-sdk)? If so you should migrate it to the Teams AI library.
+Is your Teams App currently built using the [BotFramework (BF) SDK](https://github.com/microsoft/botframework-sdk)? If so you should migrate it to the Teams AI library.
 
 Here are a few reasons why:
 

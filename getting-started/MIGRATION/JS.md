@@ -47,9 +47,9 @@ const app = new ApplicationBuilder<TurnState>()
     .build(); // this internally calls the Application constructor
 ```
 
-## 2. Replace the activity handler implementations with specific route handlers
+## 2. Replace the activity handler implementations with specific route registration methods
 
-The `BotActivityHandler` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route handler in the `Application` object. Here's a simple example:
+The `BotActivityHandler` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route registration method (`handler`) in the `Application` object. Here's a simple example:
 
 Given the `BotActivityHandler` implementation:
 
@@ -74,17 +74,17 @@ app.activity(ActivityTypes.Message, async(context: TurnContext, state: TurnState
 });
 ```
 
->  The `activity` method is refered as a *route handler*. For each method in the `ActivityHandler` or `TeamsActivityHandler` class, there is an equivalent route handler. 
+>  The `activity` method is refered as a *route registration method*. For each method in the `ActivityHandler` or `TeamsActivityHandler` class, there is an equivalent route registration method. 
 
-Your existing BF app will probably have different activity handlers implemented. To migrate that over with Teams AI route handlers see the following.
+Your existing BF app will probably have different activity handlers implemented. To migrate that over with Teams AI route registration methods see the following.
 
 ## Activity Handler Methods
 
-If your bot derives from the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route handler.
+If your bot derives from the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route registration method.
 
 ### Invoke Activities
 
-| `TeamsActivityHandler` method                               | `Application` route handler                                                                     |
+| `TeamsActivityHandler` method                               | `Application` route registration method                                                                     |
 | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `handleTeamsO365ConnectorCardAction`                        | `O365ConnectorCardAction` (usage: `app.O365ConnectorCardAction(...)`)                           |
 | `handleTeamsFileConsent`                                    | Either `fileConsentAccept` or `fileConsentDecline`                                              |
@@ -141,7 +141,7 @@ app.conversationUpdate('channelCreated', (context: TurnContext, state: TurnState
 
 ### Message Activites
 
-| `TeamsActivityHandler` method                                               | `Application` route handler                                                |
+| `TeamsActivityHandler` method                                               | `Application` route registration method                                                |
 | --------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `OnMessage`                                                                 | `message`                                                                  |
 | `OnTeamsMessageUndelete`, `OnTeamsMessageEdit` & `OnTeamsMessageSoftDelete` | `messageEventUpdate` , the first parameter `event` specifies the activity. |
@@ -150,7 +150,7 @@ app.conversationUpdate('channelCreated', (context: TurnContext, state: TurnState
 
 ### Meeting Activities
 
-| `TeamsActivityHandler` method     | `Application` route handler  |
+| `TeamsActivityHandler` method     | `Application` route registration method  |
 | --------------------------------- | ---------------------------- |
 | `OnTeamsMeetingStart`             | `meetings.start`             |
 | `OnTeamsMeetingEnd`               | `meetings.end`               |
@@ -159,4 +159,4 @@ app.conversationUpdate('channelCreated', (context: TurnContext, state: TurnState
 
 ### Other Activities
 
-If there are activities for which there isn't a corresponding route handler, you can use the generic route handler `Application.activity` and specify a custom selector function given the activity object as input.
+If there are activities for which there isn't a corresponding route registration method, you can use the generic route registration method `Application.activity` and specify a custom selector function given the activity object as input.
