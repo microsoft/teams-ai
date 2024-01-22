@@ -5,5 +5,6 @@ Licensed under the MIT License.
 
 from .completion_config import CompletionConfig
 from .prompt_manager import PromptManager
+from .prompt_section import RenderedPromptSection
 from .prompt_template import PromptTemplate
 from .prompt_template_config import PromptTemplateConfig
