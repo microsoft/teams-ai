@@ -479,7 +479,9 @@ export class LLMClient<TContent = any> {
             return {
                 status: 'invalid_response',
                 input: undefined,
-                error: new Error(`Reached max model response repair attempts. Last feedback given to model: "${feedback}"`)
+                error: new Error(
+                    `Reached max model response repair attempts. Last feedback given to model: "${feedback}"`
+                )
             };
         }
 
