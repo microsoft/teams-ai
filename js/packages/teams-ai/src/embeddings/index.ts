@@ -8,4 +8,3 @@
 
 export * from './EmbeddingsModel';
 export * from './OpenAIEmbeddings';
-export * from './TestEmbeddings';

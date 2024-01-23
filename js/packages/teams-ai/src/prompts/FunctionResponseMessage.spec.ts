@@ -1,9 +1,9 @@
 import assert from 'assert';
-import { FunctionResponseMessage } from './FunctionResponseMessage';
 import { TestAdapter } from 'botbuilder-core';
-import { TestTurnState } from '../TestTurnState';
+import { TestTurnState } from '../internals/testing/TestTurnState';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestPromptManager } from './TestPromptManager';
+import { FunctionResponseMessage } from './FunctionResponseMessage';
 
 describe('FunctionResponseMessage', () => {
     const functionName = 'foo';

@@ -59,8 +59,6 @@
         "sponge": "^0.1.0",
         "tinyify": "^4.0.0",
         "ts-node": "^10.9.2",
-        "typedoc": "^0.25.7",
-        "typedoc-plugin-markdown": "^3.17.1",
         "typescript": "^5.3.3",
         "wsrun": "^5.2.4"
     }

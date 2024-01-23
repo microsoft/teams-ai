@@ -3,7 +3,7 @@
     "include": ["packages/**/src/**/*.ts", "lib/**/*.js"],
     "exclude": [
         "**/node_modules/**",
-        "**/tests/**",
+        "**/testing/**",
         "**/coverage/**",
         "**/*.d.ts",
         "**/*.spec.ts",

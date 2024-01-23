@@ -1,10 +1,10 @@
 import assert from 'assert';
-import { TextDataSource } from '../dataSources/TextDataSource';
-import { DataSourceSection } from './DataSourceSection';
 import { TestAdapter } from 'botbuilder-core';
-import { TestTurnState } from '../TestTurnState';
+import { DataSourceSection } from './DataSourceSection';
+import { TextDataSource } from '../dataSources/TextDataSource';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestPromptManager } from './TestPromptManager';
 
 describe('DataSourceSection', () => {
     const textDataSource = new TextDataSource('testname', 'Hello World!');

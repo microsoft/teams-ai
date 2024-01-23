@@ -2,7 +2,7 @@ import { Order } from './foodOrderViewSchema';
 
 /**
  *
- * @param order
+ * @param {Order} order Order to generate a card for.
  */
 export function generateCardForOrder(order: Order) {
     const card: any = {
@@ -33,7 +33,7 @@ export function generateCardForOrder(order: Order) {
 
     for (const item of order.items) {
         switch (item.itemType) {
-            case 'pizza':
+            case 'pizza': {
                 const name = item.name ? item.name : 'Custom Pizza';
                 card.body.push({
                     type: 'TextBlock',
@@ -41,6 +41,7 @@ export function generateCardForOrder(order: Order) {
                     wrap: true
                 });
                 break;
+            }
             case 'beer':
                 card.body.push({
                     type: 'TextBlock',

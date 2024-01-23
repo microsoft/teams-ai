@@ -2,7 +2,7 @@ import { Application, AI, PredictedSayCommand } from '@microsoft/teams-ai';
 
 /**
  *
- * @param app
+ * @param {Application} app Application to add the response formatter to.
  */
 export function addResponseFormatter(app: Application): void {
     app.ai.action<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data) => {

@@ -4,10 +4,10 @@ import { MemoryStorage } from 'botbuilder';
 import { ApplicationBuilder } from './ApplicationBuilder';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
-import { TurnState } from './TurnState';
-import { TestPlanner } from './planners';
+import { TestPlanner } from './internals/testing/TestPlanner';
 import { TaskModulesOptions } from './TaskModules';
 import { TeamsAdapter } from './TeamsAdapter';
+import { TurnState } from './TurnState';
 
 describe('ApplicationBuilder', () => {
     const botAppId = 'testBot';

@@ -267,6 +267,6 @@ async function updatePost(
     }
 
     // Return card
-    const card = createEditView(response.message?.content!, PREVIEW_MODE);
+    const card = createEditView(response.message!.content!, PREVIEW_MODE);
     return createTaskInfo(card);
 }

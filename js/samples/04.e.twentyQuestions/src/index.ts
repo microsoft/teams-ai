@@ -190,5 +190,5 @@ async function getHint(context: TurnContext, state: ApplicationTurnState): Promi
         throw result.error!;
     }
 
-    return result.message?.content!;
+    return result.message!.content!;
 }
