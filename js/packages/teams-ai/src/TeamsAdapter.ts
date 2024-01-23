@@ -34,7 +34,7 @@ const USER_AGENT = `teamsai-js/${packageInfo.version}`;
 export class TeamsAdapter extends CloudAdapter {
     constructor(
         botFrameworkAuthConfig?: ConfigurationBotFrameworkAuthenticationOptions,
-        credentialsFactory?: ServiceClientCredentialsFactory,
+        readonly credentialsFactory?: ServiceClientCredentialsFactory,
         authConfiguration?: AuthenticationConfiguration,
         connectorClientOptions?: ConnectorClientOptions
     ) {

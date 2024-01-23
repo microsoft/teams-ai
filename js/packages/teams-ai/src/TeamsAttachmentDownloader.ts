@@ -8,8 +8,10 @@
 
 import axios, { AxiosInstance } from 'axios';
 import { Attachment, TurnContext } from 'botbuilder';
-import { TurnState } from './TurnState';
+
 import { InputFile, InputFileDownloader } from './InputFileDownloader';
+import { TeamsAdapter } from './TeamsAdapter';
+import { TurnState } from './TurnState';
 
 /**
  * Options for the `TeamsAttachmentDownloader` class.
@@ -24,6 +26,11 @@ export interface TeamsAttachmentDownloaderOptions {
      * The Microsoft App Password of the bot.
      */
     botAppPassword: string;
+
+    /**
+     * ServiceClientCredentialsFactory
+     */
+    adapter: TeamsAdapter;
 }
 
 /**
@@ -35,7 +42,7 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
 
     /**
      * Creates a new instance of the `TeamsAttachmentDownloader` class.
-     * @param options Options for the `TeamsAttachmentDownloader` class.
+     * @param {TeamsAttachmentDownloader} options - Options for the `TeamsAttachmentDownloader` class.
      */
     public constructor(options: TeamsAttachmentDownloaderOptions) {
         this._options = options;
@@ -44,8 +51,10 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
 
     /**
      * Download any files relative to the current user's input.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
+     * @template TState - Type of the state object passed to the `TurnContext.turnState` method.
+     * @param {TurnContext} context Context for the current turn of conversation.
+     * @param {TState} state Application state for the current turn of conversation.
+     * @returns {Promise<InputFile[]>} Promise that resolves to an array of downloaded input files.
      */
     public async downloadFiles(context: TurnContext, state: TState): Promise<InputFile[]> {
         // Filter out HTML attachments
@@ -54,8 +63,13 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
             return Promise.resolve([]);
         }
 
-        // Download all attachments
-        const accessToken = await this.getAccessToken();
+        let accessToken = '';
+
+        // If authentication is enabled, get access token
+        if ((await this._options.adapter.credentialsFactory?.isAuthenticationDisabled()) !== true) {
+            // Download all attachments
+            accessToken = await this.getAccessToken();
+        }
         const files: InputFile[] = [];
         for (const attachment of attachments) {
             const file = await this.downloadFile(attachment, accessToken);
@@ -68,16 +82,29 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
     }
 
     /**
-     * @param attachment
-     * @param accessToken
      * @private
+     * @param {Attachment} attachment - Attachment to download.
+     * @param {string} accessToken - Access token to use for downloading.
+     * @returns {Promise<InputFile>} - Promise that resolves to the downloaded input file.
      */
-    private async downloadFile(attachment: Attachment, accessToken: string): Promise<InputFile> {
-        if (attachment.contentUrl && attachment.contentUrl.startsWith('https://')) {
-            // Download file
-            const headers = {
-                Authorization: `Bearer ${accessToken}`
+    private async downloadFile(attachment: Attachment, accessToken: string): Promise<InputFile | undefined> {
+        if (attachment.content) {
+            return {
+                content: Buffer.from(attachment.content),
+                contentType: attachment.contentType,
+                contentUrl: attachment.contentUrl
             };
+        } else if (
+            (attachment.contentUrl && attachment.contentUrl.startsWith('https://')) ||
+            (attachment.contentUrl && attachment.contentUrl.startsWith('http://localhost'))
+        ) {
+            let headers;
+            if (accessToken.length > 0) {
+                // Build request for downloading file if access token is available
+                headers = {
+                    Authorization: `Bearer ${accessToken}`
+                };
+            }
             const response = await this._httpClient.get(attachment.contentUrl, {
                 headers,
                 responseType: 'arraybuffer'
@@ -98,19 +125,15 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
                 contentType,
                 contentUrl: attachment.contentUrl
             };
-        } else {
-            return {
-                content: Buffer.from(attachment.content),
-                contentType: attachment.contentType,
-                contentUrl: attachment.contentUrl
-            };
         }
     }
 
     /**
      * @private
+     * @returns {Promise<string>} - Promise that resolves to the access token.
      */
     private async getAccessToken(): Promise<string> {
+        // await this._options.adapter.credentialsFactory
         const headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         };
