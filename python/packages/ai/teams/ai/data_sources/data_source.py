@@ -9,7 +9,7 @@ from botbuilder.core import TurnContext
 
 from teams.ai.prompts.prompt_section import RenderedPromptSection
 from teams.ai.tokenizers import Tokenizer
-from teams.memory_fork import Memory
+from teams.state.memory import Memory
 
 
 class DataSource(ABC):
