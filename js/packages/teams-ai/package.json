@@ -40,7 +40,7 @@
         "@types/assert": "^1.5.10",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.11.4",
+        "@types/node": "^20.11.5",
         "@types/uuid": "^9.0.7",
         "eslint": "^8.56.0",
         "jsonwebtoken": "^9.0.2",
