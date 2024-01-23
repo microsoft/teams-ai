@@ -33,6 +33,7 @@ export interface Memory {
 
     /**
      * Retrieves a value from the memory.
+     * @template TValue Type of the value to retrieve.
      * @param path Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.
      * @returns The value or undefined if not found.
      */
@@ -95,10 +96,11 @@ export class MemoryFork implements Memory {
 
     /**
      * Retrieves a value from the memory.
+     * @template TValue Type of the value to retrieve.
      * @remarks
      * The forked memory is checked first, then the original memory.
      * @param {string} path Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.
-     * @returns {unknown | undefined} The value or undefined if not found.
+     * @returns {TValue | undefined} The value or undefined if not found.
      */
     public getValue<TValue = unknown>(path: string): TValue {
         const { scope, name } = this.getScopeAndName(path);
@@ -130,7 +132,7 @@ export class MemoryFork implements Memory {
     /**
      * @private
      * @param {string} path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
-     @returns {Record<string, string>} Scope and name.
+     * @returns {Record<string, string>} Scope and name.
      */
     private getScopeAndName(path: string): { scope: string; name: string } {
         // Get variable scope and name
