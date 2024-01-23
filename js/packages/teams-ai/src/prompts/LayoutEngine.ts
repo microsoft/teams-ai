@@ -26,10 +26,10 @@ export class LayoutEngine implements PromptSection {
 
     /**
      *
-     * @param sections List of sections to layout.
-     * @param tokens Sizing strategy for this section.
-     * @param required Indicates if this section is required.
-     * @param separator Separator to use between sections when rendering as text.
+     * @param {PromptSection[]} sections List of sections to layout.
+     * @param {number} tokens Sizing strategy for this section.
+     * @param {boolean} required Indicates if this section is required.
+     * @param {string} separator Separator to use between sections when rendering as text.
      */
     public constructor(sections: PromptSection[], tokens: number, required: boolean, separator: string) {
         this.sections = sections;
@@ -39,12 +39,13 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @param {Memory} memory The current memory.
+     * @param {PromptFunctions} functions The functions available to use in the prompt.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering as text.
+     * @param {number} maxTokens Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<string>>} Rendered section.
      */
     public async renderAsText(
         context: TurnContext,
@@ -82,12 +83,13 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @param {Memory} memory The current memory.
+     * @param {PromptFunctions} functions The functions available to use in the prompt.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering as text.
+     * @param {number} maxTokens Maximum number of tokens allowed.
+     * @returns {Promise<RenderedPromptSection<Message[]>>} Rendered section.
      */
     public async renderAsMessages(
         context: TurnContext,
@@ -122,9 +124,10 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param sections
-     * @param layout
      * @private
+     * @template T
+     * @param {PromptSection[]} sections Sections to add to the layout.
+     * @param {PromptSectionLayout<T>[]} layout Layout to add the sections to.
      */
     private addSectionsToLayout<T>(sections: PromptSection[], layout: PromptSectionLayout<T>[]): void {
         for (let i = 0; i < sections.length; i++) {
@@ -138,13 +141,15 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param layout
-     * @param maxTokens
-     * @param cbFixed
-     * @param cbProportional
-     * @param textLayout
-     * @param tokenizer
      * @private
+     * @template T
+     * @param {PromptSectionLayout<T>[]} layout Layout to render.
+     * @param {number} maxTokens Maximum number of tokens allowed.
+     * @param {Function} cbFixed Callback to render a fixed section.
+     * @param {Function} cbProportional Callback to render a proportional section.
+     * @param {boolean} textLayout Indicates if the layout is being rendered as text.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering as text.
+     * @returns {Promise<number>} Number of tokens remaining.
      */
     private async layoutSections<T>(
         layout: PromptSectionLayout<T>[],
@@ -179,9 +184,10 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param layout
-     * @param callback
      * @private
+     * @template T
+     * @param {PromptSectionLayout<T>[]} layout Layout to render.
+     * @param {Function} callback Callback to render a fixed section of the layout.
      */
     private async layoutFixedSections<T>(
         layout: PromptSectionLayout<T>[],
@@ -199,9 +205,10 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param layout
-     * @param callback
      * @private
+     * @template T
+     * @param {PromptSectionLayout<T>[]} layout Layout to render.
+     * @param {Function} callback Callback to render a proportional section of the layout.
      */
     private async layoutProportionalSections<T>(
         layout: PromptSectionLayout<T>[],
@@ -219,10 +226,12 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param layout
-     * @param textLayout
-     * @param tokenizer
      * @private
+     * @template T
+     * @param {PromptSectionLayout<T>[]} layout Layout to get the length of.
+     * @param {boolean} textLayout Indicates if the layout is being rendered as text.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering as text.
+     * @returns {number} Length of the layout.
      */
     private getLayoutLength<T>(
         layout: PromptSectionLayout<T>[],
@@ -252,8 +261,10 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param layout
      * @private
+     * @template T
+     * @param {PromptSectionLayout<T>[]} layout Layout to drop the last optional section from.
+     * @returns {boolean} True if an optional section was dropped, false otherwise.
      */
     private dropLastOptionalSection<T>(layout: PromptSectionLayout<T>[]): boolean {
         for (let i = layout.length - 1; i >= 0; i--) {
@@ -268,8 +279,10 @@ export class LayoutEngine implements PromptSection {
     }
 
     /**
-     * @param layout
      * @private
+     * @template T
+     * @param {PromptSectionLayout<T>[]} layout Layout to check.
+     * @returns {boolean} True if the layout needs more rendering, false otherwise.
      */
     private needsMoreLayout<T>(layout: PromptSectionLayout<T>[]): boolean {
         for (let i = 0; i < layout.length; i++) {

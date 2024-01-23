@@ -17,10 +17,10 @@ import {
 import { Application, ConversationUpdateEvents, MessageReactionEvents, TeamsMessageEvents } from './Application';
 import { AdaptiveCardsOptions } from './AdaptiveCards';
 import { AIOptions } from './AI';
+import { TestPlanner } from './internals/testing/TestPlanner';
+import { createTestConversationUpdate, createTestInvoke } from './internals/testing/TestUtilities';
 import { TaskModulesOptions } from './TaskModules';
 import { TurnState } from './TurnState';
-import { createTestConversationUpdate, createTestInvoke } from './internals';
-import { TestPlanner } from './planners/TestPlanner';
 import { TeamsAdapter } from './TeamsAdapter';
 
 class MockUserTokenClient {

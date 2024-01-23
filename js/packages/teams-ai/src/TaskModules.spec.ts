@@ -1,7 +1,5 @@
 import sinon from 'sinon';
 import { strict as assert } from 'assert';
-import { Application } from './Application';
-import { createTestInvoke } from './internals';
 import {
     ActivityTypes,
     BotConfigAuth,
@@ -16,6 +14,9 @@ import {
     TestAdapter,
     TurnContext
 } from 'botbuilder';
+
+import { Application } from './Application';
+import { createTestInvoke } from './internals/testing/TestUtilities';
 import { TaskModules, TaskModuleInvokeNames } from './TaskModules';
 
 describe('TaskModules', () => {

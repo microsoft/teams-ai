@@ -69,7 +69,7 @@ export class VectraDataSource implements DataSource {
 
     /**
      * Creates a new `VectraDataSource` instance.
-     * @param options Options for creating the data source.
+     * @param {VectraDataSourceOptions} options Options for creating the data source.
      */
     public constructor(options: VectraDataSourceOptions) {
         this._options = options;
@@ -95,10 +95,11 @@ export class VectraDataSource implements DataSource {
 
     /**
      * Renders the data source as a string of text.
-     * @param context Turn context for the current turn of conversation with the user.
-     * @param memory An interface for accessing state values.
-     * @param tokenizer Tokenizer to use when rendering the data source.
-     * @param maxTokens Maximum number of tokens allowed to be rendered.
+     * @param {TurnContext} context Turn context for the current turn of conversation with the user.
+     * @param {Memory} memory An interface for accessing state values.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering the data source.
+     * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
+     * @returns {Promise<RenderedPromptSection<string>>} A promise that resolves to the rendered data source.
      */
     public async renderData(
         context: TurnContext,

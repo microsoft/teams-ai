@@ -1,10 +1,11 @@
-import axios from 'axios';
 import { strict as assert } from 'assert';
-import sinon, { SinonSandbox, SinonStub } from 'sinon';
 import { TestAdapter } from 'botbuilder';
+import axios from 'axios';
+import sinon, { SinonSandbox, SinonStub } from 'sinon';
+
 import { AI } from '../AI';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { Plan, PredictedDoCommand, PredictedSayCommand } from '../planners';
-import { TestTurnState } from '../TestTurnState';
 import { OpenAIModerator, OpenAIModeratorOptions } from './OpenAIModerator';
 
 describe('OpenAIModerator', () => {
