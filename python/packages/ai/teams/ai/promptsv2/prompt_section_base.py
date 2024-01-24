@@ -3,7 +3,9 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+import json
 from abc import abstractmethod
+from dataclasses import asdict
 from typing import Any, List, Union
 
 from botbuilder.core import TurnContext
@@ -117,7 +119,7 @@ class PromptSectionBase(PromptSection):
     def _get_token_budget(self, max_tokens: int) -> int:
         return min(int(self.tokens), max_tokens) if self.tokens > 1.0 else max_tokens
 
-    def return_messages(
+    def _return_messages(
         self, output: List[Message], length: int, tokenizer: Tokenizer, max_tokens: int
     ) -> RenderedPromptSection:
         # Truncate if fixed length
@@ -140,7 +142,7 @@ class PromptSectionBase(PromptSection):
         if isinstance(text, list):
             text = " ".join([part.text for part in text if isinstance(part, TextContentPart)])
         elif message.function_call:
-            text = str(message.function_call)
+            text = json.dumps(asdict(message.function_call))
         elif message.name:
             text = f"{message.name} returned {text}"
 

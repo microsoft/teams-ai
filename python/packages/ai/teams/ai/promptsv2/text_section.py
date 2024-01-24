@@ -59,6 +59,6 @@ class TextSection(PromptSectionBase):
 
         # Return output
         messages: List[Message] = [Message(self.role, self.text)] if self._length > 0 else []
-        return self.return_messages(messages, self._length, tokenizer, max_tokens)
+        return self._return_messages(messages, self._length, tokenizer, max_tokens)
 
     # pylint: enable=too-many-arguments

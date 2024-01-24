@@ -14,7 +14,7 @@ T = TypeVar("T")
 @dataclass
 class Message(Generic[T]):
     role: str
-    content: Optional[T]
+    content: Optional[T] = None
     function_call: Optional[FunctionCall] = None
     name: Optional[str] = None
 
