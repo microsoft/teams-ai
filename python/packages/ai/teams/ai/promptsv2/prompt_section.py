@@ -26,18 +26,19 @@ class PromptSection(ABC):
         """
         If true the section is mandatory otherwise it can be safely dropped.
         """
-        pass
 
     @property
     @abstractmethod
     def tokens(self) -> float:
         """
         The requested token budget for this section.
-        - Values between 0.0 and 1.0 represent a percentage of the total budget and the section will be layed out proportionally to all other sections.
-        - Values greater than 1.0 represent the max number of tokens the section should be allowed to consume.
+        - Values between 0.0 and 1.0 represent a percentage of the total budget and
+          the section will be layed out proportionally to all other sections.
+        - Values greater than 1.0 represent the max number of tokens the section
+          should be allowed to consume.
         """
-        pass
 
+    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     @abstractmethod
     async def render_as_text(
         self,
@@ -60,8 +61,10 @@ class PromptSection(ABC):
         Returns:
             RenderedPromptSection[str]: The rendered prompt section as a string.
         """
-        pass
 
+    # pylint: enable=too-many-arguments
+
+    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     @abstractmethod
     async def render_as_messages(
         self,
@@ -84,4 +87,5 @@ class PromptSection(ABC):
         Returns:
             RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
         """
-        pass
+
+    # pylint: enable=too-many-arguments

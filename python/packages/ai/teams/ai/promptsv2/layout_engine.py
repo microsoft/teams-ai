@@ -4,7 +4,7 @@ Licensed under the MIT License.
 """
 
 import asyncio
-from typing import Any, Awaitable, Callable, List, Optional, Union
+from typing import Any, Awaitable, Callable, List, Optional
 
 from botbuilder.core import TurnContext
 
@@ -12,7 +12,6 @@ from ...state import Memory
 from ..tokenizers import Tokenizer
 from .message import Message
 from .prompt_functions import PromptFunctions
-
 from .prompt_section import PromptSection
 from .prompt_section_layout import PromptSectionLayout
 from .rendered_prompt_section import RenderedPromptSection
@@ -46,6 +45,7 @@ class LayoutEngine(PromptSection):
         self._tokens = tokens
         self._separator = separator
 
+    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def render_as_text(
         self,
         context: TurnContext,
@@ -80,6 +80,9 @@ class LayoutEngine(PromptSection):
             output=text, length=len(tokenizer.encode(text)), too_long=remaining < 0
         )
 
+    # pylint: enable=too-many-arguments
+
+    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def render_as_messages(
         self,
         context: TurnContext,
@@ -113,6 +116,8 @@ class LayoutEngine(PromptSection):
             output=output, length=self._get_layout_length(layout), too_long=remaining < 0
         )
 
+    # pylint: enable=too-many-arguments
+
     def _add_sections_to_layout(
         self, sections: List[PromptSection], layout: List[PromptSectionLayout[Any]]
     ):
@@ -122,17 +127,20 @@ class LayoutEngine(PromptSection):
             else:
                 layout.append(PromptSectionLayout(section=section))
 
+    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def _layout_sections(
         self,
         layout: List[PromptSectionLayout[Any]],
         max_tokens: int,
-        cb_fixed: Callable[[PromptSection], Awaitable[RenderedPromptSection[Any]]],
-        cb_proportional: Callable[[PromptSection, int], Awaitable[RenderedPromptSection[Any]]],
+        callback_fixed: Callable[[PromptSection], Awaitable[RenderedPromptSection[Any]]],
+        callback_proportional: Callable[
+            [PromptSection, int], Awaitable[RenderedPromptSection[Any]]
+        ],
         text_layout: bool = False,
         tokenizer: Optional[Tokenizer] = None,
     ) -> int:
         # Layout fixed sections
-        await self._layout_fixed_sections(layout, cb_fixed)
+        await self._layout_fixed_sections(layout, callback_fixed)
 
         # Get tokens remaining and drop optional sections if too long
         remaining = max_tokens - self._get_layout_length(layout, text_layout, tokenizer)
@@ -143,7 +151,7 @@ class LayoutEngine(PromptSection):
         if self._needs_more_layout(layout) and remaining > 0:
             # Layout proportional sections
             await self._layout_proportional_sections(
-                layout, lambda section: cb_proportional(section, remaining)
+                layout, lambda section: callback_proportional(section, remaining)
             )
 
             # Get tokens remaining and drop optional sections if too long
@@ -152,6 +160,8 @@ class LayoutEngine(PromptSection):
                 remaining = max_tokens - self._get_layout_length(layout, text_layout, tokenizer)
 
         return remaining
+
+    # pylint: enable=too-many-arguments
 
     async def _layout_fixed_sections(
         self,
@@ -162,11 +172,11 @@ class LayoutEngine(PromptSection):
         for layout in layouts:
             if layout.section.tokens < 0 or layout.section.tokens > 1.0:
 
-                async def task() -> None:
+                async def task(layout: PromptSectionLayout[Any]) -> None:
                     output = await callback(layout.section)
                     layout.layout = output
 
-                tasks.append(task())
+                tasks.append(task(layout))
 
         await asyncio.gather(*tasks)
 
@@ -179,11 +189,11 @@ class LayoutEngine(PromptSection):
         for layout in layouts:
             if 0.0 <= layout.section.tokens <= 1.0:
 
-                async def task() -> None:
+                async def task(layout: PromptSectionLayout[Any]) -> None:
                     output = await callback(layout.section)
                     layout.layout = output
 
-                tasks.append(task())
+                tasks.append(task(layout))
 
         await asyncio.gather(*tasks)
 
@@ -196,8 +206,8 @@ class LayoutEngine(PromptSection):
         if text_layout and tokenizer:
             output = [section.layout.output for section in layout if section.layout]
             return len(tokenizer.encode(self.separator.join(output)))
-        else:
-            return sum(section.layout.length for section in layout if section.layout)
+
+        return sum(section.layout.length for section in layout if section.layout)
 
     def _drop_last_optional_section(self, layout: List[PromptSectionLayout[Any]]) -> bool:
         for i in reversed(range(len(layout))):
