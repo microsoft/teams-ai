@@ -270,6 +270,27 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             Assert.Equal("test", userRecord["test"]);
         }
 
+        [Fact]
+        public async void Test_SaveState_Entry_Deleted()
+        {
+            // Arrange
+            var state = new CustomTurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var storage = new MemoryStorage();
+            await state.LoadStateAsync(storage, turnContext);
+            state.User["test"] = "test";
+            var storage_keys = state.GetStorageKeys(turnContext);
+            var userStorageKey = storage_keys["user"];
+            state.DeleteUserState();
+
+            // Act
+            await state.SaveStateAsync(turnContext, storage);
+
+            // Assert
+            var items = await storage.ReadAsync(new string[] { userStorageKey }, default);
+            Assert.False(items.ContainsKey(userStorageKey));
+        }
+
 
         [Fact]
         public async void Test_SetValue()
@@ -288,6 +309,32 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             Assert.Equal("temp_test", state.Temp["key"]);
             Assert.Equal("conversation_test", state.Conversation["key"]);
             Assert.Equal("user_test", state.User["key"]);
+        }
+
+        [Fact]
+        public async void Test_SetValue_InvalidScope()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            await state.LoadStateAsync(null, turnContext);
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentNullException>(() => state.SetValue("invalidScope.key", ""));
+            Assert.Contains("Invalid state scope: invalidScope", exception.Message);
+        }
+
+        [Fact]
+        public async void Test_SetValue_InvalidPath()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            await state.LoadStateAsync(null, turnContext);
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.SetValue("invalid.path.path", ""));
+            Assert.Contains("Invalid state path: invalid.path.path", exception.Message);
         }
 
         [Fact]
@@ -374,6 +421,18 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
+        public void Test_DeleteTempState_Invalid_Scope()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.DeleteTempState());
+            Assert.Contains("TurnState hasn't been loaded. Call LoadStateAsync() first.", exception.Message);
+        }
+
+        [Fact]
         public async void Test_DeleteUserState()
         {
             // Arrange
@@ -390,6 +449,18 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
+        public void Test_DeleteUserState_Invalid_Scope()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.DeleteUserState());
+            Assert.Contains("TurnState hasn't been loaded. Call LoadStateAsync() first.", exception.Message);
+        }
+
+        [Fact]
         public async void Test_DeleteConversationState()
         {
             // Arrange
@@ -403,6 +474,18 @@ namespace Microsoft.Teams.AI.Tests.StateTests
 
             // Assert
             Assert.False(state.HasValue("conversation.key"));
+        }
+
+        [Fact]
+        public void Test_DeleteConversationState_Invalid_Scope()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.DeleteConversationState());
+            Assert.Contains("TurnState hasn't been loaded. Call LoadStateAsync() first.", exception.Message);
         }
 
         [Fact]
@@ -512,6 +595,100 @@ namespace Microsoft.Teams.AI.Tests.StateTests
 
             // Assert
             Assert.NotNull(record);
+        }
+
+        [Fact]
+        public void Test_Set_Conversation_Before_Loading_State()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.Conversation = new Record());
+            Assert.Contains("TurnState hasn't been loaded. Call LoadStateAsync() first.", exception.Message);
+        }
+
+        [Fact]
+        public void Test_Set_User_Before_Loading_State()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.User = new Record());
+            Assert.Contains("TurnState hasn't been loaded. Call LoadStateAsync() first.", exception.Message);
+        }
+
+        [Fact]
+        public void Test_Set_Temp_Before_Loading_State()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() => state.Temp = new TempState());
+            Assert.Contains("TurnState hasn't been loaded. Call LoadStateAsync() first.", exception.Message);
+        }
+
+        [Fact]
+        public async void Test_Set_Conversation()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            await state.LoadStateAsync(null, turnContext);
+
+            // Act
+            state.Conversation["test"] = "value";
+
+            // Assert
+            Assert.Equal("value", state.Conversation["test"]);
+        }
+
+        [Fact]
+        public async void Test_Set_Temp()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            await state.LoadStateAsync(null, turnContext);
+
+            // Act
+            state.Temp["test"] = "value";
+
+            // Assert
+            Assert.Equal("value", state.Temp["test"]);
+        }
+
+        [Fact]
+        public async void Test_Set_User()
+        {
+            // Arrange
+            var state = new TurnState();
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            await state.LoadStateAsync(null, turnContext);
+
+            // Act
+            state.User["test"] = "value";
+
+            // Assert
+            Assert.Equal("value", state.User["test"]);
+        }
+
+        [Fact]
+        public void Test_IsLoaded()
+        {
+            // Arrange
+            var state = new TurnState();
+
+            // Act
+            var isLoaded = state.IsLoaded();
+
+            // Assert
+            Assert.False(isLoaded);
         }
     }
 }

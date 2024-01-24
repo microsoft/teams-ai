@@ -450,7 +450,7 @@ namespace Microsoft.Teams.AI.State
             string[] parts = path.Split('.');
             if (parts.Length > 2)
             {
-                throw new ArgumentException($"Invalid state path: ${path}");
+                throw new ArgumentException($"Invalid state path: {path}");
             }
             else if (parts.Length == 1)
             {
@@ -461,7 +461,7 @@ namespace Microsoft.Teams.AI.State
             TurnStateEntry? scope = GetScope(parts[0]);
             if (scope == null)
             {
-                throw new ArgumentNullException($"Invalid state scope: ${parts[0]}");
+                throw new ArgumentNullException($"Invalid state scope: {parts[0]}");
             }
 
             return (scope, parts[1]);
