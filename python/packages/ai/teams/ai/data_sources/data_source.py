@@ -38,6 +38,6 @@ class DataSource(ABC):
             max_tokens (int): Maximum number of tokens allowed to be rendered.
 
         Returns:
-            RenderedPromptSection: The text to inject into the prompt as a 
+            RenderedPromptSection: The text to inject into the prompt as a
             `RenderedPromptSection` object.
         """

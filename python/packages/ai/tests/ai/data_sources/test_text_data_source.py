@@ -8,7 +8,7 @@ from unittest import IsolatedAsyncioTestCase
 import pytest
 
 from teams.ai.data_sources import TextDataSource
-from teams.ai.tokenizers import Tokenizer, GPTTokenizer
+from teams.ai.tokenizers import GPTTokenizer, Tokenizer
 
 
 class TestTextDataSource(IsolatedAsyncioTestCase):
