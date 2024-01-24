@@ -30,7 +30,9 @@ class TestablePromptSectionBase(PromptSectionBase):
     # pylint: disable=too-many-arguments
     async def render_as_messages(self, context, memory, functions, tokenizer, max_tokens):
         return RenderedPromptSection([], 0, False)
+
     # pylint: enable=too-many-arguments
+
 
 class TestPromptSectionBase(IsolatedAsyncioTestCase):
     async def test_render_as_text_empty_message(self):

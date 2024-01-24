@@ -72,7 +72,7 @@ class PromptSectionBase(PromptSection):
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
-    ) -> RenderedPromptSection:
+    ) -> RenderedPromptSection[List[Message]]:
         pass
 
     # pylint: enable=too-many-arguments
@@ -85,7 +85,7 @@ class PromptSectionBase(PromptSection):
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
-    ) -> RenderedPromptSection:
+    ) -> RenderedPromptSection[str]:
         # Render as messages
         as_messages: RenderedPromptSection[List[Message[Any]]] = await self.render_as_messages(
             context, memory, functions, tokenizer, max_tokens

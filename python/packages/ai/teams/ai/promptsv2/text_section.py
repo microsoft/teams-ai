@@ -12,6 +12,7 @@ from ..tokenizers import Tokenizer
 from .message import Message
 from .prompt_functions import PromptFunctions
 from .prompt_section_base import PromptSectionBase
+from .rendered_prompt_section import RenderedPromptSection
 
 
 class TextSection(PromptSectionBase):
@@ -52,7 +53,7 @@ class TextSection(PromptSectionBase):
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         max_tokens: int,
-    ):
+    ) -> RenderedPromptSection[List[Message]]:
         # Calculate and cache length
         if self._length < 0:
             self._length = len(tokenizer.encode(self.text))
