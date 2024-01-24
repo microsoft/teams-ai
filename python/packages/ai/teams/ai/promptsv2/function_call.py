@@ -9,5 +9,10 @@ from typing import Optional
 
 @dataclass
 class FunctionCall:
+    """A named function to call."""
+
     name: Optional[str]
+    """Name of the function to call."""
+
     arguments: Optional[str]
+    """Arguments to pass to the function. Must be deserialized."""

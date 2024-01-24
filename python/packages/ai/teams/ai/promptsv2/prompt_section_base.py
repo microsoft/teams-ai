@@ -19,6 +19,19 @@ from .rendered_prompt_section import RenderedPromptSection
 
 
 class PromptSectionBase(PromptSection):
+    """
+    Abstract Base class for most prompt sections.
+
+    This class provides a default implementation of `renderAsText()` so that derived classes only
+    need to implement `renderAsMessages()`.
+
+    Attributes:
+        required (bool): If true the section is mandatory otherwise it can be safely dropped.
+        tokens (float): The requested token budget for this section.
+        separator (str): The separator to use between messages when rendering as text.
+        text_prefix (str): The prefix to use when rendering as text.
+    """
+
     def __init__(
         self,
         tokens: float = -1,
@@ -26,6 +39,15 @@ class PromptSectionBase(PromptSection):
         separator: str = "\n",
         text_prefix: str = "",
     ):
+        """Initializes the PromptSectionBase.
+
+        Args:
+            tokens (float, optional): Sizing strategy for this section. Defaults to `auto`.
+            required (bool, optional): Indicates if this section is required. Defaults to `true`.
+            separator (str, optional): Separator to use between sections when rendering as text.
+              Defaults to `\n`.
+            text_prefix (str, optional): Prefix to use for text output. Defaults to ``.
+        """
         self._required = required
         self._tokens = tokens
         self._separator = separator
@@ -73,7 +95,19 @@ class PromptSectionBase(PromptSection):
         tokenizer: Tokenizer,
         max_tokens: int,
     ) -> RenderedPromptSection[List[Message]]:
-        pass
+        """
+        Renders the section as a list of messages.
+
+        Args:
+            context (TurnContext): Context for the current turn of conversation with the user.
+            memory (Memory): An interface for accessing state values.
+            functions (PromptFunctions): Registry of functions that can be used by the section.
+            tokenizer (Tokenizer): Tokenizer to use when rendering the section.
+            max_tokens (int): Maximum number of tokens allowed to be rendered.
+
+        Returns:
+            RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
+        """
 
     # pylint: enable=too-many-arguments
 
@@ -86,6 +120,20 @@ class PromptSectionBase(PromptSection):
         tokenizer: Tokenizer,
         max_tokens: int,
     ) -> RenderedPromptSection[str]:
+        """
+        Renders the section as a string of text.
+
+        Args:
+            context (TurnContext): Context for the current turn of conversation with the user.
+            memory (Memory): An interface for accessing state values.
+            functions (PromptFunctions): Registry of functions that can be used by the section.
+            tokenizer (Tokenizer): Tokenizer to use when rendering the section.
+            max_tokens (int): Maximum number of tokens allowed to be rendered.
+
+        Returns:
+            RenderedPromptSection[str]: The rendered prompt section as a string.
+        """
+
         # Render as messages
         as_messages: RenderedPromptSection[List[Message[Any]]] = await self.render_as_messages(
             context, memory, functions, tokenizer, max_tokens
@@ -138,6 +186,15 @@ class PromptSectionBase(PromptSection):
 
     @staticmethod
     def get_message_text(message: Message) -> str:
+        """
+        Returns the content of a message as a string.
+
+        Args:
+            message (Message): Message to get the text of.
+
+        Returns:
+            str: The message content as a string.
+        """
         text: Union[List[MessageContentParts], str] = message.content or ""
         if isinstance(text, list):
             text = " ".join([part.text for part in text if isinstance(part, TextContentPart)])

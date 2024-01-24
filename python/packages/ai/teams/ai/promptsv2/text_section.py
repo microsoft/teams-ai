@@ -16,6 +16,15 @@ from .rendered_prompt_section import RenderedPromptSection
 
 
 class TextSection(PromptSectionBase):
+    """
+    A section of text that will be rendered as a message.
+
+    Attributes:
+        text (str): Text to use for this section.
+        role (str): Message role to use for this section.
+
+    """
+
     _text: str
     _role: str
     _length: int
@@ -30,6 +39,19 @@ class TextSection(PromptSectionBase):
         separator: str = "\n",
         text_prefix: str = "",
     ):
+        """
+        Creates a new 'TextSection' instance.
+
+        Args:
+            text (str): Text to use for this section.
+            role (str): Message role to use for this section.
+            tokens (float, optional): Sizing strategy for this section. Defaults to `auto`.
+            required (bool, optional): Indicates if this section is required. Defaults to `true`.
+            separator (str, optional): Separator to use between sections when rendering as text.
+              Defaults to `\n`.
+            text_prefix (str, optional): Prefix to use for text output. Defaults to ``.
+
+        """
         super().__init__(tokens, required, separator, text_prefix)
         self._text = text
         self._role = role
@@ -39,10 +61,12 @@ class TextSection(PromptSectionBase):
 
     @property
     def text(self):
+        """Text to use for this section."""
         return self._text
 
     @property
     def role(self):
+        """Message role to use for this section."""
         return self._role
 
     # pylint: disable=too-many-arguments # No argument can be removed based on the design
@@ -54,6 +78,19 @@ class TextSection(PromptSectionBase):
         tokenizer: Tokenizer,
         max_tokens: int,
     ) -> RenderedPromptSection[List[Message]]:
+        """
+        Renders the section as a list of messages.
+
+        Args:
+            context (TurnContext): Context for the current turn of conversation with the user.
+            memory (Memory): An interface for accessing state values.
+            functions (PromptFunctions): Registry of functions that can be used by the section.
+            tokenizer (Tokenizer): Tokenizer to use when rendering the section.
+            max_tokens (int): Maximum number of tokens allowed to be rendered.
+
+        Returns:
+            RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
+        """
         # Calculate and cache length
         if self._length < 0:
             self._length = len(tokenizer.encode(self.text))

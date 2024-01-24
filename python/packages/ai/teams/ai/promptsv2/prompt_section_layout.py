@@ -13,6 +13,6 @@ T = TypeVar("T")
 
 
 @dataclass
-class PromptSectionLayout(Generic[T]):
+class _PromptSectionLayout(Generic[T]):
     section: PromptSection
     layout: Optional[RenderedPromptSection[T]] = None
