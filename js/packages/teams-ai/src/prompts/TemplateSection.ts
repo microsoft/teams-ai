@@ -114,6 +114,7 @@ export class TemplateSection extends PromptSectionBase {
                 case ParseState.inParameter:
                     if (char === '}' && this.template[i + 1] === '}') {
                         if (part.length > 0) {
+                            part = part.trim();
                             if (part[0] === '$') {
                                 this._parts.push(this.createVariableRenderer(part.substring(1)));
                             } else {
