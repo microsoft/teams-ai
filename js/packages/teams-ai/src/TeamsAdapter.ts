@@ -15,7 +15,9 @@
 import {
     CloudAdapter,
     ConfigurationBotFrameworkAuthentication,
-    ConfigurationBotFrameworkAuthenticationOptions
+    ConfigurationBotFrameworkAuthenticationOptions,
+    ConfigurationServiceClientCredentialFactory,
+    ConfigurationServiceClientCredentialFactoryOptions
 } from 'botbuilder';
 
 import {
@@ -32,9 +34,14 @@ const USER_AGENT = `teamsai-js/${packageInfo.version}`;
  * An adapter that implements the Bot Framework Protocol and can be hosted in different cloud environments both public and private.
  */
 export class TeamsAdapter extends CloudAdapter {
+    /**
+     * The credentials factory used by the bot adapter to create a [ServiceClientCredentials](xref:botframework-connector.ServiceClientCredentials) object.
+     */
+    public readonly credentialsFactory: ServiceClientCredentialsFactory;
+
     constructor(
-        botFrameworkAuthConfig?: ConfigurationBotFrameworkAuthenticationOptions,
-        readonly credentialsFactory?: ServiceClientCredentialsFactory,
+        readonly botFrameworkAuthConfig?: ConfigurationBotFrameworkAuthenticationOptions,
+        credentialsFactory?: ServiceClientCredentialsFactory,
         authConfiguration?: AuthenticationConfiguration,
         connectorClientOptions?: ConnectorClientOptions
     ) {
@@ -51,5 +58,11 @@ export class TeamsAdapter extends CloudAdapter {
                 }
             )
         );
+
+        this.credentialsFactory =
+            credentialsFactory ??
+            new ConfigurationServiceClientCredentialFactory(
+                botFrameworkAuthConfig as ConfigurationServiceClientCredentialFactoryOptions
+            );
     }
 }

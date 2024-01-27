@@ -8,6 +8,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 import { Attachment, TurnContext } from 'botbuilder';
+import { AppCredentials, AuthenticationConstants, GovernmentConstants } from 'botframework-connector';
 
 import { InputFile, InputFileDownloader } from './InputFileDownloader';
 import { TeamsAdapter } from './TeamsAdapter';
@@ -23,16 +24,21 @@ export interface TeamsAttachmentDownloaderOptions {
     botAppId: string;
 
     /**
-     * The Microsoft App Password of the bot.
-     */
-    botAppPassword: string;
-
-    /**
      * ServiceClientCredentialsFactory
      */
     adapter: TeamsAdapter;
 }
 
+export interface AuthenticatorResult {
+    /**
+     * The value of the access token resulting from an authentication process.
+     */
+    accessToken: string;
+    /**
+     *  The date and time of expiration relative to Coordinated Universal Time (UTC).
+     */
+    expiresOn: Date;
+}
 /**
  * Downloads attachments from Teams using the bots access token.
  */
@@ -133,30 +139,31 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
      * @returns {Promise<string>} - Promise that resolves to the access token.
      */
     private async getAccessToken(): Promise<string> {
-        // await this._options.adapter.credentialsFactory
-        const headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        };
-        const body = `grant_type=client_credentials&client_id=${encodeURI(
-            this._options.botAppId
-        )}&client_secret=${encodeURI(
-            this._options.botAppPassword
-        )}&scope=https%3A%2F%2Fapi.botframework.com%2F.default`;
-        const token = await this._httpClient.post<JWTToken>(
-            'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
-            body,
-            { headers }
-        );
-        return token.data.access_token;
-    }
-}
+        // Normalize the ToChannelFromBotLoginUrl (and use a default value when it is undefined).
+        const toChannelFromBotLoginUrl = (
+            this._options.adapter.botFrameworkAuthConfig?.ToChannelFromBotLoginUrl ||
+            AuthenticationConstants.ToChannelFromBotLoginUrlPrefix + AuthenticationConstants.DefaultChannelAuthTenant
+        ).toLowerCase();
 
-/**
- * @private
- */
-interface JWTToken {
-    token_type: string;
-    expires_in: number;
-    ext_expires_in: number;
-    access_token: string;
+        let audience = this._options.adapter.botFrameworkAuthConfig?.ToChannelFromBotOAuthScope;
+        const loginEndpoint = toChannelFromBotLoginUrl;
+
+        // If there is no loginEndpoint set on the provided ConfigurationBotFrameworkAuthenticationOptions, or it starts with 'https://login.microsoftonline.com/', the bot is operating in Public Azure.
+        // So we use the Public Azure audience or the specified audience.
+        if (loginEndpoint.startsWith(AuthenticationConstants.ToChannelFromBotLoginUrlPrefix)) {
+            audience = audience ?? AuthenticationConstants.ToChannelFromBotOAuthScope;
+        } else if (toChannelFromBotLoginUrl === GovernmentConstants.ToChannelFromBotLoginUrl) {
+            // Or if the bot is operating in US Government Azure, use that audience.
+            audience = audience ?? GovernmentConstants.ToChannelFromBotOAuthScope;
+        }
+
+        const appCreds = (await this._options.adapter.credentialsFactory.createCredentials(
+            this._options.botAppId,
+            audience,
+            loginEndpoint,
+            true
+        )) as AppCredentials;
+
+        return appCreds.getToken();
+    }
 }
