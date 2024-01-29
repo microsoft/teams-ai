@@ -18,14 +18,17 @@ class Validation(Generic[ValueT]):
     valid: bool = True
     """
     Whether the validation is valid.
+    Default: True
     """
 
     feedback: Optional[str] = None
     """
     Optional. Repair instructions to send to the model.
+    Default: None
     """
 
     value: Optional[ValueT] = None
     """
     Optional. Replacement value to use for the response.
+    Default: None
     """
