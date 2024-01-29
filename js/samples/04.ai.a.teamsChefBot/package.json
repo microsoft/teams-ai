@@ -31,7 +31,7 @@
     "devDependencies": {
         "@types/dotenv": "6.1.1",
         "@types/restify": "8.5.12",
-        "@types/node": "^20.11.5",
+        "@types/node": "^20.11.10",
         "ts-node": "^10.9.2",
         "env-cmd": "^10.1.0",
         "nodemon": "~1.19.4",
