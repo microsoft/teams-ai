@@ -7,7 +7,6 @@ using Microsoft.Teams.AI.Tests.TestUtils;
 using Moq;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
-using Record = Microsoft.Teams.AI.State.Record;
 using Activity = Microsoft.Bot.Schema.Activity;
 
 namespace Microsoft.Teams.AI.Tests.Application
@@ -1069,6 +1068,48 @@ namespace Microsoft.Teams.AI.Tests.Application
             });
             var names = new List<string>();
             app.OnConversationUpdate(ConversationUpdateEvents.TeamRestored,
+                (context, _, _) =>
+                {
+                    names.Add(context.Activity.Name);
+                    return Task.CompletedTask;
+                });
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            Assert.Equal(1, names.Count);
+            Assert.Equal("1", names[0]);
+        }
+
+        [Fact]
+        public async Task Test_OnConversationUpdate_UnknownEventName()
+        {
+            // Arrange
+            var activity = new Activity
+            {
+                Type = ActivityTypes.ConversationUpdate,
+                ChannelData = new TeamsChannelData
+                {
+                    EventType = "unknown"
+                },
+                Name = "1",
+                ChannelId = Channels.Msteams,
+                Recipient = new() { Id = "recipientId" },
+                Conversation = new() { Id = "conversationId" },
+                From = new() { Id = "fromId" },
+            };
+            var adapter = new NotImplementedAdapter();
+            var turnContext = new TurnContext(adapter, activity);
+            var turnState = TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+            var app = new Application<TurnState>(new()
+            {
+                RemoveRecipientMention = false,
+                StartTypingTimer = false,
+                TurnStateFactory = () => turnState.Result,
+            });
+            var names = new List<string>();
+            app.OnConversationUpdate("unknown",
                 (context, _, _) =>
                 {
                     names.Add(context.Activity.Name);
