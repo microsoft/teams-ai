@@ -62,7 +62,7 @@ class PromptFunctions(ABC):
 
     # pylint: disable=too-many-arguments # No argument can be removed based on the design
     @abstractmethod
-    def invoke_function(
+    async def invoke_function(
         self, name: str, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: List[str]
     ):
         """

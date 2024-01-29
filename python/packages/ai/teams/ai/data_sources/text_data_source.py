@@ -61,18 +61,18 @@ class TextDataSource(DataSource):
             max_tokens (int): Maximum number of tokens allowed to be rendered.
 
         Returns:
-            RenderedPromptSection: The text to inject into the prompt as a 
+            RenderedPromptSection: The text to inject into the prompt as a
             `RenderedPromptSection` object.
         """
 
-        if not self._tokens: # Tokenize text on first use
+        if not self._tokens:  # Tokenize text on first use
             self._tokens = tokenizer.encode(self._text)
 
-        if len(self._tokens) > max_tokens: # Check for max tokens
+        if len(self._tokens) > max_tokens:  # Check for max tokens
             trimmed = self._tokens[0:max_tokens]
             return RenderedPromptSection[str](
                 output=tokenizer.decode(trimmed), length=len(trimmed), too_long=True
             )
         return RenderedPromptSection[str](
-                output=self._text, length=len(self._tokens), too_long=False
+            output=self._text, length=len(self._tokens), too_long=False
         )
