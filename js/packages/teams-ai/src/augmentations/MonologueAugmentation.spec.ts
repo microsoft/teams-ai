@@ -1,10 +1,11 @@
 import { strict as assert } from 'assert';
-import { MonologueAugmentation } from './MonologueAugmentation';
 import { TestAdapter } from 'botbuilder';
+
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestTurnState } from '../TestTurnState';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { ChatCompletionAction, PromptResponse } from '../models';
-import { TestPromptManager } from '../prompts';
+import { MonologueAugmentation } from './MonologueAugmentation';
 
 describe('MonologueAugmentation', () => {
     const adapter = new TestAdapter();

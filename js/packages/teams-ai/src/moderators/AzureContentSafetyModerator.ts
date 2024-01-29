@@ -77,7 +77,9 @@ export class AzureContentSafetyModerator<TState extends TurnState = TurnState> e
             apiKey: options.apiKey,
             moderate: options.moderate ?? 'both',
             endpoint: options.endpoint,
-            apiVersion: options.apiVersion
+            apiVersion: options.apiVersion,
+            organization: options.organization,
+            model: options.model
         };
         super(moderatorOptions);
 

@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert';
-import { SystemMessage } from './SystemMessage';
 import { TestAdapter } from 'botbuilder';
-import { TestPromptManager } from './TestPromptManager';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestTurnState } from '../TestTurnState';
+import { SystemMessage } from './SystemMessage';
 
 describe('SystemMessage', () => {
     const adapter = new TestAdapter();

@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { TestPromptManager } from './TestPromptManager';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
 
 describe('PromptManager', () => {
     describe('constructor', () => {

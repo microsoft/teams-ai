@@ -44,7 +44,7 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// tokenizer to use.
         /// </summary>
         /// <remarks>
-        /// If not specified, a new `GPTTokenizer` instance will be created.
+        /// If not specified, a new <see cref="GPTTokenizer"/> instance will be created.
         /// </remarks>
         public ITokenizer Tokenizer { get; set; } = new GPTTokenizer();
 

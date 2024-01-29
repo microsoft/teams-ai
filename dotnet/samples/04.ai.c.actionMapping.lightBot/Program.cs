@@ -3,6 +3,7 @@ using LightBot.Model;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Teams.AI;
 using Microsoft.Teams.AI.AI.Models;
 using Microsoft.Teams.AI.AI.Planners;
 using Microsoft.Teams.AI.AI.Prompts;
@@ -24,8 +25,8 @@ builder.Configuration["MicrosoftAppPassword"] = config.BOT_PASSWORD;
 builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
 
 // Create the Cloud Adapter with error handling enabled.
-builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
-builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>()!);
+builder.Services.AddSingleton<TeamsAdapter, AdapterWithErrorHandler>();
+builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
