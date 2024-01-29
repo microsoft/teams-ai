@@ -2,6 +2,7 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.AI;
 using Microsoft.Teams.AI.State;
+using Microsoft.Teams.AI.Tests.Application.Authentication;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using System.Reflection;
 
@@ -70,7 +71,11 @@ namespace Microsoft.Teams.AI.Tests.Application
                 TurnStateFactory = turnStateFactory,
                 AdaptiveCards = adaptiveCardOptions,
                 TaskModules = taskModuleOptions,
-                AI = aiOptions
+                AI = aiOptions,
+                Authentication = new()
+                {
+                    AutoSignIn = (context, cancellationToken) => Task.FromResult(false)
+                }
             };
 
             // Act
@@ -89,6 +94,45 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Equal(removeRecipientMention, app.Options.RemoveRecipientMention);
             Assert.Equal(startTypingTimer, app.Options.StartTypingTimer);
             Assert.Equal(longRunningMessages, app.Options.LongRunningMessages);
+            Assert.NotNull(app.AI);
+            Assert.NotNull(app.Authentication);
+        }
+
+        [Fact]
+        public void Test_Application_LongRunningMessages_ValidationError()
+        {
+            // Arrange
+            ApplicationOptions<TurnState> applicationOptions = new()
+            {
+                LongRunningMessages = true
+            };
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(() => new Application<TurnState>(applicationOptions));
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("The ApplicationOptions.LongRunningMessages property is unavailable because no adapter or botAppId was configured.", exception.Message);
+        }
+
+        [Fact]
+        public void Test_Application_NullPropertyGetter_ThrowsException()
+        {
+            // Arrange
+            Application<TurnState> app = new(new());
+
+            // Act
+            var adapterException = Assert.Throws<ArgumentException>(() => app.Adapter);
+            var aiException = Assert.Throws<ArgumentException>(() => app.AI);
+            var authenticationException = Assert.Throws<ArgumentException>(() => app.Authentication);
+
+            // Assert
+            Assert.NotNull(adapterException);
+            Assert.Equal("The Application.Adapter property is unavailable because it was not configured.", adapterException.Message);
+            Assert.NotNull(aiException);
+            Assert.Equal("The Application.AI property is unavailable because no AI options were configured.", aiException.Message);
+            Assert.NotNull(authenticationException);
+            Assert.Equal("The Application.Authentication property is unavailable because no authentication options were configured.", authenticationException.Message);
         }
 
         [Fact]
@@ -286,6 +330,61 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Equal(2, messages.Count);
             Assert.Equal("hello", messages[0]);
             Assert.Equal("hello", messages[1]);
+        }
+
+        [Fact]
+        public async Task Test_TurnEventHandler_EnableSignIn()
+        {
+            // Arrange
+            var graphToken = "graph token";
+            var options = new AuthenticationOptions<TurnState>();
+            options._authenticationSettings = new Dictionary<string, object>()
+            {
+                { "graph", new TestAuthenticationSettings(graphToken) }
+            };
+            var app = new TestApplication(new TestApplicationOptions());
+            var authManager = new TestAuthenticationManager(options, app);
+            FieldInfo authField = typeof(Application<TurnState>).GetField("_authentication", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            authField.SetValue(app, authManager);
+            FieldInfo signinField = typeof(Application<TurnState>).GetField("_startSignIn", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            SelectorAsync startSign = (context, cancellationToken) => Task.FromResult(true);
+            signinField.SetValue(app, startSign);
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "message";
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            string? userInSignIn = AuthUtilities.UserInSignInFlow(turnState);
+            Assert.Null(userInSignIn);
+        }
+
+
+        [Fact]
+        public async Task Test_GetTokenOrStartSignInAsync_Success()
+        {
+            // Arrange
+            var graphToken = "graph token";
+            var options = new AuthenticationOptions<TurnState>();
+            options._authenticationSettings = new Dictionary<string, object>()
+            {
+                { "graph", new TestAuthenticationSettings(graphToken) }
+            };
+            var app = new TestApplication(new TestApplicationOptions());
+            var authManager = new TestAuthenticationManager(options, app);
+            FieldInfo field = typeof(Application<TurnState>).GetField("_authentication", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            field.SetValue(app, authManager);
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            // Act
+            var token = await app.GetTokenOrStartSignInAsync(turnContext, turnState, "graph");
+
+            // Assert
+            Assert.NotNull(token);
+            Assert.Equal("graph token", token);
         }
     }
 }
