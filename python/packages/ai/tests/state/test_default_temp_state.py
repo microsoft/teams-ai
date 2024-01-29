@@ -13,7 +13,9 @@ class TestDefaultTempState(TestCase):
     def setUp(self):
         self.data = {
             DefaultTempState._INPUT: "test input",
-            DefaultTempState._INPUT_FILES: [InputFile("test_file", "test_path", "test_url")],
+            DefaultTempState._INPUT_FILES: [
+                InputFile("test_file".encode(), "test_path", "test_url")
+            ],
             DefaultTempState._LAST_OUTPUT: "test output",
             DefaultTempState._ACTION_OUTPUTS: {"action1": "output1"},
             DefaultTempState._AUTH_TOKENS: {"token1": "auth1"},
@@ -28,9 +30,9 @@ class TestDefaultTempState(TestCase):
 
     def test_input_files(self):
         self.assertEqual(
-            self.temp_state.input_files, [InputFile("test_file", "test_path", "test_url")]
+            self.temp_state.input_files, [InputFile("test_file".encode(), "test_path", "test_url")]
         )
-        new_files = [InputFile("new_file", "new_path", "new_url")]
+        new_files = [InputFile("new_file".encode(), "new_path", "new_url")]
         self.temp_state.input_files = new_files
         self.assertEqual(self.temp_state.input_files, new_files)
 

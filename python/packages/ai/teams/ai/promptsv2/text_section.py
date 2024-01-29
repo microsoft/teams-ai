@@ -29,7 +29,6 @@ class TextSection(PromptSectionBase):
     _role: str
     _length: int
 
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     def __init__(
         self,
         text: str,
@@ -57,8 +56,6 @@ class TextSection(PromptSectionBase):
         self._role = role
         self._length = -1
 
-    # pylint: enable=too-many-arguments
-
     @property
     def text(self):
         """Text to use for this section."""
@@ -69,7 +66,6 @@ class TextSection(PromptSectionBase):
         """Message role to use for this section."""
         return self._role
 
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def render_as_messages(
         self,
         context: TurnContext,
@@ -98,5 +94,3 @@ class TextSection(PromptSectionBase):
         # Return output
         messages: List[Message] = [Message(self.role, self.text)] if self._length > 0 else []
         return self._return_messages(messages, self._length, tokenizer, max_tokens)
-
-    # pylint: enable=too-many-arguments
