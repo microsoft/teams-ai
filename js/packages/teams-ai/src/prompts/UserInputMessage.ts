@@ -6,14 +6,15 @@
  * Licensed under the MIT License.
  */
 
+import { TurnContext } from 'botbuilder';
+
+import { InputFile } from '../InputFileDownloader';
+import { Memory } from '../MemoryFork';
+import { Tokenizer } from '../tokenizers';
 import { Message, MessageContentParts } from './Message';
 import { PromptFunctions } from './PromptFunctions';
 import { RenderedPromptSection } from './PromptSection';
 import { PromptSectionBase } from './PromptSectionBase';
-import { TurnContext } from 'botbuilder';
-import { Tokenizer } from '../tokenizers';
-import { Memory } from '../MemoryFork';
-import { InputFile } from '../InputFileDownloader';
 
 /**
  * A section capable of rendering user input text and images as a user message.
@@ -24,9 +25,9 @@ export class UserInputMessage extends PromptSectionBase {
 
     /**
      * Creates a new 'UserInputMessage' instance.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param inputVariable Optional. Name of the variable containing the user input text. Defaults to `input`.
-     * @param filesVariable Optional. Name of the variable containing the user input files. Defaults to `inputFiles`.
+     * @param {number} tokens Optional. Sizing strategy for this section. Defaults to `auto`.
+     * @param {string} inputVariable Optional. Name of the variable containing the user input text. Defaults to `input`.
+     * @param {string} filesVariable Optional. Name of the variable containing the user input files. Defaults to `inputFiles`.
      */
     public constructor(tokens: number = -1, inputVariable = 'input', filesVariable = 'inputFiles') {
         super(tokens, true, '\n', 'user: ');
@@ -35,12 +36,13 @@ export class UserInputMessage extends PromptSectionBase {
     }
 
     /**
-     * @param context
-     * @param memory
-     * @param functions
-     * @param tokenizer
-     * @param maxTokens
      * @private
+     * @param {TurnContext} context Turn context for the message to be rendered.
+     * @param {Memory} memory Memory in storage.
+     * @param {PromptFunctions} functions Prompt functions.
+     * @param {Tokenizer} tokenizer Tokenizer.
+     * @param {number} maxTokens Max tokens to be used for rendering.
+     * @returns {Promise<RenderedPromptSection<Message<any>[]>>} Rendered prompt section.
      */
     public async renderAsMessages(
         context: TurnContext,
@@ -87,7 +89,7 @@ export class UserInputMessage extends PromptSectionBase {
 
             // Add image
             const url = `data:${image.contentType};base64,${image.content.toString('base64')}`;
-            message.content!.push({ type: 'image', image_url: { url } });
+            message.content!.push({ type: 'image_url', image_url: { url } });
             length += 85;
             budget -= 85;
         }

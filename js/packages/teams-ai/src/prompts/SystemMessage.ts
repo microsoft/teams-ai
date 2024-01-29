@@ -14,8 +14,8 @@ import { TemplateSection } from './TemplateSection';
 export class SystemMessage extends TemplateSection {
     /**
      * Creates a new 'SystemMessage' instance.
-     * @param template Template to use for this section.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
+     * @param {string} template Template to use for this section.
+     * @param {number} tokens Optional. Sizing strategy for this section. Defaults to `auto`.
      */
     public constructor(template: string, tokens: number = -1) {
         super(template, 'system', tokens, true, '\n', '');

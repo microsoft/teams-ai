@@ -14,15 +14,15 @@ namespace Microsoft.Teams.AI.AI.Planners
     /// The ActionPlanner is a powerful planner that uses a LLM to generate plans. The planner can
     /// trigger parameterized actions and send text based responses to the user. The ActionPlanner
     /// supports the following advanced features:
-    /// - //////Augmentations:////// Augmentations virtually eliminate the need for prompt engineering. Prompts
+    /// - Augmentations: Augmentations virtually eliminate the need for prompt engineering. Prompts
     ///   can be configured to use a named augmentation which will be automatically appended to the outgoing
     ///   prompt. Augmentations let the developer specify whether they want to support multi-step plans (sequence),
     ///   use OpenAI's functions support (functions), or create an AutoGPT style agent (monologue).
-    /// - //////Validations:////// Validators are used to validate the response returned by the LLM and can guarantee
+    /// - Validations: Validators are used to validate the response returned by the LLM and can guarantee
     ///   that the parameters passed to an action match a supplied schema. The validator used is automatically
     ///   selected based on the augmentation being used. Validators also prevent hallucinated action names
     ///   making it impossible for the LLM to trigger an action that doesn't exist.
-    /// - //////Repair:////// The ActionPlanner will automatically attempt to repair invalid responses returned by the
+    /// - Repair: The ActionPlanner will automatically attempt to repair invalid responses returned by the
     ///   LLM using a feedback loop. When a validation fails, the ActionPlanner sends the error back to the
     ///   model, along with an instruction asking it to fix its mistake. This feedback technique leads to a
     ///   dramatic reduction in the number of invalid responses returned by the model.

@@ -1,4 +1,5 @@
-﻿using Microsoft.Teams.AI.State;
+﻿using Microsoft.Bot.Builder;
+using Microsoft.Teams.AI.State;
 using Record = Microsoft.Teams.AI.State.Record;
 
 namespace Microsoft.Teams.AI.Tests.TestUtils
@@ -36,6 +37,11 @@ namespace Microsoft.Teams.AI.Tests.TestUtils
 
                 scope.Replace(value!);
             }
+        }
+
+        public Dictionary<string, string> GetStorageKeys(ITurnContext turnContext)
+        {
+            return this.OnComputeStorageKeys(turnContext);
         }
     }
 

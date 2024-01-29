@@ -52,7 +52,7 @@ describe('TeamsSsoBotAuthentication', () => {
     };
 
     beforeEach(() => {
-        app = new Application({ adapter });
+        app = new Application();
         settings = {
             scopes: ['User.Read'],
             msalConfig: {
@@ -64,6 +64,8 @@ describe('TeamsSsoBotAuthentication', () => {
             },
             signInLink: 'https://localhost/auth-start.html'
         };
+
+        sinon.stub(app, 'adapter').get(() => adapter);
     });
 
     describe('constructor()', () => {

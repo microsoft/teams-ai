@@ -25,12 +25,12 @@ namespace Microsoft.Teams.AI
         /// <summary>
         /// Callback when user sign in success
         /// </summary>
-        protected Func<ITurnContext, TState, Task>? _userSignInSuccessHandler;
+        internal Func<ITurnContext, TState, Task>? _userSignInSuccessHandler;
 
         /// <summary>
         /// Callback when user sign in fail
         /// </summary>
-        protected Func<ITurnContext, TState, AuthException, Task>? _userSignInFailureHandler;
+        internal Func<ITurnContext, TState, AuthException, Task>? _userSignInFailureHandler;
 
         /// <summary>
         /// Initializes the class

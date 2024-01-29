@@ -11,66 +11,6 @@ import { ChatCompletionAction } from '../models/ChatCompletionAction';
 /**
  * @private
  */
-export interface CreateCompletionRequest {
-    prompt?: CreateCompletionRequestPrompt | null;
-    suffix?: string | null;
-    max_tokens?: number | null;
-    temperature?: number | null;
-    top_p?: number | null;
-    n?: number | null;
-    stream?: boolean | null;
-    logprobs?: number | null;
-    echo?: boolean | null;
-    stop?: CreateCompletionRequestStop | null;
-    presence_penalty?: number | null;
-    frequency_penalty?: number | null;
-    best_of?: number | null;
-    logit_bias?: object | null;
-    user?: string;
-}
-
-/**
- * @private
- */
-export interface OpenAICreateCompletionRequest extends CreateCompletionRequest {
-    model: string;
-}
-
-/**
- * @private
- */
-export interface CreateCompletionResponse {
-    id: string;
-    object: string;
-    created: number;
-    model: string;
-    choices: Array<CreateCompletionResponseChoicesInner>;
-    usage?: CreateCompletionResponseUsage;
-}
-
-/**
- * @private
- */
-export interface CreateCompletionResponseChoicesInner {
-    text?: string;
-    index?: number;
-    logprobs?: CreateCompletionResponseChoicesInnerLogprobs | null;
-    finish_reason?: string;
-}
-
-/**
- * @private
- */
-export interface CreateCompletionResponseChoicesInnerLogprobs {
-    tokens?: Array<string>;
-    token_logprobs?: Array<number>;
-    top_logprobs?: Array<object>;
-    text_offset?: Array<number>;
-}
-
-/**
- * @private
- */
 export interface CreateCompletionResponseUsage {
     prompt_tokens: number;
     completion_tokens: number;
@@ -82,8 +22,7 @@ export interface CreateCompletionResponseUsage {
  */
 export interface CreateChatCompletionRequest {
     messages: Array<ChatCompletionRequestMessage>;
-    functions?: Array<ChatCompletionAction>;
-    function_call?: CreateChatCompletionRequestFunctionCall;
+    model: string;
     temperature?: number | null;
     top_p?: number | null;
     n?: number | null;
@@ -94,12 +33,26 @@ export interface CreateChatCompletionRequest {
     frequency_penalty?: number | null;
     logit_bias?: object | null;
     user?: string;
+    logprobs?: boolean | false;
+    top_logprobs?: number | null;
+    response_format?: object | null;
+    seed?: number | null;
+    tools?: Array<CreateChatCompletionTool>;
+    tool_choice?: CreateChatCompletionRequestFunctionCall;
 }
 
 /**
  * @private
  */
 export declare type CreateChatCompletionRequestFunctionCall = CreateChatCompletionRequestFunctionCallOneOf | string;
+
+/**
+ * @private
+ */
+export interface CreateChatCompletionTool {
+    type: 'function';
+    function: ChatCompletionAction;
+}
 
 /**
  * @private
@@ -118,11 +71,21 @@ export interface OpenAICreateChatCompletionRequest extends CreateChatCompletionR
 /**
  * @private
  */
+export interface ChatCompletionRequestMessageToolCall {
+    id: string;
+    type: 'function';
+    function: ChatCompletionRequestMessageFunctionCall;
+}
+
+/**
+ * @private
+ */
 export interface ChatCompletionRequestMessage {
-    role: 'system' | 'user' | 'assistant';
+    role: 'system' | 'user' | 'assistant' | 'tool';
     content: string;
     name?: string;
-    function_call?: ChatCompletionRequestMessageFunctionCall;
+    tool_calls?: Array<ChatCompletionRequestMessageToolCall>;
+    tool_call_id?: string;
 }
 
 /**
@@ -134,7 +97,8 @@ export interface CreateChatCompletionResponse {
     created: number;
     model: string;
     choices: Array<CreateChatCompletionResponseChoicesInner>;
-    usage?: CreateCompletionResponseUsage;
+    usage: CreateCompletionResponseUsage;
+    system_fingerprint: string;
 }
 
 /**
@@ -144,6 +108,7 @@ export interface CreateChatCompletionResponseChoicesInner {
     index?: number;
     message?: ChatCompletionResponseMessage;
     finish_reason?: string;
+    logprobs?: object | null;
 }
 
 /**
@@ -152,7 +117,7 @@ export interface CreateChatCompletionResponseChoicesInner {
 export interface ChatCompletionResponseMessage {
     role: 'system' | 'user' | 'assistant';
     content: string | undefined;
-    function_call?: ChatCompletionRequestMessageFunctionCall;
+    tool_calls?: Array<ChatCompletionRequestMessageToolCall>;
 }
 
 /**
@@ -220,6 +185,8 @@ export interface CreateModerationResponseResultsInnerCategoryScores {
  */
 export interface CreateEmbeddingRequest {
     input: CreateEmbeddingRequestInput;
+    model: string;
+    encoding_format?: string;
     user?: string;
 }
 
@@ -271,6 +238,11 @@ export type CreateCompletionRequestStop = Array<string> | string;
  * @private
  */
 export type CreateChatCompletionRequestStop = Array<string> | string;
+
+/**
+ * @private
+ */
+export type ChatCompletionRequestToolChoice = object | string;
 
 /**
  * @private

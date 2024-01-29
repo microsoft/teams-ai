@@ -11,8 +11,6 @@ import axios, { AxiosInstance } from 'axios';
 import {
     CreateChatCompletionRequest,
     CreateChatCompletionResponse,
-    CreateCompletionRequest,
-    CreateCompletionResponse,
     CreateEmbeddingRequest,
     CreateEmbeddingResponse,
     CreateModerationRequest,
@@ -37,6 +35,8 @@ export interface OpenAIClientOptions {
     organization?: string;
     endpoint?: string;
     headerKey?: string;
+    apiVersion?: string;
+    ocpApimSubscriptionKey?: string;
 }
 
 /**
@@ -77,11 +77,6 @@ export class OpenAIClient {
     }
 
     public readonly options: OpenAIClientOptions;
-
-    public createCompletion(request: CreateCompletionRequest): Promise<OpenAIClientResponse<CreateCompletionResponse>> {
-        const url = `${this.options.endpoint ?? this.DefaultEndpoint}/v1/completions`;
-        return this.post(url, request);
-    }
 
     public createChatCompletion(
         request: CreateChatCompletionRequest

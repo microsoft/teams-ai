@@ -2,7 +2,7 @@
     "name": "@microsoft/teams-ai",
     "author": "Microsoft Corp.",
     "description": "SDK focused on building AI based applications for Microsoft Teams.",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "license": "MIT",
     "keywords": [
         "botbuilder",
@@ -22,14 +22,14 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "@azure/msal-node": "^2.6.0",
-        "axios": "^1.6.2",
-        "botbuilder": "^4.21.3",
-        "botbuilder-dialogs": "^4.21.3",
+        "@azure/msal-node": "^2.6.1",
+        "axios": "^1.6.5",
+        "botbuilder": "^4.21.4",
+        "botbuilder-dialogs": "^4.21.4",
         "gpt-3-encoder": "^1.1.4",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.23.0",
+        "openai": "^4.25.0",
         "uuid": "^9.0.1",
         "yaml": "^2.3.4"
     },
@@ -40,7 +40,7 @@
         "@types/assert": "^1.5.10",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.10.5",
+        "@types/node": "^20.11.5",
         "@types/uuid": "^9.0.7",
         "eslint": "^8.56.0",
         "jsonwebtoken": "^9.0.2",
@@ -53,19 +53,17 @@
     },
     "scripts": {
         "build": "tsc -b",
-        "build-docs": "typedoc --theme markdown --entryPoint teams-ai --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
-        "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
+        "build:rollup": "yarn clean && yarn build && npx api-extractor run --verbose --local",
         "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "depcheck": "depcheck --config ../../.depcheckrc",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npx mocha -r ts-node/register src/**/*.spec.ts",
         "test:debug": "ts-mocha src/**/*.spec.ts --inspect-brk",
         "test:coverage": "nyc --reporter=html --reporter=text --reporter=text-summary npm test",
-        "test:compat": "api-extractor run --verbose"
+        "test:compat": "npx api-extractor run --verbose"
     },
     "files": [
         "_ts3.4",
-        "lib",
-        "src"
+        "lib"
     ]
 }

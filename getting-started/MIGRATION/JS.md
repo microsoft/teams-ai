@@ -1,0 +1,162 @@
+# Migrating from the BotFramework SDK (Javascript)
+
+_**Navigation**_
+- [00.OVERVIEW](./README.md)
+- [**01.JS**](./JS.md)
+- [02.DOTNET](./DOTNET.md)
+___
+
+If you have a bot built using the JS BotFramework SDK, the following will help you update your bot to the Teams AI library.
+
+## New Project or Migrate existing app
+
+Since the library builds on top of the BF SDK, much of the bot logic can be directly carried over to the Teams AI app. If you want to start with a new project, set up the Echo bot sample in the [quick start](../.QUICKSTART.md) guide and jump directly to [step 2](#2-replace-the-activity-handler-implementations-with-specific-route-handlers).
+
+If you want to migrate your existing app start with [step 1](#1-replace-the-activityhandler-with-the-application-object).
+
+## 1. Replace the ActivityHandler with the Application object
+
+Replace `ActivityHandler` with `Application`.
+
+```diff
++ import { Application, TurnState } from "@microsoft/teams-ai";
+
+- const app = BotActivityHandler();
+
+// Define storage and application
++ const storage = new MemoryStorage();
++ const app =  new Application<TurnState>({
+  storage
+});
+```
+
+### Optional ApplicationBuilder Class
+
+You may also use the `ApplicationBuilder` class to build your `Application`. This option provides greater readability and separates the management of the various configuration options (e.g., storage, turn state, AI options, etc).
+
+```js
+//// Constructor initialization method
+// const app = new Application<TurnState>()
+// {
+//    storage
+// };
+
+// Build pattern method
+const app = new ApplicationBuilder<TurnState>()
+    .withStorage(storage)
+    .build(); // this internally calls the Application constructor
+```
+
+## 2. Replace the activity handler implementations with specific route registration methods
+
+The `BotActivityHandler` class derives from the `ActivityHandler` class. Each method in the class corresponds to a specific route registration method (`handler`) in the `Application` object. Here's a simple example:
+
+Given the `BotActivityHandler` implementation:
+
+```js
+class BotActivityHandler extends ActivityHandler {
+    constructor() {
+        this.onMessage(async (context, next) => {
+            const replyText = `Echo: ${ context.activity.text }`;
+            await context.sendActivity(MessageFactory.text(replyText, replyText));
+            await next();
+        });
+    }
+}
+```
+
+This is how a route should be added to the `Application` object:
+
+```js
+app.activity(ActivityTypes.Message, async(context: TurnContext, state: TurnState) => {
+    const replyText = `Echo: ${ context.activity.text }`;
+    await context.sendActivity(replyText);        
+});
+```
+
+>  The `activity` method is refered as a *route registration method*. For each method in the `ActivityHandler` or `TeamsActivityHandler` class, there is an equivalent route registration method. 
+
+Your existing BF app will probably have different activity handlers implemented. To migrate that over with Teams AI route registration methods see the following.
+
+## Activity Handler Methods
+
+If your bot derives from the `TeamsActivityHandler` refer to the following table to see which method maps to which `Application` route registration method.
+
+### Invoke Activities
+
+| `TeamsActivityHandler` method                               | `Application` route registration method                                                                     |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `handleTeamsO365ConnectorCardAction`                        | `O365ConnectorCardAction` (usage: `app.O365ConnectorCardAction(...)`)                           |
+| `handleTeamsFileConsent`                                    | Either `fileConsentAccept` or `fileConsentDecline`                                              |
+| `handleTeamsTaskModuleFetch`                                | `taskModules.fetch` (usage: `app.taskModules.Fetch(...)`)                                       |
+| `handleTeamsTaskModuleSubmit`                               | `taskModules.submit`                                                                            |
+| `handleTeamsConfigFetch`                                    | `taskModules.configFetch`                                                                       |
+| `handleTeamsConfigSubmit`                                   | `taskModules.configSubmit`                                                                      |
+| `handleTeamsAppBasedLinkQuery`                              | `messageExtensions.queryLink` (usage: `app.MessageExtensions.queryLink(...)`)                   |
+| `handleTeamsAnonymousAppBasedLinkQuery`                     | `messageExtensions.anonymousQueryLink`                                                          |
+| `handleTeamsMessagingExtensionQuery`                        | `messageExtensions.query`                                                                       |
+| `handlehandleTeamsMessageExtensionSelectItem`               | `messageExtensions.selectItem`                                                                  |
+| `handleTeamsMessagingExtensionSubmitActionDispatch`         | `messageExtensions.submitAction`                                                                |
+| `handleTeamsMessagingExtensionFetchTask`                    | `messageExtensions.fetchTask`                                                                   |
+| `handleTeamsMessagingExtensionConfigurationQuerySettingUrl` | `messageExtensions.queryUrlSetting`                                                             |
+| `handleTeamsMessagingExtensionConfigurationSetting`         | `messageExtensions.configureSettings`                                                           |
+| `handleTeamsMessagingExtensionCardButtonClicked`            | `messageExtensions.handleOnButtonClicked`                                                       |
+| `handleTeamsSigninVerifyState`                              | N/A (you should use the built-in user authentication feature instead of handling this manually) |
+| `handleTeamsSigninTokenExchange`                            | N/A (you should use the built-in user authentication feature instead of handling this manually) |
+
+### Conversation Update Activities
+
+These are the following methods from the `TeamsActivityHandler`:
+
+- `onTeamsChannelCreated`
+- `onTeamsChannelDeleted`
+- `onTeamsChannelRenamed`
+- `onTeamsTeamArchived`
+- `onTeamsTeamDeleted`
+- `onTeamsTeamHardDeleted`
+- `onTeamsChannelRestored`
+- `onTeamsTeamRenamed`
+- `onTeamsTeamRestored`
+- `onTeamsTeamUnarchived`
+
+These activities can be handled using the `Application.conversationUpdate` method. 
+
+For example in the `TeamsActivityHandler`:
+
+```js
+protected async onTeamsChannelCreated(context: TurnContext): Promise<void> {
+    // handle teams channel creation.
+}
+```
+
+The `Application` equivalent:
+
+```js
+app.conversationUpdate('channelCreated', (context: TurnContext, state: TurnState) => {
+    // handle teams channel creation.
+})
+```
+
+> Note that the first parameter `event` specifies which conversation update event to handle. It only accepts specific values that can be found through your IDE's intellisense.
+
+### Message Activites
+
+| `TeamsActivityHandler` method                                               | `Application` route registration method                                                |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `OnMessage`                                                                 | `message`                                                                  |
+| `OnTeamsMessageUndelete`, `OnTeamsMessageEdit` & `OnTeamsMessageSoftDelete` | `messageEventUpdate` , the first parameter `event` specifies the activity. |
+| `OnMessageReactionActivity`                                                 | `messageReactions`                                                         |
+| `OnTeamsReadReciept`                                                        | `teamsReadReceipt`                                                         |
+
+### Meeting Activities
+
+| `TeamsActivityHandler` method     | `Application` route registration method  |
+| --------------------------------- | ---------------------------- |
+| `OnTeamsMeetingStart`             | `meetings.start`             |
+| `OnTeamsMeetingEnd`               | `meetings.end`               |
+| `onTeamsMeetingParticipantsJoin`  | `meetings.participantsJoin`  |
+| `onTeamsMeetingParticipantsLeave` | `meetings.participantsLeave` |
+
+### Other Activities
+
+If there are activities for which there isn't a corresponding route registration method, you can use the generic route registration method `Application.activity` and specify a custom selector function given the activity object as input.
