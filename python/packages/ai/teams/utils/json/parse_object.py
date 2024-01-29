@@ -12,7 +12,7 @@ def parse_object(text: str) -> Optional[Any]:
     Parse JSON Object
     """
 
-    start_brace = text.index("{")
+    start_brace = text.find("{")
 
     if start_brace == -1:
         return None
@@ -21,8 +21,9 @@ def parse_object(text: str) -> Optional[Any]:
     nesting = ["}"]
     cleaned = "{"
     in_string = False
+    i = 1
 
-    for i in range(1, len(nesting)):
+    while i < len(obj) and len(nesting) > 0:
         char = obj[i]
 
         if in_string:
@@ -66,6 +67,8 @@ def parse_object(text: str) -> Optional[Any]:
 
             if add_post:
                 cleaned += '"'
+
+        i += 1
 
     if len(nesting) > 0:
         nesting.reverse()

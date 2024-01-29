@@ -60,7 +60,6 @@ class LayoutEngine(PromptSection):
         self._tokens = tokens
         self._separator = separator
 
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def render_as_text(
         self,
         context: TurnContext,
@@ -109,9 +108,6 @@ class LayoutEngine(PromptSection):
             output=text, length=len(tokenizer.encode(text)), too_long=remaining < 0
         )
 
-    # pylint: enable=too-many-arguments
-
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def render_as_messages(
         self,
         context: TurnContext,
@@ -159,8 +155,6 @@ class LayoutEngine(PromptSection):
             output=output, length=self._get_layout_length(layout), too_long=remaining < 0
         )
 
-    # pylint: enable=too-many-arguments
-
     def _add_sections_to_layout(
         self, sections: List[PromptSection], layout: List[_PromptSectionLayout[Any]]
     ):
@@ -170,7 +164,6 @@ class LayoutEngine(PromptSection):
             else:
                 layout.append(_PromptSectionLayout(section=section))
 
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def _layout_sections(
         self,
         layout: List[_PromptSectionLayout[Any]],
@@ -203,8 +196,6 @@ class LayoutEngine(PromptSection):
                 remaining = max_tokens - self._get_layout_length(layout, text_layout, tokenizer)
 
         return remaining
-
-    # pylint: enable=too-many-arguments
 
     async def _layout_fixed_sections(
         self,

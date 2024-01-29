@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
 from botbuilder.core import TurnContext
@@ -28,7 +28,7 @@ class ValidatedChatCompletionAction:
     Name of the action to call.
     """
 
-    parameters: Dict[str, Any] = {}
+    parameters: Dict[str, Any] = field(default_factory=dict)
     """
     Arguments to pass to the action.
     """
@@ -95,13 +95,13 @@ class ActionResponseValidator(PromptResponseValidator[ValidatedChatCompletionAct
                 f"Call a {self._noun} with valid arguments.",
             )
 
-        if func is None or func.name is None:
+        if func.name is None:
             return Validation[ValidatedChatCompletionAction](
                 valid=False,
                 feedback=f"{self._noun} name missing. Specify a valid {self._noun} name.",
             )
 
-        if not message.name in self._actions:
+        if not func.name in self._actions:
             return Validation[ValidatedChatCompletionAction](
                 valid=False,
                 feedback=f'Unknown {self._noun} named "{func.name}". '

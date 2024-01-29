@@ -11,8 +11,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-botbuilder-core = "^4.14.4"
-semantic-kernel = "^0.3.7.dev0"
+botbuilder-core = "^4.14.8"
+semantic-kernel = "0.3.7.dev0"
 tiktoken = "^0.4.0"
 aiohttp = "^3.8.5"
 jsonschema = "^4.21.1"
@@ -45,7 +45,7 @@ target-version = ['py38']
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "--cov-report html:coverage --cov=teams"
+addopts = "-rx --cov-report html:coverage --cov=teams"
 log_cli = true
 log_cli_level = "INFO"
 
@@ -56,3 +56,6 @@ show_error_codes = true
 no_implicit_optional = true
 warn_unused_ignores = true
 
+[[tool.mypy.overrides]]
+module = "tests.*"
+disable_error_code = ["var-annotated", "method-assign"]
