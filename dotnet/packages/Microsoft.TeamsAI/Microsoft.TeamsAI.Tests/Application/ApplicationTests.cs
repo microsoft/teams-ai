@@ -59,6 +59,11 @@ namespace Microsoft.Teams.AI.Tests.Application
             {
                 Moderator = new TestModerator()
             };
+            AuthenticationOptions<TurnState> authenticationOptions = new()
+            {
+                AutoSignIn = (context, cancellationToken) => Task.FromResult(false)
+            };
+            authenticationOptions.AddAuthentication("graph", new OAuthSettings());
             ApplicationOptions<TurnState> applicationOptions = new()
             {
                 RemoveRecipientMention = removeRecipientMention,
@@ -72,10 +77,7 @@ namespace Microsoft.Teams.AI.Tests.Application
                 AdaptiveCards = adaptiveCardOptions,
                 TaskModules = taskModuleOptions,
                 AI = aiOptions,
-                Authentication = new()
-                {
-                    AutoSignIn = (context, cancellationToken) => Task.FromResult(false)
-                }
+                Authentication = authenticationOptions
             };
 
             // Act
