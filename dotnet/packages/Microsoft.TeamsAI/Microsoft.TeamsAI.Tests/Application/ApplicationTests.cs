@@ -1,6 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Microsoft.Identity.Client;
 using Microsoft.Teams.AI.AI;
+using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.Application.Authentication;
 using Microsoft.Teams.AI.Tests.TestUtils;
@@ -335,7 +337,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         }
 
         [Fact]
-        public async Task Test_TurnEventHandler_EnableSignIn()
+        public async Task Test_TurnEventHandler_SignIn_Success()
         {
             // Arrange
             var graphToken = "graph token";
@@ -363,6 +365,58 @@ namespace Microsoft.Teams.AI.Tests.Application
             Assert.Null(userInSignIn);
         }
 
+        [Fact]
+        public async Task Test_TurnEventHandler_SignIn_Pending()
+        {
+            // Arrange
+            var options = new AuthenticationOptions<TurnState>();
+            options._authenticationSettings = new Dictionary<string, object>()
+            {
+                { "graph", new TestAuthenticationSettings() }
+            };
+            var app = new TestApplication(new TestApplicationOptions());
+            var authManager = new TestAuthenticationManager(options, app);
+            FieldInfo authField = typeof(Application<TurnState>).GetField("_authentication", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            authField.SetValue(app, authManager);
+            FieldInfo signinField = typeof(Application<TurnState>).GetField("_startSignIn", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            SelectorAsync startSign = (context, cancellationToken) => Task.FromResult(true);
+            signinField.SetValue(app, startSign);
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "message";
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            // Act
+            await app.OnTurnAsync(turnContext);
+
+            // Assert
+            string? userInSignIn = AuthUtilities.UserInSignInFlow(turnState);
+            Assert.Null(userInSignIn);
+        }
+
+        [Fact]
+        public async Task Test_TurnEventHandler_SignIn_Error()
+        {
+            // Arrange
+            var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
+            var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
+            var authOptions = new AuthenticationOptions<TurnState>();
+            authOptions.AddAuthentication("graph", settings);
+            var app = new TestApplication(new TestApplicationOptions()
+            {
+                Adapter = new SimpleAdapter(),
+                Authentication = authOptions
+            });
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            turnContext.Activity.Type = "message";
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            // Act
+            var exception = await Assert.ThrowsAsync<TeamsAIException>(() => app.OnTurnAsync(turnContext));
+
+            // Assert
+            Assert.NotNull(exception);
+            Assert.Equal("An error occurred when trying to sign in.", exception.Message);
+        }
 
         [Fact]
         public async Task Test_GetTokenOrStartSignInAsync_Success()
@@ -387,6 +441,53 @@ namespace Microsoft.Teams.AI.Tests.Application
             // Assert
             Assert.NotNull(token);
             Assert.Equal("graph token", token);
+        }
+
+        [Fact]
+        public async Task Test_GetTokenOrStartSignInAsync_Pending()
+        {
+            // Arrange
+            var options = new AuthenticationOptions<TurnState>();
+            options._authenticationSettings = new Dictionary<string, object>()
+            {
+                { "graph", new TestAuthenticationSettings() }
+            };
+            var app = new TestApplication(new TestApplicationOptions());
+            var authManager = new TestAuthenticationManager(options, app);
+            FieldInfo field = typeof(Application<TurnState>).GetField("_authentication", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            field.SetValue(app, authManager);
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            // Act
+            var token = await app.GetTokenOrStartSignInAsync(turnContext, turnState, "graph");
+
+            // Assert
+            Assert.Null(token);
+        }
+
+        [Fact]
+        public async Task Test_GetTokenOrStartSignInAsync_Error()
+        {
+            // Arrange
+            var msal = ConfidentialClientApplicationBuilder.Create("clientId").WithClientSecret("clientSecret").Build();
+            var settings = new TeamsSsoSettings(new string[] { "User.Read" }, "https://localhost/auth-start.html", msal);
+            var authOptions = new AuthenticationOptions<TurnState>();
+            authOptions.AddAuthentication("graph", settings);
+            var app = new TestApplication(new TestApplicationOptions()
+            {
+                Adapter = new SimpleAdapter(),
+                Authentication = authOptions
+            });
+            var turnContext = TurnStateConfig.CreateConfiguredTurnContext();
+            var turnState = await TurnStateConfig.GetTurnStateWithConversationStateAsync(turnContext);
+
+            // Act
+            var authException = await Assert.ThrowsAsync<TeamsAIException>(() => app.GetTokenOrStartSignInAsync(turnContext, turnState, "graph"));
+
+            // Assert
+            Assert.NotNull(authException);
+            Assert.True(authException.Message.StartsWith("Error occured while trying to authenticate user:"));
         }
     }
 }
