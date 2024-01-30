@@ -41,7 +41,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
                 .Build();
         }
 
-        [Theory]
+        [Theory(Skip = "Should only run manually for now.")]
         [InlineData("What is the capital of Thailand?", "Bangkok")]
         public async Task OpenAIModel_CompletePrompt(string input, string expectedAnswer)
         {
