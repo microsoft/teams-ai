@@ -9,4 +9,5 @@ from .message import ImageContentPart, Message, TextContentPart
 from .prompt_section import PromptFunctions, PromptSection
 from .prompt_section_base import PromptSectionBase
 from .rendered_prompt_section import RenderedPromptSection
+from .template_section import TemplateSection
 from .text_section import TextSection
