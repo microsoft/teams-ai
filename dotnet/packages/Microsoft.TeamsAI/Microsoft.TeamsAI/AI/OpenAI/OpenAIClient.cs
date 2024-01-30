@@ -24,9 +24,9 @@ namespace Microsoft.Teams.AI.AI.OpenAI
         private const string HttpUserAgent = "Microsoft Teams AI";
         private const string OpenAIModerationEndpoint = "https://api.openai.com/v1/moderations";
 
-        private HttpClient _httpClient;
-        private ILogger _logger;
-        private OpenAIClientOptions _options;
+        private readonly HttpClient _httpClient;
+        private readonly ILogger _logger;
+        private readonly OpenAIClientOptions _options;
         private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
