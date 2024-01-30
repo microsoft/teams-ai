@@ -28,7 +28,7 @@ steps:
   workingDirectory: 'js'
   displayName: 'Build'
 
-- script: 'yarn test'
+- script: 'yarn test:nyc:report'
   workingDirectory: 'js'
   displayName: 'Test'
 
@@ -51,11 +51,11 @@ steps:
     PathToPublish: '$(Build.ArtifactStagingDirectory)/js/packages/teams-ai'
     ArtifactName: Packages
 
-- task: Npm@1
-  displayName: 'Publish'
-  continueOnError: true
-  inputs:
-    command: publish
-    workingDir: '$(Build.ArtifactStagingDirectory)/js/packages/teams-ai'
-    publishRegistry: useFeed
-    publishFeed: 'Github_Pipelines/Teams'
+# - task: Npm@1
+#   displayName: 'Publish'
+#   continueOnError: true
+#   inputs:
+#     command: publish
+#     workingDir: '$(Build.ArtifactStagingDirectory)/js/packages/teams-ai'
+#     publishRegistry: useFeed
+#     publishFeed: 'Github_Pipelines/Teams'

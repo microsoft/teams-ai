@@ -32,10 +32,10 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
 
     /**
      * Creates a new `ActionResponseValidator` instance.
-     * @param actions List of supported actions.
-     * @param isRequired Whether the response is required to call an action.
-     * @param noun Optional. Name of the action to use in feedback messages. Defaults to `action`.
-     * @param Noun Optional. Name of the action to use in feedback messages. Defaults to `Action`.
+     * @param {ChatCompletionAction[]} actions List of supported actions.
+     * @param {boolean} isRequired Whether the response is required to call an action.
+     * @param {string} noun Optional. Name of the action to use in feedback messages. Defaults to `action`.
+     * @param {string} Noun Optional. Name of the action to use in feedback messages. Defaults to `Action`.
      */
     public constructor(
         actions: ChatCompletionAction[],
@@ -53,6 +53,7 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
 
     /**
      * Gets a list of the actions configured for the validator.
+     * @returns {ChatCompletionAction[]} A list of the actions configured for the validator.
      */
     public get actions(): ChatCompletionAction[] {
         const list: ChatCompletionAction[] = [];
@@ -62,12 +63,12 @@ export class ActionResponseValidator implements PromptResponseValidator<Validate
 
     /**
      * Validates a response to a prompt.
-     * @param context Context for the current turn of conversation with the user.
-     * @param memory An interface for accessing state values.
-     * @param tokenizer Tokenizer to use for encoding and decoding text.
-     * @param response Response to validate.
-     * @param remaining_attempts Number of remaining attempts to validate the response.
-     * @returns A `Validation` object.
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @param {Memory} memory An interface for accessing state values.
+     * @param {Tokenizer} tokenizer Tokenizer to use for encoding and decoding text.
+     * @param {PromptResponse} response Response to validate.
+     * @param {number} remaining_attempts Number of remaining attempts to validate the response.
+     * @returns {Promise<Validation<ValidatedChatCompletionAction>>} A `Validation` object.
      */
     public async validateResponse(
         context: TurnContext,

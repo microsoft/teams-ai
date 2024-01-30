@@ -1,6 +1,8 @@
+import sinon from 'sinon';
 import { strict as assert } from 'assert';
+
 import { Application, Query } from './Application';
-import { createTestInvoke } from './internals/TestUtilities';
+import { createTestInvoke } from './internals/testing/TestUtilities';
 import { MessageExtensions, MessageExtensionsInvokeNames } from './MessageExtensions';
 import {
     Channels,
@@ -27,7 +29,8 @@ describe('MessageExtensions', () => {
     const adapter = new TestAdapter();
     let mockApp: Application;
     beforeEach(() => {
-        mockApp = new Application({ adapter });
+        mockApp = new Application();
+        sinon.stub(mockApp, 'adapter').get(() => adapter);
     });
     it('should exist when Application is instantiated', () => {
         assert.notEqual(mockApp.messageExtensions, undefined);

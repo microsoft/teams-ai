@@ -1,6 +1,5 @@
+import sinon from 'sinon';
 import { strict as assert } from 'assert';
-import { Application } from './Application';
-import { createTestInvoke } from './internals';
 import {
     ActivityTypes,
     BotConfigAuth,
@@ -15,6 +14,9 @@ import {
     TestAdapter,
     TurnContext
 } from 'botbuilder';
+
+import { Application } from './Application';
+import { createTestInvoke } from './internals/testing/TestUtilities';
 import { TaskModules, TaskModuleInvokeNames } from './TaskModules';
 
 describe('TaskModules', () => {
@@ -24,7 +26,8 @@ describe('TaskModules', () => {
 
     let mockApp: Application;
     beforeEach(() => {
-        mockApp = new Application({ adapter });
+        mockApp = new Application();
+        sinon.stub(mockApp, 'adapter').get(() => adapter);
     });
 
     const createExpected200Response = (taskModuleResponse: TaskModuleContinueResponse | TaskModuleMessageResponse) => {

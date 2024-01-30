@@ -107,7 +107,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
     /**
      * Creates a new `OpenAIEmbeddings` instance.
-     * @param options Options for configuring the embeddings client.
+     * @param {OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions} options Options for configuring the embeddings client.
      */
     public constructor(options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions) {
         // Check for azure config
@@ -152,11 +152,11 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
     /**
      * Creates embeddings for the given inputs using the OpenAI API.
-     * @param model Name of the model to use (or deployment for Azure).
-     * @param inputs Text inputs to create embeddings for.
-     * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
+     * @param {string} model Name of the model to use (or deployment for Azure).
+     * @param {string | string[]} inputs Text inputs to create embeddings for.
+     * @returns {Promise<EmbeddingsResponse>} A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
-    public async createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
+    public async createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse> {
         if (this.options.logRequests) {
             console.log(Colorize.title('EMBEDDINGS REQUEST:'));
             console.log(Colorize.output(inputs));
@@ -164,6 +164,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         const startTime = Date.now();
         const response = await this.createEmbeddingRequest({
+            model: model,
             input: inputs
         });
 
@@ -191,8 +192,9 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     }
 
     /**
-     * @param request
      * @private
+     * @param {CreateEmbeddingRequest} request The request to send to the OpenAI API.
+     * @returns {Promise<AxiosResponse<CreateEmbeddingResponse>>} A promise that resolves to the response from the OpenAI API.
      */
     protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>> {
         if (this._useAzure) {
@@ -210,10 +212,12 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     }
 
     /**
-     * @param url
-     * @param body
-     * @param retryCount
      * @private
+     * @template TData Optional. Type of the data associated with the action.
+     * @param {string} url The URL to send the request to.
+     * @param {object} body The body of the request.
+     * @param {number} retryCount The number of times the request has been retried.
+     * @returns {Promise<AxiosResponse<TData>>} A promise that resolves to the response from the OpenAI API.
      */
     protected async post<TData>(url: string, body: object, retryCount = 0): Promise<AxiosResponse<TData>> {
         // Initialize request config

@@ -12,10 +12,11 @@
 export interface EmbeddingsModel {
     /**
      * Creates embeddings for the given inputs.
+     * @param model Name of the model to use (or deployment for Azure).
      * @param inputs Text inputs to create embeddings for.
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
-    createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse>;
+    createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse>;
 }
 
 /**

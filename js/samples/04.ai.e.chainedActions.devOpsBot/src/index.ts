@@ -8,19 +8,27 @@ import * as restify from 'restify';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
+import { ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
+
 import {
-    CloudAdapter,
-    ConfigurationBotFrameworkAuthentication,
-    ConfigurationServiceClientCredentialFactory,
-    MemoryStorage,
-    TurnContext
-} from 'botbuilder';
+    Application,
+    ActionPlanner,
+    OpenAIModel,
+    PromptManager,
+    TurnState,
+    DefaultConversationState,
+    TeamsAdapter
+} from '@microsoft/teams-ai';
+
+import * as responses from './responses';
 
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+// Create adapter.
+// See https://aka.ms/about-bot-adapter to learn more about how bots work.
+const adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
         MicrosoftAppId: process.env.BOT_ID,
@@ -28,10 +36,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
         MicrosoftAppType: 'MultiTenant'
     })
 );
-
-// Create adapter.
-// See https://aka.ms/about-bot-adapter to learn more about how bots work.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Create storage to use
 //const storage = new MemoryStorage();
@@ -69,16 +73,6 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
-
-import {
-    Application,
-    ActionPlanner,
-    OpenAIModel,
-    PromptManager,
-    TurnState,
-    DefaultConversationState
-} from '@microsoft/teams-ai';
-import * as responses from './responses';
 
 // Strongly type the applications turn state
 interface ConversationState extends DefaultConversationState {

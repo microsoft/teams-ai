@@ -1,11 +1,11 @@
 import { strict as assert } from 'assert';
-import { PromptSectionBase } from './PromptSectionBase';
 import { TestAdapter, TurnContext } from 'botbuilder';
-import { TestPromptManager } from './TestPromptManager';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { GPT3Tokenizer, Tokenizer } from '../tokenizers';
-import { TestTurnState } from '../TestTurnState';
 import { TurnState } from '../TurnState';
 import { PromptFunctions } from './PromptFunctions';
+import { PromptSectionBase } from './PromptSectionBase';
 import { RenderedPromptSection } from './PromptSection';
 import { Message } from './Message';
 

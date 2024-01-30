@@ -7,7 +7,8 @@
  */
 
 export * from './ActionPlanner';
-export * as preview from './AssistantsPlanner';
+// api-extractor doesn't support export * as __ from './AssistantsPlanner';
+import * as preview from './AssistantsPlanner';
+export { preview };
 export * from './LLMClient';
 export * from './Planner';
-export * from './TestPlanner';

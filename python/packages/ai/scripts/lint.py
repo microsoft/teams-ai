@@ -8,5 +8,6 @@ import subprocess
 
 def lint():
     subprocess.run(["poetry", "run", "pylint", "teams", "scripts", "tests"], check=True)
-    subprocess.run(["poetry", "run", "mypy", "-p", "teams"], check=True)
-    subprocess.run(["poetry", "run", "mypy", "-p", "examples"], check=True)
+    subprocess.run(["poetry", "run", "mypy", "--check-untyped-defs", "-p", "teams"], check=True)
+    subprocess.run(["poetry", "run", "mypy", "--check-untyped-defs", "-p", "tests"], check=True)
+    subprocess.run(["poetry", "run", "mypy", "--check-untyped-defs", "-p", "examples"], check=True)

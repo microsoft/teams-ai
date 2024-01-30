@@ -52,17 +52,18 @@
         "no-constant-condition": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "prettier/prettier": "error"
+        "prettier/prettier": "error",
+        "jsdoc/check-tag-names": [
+            1,
+            {
+                "definedTags": ["remarks"] // Allow @remarks
+            }
+        ]
     },
     "overrides": [
         {
             "files": ["bin/*.js", "lib/*.js"]
         }
     ],
-    "ignorePatterns": ["node_modules/*"],
-    "settings": {
-        // "react": {
-        //     "version": "detect"
-        // }
-    }
+    "ignorePatterns": ["node_modules/*"]
 }

@@ -39,7 +39,7 @@ namespace Microsoft.Teams.AI.Tests.Application
             bool startTypingTimer = false;
             string botAppId = "testBot";
             IStorage storage = new MemoryStorage();
-            BotAdapter adapter = new SimpleAdapter();
+            SimpleAdapter adapter = new();
             TestLoggerFactory loggerFactory = new();
             Func<TurnState> turnStateFactory = () => new TurnState();
             AdaptiveCardsOptions adaptiveCards = new()
@@ -91,7 +91,7 @@ namespace Microsoft.Teams.AI.Tests.Application
         public void Test_ApplicationBuilder_LongRunningMessages_ExceptionThrown()
         {
             // Arrange
-            BotAdapter adapter = new SimpleAdapter();
+            SimpleAdapter adapter = new();
 
             // Act
             var func = () =>

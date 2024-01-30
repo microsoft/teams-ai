@@ -1,10 +1,10 @@
 import { strict as assert } from 'assert';
-import { ActionResponseValidator } from './ActionResponseValidator';
 import { TestAdapter } from 'botbuilder';
-import { GPT3Tokenizer } from '../tokenizers';
-import { TestTurnState } from '../TestTurnState';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 import { ChatCompletionAction } from '../models';
 import { Message } from '../prompts';
+import { GPT3Tokenizer } from '../tokenizers';
+import { ActionResponseValidator } from './ActionResponseValidator';
 
 describe('ActionResponseValidator', () => {
     const adapter = new TestAdapter();

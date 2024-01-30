@@ -111,6 +111,15 @@ export interface DefaultTempState {
  * }
  * ```
  */
+/**
+ * Represents the turn state for a conversation.
+ * Turn state includes conversation state, user state, and temporary state.
+ * Provides methods to access, modify, and delete the state objects.
+ * @template TConversationState
+ * @param {TConversationState} TConversationState The type of the conversation state object.
+ * @param {TUserState} TUserState The type of the user state object.
+ * @param {TTempState} TTempState - The type of the temporary state object.
+ */
 export class TurnState<
     TConversationState = DefaultConversationState,
     TUserState = DefaultUserState,
@@ -124,6 +133,12 @@ export class TurnState<
     /**
      * Accessor for the conversation state.
      */
+    /**
+     * Gets the conversation state from the turn state.
+     * @template TConversationState
+     * @returns {TConversationState} The conversation state.
+     * @throws Error if TurnState hasn't been loaded. Call loadState() first.
+     */
     public get conversation(): TConversationState {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
@@ -134,7 +149,7 @@ export class TurnState<
 
     /**
      * Replaces the conversation state with a new value.
-     * @param value New value to replace the conversation state with.
+     * @param {TConversationState} value New value to replace the conversation state with.
      */
     public set conversation(value: TConversationState) {
         const scope = this.getScope(CONVERSATION_SCOPE);
@@ -146,6 +161,7 @@ export class TurnState<
 
     /**
      * Gets a value indicating whether the applications turn state has been loaded.
+     * @returns {boolean} True if the applications turn state has been loaded, false otherwise.
      */
     public get isLoaded(): boolean {
         return this._isLoaded;
@@ -153,6 +169,8 @@ export class TurnState<
 
     /**
      * Accessor for the temp state.
+     @returns {TTempState} The temp TurnState.
+     @throws Error if TurnState hasn't been loaded. Call loadState() first.
      */
     public get temp(): TTempState {
         const scope = this.getScope(TEMP_SCOPE);
@@ -164,7 +182,8 @@ export class TurnState<
 
     /**
      * Replaces the temp state with a new value.
-     * @param value New value to replace the temp state with.
+     * @param {TTempState} value New value to replace the temp state with.
+     * @throws Error if TurnState hasn't been loaded. Call loadState() first.
      */
     public set temp(value: TTempState) {
         const scope = this.getScope(TEMP_SCOPE);
@@ -176,6 +195,7 @@ export class TurnState<
 
     /**
      * Accessor for the user state.
+     * @returns {TUserState} The user TurnState.
      */
     public get user(): TUserState {
         const scope = this.getScope(USER_SCOPE);
@@ -231,8 +251,8 @@ export class TurnState<
 
     /**
      * Gets a state scope by name.
-     * @param scope Name of the state scope to return. (i.e. 'conversation', 'user', or 'temp')
-     * @returns The state scope or undefined if not found.
+     * @param {string} scope Name of the state scope to return. (i.e. 'conversation', 'user', or 'temp')
+     * @returns {string | undefined} The state scope or undefined if not found.
      */
     public getScope(scope: string): TurnStateEntry | undefined {
         return this._scopes[scope];
@@ -240,7 +260,7 @@ export class TurnState<
 
     /**
      * Deletes a value from the memory.
-     * @param path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
+     * @param {string} path Path to the value to delete in the form of `[scope].property`. If scope is omitted, the value is deleted from the temporary scope.
      */
     public deleteValue(path: string): void {
         const { scope, name } = this.getScopeAndName(path);
@@ -251,8 +271,8 @@ export class TurnState<
 
     /**
      * Checks if a value exists in the memory.
-     * @param path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
-     * @returns True if the value exists, false otherwise.
+     * @param {string} path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
+     * @returns {boolean} True if the value exists, false otherwise.
      */
     public hasValue(path: string): boolean {
         const { scope, name } = this.getScopeAndName(path);
@@ -261,8 +281,9 @@ export class TurnState<
 
     /**
      * Retrieves a value from the memory.
-     * @param path Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.
-     * @returns The value or undefined if not found.
+     * @template TValue
+     * @param {TValue} path Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.
+     * @returns {string} The value or undefined if not found.
      */
     public getValue<TValue = unknown>(path: string): TValue {
         const { scope, name } = this.getScopeAndName(path);
@@ -271,8 +292,8 @@ export class TurnState<
 
     /**
      * Assigns a value to the memory.
-     * @param path Path to the value to assign in the form of `[scope].property`. If scope is omitted, the value is assigned to the temporary scope.
-     * @param value Value to assign.
+     * @param {string} path Path to the value to assign in the form of `[scope].property`. If scope is omitted, the value is assigned to the temporary scope.
+     * @param {unknown} value Value to assign.
      */
     public setValue(path: string, value: unknown): void {
         const { scope, name } = this.getScopeAndName(path);
@@ -281,9 +302,9 @@ export class TurnState<
 
     /**
      * Loads all of the state scopes for the current turn.
-     * @param context Context for the current turn of conversation with the user.
-     * @param storage Optional. Storage provider to load state scopes from.
-     * @returns True if the states needed to be loaded.
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @param {Storage} storage Optional. Storage provider to load state scopes from.
+     * @returns {boolean} True if the states needed to be loaded.
      */
     public load(context: TurnContext, storage?: Storage): Promise<boolean> {
         // Only load on first call
@@ -338,8 +359,8 @@ export class TurnState<
 
     /**
      * Saves all of the state scopes for the current turn.
-     * @param context Context for the current turn of conversation with the user.
-     * @param storage Optional. Storage provider to save state scopes to.
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @param {Storage} storage Optional. Storage provider to save state scopes to.
      */
     public async save(context: TurnContext, storage?: Storage): Promise<void> {
         // Check for existing load operation
@@ -404,8 +425,9 @@ export class TurnState<
      * Computes the storage keys for the state scopes being persisted.
      * @remarks
      * Can be overridden in derived classes to add additional storage scopes.
-     * @param context Context for the current turn of conversation with the user.
-     * @returns A dictionary of scope names -> storage keys.
+     * @param {TurnContext} context Context for the current turn of conversation with the user.
+     * @returns {Promise<Record<string, string>>} A dictionary of scope names -> storage keys.
+     * @throws Error if the context is missing a required property.
      */
     protected onComputeStorageKeys(context: TurnContext): Promise<Record<string, string>> {
         // Compute state keys
@@ -438,8 +460,9 @@ export class TurnState<
     }
 
     /**
-     * @param path
      * @private
+     * @param {string} path Path to the value to check in the form of `[scope].property`. If scope is omitted, the value is checked in the temporary scope.
+     * @returns {{ scope: TurnStateEntry; name: string }} Scope and name.
      */
     private getScopeAndName(path: string): { scope: TurnStateEntry; name: string } {
         // Get variable scope and name
@@ -461,7 +484,6 @@ export class TurnState<
 
 /**
  * Accessor class for managing an individual state scope.
- * @template TValue Optional. Strongly typed value of the state scope.
  */
 export class TurnStateEntry {
     private _value: Record<string, unknown>;
@@ -471,7 +493,7 @@ export class TurnStateEntry {
 
     /**
      * Creates a new instance of the `TurnStateEntry` class.
-     * @param {TValue} value Optional. Value to initialize the state scope with. The default is an {} object.
+     * @param {Record<string, unknown>} value Optional. Value to initialize the state scope with. The default is an {} object.
      * @param {string} storageKey Optional. Storage key to use when persisting the state scope.
      */
     public constructor(value?: Record<string, unknown>, storageKey?: string) {
@@ -482,7 +504,7 @@ export class TurnStateEntry {
 
     /**
      * Gets a value indicating whether the state scope has changed since it was last loaded.
-     * @returns A value indicating whether the state scope has changed.
+     * @returns {boolean} A value indicating whether the state scope has changed.
      */
     public get hasChanged(): boolean {
         return JSON.stringify(this._value) != this._hash;
@@ -490,7 +512,7 @@ export class TurnStateEntry {
 
     /**
      * Gets a value indicating whether the state scope has been deleted.
-     * @returns A value indicating whether the state scope has been deleted.
+     * @returns {boolean} A value indicating whether the state scope has been deleted.
      */
     public get isDeleted(): boolean {
         return this._deleted;
@@ -498,7 +520,7 @@ export class TurnStateEntry {
 
     /**
      * Gets the value of the state scope.
-     * @returns The value of the state scope.
+     * @returns {Record<string, unknown>} value of the state scope.
      */
     public get value(): Record<string, unknown> {
         if (this.isDeleted) {
@@ -527,6 +549,7 @@ export class TurnStateEntry {
 
     /**
      * Replaces the state scope with a new value.
+     * @template TValue
      * @param {TValue} value New value to replace the state scope with.
      */
     public replace(value?: Record<string, unknown>): void {

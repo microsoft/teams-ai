@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert';
 import { ConversationHistory } from './ConversationHistory';
 import { TestAdapter } from 'botbuilder';
-import { TestPromptManager } from './TestPromptManager';
+import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { GPT3Tokenizer } from '../tokenizers';
-import { TestTurnState } from '../TestTurnState';
+import { TestTurnState } from '../internals/testing/TestTurnState';
 
 describe('ConversationHistory', () => {
     const adapter = new TestAdapter();

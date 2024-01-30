@@ -1,3 +1,4 @@
+import sinon from 'sinon';
 import { strict as assert } from 'assert';
 import { Application } from './Application';
 import { ActivityTypes, Channels, TestAdapter } from 'botbuilder';
@@ -5,9 +6,11 @@ import { ActivityTypes, Channels, TestAdapter } from 'botbuilder';
 describe('Meetings', () => {
     let adapter: TestAdapter;
     let mockApp: Application;
+
     beforeEach(() => {
         adapter = new TestAdapter();
-        mockApp = new Application({ adapter });
+        mockApp = new Application();
+        sinon.stub(mockApp, 'adapter').get(() => adapter);
     });
 
     /**

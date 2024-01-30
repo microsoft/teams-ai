@@ -30,9 +30,9 @@ builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFramew
 // Create the Cloud Adapter with error handling enabled.
 // Note: some classes expect a BotAdapter and some expect a BotFrameworkHttpAdapter, so
 // register the same adapter instance for all types.
-builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
-builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>()!);
-builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>()!);
+builder.Services.AddSingleton<TeamsAdapter, AdapterWithErrorHandler>();
+builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<TeamsAdapter>()!);
+builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<TeamsAdapter>()!);
 
 // Create singleton instances for bot application
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
@@ -43,7 +43,7 @@ builder.Services.AddSingleton<Utilities>();
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>()!;
-    BotAdapter adapter = sp.GetService<CloudAdapter>()!;
+    TeamsAdapter adapter = sp.GetService<TeamsAdapter>()!;
 
     AuthenticationOptions<TurnState> options = new();
     options.AddAuthentication("graph", new OAuthSettings()

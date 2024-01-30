@@ -18,6 +18,12 @@ export interface VectraDataSourceOptions {
     apiKey: string;
 
     /**
+     * Azure OpenAI API key to use as alternative way for generating embeddings.
+     */
+    azureApiKey: string;
+    azureEndpoint: string;
+
+    /**
      * Path to the folder containing the local index.
      * @remarks
      * This should be the root folder for all local indexes and the index itself
@@ -63,7 +69,7 @@ export class VectraDataSource implements DataSource {
 
     /**
      * Creates a new `VectraDataSource` instance.
-     * @param options Options for creating the data source.
+     * @param {VectraDataSourceOptions} options Options for creating the data source.
      */
     public constructor(options: VectraDataSourceOptions) {
         this._options = options;
@@ -72,7 +78,12 @@ export class VectraDataSource implements DataSource {
         // Create embeddings model
         const embeddings = new OpenAIEmbeddings({
             model: 'text-embedding-ada-002',
-            apiKey: options.apiKey
+            apiKey: options.apiKey,
+
+            // Azure OpenAI Support
+            azureApiKey: options.azureApiKey,
+            azureDeployment: 'embedding',
+            azureEndpoint: options.azureEndpoint
         });
 
         // Create local index
@@ -84,10 +95,11 @@ export class VectraDataSource implements DataSource {
 
     /**
      * Renders the data source as a string of text.
-     * @param context Turn context for the current turn of conversation with the user.
-     * @param memory An interface for accessing state values.
-     * @param tokenizer Tokenizer to use when rendering the data source.
-     * @param maxTokens Maximum number of tokens allowed to be rendered.
+     * @param {TurnContext} context Turn context for the current turn of conversation with the user.
+     * @param {Memory} memory An interface for accessing state values.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering the data source.
+     * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
+     * @returns {Promise<RenderedPromptSection<string>>} A promise that resolves to the rendered data source.
      */
     public async renderData(
         context: TurnContext,

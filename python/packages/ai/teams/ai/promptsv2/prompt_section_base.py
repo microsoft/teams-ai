@@ -85,7 +85,6 @@ class PromptSectionBase(PromptSection):
         """
         return self._text_prefix
 
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     @abstractmethod
     async def render_as_messages(
         self,
@@ -109,9 +108,6 @@ class PromptSectionBase(PromptSection):
             RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
         """
 
-    # pylint: enable=too-many-arguments
-
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     async def render_as_text(
         self,
         context: TurnContext,
@@ -161,8 +157,6 @@ class PromptSectionBase(PromptSection):
             length = int(self.tokens)
 
         return RenderedPromptSection(text, length, length > max_tokens)
-
-    # pylint: enable=too-many-arguments
 
     def _get_token_budget(self, max_tokens: int) -> int:
         return min(int(self.tokens), max_tokens) if self.tokens > 1.0 else max_tokens

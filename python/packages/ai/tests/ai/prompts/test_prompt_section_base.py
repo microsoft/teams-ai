@@ -3,18 +3,23 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from typing import cast
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock
+
+from botbuilder.core import TurnContext
 
 from teams.ai.promptsv2 import (
     FunctionCall,
     ImageContentPart,
     Message,
+    PromptFunctions,
     PromptSectionBase,
     RenderedPromptSection,
     TextContentPart,
 )
 from teams.ai.tokenizers import GPTTokenizer
+from teams.state import TurnState
 
 
 class TestablePromptSectionBase(PromptSectionBase):
@@ -27,18 +32,22 @@ class TestablePromptSectionBase(PromptSectionBase):
     ):
         super().__init__(tokens, required, separator, text_prefix)
 
-    # pylint: disable=too-many-arguments
     async def render_as_messages(self, context, memory, functions, tokenizer, max_tokens):
         return RenderedPromptSection([], 0, False)
-
-    # pylint: enable=too-many-arguments
 
 
 class TestPromptSectionBase(IsolatedAsyncioTestCase):
     async def test_render_as_text_empty_message(self):
         section = TestablePromptSectionBase()
         section.render_as_messages = AsyncMock(return_value=RenderedPromptSection([], 0, False))
-        result = await section.render_as_text(None, None, None, GPTTokenizer(), 5)
+        result = await section.render_as_text(
+            context=cast(TurnContext, {}),
+            memory=TurnState(),
+            functions=cast(PromptFunctions, {}),
+            tokenizer=GPTTokenizer(),
+            max_tokens=5,
+        )
+
         self.assertEqual(result.output, "")
         self.assertEqual(result.length, 0)
         self.assertFalse(result.too_long)
@@ -49,7 +58,14 @@ class TestPromptSectionBase(IsolatedAsyncioTestCase):
         section.render_as_messages = AsyncMock(
             return_value=RenderedPromptSection(messages, 6, False)
         )
-        result = await section.render_as_text(None, None, None, GPTTokenizer(), 100)
+        result = await section.render_as_text(
+            context=cast(TurnContext, {}),
+            memory=TurnState(),
+            functions=cast(PromptFunctions, {}),
+            tokenizer=GPTTokenizer(),
+            max_tokens=100,
+        )
+
         self.assertEqual(result.output, "Hello World!\nTeams-AI")
         self.assertEqual(result.length, 7)
         self.assertFalse(result.too_long)
@@ -60,7 +76,14 @@ class TestPromptSectionBase(IsolatedAsyncioTestCase):
         section.render_as_messages = AsyncMock(
             return_value=RenderedPromptSection(messages, 6, False)
         )
-        result = await section.render_as_text(None, None, None, GPTTokenizer(), 5)
+        result = await section.render_as_text(
+            context=cast(TurnContext, {}),
+            memory=TurnState(),
+            functions=cast(PromptFunctions, {}),
+            tokenizer=GPTTokenizer(),
+            max_tokens=5,
+        )
+
         self.assertEqual(result.output, "Hello World!\nTeams-AI")
         self.assertEqual(result.length, 7)
         self.assertTrue(result.too_long)
@@ -71,7 +94,14 @@ class TestPromptSectionBase(IsolatedAsyncioTestCase):
         section.render_as_messages = AsyncMock(
             return_value=RenderedPromptSection(messages, 6, False)
         )
-        result = await section.render_as_text(None, None, None, GPTTokenizer(), 5)
+        result = await section.render_as_text(
+            context=cast(TurnContext, {}),
+            memory=TurnState(),
+            functions=cast(PromptFunctions, {}),
+            tokenizer=GPTTokenizer(),
+            max_tokens=5,
+        )
+
         self.assertEqual(result.output, "Hello World!\nTeams-A")
         self.assertEqual(result.length, 5)
         self.assertFalse(result.too_long)
@@ -131,7 +161,7 @@ class TestPromptSectionBase(IsolatedAsyncioTestCase):
                 [
                     TextContentPart("text", "Hello"),
                     TextContentPart("text", "World!"),
-                    ImageContentPart("image", "https://www.microsoft.com"),
+                    ImageContentPart("image_url", "https://www.microsoft.com"),
                 ],
             )
         )

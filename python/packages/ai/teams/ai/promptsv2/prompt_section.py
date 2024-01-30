@@ -38,7 +38,6 @@ class PromptSection(ABC):
           should be allowed to consume.
         """
 
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     @abstractmethod
     async def render_as_text(
         self,
@@ -62,9 +61,6 @@ class PromptSection(ABC):
             RenderedPromptSection[str]: The rendered prompt section as a string.
         """
 
-    # pylint: enable=too-many-arguments
-
-    # pylint: disable=too-many-arguments # No argument can be removed based on the design
     @abstractmethod
     async def render_as_messages(
         self,
@@ -87,5 +83,3 @@ class PromptSection(ABC):
         Returns:
             RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
         """
-
-    # pylint: enable=too-many-arguments
