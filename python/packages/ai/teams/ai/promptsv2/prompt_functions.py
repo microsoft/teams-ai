@@ -61,7 +61,7 @@ class PromptFunctions(ABC):
         """
 
     @abstractmethod
-    def invoke_function(
+    async def invoke_function(
         self, name: str, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: List[str]
     ):
         """
