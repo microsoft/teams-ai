@@ -99,14 +99,14 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
             azure_endpoint="https://mock.openai.azure.com/",
             azure_deployment="text-embedding-ada-002",
             log_requests=True,
-            retry_policy=[0, 1],
+            retry_policy=[2, 4],
         )
         self.options_error = AzureOpenAIEmbeddingsOptions(
             azure_api_key="empty",
             azure_endpoint="www.mock.openai.azure.com/",
             azure_deployment="text-embedding-ada-002",
             log_requests=True,
-            retry_policy=[0, 1],
+            retry_policy=[2, 4],
         )
         self.options_with_array = AzureOpenAIEmbeddingsOptions(
             azure_api_key="empty",

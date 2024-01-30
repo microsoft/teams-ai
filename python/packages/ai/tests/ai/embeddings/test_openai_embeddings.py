@@ -90,7 +90,7 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     def setUp(self):
         self.options = OpenAIEmbeddingsOptions(
-            api_key="empty", model="text-embedding-ada-002", log_requests=True, retry_policy=[0, 1]
+            api_key="empty", model="text-embedding-ada-002", log_requests=True, retry_policy=[2, 4]
         )
         self.options_with_array = OpenAIEmbeddingsOptions(
             api_key="empty",
