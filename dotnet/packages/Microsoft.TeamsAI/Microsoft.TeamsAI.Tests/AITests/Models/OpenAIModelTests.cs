@@ -177,7 +177,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
                 LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var choice = CreateChoice("test-choice", 0, null, null);
+            var choice = CreateChoice("test-choice", 0, null, null, null);
             var usage = CreateCompletionsUsage(0, 0, 0);
             var completions = CreateCompletions("test-id", DateTimeOffset.UtcNow, new List<Choice> { choice }, usage);
             Response response = new TestResponse(200, string.Empty);
@@ -308,7 +308,8 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
                 LogRequests = true
             };
             var clientMock = new Mock<OpenAIClient>();
-            var chatChoice = CreateChatChoice(new Azure.AI.OpenAI.ChatMessage(Azure.AI.OpenAI.ChatRole.Assistant, "test-choice"), 0, null, null, null);
+            var chatResponseMessage = CreateChatResponseMessage(Azure.AI.OpenAI.ChatRole.Assistant, "test-choice", null, null, null);
+            var chatChoice = CreateChatChoice(chatResponseMessage, 0, null, null, null, null, null);
             var usage = CreateCompletionsUsage(0, 0, 0);
             var chatCompletions = CreateChatCompletions("test-id", DateTimeOffset.UtcNow, new List<ChatChoice> { chatChoice }, usage);
             Response response = new TestResponse(200, string.Empty);
@@ -327,10 +328,10 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal("test-choice", result.Message.Content);
         }
 
-        private static Choice CreateChoice(string text, int index, CompletionsLogProbabilityModel? logProbabilityModel, CompletionsFinishReason finishReason)
+        private static Choice CreateChoice(string text, int index, ContentFilterResultsForChoice? contentFilterResults, CompletionsLogProbabilityModel? logProbabilityModel, CompletionsFinishReason? finishReason)
         {
-            Type[] paramTypes = new Type[] { typeof(string), typeof(int), typeof(CompletionsLogProbabilityModel), typeof(CompletionsFinishReason) };
-            object[] paramValues = new object[] { text, index, logProbabilityModel!, finishReason };
+            Type[] paramTypes = new Type[] { typeof(string), typeof(int), typeof(ContentFilterResultsForChoice), typeof(CompletionsLogProbabilityModel), typeof(CompletionsFinishReason) };
+            object[] paramValues = new object[] { text, index, contentFilterResults, logProbabilityModel!, finishReason! };
             return Construct<Choice>(paramTypes, paramValues);
         }
 
@@ -348,10 +349,17 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             return Construct<Completions>(paramTypes, paramValues);
         }
 
-        private static ChatChoice CreateChatChoice(Azure.AI.OpenAI.ChatMessage message, int index, CompletionsFinishReason? finishReason, Azure.AI.OpenAI.ChatMessage? internalStreamingDeltaMessage, ContentFilterResults? contentFilterResults)
+        private static ChatResponseMessage CreateChatResponseMessage(Azure.AI.OpenAI.ChatRole role, string content, IReadOnlyList<Azure.AI.OpenAI.ChatCompletionsToolCall>? toolCalls, Azure.AI.OpenAI.FunctionCall? functionCall, AzureChatExtensionsMessageContext? azureExtensionsContext)
         {
-            Type[] paramTypes = new Type[] { typeof(Azure.AI.OpenAI.ChatMessage), typeof(int), typeof(CompletionsFinishReason), typeof(Azure.AI.OpenAI.ChatMessage), typeof(ContentFilterResults) };
-            object[] paramValues = new object[] { message, index, finishReason!, internalStreamingDeltaMessage!, contentFilterResults! };
+            Type[] paramTypes = new Type[] { typeof(Azure.AI.OpenAI.ChatRole), typeof(string), typeof(IReadOnlyList<Azure.AI.OpenAI.ChatCompletionsToolCall>), typeof(Azure.AI.OpenAI.FunctionCall), typeof(AzureChatExtensionsMessageContext) };
+            object[] paramValues = new object[] { role, content, toolCalls!, functionCall!, azureExtensionsContext! };
+            return Construct<ChatResponseMessage>(paramTypes, paramValues);
+        }
+
+        private static ChatChoice CreateChatChoice(ChatResponseMessage message, int index, CompletionsFinishReason? finishReason, ChatFinishDetails? finishDetails, ChatResponseMessage? internalStreamingDeltaMessage, ContentFilterResultsForChoice? contentFilterResults, AzureChatEnhancements? enhancements)
+        {
+            Type[] paramTypes = new Type[] { typeof(ChatResponseMessage), typeof(int), typeof(CompletionsFinishReason), typeof(ChatFinishDetails), typeof(ChatResponseMessage), typeof(ContentFilterResultsForChoice), typeof(AzureChatEnhancements) };
+            object[] paramValues = new object[] { message, index, finishReason!, finishDetails!, internalStreamingDeltaMessage!, contentFilterResults!, enhancements! };
             return Construct<ChatChoice>(paramTypes, paramValues);
         }
 
@@ -391,8 +399,11 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
         public override string ClientRequestId { get; set; }
 
         private bool? _isError;
-        public override bool IsError { get => _isError ?? base.IsError; }
-        public void SetIsError(bool value) => _isError = value;
+        public override bool IsError => _isError ?? base.IsError;
+        public void SetIsError(bool value)
+        {
+            _isError = value;
+        }
 
         public bool IsDisposed { get; private set; }
 
@@ -420,7 +431,10 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             return TryGetHeaderValues(name, out _);
         }
 
-        protected override IEnumerable<HttpHeader> EnumerateHeaders() => _headers.Select(h => new HttpHeader(h.Key, JoinHeaderValue(h.Value)));
+        protected override IEnumerable<HttpHeader> EnumerateHeaders()
+        {
+            return _headers.Select(h => new HttpHeader(h.Key, JoinHeaderValue(h.Value)));
+        }
 
         private static string JoinHeaderValue(IEnumerable<string> values)
         {

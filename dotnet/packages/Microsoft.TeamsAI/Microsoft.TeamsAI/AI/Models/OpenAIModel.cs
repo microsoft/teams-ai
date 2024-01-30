@@ -230,7 +230,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 }
 
                 // Call chat completion API
-                IEnumerable<Azure.AI.OpenAI.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToAzureSdkChatMessage());
+                IEnumerable<ChatRequestMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToAzureSdkChatMessage());
                 ChatCompletionsOptions chatCompletionsOptions = new(_deploymentName, chatMessages)
                 {
                     MaxTokens = maxInputTokens,
