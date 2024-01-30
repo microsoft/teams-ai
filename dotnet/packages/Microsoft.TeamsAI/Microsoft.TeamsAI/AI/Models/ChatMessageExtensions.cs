@@ -13,7 +13,7 @@ namespace Microsoft.Teams.AI.AI.Models
         /// </summary>
         /// <param name="chatMessage">The original <see cref="ChatMessage" />.</param>
         /// <returns>An <see cref="ChatRequestMessage"/>.</returns>
-        public static ChatRequestMessage ToAzureSdkChatMessage(this ChatMessage chatMessage)
+        public static ChatRequestMessage ToChatRequestMessage(this ChatMessage chatMessage)
         {
             ChatRole role = chatMessage.Role;
             ChatRequestMessage? message = null;

@@ -16,7 +16,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             };
 
             // Act
-            var result = chatMessage.ToAzureSdkChatMessage();
+            var result = chatMessage.ToChatRequestMessage();
 
             // Assert
             Assert.Equal(Azure.AI.OpenAI.ChatRole.User, result.Role);
@@ -41,7 +41,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             };
 
             // Act
-            var result = chatMessage.ToAzureSdkChatMessage();
+            var result = chatMessage.ToChatRequestMessage();
 
             // Assert
             Assert.Equal(Azure.AI.OpenAI.ChatRole.Assistant, result.Role);
@@ -70,7 +70,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             };
 
             // Act
-            var result = chatMessage.ToAzureSdkChatMessage();
+            var result = chatMessage.ToChatRequestMessage();
 
             // Assert
             Assert.Equal(Azure.AI.OpenAI.ChatRole.System, result.Role);
@@ -89,7 +89,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             };
 
             // Act
-            var result = chatMessage.ToAzureSdkChatMessage();
+            var result = chatMessage.ToChatRequestMessage();
 
             // Assert
             Assert.Equal(Azure.AI.OpenAI.ChatRole.Function, result.Role);
@@ -109,7 +109,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             };
 
             // Act
-            var result = chatMessage.ToAzureSdkChatMessage();
+            var result = chatMessage.ToChatRequestMessage();
 
             // Assert
             Assert.Equal(Azure.AI.OpenAI.ChatRole.Tool, result.Role);
