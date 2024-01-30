@@ -1,11 +1,16 @@
 # ![teams logo](https://github.com/microsoft/teams-ai/assets/14900841/10a0fbac-9d31-46d5-ad65-0eeb33b787a8) Teams AI Library
 
-[![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main)
+[![Coverage Status](https://coveralls.io/repos/github/microsoft/teams-ai/badge.svg?branch=main)](https://coveralls.io/github/microsoft/teams-ai?branch=main)
+
+| Name          | Status                |
+|---------------|-----------------------|
+| Javascript    | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) |
+| C#            | [![C# Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.dotnet?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main) |
 
 Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 
 ![Teams AI flow diagram](https://github.com/microsoft/teams-ai/assets/14900841/154353ff-bafe-4423-abcd-6dc5a8680fe9)
-This is a diagram of the Teams-AI flow. Teams AI SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.
+This is a diagram of the Teams-AI flow. Teams AI Library SDK hooks into the Teams SDK and Azure OpenAI SDK to provide a seamless experience for developers.
 
 The SDK is currently available for JavaScript/TypeScript applications in the [`js`](./js) folder and via the [teams-ai package on NPM](https://www.npmjs.com/package/@microsoft/teams-ai). .NET support is available in the [`dotnet`](./dotnet) folder and via the [teams-ai package on NuGet](https://www.nuget.org/packages/Microsoft.Teams.AI).
 

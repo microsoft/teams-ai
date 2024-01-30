@@ -27,13 +27,13 @@ builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFramew
 // Create the Cloud Adapter with error handling enabled.
 // Note: some classes expect a BotAdapter and some expect a BotFrameworkHttpAdapter, so
 // register the same adapter instance for both types.
-builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
-builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>());
+builder.Services.AddSingleton<TeamsAdapter, AdapterWithErrorHandler>();
+builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<TeamsAdapter>());
 
 // Create the storage to persist turn state
 builder.Services.AddSingleton<IStorage, MemoryStorage>();
 
-builder.Services.AddSingleton<IConfidentialClientApplication>(sp =>
+builder.Services.AddSingleton(sp =>
 {
     IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(config.AAD_APP_CLIENT_ID)
                                         .WithClientSecret(config.AAD_APP_CLIENT_SECRET)
@@ -48,7 +48,7 @@ builder.Services.AddSingleton<IConfidentialClientApplication>(sp =>
 builder.Services.AddTransient<IBot>(sp =>
 {
     IStorage storage = sp.GetService<IStorage>();
-    BotAdapter adapter = sp.GetService<CloudAdapter>()!;
+    TeamsAdapter adapter = sp.GetService<TeamsAdapter>()!;
     IConfidentialClientApplication msal = sp.GetService<IConfidentialClientApplication>();
     string signInLink = $"https://{config.BOT_DOMAIN}/auth-start.html";
 

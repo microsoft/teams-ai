@@ -5,23 +5,28 @@
 import { config } from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
+import axios from 'axios';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
-    CloudAdapter,
-    ConfigurationBotFrameworkAuthentication,
     ConfigurationServiceClientCredentialFactory,
     MemoryStorage,
     MessagingExtensionAttachment,
     TurnContext
 } from 'botbuilder';
 
+import { Application, TurnState, TeamsAdapter } from '@microsoft/teams-ai';
+
+import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
+
 // Read botFilePath and botFileSecret from .env file.
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
+// Create adapter.
+// See https://aka.ms/about-bot-adapter to learn more about how bots work.
+const adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
         MicrosoftAppId: process.env.BOT_ID,
@@ -29,10 +34,6 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
         MicrosoftAppType: 'MultiTenant'
     })
 );
-
-// Create adapter.
-// See https://aka.ms/about-bot-adapter to learn more about how bots work.
-const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: any) => {
@@ -67,10 +68,6 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
     console.log('\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator');
     console.log('\nTo test your bot in Teams, sideload the app manifest.json within Teams Apps.');
 });
-
-import axios from 'axios';
-import { Application, TurnState } from '@microsoft/teams-ai';
-import { createNpmPackageCard, createNpmSearchResultCard } from './cards';
 
 // Define storage and application
 const storage = new MemoryStorage();

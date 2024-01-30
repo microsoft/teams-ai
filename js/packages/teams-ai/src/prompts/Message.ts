@@ -63,9 +63,9 @@ export interface TextContentPart {
 
 export interface ImageContentPart {
     /**
-     * Type of the message content. Should always be 'image'.
+     * Type of the message content. Should always be 'image_url'.
      */
-    type: 'image';
+    type: 'image_url';
 
     /**
      * The URL of the image.

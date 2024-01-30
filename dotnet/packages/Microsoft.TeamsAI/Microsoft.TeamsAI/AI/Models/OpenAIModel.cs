@@ -28,6 +28,11 @@ namespace Microsoft.Teams.AI.AI.Models
 
         private readonly OpenAIClient _openAIClient;
         private string _deploymentName;
+        private static JsonSerializerOptions _serializerOptions = new()
+        {
+            WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
 
         private static readonly string _userAgent = "AlphaWave";
 
@@ -190,12 +195,12 @@ namespace Microsoft.Teams.AI.AI.Models
                     _logger.LogTrace($"duration {(DateTime.UtcNow - startTime).TotalMilliseconds} ms");
                     if (promptResponse.Status == PromptResponseStatus.Success)
                     {
-                        _logger.LogTrace(JsonSerializer.Serialize(completionsResponse!.Value));
+                        _logger.LogTrace(JsonSerializer.Serialize(completionsResponse!.Value, _serializerOptions));
                     }
                     if (promptResponse.Status == PromptResponseStatus.RateLimited)
                     {
                         _logger.LogTrace("HEADERS:");
-                        _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers));
+                        _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers, _serializerOptions));
                     }
                 }
 
@@ -221,7 +226,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 {
                     // TODO: Colorize
                     _logger.LogTrace("CHAT PROMPT:");
-                    _logger.LogTrace(JsonSerializer.Serialize(prompt.Output));
+                    _logger.LogTrace(JsonSerializer.Serialize(prompt.Output, _serializerOptions));
                 }
 
                 // Call chat completion API
@@ -269,12 +274,12 @@ namespace Microsoft.Teams.AI.AI.Models
                     _logger.LogTrace($"duration {(DateTime.UtcNow - startTime).TotalMilliseconds} ms");
                     if (promptResponse.Status == PromptResponseStatus.Success)
                     {
-                        _logger.LogTrace(JsonSerializer.Serialize(chatCompletionsResponse!.Value));
+                        _logger.LogTrace(JsonSerializer.Serialize(chatCompletionsResponse!.Value, _serializerOptions));
                     }
                     if (promptResponse.Status == PromptResponseStatus.RateLimited)
                     {
                         _logger.LogTrace("HEADERS:");
-                        _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers));
+                        _logger.LogTrace(JsonSerializer.Serialize(rawResponse.Headers, _serializerOptions));
                     }
                 }
 

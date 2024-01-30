@@ -6,6 +6,7 @@ import assert from 'assert';
 
 describe('UserTokenAccess', () => {
     let context: TurnContext;
+    let contextWithNoClient: TurnContext;
     let userTokenClient: TestUserTokenClient;
     let userTokenClientStub: Sinon.SinonStub;
 
@@ -13,34 +14,64 @@ describe('UserTokenAccess', () => {
         context = new TurnContext(new TestAdapter(), {});
         userTokenClient = new TestUserTokenClient();
         userTokenClientStub = sinon.stub(context.turnState, 'get').returns(userTokenClient);
+        contextWithNoClient = new TurnContext(new TestAdapter(), {});
+        sinon.stub(contextWithNoClient.turnState, 'get').returns(null);
     });
 
-    it('getUserToken', async () => {
+    it('valid getUserToken', async () => {
         await getUserToken(context, { title: 'title', connectionName: 'test' }, '1234');
 
         assert(userTokenClientStub.calledOnce);
         assert(userTokenClient.lastMethodCalled === 'getUserToken');
     });
 
-    it('getSignInResource', async () => {
+    it('should throw error for getUserToken due to empty token client', async () => {
+        await assert.rejects(
+            () => getUserToken(contextWithNoClient, { title: 'title', connectionName: 'test' }, '1234'),
+            new Error(`OAuth prompt is not supported by the current adapter`)
+        );
+    });
+
+    it('valid getSignInResource', async () => {
         await getSignInResource(context, { title: 'title', connectionName: 'test' });
 
         assert(userTokenClientStub.calledOnce);
         assert(userTokenClient.lastMethodCalled === 'getSignInResource');
     });
 
-    it('signOutUser', async () => {
+    it('should throw error for getSignInResource due to empty token client', async () => {
+        await assert.rejects(
+            () => getSignInResource(contextWithNoClient, { title: 'title', connectionName: 'test' }),
+            new Error(`OAuth prompt is not supported by the current adapter`)
+        );
+    });
+
+    it('valid signOutUser', async () => {
         await signOutUser(context, { title: 'title', connectionName: 'test' });
 
         assert(userTokenClientStub.calledOnce);
         assert(userTokenClient.lastMethodCalled === 'signOutUser');
     });
 
-    it('exchangeToken', async () => {
+    it('should throw error for signOutUser due to empty token client', async () => {
+        await assert.rejects(
+            () => signOutUser(contextWithNoClient, { title: 'title', connectionName: 'test' }),
+            new Error(`OAuth prompt is not supported by the current adapter`)
+        );
+    });
+
+    it('valid exchangeToken', async () => {
         await exchangeToken(context, { title: 'title', connectionName: 'test' }, {});
 
         assert(userTokenClientStub.calledOnce);
         assert(userTokenClient.lastMethodCalled === 'exchangeToken');
+    });
+
+    it('should throw error for exchangeToken due to empty token client', async () => {
+        await assert.rejects(
+            () => exchangeToken(contextWithNoClient, { title: 'title', connectionName: 'test' }, {}),
+            new Error(`OAuth prompt is not supported by the current adapter`)
+        );
     });
 });
 

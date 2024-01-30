@@ -20,7 +20,7 @@ Provide a list of your changes here. If you are fixing a bug, please provide ste
 
 - I have checked for/fixed spelling, linting, and other errors
 - I have commented my code for clarity
-- I have made corresponding changes to the documentation (we use [TypeDoc](https://typedoc.org/) to document our code)
+- I have made corresponding changes to the documentation (updating the doc strings in the code is sufficient)
 - My changes generate no new warnings
 - I have added tests that validates my changes, and provides sufficient test coverage. I have tested with:
   - Local testing

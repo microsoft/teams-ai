@@ -110,7 +110,6 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication
         public async void Test_SignOut_SpecificHandler()
         {
             // arrange
-            var graphToken = "graph token";
             var app = new TestApplication(new TestApplicationOptions());
             var options = new AuthenticationOptions<TurnState>();
             options._authenticationSettings = new Dictionary<string, object>()

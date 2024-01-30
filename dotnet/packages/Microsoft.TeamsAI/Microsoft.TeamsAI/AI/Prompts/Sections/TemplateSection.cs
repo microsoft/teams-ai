@@ -116,6 +116,7 @@ namespace Microsoft.Teams.AI.AI.Prompts.Sections
                         {
                             if (chunk.Length > 0)
                             {
+                                chunk = chunk.Trim();
                                 if (chunk[0] == '$')
                                 {
                                     renderers.Add(this.CreateVariableRenderer(chunk.Substring(1)));

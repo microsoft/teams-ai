@@ -12,8 +12,8 @@
 export class Response {
     /**
      * Parse all objects from a response string.
-     * @param text Response text to parse.
-     * @returns Array of parsed objects.
+     * @param {string} text Response text to parse.
+     * @returns {Record<string, any>[]} Array of parsed objects.
      */
     public static parseAllObjects(text: string): Record<string, any>[] {
         // First try parsing each line
@@ -42,8 +42,9 @@ export class Response {
 
     /**
      * Fuzzy JSON parser.
-     * @param text text to parse.
-     * @returns The parsed object or undefined if the object could not be parsed.
+     * @template TObject Type of the object to parse.
+     * @param {string} text text to parse.
+     * @returns {TObject | undefined} The parsed object or undefined if the object could not be parsed.
      */
     public static parseJSON<TObject = {}>(text: string): TObject | undefined {
         const startBrace = text.indexOf('{');
@@ -80,20 +81,22 @@ export class Response {
                         case '[':
                             nesting.push(']');
                             break;
-                        case '}':
+                        case '}': {
                             const closeObject = nesting.pop();
                             if (closeObject != '}') {
                                 // Malformed
                                 return undefined;
                             }
                             break;
-                        case ']':
+                        }
+                        case ']': {
                             const closeArray = nesting.pop();
                             if (closeArray != ']') {
                                 // Malformed
                                 return undefined;
                             }
                             break;
+                        }
                         case '<':
                             // The model sometimes fails to wrap <some template> with double quotes
                             ch = `"<`;
@@ -130,8 +133,8 @@ export class Response {
      * Removes any empty fields from an object.
      * @remarks
      * Empty fields include `null`, `undefined`, `[]`, `{}`, and `""`.
-     * @param obj The object to clean.
-     * @returns A cleaned object.
+     * @param {Record<string, any>} obj The object to clean.
+     * @returns {Record<string, any>} A cleaned object.
      */
     public static removeEmptyValuesFromObject(obj: Record<string, any>): Record<string, any> {
         const result: Record<string, any> = {};

@@ -445,6 +445,7 @@ disable=raw-checker-failed,
         too-many-public-methods,
         too-many-return-statements,
         too-many-boolean-expressions,
+        too-many-arguments,
         duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can
