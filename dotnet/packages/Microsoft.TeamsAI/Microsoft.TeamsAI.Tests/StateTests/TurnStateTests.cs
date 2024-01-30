@@ -49,9 +49,11 @@ namespace Microsoft.Teams.AI.Tests.StateTests
             Mock<IStorage> storage = new();
             storage.Setup(storage => storage.ReadAsync(new string[] { conversationKey, userKey }, It.IsAny<CancellationToken>())).Returns(() =>
             {
-                IDictionary<string, object> items = new Dictionary<string, object>();
-                items[conversationKey] = conversationState;
-                items[userKey] = userState;
+                IDictionary<string, object> items = new Dictionary<string, object>
+                {
+                    [conversationKey] = conversationState,
+                    [userKey] = userState
+                };
                 return Task.FromResult(items);
             });
 
@@ -489,7 +491,7 @@ namespace Microsoft.Teams.AI.Tests.StateTests
         }
 
         [Fact]
-        public async void Test_GetScope_Before_Loading_State()
+        public void Test_GetScope_Before_Loading_State()
         {
             // Arrange
             var state = new TurnState();
