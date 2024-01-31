@@ -1,5 +1,5 @@
 {
-    "name": "CardMaster-demo",
+    "name": "CardGazer-demo",
     "version": "1.0.0",
     "description": "A vision enabled bot capable of generating Adaptive Cards using uploaded images.",
     "author": "Microsoft",

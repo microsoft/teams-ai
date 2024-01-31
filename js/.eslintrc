@@ -16,9 +16,6 @@
         "plugin:jsdoc/recommended",
         "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
-        // Currently samples contain no frontend
-        // "plugin:react/recommended",
-        // "plugin:react/jsx-runtime"
     ],
     "plugins": ["@typescript-eslint", "jsdoc", "mocha", "only-warn", "prettier"],
     "parserOptions": {
@@ -41,18 +38,19 @@
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": "off",
-        "no-async-promise-executor": "off",
-        "no-constant-condition": "off",
-        "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
-        "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
-        "prettier/prettier": "error",
-        "jsdoc/empty-tags": "off",
         "jsdoc/check-tag-names": [
             1,
             {
                 "definedTags": ["remarks"] // Allow @remarks
             }
-        ]
+        ],
+        "jsdoc/empty-tags": "off",
+        "no-async-promise-executor": "off",
+        "no-constant-condition": "off",
+        "no-extra-boolean-cast": "off",
+        "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
+        "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
+        "prettier/prettier": "error"
     },
     "overrides": [
         {

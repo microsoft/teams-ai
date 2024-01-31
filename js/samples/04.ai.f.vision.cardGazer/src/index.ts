@@ -59,7 +59,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: any) => {
 
     // Send a message to the user
     await context.sendActivity('The bot encountered an error or bug.');
-    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
+    await context.sendActivity(`${error}`);
 };
 
 // Set the onTurnError for the singleton CloudAdapter.
@@ -115,7 +115,7 @@ const planner = new ActionPlanner({
 // Create an attachment downloader
 const downloader = new TeamsAttachmentDownloader({
     botAppId: process.env.BOT_ID!,
-    botAppPassword: process.env.BOT_PASSWORD!
+    adapter
 });
 
 // Define storage and application

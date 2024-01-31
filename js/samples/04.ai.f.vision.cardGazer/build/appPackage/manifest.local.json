@@ -2,14 +2,14 @@
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.1.0",
     "manifestVersion": "1.15",
-    "id": "${{TEAMS_APP_ID}}",
+    "id": "4a659e40-58a5-4883-957a-4b3cd037fe0e",
     "packageName": "com.package.name",
     "name": {
-        "short": "CardMaster-${{TEAMSFX_ENV}}",
-        "full": "Teams Card Master"
+        "short": "CardGazer-local",
+        "full": "Teams Card Gazer"
     },
     "developer": {
-        "name": "CardMaster",
+        "name": "CardGazer",
         "mpnId": "",
         "websiteUrl": "https://microsoft.com",
         "privacyUrl": "https://privacy.microsoft.com/privacystatement",
@@ -27,17 +27,25 @@
     "staticTabs": [
         {
             "entityId": "conversations",
-            "scopes": ["personal"]
+            "scopes": [
+                "personal"
+            ]
         },
         {
             "entityId": "about",
-            "scopes": ["personal"]
+            "scopes": [
+                "personal"
+            ]
         }
     ],
     "bots": [
         {
-            "botId": "${{BOT_ID}}",
-            "scopes": ["personal", "team", "groupChat"],
+            "botId": "b1df5988-0cda-4c1f-a7f3-db5b71ff6cb2",
+            "scopes": [
+                "personal",
+                "team",
+                "groupChat"
+            ],
             "isNotificationOnly": false,
             "supportsCalling": false,
             "supportsVideo": false,
