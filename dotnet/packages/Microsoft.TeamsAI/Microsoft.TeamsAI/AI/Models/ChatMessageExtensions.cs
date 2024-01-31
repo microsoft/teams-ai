@@ -20,18 +20,24 @@ namespace Microsoft.Teams.AI.AI.Models
 
             if (role == ChatRole.User)
             {
-                message = new ChatRequestUserMessage(chatMessage.Content);
+                ChatRequestUserMessage userMessage = new(chatMessage.Content);
+
+                if (chatMessage.Name != string.Empty)
+                {
+                    userMessage.Name = chatMessage.Name;
+                }
+
+                message = userMessage;
             }
 
             if (role == ChatRole.Assistant)
             {
-                Azure.AI.OpenAI.FunctionCall functionCall = new(chatMessage.FunctionCall?.Name, chatMessage.FunctionCall?.Arguments);
+                ChatRequestAssistantMessage assistantMessage = new(chatMessage.Content);
 
-                ChatRequestAssistantMessage assistantMessage = new(chatMessage.Content)
+                if (chatMessage.FunctionCall != null)
                 {
-                    FunctionCall = functionCall,
-                    Name = chatMessage.Name,
-                };
+                    assistantMessage.FunctionCall = new(chatMessage.FunctionCall.Name ?? "", chatMessage.FunctionCall.Arguments ?? "");
+                }
 
                 if (chatMessage.ToolCalls != null)
                 {
@@ -41,12 +47,24 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
 
+                if (chatMessage.Name != string.Empty)
+                {
+                    assistantMessage.Name = chatMessage.Name;
+                }
+
                 message = assistantMessage;
             }
 
             if (role == ChatRole.System)
             {
-                message = new ChatRequestSystemMessage(chatMessage.Content);
+                ChatRequestSystemMessage systemMessage = new(chatMessage.Content);
+
+                if (chatMessage.Name != string.Empty)
+                {
+                    systemMessage.Name = chatMessage.Name;
+                }
+
+                message = systemMessage;
             }
 
             if (role == ChatRole.Function)
