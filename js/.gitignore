@@ -75,9 +75,6 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.env.test
-**/samples/**/env/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -121,9 +118,6 @@ dist
 **/samples/**/package-lock.json
 package-lock.json
 
-env/.env.*.user
-env/.env.local
-env/.env.staging
 
 // Ignore codepilot
 .codepilot/
