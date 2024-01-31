@@ -164,10 +164,7 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
                 .ReturnsAsync(new DialogTurnResult(DialogTurnStatus.Waiting));
             mockedPrompt
                 .Setup(mock => mock.ContinueDialogAsync(It.IsAny<DialogContext>(), It.IsAny<CancellationToken>()))
-                .Returns(async (DialogContext dc, CancellationToken cancellationToken) =>
-                {
-                    return await dc.EndDialogAsync(new TokenResponse(token: "test token"));
-                });
+                .Returns(async (DialogContext dc, CancellationToken cancellationToken) => await dc.EndDialogAsync(new TokenResponse(token: "test token")));
             return mockedPrompt;
         }
 
@@ -186,8 +183,10 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.Bot
 
         private static TurnContext MockTokenExchangeContext(string settingName = "test")
         {
-            JObject activityValue = new();
-            activityValue["id"] = $"{Guid.NewGuid()}-{settingName}";
+            JObject activityValue = new()
+            {
+                ["id"] = $"{Guid.NewGuid()}-{settingName}"
+            };
 
             return new TurnContext(new SimpleAdapter(), new Activity()
             {

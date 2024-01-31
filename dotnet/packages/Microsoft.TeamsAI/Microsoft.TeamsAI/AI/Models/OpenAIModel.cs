@@ -27,8 +27,8 @@ namespace Microsoft.Teams.AI.AI.Models
         private readonly ILogger _logger;
 
         private readonly OpenAIClient _openAIClient;
-        private string _deploymentName;
-        private static JsonSerializerOptions _serializerOptions = new()
+        private readonly string _deploymentName;
+        private readonly static JsonSerializerOptions _serializerOptions = new()
         {
             WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -230,7 +230,7 @@ namespace Microsoft.Teams.AI.AI.Models
                 }
 
                 // Call chat completion API
-                IEnumerable<Azure.AI.OpenAI.ChatMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToAzureSdkChatMessage());
+                IEnumerable<ChatRequestMessage> chatMessages = prompt.Output.Select(chatMessage => chatMessage.ToChatRequestMessage());
                 ChatCompletionsOptions chatCompletionsOptions = new(_deploymentName, chatMessages)
                 {
                     MaxTokens = maxInputTokens,
