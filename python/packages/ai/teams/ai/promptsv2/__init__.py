@@ -4,10 +4,12 @@ Licensed under the MIT License.
 """
 
 from .assistant_message import AssistantMessage
+from .conversation_history import ConversationHistory
 from .data_source_section import DataSourceSection
 from .function_call import FunctionCall
 from .function_call_message import FunctionCallMessage
 from .function_response_message import FunctionResponseMessage
+from .group_section import GroupSection
 from .layout_engine import LayoutEngine
 from .message import ImageContentPart, Message, TextContentPart
 from .prompt_section import PromptFunctions, PromptSection
