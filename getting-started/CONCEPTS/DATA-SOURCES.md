@@ -49,7 +49,7 @@ Inside the prompt's config.json. Here, `teams-ai` denotes the name of the Vectra
 
 #### C#
 Here is an example of the configuration for the
-[Chef Bot sample](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/04.e.twentyQuestions):
+[Chef Bot sample](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/04.ai.a.teamsChefBot):
 
 ```cs
 // Inside KernelMemoryDataSource.cs
@@ -62,7 +62,7 @@ KernelMemoryDataSource dataSource = new("teams-ai", sp.GetService<IKernelMemory>
 prompts.AddDataSource("teams-ai", dataSource);
 ```
 
-Inside the prompt's `config.json`. Here, `teams-ai` denotes the name of the KernelMemoryDataSource, and 900 is the `maxTokens`.
+Inside the prompt's `config.json`. Here, `teams-ai` denotes the name of the `KernelMemoryDataSource`, and 900 is the `maxTokens`.
 ```json
 "augmentation": {
     "augmentation_type": "none",
@@ -72,4 +72,4 @@ Inside the prompt's `config.json`. Here, `teams-ai` denotes the name of the Kern
 }
 ```
 
-> The [`Kernel Memory`](https://github.com/microsoft/kernel-memory) library provides tools for indexing and querying data. The Chef Bot uses Kernel Memory as an example of how to integrate Retrieval Augmentation (RAG) into the AI libray.
+> The [`Kernel Memory`](https://github.com/microsoft/kernel-memory) library provides tools for indexing and querying data. The Chef Bot uses Kernel Memory as an example of how to integrate Retrieval Augmentation (RAG) into the AI library.
