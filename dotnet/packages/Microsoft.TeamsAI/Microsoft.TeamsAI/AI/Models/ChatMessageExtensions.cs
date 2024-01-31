@@ -1,5 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -15,6 +16,11 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <returns>An <see cref="ChatRequestMessage"/>.</returns>
         public static ChatRequestMessage ToChatRequestMessage(this ChatMessage chatMessage)
         {
+            Verify.NotNull(chatMessage.Content);
+            Verify.NotNull(chatMessage.Name);
+            Verify.NotNull(chatMessage.Role);
+            Verify.NotNull(chatMessage.ToolCallId);
+
             ChatRole role = chatMessage.Role;
             ChatRequestMessage? message = null;
 
