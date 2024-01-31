@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Teams.AI.AI.Embeddings;
-using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI.Tests.TestUtils;
 using System.Reflection;
 using Xunit.Abstractions;
@@ -42,7 +41,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("OpenAI").Get<OpenAIConfiguration>();
             var options = new OpenAIEmbeddingsOptions(config.ApiKey, config.EmbeddingModelId!);
-            var embeddings = new OpenAIEmbeddings<TurnState, OpenAIEmbeddingsOptions>(options, _loggerFactory);
+            var embeddings = new OpenAIEmbeddings(options, _loggerFactory);
             var inputs = new List<string>()
             {
                 "test-input1",
@@ -67,7 +66,7 @@ namespace Microsoft.Teams.AI.Tests.IntegrationTests
             // Arrange
             var config = _configuration.GetSection("AzureOpenAI").Get<AzureOpenAIConfiguration>();
             var options = new AzureOpenAIEmbeddingsOptions(config.ApiKey, config.EmbeddingModelId!, config.Endpoint);
-            var embeddings = new OpenAIEmbeddings<TurnState, AzureOpenAIEmbeddingsOptions>(options, _loggerFactory);
+            var embeddings = new OpenAIEmbeddings(options, _loggerFactory);
             var inputs = new List<string>()
             {
                 "test-input1",

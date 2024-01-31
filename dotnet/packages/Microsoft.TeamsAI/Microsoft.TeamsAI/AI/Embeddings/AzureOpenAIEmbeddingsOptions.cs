@@ -3,29 +3,54 @@
 namespace Microsoft.Teams.AI.AI.Embeddings
 {
     /// <summary>
-    /// Additional options needed to use the Azure OpenAI service.
+    /// Options for configuring an `OpenAIEmbeddings` to generate embeddings using an Azure OpenAI hosted model.
     /// </summary>
-    /// <remarks>
-    /// The Azure OpenAI API version is set to latest by default.
-    /// </remarks>
-    public class AzureOpenAIEmbeddingsOptions : OpenAIEmbeddingsOptions
+    public class AzureOpenAIEmbeddingsOptions : BaseOpenAIEmbeddingsOptions
     {
         /// <summary>
-        /// Endpoint for your Azure OpenAI deployment.
+        /// API key to use when making requests to Azure OpenAI.
         /// </summary>
-        public new string Endpoint { get; set; }
+        public string AzureApiKey { get; set; }
 
         /// <summary>
-        /// Create an instance of the AzureOpenAIEmbeddingsOptions class.
+        /// Name of the Azure OpenAI deployment (model) to use.
         /// </summary>
-        /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="model">The model to use for embeddings. This should be the model deployment name, not the model</param>
-        /// <param name="endpoint">Endpoint for your Azure OpenAI deployment.</param>
-        public AzureOpenAIEmbeddingsOptions(string apiKey, string model, string endpoint) : base(apiKey, model)
-        {
-            Verify.ParamNotNull(endpoint);
+        public string AzureDeployment { get; set; }
 
-            Endpoint = endpoint;
+        /// <summary>
+        /// Deployment endpoint to use.
+        /// </summary>
+        public string AzureEndpoint { get; set; }
+
+        /// <summary>
+        /// Optional. Version of the API being called.
+        /// </summary>
+        public string? AzureApiVersion { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureOpenAIEmbeddingsOptions"/> class.
+        /// </summary>
+        /// <param name="azureApiKey">API key to use when making requests to Azure OpenAI.</param>
+        /// <param name="azureDeployment">Name of the Azure OpenAI deployment (model) to use.</param>
+        /// <param name="azureEndpoint">Deployment endpoint to use.</param>
+        public AzureOpenAIEmbeddingsOptions(
+            string azureApiKey,
+            string azureDeployment,
+            string azureEndpoint) : base()
+        {
+            Verify.ParamNotNull(azureApiKey);
+            Verify.ParamNotNull(azureDeployment);
+            Verify.ParamNotNull(azureEndpoint);
+
+            azureEndpoint = azureEndpoint.Trim();
+            if (!azureEndpoint.StartsWith("https://"))
+            {
+                throw new ArgumentException($"Model created with an invalid endpoint of `{azureEndpoint}`. The endpoint must be a valid HTTPS url.");
+            }
+
+            this.AzureApiKey = azureApiKey;
+            this.AzureDeployment = azureDeployment;
+            this.AzureEndpoint = azureEndpoint;
         }
     }
 }
