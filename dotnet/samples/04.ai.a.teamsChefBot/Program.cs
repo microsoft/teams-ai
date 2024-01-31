@@ -106,6 +106,7 @@ builder.Services.AddTransient<IBot>(sp =>
     });
 
     KernelMemoryDataSource dataSource = new("teams-ai", sp.GetService<IKernelMemory>()!);
+    prompts.AddDataSource("teams-ai", dataSource);
 
     // Create ActionPlanner
     ActionPlanner<TurnState> planner = new(
@@ -121,8 +122,6 @@ builder.Services.AddTransient<IBot>(sp =>
         { LogRepairs = true },
         loggerFactory: loggerFactory
     );
-
-    planner.Options.Prompts.AddDataSource("teams-ai", dataSource);
 
     Application<TurnState> app = new ApplicationBuilder<TurnState>()
         .WithAIOptions(new(planner))

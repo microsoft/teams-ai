@@ -15,10 +15,11 @@ Our simplest example (primarily for testing) is `TextDataSource`, which adds a s
 Our most complex example is the `VectraDataSource` in the Chef Bot sample, which uses an external library called Vectra.
 
 ### Customized Example of VectraDataSource
+
+#### Javascript
 Here is an example of the configuration for the
 [Chef Bot sample](https://github.com/microsoft/teams-ai/tree/main/js/samples/04.ai.a.teamsChefBot):
 
-**JS**
 ```js
 // Inside VectraDataSource.ts
 export class VectraDataSource implements DataSource 
@@ -45,3 +46,30 @@ Inside the prompt's config.json. Here, `teams-ai` denotes the name of the Vectra
     }
 }
 ```
+
+#### C#
+Here is an example of the configuration for the
+[Chef Bot sample](https://github.com/microsoft/teams-ai/tree/main/dotnet/samples/04.e.twentyQuestions):
+
+```cs
+// Inside KernelMemoryDataSource.cs
+public class KernelMemoryDataSource : IDataSource
+```
+
+```cs
+// Inside of Program.cs
+KernelMemoryDataSource dataSource = new("teams-ai", sp.GetService<IKernelMemory>()!);
+prompts.AddDataSource("teams-ai", dataSource);
+```
+
+Inside the prompt's `config.json`. Here, `teams-ai` denotes the name of the KernelMemoryDataSource, and 900 is the `maxTokens`.
+```json
+"augmentation": {
+    "augmentation_type": "none",
+    "data_sources": {
+        "teams-ai": 900
+    }
+}
+```
+
+> The [`Kernel Memory`](https://github.com/microsoft/kernel-memory) library provides tools for indexing and querying data. The Chef Bot uses Kernel Memory as an example of how to integrate Retrieval Augmentation (RAG) into the AI libray.
