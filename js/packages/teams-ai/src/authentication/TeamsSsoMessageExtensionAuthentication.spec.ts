@@ -287,4 +287,30 @@ describe('TeamsSsoMessageExtensionAuthentication', () => {
             );
         });
     });
+
+    describe('isSsoSignIn()', async () => {
+        it('should return true if activity is composeExtension/query', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'composeExtension/query'
+            });
+
+            const msal = new ConfidentialClientApplication(settings.msalConfig);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
+
+            assert.equal(auth.isSsoSignIn(context), true);
+        });
+
+        it('should return false if activity is not composeExtension/query', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'not compose extension query'
+            });
+
+            const msal = new ConfidentialClientApplication(settings.msalConfig);
+            const auth = new TeamsSsoMessageExtensionAuthentication(settings, msal);
+
+            assert.equal(auth.isSsoSignIn(context), false);
+        });
+    });
 });

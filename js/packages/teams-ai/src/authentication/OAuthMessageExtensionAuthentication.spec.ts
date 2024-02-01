@@ -355,4 +355,63 @@ describe('OAuthPromptMessageExtensionAuthentication', () => {
             assert(exchangeTokenStub.calledWith(context, settings, { token: 'token' }));
         });
     });
+
+    describe('isSsoSignIn()', () => {
+        it('should return true if the activity is `composeExtension/query` and sso is enabled', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'composeExtension/query'
+            });
+
+            const settings = {
+                connectionName: 'connectionName',
+                title: 'title',
+                enableSso: true
+            };
+
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
+
+            const result = meAuth.isSsoSignIn(context);
+
+            assert(result === true);
+        });
+
+        it('should return false if the activity is not `composeExtension/query`', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'NOT composeExtension/query'
+            });
+
+            const settings = {
+                connectionName: 'connectionName',
+                title: 'title',
+                enableSso: true
+            };
+
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
+
+            const result = meAuth.isSsoSignIn(context);
+
+            assert(result === false);
+        });
+
+        it('should return false if sso is not enabled', async () => {
+            const [context, _] = await createTurnContextAndState({
+                type: ActivityTypes.Invoke,
+                name: 'composeExtension/query'
+            });
+
+            const settings = {
+                connectionName: 'connectionName',
+                title: 'title',
+                enableSso: false
+            };
+
+            const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
+
+            const result = meAuth.isSsoSignIn(context);
+
+            assert(result === false);
+        });
+    });
 });

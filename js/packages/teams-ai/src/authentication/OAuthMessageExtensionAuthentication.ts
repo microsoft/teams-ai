@@ -2,9 +2,10 @@
 // Licensed under the MIT License.
 
 import { TokenResponse, TurnContext } from 'botbuilder';
-import { OAuthPromptSettings } from 'botbuilder-dialogs';
 import { MessageExtensionAuthenticationBase } from './MessageExtensionAuthenticationBase';
 import * as UserTokenAccess from './UserTokenAccess';
+import { OAuthSettings } from './Authentication';
+import { MessageExtensionsInvokeNames } from '../MessageExtensions';
 
 /**
  * @internal
@@ -16,7 +17,7 @@ export class OAuthPromptMessageExtensionAuthentication extends MessageExtensionA
      * Creates a new instance of OAuthPromptMessageExtensionAuthentication.
      * @param settings The OAuthPromptSettings.
      */
-    public constructor(private readonly settings: OAuthPromptSettings) {
+    public constructor(private readonly settings: OAuthSettings) {
         super();
     }
 
@@ -53,5 +54,17 @@ export class OAuthPromptMessageExtensionAuthentication extends MessageExtensionA
     public async getSignInLink(context: TurnContext): Promise<string | undefined> {
         const signInResource = await UserTokenAccess.getSignInResource(context, this.settings);
         return signInResource.signInLink;
+    }
+
+    /**
+     * Should sign in using SSO flow.
+     * @param {TurnContext} context - The turn context.
+     * @returns {boolean} - A boolean indicating if the sign-in should use SSO flow.
+     */
+    public isSsoSignIn(context: TurnContext): boolean {
+        if (context.activity.name === MessageExtensionsInvokeNames.QUERY_INVOKE && this.settings.enableSso == true) {
+            return true;
+        }
+        return false;
     }
 }
