@@ -7,14 +7,15 @@ import {
     DialogState,
     DialogTurnResult,
     DialogTurnStatus,
-    OAuthPrompt,
-    OAuthPromptSettings
+    OAuthPrompt
 } from 'botbuilder-dialogs';
 import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse } from 'botbuilder';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import { Application } from '../Application';
 import { TurnState } from '../TurnState';
 import { TurnStateProperty } from '../TurnStateProperty';
+import { OAuthSettings } from './Authentication';
+import { OAuthBotPrompt } from './OAuthBotPrompt';
 
 /**
  * @internal
@@ -34,14 +35,18 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
      */
     public constructor(
         app: Application<TState>,
-        oauthPromptSettings: OAuthPromptSettings, // Child classes will have different types for this
+        oauthPromptSettings: OAuthSettings, // Child classes will have different types for this
         settingName: string,
         storage?: Storage
     ) {
         super(app, settingName, storage);
 
+        if (oauthPromptSettings.enableSso != true) {
+            oauthPromptSettings.showSignInLink = true;
+        }
+
         // Create OAuthPrompt
-        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthPromptSettings);
+        this._oauthPrompt = new OAuthBotPrompt('OAuthPrompt', oauthPromptSettings);
 
         // Handles deduplication of token exchange event when using SSO with Bot Authentication
         app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));

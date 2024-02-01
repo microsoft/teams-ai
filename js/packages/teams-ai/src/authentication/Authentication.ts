@@ -339,6 +339,11 @@ export type OAuthSettings = OAuthPromptSettings & {
      * Optional. Set this to enable SSO when authentication user using adaptive cards.
      */
     tokenExchangeUri?: string;
+
+    /**
+     * Optional. Set to `true` to enable SSO when authenticating using AAD.
+     */
+    enableSso?: boolean;
 };
 
 /**
