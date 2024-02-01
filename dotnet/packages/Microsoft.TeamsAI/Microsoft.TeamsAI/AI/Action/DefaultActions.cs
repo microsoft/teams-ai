@@ -79,11 +79,6 @@ namespace Microsoft.Teams.AI.AI.Action
             Verify.ParamNotNull(command);
             Verify.ParamNotNull(command.Response);
 
-            if (command.Response == string.Empty)
-            {
-                return string.Empty;
-            }
-
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
                 await turnContext.SendActivityAsync(command.Response.Replace("\n", "<br>"), null, null, cancellationToken);
