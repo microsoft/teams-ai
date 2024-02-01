@@ -77,15 +77,20 @@ namespace Microsoft.Teams.AI.AI.Action
         public async Task<string> SayCommandAsync([ActionTurnContext] ITurnContext turnContext, [ActionParameters] PredictedSayCommand command, CancellationToken cancellationToken = default)
         {
             Verify.ParamNotNull(command);
+            Verify.ParamNotNull(command.Response);
 
-            string response = command.Response;
+            if (command.Response == string.Empty)
+            {
+                return string.Empty;
+            }
+
             if (turnContext.Activity.ChannelId == Channels.Msteams)
             {
-                await turnContext.SendActivityAsync(response.Replace("\n", "<br>"), null, null, cancellationToken);
+                await turnContext.SendActivityAsync(command.Response.Replace("\n", "<br>"), null, null, cancellationToken);
             }
             else
             {
-                await turnContext.SendActivityAsync(response, null, null, cancellationToken);
+                await turnContext.SendActivityAsync(command.Response, null, null, cancellationToken);
             };
 
             return string.Empty;
