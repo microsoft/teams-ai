@@ -60,6 +60,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
         )
         self.assertEqual(result.length, 4)
         self.assertEqual(len(result.output), 1)
+        assert result.output[0].content is not None
         self.assertEqual(len(result.output[0].content), 1)
         self.assertTrue(isinstance(result.output[0].content[0], TextContentPart))
         self.assertEqual(result.output[0].content[0].text, "Hello, world!")
@@ -74,6 +75,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
         )
         self.assertEqual(result.length, 2)
         self.assertEqual(len(result.output), 1)
+        assert result.output[0].content is not None
         self.assertEqual(len(result.output[0].content), 1)
         self.assertTrue(isinstance(result.output[0].content[0], TextContentPart))
         self.assertEqual(result.output[0].content[0].text, "Hello,")
@@ -91,6 +93,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
         )
         self.assertEqual(result.length, 85)
         self.assertEqual(len(result.output), 1)
+        assert result.output[0].content is not None
         self.assertEqual(len(result.output[0].content), 1)
         self.assertIsInstance(result.output[0].content[0], ImageContentPart)
         self.assertIsInstance(result.output[0].content[0].image_url, ImageUrl)
@@ -111,6 +114,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
         )
         self.assertEqual(result.length, 0)
         self.assertEqual(len(result.output), 1)
+        assert result.output[0].content is not None
         self.assertEqual(len(result.output[0].content), 0)
         self.assertEqual(result.output[0].role, "user")
         self.assertFalse(result.too_long)
@@ -127,6 +131,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
         )
         self.assertEqual(result.length, 4 + 85)  # Length of text and image
         self.assertEqual(len(result.output), 1)
+        assert result.output[0].content is not None
         self.assertEqual(len(result.output[0].content), 2)
         self.assertTrue(isinstance(result.output[0].content[0], TextContentPart))
         self.assertEqual(result.output[0].content[0].text, "Hello, world!")
@@ -150,6 +155,7 @@ class TestUserInputMessage(IsolatedAsyncioTestCase):
         )
         self.assertEqual(result.length, 4)
         self.assertEqual(len(result.output), 1)
+        assert result.output[0].content is not None
         self.assertEqual(len(result.output[0].content), 1)
         self.assertTrue(isinstance(result.output[0].content[0], TextContentPart))
         self.assertEqual(result.output[0].content[0].text, "Hello, world!")
