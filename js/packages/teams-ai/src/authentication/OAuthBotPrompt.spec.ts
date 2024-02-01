@@ -1,21 +1,11 @@
-import {
-    CardFactory,
-    Channels,
-    // ActivityTypes,
-    // CardFactory,
-    ConversationState,
-    InputHints,
-    MemoryStorage,
-    TestAdapter
-} from 'botbuilder';
+import { CardFactory, Channels, ConversationState, InputHints, MemoryStorage, TestAdapter } from 'botbuilder';
 import { DialogSet, DialogTurnStatus } from 'botbuilder-dialogs';
 import { OAuthBotPrompt } from './OAuthBotPrompt';
-//import assert from 'assert';
 import * as UserTokenAccess from './UserTokenAccess';
 import * as sinon from 'sinon';
 import assert from 'assert';
 
-describe.only('OAuthBotPrompt', () => {
+describe('OAuthBotPrompt', () => {
     before(() => {
         sinon.stub(UserTokenAccess, 'getSignInResource').callsFake(async () => {
             return {
