@@ -1,6 +1,7 @@
 import { Activity, ActivityTypes, TestAdapter, TurnContext } from 'botbuilder';
 import { TeamsAdapter } from '../../TeamsAdapter';
 import { TurnState } from '../../TurnState';
+import { InputFile } from '../../InputFileDownloader';
 
 /**
  * Creates, for testing, an invoke activity with the given name, value and data.
@@ -64,8 +65,8 @@ export const createTestTurnContextAndState = async (
     const state = new TurnState();
     await state.load(context);
     state.temp = {
-        input: '',
-        inputFiles: [],
+        input: context.activity.text,
+        inputFiles: context.activity.attachments as InputFile[],
         lastOutput: '',
         actionOutputs: {},
         authTokens: {}
