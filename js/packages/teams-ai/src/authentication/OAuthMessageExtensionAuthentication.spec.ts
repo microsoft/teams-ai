@@ -217,7 +217,7 @@ describe('OAuthPromptMessageExtensionAuthentication', () => {
             ];
 
             testCases.forEach(([name, authType]) => {
-                it(`should send type '${authType}' suggestion action when couldn't retrieve token from token store for invoke name ${name}`, async () => {
+                it(`should send type '${authType}' suggestion action when couldn't retrieve token from token store for invoke name ${name} when sso is enabled`, async () => {
                     const magicCode = 'OAuth flow magic code';
                     const [context, _] = await createTurnContextAndState({
                         type: ActivityTypes.Invoke,
@@ -234,6 +234,12 @@ describe('OAuthPromptMessageExtensionAuthentication', () => {
                             connectionName: 'connectionName'
                         })
                     );
+
+                    const settings = {
+                        connectionName: 'connectionName',
+                        title: 'title',
+                        enableSso: true
+                    };
 
                     const meAuth = new OAuthPromptMessageExtensionAuthentication(settings);
 
