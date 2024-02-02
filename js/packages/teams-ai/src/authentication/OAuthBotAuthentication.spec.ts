@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 import { Activity, MemoryStorage, TestAdapter, TurnContext } from 'botbuilder';
 import { Application, RouteSelector } from '../Application';
-import { DialogSet, DialogState, DialogTurnResult, DialogTurnStatus } from 'botbuilder-dialogs';
+import { DialogSet, DialogState, DialogTurnResult, DialogTurnStatus, OAuthPrompt } from 'botbuilder-dialogs';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import * as sinon from 'sinon';
 import assert from 'assert';
@@ -9,7 +9,7 @@ import { TurnState } from '../TurnState';
 import { AuthError, OAuthSettings } from './Authentication';
 import { FilteredTeamsSSOTokenExchangeMiddleware, OAuthBotAuthentication } from './OAuthBotAuthentication';
 import { TurnStateProperty } from '../TurnStateProperty';
-import { OAuthBotPrompt } from './OAuthBotPrompt';
+import * as UserTokenAccess from './UserTokenAccess';
 
 describe('OAuthBotAuthentication', () => {
     const adapter = new TestAdapter();
@@ -330,12 +330,16 @@ describe('OAuthBotAuthentication', () => {
             const dialogStateProperty = 'dialogStateProperty';
             const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
             const dialogSet = new DialogSet(accessor);
-            dialogSet.add(new OAuthBotPrompt('OAuthPrompt', settings));
+            dialogSet.add(new OAuthPrompt('OAuthPrompt', settings));
             const dialogContext = await dialogSet.createContext(context);
+
             const beginDialogStub = sinon.stub(dialogContext, 'beginDialog');
             const continueDialogStub = sinon
                 .stub(dialogContext, 'continueDialog')
                 .returns(Promise.resolve({ status: DialogTurnStatus.empty }));
+
+            sinon.stub(UserTokenAccess, 'getSignInResource').returns(Promise.resolve({ signInLink: 'test' }));
+
             const botAuth = new OAuthBotAuthentication(app, settings, settingName);
             const createDialogContextStub = sinon.stub(botAuth, <any>'createDialogContext').returns(dialogContext);
 
@@ -345,6 +349,8 @@ describe('OAuthBotAuthentication', () => {
             assert(beginDialogStub.calledOnce);
             assert(continueDialogStub.calledOnce);
             assert(createDialogContextStub.calledOnce);
+
+            sinon.restore();
         });
 
         it('calling run dialog for the first time should return status waiting', async () => {
@@ -356,7 +362,8 @@ describe('OAuthBotAuthentication', () => {
                 }
             });
 
-            const stub = sinon.stub(OAuthBotPrompt, 'sendOAuthCard');
+            const stub = sinon.stub(OAuthPrompt, 'sendOAuthCard');
+            sinon.stub(UserTokenAccess, 'getSignInResource').returns(Promise.resolve({ signInLink: 'test' }));
 
             const dialogStateProperty = 'dialogStateProperty';
 
