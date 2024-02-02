@@ -9,7 +9,7 @@ import {
     DialogTurnStatus,
     OAuthPrompt
 } from 'botbuilder-dialogs';
-import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse, CardFactory, Attachment } from 'botbuilder';
+import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse, CardFactory } from 'botbuilder';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import { Application } from '../Application';
 import { TurnState } from '../TurnState';

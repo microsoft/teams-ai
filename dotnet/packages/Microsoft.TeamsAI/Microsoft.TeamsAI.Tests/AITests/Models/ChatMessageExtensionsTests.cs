@@ -7,12 +7,26 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
     public class ChatMessageExtensionsTests
     {
         [Fact]
+        public void Test_InvalidRole_ToAzureSdkChatMessage()
+        {
+            // Arrange
+            var chatMessage = new ChatMessage(new AI.Models.ChatRole("InvalidRole"));
+
+            // Act
+            var ex = Assert.Throws<TeamsAIException>(() => chatMessage.ToChatRequestMessage());
+
+            // Assert
+            Assert.Equal($"Invalid chat message role: InvalidRole", ex.Message);
+        }
+
+        [Fact]
         public void Test_UserRole_ToAzureSdkChatMessage()
         {
             // Arrange
             var chatMessage = new ChatMessage(AI.Models.ChatRole.User)
             {
                 Content = "test-content",
+                Name = "author"
             };
 
             // Act
@@ -22,6 +36,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal(Azure.AI.OpenAI.ChatRole.User, result.Role);
             Assert.Equal(typeof(ChatRequestUserMessage), result.GetType());
             Assert.Equal("test-content", ((ChatRequestUserMessage)result).Content);
+            Assert.Equal("author", ((ChatRequestUserMessage)result).Name);
         }
 
         [Fact]
@@ -67,6 +82,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             var chatMessage = new ChatMessage(AI.Models.ChatRole.System)
             {
                 Content = "test-content",
+                Name = "author"
             };
 
             // Act
@@ -76,6 +92,7 @@ namespace Microsoft.Teams.AI.Tests.AITests.Models
             Assert.Equal(Azure.AI.OpenAI.ChatRole.System, result.Role);
             Assert.Equal(typeof(ChatRequestSystemMessage), result.GetType());
             Assert.Equal("test-content", ((ChatRequestSystemMessage)result).Content);
+            Assert.Equal("author", ((ChatRequestSystemMessage)result).Name);
         }
 
         [Fact]

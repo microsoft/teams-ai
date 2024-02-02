@@ -24,7 +24,7 @@ export class DefaultResponseValidator<TValue = any> implements PromptResponseVal
      * @param {Tokenizer} tokenizer Tokenizer to use for encoding and decoding text.
      * @param {PromptResponse<string>} response Response to validate.
      * @param {number} remaining_attempts Number of remaining attempts to validate the response.
-     * @returns {PromptResponseValidator<TValue>} A `Validation` object.
+     * @returns {Promise<Validation<TValue>>} A `Validation` object.
      */
     public validateResponse(
         context: TurnContext,
