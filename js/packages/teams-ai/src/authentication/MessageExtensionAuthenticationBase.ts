@@ -119,9 +119,9 @@ export abstract class MessageExtensionAuthenticationBase {
     public abstract getSignInLink(context: TurnContext): Promise<string | undefined>;
 
     /**
-     * Should sign in using sso flow.
+     * Should sign in using SSO flow.
      * @param {TurnContext} context - The turn context.
-     * @returns {boolean} - A boolean indicating if the sign-in should use sso flow.
+     * @returns {boolean} - A boolean indicating if the sign-in should use SSO flow.
      */
     public abstract isSsoSignIn(context: TurnContext): boolean;
 }
