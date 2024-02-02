@@ -50,7 +50,7 @@ export class OAuthBotPrompt extends OAuthPrompt {
 
     /**
      * Sends an OAuth card.
-     * @param {OAuthPromptSettings} settings OAuth settings.
+     * @param {OAuthSettings} settings OAuth settings.
      * @param {TurnContext} turnContext Turn context.
      * @param {string | Partial<Activity>} prompt Message activity.
      */

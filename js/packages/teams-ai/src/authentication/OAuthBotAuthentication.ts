@@ -28,10 +28,10 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
 
     /**
      * Initializes a new instance of the OAuthBotAuthentication class.
-     * @param app - The application object.
-     * @param oauthPromptSettings - The settings for OAuthPrompt.
-     * @param settingName - The name of the setting.
-     * @param storage - The storage object for storing state.
+     * @param {Application} app - The application object.
+     * @param {OAuthSettings} oauthPromptSettings - The settings for OAuthPrompt.
+     * @param {string} settingName - The name of the setting.
+     * @param {Storage} storage - The storage object for storing state.
      */
     public constructor(
         app: Application<TState>,
@@ -54,10 +54,10 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
 
     /**
      * Run or continue the OAuthPrompt dialog and returns the result.
-     * @param context - The turn context object.
-     * @param state - The turn state object.
-     * @param dialogStateProperty - The name of the dialog state property.
-     * @returns A promise that resolves to the dialog turn result containing the token response.
+     * @param {TurnContext} context - The turn context object.
+     * @param {TState} state - The turn state object.
+     * @param {string} dialogStateProperty - The name of the dialog state property.
+     * @returns {Promise<DialogTurnResult<TokenResponse>>} A promise that resolves to the dialog turn result containing the token response.
      */
     public async runDialog(
         context: TurnContext,
@@ -74,10 +74,10 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
 
     /**
      * Continue the OAuthPrompt dialog and returns the result.
-     * @param context - The turn context object.
-     * @param state - The turn state object.
-     * @param dialogStateProperty - The name of the dialog state property.
-     * @returns A promise that resolves to the dialog turn result containing the token response.
+     * @param {TurnContext} context - The turn context object.
+     * @param {TState} state - The turn state object.
+     * @param {string} dialogStateProperty - The name of the dialog state property.
+     * @returns {Promise<DialogTurnResult<TokenResponse>>} A promise that resolves to the dialog turn result containing the token response.
      */
     public async continueDialog(
         context: TurnContext,
@@ -90,10 +90,10 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
 
     /**
      * Creates a new DialogContext for OAuthPrompt.
-     * @param context - The turn context object.
-     * @param state - The turn state object.
-     * @param dialogStateProperty - The name of the dialog state property.
-     * @returns A promise that resolves to the dialog context.
+     * @param {TurnContext} context - The turn context object.
+     * @param {TState} state - The turn state object.
+     * @param {string} dialogStateProperty - The name of the dialog state property.
+     * @returns {Promise<DialogContext>} A promise that resolves to the dialog context.
      */
     private async createDialogContext(
         context: TurnContext,

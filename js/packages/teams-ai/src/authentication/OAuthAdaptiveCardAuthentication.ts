@@ -14,7 +14,7 @@ import * as UserTokenAccess from './UserTokenAccess';
 export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationBase {
     /**
      * Creates a new instance of OAuthAdaptiveCardAuthentication.
-     * @param settings The OAuthSettings.
+     * @param {OAuthSettings} settings The OAuthSettings.
      */
     public constructor(private readonly settings: OAuthSettings) {
         super();
@@ -22,8 +22,8 @@ export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationB
 
     /**
      * Handles the SSO token exchange.
-     * @param context The turn context.
-     * @returns A promise that resolves to the token response or undefined if token exchange failed.
+     * @param {TurnContext} context The turn context.
+     * @returns {Promise<TokenResponse | undefined>} A promise that resolves to the token response or undefined if token exchange failed.
      */
     public async handleSsoTokenExchange(context: TurnContext): Promise<TokenResponse | undefined> {
         const tokenExchangeRequest = context.activity.value.authentication;
@@ -37,9 +37,9 @@ export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationB
 
     /**
      * Handles the signin/verifyState activity.
-     * @param context The turn context.
-     * @param magicCode The magic code from sign-in.
-     * @returns A promise that resolves to undefined. The parent class will trigger silentAuth again.
+     * @param {TurnContext} context The turn context.
+     * @param {string} magicCode The magic code from sign-in.
+     * @returns {Promise<TokenResponse | undefined>} A promise that resolves to undefined. The parent class will trigger silentAuth again.
      */
     public async handleUserSignIn(context: TurnContext, magicCode: string): Promise<TokenResponse | undefined> {
         return await UserTokenAccess.getUserToken(context, this.settings, magicCode);
@@ -47,8 +47,8 @@ export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationB
 
     /**
      * Gets the sign-in link for the user.
-     * @param context The turn context.
-     * @returns A promise that resolves to the sign-in link or undefined if no sign-in link available.
+     * @param {TurnContext} context The turn context.
+     * @returns {Promise<TokenResponse | undefined>} A promise that resolves to the sign-in link or undefined if no sign-in link available.
      */
     public async getLoginRequest(context: TurnContext): Promise<AdaptiveCardLoginRequest> {
         const signInResource = await UserTokenAccess.getSignInResource(context, this.settings);

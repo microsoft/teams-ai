@@ -402,8 +402,8 @@ export class AuthError extends Error {
 
     /**
      * Creates a new instance of the `AuthError` class.
-     * @param message The error message.
-     * @param reason Optional. Cause of the error. Defaults to `other`.
+     * @param {string} message The error message.
+     * @param {AuthErrorReason} reason Optional. Cause of the error. Defaults to `other`.
      */
     constructor(message?: string, reason: AuthErrorReason = 'other') {
         super(message);
