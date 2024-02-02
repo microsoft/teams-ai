@@ -9,7 +9,14 @@ import {
     DialogTurnStatus,
     OAuthPrompt
 } from 'botbuilder-dialogs';
-import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse, CardFactory } from 'botbuilder';
+import {
+    Storage,
+    TeamsSSOTokenExchangeMiddleware,
+    TurnContext,
+    TokenResponse,
+    CardFactory,
+    Attachment
+} from 'botbuilder';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import { Application } from '../Application';
 import { TurnState } from '../TurnState';
@@ -112,9 +119,9 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
     /**
      * Creates an OAuthCard that will be sent to the user.
      * @param {TurnContext} context - The turn context.
-     * @returns {Attachment} The OAuthCard.
+     * @returns {Promise<Attachment>} The OAuthCard.
      */
-    private async createOAuthCard(context: TurnContext) {
+    private async createOAuthCard(context: TurnContext): Promise<Attachment> {
         const signInResource = await getSignInResource(context, this._oauthSettings);
         let link = signInResource.signInLink;
         let tokenExchangeResource;
