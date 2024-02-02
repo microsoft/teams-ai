@@ -9,11 +9,11 @@ namespace Microsoft.Teams.AI
     /// </summary>
     internal class OAuthMessageExtensionsAuthentication : MessageExtensionsAuthenticationBase
     {
-        private string _oauthConnectionName;
+        private readonly OAuthSettings _oauthSettings;
 
-        public OAuthMessageExtensionsAuthentication(string oauthConnectionName)
+        public OAuthMessageExtensionsAuthentication(OAuthSettings oauthSettings)
         {
-            _oauthConnectionName = oauthConnectionName;
+            _oauthSettings = oauthSettings;
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The sign in link</returns>
         public override async Task<string> GetSignInLink(ITurnContext context)
         {
-            SignInResource signInResource = await UserTokenClientWrapper.GetSignInResourceAsync(context, _oauthConnectionName);
+            SignInResource signInResource = await UserTokenClientWrapper.GetSignInResourceAsync(context, _oauthSettings.ConnectionName);
             return signInResource.SignInLink;
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The token response if successfully verified the magic code</returns>
         public override async Task<TokenResponse> HandleUserSignIn(ITurnContext context, string magicCode)
         {
-            return await UserTokenClientWrapper.GetUserTokenAsync(context, _oauthConnectionName, magicCode);
+            return await UserTokenClientWrapper.GetUserTokenAsync(context, _oauthSettings.ConnectionName, magicCode);
         }
 
         /// <summary>
@@ -49,10 +49,15 @@ namespace Microsoft.Teams.AI
             TokenExchangeRequest? tokenExchangeRequest = value["authentication"]?.ToObject<TokenExchangeRequest>();
             if (tokenExchangeRequest != null && !string.IsNullOrEmpty(tokenExchangeRequest.Token))
             {
-                return await UserTokenClientWrapper.ExchangeTokenAsync(context, _oauthConnectionName, tokenExchangeRequest);
+                return await UserTokenClientWrapper.ExchangeTokenAsync(context, _oauthSettings.ConnectionName, tokenExchangeRequest);
             }
 
             return new TokenResponse();
+        }
+
+        public override bool IsSsoSignIn(ITurnContext context)
+        {
+            return context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME && _oauthSettings.EnableSso == true;
         }
     }
 }

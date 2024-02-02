@@ -11,5 +11,10 @@ namespace Microsoft.Teams.AI
         /// The token exchange uri for SSO in adaptive card auth scenario.
         /// </summary>
         public string? TokenExchangeUri { get; set; }
+
+        /// <summary>
+        /// Set to `true` to enable SSO when authenticating using Azure Active Directory (AAD).
+        /// </summary>
+        public bool? EnableSso { get; set; }
     }
 }

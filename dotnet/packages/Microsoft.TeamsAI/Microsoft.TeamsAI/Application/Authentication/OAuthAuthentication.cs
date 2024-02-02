@@ -12,9 +12,9 @@ namespace Microsoft.Teams.AI
     public class OAuthAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
-        private OAuthPromptSettings _settings;
-        private OAuthMessageExtensionsAuthentication? _messageExtensionAuth;
-        private OAuthBotAuthentication<TState>? _botAuthentication;
+        private readonly OAuthSettings _settings;
+        private readonly OAuthMessageExtensionsAuthentication? _messageExtensionAuth;
+        private readonly OAuthBotAuthentication<TState>? _botAuthentication;
 
         /// <summary>
         /// Initializes the class
@@ -26,7 +26,7 @@ namespace Microsoft.Teams.AI
         public OAuthAuthentication(Application<TState> app, string name, OAuthSettings settings, IStorage? storage)
         {
             _settings = settings;
-            _messageExtensionAuth = new OAuthMessageExtensionsAuthentication(_settings.ConnectionName);
+            _messageExtensionAuth = new OAuthMessageExtensionsAuthentication(_settings);
             _botAuthentication = new OAuthBotAuthentication<TState>(app, _settings, name, storage);
         }
 

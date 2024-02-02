@@ -43,7 +43,7 @@ namespace Microsoft.Teams.AI
 
 
                     // Token exchange failed, asks user to sign in and consent.
-                    Activity response = new()
+                    Activity activity = new()
                     {
                         Type = ActivityTypesEx.InvokeResponse,
                         Value = new InvokeResponse
@@ -51,7 +51,7 @@ namespace Microsoft.Teams.AI
                             Status = 412
                         }
                     };
-                    await context.SendActivityAsync(response);
+                    await context.SendActivityAsync(activity);
 
                     return null;
                 }
@@ -63,10 +63,10 @@ namespace Microsoft.Teams.AI
             {
                 try
                 {
-                    TokenResponse response = await HandleUserSignIn(context, state.ToString());
-                    if (!string.IsNullOrEmpty(response.Token))
+                    TokenResponse tokenResponse = await HandleUserSignIn(context, state.ToString());
+                    if (!string.IsNullOrEmpty(tokenResponse.Token))
                     {
-                        return response.Token;
+                        return tokenResponse.Token;
                     }
                 }
                 catch
@@ -80,9 +80,9 @@ namespace Microsoft.Teams.AI
 
             string signInLink = await GetSignInLink(context);
             // Do 'silentAuth' if this is a composeExtension/query request otherwise do normal `auth` flow.
-            string authType = context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME ? "silentAuth" : "auth";
+            string authType = IsSsoSignIn(context) ? "silentAuth" : "auth";
 
-            MessagingExtensionResponse resposne = new()
+            MessagingExtensionResponse response = new()
             {
                 ComposeExtension = new MessagingExtensionResult
                 {
@@ -101,7 +101,7 @@ namespace Microsoft.Teams.AI
                 },
             };
 
-            await context.SendActivityAsync(ActivityUtilities.CreateInvokeResponseActivity(resposne), cancellationToken);
+            await context.SendActivityAsync(ActivityUtilities.CreateInvokeResponseActivity(response), cancellationToken);
 
             return null;
         }
@@ -141,5 +141,12 @@ namespace Microsoft.Teams.AI
         /// <param name="context">The turn context</param>
         /// <returns>The sign in link</returns>
         public abstract Task<string> GetSignInLink(ITurnContext context);
+
+        /// <summary>
+        /// Should sign in using SSO flow.
+        /// </summary>
+        /// <param name="context">The turn context.</param>
+        /// <returns>A boolean indicating if the sign-in should use SSO flow.</returns>
+        public abstract bool IsSsoSignIn(ITurnContext context);
     }
 }
