@@ -27,7 +27,7 @@ export class OAuthBotPrompt extends OAuthPrompt {
 
     async beginDialog(dc: DialogContext): Promise<DialogTurnResult> {
         // Ensure prompts have input hint set
-        const o: Partial<PromptOptions> = {
+        const options: Partial<PromptOptions> = {
             prompt: {
                 inputHint: InputHints.AcceptingInput
             },
@@ -40,7 +40,7 @@ export class OAuthBotPrompt extends OAuthPrompt {
         const timeout = typeof this.oauthSettings.timeout === 'number' ? this.oauthSettings.timeout : 900000;
         const state = dc.activeDialog!.state as OAuthPromptState;
         state.state = {};
-        state.options = o;
+        state.options = options;
         state.expires = new Date().getTime() + timeout;
 
         // Prompt user to login
@@ -70,11 +70,11 @@ export class OAuthBotPrompt extends OAuthPrompt {
         }
 
         // Append appropriate card if missing
-        const msgHasOauthCardAttachment = msg.attachments.some(
+        const msgHasOAuthCardAttachment = msg.attachments.some(
             (a) => a.contentType === CardFactory.contentTypes.oauthCard
         );
 
-        if (!msgHasOauthCardAttachment) {
+        if (!msgHasOAuthCardAttachment) {
             const cardActionType = ActionTypes.Signin;
             const signInResource = await UserTokenAccess.getSignInResource(turnContext, settings);
 
