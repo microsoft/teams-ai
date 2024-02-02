@@ -121,7 +121,7 @@ export abstract class MessageExtensionAuthenticationBase {
     /**
      * Should sign in using SSO flow.
      * @param {TurnContext} context - The turn context.
-     * @returns {boolean} - A boolean indicating if the sign-in should use sso flow.
+     * @returns {boolean} - A boolean indicating if the sign-in should use SSO flow.
      */
     public abstract isSsoSignIn(context: TurnContext): boolean;
 }
