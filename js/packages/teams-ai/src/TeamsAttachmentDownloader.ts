@@ -8,8 +8,11 @@
 
 import axios, { AxiosInstance } from 'axios';
 import { Attachment, TurnContext } from 'botbuilder';
-import { TurnState } from './TurnState';
+import { AppCredentials, AuthenticationConstants, GovernmentConstants } from 'botframework-connector';
+
 import { InputFile, InputFileDownloader } from './InputFileDownloader';
+import { TeamsAdapter } from './TeamsAdapter';
+import { TurnState } from './TurnState';
 
 /**
  * Options for the `TeamsAttachmentDownloader` class.
@@ -21,11 +24,21 @@ export interface TeamsAttachmentDownloaderOptions {
     botAppId: string;
 
     /**
-     * The Microsoft App Password of the bot.
+     * ServiceClientCredentialsFactory
      */
-    botAppPassword: string;
+    adapter: TeamsAdapter;
 }
 
+export interface AuthenticatorResult {
+    /**
+     * The value of the access token resulting from an authentication process.
+     */
+    accessToken: string;
+    /**
+     *  The date and time of expiration relative to Coordinated Universal Time (UTC).
+     */
+    expiresOn: Date;
+}
 /**
  * Downloads attachments from Teams using the bots access token.
  */
@@ -35,7 +48,7 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
 
     /**
      * Creates a new instance of the `TeamsAttachmentDownloader` class.
-     * @param options Options for the `TeamsAttachmentDownloader` class.
+     * @param {TeamsAttachmentDownloader} options - Options for the `TeamsAttachmentDownloader` class.
      */
     public constructor(options: TeamsAttachmentDownloaderOptions) {
         this._options = options;
@@ -44,8 +57,10 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
 
     /**
      * Download any files relative to the current user's input.
-     * @param context Context for the current turn of conversation.
-     * @param state Application state for the current turn of conversation.
+     * @template TState - Type of the state object passed to the `TurnContext.turnState` method.
+     * @param {TurnContext} context Context for the current turn of conversation.
+     * @param {TState} state Application state for the current turn of conversation.
+     * @returns {Promise<InputFile[]>} Promise that resolves to an array of downloaded input files.
      */
     public async downloadFiles(context: TurnContext, state: TState): Promise<InputFile[]> {
         // Filter out HTML attachments
@@ -54,8 +69,13 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
             return Promise.resolve([]);
         }
 
-        // Download all attachments
-        const accessToken = await this.getAccessToken();
+        let accessToken = '';
+
+        // If authentication is enabled, get access token
+        if ((await this._options.adapter.credentialsFactory?.isAuthenticationDisabled()) !== true) {
+            // Download all attachments
+            accessToken = await this.getAccessToken();
+        }
         const files: InputFile[] = [];
         for (const attachment of attachments) {
             const file = await this.downloadFile(attachment, accessToken);
@@ -68,16 +88,29 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
     }
 
     /**
-     * @param attachment
-     * @param accessToken
      * @private
+     * @param {Attachment} attachment - Attachment to download.
+     * @param {string} accessToken - Access token to use for downloading.
+     * @returns {Promise<InputFile>} - Promise that resolves to the downloaded input file.
      */
-    private async downloadFile(attachment: Attachment, accessToken: string): Promise<InputFile> {
-        if (attachment.contentUrl && attachment.contentUrl.startsWith('https://')) {
-            // Download file
-            const headers = {
-                Authorization: `Bearer ${accessToken}`
+    private async downloadFile(attachment: Attachment, accessToken: string): Promise<InputFile | undefined> {
+        if (attachment.content) {
+            return {
+                content: Buffer.from(attachment.content),
+                contentType: attachment.contentType,
+                contentUrl: attachment.contentUrl
             };
+        } else if (
+            (attachment.contentUrl && attachment.contentUrl.startsWith('https://')) ||
+            (attachment.contentUrl && attachment.contentUrl.startsWith('http://localhost'))
+        ) {
+            let headers;
+            if (accessToken.length > 0) {
+                // Build request for downloading file if access token is available
+                headers = {
+                    Authorization: `Bearer ${accessToken}`
+                };
+            }
             const response = await this._httpClient.get(attachment.contentUrl, {
                 headers,
                 responseType: 'arraybuffer'
@@ -98,42 +131,39 @@ export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> imp
                 contentType,
                 contentUrl: attachment.contentUrl
             };
-        } else {
-            return {
-                content: Buffer.from(attachment.content),
-                contentType: attachment.contentType,
-                contentUrl: attachment.contentUrl
-            };
         }
     }
 
     /**
      * @private
+     * @returns {Promise<string>} - Promise that resolves to the access token.
      */
     private async getAccessToken(): Promise<string> {
-        const headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        };
-        const body = `grant_type=client_credentials&client_id=${encodeURI(
-            this._options.botAppId
-        )}&client_secret=${encodeURI(
-            this._options.botAppPassword
-        )}&scope=https%3A%2F%2Fapi.botframework.com%2F.default`;
-        const token = await this._httpClient.post<JWTToken>(
-            'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token',
-            body,
-            { headers }
-        );
-        return token.data.access_token;
-    }
-}
+        // Normalize the ToChannelFromBotLoginUrl (and use a default value when it is undefined).
+        const toChannelFromBotLoginUrl = (
+            this._options.adapter.botFrameworkAuthConfig?.ToChannelFromBotLoginUrl ||
+            AuthenticationConstants.ToChannelFromBotLoginUrlPrefix + AuthenticationConstants.DefaultChannelAuthTenant
+        ).toLowerCase();
 
-/**
- * @private
- */
-interface JWTToken {
-    token_type: string;
-    expires_in: number;
-    ext_expires_in: number;
-    access_token: string;
+        let audience = this._options.adapter.botFrameworkAuthConfig?.ToChannelFromBotOAuthScope;
+        const loginEndpoint = toChannelFromBotLoginUrl;
+
+        // If there is no loginEndpoint set on the provided ConfigurationBotFrameworkAuthenticationOptions, or it starts with 'https://login.microsoftonline.com/', the bot is operating in Public Azure.
+        // So we use the Public Azure audience or the specified audience.
+        if (loginEndpoint.startsWith(AuthenticationConstants.ToChannelFromBotLoginUrlPrefix)) {
+            audience = audience ?? AuthenticationConstants.ToChannelFromBotOAuthScope;
+        } else if (toChannelFromBotLoginUrl === GovernmentConstants.ToChannelFromBotLoginUrl) {
+            // Or if the bot is operating in US Government Azure, use that audience.
+            audience = audience ?? GovernmentConstants.ToChannelFromBotOAuthScope;
+        }
+
+        const appCreds = (await this._options.adapter.credentialsFactory.createCredentials(
+            this._options.botAppId,
+            audience,
+            loginEndpoint,
+            true
+        )) as AppCredentials;
+
+        return appCreds.getToken();
+    }
 }

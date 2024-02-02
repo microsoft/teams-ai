@@ -1,5 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
 
 namespace Microsoft.Teams.AI.AI.Models
 {
@@ -15,23 +16,32 @@ namespace Microsoft.Teams.AI.AI.Models
         /// <returns>An <see cref="ChatRequestMessage"/>.</returns>
         public static ChatRequestMessage ToChatRequestMessage(this ChatMessage chatMessage)
         {
+            Verify.NotNull(chatMessage.Content);
+            Verify.NotNull(chatMessage.Role);
+
             ChatRole role = chatMessage.Role;
             ChatRequestMessage? message = null;
 
             if (role == ChatRole.User)
             {
-                message = new ChatRequestUserMessage(chatMessage.Content);
+                ChatRequestUserMessage userMessage = new(chatMessage.Content);
+
+                if (chatMessage.Name != null)
+                {
+                    userMessage.Name = chatMessage.Name;
+                }
+
+                message = userMessage;
             }
 
             if (role == ChatRole.Assistant)
             {
-                Azure.AI.OpenAI.FunctionCall functionCall = new(chatMessage.FunctionCall?.Name, chatMessage.FunctionCall?.Arguments);
+                ChatRequestAssistantMessage assistantMessage = new(chatMessage.Content);
 
-                ChatRequestAssistantMessage assistantMessage = new(chatMessage.Content)
+                if (chatMessage.FunctionCall != null)
                 {
-                    FunctionCall = functionCall,
-                    Name = chatMessage.Name,
-                };
+                    assistantMessage.FunctionCall = new(chatMessage.FunctionCall.Name ?? "", chatMessage.FunctionCall.Arguments ?? "");
+                }
 
                 if (chatMessage.ToolCalls != null)
                 {
@@ -41,22 +51,34 @@ namespace Microsoft.Teams.AI.AI.Models
                     }
                 }
 
+                if (chatMessage.Name != null)
+                {
+                    assistantMessage.Name = chatMessage.Name;
+                }
+
                 message = assistantMessage;
             }
 
             if (role == ChatRole.System)
             {
-                message = new ChatRequestSystemMessage(chatMessage.Content);
+                ChatRequestSystemMessage systemMessage = new(chatMessage.Content);
+
+                if (chatMessage.Name != null)
+                {
+                    systemMessage.Name = chatMessage.Name;
+                }
+
+                message = systemMessage;
             }
 
             if (role == ChatRole.Function)
             {
-                message = new ChatRequestFunctionMessage(chatMessage.Name, chatMessage.Content);
+                message = new ChatRequestFunctionMessage(chatMessage.Name ?? "", chatMessage.Content);
             }
 
             if (role == ChatRole.Tool)
             {
-                message = new ChatRequestToolMessage(chatMessage.Content, chatMessage.ToolCallId);
+                message = new ChatRequestToolMessage(chatMessage.Content, chatMessage.ToolCallId ?? "");
             }
 
             if (message == null)
