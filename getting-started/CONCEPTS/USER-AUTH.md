@@ -52,7 +52,7 @@ The `connectionName` property is what you configure in the Azure Bot Resource, s
 
 The `text` property is the titie and the `text` property is the body of the sign in card sent to the user.
 
-### Auto sign in
+## Auto sign in
 
 With this configuration, the bot will attempt to authenticate the user when they try to interact with it. To control when for which incoming activities the bot should authenticate the user, you can specify configure the auto sign in property in the options.
 
@@ -89,7 +89,7 @@ The `autoSignIn` property takes a callback that triggers the sign in flow if it 
 
 This is useful if the user should be signed in by default before attempting to interacting with the bot in general. 
 
-### Manual Sign In
+## Manual Sign In
 
 If the user should only be authenticated in certain scenarios, you can disable auto sign in by having the callback always return false and trigger authentication manually.
 
@@ -119,7 +119,29 @@ If multiple settings are configured, then the user can be authenticated into mul
 
 **Note:** Once the sign in flow completes when triggered from a message activity or an action handler, the application is NOT redirected back to its previous task. This means that if user authentication is triggered through a message extension, then the same activity will be sent again to the bot after sign in completes. But if sign in is triggered when the incoming activity is a message then the same activity will NOT be sent again to the bot after sign in completes.
 
-### Handling sign in success or failure
+## Enable Single Sign-On (SSO)
+With Single sign-on (SSO) in Teams, app users have the advantage of using Teams to access bot or message extension apps. After logging into Teams using Microsoft or Microsoft 365 account, app users can use your app without needing to sign in again. Your app is available to app users on any device with access granted through Microsoft Entra ID. This means that SSO works only if the user is being authenticated with Azure Active Directory (AAD). It will not work with other authentication providers like Facebook, Google...etc. 
+
+Here's an example of enabling SSO in the `OAuthSettings`:
+
+**Javascript**
+```js
+const app = new ApplicationBuilder<ApplicationTurnState>()
+    .withStorage(storage)
+    .withAuthentication(adapter, {
+        settings: {
+            graph: {
+                connectionName: process.env.OAUTH_CONNECTION_NAME ?? '',
+                title: 'Sign in',
+                text: 'Please sign in to use the bot.',
+                enableSso: true // set this to true to enable SSO
+            }
+        }
+    })
+    .build();
+```
+
+## Handling sign in success or failure
 
 To handle the event when the user has signed in successfully or failed to sign in, simply register corresponding handler:
 
@@ -157,7 +179,7 @@ app.authentication.get('graph').onUserSignInFailure(async (context: TurnContext,
 });
 ```
 
-### Sign out a user
+## Sign out a user
 
 You can also sign a user out of connection:
 
