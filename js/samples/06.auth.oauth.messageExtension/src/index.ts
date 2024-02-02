@@ -84,7 +84,7 @@ const app = new ApplicationBuilder()
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true,
-                enableSso: true
+                enableSso: true // Set this to false to disable SSO
             }
         },
         autoSignIn: (context: TurnContext) => {
