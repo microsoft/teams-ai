@@ -75,7 +75,7 @@ export class OAuthAdaptiveCardAuthentication extends AdaptiveCardAuthenticationB
             }
         };
 
-        if (this.settings.tokenExchangeUri) {
+        if (this.settings.tokenExchangeUri && this.settings.enableSso == true) {
             const botId = context.activity.recipient.id;
             response.value.tokenExchangeResource = {
                 id: botId,
