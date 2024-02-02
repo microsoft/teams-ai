@@ -43,13 +43,6 @@ export class OAuthBotPrompt extends OAuthPrompt {
         state.options = o;
         state.expires = new Date().getTime() + timeout;
 
-        // Attempt to get the users token
-        const output = await UserTokenAccess.getUserToken(dc.context, this.oauthSettings, '');
-        if (output) {
-            // Return token
-            return await dc.endDialog(output);
-        }
-
         // Prompt user to login
         await OAuthBotPrompt.sendOAuthCard(this.oauthSettings, dc.context, state.options.prompt);
         return Dialog.EndOfTurn;

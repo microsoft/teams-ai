@@ -1,27 +1,21 @@
 /* eslint-disable security/detect-object-injection */
 import { Activity, MemoryStorage, TestAdapter, TurnContext } from 'botbuilder';
 import { Application, RouteSelector } from '../Application';
-import {
-    DialogSet,
-    DialogState,
-    DialogTurnResult,
-    DialogTurnStatus,
-    OAuthPrompt,
-    OAuthPromptSettings
-} from 'botbuilder-dialogs';
+import { DialogSet, DialogState, DialogTurnResult, DialogTurnStatus } from 'botbuilder-dialogs';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import * as sinon from 'sinon';
 import assert from 'assert';
 import { TurnState } from '../TurnState';
-import { AuthError } from './Authentication';
+import { AuthError, OAuthSettings } from './Authentication';
 import { FilteredTeamsSSOTokenExchangeMiddleware, OAuthBotAuthentication } from './OAuthBotAuthentication';
 import { TurnStateProperty } from '../TurnStateProperty';
+import { OAuthBotPrompt } from './OAuthBotPrompt';
 
-describe('BotAuthentication', () => {
+describe('OAuthBotAuthentication', () => {
     const adapter = new TestAdapter();
 
     let app: Application;
-    let settings: OAuthPromptSettings;
+    let settings: OAuthSettings;
     const settingName = 'settingName';
 
     const createTurnContextAndState = async (activity: Partial<Activity>): Promise<[TurnContext, TurnState]> => {
@@ -336,7 +330,7 @@ describe('BotAuthentication', () => {
             const dialogStateProperty = 'dialogStateProperty';
             const accessor = new TurnStateProperty<DialogState>(state, 'conversation', dialogStateProperty);
             const dialogSet = new DialogSet(accessor);
-            dialogSet.add(new OAuthPrompt('OAuthPrompt', settings));
+            dialogSet.add(new OAuthBotPrompt('OAuthPrompt', settings));
             const dialogContext = await dialogSet.createContext(context);
             const beginDialogStub = sinon.stub(dialogContext, 'beginDialog');
             const continueDialogStub = sinon
@@ -361,12 +355,18 @@ describe('BotAuthentication', () => {
                     name: 'test'
                 }
             });
-            const dialogStateProperty = 'dialogStateProperty2';
+
+            const stub = sinon.stub(OAuthBotPrompt, 'sendOAuthCard');
+
+            const dialogStateProperty = 'dialogStateProperty';
+
             const botAuth = new OAuthBotAuthentication(app, settings, settingName);
 
             const result = await botAuth.runDialog(context, state, dialogStateProperty);
 
             assert(result.status == DialogTurnStatus.waiting);
+
+            stub.restore();
         });
     });
 });
