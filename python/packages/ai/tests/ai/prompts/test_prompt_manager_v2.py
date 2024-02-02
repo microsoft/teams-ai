@@ -97,11 +97,9 @@ class TestPromptManager(IsolatedAsyncioTestCase):
             await self.prompt_manager.get_prompt("no_config")
         self.assertEqual(
             str(context.exception),
-            (
-                "PromptManager.get_prompt(): an error occurred while loading "
-                "'tests\\ai\\prompts\\test_assets\\no_config\\config.json'. "
-                "The file is either invalid or missing."
-            ),
+            "PromptManager.get_prompt(): an error occurred while loading '"
+            + os.path.join(TEST_ASSERTS_FOLDER, "no_config", "config.json")
+            + "'. The file is either invalid or missing.",
         )
 
     async def test_get_prompt_from_file_no_prompt(self):
@@ -109,11 +107,9 @@ class TestPromptManager(IsolatedAsyncioTestCase):
             await self.prompt_manager.get_prompt("no_prompt")
         self.assertEqual(
             str(context.exception),
-            (
-                "PromptManager.get_prompt(): an error occurred while loading "
-                "'tests\\ai\\prompts\\test_assets\\no_prompt\\skprompt.txt'. "
-                "The file is either invalid or missing."
-            ),
+            "PromptManager.get_prompt(): an error occurred while loading '"
+            + os.path.join(TEST_ASSERTS_FOLDER, "no_prompt", "skprompt.txt")
+            + "'. The file is either invalid or missing.",
         )
 
     async def test_get_prompt_from_file(self):
