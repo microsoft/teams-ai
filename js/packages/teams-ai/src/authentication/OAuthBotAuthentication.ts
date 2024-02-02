@@ -9,13 +9,13 @@ import {
     DialogTurnStatus,
     OAuthPrompt
 } from 'botbuilder-dialogs';
-import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse } from 'botbuilder';
+import { Storage, TeamsSSOTokenExchangeMiddleware, TurnContext, TokenResponse, CardFactory, Attachment } from 'botbuilder';
 import { BotAuthenticationBase } from './BotAuthenticationBase';
 import { Application } from '../Application';
 import { TurnState } from '../TurnState';
 import { TurnStateProperty } from '../TurnStateProperty';
 import { OAuthSettings } from './Authentication';
-import { OAuthBotPrompt } from './OAuthBotPrompt';
+import { getSignInResource } from './UserTokenAccess';
 
 /**
  * @internal
@@ -25,31 +25,29 @@ import { OAuthBotPrompt } from './OAuthBotPrompt';
  */
 export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthenticationBase<TState> {
     private _oauthPrompt: OAuthPrompt;
+    private _oauthSettings: OAuthSettings;
 
     /**
      * Initializes a new instance of the OAuthBotAuthentication class.
      * @param {Application} app - The application object.
-     * @param {OAuthSettings} oauthPromptSettings - The settings for OAuthPrompt.
+     * @param {OAuthSettings} oauthSettings - The settings for OAuthPrompt.
      * @param {string} settingName - The name of the setting.
      * @param {Storage} storage - The storage object for storing state.
      */
     public constructor(
         app: Application<TState>,
-        oauthPromptSettings: OAuthSettings, // Child classes will have different types for this
+        oauthSettings: OAuthSettings, // Child classes will have different types for this
         settingName: string,
         storage?: Storage
     ) {
         super(app, settingName, storage);
 
-        if (oauthPromptSettings.enableSso != true) {
-            oauthPromptSettings.showSignInLink = true;
-        }
-
         // Create OAuthPrompt
-        this._oauthPrompt = new OAuthBotPrompt('OAuthPrompt', oauthPromptSettings);
+        this._oauthPrompt = new OAuthPrompt('OAuthPrompt', oauthSettings);
+        this._oauthSettings = oauthSettings;
 
         // Handles deduplication of token exchange event when using SSO with Bot Authentication
-        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthPromptSettings.connectionName));
+        app.adapter.use(new FilteredTeamsSSOTokenExchangeMiddleware(this._storage, oauthSettings.connectionName));
     }
 
     /**
@@ -67,7 +65,12 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
         const dialogContext = await this.createDialogContext(context, state, dialogStateProperty);
         let results = await dialogContext.continueDialog();
         if (results.status === DialogTurnStatus.empty) {
-            results = await dialogContext.beginDialog(this._oauthPrompt.id);
+            const card = await this.createOAuthCard(context);
+            results = await dialogContext.beginDialog(this._oauthPrompt.id, {
+                prompt: {
+                    attachments: [card]
+                }
+            });
         }
         return results;
     }
@@ -104,6 +107,31 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
         const dialogSet = new DialogSet(accessor);
         dialogSet.add(this._oauthPrompt);
         return await dialogSet.createContext(context);
+    }
+
+    /**
+     * Creates an OAuthCard that will be sent to the user.
+     * @param {TurnContext} context - The turn context.
+     * @returns {Attachment} The OAuthCard.
+     */
+    private async createOAuthCard(context: TurnContext) {
+        const signInResource = await getSignInResource(context, this._oauthSettings);
+        let link = signInResource.signInLink;
+        let tokenExchangeResource;
+
+        if (this._oauthSettings.enableSso == true) {
+            tokenExchangeResource = signInResource.tokenExchangeResource;
+            link = undefined;
+        }
+
+        return CardFactory.oauthCard(
+            this._oauthSettings.connectionName,
+            this._oauthSettings.title,
+            this._oauthSettings.text,
+            link,
+            tokenExchangeResource,
+            signInResource.tokenPostResource
+        );
     }
 }
 
