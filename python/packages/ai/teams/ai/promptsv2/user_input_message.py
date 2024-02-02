@@ -69,14 +69,11 @@ class UserInputMessage(PromptSectionBase):
         Returns:
             RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
         """
-        # Get input text & images
         input_text: str = memory.get_value(self._input_variable) or ""
         input_files: List[InputFile] = memory.get_value(self._files_variable) or []
 
-        # Create message
         message: Message[List[MessageContentParts]] = Message("user", [])
 
-        # Append text content part
         length = 0
         budget = self._get_token_budget(max_tokens)
         if len(input_text) > 0:
@@ -101,7 +98,6 @@ class UserInputMessage(PromptSectionBase):
             if budget < 85:
                 break
 
-            # Add image
             url = (
                 f"data:{image.content_type};base64,"
                 f"{base64.b64encode(image.content).decode('utf-8')}"
@@ -111,5 +107,4 @@ class UserInputMessage(PromptSectionBase):
                 length += 85
                 budget -= 85
 
-        # Return output
         return RenderedPromptSection(output=[message], length=length, too_long=False)
