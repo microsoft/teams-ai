@@ -120,7 +120,7 @@ If multiple settings are configured, then the user can be authenticated into mul
 **Note:** Once the sign in flow completes when triggered from a message activity or an action handler, the application is NOT redirected back to its previous task. This means that if user authentication is triggered through a message extension, then the same activity will be sent again to the bot after sign in completes. But if sign in is triggered when the incoming activity is a message then the same activity will NOT be sent again to the bot after sign in completes.
 
 ## Enable Single Sign-On (SSO)
-With Single sign-on (SSO) in Teams, app users have the advantage of using Teams to access bot or message extension apps. After logging into Teams using Microsoft or Microsoft 365 account, app users can use your app without needing to sign in again. Your app is available to app users on any device with access granted through Microsoft Entra ID. This means that SSO works only if the user is being authenticated with Azure Active Directory (AAD). It will not work with other authentication providers like Facebook, Google, etc. 
+With Single sign-on (SSO) in Teams, users have the advantage of using Teams to access bot or message extension apps. After logging into Teams using Microsoft or Microsoft 365 account, app users can use your app without needing to sign in again. Your app is available to app users on any device with access granted through Microsoft Entra ID. This means that SSO works only if the user is being authenticated with Azure Active Directory (AAD). It will not work with other authentication providers like Facebook, Google, etc. 
 
 Here's an example of enabling SSO in the `OAuthSettings`:
 
