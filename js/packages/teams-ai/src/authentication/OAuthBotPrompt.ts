@@ -89,7 +89,7 @@ export class OAuthBotPrompt extends OAuthPrompt {
 
             let tokenExchangeResource;
             if (settings.enableSso === true) {
-                // Send the tokene exchange resource only if enableSso is true.
+                // Send the token exchange resource only if enableSso is true.
                 tokenExchangeResource = signInResource.tokenExchangeResource;
             }
 
