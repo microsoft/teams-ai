@@ -23,7 +23,7 @@ class DataSourceSection(PromptSectionBase):
 
     _data_source: DataSource
 
-    def __init__(self, dataSource: DataSource, tokens: float):
+    def __init__(self, data_source: DataSource, tokens: float):
         """
         Creates a new `DataSourceSection` instance.
 
@@ -32,7 +32,7 @@ class DataSourceSection(PromptSectionBase):
             tokens (int): Sizing strategy for this section.
         """
         super().__init__(tokens, True, "\n\n")
-        self._data_source = dataSource
+        self._data_source = data_source
 
     async def render_as_messages(
         self,
