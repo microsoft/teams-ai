@@ -8,7 +8,7 @@ from unittest import IsolatedAsyncioTestCase
 
 from botbuilder.core import TurnContext
 
-from teams.ai.modelsv2 import PromptResponse
+from teams.ai.models import PromptResponse
 from teams.ai.promptsv2 import Message
 from teams.ai.tokenizers import GPTTokenizer
 from teams.ai.validators import JSONResponseValidator

@@ -10,7 +10,7 @@ from jsonschema import ValidationError, validate
 
 from ...state import Memory
 from ...utils import parse
-from ..modelsv2 import PromptResponse
+from ..models import PromptResponse
 from ..tokenizers import Tokenizer
 from .prompt_response_validator import PromptResponseValidator
 from .validation import Validation

@@ -14,7 +14,7 @@ from teams import Application
 from tests.utils import SimpleAdapter
 
 
-class TestAdaptiveCardss(IsolatedAsyncioTestCase):
+class TestAdaptiveCards(IsolatedAsyncioTestCase):
     application: Application
 
     @pytest.fixture(autouse=True)
