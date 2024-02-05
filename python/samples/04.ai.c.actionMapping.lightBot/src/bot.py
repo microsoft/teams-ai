@@ -5,7 +5,6 @@ Licensed under the MIT License.
 Description: initialize the app and listen for `message` activitys
 """
 
-import os
 import sys
 import time
 import traceback
@@ -15,12 +14,8 @@ from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnCont
 from botbuilder.schema import Activity
 from teams import (
     ActionTurnContext,
-    AIHistoryOptions,
-    AIOptions,
     Application,
     ApplicationOptions,
-    OpenAIPlanner,
-    OpenAIPlannerOptions,
     ActionTypes,
 )
 
@@ -42,17 +37,17 @@ app = Application[AppTurnState](
             app_id=config.app_id,
             app_password=config.app_password,
         ),
-        ai=AIOptions(
-            prompt="chatGPT",
-            planner=OpenAIPlanner(
-                OpenAIPlannerOptions(
-                    api_key=config.open_ai_key,
-                    default_model="gpt-3.5-turbo",
-                    prompt_folder=f"{os.getcwd()}/src/prompts",
-                )
-            ),
-            history=AIHistoryOptions(assistant_history_type="text"),
-        ),
+        # ai=AIOptions(
+        #     prompt="chatGPT",
+        #     planner=OpenAIPlanner(
+        #         OpenAIPlannerOptions(
+        #             api_key=config.open_ai_key,
+        #             default_model="gpt-3.5-turbo",
+        #             prompt_folder=f"{os.getcwd()}/src/prompts",
+        #         )
+        #     ),
+        #     history=AIHistoryOptions(assistant_history_type="text"),
+        # ),
     )
 )
 
