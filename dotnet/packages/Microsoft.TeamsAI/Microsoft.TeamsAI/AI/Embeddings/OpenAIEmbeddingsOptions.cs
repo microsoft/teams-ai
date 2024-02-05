@@ -3,14 +3,22 @@
 namespace Microsoft.Teams.AI.AI.Embeddings
 {
     /// <summary>
-    /// Options for the OpenAI embeddings.
+    /// Options for configuring an `OpenAIEmbeddings` to generate embeddings using an OpenAI hosted model.
     /// </summary>
-    public class OpenAIEmbeddingsOptions
+    public class OpenAIEmbeddingsOptions : BaseOpenAIEmbeddingsOptions
     {
         /// <summary>
-        /// OpenAI API key.
+        /// API key to use when calling the OpenAI API.
         /// </summary>
+        /// <remarks>
+        /// A new API key can be created at https://platform.openai.com/account/api-keys.
+        /// </remarks>
         public string ApiKey { get; set; }
+
+        /// <summary>
+        /// Model to use for embeddings.
+        /// </summary>
+        public string Model { get; set; }
 
         /// <summary>
         /// Optional. OpenAI organization.
@@ -18,31 +26,10 @@ namespace Microsoft.Teams.AI.AI.Embeddings
         public string? Organization { get; set; }
 
         /// <summary>
-        /// Optional. OpenAI endpoint.
+        /// Initializes a new instance of the <see cref="OpenAIEmbeddingsOptions"/> class.
         /// </summary>
-        public string? Endpoint { get; set; }
-
-        /// <summary>
-        /// Model to use for embeddings.
-        /// </summary>
-        /// <remarks>
-        /// For Azure OpenAI this is the name of the deployment to use.
-        /// </remarks>
-        public string Model { get; set; }
-
-        /// <summary>
-        /// A flag indicating if the planner should log requests with the provided logger.
-        /// </summary>
-        /// <remarks>
-        /// This is useful for debugging prompts and defaults to `false`.
-        /// </remarks>
-        public bool LogRequests { get; set; } = false;
-
-        /// <summary>
-        /// Create an instance of the OpenAIEmbeddingsOptions class.
-        /// </summary>
-        /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="model">The model to use.</param>
+        /// <param name="apiKey">API key to use when calling the OpenAI API.</param>
+        /// <param name="model">Model to use for embeddings.</param>
         public OpenAIEmbeddingsOptions(string apiKey, string model)
         {
             Verify.ParamNotNull(apiKey);

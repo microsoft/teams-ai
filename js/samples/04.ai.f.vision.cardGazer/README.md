@@ -1,17 +1,18 @@
-# Microsoft Teams Vision Enabled Bot : Card Master
+# Microsoft Teams Vision Enabled Bot : Card Gazer
+
 This is a conversational bot for Microsoft Teams with AI Vision support that is able to generate Adaptive Cards from uploaded images using `gpt-4-vision-preview`.
 
-*Table of contents*
+_Table of contents_
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Microsoft Teams Vision Enabled Bot : Card Master](#microsoft-teams-vision-enabled-bot--card-master)
-  - [Interacting with the bot](#interacting-with-the-bot)
-  - [Setting up the sample](#setting-up-the-sample)
-  - [Testing the sample](#testing-the-sample)
-    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
+-   [Microsoft Teams Vision Enabled Bot : Card Gazer](#microsoft-teams-vision-enabled-bot--card-gazer)
+    -   [Interacting with the bot](#interacting-with-the-bot)
+    -   [Setting up the sample](#setting-up-the-sample)
+    -   [Testing the sample](#testing-the-sample)
+        -   [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
 <!-- /code_chunk_output -->
 
@@ -38,15 +39,14 @@ You can interact with this bot by sending it a message with an image or a doodle
 3. In a terminal, navigate to the sample root.
 
     ```bash
-    cd teams-ai/js/samples/04.ai.f.vision.cardMaster/
+    cd teams-ai/js/samples/04.ai.f.vision.cardGazer/
     ```
 
-4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.f.vision.cardMaster` folder. Rename the file to `.env`. 
+4. Duplicate the `sample.env` in the `teams-ai/js/samples/04.ai.f.vision.cardGazer` folder. Rename the file to `.env`.
 
 5. Add in your `OPENAI_KEY` key.
 
 6. Update `config.json` and `index.ts` with your model deployment name.
-
 
 ## Testing the sample
 
@@ -55,7 +55,7 @@ The easiest and fastest way to get up and running is with Teams Toolkit as your 
 Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
 For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-### Using Teams Toolkit for Visual Studio Code 
+### Using Teams Toolkit for Visual Studio Code
 
 The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 

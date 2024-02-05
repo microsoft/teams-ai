@@ -87,4 +87,16 @@ export class TeamsSsoMessageExtensionAuthentication extends MessageExtensionAuth
 
         return signInLink;
     }
+
+    /**
+     * Should sign in using SSO flow.
+     * @param {TurnContext} context - The turn context.
+     * @returns {boolean} - A boolean indicating if the sign-in should use SSO flow.
+     */
+    public isSsoSignIn(context: TurnContext): boolean {
+        if (context.activity.name === MessageExtensionsInvokeNames.QUERY_INVOKE) {
+            return true;
+        }
+        return false;
+    }
 }

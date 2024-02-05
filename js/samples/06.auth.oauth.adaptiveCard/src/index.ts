@@ -75,7 +75,8 @@ const app = new ApplicationBuilder()
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
                 endOnInvalidMessage: true,
-                tokenExchangeUri: process.env.TokenExchangeUri ?? ''
+                tokenExchangeUri: process.env.TOKEN_EXCHANGE_URI ?? '', // this is required for SSO
+                enableSso: true
             }
         },
         autoSignIn: (context: TurnContext) => {
