@@ -7,63 +7,63 @@ from typing import List
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..tokenizers import Tokenizer
-from .layout_engine import LayoutEngine
-from .message import Message
-from .prompt_functions import PromptFunctions
-from .prompt_section import PromptSection
+from ....state import Memory
+from ...tokenizers import Tokenizer
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section_base import PromptSectionBase
-from .rendered_prompt_section import RenderedPromptSection
 
 
-class GroupSection(PromptSectionBase):
+class TextSection(PromptSectionBase):
     """
-    A group of sections that will rendered as a single message.
+    A section of text that will be rendered as a message.
+
+    Attributes:
+        text (str): Text to use for this section.
+        role (str): Message role to use for this section.
+
     """
 
-    _layout_engine: LayoutEngine
-    _sections: List[PromptSection]
+    _text: str
     _role: str
+    _length: int
 
     def __init__(
         self,
-        sections: List[PromptSection],
-        role: str = "system",
+        text: str,
+        role: str,
         tokens: float = -1,
         required: bool = True,
-        separator: str = "\n\n",
+        separator: str = "\n",
         text_prefix: str = "",
     ):
         """
-        Initializes the GroupSection object.
+        Creates a new 'TextSection' instance.
 
         Args:
-            sections (List[PromptSection]): List of sections to group together.
-            role (str, optional): Message role to use for this section. Defaults to `system`.
+            text (str): Text to use for this section.
+            role (str): Message role to use for this section.
             tokens (float, optional): Sizing strategy for this section. Defaults to `auto`.
             required (bool, optional): Indicates if this section is required. Defaults to `true`.
             separator (str, optional): Separator to use between sections when rendering as text.
-              Defaults to `\n\n`.
+              Defaults to `\n`.
             text_prefix (str, optional): Prefix to use for text output. Defaults to ``.
+
         """
         super().__init__(tokens, required, separator, text_prefix)
-        self._layout_engine = LayoutEngine(sections, tokens, required, separator)
-        self._sections = sections
+        self._text = text
         self._role = role
+        self._length = -1
 
     @property
-    def sections(self):
-        """
-        Gets the sections in this group.
-        """
-        return self._sections
+    def text(self):
+        """Text to use for this section."""
+        return self._text
 
     @property
     def role(self):
-        """
-        Gets the role for this group.
-        """
+        """Message role to use for this section."""
         return self._role
 
     async def render_as_messages(
@@ -87,12 +87,10 @@ class GroupSection(PromptSectionBase):
         Returns:
             RenderedPromptSection[List[Message]]: The rendered prompt section as a list of messages.
         """
-        # Render sections to text
-        result = await self._layout_engine.render_as_text(
-            context, memory, functions, tokenizer, max_tokens
-        )
+        # Calculate and cache length
+        if self._length < 0:
+            self._length = len(tokenizer.encode(self.text))
 
-        # Return output as a single message
-        return self._return_messages(
-            [Message(self.role, result.output)], result.length, tokenizer, max_tokens
-        )
+        # Return output
+        messages: List[Message] = [Message(self.role, self.text)] if self._length > 0 else []
+        return self._return_messages(messages, self._length, tokenizer, max_tokens)

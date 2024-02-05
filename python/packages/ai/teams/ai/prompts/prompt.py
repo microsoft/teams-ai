@@ -5,11 +5,11 @@ Licensed under the MIT License.
 
 from typing import List
 
-from .layout_engine import LayoutEngine
-from .prompt_section import PromptSection
+from .sections.layout_engine_section import LayoutEngineSection
+from .sections.prompt_section import PromptSection
 
 
-class Prompt(LayoutEngine):
+class Prompt(LayoutEngineSection):
     """
     Top level prompt section.
 

@@ -15,15 +15,17 @@ from ...app_error import ApplicationError
 from ...state import Memory
 from ..data_sources import DataSource
 from ..tokenizers import Tokenizer
-from .conversation_history import ConversationHistory
-from .group_section import GroupSection
 from .prompt import Prompt
 from .prompt_functions import PromptFunction, PromptFunctions
 from .prompt_manager_options import PromptManagerOptions
-from .prompt_section import PromptSection
 from .prompt_template import PromptTemplate
 from .prompt_template_config import PromptTemplateConfig
-from .template_section import TemplateSection
+from .sections import (
+    ConversationHistorySection,
+    GroupSection,
+    PromptSection,
+    TemplateSection,
+)
 from .user_input_message import UserInputMessage
 from .user_message import UserMessage
 
@@ -254,7 +256,7 @@ class PromptManager(PromptFunctions):
             #   max_input_tokens.
             if template_config.completion.include_history:
                 sections.append(
-                    ConversationHistory(
+                    ConversationHistorySection(
                         f"conversation.{template_name}_history",
                         self._options.max_conversation_history_tokens,
                     )

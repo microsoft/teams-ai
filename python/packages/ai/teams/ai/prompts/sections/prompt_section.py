@@ -8,11 +8,11 @@ from typing import List
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..tokenizers import Tokenizer
-from .message import Message
-from .prompt_functions import PromptFunctions
-from .rendered_prompt_section import RenderedPromptSection
+from ....state import Memory
+from ...tokenizers import Tokenizer
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
 
 
 class PromptSection(ABC):

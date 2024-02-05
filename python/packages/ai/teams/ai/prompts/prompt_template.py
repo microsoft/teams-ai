@@ -5,8 +5,8 @@ Licensed under the MIT License.
 
 from dataclasses import dataclass
 
-from .prompt_section import PromptSection
 from .prompt_template_config import PromptTemplateConfig
+from .sections.prompt_section import PromptSection
 
 
 @dataclass

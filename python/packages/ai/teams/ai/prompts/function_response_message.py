@@ -12,8 +12,8 @@ from ..tokenizers import Tokenizer
 from ..utilities import to_string
 from .message import Message
 from .prompt_functions import PromptFunctions
-from .prompt_section_base import PromptSectionBase
 from .rendered_prompt_section import RenderedPromptSection
+from .sections.prompt_section_base import PromptSectionBase
 
 
 class FunctionResponseMessage(PromptSectionBase):

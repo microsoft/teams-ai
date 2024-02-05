@@ -6,8 +6,8 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import Generic, Optional, TypeVar
 
-from .prompt_section import PromptSection
 from .rendered_prompt_section import RenderedPromptSection
+from .sections.prompt_section import PromptSection
 
 T = TypeVar("T")
 

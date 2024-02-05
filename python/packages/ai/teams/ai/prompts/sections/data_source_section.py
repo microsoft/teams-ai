@@ -7,13 +7,13 @@ from typing import List
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..data_sources import DataSource
-from ..tokenizers import Tokenizer
-from .message import Message
-from .prompt_functions import PromptFunctions
+from ....state import Memory
+from ...data_sources import DataSource
+from ...tokenizers import Tokenizer
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section_base import PromptSectionBase
-from .rendered_prompt_section import RenderedPromptSection
 
 
 class DataSourceSection(PromptSectionBase):

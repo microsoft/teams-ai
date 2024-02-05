@@ -10,12 +10,12 @@ from typing import Any, List, Union
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..tokenizers import Tokenizer
-from .message import Message, MessageContentParts, TextContentPart
-from .prompt_functions import PromptFunctions
+from ....state import Memory
+from ...tokenizers import Tokenizer
+from ..message import Message, MessageContentParts, TextContentPart
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section import PromptSection
-from .rendered_prompt_section import RenderedPromptSection
 
 
 class PromptSectionBase(PromptSection):

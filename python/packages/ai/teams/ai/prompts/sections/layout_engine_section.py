@@ -8,16 +8,16 @@ from typing import Any, Awaitable, Callable, List, Optional
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..tokenizers import Tokenizer
-from .message import Message
-from .prompt_functions import PromptFunctions
+from ....state import Memory
+from ...tokenizers import Tokenizer
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..prompt_section_layout import _PromptSectionLayout
+from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section import PromptSection
-from .prompt_section_layout import _PromptSectionLayout
-from .rendered_prompt_section import RenderedPromptSection
 
 
-class LayoutEngine(PromptSection):
+class LayoutEngineSection(PromptSection):
     """
     Base layout engine that renders a set of `auto`, `fixed`, or `proportional` length sections.
     This class is used internally by the `Prompt` and `GroupSection` classes to
@@ -159,7 +159,7 @@ class LayoutEngine(PromptSection):
         self, sections: List[PromptSection], layout: List[_PromptSectionLayout[Any]]
     ):
         for section in sections:
-            if isinstance(section, LayoutEngine):
+            if isinstance(section, LayoutEngineSection):
                 self._add_sections_to_layout(section.sections, layout)
             else:
                 layout.append(_PromptSectionLayout(section=section))

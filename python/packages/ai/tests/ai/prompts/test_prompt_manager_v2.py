@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 
 from teams.ai.data_sources import TextDataSource
 from teams.ai.prompts import (
-    ConversationHistory,
+    ConversationHistorySection,
     GroupSection,
     Prompt,
     PromptFunction,
@@ -123,7 +123,7 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         self.assertEqual(len(prompt.prompt.sections[0].sections), 1)
         assert isinstance(prompt.prompt.sections[0].sections[0], TemplateSection)
         self.assertEqual(prompt.prompt.sections[0].sections[0].template, "test prompt")
-        assert isinstance(prompt.prompt.sections[1], ConversationHistory)
+        assert isinstance(prompt.prompt.sections[1], ConversationHistorySection)
         self.assertEqual(prompt.prompt.sections[1].variable, "conversation.happy_path_history")
         self.assertEqual(
             prompt.prompt.sections[1].tokens, self.options.max_conversation_history_tokens
@@ -158,7 +158,7 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         self.assertEqual(len(prompt.prompt.sections[0].sections), 1)
         assert isinstance(prompt.prompt.sections[0].sections[0], TemplateSection)
         self.assertEqual(prompt.prompt.sections[0].sections[0].template, "test prompt")
-        assert isinstance(prompt.prompt.sections[1], ConversationHistory)
+        assert isinstance(prompt.prompt.sections[1], ConversationHistorySection)
         self.assertEqual(prompt.prompt.sections[1].variable, "conversation.include_images_history")
         self.assertEqual(
             prompt.prompt.sections[1].tokens, self.options.max_conversation_history_tokens

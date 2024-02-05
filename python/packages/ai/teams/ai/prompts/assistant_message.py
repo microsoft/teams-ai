@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from .template_section import TemplateSection
+from .sections.template_section import TemplateSection
 
 
 class AssistantMessage(TemplateSection):

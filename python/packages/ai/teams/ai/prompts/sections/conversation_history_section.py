@@ -7,16 +7,16 @@ from typing import List
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..tokenizers import Tokenizer
-from ..utilities import to_string
-from .message import Message
-from .prompt_functions import PromptFunctions
+from ....state import Memory
+from ...tokenizers import Tokenizer
+from ...utilities import to_string
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section_base import PromptSectionBase
-from .rendered_prompt_section import RenderedPromptSection
 
 
-class ConversationHistory(PromptSectionBase):
+class ConversationHistorySection(PromptSectionBase):
     """
     A section that renders the conversation history.
     """
@@ -109,7 +109,7 @@ class ConversationHistory(PromptSectionBase):
         for msg in reversed(history):
             msg = Message(role=msg.role, content=to_string(tokenizer, msg.content))
             prefix = self.user_prefix if msg.role == "user" else self.assistant_prefix
-            line = prefix + msg.content
+            line = prefix + (msg.content if msg.content is not None else "")
             length = len(tokenizer.encode(line)) + (separator_length if len(lines) > 0 else 0)
 
             # Add initial line if required
@@ -169,7 +169,13 @@ class ConversationHistory(PromptSectionBase):
 
             # Add length of any image parts
             if isinstance(message.content, list):
-                length += sum(1 for part in message.content if part.type == "image") * 85
+                count = 0
+
+                for part in message.content:
+                    if not isinstance(part, str) and part.type == "image":
+                        count += 1
+
+                length += count * 85
 
             # Add initial message if required
             if len(messages) == 0 and self.required:

@@ -8,14 +8,14 @@ from typing import Awaitable, Callable, List
 
 from botbuilder.core import TurnContext
 
-from ...app_error import ApplicationError
-from ...state import Memory
-from ..tokenizers import Tokenizer
-from ..utilities import to_string
-from .message import Message
-from .prompt_functions import PromptFunctions
+from ....app_error import ApplicationError
+from ....state import Memory
+from ...tokenizers import Tokenizer
+from ...utilities import to_string
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
 from .prompt_section_base import PromptSectionBase
-from .rendered_prompt_section import RenderedPromptSection
 
 
 # private

@@ -19,8 +19,8 @@ from .message import (
     TextContentPart,
 )
 from .prompt_functions import PromptFunctions
-from .prompt_section_base import PromptSectionBase
 from .rendered_prompt_section import RenderedPromptSection
+from .sections.prompt_section_base import PromptSectionBase
 
 
 class UserInputMessage(PromptSectionBase):
