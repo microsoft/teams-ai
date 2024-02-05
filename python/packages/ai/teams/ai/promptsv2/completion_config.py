@@ -69,3 +69,20 @@ class CompletionConfig:
     stop_sequences: Optional[List[str]] = None
     temperature: float = 0
     top_p: float = 0
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "CompletionConfig":
+        return cls(
+            completion_type=data.get("completion_type"),
+            frequency_penalty=data.get("frequency_penalty", 0),
+            include_history=data.get("include_history", True),
+            include_input=data.get("include_input", True),
+            include_images=data.get("include_images", False),
+            max_tokens=data.get("max_tokens", 150),
+            max_input_tokens=data.get("max_input_tokens", 2048),
+            model=data.get("model"),
+            presence_penalty=data.get("presence_penalty", 0),
+            stop_sequences=data.get("stop_sequences"),
+            temperature=data.get("temperature", 0),
+            top_p=data.get("top_p", 0),
+        )
