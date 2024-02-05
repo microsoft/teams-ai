@@ -55,7 +55,7 @@ export abstract class MessageExtensionAuthenticationBase {
 
         const signInLink = await this.getSignInLink(context);
         // Do 'silentAuth' if this is a composeExtension/query request otherwise do normal `auth` flow.
-        const authType = context.activity.name === MessageExtensionsInvokeNames.QUERY_INVOKE ? 'silentAuth' : 'auth';
+        const authType = this.isSsoSignIn(context) ? 'silentAuth' : 'auth';
 
         const response = {
             composeExtension: {
@@ -117,4 +117,11 @@ export abstract class MessageExtensionAuthenticationBase {
      * @returns {Promise<string | undefined>} - A promise that resolves to the sign-in link or undefined if no sign-in link available.
      */
     public abstract getSignInLink(context: TurnContext): Promise<string | undefined>;
+
+    /**
+     * Should sign in using SSO flow.
+     * @param {TurnContext} context - The turn context.
+     * @returns {boolean} - A boolean indicating if the sign-in should use SSO flow.
+     */
+    public abstract isSsoSignIn(context: TurnContext): boolean;
 }

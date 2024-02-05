@@ -83,7 +83,8 @@ const app = new ApplicationBuilder()
                 connectionName: process.env.OAUTH_CONNECTION_NAME ?? '',
                 title: 'Sign in',
                 text: 'Please sign in to use the bot.',
-                endOnInvalidMessage: true
+                endOnInvalidMessage: true,
+                enableSso: true // Set this to false to disable SSO
             }
         },
         autoSignIn: (context: TurnContext) => {
