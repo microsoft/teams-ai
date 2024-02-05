@@ -34,4 +34,3 @@ class SimpleAdapter(BotAdapter):
         assert context is not None
         assert reference is not None
         assert reference.activity_id == ACTIVITY.id
-
