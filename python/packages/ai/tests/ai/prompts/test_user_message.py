@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from unittest import TestCase
 
-from teams.ai.promptsv2 import UserMessage
+from teams.ai.prompts import UserMessage
 
 
 class TestUserMessage(TestCase):

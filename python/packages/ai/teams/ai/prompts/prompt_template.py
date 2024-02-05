@@ -5,15 +5,23 @@ Licensed under the MIT License.
 
 from dataclasses import dataclass
 
+from .prompt_section import PromptSection
 from .prompt_template_config import PromptTemplateConfig
 
 
 @dataclass
 class PromptTemplate:
-    "prompt template cached by the prompt manager"
+    """
+    Prompt template cached by the prompt manager.
 
-    text: str
-    "text of the prompt template"
+    Attributes:
+        name (str): Name of the prompt template.
 
+        prompt (PromptSection): Text of the prompt template.
+
+        config (PromptTemplateConfig): Configuration settings for the prompt template.
+    """
+
+    name: str
+    prompt: PromptSection
     config: PromptTemplateConfig
-    "configuration settings for the prompt template"

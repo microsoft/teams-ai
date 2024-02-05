@@ -4,40 +4,45 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Literal, Optional
 
 from .completion_config import CompletionConfig
 
 
 @dataclass
 class PromptTemplateConfig:
-    "serialized prompt template configuration"
+    """
+    Serialized prompt template configuration.
 
-    schema: int
-    "the schema version of the prompt template, should always be `1`"
+    Attributes:
+        schema (float): The schema version of the prompt template. Can be '1' or '1.1'.
 
-    type: str
-    "type of prompt template, should always be `completion`"
+        completion (CompletionConfig): Completion settings for the prompt.
 
-    description: str
-    "description of the prompts purpose"
+        type (Literal['completion']): Type of prompt template. Should always be 'completion'.
 
+        augmentation (Optional[AugmentationConfig]): Augmentation settings for the prompt.
+          New in schema version 1.1.
+
+        description (Optional[str]): Description of the prompts purpose.
+
+        default_backends (Optional[List[str]]): Array of backends (models) to use for the prompt.
+          Passing the name of a model to use here will override the default model used by a planner.
+          Deprecated: Use `completion.model` instead.
+    """
+
+    schema: float
     completion: CompletionConfig
-    "completion settings for the prompt"
+    type: Literal["completion"] = "completion"
+    description: Optional[str] = None
+    default_backends: Optional[List[str]] = None
 
-    default_backends: List[str]
-    """
-    optional: array of backends (models) to use for the prompt
-    note: passing the name of a model to use here will override the default model used by a planner
-    """
-
-    @staticmethod
-    def from_dict(data: dict) -> "PromptTemplateConfig":
-        "converts a dictionary to a PromptTemplateConfig object"
-        return PromptTemplateConfig(
-            schema=data["schema"],
-            type=data["type"],
-            description=data["description"],
+    @classmethod
+    def from_dict(cls, data: dict) -> "PromptTemplateConfig":
+        return cls(
+            schema=data.get("schema", 1.0),
             completion=CompletionConfig.from_dict(data["completion"]),
-            default_backends=data.get("default_backends", []),
+            type=data.get("type", "completion"),
+            description=data.get("description"),
+            default_backends=data.get("default_backends"),
         )

@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Optional, TypeVar
 
-from ..promptsv2 import Message
+from ..prompts import Message
 
 ContentT = TypeVar("ContentT")
 PromptResponseStatus = Literal["success", "error", "rate_limited", "invalid_response", "too_long"]

@@ -10,7 +10,7 @@ from botbuilder.core import TurnContext
 
 from ...state import Memory
 from ..models import ChatCompletionAction, PromptResponse
-from ..promptsv2 import Message
+from ..prompts import Message
 from ..tokenizers import Tokenizer
 from .json_response_validator import JSONResponseValidator
 from .prompt_response_validator import PromptResponseValidator

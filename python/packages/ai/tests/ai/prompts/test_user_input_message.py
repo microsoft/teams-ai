@@ -10,7 +10,7 @@ from unittest.mock import MagicMock
 from botbuilder.core import TurnContext
 
 from teams import InputFile
-from teams.ai.promptsv2 import (
+from teams.ai.prompts import (
     ImageContentPart,
     ImageUrl,
     PromptFunctions,

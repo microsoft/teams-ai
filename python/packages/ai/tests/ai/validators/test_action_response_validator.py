@@ -9,7 +9,7 @@ from unittest import IsolatedAsyncioTestCase
 from botbuilder.core import TurnContext
 
 from teams.ai.models import ChatCompletionAction, PromptResponse
-from teams.ai.promptsv2 import FunctionCall, Message
+from teams.ai.prompts import FunctionCall, Message
 from teams.ai.tokenizers import GPTTokenizer
 from teams.ai.validators import ActionResponseValidator, ValidatedChatCompletionAction
 from teams.state import TurnState

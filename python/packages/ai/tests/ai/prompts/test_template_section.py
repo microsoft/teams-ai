@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 from botbuilder.core import MemoryStorage, TurnContext
 
-from teams.ai.promptsv2 import PromptFunctions, TemplateSection
+from teams.ai.prompts import PromptFunctions, TemplateSection
 from teams.ai.tokenizers import GPTTokenizer
 from teams.app_error import ApplicationError
 from teams.state import TurnState

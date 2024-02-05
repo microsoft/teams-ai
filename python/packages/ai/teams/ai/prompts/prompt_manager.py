@@ -5,122 +5,297 @@ Licensed under the MIT License.
 
 import json
 import os
-from typing import Any, Awaitable, Callable, Dict, Union
+from copy import deepcopy
+from pathlib import Path
+from typing import Any, Dict, List
 
-import semantic_kernel as sk
 from botbuilder.core import TurnContext
-from semantic_kernel.skill_definition import sk_function
 
-from teams.ai.state import TurnState
-from teams.app_error import ApplicationError
-
+from ...app_error import ApplicationError
+from ...state import Memory
+from ..data_sources import DataSource
+from ..tokenizers import Tokenizer
+from .conversation_history import ConversationHistory
+from .group_section import GroupSection
+from .prompt import Prompt
+from .prompt_functions import PromptFunction, PromptFunctions
+from .prompt_manager_options import PromptManagerOptions
+from .prompt_section import PromptSection
 from .prompt_template import PromptTemplate
 from .prompt_template_config import PromptTemplateConfig
-from .utils import generate_sk_prompt_template_config
+from .template_section import TemplateSection
+from .user_input_message import UserInputMessage
+from .user_message import UserMessage
 
-SK_CONFIG_FILE_NAME = "config.json"
-SK_PROMPT_FILE_NAME = "skprompt.txt"
 
+class PromptManager(PromptFunctions):
+    _options: PromptManagerOptions
+    _data_sources: Dict[str, DataSource]
+    _functions: Dict[str, PromptFunction]
+    _prompts: Dict[str, PromptTemplate]
 
-class PromptManager:
-    """
-    Prompt manager used by action planner internally
-    """
-
-    _prompts_folder: str
-    _templates: Dict[str, PromptTemplate] = {}
-    _functions: Dict[str, Callable[[TurnContext, TurnState], Awaitable[str]]] = {}
-
-    def __init__(self, prompts_folder: str = "prompts") -> None:
+    def __init__(self, options: PromptManagerOptions):
         """
-        Initializes a new instance of the DefaultPromptManager class.
+        Creates a new 'PromptManager' instance.
 
-        :param prompts_folder: The base folder path where the prompt files are located.
+        Args:
+            options (PromptManagerOptions): Options used to configure the prompt manager.
         """
-        self._prompts_folder = prompts_folder
+        self._options = options
+        self._data_sources = {}
+        self._functions = {}
+        self._prompts = {}
 
-    def add_function(
-        self,
-        name: str,
-        handler: Callable[[TurnContext, TurnState], Awaitable[Any]],
-        allow_overrides=False,
-    ):
+    @property
+    def options(self) -> PromptManagerOptions:
         """
-        Adds a new function to the prompt manager.
-
-        :param name: The name of the function.
-        :param handler: The function handler.
-        :param allow_overrides: Whether to allow overriding an existing function with the same name.
+        Gets the configured prompt manager options.
         """
-        if not allow_overrides and self._functions.get(name):
-            raise ApplicationError(f"Function {name} already exists")
+        return self._options
 
-        self._functions[name] = handler
+    def add_data_source(self, data_source: DataSource) -> "PromptManager":
+        """
+        Registers a new data source with the prompt manager.
+
+        Args:
+            data_source (DataSource): Data source to add.
+
+        Returns:
+            PromptManager: The prompt manager for chaining.
+
+        Raises:
+            ApplicationError: If a data source with the same name already exists.
+        """
+        if data_source.name in self._data_sources:
+            raise ApplicationError(f"DataSource '{data_source.name}' already exists.")
+        self._data_sources[data_source.name] = data_source
         return self
 
-    async def render_prompt(
-        self, context: TurnContext, state: TurnState, name_or_template: Union[str, PromptTemplate]
-    ) -> PromptTemplate:
+    def get_data_source(self, name: str) -> DataSource:
         """
-        Renders the given prompt template.
+        Looks up a data source by name.
 
-        :param context: The turn context for current turn of conversation.
-        :param state: The current turn state.
-        :param name_or_template: The name of the prompt template or the prompt template itself.
+        Args:
+            name (str): Name of the data source to lookup.
+
+        Returns:
+            DataSource: The data source.
+
+        Raises:
+            ApplicationError: If the data source is not found.
         """
-        prompt_template: PromptTemplate
-        if isinstance(name_or_template, str):
-            prompt_folder: str = os.path.join(self._prompts_folder, name_or_template)
+        if name not in self._data_sources:
+            raise ApplicationError(f"DataSource '{name}' not found.")
+        return self._data_sources[name]
 
-            prompt_config: PromptTemplateConfig = PromptTemplateConfig.from_dict(
-                json.loads(self._read_file(os.path.join(prompt_folder, SK_CONFIG_FILE_NAME)))
-            )
+    def has_data_source(self, name: str) -> bool:
+        """
+        Checks for the existence of a named data source.
 
-            prompt_text: str = self._read_file(os.path.join(prompt_folder, SK_PROMPT_FILE_NAME))
-            prompt_template = PromptTemplate(prompt_text, prompt_config)
-        else:
-            prompt_template = name_or_template
+        Args:
+            name (str): Name of the data source to lookup.
 
-        return await self._render_prompt_with_sk(prompt_template, context, state)
+        Returns:
+            bool: True if the data source exists, False otherwise.
+        """
+        return name in self._data_sources
 
-    def _read_file(self, file_path: str) -> str:
-        if not os.path.exists(file_path):
+    def add_function(self, name: str, function: PromptFunction) -> "PromptManager":
+        """
+        Registers a new prompt template function with the prompt manager.
+
+        Args:
+            name (str): Name of the function to add.
+            fn (PromptFunction): Function to add.
+
+        Returns:
+            PromptManager: The prompt manager for chaining.
+
+        Raises:
+            ApplicationError: If a function with the same name already exists.
+        """
+        if name in self._functions:
+            raise ApplicationError(f"Function '{name}' already exists.")
+        self._functions[name] = function
+        return self
+
+    def get_function(self, name: str) -> PromptFunction:
+        """
+        Looks up a prompt template function by name.
+
+        Args:
+            name (str): Name of the function to lookup.
+
+        Returns:
+            PromptFunction: The function.
+
+        Raises:
+            ApplicationError: If the function is not found.
+        """
+        if name not in self._functions:
+            raise ApplicationError(f"Function '{name}' not found.")
+        return self._functions[name]
+
+    def has_function(self, name: str) -> bool:
+        """
+        Checks for the existence of a named prompt template function.
+
+        Args:
+            name (str): Name of the function to lookup.
+
+        Returns:
+            bool: True if the function exists, False otherwise.
+        """
+        return name in self._functions
+
+    async def invoke_function(
+        self, name: str, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: List[str]
+    ) -> Any:
+        """
+        Invokes a prompt template function by name.
+
+        Args:
+            name (str): Name of the function to invoke.
+            context (TurnContext): Turn context for the current turn of conversation with the user.
+            memory (Memory): An interface for accessing state values.
+            tokenizer (Tokenizer): Tokenizer to use when rendering the prompt.
+            args (List[str]): Arguments to pass to the function.
+
+        Returns:
+            Any: Value returned by the function.
+        """
+        function = self.get_function(name)
+        return await function(context, memory, self, tokenizer, args)
+
+    def add_prompt(self, prompt: PromptTemplate) -> "PromptManager":
+        """
+        Registers a new prompt template with the prompt manager.
+
+        Args:
+            prompt (PromptTemplate): Prompt template to add.
+
+        Returns:
+            PromptManager: The prompt manager for chaining.
+
+        Raises:
+            ApplicationError: If a prompt with the same name already exists.
+        """
+        if prompt.name in self._prompts:
             raise ApplicationError(
-                f"Missing prompt config or text file: {file_path} does not exist"
+                (
+                    "The PromptManager.add_prompt() method was called with a "
+                    f"previously registered prompt named '{prompt.name}'."
+                )
             )
-        with open(file_path, "r", encoding="utf8") as file:
-            return file.read()
 
-    async def _render_prompt_with_sk(
-        self, prompt_template: PromptTemplate, turn_context: TurnContext, turn_state: TurnState
-    ) -> PromptTemplate:
-        kernel = sk.Kernel()
-        for function_name, function in self._functions.items():
-            # A workaround to register single native function.
-            # TODO: Use latest SK package which supports register
-            # single native function when it is available.
+        # Clone and cache prompt
+        self._prompts[prompt.name] = deepcopy(prompt)
+        return self
 
-            # pylint: disable=W0640
-            # Reason: the logic won't be impacted by the warning
-            # and SK is going to support register single native function.
-            # So no need to spend extra time on this warning.
-            class Wrapper:
-                @sk_function(name=function_name)
-                async def run(self):
-                    return await function(turn_context, turn_state)
+    async def get_prompt(self, name) -> PromptTemplate:
+        """
+        Loads a named prompt template from the filesystem.
 
-            kernel.import_skill(Wrapper())
+        The template will be pre-parsed and cached for use when the template is rendered by name.
 
-        sk_context = kernel.create_new_context()
-        # Set built-in variables
-        sk_context.variables.set("input", turn_state.temp.input)
-        sk_context.variables.set("history", turn_state.temp.history)
-        sk_context.variables.set("output", turn_state.temp.output)
+        Any augmentations will also be added to the template.
 
-        sk_template = sk.PromptTemplate(
-            prompt_template.text,
-            kernel.prompt_template_engine,
-            generate_sk_prompt_template_config(prompt_template),
-        )
-        rendered_prompt = await sk_template.render_async(sk_context)
-        return PromptTemplate(rendered_prompt, prompt_template.config)
+        Args:
+            name (str): Name of the prompt to load.
+
+        Returns:
+            PromptTemplate: The loaded and parsed prompt template.
+
+        Raises:
+            ApplicationError: If the prompt is not found or there is an error loading it.
+        """
+        if name not in self._prompts:
+            template_name = name
+
+            # Load template from disk
+            folder = os.path.join(self._options.prompts_folder, name)
+            config_file = os.path.join(folder, "config.json")
+            prompt_file = os.path.join(folder, "skprompt.txt")
+
+            # Load prompt config
+            try:
+                with open(config_file, "r", encoding="utf-8") as file:
+                    template_config = PromptTemplateConfig.from_dict(json.load(file))
+            except Exception as e:
+                raise ApplicationError(
+                    (
+                        "PromptManager.get_prompt(): an error occurred while loading "
+                        f"'{config_file}'. The file is either invalid or missing."
+                    )
+                ) from e
+
+            # Load prompt text
+            sections: List[PromptSection] = []
+            try:
+                with open(prompt_file, "r", encoding="utf-8") as file:
+                    prompt = file.read()
+                    sections.append(TemplateSection(prompt, self._options.role))
+            except Exception as e:
+                raise ApplicationError(
+                    (
+                        "PromptManager.get_prompt(): an error occurred while loading "
+                        f"'{prompt_file}'. The file is either invalid or missing."
+                    )
+                ) from e
+
+            # Migrate the templates config as needed
+            self._update_config(template_config)
+
+            # Group everything into a system message
+            sections = [GroupSection(sections, "system")]
+
+            # Include conversation history
+            # - The ConversationHistory section will use the remaining tokens from
+            #   max_input_tokens.
+            if template_config.completion.include_history:
+                sections.append(
+                    ConversationHistory(
+                        f"conversation.{template_name}_history",
+                        self._options.max_conversation_history_tokens,
+                    )
+                )
+
+            # Include user input
+            if template_config.completion.include_images:
+                sections.append(UserInputMessage(self._options.max_input_tokens))
+            elif template_config.completion.include_input:
+                sections.append(UserMessage("{{$temp.input}}", self._options.max_input_tokens))
+
+            template = PromptTemplate(template_name, Prompt(sections), template_config)
+
+            # Cache loaded template
+            self._prompts[name] = template
+
+        return self._prompts[name]
+
+    def has_prompt(self, name: str) -> bool:
+        """
+        Checks for the existence of a named prompt.
+
+        Args:
+            name (str): Name of the prompt to check.
+
+        Returns:
+            bool: True if the prompt exists, False otherwise.
+        """
+        if name not in self._prompts:
+            folder = os.path.join(self._options.prompts_folder, name)
+            prompt_file = os.path.join(folder, "skprompt.txt")
+
+            return Path(prompt_file).exists()
+        return True
+
+    def _update_config(self, template_config: PromptTemplateConfig):
+        # Migrate old schema
+        if template_config.schema == 1:
+            template_config.schema = 1.1
+            if (
+                template_config.default_backends is not None
+                and len(template_config.default_backends) > 0
+            ):
+                template_config.completion.model = template_config.default_backends[0]

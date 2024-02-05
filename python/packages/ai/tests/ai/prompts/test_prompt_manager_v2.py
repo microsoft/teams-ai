@@ -8,7 +8,7 @@ from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock
 
 from teams.ai.data_sources import TextDataSource
-from teams.ai.promptsv2 import (
+from teams.ai.prompts import (
     ConversationHistory,
     GroupSection,
     Prompt,
