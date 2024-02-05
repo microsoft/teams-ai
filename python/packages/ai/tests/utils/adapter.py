@@ -33,3 +33,5 @@ class SimpleAdapter(BotAdapter):
     async def delete_activity(self, context, reference):
         assert context is not None
         assert reference is not None
+        assert reference.activity_id == ACTIVITY.id
+
