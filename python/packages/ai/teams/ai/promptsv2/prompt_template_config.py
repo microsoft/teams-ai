@@ -36,3 +36,13 @@ class PromptTemplateConfig:
     type: Literal["completion"] = "completion"
     description: Optional[str] = None
     default_backends: Optional[List[str]] = None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "PromptTemplateConfig":
+        return cls(
+            schema=data.get("schema", 1.0),
+            completion=CompletionConfig.from_dict(data["completion"]),
+            type=data.get("type", "completion"),
+            description=data.get("description"),
+            default_backends=data.get("default_backends"),
+        )
