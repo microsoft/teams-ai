@@ -245,11 +245,12 @@ describe('AdaptiveCardAuthenticaion', () => {
                     assert(result == undefined);
                 });
 
-                it(`should to normal auth flow if tokenExchangeUri is not set`, async () => {
+                it(`should to normal auth flow if tokenExchangeUri is set and enableSso is true`, async () => {
                     const settings = {
                         connectionName: 'connectionName',
                         title: 'title',
-                        tokenExchangeUri: 'tokenExchangeUri'
+                        tokenExchangeUri: 'tokenExchangeUri',
+                        enableSso: true
                     };
 
                     acAuth = new OAuthAdaptiveCardAuthentication(settings);

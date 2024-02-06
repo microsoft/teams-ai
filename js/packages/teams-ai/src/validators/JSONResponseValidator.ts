@@ -30,11 +30,6 @@ export class JSONResponseValidator<TValue = Record<string, any>> implements Prom
     public errorFeedback: string;
 
     /**
-     * Optional. Substitution for the word "instance" to use in feedback messages.
-     */
-    public instanceName?: string;
-
-    /**
      * Feedback given when no JSON is returned.
      */
     public missingJsonFeedback: string;

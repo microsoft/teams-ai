@@ -19,12 +19,12 @@
         "url": "https://github.com"
     },
     "dependencies": {
-        "botbuilder": "^4.21.4",
+        "botbuilder": "^4.22.1",
         "@microsoft/teams-ai": "~1.1.0",
-        "dotenv": "^16.3.2",
+        "dotenv": "^16.4.1",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
-        "axios": "^1.6.5"
+        "axios": "^1.6.7"
     },
     "devDependencies": {
         "@types/dotenv": "6.1.1",

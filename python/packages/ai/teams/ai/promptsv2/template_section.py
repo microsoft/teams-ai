@@ -56,7 +56,7 @@ class TemplateSection(PromptSectionBase):
         self,
         template: str,
         role: str,
-        tokens: int = -1,
+        tokens: float = -1,
         required: bool = True,
         separator: str = "\n",
         text_prefix: str = "",

@@ -1,14 +1,12 @@
-﻿using Microsoft.Teams.AI.State;
-
-namespace Microsoft.Teams.AI.AI.Embeddings
+﻿namespace Microsoft.Teams.AI.AI.Embeddings
 {
     /// <summary>
-    /// Interface for Embeddings.
+    /// An AI model that can be used to create embeddings.
     /// </summary>
-    public interface IEmbeddings<TState> where TState : TurnState
+    public interface IEmbeddingsModel
     {
         /// <summary>
-        /// Creates embeddings for the given inputs using the OpenAI API.
+        /// Creates embeddings for the given inputs.
         /// </summary>
         /// <param name="inputs">Text inputs to create embeddings for.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects

@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Teams.AI.AI.Models
+﻿using Azure.AI.OpenAI;
+using Microsoft.Teams.AI.Exceptions;
+using Microsoft.Teams.AI.Utilities;
+
+namespace Microsoft.Teams.AI.AI.Models
 {
     /// <summary>
     /// Provides extension methods for the <see cref="ChatMessage"/> class.
@@ -6,21 +10,94 @@
     internal static class ChatMessageExtensions
     {
         /// <summary>
-        /// Converts a <see cref="ChatMessage"/> to an <see cref="Azure.AI.OpenAI.ChatMessage"/>.
+        /// Converts a <see cref="ChatMessage"/> to an <see cref="ChatRequestMessage"/>.
         /// </summary>
         /// <param name="chatMessage">The original <see cref="ChatMessage" />.</param>
-        /// <returns>An <see cref="Azure.AI.OpenAI.ChatMessage"/>.</returns>
-        public static Azure.AI.OpenAI.ChatMessage ToAzureSdkChatMessage(this ChatMessage chatMessage)
+        /// <returns>An <see cref="ChatRequestMessage"/>.</returns>
+        public static ChatRequestMessage ToChatRequestMessage(this ChatMessage chatMessage)
         {
-            Azure.AI.OpenAI.ChatMessage message = new(new Azure.AI.OpenAI.ChatRole(chatMessage.Role.ToString()), chatMessage.Content)
+            Verify.NotNull(chatMessage.Content);
+            Verify.NotNull(chatMessage.Role);
+
+            ChatRole role = chatMessage.Role;
+            ChatRequestMessage? message = null;
+
+            if (role == ChatRole.User)
             {
-                Name = chatMessage.Name,
-            };
-            if (chatMessage.FunctionCall != null)
-            {
-                message.FunctionCall = new Azure.AI.OpenAI.FunctionCall(chatMessage.FunctionCall.Name, chatMessage.FunctionCall.Arguments);
+                ChatRequestUserMessage userMessage = new(chatMessage.Content);
+
+                if (chatMessage.Name != null)
+                {
+                    userMessage.Name = chatMessage.Name;
+                }
+
+                message = userMessage;
             }
+
+            if (role == ChatRole.Assistant)
+            {
+                ChatRequestAssistantMessage assistantMessage = new(chatMessage.Content);
+
+                if (chatMessage.FunctionCall != null)
+                {
+                    assistantMessage.FunctionCall = new(chatMessage.FunctionCall.Name ?? "", chatMessage.FunctionCall.Arguments ?? "");
+                }
+
+                if (chatMessage.ToolCalls != null)
+                {
+                    foreach (ChatCompletionsToolCall toolCall in chatMessage.ToolCalls)
+                    {
+                        assistantMessage.ToolCalls.Add(toolCall.ToAzureSdkChatCompletionsToolCall());
+                    }
+                }
+
+                if (chatMessage.Name != null)
+                {
+                    assistantMessage.Name = chatMessage.Name;
+                }
+
+                message = assistantMessage;
+            }
+
+            if (role == ChatRole.System)
+            {
+                ChatRequestSystemMessage systemMessage = new(chatMessage.Content);
+
+                if (chatMessage.Name != null)
+                {
+                    systemMessage.Name = chatMessage.Name;
+                }
+
+                message = systemMessage;
+            }
+
+            if (role == ChatRole.Function)
+            {
+                message = new ChatRequestFunctionMessage(chatMessage.Name ?? "", chatMessage.Content);
+            }
+
+            if (role == ChatRole.Tool)
+            {
+                message = new ChatRequestToolMessage(chatMessage.Content, chatMessage.ToolCallId ?? "");
+            }
+
+            if (message == null)
+            {
+                throw new TeamsAIException($"Invalid chat message role: {role}");
+            }
+
             return message;
+        }
+
+        public static Azure.AI.OpenAI.ChatCompletionsToolCall ToAzureSdkChatCompletionsToolCall(this ChatCompletionsToolCall toolCall)
+        {
+            if (toolCall.Type == ToolType.Function)
+            {
+                ChatCompletionsFunctionToolCall functionToolCall = (ChatCompletionsFunctionToolCall)toolCall;
+                return new Azure.AI.OpenAI.ChatCompletionsFunctionToolCall(functionToolCall.Id, functionToolCall.Name, functionToolCall.Arguments);
+            }
+
+            throw new TeamsAIException($"Invalid tool type: {toolCall.Type}");
         }
     }
 }

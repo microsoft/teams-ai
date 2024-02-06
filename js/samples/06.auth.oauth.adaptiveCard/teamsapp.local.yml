@@ -110,3 +110,4 @@ deploy:
         BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}
         # an arbitrary name for the connection
         OAUTH_CONNECTION_NAME: graph-connection
+        TOKEN_EXCHANGE_URI: api://botid-${{BOT_ID}}

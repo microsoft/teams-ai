@@ -1,8 +1,10 @@
-import { ActivityTypes, InvokeResponse, TestAdapter, TurnContext } from 'botbuilder';
-import { Application, Query, RouteSelector } from './Application';
-import * as sinon from 'sinon';
-import { AdaptiveCard, AdaptiveCardSearchResult, AdaptiveCards, AdaptiveCardsSearchParams, TurnState } from '.';
 import assert from 'assert';
+import { ActivityTypes, InvokeResponse, TestAdapter, TurnContext } from 'botbuilder';
+import * as sinon from 'sinon';
+
+import { AdaptiveCard, AdaptiveCardSearchResult, AdaptiveCards, AdaptiveCardsSearchParams, TurnState } from '.';
+import { Application, Query, RouteSelector } from './Application';
+import { createTestTurnContextAndState } from './internals/testing/TestUtilities';
 
 describe('AdaptiveCards', () => {
     let adaptiveCards: AdaptiveCards<TurnState>;
@@ -10,10 +12,7 @@ describe('AdaptiveCards', () => {
     let selector: RouteSelector;
     let handler: any;
     let addRouteStub: sinon.SinonStub;
-
-    const createTurnContext = (activity: any) => {
-        return new TurnContext(new TestAdapter(), activity);
-    };
+    let adapter = new TestAdapter();
 
     beforeEach(() => {
         app = new Application();
@@ -67,7 +66,7 @@ describe('AdaptiveCards', () => {
                             }
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == true);
                 });
@@ -77,7 +76,7 @@ describe('AdaptiveCards', () => {
                         type: 'NotInvoke'
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -102,7 +101,7 @@ describe('AdaptiveCards', () => {
                         }
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == true);
                 });
@@ -112,7 +111,7 @@ describe('AdaptiveCards', () => {
                         type: 'NotInvoke'
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -133,7 +132,7 @@ describe('AdaptiveCards', () => {
                     type: 'invalidActivityType'
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const state = new TurnState();
                 const errorMsg = `Unexpected AdaptiveCards.actionExecute() triggered for activity type: invalidActivityType`;
 
@@ -159,7 +158,7 @@ describe('AdaptiveCards', () => {
                     }
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const state = new TurnState();
 
                 // this is the handler that is registered as an app route.
@@ -201,7 +200,7 @@ describe('AdaptiveCards', () => {
                     }
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const contextSendActivityStub = sinon.stub(context, 'sendActivity');
                 const state = new TurnState();
 
@@ -246,7 +245,7 @@ describe('AdaptiveCards', () => {
                     }
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const contextSendActivityStub = sinon.stub(context, 'sendActivity');
                 const state = new TurnState();
 
@@ -304,7 +303,7 @@ describe('AdaptiveCards', () => {
                             verb: 'test'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     // the selector should be testing if `value.verb` matches the regex `verbRegex`.
                     assert((await selector(context)) == true);
@@ -319,7 +318,7 @@ describe('AdaptiveCards', () => {
                             verb: 'verbThatDoesNotMatchRegex'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     // the selector should be testing if `value.verb` matches the regex `verbRegex`.
                     assert((await selector(context)) == false);
@@ -330,7 +329,7 @@ describe('AdaptiveCards', () => {
                         type: 'notActionSubmit'
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -352,7 +351,7 @@ describe('AdaptiveCards', () => {
                             verb: 'test'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     // the selector should be testing if `value.verb` == `verb`.
                     assert((await selector(context)) == true);
@@ -367,7 +366,7 @@ describe('AdaptiveCards', () => {
                             verb: 'notEqualToTest'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     // the selector should be testing if `value.verb` == `verb`.
                     assert((await selector(context)) == false);
@@ -378,7 +377,7 @@ describe('AdaptiveCards', () => {
                         type: 'NotActionSubmit'
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -399,7 +398,7 @@ describe('AdaptiveCards', () => {
                     type: 'invalidActivityType'
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const state = new TurnState();
                 const errorMsg = `Unexpected AdaptiveCards.actionSubmit() triggered for activity type: invalidActivityType`;
 
@@ -419,7 +418,7 @@ describe('AdaptiveCards', () => {
                     }
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const state = new TurnState();
 
                 // this is the handler that is registered as an app route.
@@ -475,7 +474,7 @@ describe('AdaptiveCards', () => {
                             dataset: 'test'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     // the selector should be testing if `value.dataset` matches the regex `datasetRegex`.
                     assert((await selector(context)) == true);
@@ -489,7 +488,7 @@ describe('AdaptiveCards', () => {
                             dataset: 'DoesNotMatchRegex'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     // the selector should be testing if `value.dataset` matches the regex `datasetRegex`.
                     assert((await selector(context)) == false);
@@ -500,7 +499,7 @@ describe('AdaptiveCards', () => {
                         type: 'NotInvoke'
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -521,7 +520,7 @@ describe('AdaptiveCards', () => {
                             dataset: 'test'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == true);
                 });
@@ -534,7 +533,7 @@ describe('AdaptiveCards', () => {
                             dataset: 'NotEqualToTest'
                         }
                     };
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -544,7 +543,7 @@ describe('AdaptiveCards', () => {
                         type: 'NotApplicationSearch'
                     };
 
-                    const context = createTurnContext(activity);
+                    const [context, _] = await createTestTurnContextAndState(adapter, activity);
 
                     assert((await selector(context)) == false);
                 });
@@ -565,7 +564,7 @@ describe('AdaptiveCards', () => {
                     type: 'invalidActivityType'
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const state = new TurnState();
                 const errorMsg = `Unexpected AdaptiveCards.search() triggered for activity type: invalidActivityType`;
 
@@ -599,7 +598,7 @@ describe('AdaptiveCards', () => {
                     }
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const state = new TurnState();
 
                 // this is the handler that is registered as an app route.
@@ -630,7 +629,7 @@ describe('AdaptiveCards', () => {
                     name: 'application/search'
                 };
 
-                const context = createTurnContext(activity);
+                const [context, _] = await createTestTurnContextAndState(adapter, activity);
                 const contextSendActivityStub = sinon.stub(context, 'sendActivity');
                 const state = new TurnState();
 

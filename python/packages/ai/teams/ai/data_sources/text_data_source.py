@@ -38,7 +38,7 @@ class TextDataSource(DataSource):
         self._text = text
 
     @property
-    def get_name(self) -> str:
+    def name(self) -> str:
         """
         Name of the data source.
         """
