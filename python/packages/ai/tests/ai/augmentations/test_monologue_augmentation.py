@@ -132,7 +132,6 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
                 )
             ),
         )
-        print(plan)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
         self.assertEqual(plan.commands[0].response, "hello world")
@@ -152,7 +151,6 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
                 )
             ),
         )
-        print(plan)
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "DO")
         self.assertEqual(plan.commands[0].action, "test")
