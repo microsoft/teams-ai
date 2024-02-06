@@ -81,9 +81,9 @@ namespace Microsoft.Teams.AI
             return await dialogSet.CreateContextAsync(context, cancellationToken);
         }
 
-        private async Task<Attachment> CreateOAuthCard(ITurnContext context, CancellationToken cancellationToken = default)
+        public async Task<Attachment> CreateOAuthCard(ITurnContext context, CancellationToken cancellationToken = default)
         {
-            SignInResource signInResource = await UserTokenClientWrapper.GetSignInResourceAsync(context, this._oauthSettings.ConnectionName, cancellationToken);
+            SignInResource signInResource = await GetSignInResourceAsync(context, this._oauthSettings.ConnectionName, cancellationToken);
             string? link = signInResource.SignInLink;
             TokenExchangeResource? tokenExchangeResource = null;
 
@@ -113,6 +113,11 @@ namespace Microsoft.Teams.AI
                     TokenPostResource = signInResource.TokenPostResource
                 },
             };
+        }
+
+        protected async virtual Task<SignInResource> GetSignInResourceAsync(ITurnContext context, string connectionName, CancellationToken cancellationToken = default)
+        {
+            return await UserTokenClientWrapper.GetSignInResourceAsync(context, this._oauthSettings.ConnectionName, cancellationToken);
         }
     }
 }
