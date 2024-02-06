@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 from botbuilder.core import TurnContext
 
-from teams.ai.promptsv2 import ConversationHistory, Message, PromptFunctions
+from teams.ai.prompts import ConversationHistorySection, Message, PromptFunctions
 from teams.ai.tokenizers import GPTTokenizer
 from teams.state import TurnState
 
@@ -27,7 +27,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         ]
 
     def test_init(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         self.assertEqual(conversation_history.tokens, 1.0)
         self.assertFalse(conversation_history.required)
         self.assertEqual(conversation_history.separator, "\n")
@@ -35,7 +35,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertEqual(conversation_history.assistant_prefix, "assistant: ")
 
     def test_init_with_optional_params(self):
-        conversation_history = ConversationHistory(
+        conversation_history = ConversationHistorySection(
             "conversation.history",
             tokens=0.5,
             required=True,
@@ -50,7 +50,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertEqual(conversation_history.assistant_prefix, "assistant: ")
 
     async def test_render_as_text(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 100
         )
@@ -65,7 +65,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_text_include_initial_line_when_required(self):
-        conversation_history = ConversationHistory("conversation.history", required=True)
+        conversation_history = ConversationHistorySection("conversation.history", required=True)
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 1
         )
@@ -74,7 +74,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertTrue(result.too_long)
 
     async def test_render_as_text_truncate_history(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 12
         )
@@ -83,7 +83,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_text_empty_history(self):
-        conversation_history = ConversationHistory("conversation.no_history")
+        conversation_history = ConversationHistorySection("conversation.no_history")
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 100
         )
@@ -92,7 +92,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_text_long_last_message(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         result = await conversation_history.render_as_text(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 1
         )
@@ -101,7 +101,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_messages(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 100
         )
@@ -118,7 +118,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_messages_include_initial_line_when_required(self):
-        conversation_history = ConversationHistory("conversation.history", required=True)
+        conversation_history = ConversationHistorySection("conversation.history", required=True)
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 1
         )
@@ -127,7 +127,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertTrue(result.too_long)
 
     async def test_render_as_messages_truncate_history(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 12
         )
@@ -136,7 +136,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_messages_empty_history(self):
-        conversation_history = ConversationHistory("conversation.no_history")
+        conversation_history = ConversationHistorySection("conversation.no_history")
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 100
         )
@@ -145,7 +145,7 @@ class TestConversationHistory(IsolatedAsyncioTestCase):
         self.assertFalse(result.too_long)
 
     async def test_render_as_messages_long_last_message(self):
-        conversation_history = ConversationHistory("conversation.history")
+        conversation_history = ConversationHistorySection("conversation.history")
         result = await conversation_history.render_as_messages(
             self.turn_context, self.memory, self.prompt_functions, GPTTokenizer(), 1
         )

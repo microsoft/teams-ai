@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 from botbuilder.core import TurnContext
 
 from teams.ai.data_sources import TextDataSource
-from teams.ai.promptsv2 import DataSourceSection, PromptFunctions
+from teams.ai.prompts import DataSourceSection, PromptFunctions
 from teams.ai.tokenizers import GPTTokenizer
 from teams.state import Memory
 
