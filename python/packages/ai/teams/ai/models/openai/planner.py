@@ -164,7 +164,7 @@ class OpenAIPlanner(Planner):
                     commands=[
                         PredictedDoCommand(
                             action=ActionTypes.FLAGGED_INPUT,
-                            entities=vars(res.data.results[0]),
+                            parameters=vars(res.data.results[0]),
                         )
                     ]
                 )
@@ -173,7 +173,7 @@ class OpenAIPlanner(Planner):
                 commands=[
                     PredictedDoCommand(
                         action=ActionTypes.HTTP_ERROR,
-                        entities={"status": e.status, "message": e.message},
+                        parameters={"status": e.status, "message": e.message},
                     )
                 ]
             )
@@ -200,7 +200,7 @@ class OpenAIPlanner(Planner):
                             commands=[
                                 PredictedDoCommand(
                                     action=ActionTypes.FLAGGED_INPUT,
-                                    entities=vars(res.data.results[0]),
+                                    parameters=vars(res.data.results[0]),
                                 )
                             ]
                         )
@@ -209,7 +209,7 @@ class OpenAIPlanner(Planner):
                         commands=[
                             PredictedDoCommand(
                                 action=ActionTypes.HTTP_ERROR,
-                                entities={"status": e.status, "message": e.message},
+                                parameters={"status": e.status, "message": e.message},
                             )
                         ]
                     )

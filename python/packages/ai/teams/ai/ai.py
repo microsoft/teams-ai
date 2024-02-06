@@ -288,7 +288,7 @@ class AI(Generic[StateT]):
         state: StateT,
     ) -> bool:
         action = self._actions.get(context.data.action)
-        ctx = ActionTurnContext(context.data.action, context.data.entities, context)
+        ctx = ActionTurnContext(context.data.action, context.data.parameters, context)
 
         if not action:
             return await self._on_unknown_action(ctx, state)
