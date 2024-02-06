@@ -9,11 +9,11 @@ from typing import Any, Dict, List, Optional, Union
 import yaml
 from botbuilder.core import TurnContext
 
-from teams.ai.modelsv2.chat_completion_action import ChatCompletionAction
-from teams.ai.promptsv2.message import Message
-from teams.ai.promptsv2.prompt_functions import PromptFunctions
-from teams.ai.promptsv2.prompt_section_base import PromptSectionBase
-from teams.ai.promptsv2.rendered_prompt_section import RenderedPromptSection
+from teams.ai.models.chat_completion_action import ChatCompletionAction
+from teams.ai.prompts.message import Message
+from teams.ai.prompts.prompt_functions import PromptFunctions
+from teams.ai.prompts.rendered_prompt_section import RenderedPromptSection
+from teams.ai.prompts.sections.prompt_section_base import PromptSectionBase
 from teams.ai.tokenizers.tokenizer import Tokenizer
 from teams.state.memory import Memory
 
@@ -57,19 +57,20 @@ class ActionAugmentationSection(PromptSectionBase):
         super().__init__(-1, True, "\n\n")
 
         # Convert actions to an ActionList
-        action_list: ActionList = {"actions": {}}
+        action_list = ActionList(actions={})
 
         for action in actions:
             self._actions[action.name] = action
-            action_list["actions"][action.name] = {}
-            if action.description:
-                action_list["actions"][action.name]["description"] = action.description
+            action_list.actions[action.name] = ActionValue(description=action.description)
             if action.parameters:
                 params = action.parameters
-                action_list["actions"][action.name]["parameters"] = (
+                updated_params = (
                     params.get("properties")
                     if params.get("additional_properties") is None
                     else params
+                )
+                action_list.actions[action.name] = ActionValue(
+                    description=action.description, parameters=updated_params
                 )
 
         # Build augmentation text

@@ -9,12 +9,12 @@ from unittest import IsolatedAsyncioTestCase
 from botbuilder.core import TurnContext
 
 from teams.ai.augmentations.default_augmentation import DefaultAugmentation
-from teams.ai.modelsv2.prompt_response import PromptResponse
+from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planner.command_type import CommandType
 from teams.ai.planner.plan import Plan
 from teams.ai.planner.predicted_do_command import PredictedDoCommand
 from teams.ai.planner.predicted_say_command import PredictedSayCommand
-from teams.ai.promptsv2.message import Message
+from teams.ai.prompts.message import Message
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
 from teams.state import TurnState
 

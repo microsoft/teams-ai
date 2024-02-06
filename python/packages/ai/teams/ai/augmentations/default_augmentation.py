@@ -8,10 +8,10 @@ from typing import Union
 from botbuilder.core import TurnContext
 
 from teams.ai.augmentations.augmentation import Augmentation
-from teams.ai.modelsv2.prompt_response import PromptResponse
+from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planner import Plan
 from teams.ai.planner.predicted_say_command import PredictedSayCommand
-from teams.ai.promptsv2.prompt_section import PromptSection
+from teams.ai.prompts.sections.prompt_section import PromptSection
 from teams.ai.tokenizers.tokenizer import Tokenizer
 from teams.ai.validators.validation import Validation
 from teams.state.memory import Memory
@@ -68,5 +68,7 @@ class DefaultAugmentation(Augmentation[str]):
         Returns:
             Plan: The created plan.
         """
-        say_response = response.message.content if response.message.content else ""
+        say_response = ""
+        if response.message and response.message.content:
+            say_response = response.message.content
         return Plan(commands=[PredictedSayCommand(response=say_response)])

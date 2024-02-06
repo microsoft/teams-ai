@@ -15,10 +15,10 @@ from teams.ai.augmentations.monologue_augmentation import (
     MonologueAugmentation,
     Thoughts,
 )
-from teams.ai.modelsv2.chat_completion_action import ChatCompletionAction
-from teams.ai.modelsv2.prompt_response import PromptResponse
+from teams.ai.models.chat_completion_action import ChatCompletionAction
+from teams.ai.models.prompt_response import PromptResponse
+from teams.ai.prompts.message import Message
 from teams.ai.prompts.prompt_manager import PromptManager
-from teams.ai.promptsv2.message import Message
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
 from teams.state import TurnState
 
@@ -41,7 +41,7 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
                 },
             )
         ]
-        self.functions = PromptManager()
+        self.functions = PromptManager(options=None)
         self.monologue_augmentation = MonologueAugmentation(self.test_actions)
 
     async def test_create_prompt_section(self):

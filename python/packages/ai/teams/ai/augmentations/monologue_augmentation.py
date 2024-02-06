@@ -5,21 +5,21 @@ Licensed under the MIT License.
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
 from botbuilder.core import TurnContext
 
 from teams.ai.augmentations.action_augmentation_section import ActionAugmentationSection
 from teams.ai.augmentations.augmentation import Augmentation
-from teams.ai.modelsv2 import PromptResponse
-from teams.ai.modelsv2.chat_completion_action import ChatCompletionAction
+from teams.ai.models.chat_completion_action import ChatCompletionAction
+from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planner import Plan
 from teams.ai.planner.predicted_command import PredictedCommand
 from teams.ai.planner.predicted_do_command import PredictedDoCommand
 from teams.ai.planner.predicted_say_command import PredictedSayCommand
-from teams.ai.promptsv2.function_call import FunctionCall
-from teams.ai.promptsv2.message import Message
-from teams.ai.promptsv2.prompt_section import PromptSection
+from teams.ai.prompts.function_call import FunctionCall
+from teams.ai.prompts.message import Message
+from teams.ai.prompts.sections.prompt_section import PromptSection
 from teams.ai.tokenizers import Tokenizer
 from teams.ai.validators.action_response_validator import ActionResponseValidator
 from teams.ai.validators.json_response_validator import JSONResponseValidator
@@ -95,7 +95,7 @@ InnerMonologueSchema: Dict[str, Any] = {
 "Json schema for validating an 'InnerMonologue'"
 
 
-class MonologueAugmentation(Augmentation[Union[InnerMonologue, None]]):
+class MonologueAugmentation(Augmentation[InnerMonologue]):
     """
     The 'monologue' augmentation.
     This augmentation adds support for an inner monologue to the prompt.
@@ -152,7 +152,7 @@ class MonologueAugmentation(Augmentation[Union[InnerMonologue, None]]):
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
-    ) -> Validation[Union[InnerMonologue, None]]:
+    ) -> Validation[InnerMonologue]:
         """
         Validates a response to a prompt.
 
@@ -167,7 +167,7 @@ class MonologueAugmentation(Augmentation[Union[InnerMonologue, None]]):
         Validation[InnerMonologue]: A 'Validation' object.
         """
         # Validate that we got a well-formed inner monologue
-        validation_result = await self._monologue_validator.validate_response(
+        validation_result: Validation[InnerMonologue] = await self._monologue_validator.validate_response(
             context, memory, tokenizer, response, remaining_attempts
         )
 
@@ -180,27 +180,28 @@ class MonologueAugmentation(Augmentation[Union[InnerMonologue, None]]):
             return validation_result
 
         # Validate that the action exists and its parameters are valid
-        monologue = validation_result.value
-        parameters = (
-            json.dumps(monologue["action"]["parameters"])
-            if "parameters" in monologue["action"]
-            else {}
-        )
-        message = Message(
-            role="assistant",
-            content=None,
-            function_call=FunctionCall(name=monologue["action"]["name"], arguments=parameters),
-        )
-        action_validation = await self._action_validator.validate_response(
-            context,
-            memory,
-            tokenizer,
-            PromptResponse(status="success", message=message),
-            remaining_attempts,
-        )
+        if validation_result.value:
+            monologue = validation_result.value
+            parameters = (
+                json.dumps(monologue.action.parameters)
+                if monologue.action.parameters
+                else ""
+            )
+            message = Message[str](
+                role="assistant",
+                content=None,
+                function_call=FunctionCall(name=monologue.action.name, arguments=parameters),
+            )
+            action_validation = await self._action_validator.validate_response(
+                context,
+                memory,
+                tokenizer,
+                PromptResponse(status="success", message=message),
+                remaining_attempts,
+            )
 
-        if not action_validation.valid:
-            return action_validation
+            if not action_validation.valid:
+                return cast(Any, action_validation)
 
         return validation_result
 
@@ -208,7 +209,7 @@ class MonologueAugmentation(Augmentation[Union[InnerMonologue, None]]):
         self,
         turn_context: TurnContext,
         memory: Memory,
-        response: PromptResponse[Union[InnerMonologue, None]],
+        response: PromptResponse[InnerMonologue],
     ) -> Plan:
         """
         Creates a plan given validated response value.
@@ -223,15 +224,18 @@ class MonologueAugmentation(Augmentation[Union[InnerMonologue, None]]):
         """
         # Identify the action to perform
         command: PredictedCommand
-        monologue = response.message.content
+        if response.message and response.message.content:
+            monologue: InnerMonologue = response.message.content
 
-        if monologue.action.name == "SAY":
-            command = PredictedSayCommand(response=monologue.action.parameters.get("text"))
-        else:
-            command = PredictedDoCommand(
-                action=monologue.action.name,
-                parameters=monologue.action.parameters if monologue.action.parameters else {},
-            )
+            if monologue.action.name == "SAY":
+                params =  monologue.action.parameters
+                response_val = cast(str, params.get("text")) if params else ""
+                command = PredictedSayCommand(response= response_val)
+            else:
+                command = PredictedDoCommand(
+                    action=monologue.action.name,
+                    parameters=monologue.action.parameters if monologue.action.parameters else {},
+                )
         return Plan(commands=[command])
 
     def _append_say_action(self, actions: List[ChatCompletionAction]) -> List[ChatCompletionAction]:
