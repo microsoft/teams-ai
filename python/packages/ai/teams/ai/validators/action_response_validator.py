@@ -9,8 +9,8 @@ from typing import Any, Dict, List
 from botbuilder.core import TurnContext
 
 from ...state import Memory
-from ..modelsv2 import ChatCompletionAction, PromptResponse
-from ..promptsv2 import Message
+from ..models import ChatCompletionAction, PromptResponse
+from ..prompts import Message
 from ..tokenizers import Tokenizer
 from .json_response_validator import JSONResponseValidator
 from .prompt_response_validator import PromptResponseValidator

@@ -3,5 +3,5 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from .azure_openai import *
-from .openai import *
+from .chat_completion_action import ChatCompletionAction
+from .prompt_response import PromptResponse, PromptResponseStatus

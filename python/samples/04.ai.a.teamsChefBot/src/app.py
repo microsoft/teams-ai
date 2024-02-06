@@ -9,26 +9,22 @@ from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnCont
 from botbuilder.schema import Activity
 from fastapi import FastAPI, Request, Response
 from teams import (
-    AIHistoryOptions,
-    AIOptions,
     Application,
     ApplicationOptions,
-    AzureOpenAIPlanner,
-    AzureOpenAIPlannerOptions,
     TurnState,
 )
 
 from src.config import Config
 
 # Initialize Teams AI application
-planner = AzureOpenAIPlanner(
-    AzureOpenAIPlannerOptions(
-        Config.AZURE_OPENAI_KEY,
-        Config.AZURE_OPENAI_MODEL_DEPLOYMENT_NAME,
-        Config.AZURE_OPENAI_ENDPOINT,
-        prompt_folder="src/prompts",
-    )
-)
+# planner = AzureOpenAIPlanner(
+#     AzureOpenAIPlannerOptions(
+#         Config.AZURE_OPENAI_KEY,
+#         Config.AZURE_OPENAI_MODEL_DEPLOYMENT_NAME,
+#         Config.AZURE_OPENAI_ENDPOINT,
+#         prompt_folder="src/prompts",
+#     )
+# )
 storage = MemoryStorage()
 app = Application[TurnState](
     ApplicationOptions(
@@ -36,11 +32,11 @@ app = Application[TurnState](
             app_id=Config.BOT_ID,
             app_password=Config.BOT_PASSWORD,
         ),
-        ai=AIOptions(
-            planner=planner,
-            prompt="chat",
-            history=AIHistoryOptions(assistant_history_type="text"),
-        ),
+        # ai=AIOptions(
+        #     planner=planner,
+        #     prompt="chat",
+        #     history=AIHistoryOptions(assistant_history_type="text"),
+        # ),
         storage=storage,
     )
 )

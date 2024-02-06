@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock
 
 from botbuilder.core import TurnContext
 
-from teams.ai.promptsv2 import (
+from teams.ai.prompts import (
     FunctionCall,
     ImageContentPart,
     Message,
