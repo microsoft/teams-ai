@@ -167,7 +167,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
         Validation[InnerMonologue]: A 'Validation' object.
         """
         # Validate that we got a well-formed inner monologue
-        validation_result: Validation[InnerMonologue] = await self._monologue_validator.validate_response(
+        validation_result = await self._monologue_validator.validate_response(
             context, memory, tokenizer, response, remaining_attempts
         )
 
