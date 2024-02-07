@@ -52,8 +52,8 @@ builder.Services.AddTransient<IBot>(sp =>
         Title = "Sign In",
         Text = "Please sign in to use the bot.",
         EndOnInvalidMessage = true,
-    }
-    );
+        EnableSso = true,
+    });
 
     Application<TurnState> app = new ApplicationBuilder<TurnState>()
         .WithStorage(storage)

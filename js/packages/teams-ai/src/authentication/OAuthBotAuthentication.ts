@@ -123,12 +123,11 @@ export class OAuthBotAuthentication<TState extends TurnState> extends BotAuthent
      */
     private async createOAuthCard(context: TurnContext): Promise<Attachment> {
         const signInResource = await getSignInResource(context, this._oauthSettings);
-        let link = signInResource.signInLink;
+        const link = signInResource.signInLink;
         let tokenExchangeResource;
 
         if (this._oauthSettings.enableSso == true) {
             tokenExchangeResource = signInResource.tokenExchangeResource;
-            link = undefined;
         }
 
         return CardFactory.oauthCard(
