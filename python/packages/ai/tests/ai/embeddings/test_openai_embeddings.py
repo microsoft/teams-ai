@@ -31,7 +31,7 @@ class MockAsyncEmbeddings:
         input: Union[str, List[str], List[int], List[List[int]]],
         model: Union[str, Literal["text-embedding-ada-002"]],
     ) -> openai.types.CreateEmbeddingResponse:
-        # pylint: disable=unused-argument 
+        # pylint: disable=unused-argument
         # this is necessary to override and mock the class
         return openai.types.CreateEmbeddingResponse(
             data=[
