@@ -7,6 +7,7 @@ using Microsoft.Teams.AI.AI.Prompts;
 using Microsoft.Teams.AI.State;
 using Microsoft.Teams.AI;
 using TeamsChefBot;
+using Microsoft.KernelMemory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.AddSingleton<IStorage, MemoryStorage>();
 // Create AI Model
 if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
 {
+    // Create OpenAI Model
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
         new OpenAIModelOptions(config.OpenAI.ApiKey, "gpt-3.5-turbo")
         {
@@ -42,9 +44,19 @@ if (!string.IsNullOrEmpty(config.OpenAI?.ApiKey))
         },
         sp.GetService<ILoggerFactory>()
     ));
+
+    // Create Kernel Memory Serverless instance using OpenAI embeddings API
+    builder.Services.AddSingleton<IKernelMemory>((sp) =>
+    {
+        return new KernelMemoryBuilder()
+            .WithOpenAIDefaults(config.OpenAI.ApiKey)
+            .WithSimpleFileStorage()
+            .Build<MemoryServerless>();
+    });
 }
 else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEmpty(config.Azure.OpenAIEndpoint))
 {
+    // Create Azure OpenAI Model
     builder.Services.AddSingleton<OpenAIModel>(sp => new(
         new AzureOpenAIModelOptions(
             config.Azure.OpenAIApiKey,
@@ -56,6 +68,25 @@ else if (!string.IsNullOrEmpty(config.Azure?.OpenAIApiKey) && !string.IsNullOrEm
         },
         sp.GetService<ILoggerFactory>()
     ));
+
+    // Create Kernel Memory Serverless instance using AzureOpenAI embeddings API
+    builder.Services.AddSingleton<IKernelMemory>((sp) =>
+    {
+        AzureOpenAIConfig azureConfig = new()
+        {
+            Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+            APIKey = config.Azure.OpenAIApiKey,
+            Endpoint = config.Azure.OpenAIEndpoint,
+            APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+            Deployment = "text-embedding-ada-002" // Update this to the deployment you want to use
+        };
+
+        return new KernelMemoryBuilder()
+            .WithAzureOpenAITextEmbeddingGeneration(azureConfig)
+            .WithAzureOpenAITextGeneration(azureConfig)
+            .WithSimpleFileStorage()
+            .Build<MemoryServerless>();
+    });
 }
 else
 {
@@ -73,6 +104,9 @@ builder.Services.AddTransient<IBot>(sp =>
     {
         PromptFolder = "./Prompts"
     });
+
+    KernelMemoryDataSource dataSource = new("teams-ai", sp.GetService<IKernelMemory>()!);
+    prompts.AddDataSource("teams-ai", dataSource);
 
     // Create ActionPlanner
     ActionPlanner<TurnState> planner = new(

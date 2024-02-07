@@ -293,8 +293,9 @@ describe('TeamsSsoPrompt', () => {
 
     /**
      *
-     * @param type
-     * @param activity
+     * @param {ActivityTypes} type - The activity type.
+     * @param {Partial<Activity>} activity - The activity to use for the turn context.
+     * @returns {Partial<Activity>} - The created reply activity.
      */
     function createReply(type: ActivityTypes, activity: Partial<Activity>): Partial<Activity> {
         return {
@@ -316,7 +317,7 @@ describe('TeamsSsoPrompt', () => {
 
     /**
      *
-     * @param activity
+     * @param {Partial<Activity>} activity - The activity to assert.
      */
     function assertTeamsSsoOauthCardActivity(activity: Partial<Activity>): void {
         assert.equal(Array.isArray(activity.attachments), true);
@@ -337,8 +338,8 @@ describe('TeamsSsoPrompt', () => {
 
     /**
      *
-     * @param adapter
-     * @param activity
+     * @param {TestAdapter} adapter - The adapter to use for the turn context.
+     * @param {Partial<Activity>} activity - The activity to use for the turn context.
      */
     function mockTeamsSendsTokenExchangeInvokeActivityWithSsoToken(
         adapter: TestAdapter,
@@ -355,9 +356,10 @@ describe('TeamsSsoPrompt', () => {
 
     /**
      * Initialize dialogs, adds teamsBotSsoPrompt in dialog set and initialize testAdapter for test case.
-     * @param timeout_value positive number set to teamsSsoPromptSettings.timeout property
-     * @param endOnInvalidMessage boolean value set to teamsSsoPromptSettings.endOnInvalidMessage property
-     * @param channelId value set to dialog context activity channel. Defaults to `Channels.MSteams`.
+     * @param {number} timeout_value - A positive number set to teamsSsoPromptSettings.timeout property
+     * @param {boolean} endOnInvalidMessage - A boolean value set to teamsSsoPromptSettings.endOnInvalidMessage property
+     * @param {Channels} channelId - A value set to dialog context activity channel. Defaults to `Channels.MSteams`.
+     @returns {Promise<TestAdapter>} - The Test Adapter
      */
     async function initializeTestEnv(
         timeout_value?: number,

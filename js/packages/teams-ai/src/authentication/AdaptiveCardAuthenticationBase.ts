@@ -98,8 +98,8 @@ export abstract class AdaptiveCardAuthenticationBase {
 
     /**
      * Checks if the activity is a valid Adaptive Card activity that supports authentication.
-     * @param context - The turn context.
-     * @returns A boolean indicating if the activity is valid.
+     * @param {TurnContext} context - The turn context.
+     * @returns {boolean} A boolean indicating if the activity is valid.
      */
     public isValidActivity(context: TurnContext): boolean {
         return context.activity.type == ActivityTypes.Invoke && context.activity.name == ACTION_INVOKE_NAME;

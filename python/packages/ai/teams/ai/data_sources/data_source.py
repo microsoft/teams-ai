@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 
 from botbuilder.core import TurnContext
 
-from teams.ai.prompts.prompt_section import RenderedPromptSection
+from teams.ai.prompts.rendered_prompt_section import RenderedPromptSection
 from teams.ai.tokenizers import Tokenizer
 from teams.state.memory import Memory
 
@@ -17,8 +17,10 @@ class DataSource(ABC):
     A data source that can be used to render text that's added to a prompt.
     """
 
-    name: str
-    "Name of the data source."
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        "Name of the data source."
 
     @abstractmethod
     async def render_data(

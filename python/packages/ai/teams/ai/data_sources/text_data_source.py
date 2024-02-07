@@ -8,7 +8,7 @@ from typing import List, Optional
 from botbuilder.core import TurnContext
 
 from teams.ai.data_sources.data_source import DataSource
-from teams.ai.prompts.prompt_section import RenderedPromptSection
+from teams.ai.prompts.rendered_prompt_section import RenderedPromptSection
 from teams.ai.tokenizers import Tokenizer
 from teams.state.memory import Memory
 
@@ -38,7 +38,7 @@ class TextDataSource(DataSource):
         self._text = text
 
     @property
-    def get_name(self) -> str:
+    def name(self) -> str:
         """
         Name of the data source.
         """

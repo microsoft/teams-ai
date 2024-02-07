@@ -289,11 +289,14 @@ export class AI<TState extends TurnState = TurnState> {
 
         // Register default SayCommandActionName
         this.defaultAction<PredictedSayCommand>(AI.SayCommandActionName, async (context, state, data, action) => {
-            const response = data.response;
+            if (!data.response) {
+                return '';
+            }
+
             if (context.activity.channelId == Channels.Msteams) {
-                await context.sendActivity(response.split('\n').join('<br>'));
+                await context.sendActivity(data.response.split('\n').join('<br>'));
             } else {
-                await context.sendActivity(response);
+                await context.sendActivity(data.response);
             }
 
             return '';
