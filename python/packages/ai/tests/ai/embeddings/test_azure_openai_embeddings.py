@@ -35,6 +35,8 @@ class MockAsyncEmbeddings:
         input: Union[str, List[str], List[int], List[List[int]]],
         model: Union[str, Literal["text-embedding-ada-002"]],
     ) -> openai.types.CreateEmbeddingResponse:
+        # pylint: disable=unused-argument
+        # this is necessary to override and mock the class
         return openai.types.CreateEmbeddingResponse(
             data=[
                 openai.types.Embedding(embedding=embedding_1, index=1, object="embedding"),
@@ -42,9 +44,9 @@ class MockAsyncEmbeddings:
             ],
             model="text-embedding-ada-002",
             object="list",
-            usage={"prompt_tokens": 5, "total_tokens": 5},
+            usage={"prompt_tokens": 5, "total_tokens": 5} # type: ignore[arg-type]
+            # need to ignore as "Usage" class is not yet an exported type from openai
         )
-
 
 class MockAsyncAzureOpenAI:
     embeddings = MockAsyncEmbeddings()
@@ -126,6 +128,8 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncAzureOpenAI)
     async def test_string_embedding(self, mock_async_azure_open_ai):
+        # pylint: disable=unused-argument
+        # this is necessary to override and mock the class
         self.embeddings = AzureOpenAIEmbeddings(self.options)
         section = await self.embeddings.create_embeddings("This is an embedding")
         self.assertEqual(section.status, "success")
@@ -133,6 +137,8 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncAzureOpenAI)
     async def test_array_embedding(self, mock_async_azure_open_ai):
+        # pylint: disable=unused-argument
+        # this is necessary to override and mock the class
         self.embeddings_with_array = AzureOpenAIEmbeddings(self.options_with_array)
         section = await self.embeddings_with_array.create_embeddings(["This is", "an embedding"])
         self.assertEqual(section.status, "success")
@@ -140,6 +146,8 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncAzureOpenAIAPIError)
     async def test_api_error(self, mock_async_azure_open_ai):
+        # pylint: disable=unused-argument
+        # this is necessary to override and mock the class
         self.embeddings = AzureOpenAIEmbeddings(self.options)
         section = await self.embeddings.create_embeddings("This is an embedding")
         self.assertEqual(section.status, "error")
@@ -150,6 +158,8 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     @mock.patch("openai.AsyncAzureOpenAI", return_value=MockAsyncAzureOpenAIRateLimited)
     async def test_rate_limited(self, mock_async_azure_open_ai):
+        # pylint: disable=unused-argument
+        # this is necessary to override and mock the class
         self.embeddings = AzureOpenAIEmbeddings(self.options)
         section = await self.embeddings.create_embeddings("This is an embedding")
         self.assertEqual(section.status, "rate_limited")

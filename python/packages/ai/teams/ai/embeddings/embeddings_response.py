@@ -4,7 +4,7 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
 
 EmbeddingsResponseStatus = Literal[
     "success",  # The embeddings were successfully created.
@@ -22,8 +22,8 @@ class EmbeddingsResponse:
     status: EmbeddingsResponseStatus
     "Status of the embeddings response."
 
-    output: Optional[List[List[int]]] = None
-    "Optional. Embeddings for the given inputs."
+    output: Optional[Union[List[List[int]], str]] = None
+    "Optional. Embeddings for the given inputs or the error string."
 
     message: Optional[str] = None
     "Optional. Message status."

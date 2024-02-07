@@ -107,10 +107,11 @@ class AzureOpenAIEmbeddings(EmbeddingsModel):
 
             return EmbeddingsResponse(status="success", output=data)
         except openai.RateLimitError:
-            if retry_count < len(self.options.retry_policy):
-                delay = self.options.retry_policy[retry_count]
-                await asyncio.sleep(delay)
-                return await self.create_embeddings(inputs, retry_count + 1)
+            if self.options.retry_policy:
+                if retry_count < len(self.options.retry_policy):
+                    delay = self.options.retry_policy[retry_count]
+                    await asyncio.sleep(delay)
+                    return await self.create_embeddings(inputs, retry_count + 1)
             return EmbeddingsResponse(
                 status="rate_limited", output="The embeddings API returned a rate limit error."
             )
