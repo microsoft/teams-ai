@@ -29,7 +29,7 @@
         "gpt-3-encoder": "^1.1.4",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.26.0",
+        "openai": "^4.26.1",
         "uuid": "^9.0.1",
         "yaml": "^2.3.4"
     },
@@ -40,7 +40,7 @@
         "@types/assert": "^1.5.10",
         "@types/jsonwebtoken": "^9.0.4",
         "@types/mocha": "^10.0.6",
-        "@types/node": "^20.11.10",
+        "@types/node": "^20.11.16",
         "@types/uuid": "^9.0.8",
         "eslint": "^8.56.0",
         "jsonwebtoken": "^9.0.2",
