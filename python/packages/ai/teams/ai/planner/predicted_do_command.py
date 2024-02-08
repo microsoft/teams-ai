@@ -14,10 +14,10 @@ from .predicted_command import PredictedCommand
 class PredictedDoCommand(PredictedCommand):
     type: Literal[CommandType.DO] = CommandType.DO
     action: str = ""
-    entities: Dict[str, Any] = field(default_factory=dict)
+    parameters: Dict[str, Any] = field(default_factory=dict)
 
     @staticmethod
     def from_dict(data: dict) -> "PredictedDoCommand":
         return PredictedDoCommand(
-            type=CommandType.DO, action=data["action"], entities=data["entities"]
+            type=CommandType.DO, action=data["action"], parameters=data["parameters"]
         )

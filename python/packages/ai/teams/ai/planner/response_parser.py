@@ -207,7 +207,7 @@ def _parse_do_command(tokens: List[str]):
                 # Accumulate tokens until end of string is hit
                 if token == quote_type:
                     # Save pair and look for additional pairs
-                    command.entities[entity_name] = entity_value
+                    command.parameters[entity_name] = entity_value
                     parse_state = DoCommandParseState.FIND_ENTITY_NAME
                     entity_name = entity_value = ""
                 else:
@@ -216,7 +216,7 @@ def _parse_do_command(tokens: List[str]):
                 if token == "`" and tokens[length + 1] == "`" and tokens[length + 2] == "`":
                     # Save pair and look for additional pairs
                     length += 2
-                    command.entities[entity_name] = entity_value
+                    command.parameters[entity_name] = entity_value
                     parse_state = DoCommandParseState.FIND_ENTITY_NAME
                     entity_name = entity_value = ""
                 else:
@@ -225,20 +225,20 @@ def _parse_do_command(tokens: List[str]):
                 # Accumulate tokens until you hit a space
                 if token in SPACE_CHARACTERS:
                     # Save pair and look for additional pairs
-                    command.entities[entity_name] = entity_value
+                    command.parameters[entity_name] = entity_value
                     parse_state = DoCommandParseState.FIND_ENTITY_NAME
                     entity_name = entity_value = ""
                 else:
                     entity_value += token
 
         # Create command if not created
-        # - This happens when a DO command without any entities is at the end of the response.
+        # - This happens when a DO command without any parameters is at the end of the response.
         if not command and action_name:
             command = PredictedDoCommand(action=action_name)
 
         # Append final entity
         if command and entity_name:
-            command.entities[entity_name] = entity_value
+            command.parameters[entity_name] = entity_value
 
     return ParsedCommandResult(length, command)
 

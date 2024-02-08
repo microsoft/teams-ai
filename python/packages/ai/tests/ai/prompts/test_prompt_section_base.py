@@ -23,6 +23,8 @@ from teams.state import TurnState
 
 
 class TestablePromptSectionBase(PromptSectionBase):
+    __test__ = False
+
     def __init__(
         self,
         tokens: float = -1,
