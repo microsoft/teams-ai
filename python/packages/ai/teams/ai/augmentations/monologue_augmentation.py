@@ -185,11 +185,9 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
         if validation_result.value:
             # pylint:disable=no-member, line-too-long
             # from_dict provided from @dataclass_json decorator
-            monologue = InnerMonologue.from_dict(validation_result.value) # type: ignore[attr-defined]
+            monologue = InnerMonologue.from_dict(validation_result.value)  # type: ignore[attr-defined]
             parameters = (
-                json.dumps(monologue.action.parameters)
-                if monologue.action.parameters
-                else ""
+                json.dumps(monologue.action.parameters) if monologue.action.parameters else ""
             )
             message = Message[str](
                 role="assistant",
@@ -227,20 +225,21 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
             Plan: The created plan.
         """
         # Identify the action to perform
-        command: PredictedCommand
         if response.message and response.message.content:
+            command: PredictedCommand
             monologue: InnerMonologue = response.message.content
 
             if monologue.action.name == "SAY":
-                params =  monologue.action.parameters
+                params = monologue.action.parameters
                 response_val = cast(str, params.get("text")) if params else ""
-                command = PredictedSayCommand(response= response_val)
+                command = PredictedSayCommand(response=response_val)
             else:
                 command = PredictedDoCommand(
                     action=monologue.action.name,
                     parameters=monologue.action.parameters if monologue.action.parameters else {},
                 )
-        return Plan(commands=[command])
+            return Plan(commands=[command])
+        return Plan()
 
     def _append_say_action(self, actions: List[ChatCompletionAction]) -> List[ChatCompletionAction]:
         clone = actions

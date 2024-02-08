@@ -77,8 +77,9 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             self.tokenizer,
             PromptResponse[str](
                 message=Message[str](
-                    role="assistant", content='{ "type": "plan", '+
-                    '"commands": [{ "type": "DO", "action": "", "parameters": {} }]}'
+                    role="assistant",
+                    content='{ "type": "plan", '
+                    + '"commands": [{ "type": "DO", "action": "", "parameters": {} }]}',
                 )
             ),
             3,
@@ -118,8 +119,9 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             self.tokenizer,
             PromptResponse[str](
                 message=Message[str](
-                    role="assistant", content='{ "type": "plan", '
-                    +'"commands": [{ "type": "SAY", "response": ""}]}'
+                    role="assistant",
+                    content='{ "type": "plan", '
+                    + '"commands": [{ "type": "SAY", "response": ""}]}',
                 )
             ),
             3,

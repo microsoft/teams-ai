@@ -17,6 +17,8 @@ aiohttp = "^3.8.5"
 jsonschema = "^4.21.1"
 types-pyyaml = "^6.0.12.12"
 pyyaml = "^6.0.1"
+dataclasses-json = "^0.6.4"
+openai = "^1.11.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -27,8 +29,6 @@ black = "^23.7.0"
 isort = "^5.12.0"
 mypy = "^1.5.0"
 httpx = "^0.26.0"
-openai = "^1.11.1"
-dataclasses-json = "^0.6.4"
 
 [tool.poetry.scripts]
 lint = "scripts:lint"
