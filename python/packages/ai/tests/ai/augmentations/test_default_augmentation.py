@@ -13,7 +13,6 @@ from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planner.command_type import CommandType
 from teams.ai.planner.plan import Plan
 from teams.ai.planner.predicted_do_command import PredictedDoCommand
-from teams.ai.planner.predicted_say_command import PredictedSayCommand
 from teams.ai.prompts.message import Message
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
 from teams.state import TurnState
@@ -50,8 +49,9 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
         state = TurnState()
 
         # Validate response
-        say_response = PromptResponse[str](
-            message=Message(role="assistant", content=PredictedSayCommand(response="hello world"))
+        say_response = PromptResponse(
+            message=Message(role="assistant", content='{ "type": "plan", '
+                    +'"commands": [{ "type": "SAY", "response": "hello world"}]}')
         )
         validation = await self.default_augmentation.validate_response(
             cast(TurnContext, {}),
@@ -72,4 +72,4 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, CommandType.SAY)
-        self.assertEqual(plan.commands[0].response, "")
+        self.assertEqual(plan.commands[0].response, "") # type: ignore[attr-defined]

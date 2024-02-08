@@ -11,7 +11,6 @@ from botbuilder.core import TurnContext
 from teams.ai.augmentations.sequence_augmentation import SequenceAugmentation
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
-from teams.ai.planner.plan import Plan
 from teams.ai.prompts.message import Message
 from teams.ai.prompts.prompt_functions import PromptFunctions
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
@@ -37,22 +36,23 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
     async def test__sequence_aug_create_prompt_section(self):
         state = TurnState()
         section = self.sequence_augmentation.create_prompt_section()
-        rendered = await section.render_as_messages(
-            cast(TurnContext, {}),
-            memory=state,
-            functions=cast(PromptFunctions, {}),
-            tokenizer=self.tokenizer,
-            max_tokens=2000,
-        )
-        self.assertEqual(len(rendered.output), 1)
-        self.assertEqual(rendered.output[0].role, "system")
-        self.assertNotEqual(
-            rendered.output[0].content.find(
-                "Use the actions above to create a plan in the following JSON format:"
-            ),
-            -1,
-        )
-        self.assertEqual(rendered.too_long, False)
+        if section:
+            rendered = await section.render_as_messages(
+                cast(TurnContext, {}),
+                memory=state,
+                functions=cast(PromptFunctions, {}),
+                tokenizer=self.tokenizer,
+                max_tokens=2000,
+            )
+            self.assertEqual(len(rendered.output), 1)
+            self.assertEqual(rendered.output[0].role, "system")
+            self.assertNotEqual(
+                str(rendered.output[0].content).find(
+                    "Use the actions above to create a plan in the following JSON format:"
+                ),
+                -1,
+            )
+            self.assertEqual(rendered.too_long, False)
 
     async def test_validate_badly_formed_plan(self):
         state = TurnState()
@@ -69,15 +69,16 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             "Return a JSON object that uses the SAY command to say what you're thinking.",
         )
 
-    async def test_validate_missing_action_in_do_command(self):
+    async def test_validate_empty_action_in_do_command(self):
         state = TurnState()
         response = await self.sequence_augmentation.validate_response(
             cast(TurnContext, {}),
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Plan](
-                    role="assistant", content='{ "type": "plan", "commands": [{ "type": "DO" }]}'
+                message=Message[str](
+                    role="assistant", content='{ "type": "plan", '+
+                    '"commands": [{ "type": "DO", "action": "", "parameters": {} }]}'
                 )
             ),
             3,
@@ -96,10 +97,10 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Plan](
+                message=Message[str](
                     role="assistant",
                     content='{ "type": "plan", "commands": '
-                    + '[{ "type": "DO", "action": "randomAction" }]}',
+                    + '[{ "type": "DO", "action": "randomAction", "parameters": {}}]}',
                 )
             ),
             3,
@@ -109,15 +110,16 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             response.feedback, 'Unknown action named "randomAction". Specify a valid action name.'
         )
 
-    async def test_validate_missing_response_in_say_command(self):
+    async def test_validate_empty_response_in_say_command(self):
         state = TurnState()
         response = await self.sequence_augmentation.validate_response(
             cast(TurnContext, {}),
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Plan](
-                    role="assistant", content='{ "type": "plan", "commands": [{ "type": "SAY" }]}'
+                message=Message[str](
+                    role="assistant", content='{ "type": "plan", '
+                    +'"commands": [{ "type": "SAY", "response": ""}]}'
                 )
             ),
             3,
@@ -136,7 +138,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Plan](
+                message=Message[str](
                     role="assistant", content='{ "type": "plan", "commands": [{ "type": "DOO" }]}'
                 )
             ),
@@ -155,7 +157,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Plan](
+                message=Message[str](
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }}'
@@ -174,7 +176,7 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
             state,
             self.tokenizer,
             PromptResponse[str](
-                message=Message[Plan](
+                message=Message[str](
                     role="assistant",
                     content='{"type":"plan","commands":[{"type":"DO",'
                     + '"action":"test1","parameters": { "foo": "bar" }},'

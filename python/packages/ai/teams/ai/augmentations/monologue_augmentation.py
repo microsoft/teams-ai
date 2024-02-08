@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union, cast
 
 from botbuilder.core import TurnContext
+from dataclasses_json import dataclass_json
 
 from teams.ai.augmentations.action_augmentation_section import ActionAugmentationSection
 from teams.ai.augmentations.augmentation import Augmentation
@@ -62,6 +63,7 @@ class Action:
     "Optional. Parameters for the action"
 
 
+@dataclass_json
 @dataclass
 class InnerMonologue:
     """
@@ -181,7 +183,9 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
 
         # Validate that the action exists and its parameters are valid
         if validation_result.value:
-            monologue = validation_result.value
+            # pylint:disable=no-member, line-too-long
+            # from_dict provided from @dataclass_json decorator
+            monologue = InnerMonologue.from_dict(validation_result.value) # type: ignore[attr-defined]
             parameters = (
                 json.dumps(monologue.action.parameters)
                 if monologue.action.parameters

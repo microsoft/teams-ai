@@ -14,8 +14,6 @@ from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.planner import Plan
 from teams.ai.planner.command_type import CommandType
-from teams.ai.planner.predicted_do_command import PredictedDoCommand
-from teams.ai.planner.predicted_say_command import PredictedSayCommand
 from teams.ai.prompts.function_call import FunctionCall
 from teams.ai.prompts.message import Message
 from teams.ai.prompts.sections.prompt_section import PromptSection
@@ -114,13 +112,13 @@ class SequenceAugmentation(Augmentation[Plan]):
             return validation_result
 
         # Validate that the plan is structurally correct
+        # series of ignore[attr-defined] - necessary due to dict casting with parent class
         if validation_result.value:
-            plan = cast(Plan, validation_result.value)
+            plan = Plan.from_dict(validation_result.value)  # type: ignore[arg-type]
             for index, command in enumerate(plan.commands):
                 if command.type == CommandType.DO:
-                    do_command = cast(PredictedDoCommand, command)
                     # Ensure that the model specified an action
-                    if not do_command.action:
+                    if not command.action: # type: ignore[attr-defined]
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the DO "action" for '
@@ -129,12 +127,13 @@ class SequenceAugmentation(Augmentation[Plan]):
 
                     # Ensure that the action is valid
                     parameters: str = ""
-                    if do_command.parameters:
-                        parameters = json.dumps(do_command.parameters)
+                    if command.parameters: # type: ignore[attr-defined]
+                        parameters = json.dumps(command.parameters) # type: ignore[attr-defined]
                     message = Message[str](
                         role="assistant",
                         content=None,
-                        function_call=FunctionCall(name=do_command.action, arguments=parameters),
+                        function_call=FunctionCall(name=command.action, # type: ignore[attr-defined]
+                                                   arguments=parameters),
                     )
                     action_validation = await self._action_validator.validate_response(
                         context, memory, tokenizer,
@@ -145,9 +144,8 @@ class SequenceAugmentation(Augmentation[Plan]):
                         return cast(Any, action_validation)
 
                 elif command.type == CommandType.SAY:
-                    say_command = cast(PredictedSayCommand, command)
                     # Ensure that the model specified a response
-                    if not say_command.response:
+                    if not command.response: # type: ignore[attr-defined]
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the SAY "response" '
@@ -157,7 +155,7 @@ class SequenceAugmentation(Augmentation[Plan]):
                     return Validation(
                         valid=False,
                         feedback="The plan JSON contains an unknown command"
-                        + f'type of ${say_command.type}. Only use DO or SAY commands.',
+                        + f'type of ${command.type}. Only use DO or SAY commands.',
                     )
 
         # Return the validated monologue
@@ -177,4 +175,6 @@ class SequenceAugmentation(Augmentation[Plan]):
         Returns:
             Plan: The created plan
         """
-        return response.message.content
+        if response.message and response.message.content:
+            return response.message.content
+        return Plan()
