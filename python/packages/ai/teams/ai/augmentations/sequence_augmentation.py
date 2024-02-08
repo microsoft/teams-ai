@@ -118,7 +118,7 @@ class SequenceAugmentation(Augmentation[Plan]):
             for index, command in enumerate(plan.commands):
                 if command.type == CommandType.DO:
                     # Ensure that the model specified an action
-                    if not command.action: # type: ignore[attr-defined]
+                    if not command.action:  # type: ignore[attr-defined]
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the DO "action" for '
@@ -127,17 +127,21 @@ class SequenceAugmentation(Augmentation[Plan]):
 
                     # Ensure that the action is valid
                     parameters: str = ""
-                    if command.parameters: # type: ignore[attr-defined]
-                        parameters = json.dumps(command.parameters) # type: ignore[attr-defined]
+                    if command.parameters:  # type: ignore[attr-defined]
+                        parameters = json.dumps(command.parameters)  # type: ignore[attr-defined]
                     message = Message[str](
                         role="assistant",
                         content=None,
-                        function_call=FunctionCall(name=command.action, # type: ignore[attr-defined]
-                                                   arguments=parameters),
+                        function_call=FunctionCall(
+                            name=command.action, arguments=parameters  # type: ignore[attr-defined]
+                        ),
                     )
                     action_validation = await self._action_validator.validate_response(
-                        context, memory, tokenizer,
-                        PromptResponse(message=message), remaining_attempts
+                        context,
+                        memory,
+                        tokenizer,
+                        PromptResponse(message=message),
+                        remaining_attempts,
                     )
 
                     if not action_validation.valid:
@@ -145,7 +149,7 @@ class SequenceAugmentation(Augmentation[Plan]):
 
                 elif command.type == CommandType.SAY:
                     # Ensure that the model specified a response
-                    if not command.response: # type: ignore[attr-defined]
+                    if not command.response:  # type: ignore[attr-defined]
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the SAY "response" '
@@ -155,7 +159,7 @@ class SequenceAugmentation(Augmentation[Plan]):
                     return Validation(
                         valid=False,
                         feedback="The plan JSON contains an unknown command"
-                        + f'type of ${command.type}. Only use DO or SAY commands.',
+                        + f"type of ${command.type}. Only use DO or SAY commands.",
                     )
 
         # Return the validated monologue

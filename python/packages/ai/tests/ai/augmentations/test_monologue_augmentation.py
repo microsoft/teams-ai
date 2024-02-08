@@ -42,14 +42,15 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
                 },
             )
         ]
-        self.functions = PromptManager(options=
-                                       PromptManagerOptions(
-                                           prompts_folder="",
-                                           role="",
-                                           max_conversation_history_tokens=1,
-                                           max_history_messages=10,
-                                           max_input_tokens=-1
-                                        ))
+        self.functions = PromptManager(
+            options=PromptManagerOptions(
+                prompts_folder="",
+                role="",
+                max_conversation_history_tokens=1,
+                max_history_messages=10,
+                max_input_tokens=-1,
+            )
+        )
         self.monologue_augmentation = MonologueAugmentation(self.test_actions)
 
     async def test_create_prompt_section(self):
@@ -57,7 +58,7 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         section = self.monologue_augmentation.create_prompt_section()
         if section:
             rendered = await section.render_as_messages(
-                    cast(TurnContext, {}), state, self.functions, self.tokenizer, 20000
+                cast(TurnContext, {}), state, self.functions, self.tokenizer, 20000
             )
             if rendered:
                 self.assertEqual(len(rendered.output), 1)
@@ -70,7 +71,6 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
                     -1,
                 )
                 self.assertEqual(rendered.too_long, False)
-
 
     async def test_valid_monologue(self):
         state = TurnState()
@@ -145,7 +145,7 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual(plan.commands[0].response, "hello world") # type: ignore[attr-defined]
+        self.assertEqual(plan.commands[0].response, "hello world")  # type: ignore[attr-defined]
 
     async def test_create_plan_with_do_command(self):
         state = TurnState()
@@ -164,5 +164,7 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "DO")
-        self.assertEqual(plan.commands[0].action, "test") # type: ignore[attr-defined]
-        self.assertEqual(plan.commands[0].parameters.get("foo"), "bar") # type: ignore[attr-defined]
+        self.assertEqual(plan.commands[0].action, "test")  # type: ignore[attr-defined]
+
+        # pylint:disable=line-too-long
+        self.assertEqual(plan.commands[0].parameters.get("foo"), "bar")  # type: ignore[attr-defined]

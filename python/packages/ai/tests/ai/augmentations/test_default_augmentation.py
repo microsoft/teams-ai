@@ -50,8 +50,11 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
 
         # Validate response
         say_response = PromptResponse(
-            message=Message(role="assistant", content='{ "type": "plan", '
-                    +'"commands": [{ "type": "SAY", "response": "hello world"}]}')
+            message=Message(
+                role="assistant",
+                content='{ "type": "plan", '
+                + '"commands": [{ "type": "SAY", "response": "hello world"}]}',
+            )
         )
         validation = await self.default_augmentation.validate_response(
             cast(TurnContext, {}),
@@ -72,4 +75,4 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, CommandType.SAY)
-        self.assertEqual(plan.commands[0].response, "") # type: ignore[attr-defined]
+        self.assertEqual(plan.commands[0].response, "")  # type: ignore[attr-defined]
