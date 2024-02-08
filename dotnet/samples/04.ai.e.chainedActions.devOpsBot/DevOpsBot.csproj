@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="AdaptiveCards.Templating" Version="1.4.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
-    <PackageReference Include="Microsoft.Teams.AI" Version="1.1.*-*" />
+    <PackageReference Include="Microsoft.Teams.AI" Version="1.1.*" />
   </ItemGroup>
 
   <!-- Include prompt as content in build output -->
