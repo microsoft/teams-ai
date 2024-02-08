@@ -11,7 +11,7 @@ import { StatePropertyAccessor, TurnContext } from 'botbuilder';
 import { TurnState, TurnStateEntry } from './TurnState';
 
 /**
- * Maps an applications Turn State property to a Bot State property.
+ * Maps an application's Turn State property to a Bot State property.
  * Note: This is used to inject a Turn State property into a DialogSet.
  * @template T Optional. Type of the property being mapped. Defaults to any.
  */
