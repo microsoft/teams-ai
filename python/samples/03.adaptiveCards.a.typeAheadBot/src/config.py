@@ -14,5 +14,5 @@ class Config:
     """Bot Configuration"""
 
     PORT = 3978
-    BOT_ID = os.environ["BOT_ID"]
-    BOT_PASSWORD = os.environ["BOT_PASSWORD"]
+    APP_ID = os.environ["BOT_ID"]
+    APP_PASSWORD = os.environ["BOT_PASSWORD"]

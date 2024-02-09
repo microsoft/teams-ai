@@ -10,14 +10,10 @@ import time
 import traceback
 from typing import Any, Dict
 
-from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
+from botbuilder.core import MemoryStorage, TurnContext
+from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
 from botbuilder.schema import Activity
-from teams import (
-    ActionTurnContext,
-    Application,
-    ApplicationOptions,
-    ActionTypes,
-)
+from teams import ActionTurnContext, ActionTypes, Application, ApplicationOptions
 
 from src.config import Config
 from state import AppTurnState
@@ -25,18 +21,15 @@ from state import AppTurnState
 config = Config()
 storage = MemoryStorage()
 
-if config.open_ai_key == "":
+if config.OPEN_AI_KEY == "":
     raise RuntimeError("OpenAIKey is a required environment variable")
 
 MyActionTurnContext = ActionTurnContext[Dict[str, Any]]
 app = Application[AppTurnState](
     ApplicationOptions(
-        bot_app_id=config.app_id,
+        bot_app_id=config.APP_ID,
         storage=storage,
-        auth=BotFrameworkAdapterSettings(
-            app_id=config.app_id,
-            app_password=config.app_password,
-        ),
+        auth=ConfigurationBotFrameworkAuthentication(Config),
         # ai=AIOptions(
         #     prompt="chatGPT",
         #     planner=OpenAIPlanner(

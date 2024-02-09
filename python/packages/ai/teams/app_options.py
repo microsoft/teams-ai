@@ -7,7 +7,8 @@ from dataclasses import dataclass, field
 from logging import Logger
 from typing import Optional
 
-from botbuilder.core import BotFrameworkAdapterSettings, Storage
+from botbuilder.core import Storage
+from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
 
 from teams.adaptive_cards import AdaptiveCardsOptions
 from teams.ai import AIOptions
@@ -16,7 +17,7 @@ from teams.task_modules import TaskModulesOptions
 
 @dataclass
 class ApplicationOptions:
-    auth: Optional[BotFrameworkAdapterSettings] = None
+    auth: Optional[ConfigurationBotFrameworkAuthentication] = None
     """
     Optional. Bot auth settings.
     If using the `long_running_messages` option or calling the `continue_conversation_async` 

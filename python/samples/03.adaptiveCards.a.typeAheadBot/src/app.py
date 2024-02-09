@@ -7,7 +7,8 @@ import re
 
 import aiohttp
 import uvicorn
-from botbuilder.core import BotFrameworkAdapterSettings, MemoryStorage, TurnContext
+from botbuilder.core import MemoryStorage, TurnContext
+from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
 from botbuilder.schema import Activity
 from fastapi import FastAPI, Request, Response
 from teams import Application, ApplicationOptions, Query, TurnState
@@ -21,10 +22,7 @@ from src.config import Config
 storage = MemoryStorage()
 app = Application[TurnState](
     ApplicationOptions(
-        auth=BotFrameworkAdapterSettings(
-            app_id=Config.BOT_ID,
-            app_password=Config.BOT_PASSWORD,
-        ),
+        auth=ConfigurationBotFrameworkAuthentication(Config),
         storage=storage,
     )
 )

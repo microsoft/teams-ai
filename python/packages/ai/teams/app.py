@@ -17,7 +17,8 @@ from typing import (
     cast,
 )
 
-from botbuilder.core import Bot, BotFrameworkAdapter, InvokeResponse, TurnContext
+from botbuilder.core import Bot, InvokeResponse, TurnContext
+from botbuilder.integration.aiohttp import CloudAdapter
 from botbuilder.schema import Activity, ActivityTypes
 
 from teams.adaptive_cards.adaptive_cards import AdaptiveCards
@@ -52,7 +53,7 @@ class Application(Bot, Generic[StateT]):
     _ai: Optional[AI[StateT]]
     _adaptive_card: AdaptiveCards[StateT]
     _options: ApplicationOptions
-    _adapter: Optional[BotFrameworkAdapter] = None
+    _adapter: Optional[CloudAdapter] = None
     _before_turn: List[RouteHandler[StateT]] = []
     _after_turn: List[RouteHandler[StateT]] = []
     _routes: List[Route[StateT]] = []
@@ -86,7 +87,7 @@ class Application(Bot, Generic[StateT]):
             )
 
         if options.auth:
-            self._adapter = BotFrameworkAdapter(options.auth)
+            self._adapter = CloudAdapter(options.auth)
 
     @property
     def ai(self) -> AI[StateT]:
@@ -353,7 +354,7 @@ class Application(Bot, Generic[StateT]):
                 "cannot call `app.process_activity` when `ApplicationOptions.adapter` not provided"
             )
 
-        return await self._adapter.process_activity(activity, auth_header, self.on_turn)
+        return await self._adapter.process_activity(auth_header, activity, self.on_turn)
 
     async def on_turn(self, context: TurnContext):
         await self._start_long_running_call(context, self._on_turn)
@@ -454,6 +455,7 @@ class Application(Bot, Generic[StateT]):
             return await self._adapter.continue_conversation(
                 reference=context.get_conversation_reference(context.activity),
                 callback=func,
+                bot_app_id=self.options.bot_app_id,
             )
 
         return await func(context)
