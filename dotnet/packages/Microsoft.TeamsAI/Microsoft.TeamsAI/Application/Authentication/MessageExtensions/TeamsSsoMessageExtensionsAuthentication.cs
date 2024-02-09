@@ -83,6 +83,11 @@ namespace Microsoft.Teams.AI
             return new TokenResponse();
         }
 
+        public override bool IsSsoSignIn(ITurnContext context)
+        {
+            return context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME;
+        }
+
         public override bool IsValidActivity(ITurnContext context)
         {
             return base.IsValidActivity(context)
