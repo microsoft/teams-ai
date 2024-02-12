@@ -36,9 +36,6 @@ class OpenAIModeratorOptions:
     model: str = "text-moderation-latest"
     "Optional. OpenAI model to use. Default: text-moderation-latest"
 
-    api_version: Optional[str] = None
-    "Optional. Azure Content Safety API version."
-
 
 class OpenAIModerator(Moderator):
     """
@@ -52,17 +49,27 @@ class OpenAIModerator(Moderator):
     def options(self) -> OpenAIModeratorOptions:
         return self._options
 
-    def __init__(self, options: OpenAIModeratorOptions) -> None:
+    def __init__(
+        self, options: OpenAIModeratorOptions, client: Optional[openai.AsyncOpenAI] = None
+    ) -> None:
         """
         Creates a new instance of the OpenAI based moderator.
 
         Args:
             options (OpenAIModeratorOptions): options for the moderator.
+            client (Optional[openai.AsyncOpenAI]): Optional. client override
         """
 
         self._options = options
-        self._client = openai.AsyncOpenAI(
-            api_key=options.api_key, organization=options.organization
+        self._client = (
+            client
+            if client is not None
+            else openai.AsyncOpenAI(
+                api_key=options.api_key,
+                organization=options.organization,
+                default_headers={"User-Agent": "teamsai-py/1.0.0"},
+                base_url=options.endpoint,
+            )
         )
 
     async def review_input(self, context: TurnContext, state: TurnState) -> Optional[Plan]:
