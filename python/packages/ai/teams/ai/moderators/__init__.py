@@ -5,3 +5,4 @@ Licensed under the MIT License.
 
 from .default_moderator import DefaultModerator
 from .moderator import Moderator
+from .openai_moderator import OpenAIModerator, OpenAIModeratorOptions
