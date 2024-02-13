@@ -109,28 +109,25 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_string_embedding(self, mock_async_open_ai):
-        # pylint: disable=unused-argument
-        # this is necessary to override and mock the class
         self.embeddings = OpenAIEmbeddings(self.options)
         section = await self.embeddings.create_embeddings("This is an embedding")
+        self.assertTrue(mock_async_open_ai.called)
         self.assertEqual(section.status, "success")
         self.assertEqual(section.output, [embedding_2, embedding_1])
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAI)
     async def test_array_embedding(self, mock_async_open_ai):
-        # pylint: disable=unused-argument
-        # this is necessary to override and mock the class
         self.embeddings_with_array = OpenAIEmbeddings(self.options_with_array)
         section = await self.embeddings_with_array.create_embeddings(["This is", "an embedding"])
+        self.assertTrue(mock_async_open_ai.called)
         self.assertEqual(section.status, "success")
         self.assertEqual(section.output, [embedding_2, embedding_1])
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIAPIError)
     async def test_api_error(self, mock_async_open_ai):
-        # pylint: disable=unused-argument
-        # this is necessary to override and mock the class
         self.embeddings = OpenAIEmbeddings(self.options)
         section = await self.embeddings.create_embeddings("This is an embedding")
+        self.assertTrue(mock_async_open_ai.called)
         self.assertEqual(section.status, "error")
         self.assertEqual(
             section.output,
@@ -139,9 +136,8 @@ class TestOpenAIEmbeddings(IsolatedAsyncioTestCase):
 
     @mock.patch("openai.AsyncOpenAI", return_value=MockAsyncOpenAIRateLimited)
     async def test_rate_limited(self, mock_async_open_ai):
-        # pylint: disable=unused-argument
-        # this is necessary to override and mock the class
         self.embeddings = OpenAIEmbeddings(self.options)
         section = await self.embeddings.create_embeddings("This is an embedding")
+        self.assertTrue(mock_async_open_ai.called)
         self.assertEqual(section.status, "rate_limited")
         self.assertEqual(section.output, "The embeddings API returned a rate limit error.")
