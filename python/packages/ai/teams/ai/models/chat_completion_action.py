@@ -6,7 +6,10 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
+from dataclasses_json import dataclass_json
 
+
+@dataclass_json
 @dataclass
 class ChatCompletionAction:
     """

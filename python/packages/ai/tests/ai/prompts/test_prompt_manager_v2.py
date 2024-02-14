@@ -7,6 +7,7 @@ import os
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock
 
+from teams.ai.augmentations.action_augmentation_section import ActionAugmentationSection
 from teams.ai.data_sources import TextDataSource
 from teams.ai.prompts import (
     ConversationHistorySection,
@@ -20,6 +21,7 @@ from teams.ai.prompts import (
     UserInputMessage,
     UserMessage,
 )
+from teams.ai.prompts.sections.data_source_section import DataSourceSection
 from teams.app_error import ApplicationError
 
 TEST_ASSERTS_FOLDER: str = os.path.join("tests", "ai", "prompts", "test_assets")
@@ -113,16 +115,25 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         )
 
     async def test_get_prompt_from_file(self):
+        self.prompt_manager.add_data_source(TextDataSource("teams-ai", "test_text"))
         prompt = await self.prompt_manager.get_prompt("happy_path")
 
         self.assertEqual(prompt.name, "happy_path")
         assert isinstance(prompt.prompt, Prompt)
-        print(prompt.prompt.sections)
         self.assertEqual(len(prompt.prompt.sections), 3)
         assert isinstance(prompt.prompt.sections[0], GroupSection)
-        self.assertEqual(len(prompt.prompt.sections[0].sections), 1)
+        self.assertEqual(len(prompt.prompt.sections[0].sections), 3)
         assert isinstance(prompt.prompt.sections[0].sections[0], TemplateSection)
         self.assertEqual(prompt.prompt.sections[0].sections[0].template, "test prompt")
+        assert isinstance(prompt.prompt.sections[0].sections[1], DataSourceSection)
+        assert isinstance(prompt.prompt.sections[0].sections[2], ActionAugmentationSection)
+        self.assertEqual(len(prompt.prompt.sections[0].sections[2].actions.keys()), 3)
+        actions = prompt.prompt.sections[0].sections[2].actions
+        self.assertEqual(actions.get("createList").name, "createList")  # type: ignore[union-attr]
+        self.assertEqual(
+            actions.get("createList").description,  # type: ignore[union-attr]
+            "Creates a new list with an optional set of initial items",
+        )
         assert isinstance(prompt.prompt.sections[1], ConversationHistorySection)
         self.assertEqual(prompt.prompt.sections[1].variable, "conversation.happy_path_history")
         self.assertEqual(
@@ -146,8 +157,12 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         self.assertEqual(prompt.config.completion.presence_penalty, 0.6)
         self.assertEqual(prompt.config.completion.frequency_penalty, 0.0)
         self.assertEqual(prompt.config.completion.stop_sequences, [])
+        augmentation = prompt.config.augmentation
+        self.assertEqual(augmentation.augmentation_type, "monologue")  # type: ignore[union-attr]
+        self.assertEqual(augmentation.data_sources.get("teams-ai"), 1200)  # type: ignore[union-attr]
 
     async def test_get_prompt_from_file_include_images(self):
+        self.prompt_manager.add_data_source(TextDataSource("teams-ai", "test_text"))
         prompt = await self.prompt_manager.get_prompt("include_images")
 
         self.assertEqual(prompt.name, "include_images")
@@ -155,9 +170,10 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         print(prompt.prompt.sections)
         self.assertEqual(len(prompt.prompt.sections), 3)
         assert isinstance(prompt.prompt.sections[0], GroupSection)
-        self.assertEqual(len(prompt.prompt.sections[0].sections), 1)
+        self.assertEqual(len(prompt.prompt.sections[0].sections), 2)
         assert isinstance(prompt.prompt.sections[0].sections[0], TemplateSection)
         self.assertEqual(prompt.prompt.sections[0].sections[0].template, "test prompt")
+        assert isinstance(prompt.prompt.sections[0].sections[1], DataSourceSection)
         assert isinstance(prompt.prompt.sections[1], ConversationHistorySection)
         self.assertEqual(prompt.prompt.sections[1].variable, "conversation.include_images_history")
         self.assertEqual(
@@ -165,6 +181,9 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         )
         assert isinstance(prompt.prompt.sections[2], UserInputMessage)
         self.assertEqual(prompt.prompt.sections[2].tokens, self.options.max_input_tokens)
+        augmentation = prompt.config.augmentation
+        self.assertEqual(augmentation.augmentation_type, "none")  # type: ignore[union-attr]
+        self.assertEqual(augmentation.data_sources.get("teams-ai"), 1200)  # type: ignore[union-attr]
 
     async def test_get_prompt_from_file_migrate_old_schema(self):
         prompt = await self.prompt_manager.get_prompt("migrate_old_schema")

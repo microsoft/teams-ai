@@ -7,9 +7,15 @@ import json
 import os
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from botbuilder.core import TurnContext
+
+from teams.ai.augmentations.augmentation import Augmentation
+from teams.ai.augmentations.monologue_augmentation import MonologueAugmentation
+from teams.ai.augmentations.sequence_augmentation import SequenceAugmentation
+from teams.ai.models.chat_completion_action import ChatCompletionAction
+from teams.ai.prompts.sections.data_source_section import DataSourceSection
 
 from ...app_error import ApplicationError
 from ...state import Memory
@@ -218,6 +224,7 @@ class PromptManager(PromptFunctions):
             folder = os.path.join(self._options.prompts_folder, name)
             config_file = os.path.join(folder, "config.json")
             prompt_file = os.path.join(folder, "skprompt.txt")
+            actions_file = os.path.join(folder, "actions.json")
 
             # Load prompt config
             try:
@@ -245,8 +252,22 @@ class PromptManager(PromptFunctions):
                     )
                 ) from e
 
+            # Load optional actions
+            template_actions: List[ChatCompletionAction] = []
+            try:
+                with open(actions_file, "r", encoding="utf-8") as file:
+                    template_actions = json.load(file)
+            except Exception:  # pylint:disable=broad-exception-caught
+                # Ignore missing actions file
+                pass
+
             # Migrate the templates config as needed
             self._update_config(template_config)
+
+            # Add augmentations
+            augmentation = self._append_augmentations(
+                name, template_config, template_actions, sections
+            )
 
             # Group everything into a system message
             sections = [GroupSection(sections, "system")]
@@ -269,6 +290,9 @@ class PromptManager(PromptFunctions):
                 sections.append(UserMessage("{{$temp.input}}", self._options.max_input_tokens))
 
             template = PromptTemplate(template_name, Prompt(sections), template_config)
+
+            if augmentation:
+                template.augmentation = augmentation
 
             # Cache loaded template
             self._prompts[name] = template
@@ -301,3 +325,57 @@ class PromptManager(PromptFunctions):
                 and len(template_config.default_backends) > 0
             ):
                 template_config.completion.model = template_config.default_backends[0]
+
+    # pylint:disable=too-many-locals
+    def _append_augmentations(
+        self,
+        name: str,
+        template_config: PromptTemplateConfig,
+        template_actions: List[ChatCompletionAction],
+        sections: List[PromptSection],
+    ) -> Optional[Augmentation]:
+        # Check for augmentation
+        augmentation = template_config.augmentation
+        if augmentation:
+            # First append data sources
+            # - We're using a minimum of 2 tokens for each data source to prevent
+            # any sort of prompt rendering conflicts between sources and conversation history.
+            # - If we wanted to let users specify a percentage% for a data source we would need
+            # to track the percentage they gave the data source(s) and give the remaining to
+            # the ConversationHistory section.
+            data_sources = augmentation.data_sources if augmentation.data_sources else {}
+            for source in data_sources:
+                if not self.has_data_source(source):
+                    raise ApplicationError(f"DataSource '{source}' not found for prompt '{name}.")
+                data_source = self.get_data_source(source)
+                tokens = max(data_sources[source], 2)
+                sections.append(DataSourceSection(data_source, tokens))
+
+            # Next, create augmentation
+            augmentation_type = augmentation.augmentation_type
+            curr_augmentation: Optional[Augmentation] = None
+
+            # Parse the dict objects into ChatCompletionAction objects
+            parsed_actions: List[ChatCompletionAction] = []
+            if template_actions:
+                for action in template_actions:
+                    parsed_actions.append(
+                        # pylint:disable=no-member
+                        # from_dict provided from @dataclass_json decorator
+                        ChatCompletionAction.from_dict(action)
+                    )  # type: ignore[attr-defined]
+
+            curr_actions = parsed_actions if template_actions else []
+            if augmentation_type == "monologue":
+                curr_augmentation = MonologueAugmentation(curr_actions)
+            elif augmentation_type == "sequence":
+                curr_augmentation = SequenceAugmentation(curr_actions)
+
+            # Append the augmentations prompt section
+            if curr_augmentation:
+                section = curr_augmentation.create_prompt_section()
+                if section:
+                    sections.append(section)
+
+            return curr_augmentation
+        return None
