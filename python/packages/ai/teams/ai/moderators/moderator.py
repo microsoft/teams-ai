@@ -4,23 +4,19 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
-from importlib.metadata import version
 from typing import Optional
 
 from botbuilder.core import TurnContext
 
 from ...state import TurnState
+from ...user_agent import _UserAgent
 from ..planner import Plan
 
 
-class Moderator(ABC):
+class Moderator(ABC, _UserAgent):
     """
     A moderator is responsible for reviewing and approving AI prompts and plans.
     """
-
-    @property
-    def user_agent(self) -> str:
-        return f"teamsai-py/{version('teams-ai')}"
 
     @abstractmethod
     async def review_input(self, context: TurnContext, state: TurnState) -> Optional[Plan]:

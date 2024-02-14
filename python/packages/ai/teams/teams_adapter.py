@@ -3,7 +3,6 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from importlib.metadata import version
 from logging import Logger
 from typing import Any, Optional, cast
 
@@ -21,16 +20,14 @@ from botframework.connector.auth import (
     ServiceClientCredentialsFactory,
 )
 
+from .user_agent import _UserAgent
 
-class TeamsAdapter(CloudAdapter):
+
+class TeamsAdapter(CloudAdapter, _UserAgent):
     """
     An adapter that implements the Bot Framework Protocol
     and can be hosted in different cloud environments both public and private.
     """
-
-    @property
-    def user_agent(self) -> str:
-        return f"teamsai-py/{version('teams-ai')}"
 
     def __init__(
         self,
@@ -50,9 +47,7 @@ class TeamsAdapter(CloudAdapter):
                 configuration,
                 credentials_factory=cast(ServiceClientCredentialsFactory, credentials_factory),
                 auth_configuration=cast(AuthenticationConfiguration, auth_configuration),
-                http_client_factory=_TeamsHttpClientFactory(
-                    self.user_agent, parent=http_client_factory
-                ),
+                http_client_factory=_TeamsHttpClientFactory(parent=http_client_factory),
                 logger=cast(Logger, logger),
             )
         )
@@ -76,31 +71,27 @@ class TeamsAdapter(CloudAdapter):
 
 
 class _TeamsHttpClientFactory(HttpClientFactory):
-    _user_agent: str
     _parent: Optional[HttpClientFactory]
 
-    def __init__(self, user_agent: str, *, parent: Optional[HttpClientFactory] = None) -> None:
-        self._user_agent = user_agent
+    def __init__(self, *, parent: Optional[HttpClientFactory] = None) -> None:
         self._parent = parent
 
     def create_client(self) -> HttpClientBase:
         if self._parent:
-            return _TeamsHttpClient(self._user_agent, parent=self._parent.create_client())
+            return _TeamsHttpClient(parent=self._parent.create_client())
 
-        return _TeamsHttpClient(self._user_agent)
+        return _TeamsHttpClient()
 
 
-class _TeamsHttpClient(HttpClientBase):
-    _user_agent: str
+class _TeamsHttpClient(HttpClientBase, _UserAgent):
     _parent: Optional[HttpClientBase]
 
-    def __init__(self, user_agent: str, *, parent: Optional[HttpClientBase] = None) -> None:
+    def __init__(self, *, parent: Optional[HttpClientBase] = None) -> None:
         self._session = ClientSession()
-        self._user_agent = user_agent
         self._parent = parent
 
     async def post(self, *, request: HttpRequest) -> HttpResponseBase:
-        request.headers["User-Agent"] = self._user_agent
+        request.headers["User-Agent"] = self.user_agent
 
         if self._parent:
             return await self._parent.post(request=request)
