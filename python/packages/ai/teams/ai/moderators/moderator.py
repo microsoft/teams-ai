@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
+from importlib.metadata import version
 from typing import Optional
 
 from botbuilder.core import TurnContext
@@ -16,6 +17,10 @@ class Moderator(ABC):
     """
     A moderator is responsible for reviewing and approving AI prompts and plans.
     """
+
+    @property
+    def user_agent(self) -> str:
+        return f"teamsai-py/{version('teams-ai')}"
 
     @abstractmethod
     async def review_input(self, context: TurnContext, state: TurnState) -> Optional[Plan]:
