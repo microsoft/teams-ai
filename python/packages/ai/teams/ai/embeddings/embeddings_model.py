@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
+from importlib.metadata import version
 from typing import List, Union
 
 from teams.ai.embeddings.embeddings_response import EmbeddingsResponse
@@ -13,6 +14,10 @@ class EmbeddingsModel(ABC):
     """
     An AI model that can be used to create embeddings.
     """
+
+    @property
+    def user_agent(self) -> str:
+        return f"teamsai-py/{version('teams-ai')}"
 
     @abstractmethod
     async def create_embeddings(

@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
+from importlib.metadata import version
 
 from botbuilder.core import TurnContext
 
@@ -17,6 +18,10 @@ class PromptCompletionModel(ABC):
     """
     An AI model that can be used to complete prompts.
     """
+
+    @property
+    def user_agent(self) -> str:
+        return f"teamsai-py/{version('teams-ai')}"
 
     @abstractmethod
     async def complete_prompt(
