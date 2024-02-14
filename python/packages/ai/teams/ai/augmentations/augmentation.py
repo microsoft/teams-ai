@@ -8,10 +8,10 @@ from typing import Generic, TypeVar, Union
 
 from botbuilder.core import TurnContext
 
-from teams.ai.models.prompt_response import PromptResponse
-from teams.ai.planner import Plan
-from teams.ai.prompts.sections.prompt_section import PromptSection
-from teams.ai.validators.prompt_response_validator import PromptResponseValidator
+from ..models.prompt_response import PromptResponse
+from ..planner.plan import Plan
+from ..prompts.sections.prompt_section import PromptSection
+from ..validators.prompt_response_validator import PromptResponseValidator
 from teams.state.memory import Memory
 
 ValueT = TypeVar("ValueT")

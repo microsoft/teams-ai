@@ -5,6 +5,7 @@ Licensed under the MIT License.
 
 from .command_type import CommandType
 from .plan import Plan, PlanType
+from .response_parser import parse_adaptive_card
 from .planner import Planner
 from .predicted_command import PredictedCommand
 from .predicted_do_command import PredictedDoCommand

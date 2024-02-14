@@ -7,13 +7,13 @@ from typing import Union
 
 from botbuilder.core import TurnContext
 
-from teams.ai.augmentations.augmentation import Augmentation
-from teams.ai.models.prompt_response import PromptResponse
-from teams.ai.planner import Plan
-from teams.ai.planner.predicted_say_command import PredictedSayCommand
-from teams.ai.prompts.sections.prompt_section import PromptSection
-from teams.ai.tokenizers.tokenizer import Tokenizer
-from teams.ai.validators.validation import Validation
+from ..augmentations.augmentation import Augmentation
+from ..models.prompt_response import PromptResponse
+from ..planner.plan import Plan
+from ..planner.predicted_say_command import PredictedSayCommand
+from ..prompts.sections.prompt_section import PromptSection
+from ..tokenizers.tokenizer import Tokenizer
+from ..validators.validation import Validation
 from teams.state.memory import Memory
 
 

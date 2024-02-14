@@ -19,12 +19,14 @@ from typing import (
 from botbuilder.core import CardFactory, MessageFactory, TurnContext
 from botframework.connector import Channels
 
-from teams.ai.actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
-from teams.ai.planner import Plan, PredictedDoCommand, PredictedSayCommand
-from teams.ai.planner.response_parser import parse_adaptive_card
-from teams.ai.prompts import PromptTemplate
-from teams.ai.state import TurnState
-from teams.app_error import ApplicationError
+from .actions import ActionEntry, ActionHandler, ActionTurnContext, ActionTypes
+from .planner.plan import Plan
+from .planner.predicted_do_command import PredictedDoCommand
+from .planner.predicted_say_command import PredictedSayCommand
+from .planner.response_parser import parse_adaptive_card
+from .prompts.prompt_template import PromptTemplate
+from .state import TurnState
+from app_error import ApplicationError
 
 from .ai_options import AIOptions
 
