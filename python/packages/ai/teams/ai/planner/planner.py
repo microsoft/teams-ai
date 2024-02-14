@@ -10,7 +10,7 @@ from typing import Any, Awaitable, Callable, Optional, Union
 from botbuilder.core import TurnContext
 
 from teams.ai.ai_history_options import AIHistoryOptions
-from teams.ai.prompts import PromptTemplate
+from ..prompts import PromptTemplate
 from teams.ai.state import TurnState
 
 from .plan import Plan

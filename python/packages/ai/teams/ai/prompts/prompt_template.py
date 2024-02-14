@@ -6,8 +6,8 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import List, Optional
 
-from teams.ai.augmentations.augmentation import Augmentation
-from teams.ai.models.chat_completion_action import ChatCompletionAction
+from ..augmentations.augmentation import Augmentation
+from ..models.chat_completion_action import ChatCompletionAction
 
 from .prompt_template_config import PromptTemplateConfig
 from .sections.prompt_section import PromptSection

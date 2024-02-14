@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from dataclasses import dataclass
 from typing import List, Literal, Optional
 
-from teams.ai.prompts.augmentation_config import AugmentationConfig
+from .augmentation_config import AugmentationConfig
 
 from .completion_config import CompletionConfig
 

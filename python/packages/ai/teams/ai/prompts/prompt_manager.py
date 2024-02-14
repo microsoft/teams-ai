@@ -11,11 +11,11 @@ from typing import Any, Dict, List, Optional
 
 from botbuilder.core import TurnContext
 
-from teams.ai.augmentations.augmentation import Augmentation
-from teams.ai.augmentations.monologue_augmentation import MonologueAugmentation
-from teams.ai.augmentations.sequence_augmentation import SequenceAugmentation
-from teams.ai.models.chat_completion_action import ChatCompletionAction
-from teams.ai.prompts.sections.data_source_section import DataSourceSection
+from ..augmentations.augmentation import Augmentation
+from ..augmentations.monologue_augmentation import MonologueAugmentation
+from ..augmentations.sequence_augmentation import SequenceAugmentation
+from ..models.chat_completion_action import ChatCompletionAction
+from ..prompts.sections.data_source_section import DataSourceSection
 
 from ...app_error import ApplicationError
 from ...state import Memory
