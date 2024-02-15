@@ -229,10 +229,10 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-13.3.1.tgz#012465bf940d12375dc47387b754ccf9d6b92180"
   integrity sha512-Lrk1ozoAtaP/cp53May3v6HtcFSVxdFrg2Pa/1xu5oIvsIwhxW6zSPibKefCOVgd5osgykMi5jjcZHv8XkzZEQ==
 
-"@azure/msal-common@14.6.1":
-  version "14.6.1"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.6.1.tgz#1c76084ae5b0870fe0b15b9469c9bce0036acc15"
-  integrity sha512-yL97p2La0WrgU3MdXThOLOpdmBMvH8J69vwQ/skOqORYwOW/UYPdp9nZpvvfBO+zFZB5M3JkqA2NKtn4GfVBHw==
+"@azure/msal-common@14.7.0":
+  version "14.7.0"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.7.0.tgz#29e6f6ae9cb4c32dc4eeba13c3eb59078c4fb487"
+  integrity sha512-WexujW5jKWib7xtIxR7fEVyd5xcA3FNwenELy2HO4YC/ivTFdsEcDhtpKQuRUHqXRwxoqBblyZzTAhBm4v6fHA==
 
 "@azure/msal-common@^7.0.0":
   version "7.6.0"
@@ -248,12 +248,12 @@
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
-"@azure/msal-node@^2.6.2":
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.6.2.tgz#d6b619160a991a61ab768c5bbc8f42c279ec5416"
-  integrity sha512-XyP+5lUZxTpWpLCC2wAFGA9wXrUhHp1t4NLmQW0mQZzUdcSay3rG7kGGqxxeLf8mRdwoR0B70TCLmIGX6cfK/g==
+"@azure/msal-node@^2.6.3":
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-2.6.3.tgz#16a74b207099fe982f686367bc34ffb9f1d5e790"
+  integrity sha512-ojjJqUwb297T5Tcln4PbJANFEqRXfbQXcyOrtdr1HQYIo+dSuCT/o0nG6bFVihf6fcNykDwJLCQPVXzTkx/oGg==
   dependencies:
-    "@azure/msal-common" "14.6.1"
+    "@azure/msal-common" "14.7.0"
     jsonwebtoken "^9.0.0"
     uuid "^8.3.0"
 
@@ -3567,10 +3567,10 @@ dot-prop@^4.2.1:
   dependencies:
     is-obj "^1.0.0"
 
-dotenv@*, dotenv@^16.4.1:
-  version "16.4.1"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.1.tgz#1d9931f1d3e5d2959350d1250efab299561f7f11"
-  integrity sha512-CjA3y+Dr3FyFDOAMnxZEGtnW9KBR2M0JvvUtXNW+dYJL5ROWxP9DUHCwgFqpMk0OXCc0ljhaNTr2w/kutYIcHQ==
+dotenv@*, dotenv@^16.4.2:
+  version "16.4.2"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.2.tgz#7ca798f89ae2011846bbdbf6470785307754120d"
+  integrity sha512-rZSSFxke7d9nYQ5NeMIwp5PP+f8wXgKNljpOb7KtH6SKW1cEqcXAz9VSJYVLKe7Jhup/gUYOkaeSVyK8GJ+nBg==
 
 dotenv@^8.2.0:
   version "8.6.0"
@@ -7078,10 +7078,10 @@ openai@^3.2.1:
     axios "^0.26.0"
     form-data "^4.0.0"
 
-openai@^4.26.1:
-  version "4.26.1"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-4.26.1.tgz#7b7c0225c09922445f68f3c4cdbd5775ed31108c"
-  integrity sha512-DvWbjhWbappsFRatOWmu4Dp1/Q4RG9oOz6CfOSjy0/Drb8G+5iAiqWAO4PfpGIkhOOKtvvNfQri2SItl+U7LhQ==
+openai@^4.27.0:
+  version "4.27.0"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-4.27.0.tgz#4ada66a19c369b202e8a939b8bd287e4dca036f4"
+  integrity sha512-j1ZEx9NiBpm31rxWqQTjQt1QvH/8001xHsc/pRoPjkRDYWONCb+qkR6L9C7Wl6ar72Mz1ybtn1bv6fqAoTPlKw==
   dependencies:
     "@types/node" "^18.11.18"
     "@types/node-fetch" "^2.6.4"
