@@ -25,7 +25,12 @@ from teams.adaptive_cards.adaptive_cards import AdaptiveCards
 from teams.ai import AI, TurnState
 from teams.task_modules import TaskModules
 
-from .activity_type import ActivityType, ConversationUpdateType
+from .activity_type import (
+    ActivityType,
+    ConversationUpdateType,
+    MessageReactionType,
+    MessageUpdateType,
+)
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .message_extensions import MessageExtensions
@@ -244,6 +249,104 @@ class Application(Bot, Generic[StateT]):
                 data = vars(context.activity.channel_data)
                 return data["event_type"] == type
 
+            return False
+
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
+            return func
+
+        return __call__
+
+    def message_reaction(
+        self, type: MessageReactionType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
+        """
+        Registers a new message activity event listener. This method can be used as either
+        a decorator or a method.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_reaction("reactionsAdded")
+        async def on_reactions_added(context: TurnContext, state: TurnState):
+            print("reactions was added!")
+            return True
+
+        # Pass a function to this method
+        app.message_reaction("reactionsAdded")(on_reactions_added)
+        ```
+
+        #### Args:
+        - `type`: a string or regex pattern
+        """
+
+        def __selector__(context: TurnContext):
+            if context.activity.type != ActivityTypes.message_reaction:
+                return False
+
+            if type == "reactionsAdded":
+                if isinstance(context.activity.reactions_added, List):
+                    return len(context.activity.reactions_added) > 0
+                return False
+
+            if type == "reactionsRemoved":
+                if isinstance(context.activity.reactions_removed, List):
+                    return len(context.activity.reactions_removed) > 0
+                return False
+
+            return False
+
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
+            return func
+
+        return __call__
+
+    def message_update(
+        self, type: MessageUpdateType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
+        """
+        Registers a new message activity event listener. This method can be used as either
+        a decorator or a method.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_update("editMessage")
+        async def on_edit_message(context: TurnContext, state: TurnState):
+            print("message was edited!")
+            return True
+
+        # Pass a function to this method
+        app.message_update("editMessage")(on_edit_message)
+        ```
+
+        #### Args:
+        - `type`: a string or regex pattern
+        """
+
+        def __selector__(context: TurnContext):
+            if type == "editMessage":
+                if context.activity.type == ActivityTypes.message_update and isinstance(
+                    context.activity.channel_data, dict
+                ):
+                    data = context.activity.channel_data
+                    return data["event_type"] == type
+                return False
+
+            if type == "softDeleteMessage":
+                if context.activity.type == ActivityTypes.message_delete and isinstance(
+                    context.activity.channel_data, dict
+                ):
+                    data = context.activity.channel_data
+                    return data["event_type"] == type
+                return False
+
+            if type == "undeleteMessage":
+                if context.activity.type == ActivityTypes.message_update and isinstance(
+                    context.activity.channel_data, dict
+                ):
+                    data = context.activity.channel_data
+                    return data["event_type"] == type
+                return False
             return False
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
