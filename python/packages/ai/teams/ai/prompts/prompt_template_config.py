@@ -54,7 +54,7 @@ class PromptTemplateConfig:
 
         if data.get("augmentation"):
             config.augmentation = AugmentationConfig.from_dict(
-                data.get("augmentation")
-            )  # type: ignore[arg-type]
+                data.get("augmentation")  # type: ignore[arg-type]
+            )
 
         return config

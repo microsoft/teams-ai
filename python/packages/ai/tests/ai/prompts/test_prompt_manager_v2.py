@@ -159,7 +159,9 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         self.assertEqual(prompt.config.completion.stop_sequences, [])
         augmentation = prompt.config.augmentation
         self.assertEqual(augmentation.augmentation_type, "monologue")  # type: ignore[union-attr]
-        self.assertEqual(augmentation.data_sources.get("teams-ai"), 1200)  # type: ignore[union-attr]
+        self.assertEqual(
+            augmentation.data_sources.get("teams-ai"), 1200  # type: ignore[union-attr]
+        )
 
     async def test_get_prompt_from_file_include_images(self):
         self.prompt_manager.add_data_source(TextDataSource("teams-ai", "test_text"))
@@ -183,7 +185,9 @@ class TestPromptManager(IsolatedAsyncioTestCase):
         self.assertEqual(prompt.prompt.sections[2].tokens, self.options.max_input_tokens)
         augmentation = prompt.config.augmentation
         self.assertEqual(augmentation.augmentation_type, "none")  # type: ignore[union-attr]
-        self.assertEqual(augmentation.data_sources.get("teams-ai"), 1200)  # type: ignore[union-attr]
+        self.assertEqual(
+            augmentation.data_sources.get("teams-ai"), 1200  # type: ignore[union-attr]
+        )
 
     async def test_get_prompt_from_file_migrate_old_schema(self):
         prompt = await self.prompt_manager.get_prompt("migrate_old_schema")

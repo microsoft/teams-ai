@@ -361,8 +361,8 @@ class PromptManager(PromptFunctions):
                     parsed_actions.append(
                         # pylint:disable=no-member
                         # from_dict provided from @dataclass_json decorator
-                        ChatCompletionAction.from_dict(action)
-                    )  # type: ignore[attr-defined]
+                        ChatCompletionAction.from_dict(action)  # type: ignore[attr-defined]
+                    )
 
             curr_actions = parsed_actions if template_actions else []
             if augmentation_type == "monologue":
