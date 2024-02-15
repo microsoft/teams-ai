@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import List, Literal, Optional
 
 from .augmentation_config import AugmentationConfig
-
 from .completion_config import CompletionConfig
 
 

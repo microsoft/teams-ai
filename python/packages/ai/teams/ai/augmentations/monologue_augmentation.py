@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 from botbuilder.core import TurnContext
 from dataclasses_json import dataclass_json
 
+from ...state import Memory
 from ..augmentations.action_augmentation_section import ActionAugmentationSection
 from ..augmentations.augmentation import Augmentation
 from ..models.chat_completion_action import ChatCompletionAction
@@ -25,7 +26,6 @@ from ..tokenizers import Tokenizer
 from ..validators.action_response_validator import ActionResponseValidator
 from ..validators.json_response_validator import JSONResponseValidator
 from ..validators.validation import Validation
-from ..state import Memory
 
 _MISSING_ACTION_FEEDBACK = (
     'The JSON returned had errors. Apply these fixes:\nadd the "action" property to "instance"'

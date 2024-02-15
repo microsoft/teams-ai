@@ -11,15 +11,14 @@ from typing import Any, Dict, List, Optional
 
 from botbuilder.core import TurnContext
 
+from ...app_error import ApplicationError
+from ...state import Memory
 from ..augmentations.augmentation import Augmentation
 from ..augmentations.monologue_augmentation import MonologueAugmentation
 from ..augmentations.sequence_augmentation import SequenceAugmentation
+from ..data_sources import DataSource
 from ..models.chat_completion_action import ChatCompletionAction
 from ..prompts.sections.data_source_section import DataSourceSection
-
-from ...app_error import ApplicationError
-from ...state import Memory
-from ..data_sources import DataSource
 from ..tokenizers import Tokenizer
 from .prompt import Prompt
 from .prompt_functions import PromptFunction, PromptFunctions

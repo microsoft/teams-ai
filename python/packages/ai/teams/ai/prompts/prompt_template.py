@@ -8,7 +8,6 @@ from typing import List, Optional
 
 from ..augmentations.augmentation import Augmentation
 from ..models.chat_completion_action import ChatCompletionAction
-
 from .prompt_template_config import PromptTemplateConfig
 from .sections.prompt_section import PromptSection
 

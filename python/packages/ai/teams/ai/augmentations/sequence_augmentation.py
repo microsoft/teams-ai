@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 
 from botbuilder.core import TurnContext
 
+from ...state import Memory
 from ..augmentations.action_augmentation_section import ActionAugmentationSection
 from ..augmentations.augmentation import Augmentation
 from ..models.chat_completion_action import ChatCompletionAction
@@ -21,7 +22,6 @@ from ..tokenizers import Tokenizer
 from ..validators.action_response_validator import ActionResponseValidator
 from ..validators.json_response_validator import JSONResponseValidator
 from ..validators.validation import Validation
-from teams.state.memory import Memory
 
 PlanSchema: Optional[Dict[str, Any]] = {
     "type": "object",

@@ -7,6 +7,7 @@ from typing import Union
 
 from botbuilder.core import TurnContext
 
+from ...state import Memory
 from ..augmentations.augmentation import Augmentation
 from ..models.prompt_response import PromptResponse
 from ..planner.plan import Plan
@@ -14,7 +15,6 @@ from ..planner.predicted_say_command import PredictedSayCommand
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
-from teams.state.memory import Memory
 
 
 class DefaultAugmentation(Augmentation[str]):
