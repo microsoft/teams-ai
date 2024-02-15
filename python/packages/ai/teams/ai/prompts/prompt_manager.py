@@ -256,7 +256,7 @@ class PromptManager(PromptFunctions):
             try:
                 with open(actions_file, "r", encoding="utf-8") as file:
                     template_actions = json.load(file)
-            except Exception:  # pylint:disable=broad-exception-caught
+            except IOError:
                 # Ignore missing actions file
                 pass
 
