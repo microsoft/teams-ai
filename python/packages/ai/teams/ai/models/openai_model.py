@@ -93,7 +93,7 @@ class OpenAIModel(PromptCompletionModel):
                 api_key=options.api_key,
                 base_url=options.endpoint,
                 organization=options.organization,
-                default_headers={"User-Agent": "teamsai-py/1.0.0"},
+                default_headers={"User-Agent": self.user_agent},
             )
         elif isinstance(options, AzureOpenAIModelOptions):
             self._client = openai.AsyncAzureOpenAI(
@@ -102,7 +102,7 @@ class OpenAIModel(PromptCompletionModel):
                 azure_endpoint=options.endpoint,
                 azure_deployment=options.default_model,
                 organization=options.organization,
-                default_headers={"User-Agent": "teamsai-py/1.0.0"},
+                default_headers={"User-Agent": self.user_agent},
             )
 
     async def complete_prompt(

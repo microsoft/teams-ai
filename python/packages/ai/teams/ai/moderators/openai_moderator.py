@@ -67,7 +67,7 @@ class OpenAIModerator(Moderator):
             else openai.AsyncOpenAI(
                 api_key=options.api_key,
                 organization=options.organization,
-                default_headers={"User-Agent": "teamsai-py/1.0.0"},
+                default_headers={"User-Agent": self.user_agent},
                 base_url=options.endpoint,
             )
         )

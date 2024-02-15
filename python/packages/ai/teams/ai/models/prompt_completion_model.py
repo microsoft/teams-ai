@@ -8,12 +8,13 @@ from abc import ABC, abstractmethod
 from botbuilder.core import TurnContext
 
 from ...state import Memory
+from ...user_agent import _UserAgent
 from ..prompts import PromptFunctions, PromptTemplate
 from ..tokenizers import Tokenizer
 from .prompt_response import PromptResponse
 
 
-class PromptCompletionModel(ABC):
+class PromptCompletionModel(ABC, _UserAgent):
     """
     An AI model that can be used to complete prompts.
     """

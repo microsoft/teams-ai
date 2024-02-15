@@ -55,6 +55,6 @@ class AzureContentSafetyModerator(OpenAIModerator):
                 api_key=options.api_key,
                 api_version=options.api_version,
                 organization=options.organization,
-                default_headers={"User-Agent": "teamsai-py/1.0.0"},
+                default_headers={"User-Agent": self.user_agent},
             ),
         )
