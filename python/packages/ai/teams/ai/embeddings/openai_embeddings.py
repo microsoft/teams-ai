@@ -21,7 +21,6 @@ class OpenAIEmbeddings(EmbeddingsModel):
     A `EmbeddingsModel` for calling the OpenAI hosted model.
     """
 
-    _user_agent = "@microsoft/teams-ai-v1"
     _log: Logger
 
     options: OpenAIEmbeddingsOptions
@@ -66,7 +65,7 @@ class OpenAIEmbeddings(EmbeddingsModel):
             self.options.request_config.update({"Content-Type": "application/json"})
 
         if not self.options.request_config.get("User-Agent"):
-            self.options.request_config.update({"User-Agent": self._user_agent})
+            self.options.request_config.update({"User-Agent": self.user_agent})
 
         if self.options.organization:
             self.options.request_config.update({"OpenAI-Organization": self.options.organization})

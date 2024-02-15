@@ -9,10 +9,11 @@ from typing import Optional
 from botbuilder.core import TurnContext
 
 from ...state import TurnState
+from ...user_agent import _UserAgent
 from ..planner import Plan
 
 
-class Moderator(ABC):
+class Moderator(ABC, _UserAgent):
     """
     A moderator is responsible for reviewing and approving AI prompts and plans.
     """

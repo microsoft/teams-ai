@@ -23,7 +23,6 @@ class AzureOpenAIEmbeddings(EmbeddingsModel):
     A `EmbeddingsModel` for calling the AzureOpenAI hosted model.
     """
 
-    _user_agent = "@microsoft/teams-ai-v1"
     _log: Logger
 
     options: AzureOpenAIEmbeddingsOptions
@@ -85,7 +84,7 @@ class AzureOpenAIEmbeddings(EmbeddingsModel):
             self.options.request_config.update({"Content-Type": "application/json"})
 
         if not self.options.request_config.get("User-Agent"):
-            self.options.request_config.update({"User-Agent": self._user_agent})
+            self.options.request_config.update({"User-Agent": self.user_agent})
 
         client = openai.AsyncAzureOpenAI(
             api_key=self.options.azure_api_key,

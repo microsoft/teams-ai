@@ -11,3 +11,4 @@ from .app_options import ApplicationOptions
 from .input_file import InputFile
 from .message_extensions import MessagePreviewAction
 from .query import Query
+from .teams_adapter import TeamsAdapter
