@@ -13,7 +13,9 @@ from botbuilder.core import TurnContext
 from openai.types import chat
 
 from ...state import Memory
-from ..prompts import Message, PromptFunctions, PromptTemplate
+from ..prompts.message import Message
+from ..prompts.prompt_functions import PromptFunctions
+from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
 from .prompt_completion_model import PromptCompletionModel
 from .prompt_response import PromptResponse

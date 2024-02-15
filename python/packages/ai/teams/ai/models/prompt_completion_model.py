@@ -8,7 +8,8 @@ from abc import ABC, abstractmethod
 from botbuilder.core import TurnContext
 
 from ...state import Memory
-from ..prompts import PromptFunctions, PromptTemplate
+from ..prompts.prompt_functions import PromptFunctions
+from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
 from .prompt_response import PromptResponse
 
