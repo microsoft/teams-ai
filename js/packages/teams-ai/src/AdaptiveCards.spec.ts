@@ -12,7 +12,7 @@ describe('AdaptiveCards', () => {
     let selector: RouteSelector;
     let handler: any;
     let addRouteStub: sinon.SinonStub;
-    let adapter = new TestAdapter();
+    const adapter = new TestAdapter();
 
     beforeEach(() => {
         app = new Application();

@@ -17,7 +17,10 @@ import {
     ConfigurationBotFrameworkAuthentication,
     ConfigurationBotFrameworkAuthenticationOptions,
     ConfigurationServiceClientCredentialFactory,
-    ConfigurationServiceClientCredentialFactoryOptions
+    ConfigurationServiceClientCredentialFactoryOptions,
+    Request,
+    Response,
+    TurnContext
 } from 'botbuilder';
 
 import {
@@ -27,6 +30,7 @@ import {
 } from 'botframework-connector';
 
 import packageInfo from '../package.json';
+import { INodeSocket, INodeBuffer } from 'botframework-streaming';
 
 const USER_AGENT = `teamsai-js/${packageInfo.version}`;
 
@@ -38,6 +42,10 @@ export class TeamsAdapter extends CloudAdapter {
      * The credentials factory used by the bot adapter to create a [ServiceClientCredentials](xref:botframework-connector.ServiceClientCredentials) object.
      */
     public readonly credentialsFactory: ServiceClientCredentialsFactory;
+
+    public get userAgent(): string {
+        return USER_AGENT;
+    }
 
     constructor(
         readonly botFrameworkAuthConfig?: ConfigurationBotFrameworkAuthenticationOptions,
@@ -64,5 +72,28 @@ export class TeamsAdapter extends CloudAdapter {
             new ConfigurationServiceClientCredentialFactory(
                 botFrameworkAuthConfig as ConfigurationServiceClientCredentialFactoryOptions
             );
+    }
+
+    async process(req: Request, res: Response, logic: (context: TurnContext) => Promise<void>): Promise<void>;
+    async process(
+        req: Request,
+        socket: INodeSocket,
+        head: INodeBuffer,
+        logic: (context: TurnContext) => Promise<void>
+    ): Promise<void>;
+    async process(
+        req: Request,
+        resOrSocket: Response | INodeSocket,
+        logicOrHead: ((context: TurnContext) => Promise<void>) | INodeBuffer,
+        maybeLogic?: (context: TurnContext) => Promise<void>
+    ): Promise<void> {
+        if ('header' in resOrSocket && typeof logicOrHead === 'function') {
+            resOrSocket.header('User-Agent', USER_AGENT);
+            return super.process(req, resOrSocket, logicOrHead);
+        }
+
+        if ('connecting' in resOrSocket && typeof logicOrHead !== 'function' && !!maybeLogic) {
+            return super.process(req, resOrSocket, logicOrHead, maybeLogic);
+        }
     }
 }
