@@ -10,22 +10,22 @@ from typing import Any, Dict, List, Optional, Union, cast
 from botbuilder.core import TurnContext
 from dataclasses_json import dataclass_json
 
-from teams.ai.augmentations.action_augmentation_section import ActionAugmentationSection
-from teams.ai.augmentations.augmentation import Augmentation
-from teams.ai.models.chat_completion_action import ChatCompletionAction
-from teams.ai.models.prompt_response import PromptResponse
-from teams.ai.planner import Plan
-from teams.ai.planner.predicted_command import PredictedCommand
-from teams.ai.planner.predicted_do_command import PredictedDoCommand
-from teams.ai.planner.predicted_say_command import PredictedSayCommand
-from teams.ai.prompts.function_call import FunctionCall
-from teams.ai.prompts.message import Message
-from teams.ai.prompts.sections.prompt_section import PromptSection
-from teams.ai.tokenizers import Tokenizer
-from teams.ai.validators.action_response_validator import ActionResponseValidator
-from teams.ai.validators.json_response_validator import JSONResponseValidator
-from teams.ai.validators.validation import Validation
-from teams.state import Memory
+from ...state import Memory
+from ..augmentations.action_augmentation_section import ActionAugmentationSection
+from ..augmentations.augmentation import Augmentation
+from ..models.chat_completion_action import ChatCompletionAction
+from ..models.prompt_response import PromptResponse
+from ..planner.plan import Plan
+from ..planner.predicted_command import PredictedCommand
+from ..planner.predicted_do_command import PredictedDoCommand
+from ..planner.predicted_say_command import PredictedSayCommand
+from ..prompts.function_call import FunctionCall
+from ..prompts.message import Message
+from ..prompts.sections.prompt_section import PromptSection
+from ..tokenizers import Tokenizer
+from ..validators.action_response_validator import ActionResponseValidator
+from ..validators.json_response_validator import JSONResponseValidator
+from ..validators.validation import Validation
 
 _MISSING_ACTION_FEEDBACK = (
     'The JSON returned had errors. Apply these fixes:\nadd the "action" property to "instance"'

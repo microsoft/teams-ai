@@ -9,3 +9,4 @@ from .planner import Planner
 from .predicted_command import PredictedCommand
 from .predicted_do_command import PredictedDoCommand
 from .predicted_say_command import PredictedSayCommand
+from .response_parser import parse_adaptive_card

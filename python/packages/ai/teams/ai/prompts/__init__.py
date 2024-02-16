@@ -4,6 +4,7 @@ Licensed under the MIT License.
 """
 
 from .assistant_message import AssistantMessage
+from .augmentation_config import AugmentationConfig
 from .completion_config import CompletionConfig
 from .function_call import FunctionCall
 from .function_call_message import FunctionCallMessage

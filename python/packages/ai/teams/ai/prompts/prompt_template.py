@@ -4,7 +4,10 @@ Licensed under the MIT License.
 """
 
 from dataclasses import dataclass
+from typing import List, Optional
 
+from ..augmentations.augmentation import Augmentation
+from ..models.chat_completion_action import ChatCompletionAction
 from .prompt_template_config import PromptTemplateConfig
 from .sections.prompt_section import PromptSection
 
@@ -20,8 +23,15 @@ class PromptTemplate:
         prompt (PromptSection): Text of the prompt template.
 
         config (PromptTemplateConfig): Configuration settings for the prompt template.
+
+        actions (Optional[List[ChatCompletionAction]]): Optional
+            list of actions the model may generate JSON inputs for.
+
+        augmentation (Optional[Augmentation]): Optional augmentation for the prompt template.
     """
 
     name: str
     prompt: PromptSection
     config: PromptTemplateConfig
+    actions: Optional[List[ChatCompletionAction]] = None
+    augmentation: Optional[Augmentation] = None

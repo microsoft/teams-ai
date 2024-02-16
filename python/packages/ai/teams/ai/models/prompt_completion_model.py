@@ -9,7 +9,8 @@ from botbuilder.core import TurnContext
 
 from ...state import Memory
 from ...user_agent import _UserAgent
-from ..prompts import PromptFunctions, PromptTemplate
+from ..prompts.prompt_functions import PromptFunctions
+from ..prompts.prompt_template import PromptTemplate
 from ..tokenizers import Tokenizer
 from .prompt_response import PromptResponse
 
