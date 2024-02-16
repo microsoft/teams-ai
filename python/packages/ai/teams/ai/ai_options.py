@@ -5,9 +5,8 @@ Licensed under the MIT License.
 
 from dataclasses import dataclass, field
 
-from teams.ai.planner import Planner
-
 from .ai_history_options import AIHistoryOptions
+from .planner import Planner
 
 
 @dataclass

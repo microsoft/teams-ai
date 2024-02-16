@@ -16,7 +16,7 @@
         "stop_sequences": []
     },
     "augmentation": {
-        "augmentation_type": "none",
+        "augmentation_type": "monologue",
         "data_sources": {
             "teams-ai": 1200
         }

@@ -9,13 +9,13 @@ from typing import Any, Dict, List, Optional, Union
 import yaml
 from botbuilder.core import TurnContext
 
-from teams.ai.models.chat_completion_action import ChatCompletionAction
-from teams.ai.prompts.message import Message
-from teams.ai.prompts.prompt_functions import PromptFunctions
-from teams.ai.prompts.rendered_prompt_section import RenderedPromptSection
-from teams.ai.prompts.sections.prompt_section_base import PromptSectionBase
-from teams.ai.tokenizers.tokenizer import Tokenizer
-from teams.state.memory import Memory
+from ...state import Memory
+from ..models.chat_completion_action import ChatCompletionAction
+from ..prompts.message import Message
+from ..prompts.prompt_functions import PromptFunctions
+from ..prompts.rendered_prompt_section import RenderedPromptSection
+from ..prompts.sections.prompt_section_base import PromptSectionBase
+from ..tokenizers.tokenizer import Tokenizer
 
 
 @dataclass

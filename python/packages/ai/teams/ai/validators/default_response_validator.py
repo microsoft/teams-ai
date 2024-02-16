@@ -8,7 +8,7 @@ from typing import Generic, TypeVar
 from botbuilder.core import TurnContext
 
 from ...state import Memory
-from ..models import PromptResponse
+from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
 from .prompt_response_validator import PromptResponseValidator
 from .validation import Validation
