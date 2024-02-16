@@ -20,6 +20,10 @@ from typing import (
 from botbuilder.core import Bot, InvokeResponse, TurnContext
 from botbuilder.integration.aiohttp import CloudAdapter
 from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema.teams import (
+    FileConsentCardResponse,
+    O365ConnectorCardActionQuery,
+)
 
 from teams.adaptive_cards.adaptive_cards import AdaptiveCards
 from teams.ai import AI, TurnState
@@ -351,6 +355,130 @@ class Application(Bot, Generic[StateT]):
 
         def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
             self._routes.append(Route[StateT](__selector__, func))
+            return func
+
+        return __call__
+
+    def file_consent_accept(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]],
+        Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for when a file consent card is accepted by the user.
+         ```python
+        # Use this method as a decorator
+        @app.file_consent_accept()
+        async def on_file_consent_accept(
+            context: TurnContext, state: TurnState, file_consent_response: FileConsentCardResponse
+        ):
+            print(file_consent_response)
+        # Pass a function to this method
+        app.file_consent_accept()(on_file_consent_accept)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "fileConsent/invoke"
+                and isinstance(context.activity.value, dict)
+                and context.activity.value.get("action") == "accept"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+                await func(context, state, context.activity.value)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __handler__))
+            return func
+
+        return __call__
+
+    def file_consent_decline(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]],
+        Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for when a file consent card is declined by the user.
+         ```python
+        # Use this method as a decorator
+        @app.file_consent_decline()
+        async def on_file_consent_decline(
+            context: TurnContext, state: TurnState, file_consent_response: FileConsentCardResponse
+        ):
+            print(file_consent_response)
+        # Pass a function to this method
+        app.file_consent_decline()(on_file_consent_decline)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "fileConsent/invoke"
+                and isinstance(context.activity.value, dict)
+                and context.activity.value.get("action") == "decline"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+                await func(context, state, context.activity.value)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __handler__))
+            return func
+
+        return __call__
+
+    def o365_connector_card_action(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]],
+        Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for when a O365 connector card action is received from the user.
+         ```python
+        # Use this method as a decorator
+        @app.o365_connector_card_action()
+        async def on_o365_connector_card_action(
+            context: TurnContext, state: TurnState, query: O365ConnectorCardActionQuery
+        ):
+            print(query)
+        # Pass a function to this method
+        app.o365_connector_card_action()(on_o365_connector_card_action)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "actionableMessage/executeAction"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
+                if not context.activity.value:
+                    return False
+                await func(context, state, context.activity.value)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __handler__))
             return func
 
         return __call__

@@ -265,3 +265,488 @@ class TestApp(IsolatedAsyncioTestCase):
         on_edit_message.assert_called_once()
         on_soft_delete_message.assert_called_once()
         on_undelete_message.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_o365_connector_card_action(self):
+        on_o365_connector_card_action = mock.AsyncMock()
+        self.app.o365_connector_card_action()(on_o365_connector_card_action)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="actionableMessage/executeAction",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"body": "some results", "action_id": "actionId"},
+                ),
+            )
+        )
+
+        on_o365_connector_card_action.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_o365_connector_card_action_wrong_type(self):
+        on_o365_connector_card_action = mock.AsyncMock()
+        self.app.o365_connector_card_action()(on_o365_connector_card_action)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="event",
+                    name="actionableMessage/executeAction",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"body": "some results", "action_id": "actionId"},
+                ),
+            )
+        )
+
+        on_o365_connector_card_action.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_o365_connector_card_action_wrong_name(self):
+        on_o365_connector_card_action = mock.AsyncMock()
+        self.app.o365_connector_card_action()(on_o365_connector_card_action)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="actionableMessage/executeAc",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"body": "some results", "action_id": "actionId"},
+                ),
+            )
+        )
+
+        on_o365_connector_card_action.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_o365_connector_card_action_missing_value(self):
+        on_o365_connector_card_action = mock.AsyncMock()
+        self.app.o365_connector_card_action()(on_o365_connector_card_action)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="actionableMessage/executeAction",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        on_o365_connector_card_action.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_accept(self):
+        on_file_consent_accept = mock.AsyncMock()
+        self.app.file_consent_accept()(on_file_consent_accept)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "accept",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_accept.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_accept_wrong_type(self):
+        on_file_consent_accept = mock.AsyncMock()
+        self.app.file_consent_accept()(on_file_consent_accept)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="event",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "accept",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_accept.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_accept_invalid_name(self):
+        on_file_consent_accept = mock.AsyncMock()
+        self.app.file_consent_accept()(on_file_consent_accept)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/event",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "accept",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_accept.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_accept_missing_action(self):
+        on_file_consent_accept = mock.AsyncMock()
+        self.app.file_consent_accept()(on_file_consent_accept)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_accept.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_accept_missing_value(self):
+        on_file_consent_accept = mock.AsyncMock()
+        self.app.file_consent_accept()(on_file_consent_accept)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        on_file_consent_accept.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_accept_invalid_action(self):
+        on_file_consent_accept = mock.AsyncMock()
+        self.app.file_consent_accept()(on_file_consent_accept)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "stub",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_accept.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_decline(self):
+        on_file_consent_decline = mock.AsyncMock()
+        self.app.file_consent_decline()(on_file_consent_decline)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "decline",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_decline.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_decline_wrong_type(self):
+        on_file_consent_decline = mock.AsyncMock()
+        self.app.file_consent_decline()(on_file_consent_decline)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="event",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "decline",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_decline.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_decline_invalid_name(self):
+        on_file_consent_decline = mock.AsyncMock()
+        self.app.file_consent_decline()(on_file_consent_decline)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/event",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "decline",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_decline.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_missing_value(self):
+        on_file_consent_decline = mock.AsyncMock()
+        self.app.file_consent_decline()(on_file_consent_decline)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        on_file_consent_decline.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_decline_missing_action(self):
+        on_file_consent_decline = mock.AsyncMock()
+        self.app.file_consent_decline()(on_file_consent_decline)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_decline.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_file_consent_decline_invalid_action(self):
+        on_file_consent_decline = mock.AsyncMock()
+        self.app.file_consent_decline()(on_file_consent_decline)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="fileConsent/invoke",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="UnitTest",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={
+                        "action": "stub",
+                        "context": {"theme": "dark", "consentId": "1234567890"},
+                        "uploadInfo": {
+                            "name": "test.txt",
+                            "uploadUrl": "https://test.com",
+                            "contentUrl": "https://test.com",
+                            "uniqueId": "1234567890",
+                        },
+                    },
+                ),
+            )
+        )
+
+        on_file_consent_decline.assert_not_called()
