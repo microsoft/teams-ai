@@ -7,7 +7,7 @@ from typing import Awaitable, Callable, Generic, List, TypeVar
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import ActivityTypes
-from botbuilder.schema.teams import MeetingEndEventDetails, MeetingStartEventDetails, MeetingEndEventDetails
+from botbuilder.schema.teams import MeetingEndEventDetails, MeetingStartEventDetails
 
 from teams.ai import TurnState
 
