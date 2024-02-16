@@ -10,5 +10,6 @@ from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .input_file import InputFile
 from .message_extensions import MessagePreviewAction
+from .message_reaction_types import MessageReactionTypes
 from .query import Query
 from .teams_adapter import TeamsAdapter

@@ -39,3 +39,7 @@ ConversationUpdateType = Literal[
     "teamUnarchived",
     "teamRestored",
 ]
+
+MessageReactionType = Literal["reactionsAdded", "reactionsRemoved"]
+
+MessageUpdateType = Literal["editMessage", "softDeleteMessage", "undeleteMessage"]
