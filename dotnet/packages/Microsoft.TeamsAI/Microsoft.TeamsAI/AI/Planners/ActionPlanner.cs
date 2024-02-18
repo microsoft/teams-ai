@@ -34,7 +34,8 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <summary>
         /// Options used to configure the planner.
         /// </summary>
-        private readonly ActionPlannerOptions<TState> _options;
+        public readonly ActionPlannerOptions<TState> Options;
+
         private readonly ILoggerFactory? _logger;
 
         /// <summary>
@@ -44,19 +45,19 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <param name="loggerFactory"></param>
         public ActionPlanner(ActionPlannerOptions<TState> options, ILoggerFactory? loggerFactory = null)
         {
-            this._options = options;
+            this.Options = options;
             this._logger = loggerFactory;
         }
 
         /// <summary>
         /// Gets the prompt completion model in use
         /// </summary>
-        public IPromptCompletionModel Model { get => _options.Model; }
+        public IPromptCompletionModel Model { get => Options.Model; }
 
         /// <summary>
         /// Get the prompt manager in use
         /// </summary>
-        public PromptManager Prompts { get => _options.Prompts; }
+        public PromptManager Prompts { get => Options.Prompts; }
 
         /// <summary>
         /// Starts a new task.
@@ -97,7 +98,7 @@ namespace Microsoft.Teams.AI.AI.Planners
         /// <exception cref="Exception">thrown when there was an issue generating a plan</exception>
         public async Task<Plan> ContinueTaskAsync(ITurnContext context, TState state, AI<TState> ai, CancellationToken cancellationToken = default)
         {
-            PromptTemplate template = await this._options.DefaultPrompt(context, state, this);
+            PromptTemplate template = await this.Options.DefaultPrompt(context, state, this);
             PromptResponse response = await this.CompletePromptAsync(context, state, template, template.Augmentation, cancellationToken);
 
             if (response.Status != PromptResponseStatus.Success)
@@ -155,10 +156,10 @@ namespace Microsoft.Teams.AI.AI.Planners
             {
                 HistoryVariable = historyVariable,
                 Validator = validator ?? new DefaultResponseValidator(),
-                Tokenizer = this._options.Tokenizer,
+                Tokenizer = this.Options.Tokenizer,
                 MaxHistoryMessages = this.Prompts.Options.MaxHistoryMessages,
-                MaxRepairAttempts = this._options.MaxRepairAttempts,
-                LogRepairs = this._options.LogRepairs
+                MaxRepairAttempts = this.Options.MaxRepairAttempts,
+                LogRepairs = this.Options.LogRepairs
             }, this._logger);
 
             return await client.CompletePromptAsync(context, memory, this.Prompts, null, cancellationToken);
