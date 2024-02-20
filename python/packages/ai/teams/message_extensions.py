@@ -230,6 +230,142 @@ class MessageExtensions(Generic[StateT]):
 
         return __call__
 
+    def query_setting_url(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]],
+    ]:
+        """
+        Registers a handler that invokes the fetch of the config settings for a Message Extension.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_extensions.query_setting_url()
+        async def on_query_setting_url(context: TurnContext, state: TurnState):
+            return MessagingExtensionResult()
+
+        # Pass a function to this method
+        app.message_extensions.query_setting_url()(on_query_setting_url)
+        ```
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/querySettingUrl"
+            ):
+                return False
+            return True
+
+        def __call__(
+            func: Callable[
+                [TurnContext, StateT],
+                Awaitable[MessagingExtensionResult],
+            ]
+        ) -> Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]]:
+            async def __invoke__(context: TurnContext, state: StateT):
+                res = await func(context, state)
+                await self._invoke_action_response(context, res)
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
+            return func
+
+        return __call__
+
+    def configure_settings(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, Any], Awaitable[None]]],
+        Callable[[TurnContext, StateT, Any], Awaitable[None]],
+    ]:
+        """
+        Registers a handler that implements the logic to invoke
+            configuring Message Extension settings
+
+        ```python
+        # Use this method as a decorator
+        @app.message_extensions.configure_settings({"foo": "bar"})
+        async def on_configure_settings(context: TurnContext, state: TurnState, data: Any):
+            print(data)
+
+        # Pass a function to this method
+        app.message_extensions.configure_settings({"foo": "bar"})(on_configure_settings)
+        ```
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/setting"
+            ):
+                return False
+            return True
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, Any], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, Any], Awaitable[None]]:
+            async def __invoke__(context: TurnContext, state: StateT):
+                value = {}
+                if context.activity.value:
+                    value = context.activity.value
+
+                await func(context, state, value)
+                await self._invoke_response(context, MessagingExtensionResult())
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
+            return func
+
+        return __call__
+
+    def card_button_clicked(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, StateT, Any], Awaitable[None]]],
+        Callable[[TurnContext, StateT, Any], Awaitable[None]],
+    ]:
+        """
+        Registers a handler that implements the logic when a
+            user has clicked on a button in a Message Extension card.
+
+        ```python
+        # Use this method as a decorator
+        @app.message_extensions.card_button_clicked({"foo": "bar"})
+        async def on_card_button_clicked(context: TurnContext, state: TurnState, data: Any):
+            print(data)
+
+        # Pass a function to this method
+        app.message_extensions.card_button_clicked({"foo": "bar"})(on_card_button_clicked)
+        ```
+        """
+
+        def __selector__(context: TurnContext):
+            if (
+                context.activity.type != ActivityTypes.invoke
+                or context.activity.name != "composeExtension/onCardButtonClicked"
+            ):
+                return False
+            return True
+
+        def __call__(
+            func: Callable[[TurnContext, StateT, Any], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, Any], Awaitable[None]]:
+            async def __invoke__(context: TurnContext, state: StateT):
+                value = {}
+                if context.activity.value:
+                    value = context.activity.value
+
+                await func(context, state, value)
+                await self._invoke_response(context, MessagingExtensionResult())
+                return True
+
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
+            return func
+
+        return __call__
+
     def message_preview(
         self, command_id: Union[str, Pattern[str]], action: MessagePreviewAction
     ) -> Callable[
