@@ -396,7 +396,7 @@ class Application(Bot, Generic[StateT]):
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route[StateT](__selector__, __handler__))
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
@@ -438,7 +438,7 @@ class Application(Bot, Generic[StateT]):
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route[StateT](__selector__, __handler__))
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
@@ -478,7 +478,7 @@ class Application(Bot, Generic[StateT]):
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route[StateT](__selector__, __handler__))
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
