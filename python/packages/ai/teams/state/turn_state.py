@@ -34,7 +34,7 @@ class TurnState(Memory):
             def custom(self) -> DefaultCustomState:
                 scope = self.get_scope(self.CUSTOM_SCOPE)
                 if not scope:
-                    raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+                    raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
                 return DefaultCustomState(scope.value)
 
@@ -42,7 +42,7 @@ class TurnState(Memory):
             def custom(self, value: DefaultCustomState):
                 scope = self.get_scope(self.CUSTOM_SCOPE)
                 if not scope:
-                    raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+                    raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
                 scope.replace(value.get_dict())
 
@@ -78,10 +78,10 @@ class TurnState(Memory):
         """
         scope = self.get_scope(CONVERSATION_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
-        return DefaultConversationState(scope)
+        return DefaultConversationState(scope.data)
 
     @conversation.setter
     def conversation(self, value: DefaultConversationState):
@@ -95,8 +95,8 @@ class TurnState(Memory):
         """
         scope = self.get_scope(CONVERSATION_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.replace(value.get_dict())
 
@@ -121,10 +121,10 @@ class TurnState(Memory):
         """
         scope = self.get_scope(TEMP_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
-        return DefaultTempState(scope)
+        return DefaultTempState(scope.data)
 
     @temp.setter
     def temp(self, value: DefaultTempState):
@@ -138,8 +138,8 @@ class TurnState(Memory):
         """
         scope = self.get_scope(TEMP_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.replace(value.get_dict())
 
@@ -155,10 +155,10 @@ class TurnState(Memory):
         """
         scope = self.get_scope(USER_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
-        return DefaultUserState(scope)
+        return DefaultUserState(scope.data)
 
     @user.setter
     def user(self, value: DefaultUserState):
@@ -172,8 +172,8 @@ class TurnState(Memory):
         """
         scope = self.get_scope(USER_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.replace(value.get_dict())
 
@@ -185,8 +185,8 @@ class TurnState(Memory):
         """
         scope = self.get_scope(CONVERSATION_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.delete()
 
@@ -198,8 +198,8 @@ class TurnState(Memory):
         """
         scope = self.get_scope(TEMP_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.delete()
 
@@ -211,8 +211,8 @@ class TurnState(Memory):
         """
         scope = self.get_scope(USER_SCOPE)
 
-        if not scope:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+        if scope is None:
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.delete()
 
@@ -360,7 +360,7 @@ class TurnState(Memory):
             await self._loading_callable()
 
         if not self._is_loaded:
-            raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
+            raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         # Find changes and deletions
         changes = {}
@@ -372,7 +372,7 @@ class TurnState(Memory):
                     if entry.is_deleted:
                         deletions.append(entry.storage_key)
                     elif entry.has_changed:
-                        changes[entry.storage_key] = entry
+                        changes[entry.storage_key] = entry.data
 
         # Do we have a storage provider?
         if storage:

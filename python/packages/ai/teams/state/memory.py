@@ -3,6 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from collections import UserDict
 from typing import Any, Dict, Optional, Tuple
 
 from ..app_error import ApplicationError
@@ -16,7 +17,7 @@ class Memory:
     """
 
     _parent: Optional["Memory"]
-    _scopes: Dict[str, Dict[str, Any]]
+    _scopes: Dict[str, UserDict[str, Any]]
 
     def __init__(self, parent: Optional["Memory"] = None) -> None:
         self._parent = parent
@@ -32,8 +33,8 @@ class Memory:
         """
         scope, name = self._get_scope_and_name(path)
 
-        if scope in self._scopes and name in self._scopes[scope]:
-            del self._scopes[scope][name]
+        if scope in self._scopes and name in self._scopes[scope].data:
+            del self._scopes[scope].data[name]
 
     def has_value(self, path: str) -> bool:
         """
@@ -48,7 +49,7 @@ class Memory:
         """
         scope, name = self._get_scope_and_name(path)
 
-        if scope in self._scopes and name in self._scopes[name]:
+        if scope in self._scopes and name in self._scopes[name].data:
             return True
 
         if self._parent:
@@ -69,8 +70,8 @@ class Memory:
         """
         scope, name = self._get_scope_and_name(path)
 
-        if scope in self._scopes and name in self._scopes[name]:
-            return self._scopes[scope][name]
+        if scope in self._scopes and name in self._scopes[name].data:
+            return self._scopes[scope].data[name]
 
         if self._parent:
             return self._parent.get_value(path)
@@ -89,15 +90,15 @@ class Memory:
         scope, name = self._get_scope_and_name(path)
 
         if not scope in self._scopes:
-            self._scopes[scope] = {}
+            self._scopes[scope] = UserDict()
 
-        self._scopes[scope][name] = value
+        self._scopes[scope].data[name] = value
 
     def _get_scope_and_name(self, path: str) -> Tuple[str, str]:
         parts = path.split(".")
 
         if len(parts) > 2:
-            raise ApplicationError(f"invalid state path: {'.'.join(path)}")
+            raise ApplicationError(f"Invalid state path: {path}")
 
         if len(parts) == 1:
             parts.insert(0, "temp")

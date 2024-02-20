@@ -2,10 +2,11 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
+from collections import UserDict
 from typing import Any, Dict, Optional
 
 
-class TurnStateEntry(Dict[str, Any]):
+class TurnStateEntry(UserDict[str, Any]):
     """Accessor class for managing an individual state scope."""
 
     _storage_key: Optional[str]
@@ -23,7 +24,7 @@ class TurnStateEntry(Dict[str, Any]):
         """
         super().__init__(value or {})
         self._storage_key = storage_key
-        self._hash = str(self.items())
+        self._hash = str(self.data)
 
     @property
     def has_changed(self) -> bool:
@@ -32,7 +33,7 @@ class TurnStateEntry(Dict[str, Any]):
         Returns:
             bool: True if the value has changed, False otherwise.
         """
-        return str(self.items()) != self._hash
+        return str(self.data) != self._hash
 
     @property
     def is_deleted(self) -> bool:
@@ -54,8 +55,8 @@ class TurnStateEntry(Dict[str, Any]):
 
     def delete(self) -> None:
         """Clears the state scope."""
+        self.data = {}
         self._deleted = True
-        self.clear()
 
     def replace(self, value: Optional[Dict[str, Any]] = None) -> None:
         """Replaces the state scope with a new value.
@@ -63,12 +64,24 @@ class TurnStateEntry(Dict[str, Any]):
         Args:
             value (Optional[Dict[str, Any]], optional): New value to replace the state scope with.
         """
-        self.clear()
+        self.data = {}
+        self._deleted = False
 
         if not value:
             return None
 
-        for key in value:
-            self[key] = value
+        return self.update(value)
 
-        return None
+    def __getitem__(self, key: str) -> Any:
+        self._deleted = False
+        return super().__getitem__(key)
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self._deleted = False
+        return super().__setitem__(key, value)
+
+    def __getattribute__(self, name: str) -> Any:
+        if name == "data":
+            self._deleted = False
+
+        return super().__getattribute__(name)

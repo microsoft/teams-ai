@@ -14,7 +14,6 @@ class TestTurnStateEntry(TestCase):
 
     def setUp(self):
         self.entry = TurnStateEntry(deepcopy(self._value), deepcopy(self._storage_key))
-        print(self.entry)
 
     def test_has_changed_replace_entry(self):
         self.assertFalse(self.entry.has_changed)
