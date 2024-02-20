@@ -7,22 +7,20 @@ to our app
 """
 
 from botbuilder.schema import Activity
-from fastapi import FastAPI, Request, Response
+from flask import Flask, jsonify, request
 
-from src.bot import app
+from bot import app
 
-api = FastAPI()
+api = Flask(__name__)
 
 
-@api.post("/api/messages")
-async def on_message(req: Request, res: Response):
-    body = await req.json()
-    activity = Activity().deserialize(body)
-    auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
+@api.route("/api/messages", methods=["POST"])
+async def on_messages():
+    activity = Activity().deserialize(request.json)
+
+    auth_header = request.headers["Authorization"] if "Authorization" in request.headers else ""
     response = await app.process_activity(activity, auth_header)
 
     if response:
-        res.status_code = response.status
-        return response.body
-
-    return None
+        return jsonify(response.body), response.status
+    return "", 200

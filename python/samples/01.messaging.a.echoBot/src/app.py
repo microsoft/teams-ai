@@ -3,10 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-import uvicorn
-
-from src.api import api
-from src.bot import config
+from api import api
+from config import Config
 
 if __name__ == "__main__":
-    uvicorn.run(api, port=config.PORT)
+    api.run(host="localhost", port=Config.PORT)

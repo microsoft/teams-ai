@@ -12,7 +12,7 @@ from botbuilder.core import TurnContext
 from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
 from teams import Application, ApplicationOptions, TurnState
 
-from src.config import Config
+from config import Config
 
 config = Config()
 app = Application[TurnState](

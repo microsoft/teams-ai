@@ -37,6 +37,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
+          pip install pylint
+          pip install mypy
           python scripts/install.py
       - name: Check
         run: |
