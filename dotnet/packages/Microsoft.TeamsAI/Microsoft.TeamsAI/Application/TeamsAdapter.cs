@@ -1,4 +1,6 @@
-﻿using Microsoft.Bot.Builder.Integration.AspNet.Core;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
@@ -41,6 +43,15 @@ namespace Microsoft.Teams.AI
                 logger)
         {
             HttpClientFactory = new TeamsHttpClientFactory(httpClientFactory);
+        }
+
+        /// <inheritdoc />
+        public new async Task ProcessAsync(HttpRequest httpRequest, HttpResponse httpResponse, IBot bot, CancellationToken cancellationToken = default)
+        {
+            string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            ProductInfoHeaderValue productInfo = new("teamsai-dotnet", version);
+            httpResponse.Headers.Add("User-Agent", productInfo.ToString());
+            await base.ProcessAsync(httpRequest, httpResponse, bot, cancellationToken);
         }
     }
 
