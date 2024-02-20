@@ -8,6 +8,7 @@ from .ai import AI
 from .ai_history_options import AIHistoryOptions
 from .ai_options import AIOptions
 from .augmentations import *
+from .clients import *
 from .data_sources import *
 from .embeddings import *
 from .models import *

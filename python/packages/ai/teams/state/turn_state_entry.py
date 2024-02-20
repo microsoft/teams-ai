@@ -5,10 +5,9 @@ Licensed under the MIT License.
 from typing import Any, Dict, Optional
 
 
-class TurnStateEntry:
+class TurnStateEntry(Dict[str, Any]):
     """Accessor class for managing an individual state scope."""
 
-    _value: Dict[str, Any]
     _storage_key: Optional[str]
     _deleted: bool = False
     _hash: str
@@ -22,9 +21,9 @@ class TurnStateEntry:
             storage_key (Optional[str], optional): Storage key to use when persisting the
                 state scope. Defaults to None.
         """
-        self._value = value or {}
+        super().__init__(value or {})
         self._storage_key = storage_key
-        self._hash = str(self._value)
+        self._hash = str(self.items())
 
     @property
     def has_changed(self) -> bool:
@@ -33,7 +32,7 @@ class TurnStateEntry:
         Returns:
             bool: True if the value has changed, False otherwise.
         """
-        return str(self._value) != self._hash
+        return str(self.items()) != self._hash
 
     @property
     def is_deleted(self) -> bool:
@@ -43,21 +42,6 @@ class TurnStateEntry:
             bool: True if the state entry is deleted, False otherwise.
         """
         return self._deleted
-
-    @property
-    def value(self) -> Dict[str, Any]:
-        """Gets the value of the state scope.
-        If the state scope is deleted, it resets the value to empty dict.
-
-        Returns:
-            Dict[str, Any]: The value of the state scope.
-        """
-        if self._deleted:
-            # Switch to a replace scenario
-            self._value = {}
-            self._deleted = False
-
-        return self._value
 
     @property
     def storage_key(self) -> Optional[str]:
@@ -71,6 +55,7 @@ class TurnStateEntry:
     def delete(self) -> None:
         """Clears the state scope."""
         self._deleted = True
+        self.clear()
 
     def replace(self, value: Optional[Dict[str, Any]] = None) -> None:
         """Replaces the state scope with a new value.
@@ -78,4 +63,12 @@ class TurnStateEntry:
         Args:
             value (Optional[Dict[str, Any]], optional): New value to replace the state scope with.
         """
-        self._value = value or {}
+        self.clear()
+
+        if not value:
+            return None
+
+        for key in value:
+            self[key] = value
+
+        return None

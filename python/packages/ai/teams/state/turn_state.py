@@ -4,8 +4,7 @@ Licensed under the MIT License.
 """
 
 import asyncio
-from dataclasses import dataclass
-from typing import Any, Awaitable, Callable, Dict, Optional
+from typing import Any, Awaitable, Callable, Dict, Optional, cast
 
 from botbuilder.core import Storage, TurnContext
 
@@ -19,12 +18,6 @@ from .turn_state_entry import TurnStateEntry
 CONVERSATION_SCOPE = "conversation"
 USER_SCOPE = "user"
 TEMP_SCOPE = "temp"
-
-
-@dataclass
-class _GetScopeAndNameResult:
-    scope: TurnStateEntry
-    name: str
 
 
 class TurnState(Memory):
@@ -64,14 +57,12 @@ class TurnState(Memory):
         ```
     """
 
-    _scopes: Dict[str, TurnStateEntry]
     _is_loaded: bool
     _loading_callable: Optional[Callable[[], Awaitable[bool]]]
 
     def __init__(self):
         """Initialize the class."""
         super().__init__()
-        self._scopes = {}
         self._is_loaded = False
         self._loading_callable = None
 
@@ -86,10 +77,11 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(CONVERSATION_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
-        return DefaultConversationState(scope.value)
+        return DefaultConversationState(scope)
 
     @conversation.setter
     def conversation(self, value: DefaultConversationState):
@@ -102,6 +94,7 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(CONVERSATION_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
@@ -127,10 +120,11 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(TEMP_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
-        return DefaultTempState(scope.value)
+        return DefaultTempState(scope)
 
     @temp.setter
     def temp(self, value: DefaultTempState):
@@ -143,6 +137,7 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(TEMP_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
@@ -159,10 +154,11 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(USER_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
-        return DefaultUserState(scope.value)
+        return DefaultUserState(scope)
 
     @user.setter
     def user(self, value: DefaultUserState):
@@ -175,6 +171,7 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(USER_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
@@ -187,6 +184,7 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(CONVERSATION_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
@@ -199,6 +197,7 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(TEMP_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
@@ -211,6 +210,7 @@ class TurnState(Memory):
             ApplicationError: If the state has not been loaded.
         """
         scope = self.get_scope(USER_SCOPE)
+
         if not scope:
             raise ApplicationError("TurnState hasn't been loaded. Call loadState() first.")
 
@@ -225,7 +225,7 @@ class TurnState(Memory):
         Returns:
             Optional[TurnStateEntry]: The state scope or None if not found.
         """
-        return self._scopes.get(scope, None)
+        return cast(TurnStateEntry, self._scopes.get(scope, None))
 
     def delete_value(self, path: str) -> None:
         """Deletes a value from the memory.
@@ -234,11 +234,13 @@ class TurnState(Memory):
             path (str): Path to the value to delete in the form of `[scope].property`.
               If scope is omitted, the value is deleted from the temporary scope.
         """
-        scope_and_name = self._get_scope_and_name(path)
-        scope = scope_and_name.scope
-        name = scope_and_name.name
-        if name in scope.value:
-            del scope.value[name]
+        scope, name = self._get_scope_and_name(path)
+
+        if not scope in self._scopes or not name in self._scopes[scope]:
+            return None
+
+        del self._scopes[scope][name]
+        return None
 
     def has_value(self, path: str) -> bool:
         """Checks if a value exists in the memory.
@@ -250,10 +252,12 @@ class TurnState(Memory):
         Returns:
             bool: True if the value exists, False otherwise.
         """
-        scope_and_name = self._get_scope_and_name(path)
-        scope = scope_and_name.scope
-        name = scope_and_name.name
-        return name in scope.value
+        scope, name = self._get_scope_and_name(path)
+
+        if not scope in self._scopes:
+            return False
+
+        return name in self._scopes[scope]
 
     def get_value(self, path: str) -> Optional[Any]:
         """Retrieves a value from the memory.
@@ -265,10 +269,12 @@ class TurnState(Memory):
         Returns:
             Optional[Any]: The value or None if not found.
         """
-        scope_and_name = self._get_scope_and_name(path)
-        scope = scope_and_name.scope
-        name = scope_and_name.name
-        return scope.value[name] if name in scope.value else None
+        scope, name = self._get_scope_and_name(path)
+
+        if not scope in self._scopes:
+            return None
+
+        return self._scopes[scope][name] if name in self._scopes[scope] else None
 
     def set_value(self, path: str, value: Any) -> None:
         """Assigns a value to the memory.
@@ -278,10 +284,12 @@ class TurnState(Memory):
               If scope is omitted, the value is assigned to the temporary scope.
             value (Any): Value to assign.
         """
-        scope_and_name = self._get_scope_and_name(path)
-        scope = scope_and_name.scope
-        name = scope_and_name.name
-        scope.value[name] = value
+        scope, name = self._get_scope_and_name(path)
+
+        if not scope in self._scopes:
+            self._scopes[scope] = TurnStateEntry()
+
+        self._scopes[scope][name] = value
 
     async def load(self, context: TurnContext, storage: Optional[Storage] = None) -> bool:
         """Loads all of the state scopes for the current turn.
@@ -357,12 +365,14 @@ class TurnState(Memory):
         # Find changes and deletions
         changes = {}
         deletions = []
+
         for _key, entry in self._scopes.items():
-            if entry.storage_key:
-                if entry.is_deleted:
-                    deletions.append(entry.storage_key)
-                elif entry.has_changed:
-                    changes[entry.storage_key] = entry.value
+            if isinstance(entry, TurnStateEntry):
+                if entry.storage_key:
+                    if entry.is_deleted:
+                        deletions.append(entry.storage_key)
+                    elif entry.has_changed:
+                        changes[entry.storage_key] = entry
 
         # Do we have a storage provider?
         if storage:
@@ -404,18 +414,3 @@ class TurnState(Memory):
         keys[USER_SCOPE] = f"{channel_id}/{bot_id}/users/{user_id}"
 
         return keys
-
-    def _get_scope_and_name(self, path: str) -> _GetScopeAndNameResult:
-        # Get variable scope and name
-        parts = path.split(".")
-        if len(parts) > 2:
-            raise ApplicationError(f"Invalid state path: {path}")
-        if len(parts) == 1:
-            parts.insert(0, TEMP_SCOPE)
-
-        # Validate scope
-        scope = self.get_scope(parts[0])
-        if not scope:
-            raise ApplicationError(f"Invalid state scope: {parts[0]}")
-
-        return _GetScopeAndNameResult(scope, parts[1])

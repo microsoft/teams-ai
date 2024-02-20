@@ -294,7 +294,9 @@ class TestTurnState(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
         self.turn_state.delete_conversation_state()
-        self.assertTrue(self.turn_state._scopes[CONVERSATION_SCOPE].is_deleted)
+        scope = self.turn_state.get_scope(CONVERSATION_SCOPE)
+        assert scope
+        self.assertTrue(scope.is_deleted)
 
     async def test_delete_conversation_state_not_loaded(self):
         with self.assertRaises(Exception) as context:
@@ -307,7 +309,9 @@ class TestTurnState(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
         self.turn_state.delete_user_state()
-        self.assertTrue(self.turn_state._scopes[USER_SCOPE].is_deleted)
+        scope = self.turn_state.get_scope(USER_SCOPE)
+        assert scope
+        self.assertTrue(scope.is_deleted)
 
     async def test_delete_user_state_not_loaded(self):
         with self.assertRaises(Exception) as context:
@@ -320,7 +324,9 @@ class TestTurnState(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
         self.turn_state.delete_temp_state()
-        self.assertTrue(self.turn_state._scopes[TEMP_SCOPE].is_deleted)
+        scope = self.turn_state.get_scope(TEMP_SCOPE)
+        assert scope
+        self.assertTrue(scope.is_deleted)
 
     async def test_delete_temp_state_not_loaded(self):
         with self.assertRaises(Exception) as context:
