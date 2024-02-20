@@ -27,6 +27,7 @@ from botbuilder.schema.teams import (
 
 from teams.adaptive_cards.adaptive_cards import AdaptiveCards
 from teams.ai import AI, TurnState
+from teams.meetings import Meetings
 from teams.task_modules import TaskModules
 
 from .activity_type import (
@@ -44,6 +45,7 @@ from .typing import Typing
 StateT = TypeVar("StateT", bound=TurnState)
 
 
+# pylint: disable=too-many-instance-attributes
 class Application(Bot, Generic[StateT]):
     """
     Application class for routing and processing incoming requests.
@@ -70,6 +72,7 @@ class Application(Bot, Generic[StateT]):
     _turn_state_factory: Optional[Callable[[Activity], Awaitable[StateT]]] = None
     _message_extensions: MessageExtensions[StateT]
     _task_modules: TaskModules[StateT]
+    _meetings: Meetings[StateT]
 
     def __init__(self, options=ApplicationOptions()) -> None:
         """
@@ -86,6 +89,7 @@ class Application(Bot, Generic[StateT]):
         self._task_modules = TaskModules[StateT](
             self._routes, options.task_modules.task_data_filter
         )
+        self._meetings = Meetings[StateT](self._routes)
 
         if options.long_running_messages and (not options.auth or not options.bot_app_id):
             raise ApplicationError(
@@ -141,6 +145,13 @@ class Application(Bot, Generic[StateT]):
         Access the application's task modules functionalities.
         """
         return self._task_modules
+
+    @property
+    def meetings(self) -> Meetings[StateT]:
+        """
+        Access the application's meetings functionalities.
+        """
+        return self._meetings
 
     def activity(
         self, type: ActivityType
@@ -594,6 +605,11 @@ class Application(Bot, Generic[StateT]):
         try:
             if self._options.start_typing_timer:
                 await self.typing.start(context)
+
+            # remove @mentions
+            if self.options.remove_recipient_mention:
+                if context.activity.type == ActivityTypes.message:
+                    context.activity.text = context.remove_recipient_mention(context.activity)
 
             state: TurnState
 
