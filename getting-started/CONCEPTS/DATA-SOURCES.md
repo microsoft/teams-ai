@@ -12,9 +12,11 @@ Within each Action Planner’s prompt management system, a list of data sources 
 
 Our simplest example (primarily for testing) is `TextDataSource`, which adds a static block of text to a prompt.  
 
-Our most complex example is the `VectraDataSource` in the Chef Bot sample, which uses an external library called Vectra.
+Our most complex Javascript example is the `VectraDataSource` in the Chef Bot sample, which uses an external library called [Vectra](https://github.com/Stevenic/vectra). 
 
-### Customized Example of VectraDataSource
+Our most complex C# example is the `KernelMemoryDataSource` in the Chef Bot sample, which uses an external library called [Kernel Memory](https://github.com/microsoft/kernel-memory).
+
+### Customized Examples
 
 #### Javascript
 Here is an example of the configuration for the
