@@ -20,7 +20,7 @@ describe('TeamsAdapter', () => {
             await adapter.process(req, res, async () => {});
         });
 
-        server = app.listen(80);
+        server = app.listen(9876);
     });
 
     afterEach(() => {
