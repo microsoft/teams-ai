@@ -199,7 +199,7 @@ class PromptManager(PromptFunctions):
         self._prompts[prompt.name] = deepcopy(prompt)
         return self
 
-    async def get_prompt(self, name) -> PromptTemplate:
+    async def get_prompt(self, name: str) -> PromptTemplate:
         """
         Loads a named prompt template from the filesystem.
 
@@ -255,7 +255,10 @@ class PromptManager(PromptFunctions):
             template_actions: List[ChatCompletionAction] = []
             try:
                 with open(actions_file, "r", encoding="utf-8") as file:
-                    template_actions = json.load(file)
+                    actions = json.load(file)
+
+                    for action in actions:
+                        template_actions.append(ChatCompletionAction.from_dict(action))
             except IOError:
                 # Ignore missing actions file
                 pass
@@ -325,7 +328,6 @@ class PromptManager(PromptFunctions):
             ):
                 template_config.completion.model = template_config.default_backends[0]
 
-    # pylint:disable=too-many-locals
     def _append_augmentations(
         self,
         name: str,
@@ -358,11 +360,7 @@ class PromptManager(PromptFunctions):
             parsed_actions: List[ChatCompletionAction] = []
             if template_actions:
                 for action in template_actions:
-                    parsed_actions.append(
-                        # pylint:disable=no-member
-                        # from_dict provided from @dataclass_json decorator
-                        ChatCompletionAction.from_dict(action)  # type: ignore[attr-defined]
-                    )
+                    parsed_actions.append(ChatCompletionAction.from_dict(action.to_dict()))
 
             curr_actions = parsed_actions if template_actions else []
             if augmentation_type == "monologue":

@@ -16,7 +16,7 @@ from teams.ai.moderators import (
     AzureContentSafetyModerator,
     AzureContentSafetyModeratorOptions,
 )
-from teams.ai.planner import CommandType, Plan, PredictedDoCommand, PredictedSayCommand
+from teams.ai.planners import Plan, PredictedDoCommand, PredictedSayCommand
 from teams.state import TurnState
 
 
@@ -173,7 +173,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         assert plan is not None
         self.assertEqual(len(plan.commands), 1)
-        self.assertEqual(plan.commands[0].type, CommandType.DO)
+        self.assertEqual(plan.commands[0].type, "DO")
         assert isinstance(plan.commands[0], PredictedDoCommand)
         self.assertEqual(plan.commands[0].action, ActionTypes.FLAGGED_INPUT)
 
@@ -189,7 +189,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         assert plan is not None
         self.assertEqual(len(plan.commands), 1)
-        self.assertEqual(plan.commands[0].type, CommandType.DO)
+        self.assertEqual(plan.commands[0].type, "DO")
         assert isinstance(plan.commands[0], PredictedDoCommand)
         self.assertEqual(plan.commands[0].action, ActionTypes.HTTP_ERROR)
 
@@ -218,7 +218,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         assert output is not None
         self.assertEqual(len(output.commands), 1)
-        self.assertEqual(output.commands[0].type, CommandType.DO)
+        self.assertEqual(output.commands[0].type, "DO")
         assert isinstance(output.commands[0], PredictedDoCommand)
         self.assertEqual(output.commands[0].action, ActionTypes.FLAGGED_OUTPUT)
 
@@ -235,6 +235,6 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
         self.assertTrue(mock_async_openai.called)
         assert output is not None
         self.assertEqual(len(output.commands), 1)
-        self.assertEqual(output.commands[0].type, CommandType.DO)
+        self.assertEqual(output.commands[0].type, "DO")
         assert isinstance(output.commands[0], PredictedDoCommand)
         self.assertEqual(output.commands[0].action, ActionTypes.HTTP_ERROR)

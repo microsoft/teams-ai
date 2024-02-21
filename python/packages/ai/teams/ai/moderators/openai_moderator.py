@@ -11,7 +11,7 @@ from botbuilder.core import TurnContext
 
 from ...state import TurnState
 from ..actions import ActionTypes
-from ..planner import Plan, PredictedDoCommand, PredictedSayCommand
+from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .moderator import Moderator
 
 

@@ -4,7 +4,6 @@ Licensed under the MIT License.
 """
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
 
 from botbuilder.core import TurnContext
 
@@ -13,10 +12,8 @@ from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
 from .validation import Validation
 
-ValueT = TypeVar("ValueT")
 
-
-class PromptResponseValidator(ABC, Generic[ValueT]):
+class PromptResponseValidator(ABC):
     """
     A validator that can be used to validate prompt responses.
     """
@@ -29,7 +26,7 @@ class PromptResponseValidator(ABC, Generic[ValueT]):
         tokenizer: Tokenizer,
         response: PromptResponse,
         remaining_attempts: int,
-    ) -> Validation[ValueT]:
+    ) -> Validation:
         """
         Validates a response to a prompt.
 
@@ -41,5 +38,5 @@ class PromptResponseValidator(ABC, Generic[ValueT]):
             remaining_attempts (int): Number of remaining attempts to validate the response.
 
         Returns:
-            Validation[TValue]: A `Validation` object.
+            Validation: A `Validation` object.
         """

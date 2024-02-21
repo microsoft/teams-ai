@@ -3,12 +3,15 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Union
 
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
+
+@dataclass_json
 @dataclass
-class PredictedDoCommand:
+class PredictedDoCommand(DataClassJsonMixin):
     """
     A predicted DO command is an action that the AI system should perform.
     """
@@ -19,12 +22,13 @@ class PredictedDoCommand:
     action: str = ""
     "The named action that the AI system should perform."
 
-    parameters: Dict[str, Any] = {}
+    parameters: Dict[str, Any] = field(default_factory=dict)
     "Any parameters that the AI system should use to perform the action."
 
 
+@dataclass_json
 @dataclass
-class PredictedSayCommand:
+class PredictedSayCommand(DataClassJsonMixin):
     """
     A predicted SAY command is a response that the AI system should say.
     """
@@ -49,5 +53,15 @@ class Plan:
     type: Literal["plan"] = "plan"
     "Type to indicate that a plan is being returned."
 
-    commands: List[PredictedCommand] = []
+    commands: List[PredictedCommand] = field(default_factory=list)
     "Array of predicted commands that the AI system should execute."
+
+    @classmethod
+    def from_dict(cls, dict: Dict[str, Any], *, infer_missing: bool = False) -> "Plan":
+        commands: List[PredictedCommand] = []
+        for command in dict["commands"]:
+            if command["type"] == "DO":
+                commands.append(PredictedDoCommand.from_dict(command, infer_missing=infer_missing))
+            if command["type"] == "SAY":
+                commands.append(PredictedSayCommand.from_dict(command, infer_missing=infer_missing))
+        return Plan(commands=commands)

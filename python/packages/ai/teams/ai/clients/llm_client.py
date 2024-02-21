@@ -56,7 +56,7 @@ class LLMClientOptions:
     Defaults to `3`
     """
 
-    validator: PromptResponseValidator[str] = field(default_factory=DefaultResponseValidator)
+    validator: PromptResponseValidator = field(default_factory=DefaultResponseValidator)
     """
     Optional. Response validator to use when completing prompts.
     Defaults to `DefaultResponseValidator`

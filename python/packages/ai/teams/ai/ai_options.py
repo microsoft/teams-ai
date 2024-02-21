@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from dataclasses import dataclass, field
 
 from .ai_history_options import AIHistoryOptions
-from .planner import Planner
+from .planner.planner import Planner
 
 
 @dataclass

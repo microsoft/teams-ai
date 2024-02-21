@@ -8,7 +8,7 @@ from typing import Optional
 from botbuilder.core import TurnContext
 
 from ...state import TurnState
-from ..planner import Plan
+from ..planners.plan import Plan
 from .moderator import Moderator
 
 
