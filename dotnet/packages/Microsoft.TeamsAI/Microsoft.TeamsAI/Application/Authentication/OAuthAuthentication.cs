@@ -1,9 +1,11 @@
 ﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.AI.Exceptions;
 using Microsoft.Teams.AI.State;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
+[assembly: InternalsVisibleTo("Microsoft.Teams.AI.Tests")]
 namespace Microsoft.Teams.AI
 {
     /// <summary>
@@ -12,9 +14,9 @@ namespace Microsoft.Teams.AI
     public class OAuthAuthentication<TState> : IAuthentication<TState>
         where TState : TurnState, new()
     {
-        private OAuthPromptSettings _settings;
-        private OAuthMessageExtensionsAuthentication? _messageExtensionAuth;
-        private OAuthBotAuthentication<TState>? _botAuthentication;
+        private readonly OAuthSettings _settings;
+        private readonly OAuthMessageExtensionsAuthentication? _messageExtensionAuth;
+        private readonly OAuthBotAuthentication<TState>? _botAuthentication;
 
         /// <summary>
         /// Initializes the class
@@ -23,11 +25,21 @@ namespace Microsoft.Teams.AI
         /// <param name="name">The authentication name.</param>
         /// <param name="settings">The settings to initialize the class</param>
         /// <param name="storage">The storage to use.</param>
-        public OAuthAuthentication(Application<TState> app, string name, OAuthSettings settings, IStorage? storage)
+        public OAuthAuthentication(Application<TState> app, string name, OAuthSettings settings, IStorage? storage) : this(settings, new OAuthMessageExtensionsAuthentication(settings), new OAuthBotAuthentication<TState>(app, settings, name, storage))
+        {
+        }
+
+        /// <summary>
+        /// Initializes the class
+        /// </summary>
+        /// <param name="settings">The settings to initialize the class</param>
+        /// <param name="botAuthentication">The bot authentication instance</param>
+        /// <param name="messageExtensionAuth">The message extension authentication instance</param>
+        internal OAuthAuthentication(OAuthSettings settings, OAuthMessageExtensionsAuthentication messageExtensionAuth, OAuthBotAuthentication<TState> botAuthentication)
         {
             _settings = settings;
-            _messageExtensionAuth = new OAuthMessageExtensionsAuthentication(_settings.ConnectionName);
-            _botAuthentication = new OAuthBotAuthentication<TState>(app, _settings, name, storage);
+            _messageExtensionAuth = messageExtensionAuth;
+            _botAuthentication = botAuthentication;
         }
 
         /// <summary>
@@ -38,7 +50,7 @@ namespace Microsoft.Teams.AI
         /// <returns>The token if the user is signed. Otherwise null.</returns>
         public async Task<string?> IsUserSignedInAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            TokenResponse tokenResponse = await UserTokenClientWrapper.GetUserTokenAsync(turnContext, _settings.ConnectionName, "", cancellationToken);
+            TokenResponse tokenResponse = await GetUserToken(turnContext, _settings.ConnectionName, cancellationToken);
 
             if (tokenResponse != null && tokenResponse.Token != string.Empty)
             {
@@ -119,6 +131,11 @@ namespace Microsoft.Teams.AI
             _botAuthentication?.DeleteAuthFlowState(context, state);
 
             await UserTokenClientWrapper.SignoutUserAsync(context, _settings.ConnectionName, cancellationToken);
+        }
+
+        protected virtual async Task<TokenResponse> GetUserToken(ITurnContext context, string connectionName, CancellationToken cancellationToken = default)
+        {
+            return await UserTokenClientWrapper.GetUserTokenAsync(context, connectionName, "", cancellationToken);
         }
     }
 }
