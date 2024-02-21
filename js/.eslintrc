@@ -14,7 +14,6 @@
         "plugin:import/typescript",
         "plugin:import/recommended",
         "plugin:jsdoc/recommended",
-        "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
     ],
     "plugins": ["@typescript-eslint", "jsdoc", "mocha", "only-warn", "prettier"],

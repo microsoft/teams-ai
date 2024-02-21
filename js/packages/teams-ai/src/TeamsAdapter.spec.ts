@@ -16,7 +16,7 @@ describe('TeamsAdapter', () => {
         sandbox = sinon.createSandbox();
         adapter = new TeamsAdapter();
 
-        app.post('/api/messages', async (req, res) => {
+        app.post('/api/messages', async (req: any, res: any) => {
             await adapter.process(req, res, async () => {});
         });
 
