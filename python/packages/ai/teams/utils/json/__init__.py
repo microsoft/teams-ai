@@ -5,3 +5,5 @@ Licensed under the MIT License.
 
 from .parse import parse
 from .parse_object import parse_object
+
+__all__ = ["parse", "parse_object"]

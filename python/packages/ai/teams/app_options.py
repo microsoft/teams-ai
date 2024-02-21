@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from logging import Logger
 from typing import Optional
@@ -10,9 +12,9 @@ from typing import Optional
 from botbuilder.core import Storage
 from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
 
-from teams.adaptive_cards import AdaptiveCardsOptions
-from teams.ai import AIOptions
-from teams.task_modules import TaskModulesOptions
+from .adaptive_cards import AdaptiveCardsOptions
+from .ai import AIOptions
+from .task_modules import TaskModulesOptions
 
 
 @dataclass

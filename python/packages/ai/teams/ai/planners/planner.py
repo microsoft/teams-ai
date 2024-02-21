@@ -3,12 +3,13 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from botbuilder.core import TurnContext
 
 from ...state import TurnState
-from ..ai import AI
 from .plan import Plan
 
 
@@ -18,7 +19,7 @@ class Planner(ABC):
     """
 
     @abstractmethod
-    async def begin_task(self, context: TurnContext, state: TurnState, ai: AI) -> Plan:
+    async def begin_task(self, context: TurnContext, state: TurnState) -> Plan:
         """
         Starts a new task.
 
@@ -29,7 +30,7 @@ class Planner(ABC):
         """
 
     @abstractmethod
-    async def continue_task(self, context: TurnContext, state: TurnState, ai: AI) -> Plan:
+    async def continue_task(self, context: TurnContext, state: TurnState) -> Plan:
         """
         Continues the current task.
 

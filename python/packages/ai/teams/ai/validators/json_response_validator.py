@@ -3,13 +3,15 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from typing import Any, Dict, List, Optional
 
 from botbuilder.core import TurnContext
 from jsonschema import ValidationError, validate
 
 from ...state import Memory
-from ...utils import parse
+from ...utils.json import parse
 from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
 from .prompt_response_validator import PromptResponseValidator

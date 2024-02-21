@@ -3,10 +3,13 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import List, Optional
 
-from ..augmentations.augmentation import Augmentation
+import teams.ai.augmentations
+
 from ..models.chat_completion_action import ChatCompletionAction
 from .prompt_template_config import PromptTemplateConfig
 from .sections.prompt_section import PromptSection
@@ -34,4 +37,4 @@ class PromptTemplate:
     prompt: PromptSection
     config: PromptTemplateConfig
     actions: Optional[List[ChatCompletionAction]] = None
-    augmentation: Optional[Augmentation] = None
+    augmentation: Optional[teams.ai.augmentations.Augmentation] = None

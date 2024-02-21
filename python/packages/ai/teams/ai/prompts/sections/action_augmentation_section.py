@@ -3,19 +3,21 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from botbuilder.core import TurnContext
 
-from ...state import Memory
-from ..models.chat_completion_action import ChatCompletionAction
-from ..prompts.message import Message
-from ..prompts.prompt_functions import PromptFunctions
-from ..prompts.rendered_prompt_section import RenderedPromptSection
-from ..prompts.sections.prompt_section_base import PromptSectionBase
-from ..tokenizers.tokenizer import Tokenizer
+from ....state import Memory
+from ...models.chat_completion_action import ChatCompletionAction
+from ...tokenizers.tokenizer import Tokenizer
+from ..message import Message
+from ..prompt_functions import PromptFunctions
+from ..rendered_prompt_section import RenderedPromptSection
+from .prompt_section_base import PromptSectionBase
 
 
 @dataclass

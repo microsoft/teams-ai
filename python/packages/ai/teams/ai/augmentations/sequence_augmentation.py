@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 import json
 from typing import Any, Dict, List, Optional, Union, cast
 
@@ -14,12 +16,12 @@ from ..models.prompt_response import PromptResponse
 from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from ..prompts.function_call import FunctionCall
 from ..prompts.message import Message
+from ..prompts.sections.action_augmentation_section import ActionAugmentationSection
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers import Tokenizer
 from ..validators.action_response_validator import ActionResponseValidator
 from ..validators.json_response_validator import JSONResponseValidator
 from ..validators.validation import Validation
-from .action_augmentation_section import ActionAugmentationSection
 from .augmentation import Augmentation
 
 PlanSchema: Optional[Dict[str, Any]] = {

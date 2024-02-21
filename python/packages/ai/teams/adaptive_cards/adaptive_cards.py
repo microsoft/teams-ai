@@ -2,8 +2,11 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
+
+from __future__ import annotations
+
 import re
-from typing import Awaitable, Callable, Generic, List, Pattern, TypeVar, Union
+from typing import Awaitable, Callable, List, Pattern, Union
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import (
@@ -13,33 +16,31 @@ from botbuilder.schema import (
     InvokeResponse,
 )
 
-from teams.ai import TurnState
 from teams.query import Query
 from teams.route import Route
+from teams.state import TurnState
 
 from .adaptive_cards_search_params import AdaptiveCardsSearchParams
 from .adaptive_cards_search_result import AdaptiveCardsSearchResult
-
-StateT = TypeVar("StateT", bound=TurnState)
 
 ACTION_INVOKE_NAME = "adaptiveCard/action"
 ACTION_EXECUTE_TYPE = "Action.Execute"
 SEARCH_INVOKE_NAME = "application/search"
 
 
-class AdaptiveCards(Generic[StateT]):
-    _route_registry: List[Route[StateT]]
+class AdaptiveCards:
+    _route_registry: List[Route]
     _action_submit_filter: str
 
-    def __init__(self, route_registry: List[Route[StateT]], action_submit_filter: str) -> None:
+    def __init__(self, route_registry: List[Route], action_submit_filter: str) -> None:
         self._route_registry = route_registry
         self._action_submit_filter = action_submit_filter
 
     def action_execute(
         self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
     ) -> Callable[
-        [Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]],
-        Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]],
+        [Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]]],
+        Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]],
     ]:
         """
         Adds a route for handling Adaptive Card Action.Execute events.
@@ -83,9 +84,9 @@ class AdaptiveCards(Generic[StateT]):
             return False
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]
-        ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]:
-            async def __handler__(context: TurnContext, state: StateT) -> bool:
+            func: Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]]
+        ) -> Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]]:
+            async def __handler__(context: TurnContext, state: TurnState) -> bool:
                 result = await func(context, state, context.activity.value["action"]["data"])
                 if context.turn_state.get(ActivityTypes.invoke_response) is None:
                     if isinstance(result, str):
@@ -107,7 +108,7 @@ class AdaptiveCards(Generic[StateT]):
                     )
                 return True
 
-            self._route_registry.append(Route[StateT](__selector__, __handler__))
+            self._route_registry.append(Route(__selector__, __handler__))
             return func
 
         return __call__
@@ -115,8 +116,8 @@ class AdaptiveCards(Generic[StateT]):
     def action_submit(
         self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
     ) -> Callable[
-        [Callable[[TurnContext, StateT, dict], Awaitable[None]]],
-        Callable[[TurnContext, StateT, dict], Awaitable[None]],
+        [Callable[[TurnContext, TurnState, dict], Awaitable[None]]],
+        Callable[[TurnContext, TurnState, dict], Awaitable[None]],
     ]:
         """
         Adds a route for handling Adaptive Card Action.Submit events.
@@ -159,13 +160,13 @@ class AdaptiveCards(Generic[StateT]):
             return False
 
         def __call__(
-            func: Callable[[TurnContext, StateT, dict], Awaitable[None]]
-        ) -> Callable[[TurnContext, StateT, dict], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: StateT) -> bool:
+            func: Callable[[TurnContext, TurnState, dict], Awaitable[None]]
+        ) -> Callable[[TurnContext, TurnState, dict], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: TurnState) -> bool:
                 await func(context, state, context.activity.value)
                 return True
 
-            self._route_registry.append(Route[StateT](__selector__, __handler__))
+            self._route_registry.append(Route(__selector__, __handler__))
             return func
 
         return __call__
@@ -175,12 +176,12 @@ class AdaptiveCards(Generic[StateT]):
     ) -> Callable[
         [
             Callable[
-                [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
+                [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
                 Awaitable[List[AdaptiveCardsSearchResult]],
             ]
         ],
         Callable[
-            [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
+            [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
             Awaitable[List[AdaptiveCardsSearchResult]],
         ],
     ]:
@@ -226,14 +227,14 @@ class AdaptiveCards(Generic[StateT]):
 
         def __call__(
             func: Callable[
-                [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
+                [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
                 Awaitable[List[AdaptiveCardsSearchResult]],
             ]
         ) -> Callable[
-            [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
+            [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
             Awaitable[List[AdaptiveCardsSearchResult]],
         ]:
-            async def __handler__(context: TurnContext, state: StateT) -> bool:
+            async def __handler__(context: TurnContext, state: TurnState) -> bool:
                 params = context.activity.value
                 # Flatten search parameters
                 query = Query[AdaptiveCardsSearchParams](
@@ -262,7 +263,7 @@ class AdaptiveCards(Generic[StateT]):
                     )
                 return True
 
-            self._route_registry.append(Route[StateT](__selector__, __handler__))
+            self._route_registry.append(Route(__selector__, __handler__))
             return func
 
         return __call__

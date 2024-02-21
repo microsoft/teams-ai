@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from logging import Logger
 from typing import Awaitable, Callable, List, Optional, Union
@@ -11,7 +13,6 @@ from botbuilder.core import TurnContext
 
 from ...app_error import ApplicationError
 from ...state import Memory, TurnState
-from ..ai import AI
 from ..augmentations.default_augmentation import DefaultAugmentation
 from ..clients import LLMClient, LLMClientOptions
 from ..models.prompt_completion_model import PromptCompletionModel
@@ -81,10 +82,10 @@ class ActionPlanner(Planner):
         else:
             self._prompt_factory = self._options.default_prompt
 
-    async def begin_task(self, context: TurnContext, state: TurnState, ai: AI) -> Plan:
-        return await self.continue_task(context, state, ai)
+    async def begin_task(self, context: TurnContext, state: TurnState) -> Plan:
+        return await self.continue_task(context, state)
 
-    async def continue_task(self, context: TurnContext, state: TurnState, ai: AI) -> Plan:
+    async def continue_task(self, context: TurnContext, state: TurnState) -> Plan:
         template = await self._prompt_factory(context, state, self)
         augmentation = template.augmentation or DefaultAugmentation()
         res = await self.complete_prompt(
