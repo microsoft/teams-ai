@@ -20,6 +20,7 @@ from teams.ai.models.prompt_response import PromptResponse
 from teams.ai.prompts.message import Message
 from teams.ai.prompts.prompt_manager import PromptManager
 from teams.ai.prompts.prompt_manager_options import PromptManagerOptions
+from teams.ai.planners import PredictedDoCommand, PredictedSayCommand
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
 from teams.state import TurnState
 
@@ -145,7 +146,8 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "SAY")
-        self.assertEqual(plan.commands[0].response, "hello world")  # type: ignore[attr-defined]
+        assert isinstance(plan.commands[0], PredictedSayCommand)
+        self.assertEqual(plan.commands[0].response, "hello world")
 
     async def test_create_plan_with_do_command(self):
         state = TurnState()
@@ -164,7 +166,6 @@ class TestMonologueAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(plan.commands), 1)
         self.assertEqual(plan.commands[0].type, "DO")
-        self.assertEqual(plan.commands[0].action, "test")  # type: ignore[attr-defined]
-
-        # pylint:disable=line-too-long
-        self.assertEqual(plan.commands[0].parameters.get("foo"), "bar")  # type: ignore[attr-defined]
+        assert isinstance(plan.commands[0], PredictedDoCommand)
+        self.assertEqual(plan.commands[0].action, "test")
+        self.assertEqual(plan.commands[0].parameters.get("foo"), "bar")
