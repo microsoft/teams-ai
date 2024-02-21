@@ -26,7 +26,7 @@ This sample shows how to incorporate basic conversational flow into a Teams appl
 ## Run
 
 > To run samples we encourage the use of the [Teams Toolkit VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension), to run the project using `Teams Toolkit`:
-1. Use `Python: Create Environment` command to create a virtual environment and install dependencies in `pyproject.toml`.
+1. Use `Python: Create Environment` command to create a virtual environment. Python extension will install dependencies defined in `pyproject.toml` automatically.
 2. Click the `Debug` button and select a profile.
 ![Teams Toolkit VSCode](./assets/screenshot_1.png)  
 ![Teams Toolkit VSCode](./assets/screenshot_2.png)
@@ -39,14 +39,52 @@ When prompted, add your app in teams and start chatting!
 
 ## Development
 
+### Prerequisites
+
+[Install Poetry](https://python-poetry.org/docs/)
+
+```bash
+$: pip install poetry
+```
+
 ### Install Dependencies
 
 ```bash
-$: pip install -r src/requirements.txt
+$: poetry install
 ```
 
 ## Start
 
 ```bash
-$: python src/app.py
+$: poetry run start
+```
+
+### Build
+
+```bash
+$: poetry build
+```
+
+### Test
+
+```bash
+$: poetry run test
+```
+
+### Lint
+
+```bash
+$: poetry run lint
+```
+
+## Format
+
+```bash
+$: poetry run fmt
+```
+
+## Clean
+
+```bash
+$: poetry run clean
 ```
