@@ -15,5 +15,4 @@ for e in Path("./packages").glob("*"):
 for e in Path("./samples").glob("*"):
     if e.is_dir():
         print("------ Samples[" + e.name + "] ------")
-        subprocess.run(["pylint", "src"], cwd=e.absolute(), check=True)
-        subprocess.run(["mypy", "-p", "src"], cwd=e.absolute(), check=True)
+        subprocess.run(["poetry", "run", "lint"], cwd=e.absolute(), check=True)

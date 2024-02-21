@@ -1,3 +1,0 @@
-flask[async]
-python-dotenv
--e ../../packages/ai
