@@ -34,7 +34,7 @@ describe('TeamsAdapter', () => {
             let userAgent: string | undefined;
 
             try {
-                const res = await axios.post('/api/messages', {
+                const res = await axios.post('http://127.0.0.1:9876/api/messages', {
                     type: 'invoke',
                     localTimezone: 'America/Los_Angeles',
                     callerId: 'test',
