@@ -350,3 +350,496 @@ class TestMessageExtensions(IsolatedAsyncioTestCase):
         )
 
         handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_query_setting_url(self):
+        handler = mock.AsyncMock()
+        handler.return_value = MessagingExtensionResult()
+        self.app.message_extensions.query_setting_url()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/querySettingUrl",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_query_setting_url_invalid_type(self):
+        handler = mock.AsyncMock()
+        handler.return_value = MessagingExtensionResult()
+        self.app.message_extensions.query_setting_url()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="event",
+                    name="composeExtension/querySettingUrl",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_query_setting_url_invalid_name(self):
+        handler = mock.AsyncMock()
+        handler.return_value = MessagingExtensionResult()
+        self.app.message_extensions.query_setting_url()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/queryUrl",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_configure_settings(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.configure_settings()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/setting",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"theme": "dark"},
+                ),
+            )
+        )
+
+        handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_configure_settings_empty_value(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.configure_settings()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/setting",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_configure_settings_wrong_type(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.configure_settings()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="event",
+                    name="composeExtension/setting",
+                    text="test",
+                    value={"theme": "dark"},
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_configure_settings_wrong_name(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.configure_settings()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/settings",
+                    text="test",
+                    value={"theme": "dark"},
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_card_button_clicked(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.card_button_clicked()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/onCardButtonClicked",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"title": "Query button", "display_text": "Yes", "value": "Yes"},
+                ),
+            )
+        )
+
+        handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_card_button_clicked_empty_value(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.card_button_clicked()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/onCardButtonClicked",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                ),
+            )
+        )
+
+        handler.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_card_button_clicked_wrong_type(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.card_button_clicked()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="event",
+                    name="composeExtension/onCardButtonClicked",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"title": "Query button", "display_text": "Yes", "value": "Yes"},
+                ),
+            )
+        )
+
+        handler.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_card_button_clicked_invalid_name(self):
+        handler = mock.AsyncMock()
+        self.app.message_extensions.card_button_clicked()(handler)
+        self.assertEqual(len(self.app._routes), 1)
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    members_added=[ChannelAccount(id="user-2", name="User Name 2")],
+                ),
+            )
+        )
+
+        await self.app.on_turn(
+            TurnContext(
+                SimpleAdapter(),
+                Activity(
+                    id="1234",
+                    type="invoke",
+                    name="composeExtension/onCardButtonClick",
+                    text="test",
+                    from_property=ChannelAccount(id="user", name="User Name"),
+                    recipient=ChannelAccount(id="bot", name="Bot Name"),
+                    conversation=ConversationAccount(id="convo", name="Convo Name"),
+                    channel_id="msteams",
+                    locale="en-uS",
+                    service_url="https://example.org",
+                    value={"title": "Query button", "display_text": "Yes", "value": "Yes"},
+                ),
+            )
+        )
+
+        handler.assert_not_called()
