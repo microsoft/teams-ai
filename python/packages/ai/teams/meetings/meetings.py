@@ -11,9 +11,8 @@ from botbuilder.core import TurnContext
 from botbuilder.schema import ActivityTypes
 from botbuilder.schema.teams import MeetingEndEventDetails, MeetingStartEventDetails
 
-from ..state import TurnState
-
 from ..route import Route
+from ..state import TurnState
 
 StateT = TypeVar("StateT", bound=TurnState)
 

@@ -27,8 +27,8 @@ from .adaptive_cards.adaptive_cards import AdaptiveCards
 from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
-from .message_extensions.message_extensions import MessageExtensions
 from .meetings.meetings import Meetings
+from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
 from .state import TurnState
 from .task_modules import TaskModules
@@ -132,7 +132,7 @@ class Application(Bot):
         Access the application's task modules functionalities.
         """
         return self._task_modules
-    
+
     @property
     def meetings(self) -> Meetings:
         """
@@ -348,7 +348,7 @@ class Application(Bot):
             return func
 
         return __call__
-    
+
     def file_consent_accept(
         self,
     ) -> Callable[
