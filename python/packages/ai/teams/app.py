@@ -12,6 +12,10 @@ from aiohttp.web import Request, Response
 from botbuilder.core import Bot, TurnContext
 from botbuilder.integration.aiohttp import CloudAdapter
 from botbuilder.schema import ActivityTypes
+from botbuilder.schema.teams import (
+    FileConsentCardResponse,
+    O365ConnectorCardActionQuery,
+)
 
 from .activity_type import (
     ActivityType,
@@ -24,6 +28,7 @@ from .ai import AI
 from .app_error import ApplicationError
 from .app_options import ApplicationOptions
 from .message_extensions.message_extensions import MessageExtensions
+from .meetings.meetings import Meetings
 from .route import Route, RouteHandler
 from .state import TurnState
 from .task_modules import TaskModules
@@ -56,6 +61,7 @@ class Application(Bot):
     _turn_state_factory: Optional[Callable[[], Awaitable[TurnState]]] = None
     _message_extensions: MessageExtensions
     _task_modules: TaskModules
+    _meetings: Meetings
 
     def __init__(self, options: ApplicationOptions = ApplicationOptions()) -> None:
         """
@@ -70,6 +76,7 @@ class Application(Bot):
             self._routes, options.adaptive_cards.action_submit_filer
         )
         self._task_modules = TaskModules(self._routes, options.task_modules.task_data_filter)
+        self._meetings = Meetings(self._routes)
 
         if options.long_running_messages and (not options.auth or not options.bot_app_id):
             raise ApplicationError(
@@ -125,6 +132,13 @@ class Application(Bot):
         Access the application's task modules functionalities.
         """
         return self._task_modules
+    
+    @property
+    def meetings(self) -> Meetings:
+        """
+        Access the application's meetings functionalities.
+        """
+        return self._meetings
 
     def activity(self, type: ActivityType) -> Callable[[RouteHandler], RouteHandler]:
         """
@@ -334,6 +348,130 @@ class Application(Bot):
             return func
 
         return __call__
+    
+    def file_consent_accept(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]],
+        Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for when a file consent card is accepted by the user.
+         ```python
+        # Use this method as a decorator
+        @app.file_consent_accept()
+        async def on_file_consent_accept(
+            context: TurnContext, state: TurnState, file_consent_response: FileConsentCardResponse
+        ):
+            print(file_consent_response)
+        # Pass a function to this method
+        app.file_consent_accept()(on_file_consent_accept)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "fileConsent/invoke"
+                and isinstance(context.activity.value, dict)
+                and context.activity.value.get("action") == "accept"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]
+        ) -> Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: TurnState):
+                if not context.activity.value:
+                    return False
+                await func(context, state, context.activity.value)
+                return True
+
+            self._routes.append(Route(__selector__, __handler__, True))
+            return func
+
+        return __call__
+
+    def file_consent_decline(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]],
+        Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for when a file consent card is declined by the user.
+         ```python
+        # Use this method as a decorator
+        @app.file_consent_decline()
+        async def on_file_consent_decline(
+            context: TurnContext, state: TurnState, file_consent_response: FileConsentCardResponse
+        ):
+            print(file_consent_response)
+        # Pass a function to this method
+        app.file_consent_decline()(on_file_consent_decline)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "fileConsent/invoke"
+                and isinstance(context.activity.value, dict)
+                and context.activity.value.get("action") == "decline"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]
+        ) -> Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: TurnState):
+                if not context.activity.value:
+                    return False
+                await func(context, state, context.activity.value)
+                return True
+
+            self._routes.append(Route(__selector__, __handler__, True))
+            return func
+
+        return __call__
+
+    def o365_connector_card_action(
+        self,
+    ) -> Callable[
+        [Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]]],
+        Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]],
+    ]:
+        """
+        Registers a handler for when a O365 connector card action is received from the user.
+         ```python
+        # Use this method as a decorator
+        @app.o365_connector_card_action()
+        async def on_o365_connector_card_action(
+            context: TurnContext, state: TurnState, query: O365ConnectorCardActionQuery
+        ):
+            print(query)
+        # Pass a function to this method
+        app.o365_connector_card_action()(on_o365_connector_card_action)
+        ```
+        """
+
+        def __selector__(context: TurnContext) -> bool:
+            return (
+                context.activity.type == ActivityTypes.invoke
+                and context.activity.name == "actionableMessage/executeAction"
+            )
+
+        def __call__(
+            func: Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]]
+        ) -> Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: TurnState):
+                if not context.activity.value:
+                    return False
+                await func(context, state, context.activity.value)
+                return True
+
+            self._routes.append(Route(__selector__, __handler__, True))
+            return func
+
+        return __call__
 
     def before_turn(self, func: RouteHandler) -> RouteHandler:
         """
@@ -429,6 +567,11 @@ class Application(Bot):
         try:
             if self._options.start_typing_timer:
                 await self.typing.start(context)
+
+            # remove @mentions
+            if self.options.remove_recipient_mention:
+                if context.activity.type == ActivityTypes.message:
+                    context.activity.text = context.remove_recipient_mention(context.activity)
 
             state = TurnState()
 
