@@ -5,16 +5,16 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from collections import UserDict
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterator, MutableMapping, Optional
 
 
-class TurnStateEntry(UserDict[str, Any]):
+class TurnStateEntry(MutableMapping[str, Any]):
     """Accessor class for managing an individual state scope."""
 
     _storage_key: Optional[str]
     _deleted: bool = False
     _hash: str
+    data: Dict[str, Any]
 
     def __init__(self, value: Optional[Dict[str, Any]] = None, storage_key: Optional[str] = None):
         """Creates a new instance of the `TurnStateEntry` class.
@@ -25,7 +25,8 @@ class TurnStateEntry(UserDict[str, Any]):
             storage_key (Optional[str], optional): Storage key to use when persisting the
                 state scope. Defaults to None.
         """
-        super().__init__(value or {})
+        super().__init__()
+        self.data = value or {}
         self._storage_key = storage_key
         self._hash = str(self.data)
 
@@ -73,15 +74,29 @@ class TurnStateEntry(UserDict[str, Any]):
         if not value:
             return None
 
-        return self.update(value)
+        self.data = value
+        return None
 
-    def __getitem__(self, key: str) -> Any:
+    def __getitem__(self, key: str) -> Optional[Any]:
         self._deleted = False
-        return super().__getitem__(key)
+        return self.data.get(key)
 
     def __setitem__(self, key: str, value: Any) -> None:
         self._deleted = False
-        return super().__setitem__(key, value)
+        self.data[key] = value
+
+    def __contains__(self, key: object) -> bool:
+        return key in self.data
+
+    def __delitem__(self, key: str) -> None:
+        if key in self.data:
+            del self.data[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.data)
+
+    def __len__(self) -> int:
+        return len(self.data)
 
     def __getattribute__(self, name: str) -> Any:
         if name == "data":
