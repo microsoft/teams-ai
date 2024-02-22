@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-object-injection */
 import assert from 'assert';
 import { TurnState } from '../TurnState';
 import {

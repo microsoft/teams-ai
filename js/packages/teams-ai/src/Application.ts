@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-object-injection */
 /**
  * @module teams-ai
  */
@@ -707,8 +706,6 @@ export class Application<TState extends TurnState = TurnState> {
                 // Invoke Activities from Teams need to be responded to in less than 5 seconds.
                 if (context.activity.type === ActivityTypes.Invoke) {
                     for (let i = 0; i < this._invokeRoutes.length; i++) {
-                        // TODO: fix security/detect-object-injection
-                        // eslint-disable-next-line security/detect-object-injection
                         const route = this._invokeRoutes[i];
                         if (await route.selector(context)) {
                             // Execute route handler
@@ -728,8 +725,6 @@ export class Application<TState extends TurnState = TurnState> {
 
                 // All other ActivityTypes and any unhandled Invokes are run through the remaining routes.
                 for (let i = 0; i < this._routes.length; i++) {
-                    // TODO:
-                    // eslint-disable-next-line security/detect-object-injection
                     const route = this._routes[i];
                     if (await route.selector(context)) {
                         // Execute route handler
@@ -835,8 +830,6 @@ export class Application<TState extends TurnState = TurnState> {
                 // Listen for any messages to be sent from the bot
                 if (timerRunning) {
                     for (let i = 0; i < activities.length; i++) {
-                        // TODO:
-                        // eslint-disable-next-line security/detect-object-injection
                         if (activities[i].type == ActivityTypes.Message) {
                             // Stop the timer
                             this.stopTypingTimer();
@@ -957,8 +950,6 @@ export class Application<TState extends TurnState = TurnState> {
         handlers: ApplicationEventHandler<TState>[]
     ): Promise<boolean> {
         for (let i = 0; i < handlers.length; i++) {
-            // TODO:
-            // eslint-disable-next-line security/detect-object-injection
             const continueExecution = await handlers[i](context, state);
             if (!continueExecution) {
                 return false;
@@ -991,7 +982,6 @@ export class Application<TState extends TurnState = TurnState> {
                     try {
                         // Copy original activity to new context
                         for (const key in context.activity) {
-                            // eslint-disable-next-line security/detect-object-injection
                             (ctx.activity as any)[key] = (context.activity as any)[key];
                         }
 

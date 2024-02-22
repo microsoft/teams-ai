@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-object-injection */
 import { Activity, MemoryStorage, TestAdapter, TurnContext } from 'botbuilder';
 import { Application, RouteSelector } from '../Application';
 import { DialogSet, DialogState, DialogTurnResult, DialogTurnStatus, OAuthPrompt } from 'botbuilder-dialogs';

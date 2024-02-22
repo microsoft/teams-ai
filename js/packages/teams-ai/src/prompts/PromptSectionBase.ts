@@ -27,10 +27,10 @@ export abstract class PromptSectionBase implements PromptSection {
 
     /**
      * Creates a new 'PromptSectionBase' instance.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param required Optional. Indicates if this section is required. Defaults to `true`.
-     * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
-     * @param textPrefix Optional. Prefix to use for text output. Defaults to `undefined`.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to -1, 'auto'.
+     * @param {boolean} required - Optional. Indicates if this section is required. Defaults to `true`.
+     * @param {string} separator - Optional. Separator to use between sections when rendering as text. Defaults to `\n`.
+     * @param {string} textPrefix - Optional. Prefix to use for text output. Defaults to an empty string.
      */
     public constructor(
         tokens: number = -1,
@@ -46,12 +46,12 @@ export abstract class PromptSectionBase implements PromptSection {
 
     /**
      * Renders the prompt section as a string of text.
-     * @param context Context for the current turn of conversation.
-     * @param memory Interface for accessing state variables.
-     * @param functions Functions for rendering prompts.
-     * @param tokenizer Tokenizer to use for encoding/decoding text.
-     * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
-     * @returns The rendered prompt section.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Interface for accessing state variables.
+     * @param {PromptFunctions} functions - Functions for rendering prompts.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding/decoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed for the rendered prompt.
+     * @returns {Promise<RenderedPromptSection<string>>} The rendered prompt section.
      */
     public async renderAsText(
         context: TurnContext,
@@ -89,12 +89,12 @@ export abstract class PromptSectionBase implements PromptSection {
      * Renders the prompt section as a list of `Message` objects.
      * @remarks
      * MUST be implemented by derived classes.
-     * @param context Context for the current turn of conversation.
-     * @param memory Interface for accessing state variables.
-     * @param functions Functions for rendering prompts.
-     * @param tokenizer Tokenizer to use for encoding/decoding text.
-     * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
-     * @returns The rendered prompt section.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - Interface for accessing state variables.
+     * @param {PromptFunctions} functions - Functions for rendering prompts.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding/decoding text.
+     * @param {number} maxTokens - Maximum number of tokens allowed for the rendered prompt.
+     * @returns {Promise<RenderedPromptSection<Message<any>[]>>} The rendered prompt section.
      */
     public abstract renderAsMessages(
         context: TurnContext,
@@ -109,8 +109,8 @@ export abstract class PromptSectionBase implements PromptSection {
      * @remarks
      * If the section has a fixed length, the budget will be the minimum of the section's length
      * and the maximum number of tokens. Otherwise, the budget will be the maximum number of tokens.
-     * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
-     * @returns The token budget for the prompt section.
+     * @param {number} maxTokens - Maximum number of tokens allowed for the rendered prompt.
+     * @returns {number} The token budget for the prompt section.
      */
     protected getTokenBudget(maxTokens: number): number {
         return this.tokens > 1.0 ? Math.min(this.tokens, maxTokens) : maxTokens;
@@ -121,11 +121,11 @@ export abstract class PromptSectionBase implements PromptSection {
      * @remarks
      * If the section has a fixed length, the function will truncate the list of messages to
      * fit within the token budget.
-     * @param output List of messages to return.
-     * @param length Total number of tokens consumed by the list of messages.
-     * @param tokenizer Tokenizer to use for encoding/decoding text.
-     * @param maxTokens Maximum number of tokens allowed for the rendered prompt.
-     * @returns The rendered prompt section.
+     * @param {Message[]} output - List of messages to return.
+     * @param {number} length Total number of tokens consumed by the list of messages.
+     * @param {Tokenizer} tokenizer Tokenizer to use for encoding/decoding text.
+     * @param {number} maxTokens Maximum number of tokens allowed for the rendered prompt.
+     * @returns {RenderedPromptSection<Message[]>} The rendered prompt section.
      */
     protected returnMessages(
         output: Message[],
@@ -153,8 +153,8 @@ export abstract class PromptSectionBase implements PromptSection {
 
     /**
      * Returns the content of a message as a string.
-     * @param message Message to get the text of.
-     * @returns The message content as a string.
+     * @param {Message} message - Message to get the text of.
+     * @returns {string} The message content as a string.
      */
     public static getMessageText(message: Message): string {
         let text: MessageContentParts[] | string = message.content ?? '';
