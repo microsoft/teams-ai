@@ -5,8 +5,6 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
-// TODO:
-/* eslint-disable security/detect-object-injection */
 import {
     TurnContext,
     ActivityTypes,

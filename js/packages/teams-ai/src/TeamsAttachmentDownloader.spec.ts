@@ -1,20 +1,18 @@
 import { strict as assert } from 'assert';
-
-import { Application } from './Application';
-import { TeamsAdapter } from './TeamsAdapter';
-import { TeamsAttachmentDownloader } from './TeamsAttachmentDownloader';
-import { Activity, Attachment, CallerIdConstants } from 'botbuilder';
-
-import { createTestTurnContextAndState } from './internals/testing/TestUtilities';
-import sinon, { createSandbox } from 'sinon';
-
 import axios from 'axios';
+import { Activity, Attachment, CallerIdConstants } from 'botbuilder';
 import {
     AppCredentials,
     AuthenticatorResult,
     GovernmentConstants,
     PasswordServiceClientCredentialFactory
 } from 'botframework-connector';
+import sinon, { createSandbox } from 'sinon';
+
+import { Application } from './Application';
+import { TeamsAdapter } from './TeamsAdapter';
+import { TeamsAttachmentDownloader } from './TeamsAttachmentDownloader';
+import { createTestTurnContextAndState } from './internals/testing/TestUtilities';
 
 describe('TeamsAttachmentDownloader', () => {
     const mockAxios = axios;
