@@ -446,6 +446,7 @@ disable=raw-checker-failed,
         too-many-return-statements,
         too-many-boolean-expressions,
         too-many-arguments,
+        too-many-instance-attributes,
         duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can

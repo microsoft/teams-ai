@@ -7,7 +7,6 @@ import os
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock
 
-from teams.ai.augmentations.action_augmentation_section import ActionAugmentationSection
 from teams.ai.data_sources import TextDataSource
 from teams.ai.prompts import (
     ConversationHistorySection,
@@ -21,6 +20,7 @@ from teams.ai.prompts import (
     UserInputMessage,
     UserMessage,
 )
+from teams.ai.prompts.sections import ActionAugmentationSection
 from teams.ai.prompts.sections.data_source_section import DataSourceSection
 from teams.app_error import ApplicationError
 

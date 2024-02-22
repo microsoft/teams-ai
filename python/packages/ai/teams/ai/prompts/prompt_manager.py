@@ -3,22 +3,22 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 import json
 import os
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from botbuilder.core import TurnContext
 
+import teams.ai.augmentations
+
 from ...app_error import ApplicationError
 from ...state import Memory
-from ..augmentations.augmentation import Augmentation
-from ..augmentations.monologue_augmentation import MonologueAugmentation
-from ..augmentations.sequence_augmentation import SequenceAugmentation
 from ..data_sources import DataSource
 from ..models.chat_completion_action import ChatCompletionAction
-from ..prompts.sections.data_source_section import DataSourceSection
 from ..tokenizers import Tokenizer
 from .prompt import Prompt
 from .prompt_functions import PromptFunction, PromptFunctions
@@ -31,6 +31,7 @@ from .sections import (
     PromptSection,
     TemplateSection,
 )
+from .sections.data_source_section import DataSourceSection
 from .user_input_message import UserInputMessage
 from .user_message import UserMessage
 
@@ -59,6 +60,39 @@ class PromptManager(PromptFunctions):
         Gets the configured prompt manager options.
         """
         return self._options
+
+    def function(
+        self, name: Optional[str] = None
+    ) -> Callable[[PromptFunction], PromptFunction,]:
+        """
+        Registers a new prompt function event listener. This method can be used as either
+        a decorator or a method.
+
+        ```python
+        # Use this method as a decorator
+        @prompts.function()
+        async def hello_world(context: TurnContext, state: TurnState, entities: Any, name: str):
+            print("hello world!")
+            return True
+
+        # Pass a function to this method
+        prompts.function()(hello_world)
+        ```
+
+        Args:
+        - `name`: The name of the action `Default: Function Name`
+        """
+
+        def __call__(func: PromptFunction) -> PromptFunction:
+            func_name = name
+
+            if not func_name:
+                func_name = func.__name__
+
+            self.add_function(func_name, func)
+            return func
+
+        return __call__
 
     def add_data_source(self, data_source: DataSource) -> "PromptManager":
         """
@@ -199,7 +233,7 @@ class PromptManager(PromptFunctions):
         self._prompts[prompt.name] = deepcopy(prompt)
         return self
 
-    async def get_prompt(self, name) -> PromptTemplate:
+    async def get_prompt(self, name: str) -> PromptTemplate:
         """
         Loads a named prompt template from the filesystem.
 
@@ -255,7 +289,10 @@ class PromptManager(PromptFunctions):
             template_actions: List[ChatCompletionAction] = []
             try:
                 with open(actions_file, "r", encoding="utf-8") as file:
-                    template_actions = json.load(file)
+                    actions = json.load(file)
+
+                    for action in actions:
+                        template_actions.append(ChatCompletionAction.from_dict(action))
             except IOError:
                 # Ignore missing actions file
                 pass
@@ -325,14 +362,13 @@ class PromptManager(PromptFunctions):
             ):
                 template_config.completion.model = template_config.default_backends[0]
 
-    # pylint:disable=too-many-locals
     def _append_augmentations(
         self,
         name: str,
         template_config: PromptTemplateConfig,
         template_actions: List[ChatCompletionAction],
         sections: List[PromptSection],
-    ) -> Optional[Augmentation]:
+    ) -> Optional[teams.ai.augmentations.Augmentation]:
         # Check for augmentation
         augmentation = template_config.augmentation
         if augmentation:
@@ -352,23 +388,19 @@ class PromptManager(PromptFunctions):
 
             # Next, create augmentation
             augmentation_type = augmentation.augmentation_type
-            curr_augmentation: Optional[Augmentation] = None
+            curr_augmentation: Optional[teams.ai.augmentations.Augmentation] = None
 
             # Parse the dict objects into ChatCompletionAction objects
             parsed_actions: List[ChatCompletionAction] = []
             if template_actions:
                 for action in template_actions:
-                    parsed_actions.append(
-                        # pylint:disable=no-member
-                        # from_dict provided from @dataclass_json decorator
-                        ChatCompletionAction.from_dict(action)  # type: ignore[attr-defined]
-                    )
+                    parsed_actions.append(ChatCompletionAction.from_dict(action.to_dict()))
 
             curr_actions = parsed_actions if template_actions else []
             if augmentation_type == "monologue":
-                curr_augmentation = MonologueAugmentation(curr_actions)
+                curr_augmentation = teams.ai.augmentations.MonologueAugmentation(curr_actions)
             elif augmentation_type == "sequence":
-                curr_augmentation = SequenceAugmentation(curr_actions)
+                curr_augmentation = teams.ai.augmentations.SequenceAugmentation(curr_actions)
 
             # Append the augmentations prompt section
             if curr_augmentation:

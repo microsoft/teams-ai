@@ -9,7 +9,7 @@ from unittest import IsolatedAsyncioTestCase
 from botbuilder.core import TurnContext
 
 from teams.ai.moderators import DefaultModerator
-from teams.ai.planner import Plan
+from teams.ai.planners import Plan
 from teams.state import TurnState
 
 

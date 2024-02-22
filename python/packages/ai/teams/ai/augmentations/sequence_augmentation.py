@@ -3,25 +3,26 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 import json
 from typing import Any, Dict, List, Optional, Union, cast
 
 from botbuilder.core import TurnContext
 
 from ...state import Memory
-from ..augmentations.action_augmentation_section import ActionAugmentationSection
-from ..augmentations.augmentation import Augmentation
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
-from ..planner import Plan
-from ..planner.command_type import CommandType
+from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from ..prompts.function_call import FunctionCall
 from ..prompts.message import Message
+from ..prompts.sections.action_augmentation_section import ActionAugmentationSection
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers import Tokenizer
 from ..validators.action_response_validator import ActionResponseValidator
 from ..validators.json_response_validator import JSONResponseValidator
 from ..validators.validation import Validation
+from .augmentation import Augmentation
 
 PlanSchema: Optional[Dict[str, Any]] = {
     "type": "object",
@@ -54,7 +55,7 @@ class SequenceAugmentation(Augmentation[Plan]):
     """
 
     _section: ActionAugmentationSection
-    _plan_validator: JSONResponseValidator[Plan] = JSONResponseValidator(
+    _plan_validator: JSONResponseValidator = JSONResponseValidator(
         PlanSchema, "Return a JSON object that uses the SAY command to say what you're thinking."
     )
     _action_validator: ActionResponseValidator
@@ -88,7 +89,7 @@ class SequenceAugmentation(Augmentation[Plan]):
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
-    ) -> Validation[Plan]:
+    ) -> Validation:
         """
         Validates a response to a prompt.
 
@@ -100,7 +101,7 @@ class SequenceAugmentation(Augmentation[Plan]):
             remaining_attempts (int): Nubmer of remaining attempts to validate the response.
 
         Returns:
-            Validation[Union[Plan, None]]: A 'Validation' object.
+            Validation: A 'Validation' object.
         """
 
         # Validate that we got a well-formed inner monologue
@@ -112,13 +113,15 @@ class SequenceAugmentation(Augmentation[Plan]):
             return validation_result
 
         # Validate that the plan is structurally correct
-        # series of ignore[attr-defined] - necessary due to dict casting with parent class
         if validation_result.value:
-            plan = Plan.from_dict(validation_result.value)  # type: ignore[arg-type]
+            print(validation_result.value)
+            plan = Plan.from_dict(validation_result.value)
+            print(plan)
+
             for index, command in enumerate(plan.commands):
-                if command.type == CommandType.DO:
+                if isinstance(command, PredictedDoCommand):
                     # Ensure that the model specified an action
-                    if not command.action:  # type: ignore[attr-defined]
+                    if not command.action:
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the DO "action" for '
@@ -127,14 +130,12 @@ class SequenceAugmentation(Augmentation[Plan]):
 
                     # Ensure that the action is valid
                     parameters: str = ""
-                    if command.parameters:  # type: ignore[attr-defined]
-                        parameters = json.dumps(command.parameters)  # type: ignore[attr-defined]
+                    if command.parameters:
+                        parameters = json.dumps(command.parameters)
                     message = Message[str](
                         role="assistant",
                         content=None,
-                        function_call=FunctionCall(
-                            name=command.action, arguments=parameters  # type: ignore[attr-defined]
-                        ),
+                        function_call=FunctionCall(name=command.action, arguments=parameters),
                     )
                     action_validation = await self._action_validator.validate_response(
                         context,
@@ -146,10 +147,9 @@ class SequenceAugmentation(Augmentation[Plan]):
 
                     if not action_validation.valid:
                         return cast(Any, action_validation)
-
-                elif command.type == CommandType.SAY:
+                elif isinstance(command, PredictedSayCommand):
                     # Ensure that the model specified a response
-                    if not command.response:  # type: ignore[attr-defined]
+                    if not command.response:
                         return Validation(
                             valid=False,
                             feedback='The plan JSON is missing the SAY "response" '

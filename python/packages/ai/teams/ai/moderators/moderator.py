@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -10,7 +12,7 @@ from botbuilder.core import TurnContext
 
 from ...state import TurnState
 from ...user_agent import _UserAgent
-from ..planner import Plan
+from ..planners.plan import Plan
 
 
 class Moderator(ABC, _UserAgent):

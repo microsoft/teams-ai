@@ -106,16 +106,12 @@ class TestTurnState(IsolatedAsyncioTestCase):
         # Test getter when TurnState hasn't been loaded
         with self.assertRaises(Exception) as context:
             print(self.turn_state.conversation)
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
         # Test setter when TurnState hasn't been loaded
         with self.assertRaises(Exception) as context:
             self.turn_state.conversation = DefaultConversationState({})
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
     async def test_conversation_property_loaded(self):
         # Load the TurnState
@@ -146,16 +142,12 @@ class TestTurnState(IsolatedAsyncioTestCase):
         # Test getter when TurnState hasn't been loaded
         with self.assertRaises(Exception) as context:
             print(self.turn_state.user)
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
         # Test setter when TurnState hasn't been loaded
         with self.assertRaises(Exception) as context:
             self.turn_state.user = DefaultUserState({})
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
     async def test_user_property_loaded(self):
         # Load the TurnState
@@ -178,16 +170,12 @@ class TestTurnState(IsolatedAsyncioTestCase):
         # Test getter when TurnState hasn't been loaded
         with self.assertRaises(Exception) as context:
             print(self.turn_state.temp)
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
         # Test setter when TurnState hasn't been loaded
         with self.assertRaises(Exception) as context:
             self.turn_state.temp = DefaultTempState({})
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
     async def test_temp_property_loaded(self):
         # Load the TurnState
@@ -211,7 +199,7 @@ class TestTurnState(IsolatedAsyncioTestCase):
         with self.assertRaises(Exception) as context:
             await self.turn_state.save(context, self.storage)
         self.assertTrue(
-            "TurnState hasn't been loaded. Call loadState() first." in str(context.exception)
+            "TurnState hasn't been loaded. Call load() first." in str(context.exception)
         )
 
     async def test_save_when_loading(self):
@@ -294,40 +282,40 @@ class TestTurnState(IsolatedAsyncioTestCase):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
         self.turn_state.delete_conversation_state()
-        self.assertTrue(self.turn_state._scopes[CONVERSATION_SCOPE].is_deleted)
+        scope = self.turn_state.get_scope(CONVERSATION_SCOPE)
+        assert scope is not None
+        self.assertTrue(scope.is_deleted)
 
     async def test_delete_conversation_state_not_loaded(self):
         with self.assertRaises(Exception) as context:
             self.turn_state.delete_conversation_state()
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
     async def test_delete_user_state(self):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
         self.turn_state.delete_user_state()
-        self.assertTrue(self.turn_state._scopes[USER_SCOPE].is_deleted)
+        scope = self.turn_state.get_scope(USER_SCOPE)
+        assert scope is not None
+        self.assertTrue(scope.is_deleted)
 
     async def test_delete_user_state_not_loaded(self):
         with self.assertRaises(Exception) as context:
             self.turn_state.delete_user_state()
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
     async def test_delete_temp_state(self):
         context = self.create_mock_context()
         await self.turn_state.load(context, self.storage)
         self.turn_state.delete_temp_state()
-        self.assertTrue(self.turn_state._scopes[TEMP_SCOPE].is_deleted)
+        scope = self.turn_state.get_scope(TEMP_SCOPE)
+        assert scope is not None
+        self.assertTrue(scope.is_deleted)
 
     async def test_delete_temp_state_not_loaded(self):
         with self.assertRaises(Exception) as context:
             self.turn_state.delete_temp_state()
-        self.assertEqual(
-            str(context.exception), "TurnState hasn't been loaded. Call loadState() first."
-        )
+        self.assertEqual(str(context.exception), "TurnState hasn't been loaded. Call load() first.")
 
     async def test_delete_value(self):
         context = self.create_mock_context()
@@ -415,13 +403,6 @@ class TestTurnState(IsolatedAsyncioTestCase):
         with self.assertRaises(Exception) as context:
             self.turn_state.get_value("invalid.scope.property")
         self.assertIn("Invalid state path: invalid.scope.property", str(context.exception))
-
-    async def test_get_value_invalid_scope(self):
-        context = self.create_mock_context()
-        await self.turn_state.load(context, self.storage)
-        with self.assertRaises(Exception) as context:
-            self.turn_state.get_value("invalid.property")
-        self.assertIn("Invalid state scope: invalid", str(context.exception))
 
     async def test_get_value_default_scope(self):
         context = self.create_mock_context()

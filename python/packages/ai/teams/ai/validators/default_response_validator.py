@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Generic, TypeVar
+from __future__ import annotations
 
 from botbuilder.core import TurnContext
 
@@ -13,10 +13,8 @@ from ..tokenizers import Tokenizer
 from .prompt_response_validator import PromptResponseValidator
 from .validation import Validation
 
-ValueT = TypeVar("ValueT")
 
-
-class DefaultResponseValidator(Generic[ValueT], PromptResponseValidator[ValueT]):
+class DefaultResponseValidator(PromptResponseValidator):
     """
     Default response validator that always returns true.
     """
@@ -28,5 +26,5 @@ class DefaultResponseValidator(Generic[ValueT], PromptResponseValidator[ValueT])
         tokenizer: Tokenizer,
         response: PromptResponse,
         remaining_attempts: int,
-    ) -> Validation[ValueT]:
-        return Validation[ValueT]()
+    ) -> Validation:
+        return Validation()

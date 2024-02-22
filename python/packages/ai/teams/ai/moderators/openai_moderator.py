@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Literal, Optional
 
@@ -11,7 +13,7 @@ from botbuilder.core import TurnContext
 
 from ...state import TurnState
 from ..actions import ActionTypes
-from ..planner import Plan, PredictedDoCommand, PredictedSayCommand
+from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .moderator import Moderator
 
 

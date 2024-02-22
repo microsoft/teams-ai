@@ -3,18 +3,19 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from typing import Union
 
 from botbuilder.core import TurnContext
 
 from ...state import Memory
-from ..augmentations.augmentation import Augmentation
 from ..models.prompt_response import PromptResponse
-from ..planner.plan import Plan
-from ..planner.predicted_say_command import PredictedSayCommand
+from ..planners.plan import Plan, PredictedSayCommand
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers.tokenizer import Tokenizer
 from ..validators.validation import Validation
+from .augmentation import Augmentation
 
 
 class DefaultAugmentation(Augmentation[str]):
@@ -38,7 +39,7 @@ class DefaultAugmentation(Augmentation[str]):
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
-    ) -> Validation[str]:
+    ) -> Validation:
         """
         Validates a response to a prompt.
 
@@ -50,9 +51,9 @@ class DefaultAugmentation(Augmentation[str]):
             remaining_attempts (int): Nubmer of remaining attempts to validate the response.
 
         Returns:
-            Validation[str]: A 'Validation' object.
+            Validation: A 'Validation' object.
         """
-        return Validation[str](valid=True)
+        return Validation(valid=True)
 
     async def create_plan_from_response(
         self, turn_context: TurnContext, memory: Memory, response: PromptResponse[str]
