@@ -130,6 +130,8 @@ class LLMClient:
             content (TurnContext): The turn context.
             memory (Memory): An interface for accessing state values.
             functions (PromptFunctions): Functions to use when rendering the prompt.
+            tokenizer (Tokenizer): Tokenizer used when rendering the prompt or counting tokens.
+            template (PromptTemplate): Prompt used for the conversation.
         """
 
         remaining_attempts = remaining_attempts or self._options.max_repair_attempts

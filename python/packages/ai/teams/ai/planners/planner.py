@@ -26,7 +26,6 @@ class Planner(ABC):
         Args:
             context (TurnContext): The current turn context.
             state (TurnState): The current turn state.
-            ai (AI): The AI system that is generating the plan.
         """
 
     @abstractmethod
@@ -37,5 +36,4 @@ class Planner(ABC):
         Args:
             context (TurnContext): The current turn context.
             state (TurnState): The current turn state.
-            ai (AI): The AI system that is generating the plan.
         """
