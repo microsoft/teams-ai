@@ -3,30 +3,32 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Awaitable, Callable, Generic, List, TypeVar
+from __future__ import annotations
+
+from typing import Awaitable, Callable, List, TypeVar
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import ActivityTypes
 from botbuilder.schema.teams import MeetingEndEventDetails, MeetingStartEventDetails
 
-from teams.ai import TurnState
+from ..state import TurnState
 
-from .route import Route
+from ..route import Route
 
 StateT = TypeVar("StateT", bound=TurnState)
 
 
-class Meetings(Generic[StateT]):
-    _routes: List[Route[StateT]] = []
+class Meetings:
+    _routes: List[Route] = []
 
-    def __init__(self, routes: List[Route[StateT]]) -> None:
+    def __init__(self, routes: List[Route]) -> None:
         self._routes = routes
 
     def start(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]],
-        Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]],
+        [Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]]],
+        Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]],
     ]:
         """
         Registers a handler for meeting start events for Microsoft Teams.
@@ -52,15 +54,15 @@ class Meetings(Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]
-        ) -> Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: StateT):
+            func: Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]]
+        ) -> Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: TurnState):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route[StateT](__selector__, __handler__))
+            self._routes.append(Route(__selector__, __handler__))
             return func
 
         return __call__
@@ -68,8 +70,8 @@ class Meetings(Generic[StateT]):
     def end(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]],
-        Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]],
+        [Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]]],
+        Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]],
     ]:
         """
         Registers a handler for meeting end events for Microsoft Teams.
@@ -93,15 +95,15 @@ class Meetings(Generic[StateT]):
             )
 
         def __call__(
-            func: Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]
-        ) -> Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: StateT):
+            func: Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]]
+        ) -> Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: TurnState):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route[StateT](__selector__, __handler__))
+            self._routes.append(Route(__selector__, __handler__))
             return func
 
         return __call__
