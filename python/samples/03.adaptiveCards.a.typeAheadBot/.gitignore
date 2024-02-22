@@ -1,6 +1,0 @@
-.env
-
-# TeamsFx files
-env/.env.*.user
-env/.env.local
-build
