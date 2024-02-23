@@ -22,14 +22,14 @@
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "dependencies": {
-        "@azure/msal-node": "^2.6.3",
+        "@azure/msal-node": "^2.6.4",
         "axios": "^1.6.7",
         "botbuilder": "^4.22.1",
         "botbuilder-dialogs": "^4.22.1",
         "gpt-3-encoder": "^1.1.4",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
-        "openai": "^4.27.0",
+        "openai": "^4.28.0",
         "uuid": "^9.0.1",
         "yaml": "^2.3.4"
     },
