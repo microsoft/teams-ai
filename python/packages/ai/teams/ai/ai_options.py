@@ -3,28 +3,30 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 
-from .ai_history_options import AIHistoryOptions
-from .planner import Planner
+from .moderators.default_moderator import DefaultModerator
+from .moderators.moderator import Moderator
+from .planners.planner import Planner
 
 
 @dataclass
 class AIOptions:
     planner: Planner
     """
-    The planner to use for generating plans. For example,
-    you could set this as an instance of `OpenAIPlanner` or
-    `AzureOpenAIPlanner`.
+    The planner to use for generating plans.
     """
 
-    prompt: str = "default"
+    moderator: Moderator = field(default_factory=DefaultModerator)
     """
-    The prompt to use for the current turn.
+    Optional. The moderator to use for moderating input passed to 
+    the model and the output return by the model.
     """
 
-    history: AIHistoryOptions = field(default_factory=AIHistoryOptions)
+    allow_looping: bool = True
     """
-    Optional. The history options to use for the AI system
-    `Default: tracking history with a maximum of 3 turns and 1000 tokens per turn.`
+    Optional. If true, the AI system will allow the planner to loop.
+    Default `True`
     """

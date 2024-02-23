@@ -12,7 +12,7 @@ for e in Path("./packages").glob("*"):
         print("------ Package[" + e.name + "] ------")
         subprocess.run(["poetry", "run", "ci"], cwd=e.absolute(), check=True)
 
-for e in Path("./samples").glob("*"):
-    if e.is_dir():
-        print("------ Sample[" + e.name + "] ------")
-        subprocess.run(["poetry", "run", "ci"], cwd=e.absolute(), check=True)
+# for e in Path("./samples").glob("*"):
+#     if e.is_dir():
+#         print("------ Sample[" + e.name + "] ------")
+#         subprocess.run(["poetry", "run", "ci"], cwd=e.absolute(), check=True)

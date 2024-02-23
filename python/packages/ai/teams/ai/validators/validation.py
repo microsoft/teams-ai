@@ -3,14 +3,14 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from __future__ import annotations
 
-ValueT = TypeVar("ValueT")
+from dataclasses import dataclass
+from typing import Any, Optional
 
 
 @dataclass
-class Validation(Generic[ValueT]):
+class Validation:
     """
     Response returned by a `PromptResponseValidator`.
     """
@@ -27,7 +27,7 @@ class Validation(Generic[ValueT]):
     Default: None
     """
 
-    value: Optional[ValueT] = None
+    value: Optional[Any] = None
     """
     Optional. Replacement value to use for the response.
     Default: None

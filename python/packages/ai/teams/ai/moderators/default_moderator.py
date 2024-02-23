@@ -3,12 +3,14 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from typing import Optional
 
 from botbuilder.core import TurnContext
 
 from ...state import TurnState
-from ..planner import Plan
+from ..planners.plan import Plan
 from .moderator import Moderator
 
 

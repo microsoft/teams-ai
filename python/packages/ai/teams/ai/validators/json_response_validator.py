@@ -3,23 +3,24 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
 
 from botbuilder.core import TurnContext
 from jsonschema import ValidationError, validate
 
 from ...state import Memory
-from ...utils import parse
+from ...utils.json import parse
 from ..models.prompt_response import PromptResponse
 from ..tokenizers import Tokenizer
 from .prompt_response_validator import PromptResponseValidator
 from .validation import Validation
 
-ValueT = TypeVar("ValueT")
 NEW_LINE = "\n"
 
 
-class JSONResponseValidator(Generic[ValueT], PromptResponseValidator[ValueT]):
+class JSONResponseValidator(PromptResponseValidator):
     """
     Default response validator that always returns true.
     """
@@ -79,20 +80,20 @@ class JSONResponseValidator(Generic[ValueT], PromptResponseValidator[ValueT]):
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
-    ) -> Validation[ValueT]:
+    ) -> Validation:
         message = response.message
 
         if message is None:
-            return Validation[ValueT](valid=False)
+            return Validation(valid=False)
 
         content = message.content if message.content is not None else ""
         parsed = parse(content)
 
         if len(parsed) == 0:
-            return Validation[ValueT](valid=False, feedback=self.missing_json_feedback)
+            return Validation(valid=False, feedback=self.missing_json_feedback)
 
         if self._schema is None:
-            return Validation[ValueT](value=parsed.pop())
+            return Validation(value=parsed.pop())
 
         parsed.reverse()
         errors: List[str] = []
@@ -104,6 +105,6 @@ class JSONResponseValidator(Generic[ValueT], PromptResponseValidator[ValueT]):
             except ValidationError as err:
                 errors.append(err.message)
 
-        return Validation[ValueT](
+        return Validation(
             valid=False, feedback=f"{self._error_feedback}{NEW_LINE}{NEW_LINE.join(errors)}"
         )

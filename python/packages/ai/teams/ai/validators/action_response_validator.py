@@ -3,6 +3,8 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
@@ -35,7 +37,7 @@ class ValidatedChatCompletionAction:
     """
 
 
-class ActionResponseValidator(PromptResponseValidator[ValidatedChatCompletionAction]):
+class ActionResponseValidator(PromptResponseValidator):
     """
     Default response validator that always returns true.
     """
@@ -82,28 +84,28 @@ class ActionResponseValidator(PromptResponseValidator[ValidatedChatCompletionAct
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
-    ) -> Validation[ValidatedChatCompletionAction]:
+    ) -> Validation:
         message = response.message
         func = response.message.function_call if response.message is not None else None
 
         if message is None or func is None:
             if not self._required:
-                return Validation[ValidatedChatCompletionAction]()
+                return Validation()
 
-            return Validation[ValidatedChatCompletionAction](
+            return Validation(
                 valid=False,
                 feedback=f"No {self._noun} was specified. "
                 f"Call a {self._noun} with valid arguments.",
             )
 
         if func.name is None:
-            return Validation[ValidatedChatCompletionAction](
+            return Validation(
                 valid=False,
                 feedback=f"{self._noun} name missing. Specify a valid {self._noun} name.",
             )
 
         if not func.name in self._actions:
-            return Validation[ValidatedChatCompletionAction](
+            return Validation(
                 valid=False,
                 feedback=f'Unknown {self._noun} named "{func.name}". '
                 f"Specify a valid {self._noun} name.",
@@ -113,7 +115,7 @@ class ActionResponseValidator(PromptResponseValidator[ValidatedChatCompletionAct
         action = self._actions[func.name]
 
         if action.parameters is not None:
-            validator = JSONResponseValidator[Dict[str, Any]](
+            validator = JSONResponseValidator(
                 schema=action.parameters,
                 missing_json_feedback=f"No arguments were sent with called {self._noun}. "
                 f'Call the "{func.name}" {self._noun} with required '
@@ -135,11 +137,11 @@ class ActionResponseValidator(PromptResponseValidator[ValidatedChatCompletionAct
             )
 
             if not res.valid:
-                return Validation[ValidatedChatCompletionAction](valid=False, feedback=res.feedback)
+                return Validation(valid=False, feedback=res.feedback)
 
             if res.value is not None:
                 params = res.value
 
-        return Validation[ValidatedChatCompletionAction](
+        return Validation(
             valid=True, value=ValidatedChatCompletionAction(name=func.name, parameters=params)
         )

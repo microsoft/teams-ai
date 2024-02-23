@@ -8,3 +8,12 @@ from .embeddings_model import EmbeddingsModel
 from .embeddings_response import EmbeddingsResponse
 from .openai_embeddings import OpenAIEmbeddings
 from .openai_embeddings_options import OpenAIEmbeddingsOptions
+
+__all__ = [
+    "AzureOpenAIEmbeddings",
+    "AzureOpenAIEmbeddingsOptions",
+    "EmbeddingsModel",
+    "EmbeddingsResponse",
+    "OpenAIEmbeddings",
+    "OpenAIEmbeddingsOptions",
+]

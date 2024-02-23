@@ -3,29 +3,33 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union, cast
 
 from botbuilder.core import TurnContext
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 from ...state import Memory
-from ..augmentations.action_augmentation_section import ActionAugmentationSection
-from ..augmentations.augmentation import Augmentation
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
-from ..planner.plan import Plan
-from ..planner.predicted_command import PredictedCommand
-from ..planner.predicted_do_command import PredictedDoCommand
-from ..planner.predicted_say_command import PredictedSayCommand
+from ..planners.plan import (
+    Plan,
+    PredictedCommand,
+    PredictedDoCommand,
+    PredictedSayCommand,
+)
 from ..prompts.function_call import FunctionCall
 from ..prompts.message import Message
+from ..prompts.sections.action_augmentation_section import ActionAugmentationSection
 from ..prompts.sections.prompt_section import PromptSection
 from ..tokenizers import Tokenizer
 from ..validators.action_response_validator import ActionResponseValidator
 from ..validators.json_response_validator import JSONResponseValidator
 from ..validators.validation import Validation
+from .augmentation import Augmentation
 
 _MISSING_ACTION_FEEDBACK = (
     'The JSON returned had errors. Apply these fixes:\nadd the "action" property to "instance"'
@@ -34,8 +38,9 @@ _SAY_REDIRECT_FEEDBACK = """The JSON returned was missing an action. Return a va
 object that contains your thoughts and uses the SAY action."""
 
 
+@dataclass_json
 @dataclass
-class Thoughts:
+class Thoughts(DataClassJsonMixin):
     """
     The LLM's thoughts.
     """
@@ -50,8 +55,9 @@ class Thoughts:
     "The LLM's plan for the future."
 
 
+@dataclass_json
 @dataclass
-class Action:
+class Action(DataClassJsonMixin):
     """
     The next action to perform.
     """
@@ -65,7 +71,7 @@ class Action:
 
 @dataclass_json
 @dataclass
-class InnerMonologue:
+class InnerMonologue(DataClassJsonMixin):
     """
     Structure used to track the inner monologue of an LLM.
     """
@@ -106,7 +112,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
     """
 
     _section: ActionAugmentationSection
-    _monologue_validator = JSONResponseValidator[InnerMonologue](
+    _monologue_validator = JSONResponseValidator(
         InnerMonologueSchema,
         """No valid JSON objects were found in the response. Return a 
         valid JSON object with your thoughts and the next 
@@ -154,7 +160,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
-    ) -> Validation[InnerMonologue]:
+    ) -> Validation:
         """
         Validates a response to a prompt.
 
@@ -166,7 +172,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
             remaining_attempts (int): Number of remaining attempts to validate the response.
 
         Returns:
-        Validation[InnerMonologue]: A 'Validation' object.
+        Validation: A 'Validation' object.
         """
         # Validate that we got a well-formed inner monologue
         validation_result = await self._monologue_validator.validate_response(
@@ -183,9 +189,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
 
         # Validate that the action exists and its parameters are valid
         if validation_result.value:
-            # pylint:disable=no-member, line-too-long
-            # from_dict provided from @dataclass_json decorator
-            monologue = InnerMonologue.from_dict(validation_result.value)  # type: ignore[attr-defined]
+            monologue = InnerMonologue.from_dict(validation_result.value)
             parameters = (
                 json.dumps(monologue.action.parameters) if monologue.action.parameters else ""
             )

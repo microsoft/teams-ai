@@ -2,9 +2,7 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
-from enum import Enum
 
+from .llm_client import LLMClient, LLMClientOptions
 
-class CommandType(str, Enum):
-    DO = "DO"
-    SAY = "SAY"
+__all__ = ["LLMClient", "LLMClientOptions"]

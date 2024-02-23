@@ -2,16 +2,19 @@
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
-from typing import Any, Dict, Optional
+
+from __future__ import annotations
+
+from typing import Any, Dict, Iterator, MutableMapping, Optional
 
 
-class TurnStateEntry:
+class TurnStateEntry(MutableMapping[str, Any]):
     """Accessor class for managing an individual state scope."""
 
-    _value: Dict[str, Any]
     _storage_key: Optional[str]
     _deleted: bool = False
     _hash: str
+    data: Dict[str, Any]
 
     def __init__(self, value: Optional[Dict[str, Any]] = None, storage_key: Optional[str] = None):
         """Creates a new instance of the `TurnStateEntry` class.
@@ -22,9 +25,10 @@ class TurnStateEntry:
             storage_key (Optional[str], optional): Storage key to use when persisting the
                 state scope. Defaults to None.
         """
-        self._value = value or {}
+        super().__init__()
+        self.data = value or {}
         self._storage_key = storage_key
-        self._hash = str(self._value)
+        self._hash = str(self.data)
 
     @property
     def has_changed(self) -> bool:
@@ -33,7 +37,7 @@ class TurnStateEntry:
         Returns:
             bool: True if the value has changed, False otherwise.
         """
-        return str(self._value) != self._hash
+        return str(self.data) != self._hash
 
     @property
     def is_deleted(self) -> bool:
@@ -43,21 +47,6 @@ class TurnStateEntry:
             bool: True if the state entry is deleted, False otherwise.
         """
         return self._deleted
-
-    @property
-    def value(self) -> Dict[str, Any]:
-        """Gets the value of the state scope.
-        If the state scope is deleted, it resets the value to empty dict.
-
-        Returns:
-            Dict[str, Any]: The value of the state scope.
-        """
-        if self._deleted:
-            # Switch to a replace scenario
-            self._value = {}
-            self._deleted = False
-
-        return self._value
 
     @property
     def storage_key(self) -> Optional[str]:
@@ -70,6 +59,7 @@ class TurnStateEntry:
 
     def delete(self) -> None:
         """Clears the state scope."""
+        self.data = {}
         self._deleted = True
 
     def replace(self, value: Optional[Dict[str, Any]] = None) -> None:
@@ -78,4 +68,38 @@ class TurnStateEntry:
         Args:
             value (Optional[Dict[str, Any]], optional): New value to replace the state scope with.
         """
-        self._value = value or {}
+        self.data = {}
+        self._deleted = False
+
+        if not value:
+            return None
+
+        self.data = value
+        return None
+
+    def __getitem__(self, key: str) -> Optional[Any]:
+        self._deleted = False
+        return self.data.get(key)
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self._deleted = False
+        self.data[key] = value
+
+    def __contains__(self, key: object) -> bool:
+        return key in self.data
+
+    def __delitem__(self, key: str) -> None:
+        if key in self.data:
+            del self.data[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.data)
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+    def __getattribute__(self, name: str) -> Any:
+        if name == "data":
+            self._deleted = False
+
+        return super().__getattribute__(name)

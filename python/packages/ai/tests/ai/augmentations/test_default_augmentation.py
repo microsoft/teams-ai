@@ -10,9 +10,7 @@ from botbuilder.core import TurnContext
 
 from teams.ai.augmentations.default_augmentation import DefaultAugmentation
 from teams.ai.models.prompt_response import PromptResponse
-from teams.ai.planner.command_type import CommandType
-from teams.ai.planner.plan import Plan
-from teams.ai.planner.predicted_do_command import PredictedDoCommand
+from teams.ai.planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from teams.ai.prompts.message import Message
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
 from teams.state import TurnState
@@ -74,5 +72,6 @@ class TestDefaultAugmentation(IsolatedAsyncioTestCase):
             ),
         )
         self.assertEqual(len(plan.commands), 1)
-        self.assertEqual(plan.commands[0].type, CommandType.SAY)
-        self.assertEqual(plan.commands[0].response, "")  # type: ignore[attr-defined]
+        self.assertEqual(plan.commands[0].type, "SAY")
+        assert isinstance(plan.commands[0], PredictedSayCommand)
+        self.assertEqual(plan.commands[0].response, "")
