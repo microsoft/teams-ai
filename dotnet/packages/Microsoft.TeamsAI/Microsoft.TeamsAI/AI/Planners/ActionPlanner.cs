@@ -60,6 +60,11 @@ namespace Microsoft.Teams.AI.AI.Planners
         public PromptManager Prompts { get => Options.Prompts; }
 
         /// <summary>
+        /// Get the default prompt manager in use
+        /// </summary>
+        public ActionPlannerOptions<TState>.ActionPlannerPromptFactory DefaultPrompt { get => Options.DefaultPrompt; }
+
+        /// <summary>
         /// Starts a new task.
         /// </summary>
         /// <remarks>
