@@ -96,7 +96,7 @@ export interface DefaultTempState {
  *   public get myScope() {
  *     const scope = this.getScope('myScope');
  *     if (!scope) {
- *       throw new Error(`MyTurnState hasn't been loaded. Call loadState() first.`);
+ *       throw new Error(`MyTurnState hasn't been loaded. Call load() first.`);
  *     }
  *     return scope.value;
  *   }
@@ -104,7 +104,7 @@ export interface DefaultTempState {
  *   public set myScope(value) {
  *     const scope = this.getScope('myScope');
  *     if (!scope) {
- *       throw new Error(`MyTurnState hasn't been loaded. Call loadState() first.`);
+ *       throw new Error(`MyTurnState hasn't been loaded. Call load() first.`);
  *     }
  *     scope.replace(value);
  *   }
@@ -129,6 +129,7 @@ export class TurnState<
     private _scopes: Record<string, TurnStateEntry> = {};
     private _isLoaded = false;
     private _loadingPromise?: Promise<boolean>;
+    private _stateNotLoadedString = `TurnState hasn't been loaded. Call load() first.`;
 
     /**
      * Accessor for the conversation state.
@@ -137,12 +138,12 @@ export class TurnState<
      * Gets the conversation state from the turn state.
      * @template TConversationState
      * @returns {TConversationState} The conversation state.
-     * @throws Error if TurnState hasn't been loaded. Call loadState() first.
+     * @throws Error if TurnState hasn't been loaded. Call load() first.
      */
     public get conversation(): TConversationState {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         return scope.value as TConversationState;
     }
@@ -154,7 +155,7 @@ export class TurnState<
     public set conversation(value: TConversationState) {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         scope.replace(value as Record<string, unknown>);
     }
@@ -170,12 +171,12 @@ export class TurnState<
     /**
      * Accessor for the temp state.
      @returns {TTempState} The temp TurnState.
-     @throws Error if TurnState hasn't been loaded. Call loadState() first.
+     @throws Error if TurnState hasn't been loaded. Call load() first.
      */
     public get temp(): TTempState {
         const scope = this.getScope(TEMP_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         return scope.value as TTempState;
     }
@@ -183,12 +184,12 @@ export class TurnState<
     /**
      * Replaces the temp state with a new value.
      * @param {TTempState} value New value to replace the temp state with.
-     * @throws Error if TurnState hasn't been loaded. Call loadState() first.
+     * @throws Error if TurnState hasn't been loaded. Call load() first.
      */
     public set temp(value: TTempState) {
         const scope = this.getScope(TEMP_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         scope.replace(value as Record<string, unknown>);
     }
@@ -200,7 +201,7 @@ export class TurnState<
     public get user(): TUserState {
         const scope = this.getScope(USER_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         return scope.value as TUserState;
     }
@@ -211,7 +212,7 @@ export class TurnState<
     public set user(value: TUserState) {
         const scope = this.getScope(USER_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         scope.replace(value as Record<string, unknown>);
     }
@@ -222,7 +223,7 @@ export class TurnState<
     public deleteConversationState(): void {
         const scope = this.getScope(CONVERSATION_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         scope.delete();
     }
@@ -233,7 +234,7 @@ export class TurnState<
     public deleteTempState(): void {
         const scope = this.getScope(TEMP_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
         scope.delete();
     }
@@ -244,7 +245,7 @@ export class TurnState<
     public deleteUserState(): void {
         const scope = this.getScope(USER_SCOPE);
         if (!scope) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error();
         }
         scope.delete();
     }
@@ -276,7 +277,7 @@ export class TurnState<
      */
     public hasValue(path: string): boolean {
         const { scope, name } = this.getScopeAndName(path);
-        return scope.value.hasOwnProperty(name);
+        return Object.prototype.hasOwnProperty.call(scope.value, name);
     }
 
     /**
@@ -323,7 +324,7 @@ export class TurnState<
                     const keys: string[] = [];
                     const scopes = await this.onComputeStorageKeys(context);
                     for (const key in scopes) {
-                        if (scopes.hasOwnProperty(key)) {
+                        if (Object.prototype.hasOwnProperty.call(scopes, key)) {
                             keys.push(scopes[key]);
                         }
                     }
@@ -333,7 +334,7 @@ export class TurnState<
 
                     // Create scopes for items
                     for (const key in scopes) {
-                        if (scopes.hasOwnProperty(key)) {
+                        if (Object.prototype.hasOwnProperty.call(scopes, key)) {
                             const storageKey = scopes[key];
                             const value = items[storageKey];
                             this._scopes[key] = new TurnStateEntry(value, storageKey);
@@ -371,14 +372,14 @@ export class TurnState<
 
         // Ensure loaded
         if (!this._isLoaded) {
-            throw new Error(`TurnState hasn't been loaded. Call loadState() first.`);
+            throw new Error(this._stateNotLoadedString);
         }
 
         // Find changes and deletions
         let changes: StoreItems | undefined;
         let deletions: string[] | undefined;
         for (const key in this._scopes) {
-            if (!this._scopes.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(this._scopes, key)) {
                 continue;
             }
             const entry = this._scopes[key];

@@ -16,11 +16,11 @@ describe('TeamsAdapter', () => {
         sandbox = sinon.createSandbox();
         adapter = new TeamsAdapter();
 
-        app.post('/api/messages', async (req, res) => {
+        app.post('/api/messages', async (req: any, res: any) => {
             await adapter.process(req, res, async () => {});
         });
 
-        server = app.listen(80);
+        server = app.listen(9876);
     });
 
     afterEach(() => {
@@ -34,7 +34,7 @@ describe('TeamsAdapter', () => {
             let userAgent: string | undefined;
 
             try {
-                const res = await axios.post('/api/messages', {
+                const res = await axios.post('http://127.0.0.1:9876/api/messages', {
                     type: 'invoke',
                     localTimezone: 'America/Los_Angeles',
                     callerId: 'test',
