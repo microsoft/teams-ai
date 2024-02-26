@@ -10,20 +10,18 @@ from logging import Logger
 from typing import Optional
 
 from botbuilder.core import Storage
-from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
 
 from .adaptive_cards import AdaptiveCardsOptions
 from .ai import AIOptions
 from .task_modules import TaskModulesOptions
+from .teams_adapter import TeamsAdapter
 
 
 @dataclass
 class ApplicationOptions:
-    auth: Optional[ConfigurationBotFrameworkAuthentication] = None
+    adapter: Optional[TeamsAdapter] = None
     """
-    Optional. Bot auth settings.
-    If using the `long_running_messages` option or calling the `continue_conversation_async` 
-    method, this property is required.
+    Optional. Options used to initialize your `BotAdapter`
     """
 
     bot_app_id: str = ""

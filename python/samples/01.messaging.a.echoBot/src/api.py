@@ -6,23 +6,25 @@ Description: initialize the api and route incoming messages
 to our app
 """
 
-from botbuilder.schema import Activity
-from fastapi import FastAPI, Request, Response
+from http import HTTPStatus
 
-from src.bot import app
+from aiohttp import web
+from botbuilder.core.integration import aiohttp_error_middleware
 
-api = FastAPI()
+from bot import app
+
+routes = web.RouteTableDef()
 
 
-@api.post("/api/messages")
-async def on_message(req: Request, res: Response):
-    body = await req.json()
-    activity = Activity().deserialize(body)
-    auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
-    response = await app.process_activity(activity, auth_header)
+@routes.post("/api/messages")
+async def on_messages(req: web.Request) -> web.Response:
+    res = await app.adapter.process(req, app)
 
-    if response:
-        res.status_code = response.status
-        return response.body
+    if res:
+        return res
 
-    return None
+    return web.Response(status=HTTPStatus.OK)
+
+
+api = web.Application(middlewares=[aiohttp_error_middleware])
+api.add_routes(routes)
