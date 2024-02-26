@@ -70,7 +70,7 @@ jobs:
       - name: Test
         run: dotnet test Microsoft.TeamsAI.Tests/Microsoft.Teams.AI.Tests.csproj --verbosity normal --logger trx --results-directory ./TestResults --collect:"XPlat Code Coverage" --configuration Release
       - name: Coverage
-        uses: danielpalme/ReportGenerator-GitHub-Action@68f1963d9876d2ac78bfd1c41c395514b7318855 # 5.2.1
+        uses: danielpalme/ReportGenerator-GitHub-Action@b067e0c5d288fb4277b9f397b2dc6013f60381f0 # 5.2.2
         with:
           reports: ${{ env.SOLUTION_DIR }}TestResults/*/coverage.cobertura.xml
           targetdir: ${{ env.SOLUTION_DIR }}TestResults/coverage
