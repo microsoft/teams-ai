@@ -120,7 +120,7 @@ jobs:
         with:
           flag-name: python
           parallel: true
-          files: python/packages/ai/coverage/lcov
+          files: python/packages/ai/coverage/lcov.info
 
   finish:
     needs: [javascript, dotnet]
