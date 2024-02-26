@@ -59,3 +59,24 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: pip
+    directory: /python
+    commit-message:
+      prefix: '[PY] bump: '
+      include: scope
+    labels:
+      - dependencies
+      - Python
+    reviewers:
+      - microsoft/teams-ai-admins
+    schedule:
+      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
