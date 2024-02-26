@@ -51,7 +51,7 @@ target-version = ['py38']
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "-rx --cov-report html:coverage --cov=teams"
+addopts = "-rx --cov-report html:coverage/html --cov-report lcov:coverage/lcov --cov=teams"
 log_cli = true
 log_cli_level = "INFO"
 
