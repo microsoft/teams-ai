@@ -11,7 +11,8 @@ on:
     paths: [
         '.github/workflows/coverage.yml',
         'js/**',
-        'dotnet/**'
+        'dotnet/**',
+        'python/**'
     ]
 
 permissions: read-all
@@ -87,6 +88,39 @@ jobs:
         with:
           name: testresults-dotnet-${{ env.dotnet-version }}
           path: ${{ env.SOLUTION_DIR }}TestResults
+
+  python:
+    name: Python
+    runs-on: ubuntu-latest
+    environment: main
+    env:
+      python-version: 3.8
+    defaults:
+      run:
+        working-directory: python/packages/ai
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup Python ${{ env.python-version }}
+        uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4.7.0
+        with:
+          python-version: ${{ env.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+      - name: Test
+        run: |
+          poetry run test
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          flag-name: python
+          parallel: true
+          files: python/packages/ai/coverage/lcov
 
   finish:
     needs: [javascript, dotnet]
