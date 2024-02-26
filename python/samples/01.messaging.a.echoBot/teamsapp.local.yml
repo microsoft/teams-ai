@@ -63,19 +63,10 @@ provision:
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
 
 deploy:
-  # prerequisite: pip install
-  - uses: script
-    with:
-      run: pip install poetry
-
-  - uses: script
-    with:
-      run: poetry install
-
   # Generate runtime environment variables
   - uses: file/createOrUpdateEnvironmentFile
     with:
       target: ./.env
       envs:
-        MicrosoftAppId: ${{BOT_ID}}
-        MicrosoftAppPassword: ${{SECRET_BOT_PASSWORD}}
+        BOT_ID: ${{BOT_ID}}
+        BOT_PASSWORD: ${{SECRET_BOT_PASSWORD}}

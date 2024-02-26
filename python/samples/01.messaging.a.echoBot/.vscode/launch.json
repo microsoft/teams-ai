@@ -52,18 +52,6 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Attach to Local Service",
-            "type": "node",
-            "request": "attach",
-            "port": 9239,
-            "restart": true,
-            "presentation": {
-                "group": "all",
-                "hidden": true
-            },
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
             "name": "Start",
             "type": "python",
             "request": "launch",
@@ -76,7 +64,6 @@
             "name": "Debug (Edge)",
             "configurations": [
                 "Launch App (Edge)",
-                "Attach to Local Service",
                 "Start"
             ],
             "preLaunchTask": "Start Teams App Locally",
@@ -90,7 +77,6 @@
             "name": "Debug (Chrome)",
             "configurations": [
                 "Launch App (Chrome)",
-                "Attach to Local Service",
                 "Start"
             ],
             "preLaunchTask": "Start Teams App Locally",

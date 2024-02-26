@@ -10,7 +10,6 @@ from typing import Awaitable, Callable, List, Optional, Pattern, Tuple, Union
 
 from aiohttp.web import Request, Response
 from botbuilder.core import Bot, TurnContext
-from botbuilder.integration.aiohttp import CloudAdapter
 from botbuilder.schema import ActivityTypes
 from botbuilder.schema.teams import (
     FileConsentCardResponse,
@@ -32,6 +31,7 @@ from .message_extensions.message_extensions import MessageExtensions
 from .route import Route, RouteHandler
 from .state import TurnState
 from .task_modules import TaskModules
+from .teams_adapter import TeamsAdapter
 from .typing import Typing
 
 
@@ -53,7 +53,7 @@ class Application(Bot):
     _ai: Optional[AI]
     _adaptive_card: AdaptiveCards
     _options: ApplicationOptions
-    _adapter: Optional[CloudAdapter] = None
+    _adapter: Optional[TeamsAdapter] = None
     _before_turn: List[RouteHandler] = []
     _after_turn: List[RouteHandler] = []
     _routes: List[Route] = []
@@ -78,7 +78,7 @@ class Application(Bot):
         self._task_modules = TaskModules(self._routes, options.task_modules.task_data_filter)
         self._meetings = Meetings(self._routes)
 
-        if options.long_running_messages and (not options.auth or not options.bot_app_id):
+        if options.long_running_messages and (not options.adapter or not options.bot_app_id):
             raise ApplicationError(
                 """
                 The `ApplicationOptions.long_running_messages` property is unavailable because 
@@ -86,8 +86,24 @@ class Application(Bot):
                 """
             )
 
-        if options.auth:
-            self._adapter = CloudAdapter(options.auth)
+        if options.adapter:
+            self._adapter = options.adapter
+
+    @property
+    def adapter(self) -> TeamsAdapter:
+        """
+        The bot's adapter.
+        """
+
+        if not self._adapter:
+            raise ApplicationError(
+                """
+                The Application.adapter property is unavailable because it was 
+                not configured when creating the Application.
+                """
+            )
+
+        return self._adapter
 
     @property
     def ai(self) -> AI:
