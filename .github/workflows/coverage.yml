@@ -123,7 +123,7 @@ jobs:
           files: python/packages/ai/coverage/lcov.info
 
   finish:
-    needs: [javascript, dotnet]
+    needs: [javascript, dotnet, python]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     environment: main
@@ -132,4 +132,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
-          carryforward: 'javascript,dotnet'
+          carryforward: 'javascript,dotnet,python'
