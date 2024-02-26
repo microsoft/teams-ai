@@ -31,7 +31,7 @@
         "jsonschema": "1.4.1",
         "openai": "^4.28.0",
         "uuid": "^9.0.1",
-        "yaml": "^2.3.4"
+        "yaml": "^2.4.0"
     },
     "resolutions": {
         "follow-redirects": "^1.15.0"
