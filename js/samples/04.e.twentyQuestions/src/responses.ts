@@ -366,6 +366,5 @@ export function youLose(secretWord: string): string {
  */
 function getRandomResponse(responses: string[]): string {
     const i = Math.floor(Math.random() * (responses.length - 1));
-    // eslint-disable-next-line security/detect-object-injection
     return responses[i];
 }

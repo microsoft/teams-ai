@@ -102,7 +102,6 @@ app.conversationUpdate('membersAdded', async (context, state) => {
     const membersAdded = context.activity.membersAdded || [];
     for (let member = 0; member < membersAdded.length; member++) {
         // Ignore the bot joining the conversation
-        // eslint-disable-next-line security/detect-object-injection
         if (membersAdded[member].id !== context.activity.recipient.id) {
             await context.sendActivity(
                 `Hello and welcome! With this sample you can see the functionality of the Content Safety Moderator of Azure Open AI services.`

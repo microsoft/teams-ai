@@ -499,7 +499,6 @@ export class AI<TState extends TurnState = TurnState> {
                 break;
             }
 
-            // eslint-disable-next-line security/detect-object-injection
             let output: string;
             const cmd = plan.commands[i];
             switch (cmd.type) {
