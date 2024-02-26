@@ -1,0 +1,56 @@
+#
+# This workflow will build/test/lint the Python SDK.
+#
+
+name: Python Build/Test/Lint
+
+on:
+  workflow_call:
+  push:
+    branches: ['**']
+    paths: ['python/**']
+  pull_request:
+    branches: ['**']
+    paths: ['python/**']
+
+permissions: read-all
+
+jobs:
+  build-test-lint:
+    name: Build/Test/Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    defaults:
+      run:
+        working-directory: python/
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4.7.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          python scripts/install.py
+      - name: Check
+        run: |
+          python scripts/check.py
+      - name: Build
+        run: |
+          python scripts/build.py
+      - name: Test
+        run: |
+          python scripts/test.py
+      - name: Lint
+        run: |
+          python scripts/lint.py
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          egress-policy: audit
