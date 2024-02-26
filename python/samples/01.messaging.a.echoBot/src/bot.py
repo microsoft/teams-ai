@@ -9,16 +9,16 @@ import sys
 import traceback
 
 from botbuilder.core import TurnContext
-from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
-from teams import Application, ApplicationOptions, TurnState
+from teams import Application, ApplicationOptions, TeamsAdapter
+from teams.state import TurnState
 
 from config import Config
 
 config = Config()
-app = Application[TurnState](
+app = Application(
     ApplicationOptions(
         bot_app_id=config.APP_ID,
-        auth=ConfigurationBotFrameworkAuthentication(config),
+        adapter=TeamsAdapter(config),
     )
 )
 

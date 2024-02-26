@@ -10,7 +10,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-flask = {extras = ["async"], version = "^3.0.2"}
 python-dotenv = "^1.0.1"
 teams-ai = { path = "../../packages/ai", develop = true }
 
