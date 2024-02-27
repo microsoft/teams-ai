@@ -26,7 +26,7 @@
         "axios": "^1.6.7",
         "botbuilder": "^4.22.1",
         "botbuilder-dialogs": "^4.22.1",
-        "gpt-3-encoder": "^1.1.4",
+        "gpt-tokenizer": "^2.1.2",
         "json-colorizer": "^2.2.2",
         "jsonschema": "1.4.1",
         "openai": "^4.28.0",

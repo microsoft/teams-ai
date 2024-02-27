@@ -7,12 +7,13 @@
  */
 
 import { Tokenizer } from './Tokenizer';
-import { encode, decode } from 'gpt-tokenizer/cjs/model/text-davinci-003';
+import { encode, decode } from 'gpt-tokenizer';
 
 /**
- * Tokenizer that uses GPT-3's encoder.
+ * Tokenizer that uses GPT's cl100k_base encoding.
+ * To use GPT-3 encoding, pass in an instance of GPT3Tokenizer.
  */
-export class GPT3Tokenizer implements Tokenizer {
+export class GPTTokenizer implements Tokenizer {
     public decode(tokens: number[]): string {
         return decode(tokens);
     }
