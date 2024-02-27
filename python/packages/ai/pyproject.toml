@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "teams-ai"
-version = "0.0.0"
+version = "1.0.0.rc0"
 description = "SDK focused on building AI based applications for Microsoft Teams."
 authors = ["Microsoft <teams@microsoft.com>"]
 readme = "README.md"
