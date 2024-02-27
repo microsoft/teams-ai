@@ -3,9 +3,9 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     commit-message:
-      prefix: '[repo] bump: '
+      prefix: "[repo] bump: "
       include: scope
-    labels: 
+    labels:
       - dependencies
     reviewers:
       - microsoft/teams-ai-admins
@@ -20,13 +20,13 @@ updates:
   - package-ecosystem: nuget
     directory: /dotnet/packages/Microsoft.TeamsAI
     commit-message:
-      prefix: '[C#] bump: '
+      prefix: "[C#] bump: "
       include: scope
-    labels: 
+    labels:
       - dependencies
       - dotnet
     reviewers:
-      - microsoft/teams-ai-admins
+      - "microsoft/teams-ai-admins"
     schedule:
       interval: weekly
     groups:
@@ -38,17 +38,37 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
-
   - package-ecosystem: npm
     directory: /js
     commit-message:
-      prefix: '[JS] bump: '
+      prefix: "[JS] bump: "
       include: scope
     labels:
       - dependencies
       - JS
     reviewers:
-      - microsoft/teams-ai-admins
+      - "microsoft/teams-ai-admins"
+    schedule:
+      interval: weekly
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "pip"
+    directory: /python
+    commit-message:
+      prefix: "[PY] bump: "
+      include: scope
+    labels:
+      - dependencies
+      - PY
+    reviewers:
+      - "microsoft/teams-ai-admins"
     schedule:
       interval: weekly
     groups:
