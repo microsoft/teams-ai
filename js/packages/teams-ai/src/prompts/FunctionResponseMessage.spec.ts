@@ -2,7 +2,7 @@ import assert from 'assert';
 import { TestAdapter } from 'botbuilder-core';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { FunctionResponseMessage } from './FunctionResponseMessage';
 
 describe('FunctionResponseMessage', () => {
@@ -10,7 +10,7 @@ describe('FunctionResponseMessage', () => {
     const response = 'bar';
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a FunctionResponseMessage', () => {

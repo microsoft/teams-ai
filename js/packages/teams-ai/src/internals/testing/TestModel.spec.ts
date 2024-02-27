@@ -2,7 +2,7 @@ import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 
 import { PromptTemplate, SystemMessage } from '../../prompts';
-import { GPT3Tokenizer } from '../../tokenizers';
+import { GPTTokenizer } from '../../tokenizers';
 import { TestTurnState } from './TestTurnState';
 import { TestPromptManager } from './TestPromptManager';
 import { TestModel } from './TestModel';
@@ -10,7 +10,7 @@ import { TestModel } from './TestModel';
 describe('TestModel', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const template: PromptTemplate = {
         name: 'test',
         prompt: new SystemMessage('Hello World'),

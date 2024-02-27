@@ -5,14 +5,14 @@ import { createTestTurnContextAndState } from '../internals/testing/TestUtilitie
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TeamsAdapter } from '../TeamsAdapter';
 import { UserInputMessage } from './UserInputMessage';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 
 describe('UserInputMessage', () => {
     const adapter = new TeamsAdapter();
     const userInputMessage = new UserInputMessage(100);
 
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const base64String =
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAJBJREFUaEPtksEJADAMhJL9l+4OglCC/Z8Q7c6Rt0fumA75rWRFKiIZ6GtJYjG2IlidNKyIJBZjK4LVScOKSGIxtiJYnTSsiCQWYyuC1UnDikhiMbYiWJ00rIgkFmMrgtVJw4pIYjG2IlidNKyIJBZjK4LVScOKSGIxtiJYnTSsiCQWYyuC1UnDikhiMfZMkQcQkQAzneSfdgAAAABJRU5ErkJggg==';
 

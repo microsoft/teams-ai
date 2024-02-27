@@ -2,14 +2,14 @@ import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { GroupSection } from './GroupSection';
 import { TextSection } from './TextSection';
 
 describe('GroupSection', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a GroupSection', () => {
@@ -59,7 +59,7 @@ describe('GroupSection', () => {
                 const section = new GroupSection([new TextSection('Hello', 'user'), new TextSection('World', 'user')]);
                 const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
                 assert.deepEqual(rendered.output, [{ role: 'system', content: 'Hello\n\nWorld' }]);
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -73,7 +73,7 @@ describe('GroupSection', () => {
                 ]);
                 const rendered = await section.renderAsMessages(context, state, functions, tokenizer, 100);
                 assert.deepEqual(rendered.output, [{ role: 'system', content: 'Hello\n\nWorld' }]);
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -108,7 +108,7 @@ describe('GroupSection', () => {
                 const section = new GroupSection([new TextSection('Hello', 'user'), new TextSection('World', 'user')]);
                 const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'Hello\n\nWorld');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -122,7 +122,7 @@ describe('GroupSection', () => {
                 ]);
                 const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'Hello\n\nWorld');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
