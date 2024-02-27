@@ -5,7 +5,7 @@ trigger:
     - main
   paths:
     include:
-    - js
+    - python
     - pipelines/python.yml
 
 pool:
