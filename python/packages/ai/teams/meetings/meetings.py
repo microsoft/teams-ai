@@ -5,7 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Awaitable, Callable, List, TypeVar
+from typing import Awaitable, Callable, Generic, List, TypeVar
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import ActivityTypes
@@ -17,17 +17,17 @@ from ..state import TurnState
 StateT = TypeVar("StateT", bound=TurnState)
 
 
-class Meetings:
-    _routes: List[Route] = []
+class Meetings(Generic[StateT]):
+    _routes: List[Route[StateT]] = []
 
-    def __init__(self, routes: List[Route]) -> None:
+    def __init__(self, routes: List[Route[StateT]]) -> None:
         self._routes = routes
 
     def start(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]],
+        [Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]],
+        Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]],
     ]:
         """
         Registers a handler for meeting start events for Microsoft Teams.
@@ -53,15 +53,15 @@ class Meetings:
             )
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, MeetingStartEventDetails], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, MeetingStartEventDetails], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route(__selector__, __handler__))
+            self._routes.append(Route[StateT](__selector__, __handler__))
             return func
 
         return __call__
@@ -69,8 +69,8 @@ class Meetings:
     def end(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]],
+        [Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]],
+        Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]],
     ]:
         """
         Registers a handler for meeting end events for Microsoft Teams.
@@ -94,9 +94,9 @@ class Meetings:
             )
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, MeetingEndEventDetails], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, MeetingEndEventDetails], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)

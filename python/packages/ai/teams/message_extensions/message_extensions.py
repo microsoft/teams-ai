@@ -6,7 +6,18 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import re
-from typing import Any, Awaitable, Callable, List, Literal, Pattern, Union, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Generic,
+    List,
+    Literal,
+    Pattern,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from botbuilder.core import InvokeResponse, TurnContext
 from botbuilder.core.serializer_helper import deserializer_helper, serializer_helper
@@ -28,13 +39,14 @@ from teams.state import TurnState
 
 from ..route import Route
 
+StateT = TypeVar("StateT", bound=TurnState)
 MessagePreviewAction = Literal["edit", "send"]
 
 
-class MessageExtensions:
-    _routes: List[Route] = []
+class MessageExtensions(Generic[StateT]):
+    _routes: List[Route[StateT]] = []
 
-    def __init__(self, routes: List[Route]) -> None:
+    def __init__(self, routes: List[Route[StateT]]) -> None:
         self._routes = routes
 
     def query(
@@ -42,12 +54,12 @@ class MessageExtensions:
     ) -> Callable[
         [
             Callable[
-                [TurnContext, TurnState, MessagingExtensionQuery],
+                [TurnContext, StateT, MessagingExtensionQuery],
                 Awaitable[MessagingExtensionResult],
             ]
         ],
         Callable[
-            [TurnContext, TurnState, MessagingExtensionQuery], Awaitable[MessagingExtensionResult]
+            [TurnContext, StateT, MessagingExtensionQuery], Awaitable[MessagingExtensionResult]
         ],
     ]:
         """
@@ -79,14 +91,14 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, MessagingExtensionQuery],
+                [TurnContext, StateT, MessagingExtensionQuery],
                 Awaitable[MessagingExtensionResult],
             ]
         ) -> Callable[
-            [TurnContext, TurnState, MessagingExtensionQuery],
+            [TurnContext, StateT, MessagingExtensionQuery],
             Awaitable[MessagingExtensionResult],
         ]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+            async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
 
@@ -98,7 +110,7 @@ class MessageExtensions:
                 await self._invoke_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -106,8 +118,8 @@ class MessageExtensions:
     def query_link(
         self, command_id: Union[str, Pattern[str]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult]]],
-        Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult]],
+        [Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
     ]:
         """
         Registers a handler that implements a Link Unfurling based Message Extension.
@@ -138,11 +150,11 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, str],
+                [TurnContext, StateT, str],
                 Awaitable[MessagingExtensionResult],
             ]
-        ) -> Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult],]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+        ) -> Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult],]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
 
@@ -158,7 +170,7 @@ class MessageExtensions:
                 await self._invoke_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -166,8 +178,8 @@ class MessageExtensions:
     def anonymous_query_link(
         self, command_id: Union[str, Pattern[str]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult]]],
-        Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult]],
+        [Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]],
     ]:
         """
         Registers a handler for a command that performs anonymous link unfurling.
@@ -198,9 +210,9 @@ class MessageExtensions:
             return self._activity_with_command_id(context.activity, command_id)
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult]]
-        ) -> Callable[[TurnContext, TurnState, str], Awaitable[MessagingExtensionResult]]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]
+        ) -> Callable[[TurnContext, StateT, str], Awaitable[MessagingExtensionResult]]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
 
@@ -216,7 +228,7 @@ class MessageExtensions:
                 await self._invoke_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -224,8 +236,8 @@ class MessageExtensions:
     def query_setting_url(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState], Awaitable[MessagingExtensionResult]]],
-        Callable[[TurnContext, TurnState], Awaitable[MessagingExtensionResult]],
+        [Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]],
     ]:
         """
         Registers a handler that invokes the fetch of the config settings for a Message Extension.
@@ -251,16 +263,16 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState],
+                [TurnContext, StateT],
                 Awaitable[MessagingExtensionResult],
             ]
-        ) -> Callable[[TurnContext, TurnState], Awaitable[MessagingExtensionResult]]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+        ) -> Callable[[TurnContext, StateT], Awaitable[MessagingExtensionResult]]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state)
                 await self._invoke_action_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -268,8 +280,8 @@ class MessageExtensions:
     def configure_settings(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, Any], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, Any], Awaitable[None]],
+        [Callable[[TurnContext, StateT, Any], Awaitable[None]]],
+        Callable[[TurnContext, StateT, Any], Awaitable[None]],
     ]:
         """
         Registers a handler that implements the logic to invoke
@@ -295,9 +307,9 @@ class MessageExtensions:
             return True
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, Any], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, Any], Awaitable[None]]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, Any], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, Any], Awaitable[None]]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 value = {}
                 if context.activity.value:
                     value = context.activity.value
@@ -306,7 +318,7 @@ class MessageExtensions:
                 await self._invoke_response(context, MessagingExtensionResult())
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -314,8 +326,8 @@ class MessageExtensions:
     def card_button_clicked(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, Any], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, Any], Awaitable[None]],
+        [Callable[[TurnContext, StateT, Any], Awaitable[None]]],
+        Callable[[TurnContext, StateT, Any], Awaitable[None]],
     ]:
         """
         Registers a handler that implements the logic when a
@@ -341,9 +353,9 @@ class MessageExtensions:
             return True
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, Any], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, Any], Awaitable[None]]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, Any], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, Any], Awaitable[None]]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 value = {}
                 if context.activity.value:
                     value = context.activity.value
@@ -352,7 +364,7 @@ class MessageExtensions:
                 await self._invoke_response(context, MessagingExtensionResult())
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -362,12 +374,12 @@ class MessageExtensions:
     ) -> Callable[
         [
             Callable[
-                [TurnContext, TurnState, Activity],
+                [TurnContext, StateT, Activity],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
             ]
         ],
         Callable[
-            [TurnContext, TurnState, Activity],
+            [TurnContext, StateT, Activity],
             Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
         ],
     ]:
@@ -417,14 +429,14 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, Activity],
+                [TurnContext, StateT, Activity],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
             ]
         ) -> Callable[
-            [TurnContext, TurnState, Activity],
+            [TurnContext, StateT, Activity],
             Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
         ]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+            async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
 
@@ -443,7 +455,7 @@ class MessageExtensions:
                 await self._invoke_action_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -451,8 +463,8 @@ class MessageExtensions:
     def fetch_task(
         self, command_id: Union[str, Pattern[str]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState], Awaitable[Union[TaskModuleTaskInfo, str]]]],
-        Callable[[TurnContext, TurnState], Awaitable[Union[TaskModuleTaskInfo, str]]],
+        [Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]]]],
+        Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]]],
     ]:
         """
         Registers a handler to process the initial fetch task for an
@@ -484,16 +496,16 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState],
+                [TurnContext, StateT],
                 Awaitable[Union[TaskModuleTaskInfo, str]],
             ]
-        ) -> Callable[[TurnContext, TurnState], Awaitable[Union[TaskModuleTaskInfo, str]],]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+        ) -> Callable[[TurnContext, StateT], Awaitable[Union[TaskModuleTaskInfo, str]],]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state)
                 await self._invoke_task_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -501,8 +513,8 @@ class MessageExtensions:
     def select_item(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, Any], Awaitable[MessagingExtensionResult]]],
-        Callable[[TurnContext, TurnState, Any], Awaitable[MessagingExtensionResult]],
+        [Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult]]],
+        Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult]],
     ]:
         """
         Registers a handler that implements the logic to handle the
@@ -530,16 +542,16 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, Any],
+                [TurnContext, StateT, Any],
                 Awaitable[MessagingExtensionResult],
             ]
-        ) -> Callable[[TurnContext, TurnState, Any], Awaitable[MessagingExtensionResult],]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+        ) -> Callable[[TurnContext, StateT, Any], Awaitable[MessagingExtensionResult],]:
+            async def __invoke__(context: TurnContext, state: StateT):
                 res = await func(context, state, context.activity.value)
                 await self._invoke_action_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__
@@ -549,12 +561,12 @@ class MessageExtensions:
     ) -> Callable[
         [
             Callable[
-                [TurnContext, TurnState, Any],
+                [TurnContext, StateT, Any],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
             ]
         ],
         Callable[
-            [TurnContext, TurnState, Any],
+            [TurnContext, StateT, Any],
             Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
         ],
     ]:
@@ -588,14 +600,14 @@ class MessageExtensions:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, Any],
+                [TurnContext, StateT, Any],
                 Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
             ]
         ) -> Callable[
-            [TurnContext, TurnState, Any],
+            [TurnContext, StateT, Any],
             Awaitable[Union[MessagingExtensionResult, TaskModuleTaskInfo, str, None]],
         ]:
-            async def __invoke__(context: TurnContext, state: TurnState):
+            async def __invoke__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
 
@@ -607,7 +619,7 @@ class MessageExtensions:
                 await self._invoke_action_response(context, res)
                 return True
 
-            self._routes.append(Route(__selector__, __invoke__, True))
+            self._routes.append(Route[StateT](__selector__, __invoke__, True))
             return func
 
         return __call__

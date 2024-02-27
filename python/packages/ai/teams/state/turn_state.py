@@ -62,11 +62,20 @@ class TurnState(Memory):
     _is_loaded: bool
     _loading_callable: Optional[Callable[[], Awaitable[bool]]]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the class."""
         super().__init__()
         self._is_loaded = False
         self._loading_callable = None
+
+    @property
+    def is_loaded(self) -> bool:
+        """Gets a value indicating whether the applications turn state has been loaded.
+
+        Returns:
+            bool: True if the state is loaded, False otherwise.
+        """
+        return self._is_loaded
 
     @property
     def conversation(self) -> DefaultConversationState:
@@ -101,15 +110,6 @@ class TurnState(Memory):
             raise ApplicationError("TurnState hasn't been loaded. Call load() first.")
 
         scope.replace(value.get_dict())
-
-    @property
-    def is_loaded(self) -> bool:
-        """Gets a value indicating whether the applications turn state has been loaded.
-
-        Returns:
-            bool: True if the state is loaded, False otherwise.
-        """
-        return self._is_loaded
 
     @property
     def temp(self) -> DefaultTempState:
