@@ -283,7 +283,6 @@ export class PromptManager implements PromptFunctions {
 
             // Load prompt config
             try {
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const config = await fs.readFile(configFile, 'utf-8');
                 template.config = JSON.parse(config);
             } catch (err: unknown) {
@@ -295,7 +294,6 @@ export class PromptManager implements PromptFunctions {
             // Load prompt text
             let sections: PromptSection[] = [];
             try {
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const role = this._options.role || 'system';
                 const prompt = await fs.readFile(promptFile, 'utf-8');
                 sections.push(new TemplateSection(prompt, role));
@@ -307,7 +305,6 @@ export class PromptManager implements PromptFunctions {
 
             // Load optional actions
             try {
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 const actions = await fs.readFile(actionsFile, 'utf-8');
                 template.actions = JSON.parse(actions);
             } catch (err: unknown) {
@@ -364,7 +361,6 @@ export class PromptManager implements PromptFunctions {
 
             // Check for prompt existence
             try {
-                // eslint-disable-next-line security/detect-non-literal-fs-filename
                 await fs.access(promptFile);
             } catch (err: unknown) {
                 return false;

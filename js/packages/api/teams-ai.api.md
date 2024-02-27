@@ -4,15 +4,88 @@
 
 ```ts
 
+/// <reference types="node" />
+
 import { Activity } from 'botbuilder';
+import { AuthenticationConfiguration } from 'botframework-connector';
+import { AxiosRequestConfig } from 'axios';
+import { AxiosResponse } from 'axios';
 import { BotAdapter } from 'botbuilder';
+import { BotConfigAuth } from 'botbuilder';
+import { CloudAdapter } from 'botbuilder';
+import { ConfidentialClientApplication } from '@azure/msal-node';
+import { Configuration } from '@azure/msal-node';
+import { ConnectorClientOptions } from 'botframework-connector';
 import { ConversationReference } from 'botbuilder';
+import { Dialog } from 'botbuilder-dialogs';
+import { DialogTurnResult } from 'botbuilder-dialogs';
+import { FileConsentCardResponse } from 'botbuilder';
+import { INodeBuffer } from 'botframework-streaming';
+import { INodeSocket } from 'botframework-streaming';
+import { MeetingEndEventDetails } from 'botbuilder';
+import { MeetingParticipantsEventDetails } from 'botbuilder';
+import { MeetingStartEventDetails } from 'botbuilder';
 import { MessagingExtensionResult } from 'botbuilder';
+import { O365ConnectorCardActionQuery } from 'botbuilder';
+import { OAuthPromptSettings } from 'botbuilder-dialogs';
+import OpenAI from 'openai';
+import { ReadReceiptInfo } from 'botframework-connector';
+import { Request as Request_2 } from 'botbuilder';
 import { ResourceResponse } from 'botbuilder';
+import { Response as Response_2 } from 'botbuilder';
+import { Schema } from 'jsonschema';
+import { ServiceClientCredentialsFactory } from 'botframework-connector';
 import { Storage as Storage_2 } from 'botbuilder';
+import { TaskModuleResponse } from 'botbuilder';
 import { TaskModuleTaskInfo } from 'botbuilder';
+import { TokenResponse } from 'botbuilder';
 import { TurnContext } from 'botbuilder';
 import { TurnContext as TurnContext_2 } from 'botbuilder-core';
+
+// @public (undocumented)
+export const ACTION_INVOKE_NAME = "adaptiveCard/action";
+
+// @public
+export class ActionAugmentationSection extends PromptSectionBase {
+    constructor(actions: ChatCompletionAction[], callToAction: string);
+    get actions(): Map<string, ChatCompletionAction>;
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>>;
+}
+
+// @public
+export class ActionPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
+    constructor(options: ActionPlannerOptions<TState>);
+    addSemanticFunction(prompt: string | PromptTemplate, validator?: PromptResponseValidator<any>): this;
+    beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
+    completePrompt<TContent = string>(context: TurnContext, memory: Memory, prompt: string | PromptTemplate, validator?: PromptResponseValidator<TContent>): Promise<PromptResponse<TContent>>;
+    continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
+    // (undocumented)
+    get defaultPrompt(): string | undefined;
+    // (undocumented)
+    get model(): PromptCompletionModel;
+    // (undocumented)
+    get prompts(): PromptManager;
+}
+
+// @public
+export interface ActionPlannerOptions<TState extends TurnState = TurnState> {
+    defaultPrompt: string | ActionPlannerPromptFactory<TState>;
+    logRepairs?: boolean;
+    max_repair_attempts?: number;
+    model: PromptCompletionModel;
+    prompts: PromptManager;
+    tokenizer?: Tokenizer;
+}
+
+// @public
+export type ActionPlannerPromptFactory<TState extends TurnState = TurnState> = (context: TurnContext, state: TState, planner: ActionPlanner<TState>) => Promise<PromptTemplate>;
+
+// @public
+export class ActionResponseValidator implements PromptResponseValidator<ValidatedChatCompletionAction> {
+    constructor(actions: ChatCompletionAction[], isRequired: boolean, noun?: string, Noun?: string);
+    get actions(): ChatCompletionAction[];
+    validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<ValidatedChatCompletionAction>>;
+}
 
 // @public
 export interface AdaptiveCard {
@@ -25,7 +98,6 @@ export class AdaptiveCards<TState extends TurnState> {
     constructor(app: Application<TState>);
     actionExecute<TData = Record<string, any>>(verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, data: TData) => Promise<AdaptiveCard | string>): Application<TState>;
     actionSubmit<TData = Record<string, any>>(verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, data: TData) => Promise<void>): Application<TState>;
-    // (undocumented)
     search(dataset: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, query: Query<AdaptiveCardsSearchParams>) => Promise<AdaptiveCardSearchResult[]>): Application<TState>;
 }
 
@@ -47,62 +119,58 @@ export interface AdaptiveCardsSearchParams {
 }
 
 // @public
-export class AI<TState extends TurnState = DefaultTurnState> {
+export class AI<TState extends TurnState = TurnState> {
     constructor(options: AIOptions<TState>);
-    action<TEntities extends Record<string, any> | undefined>(name: string | string[], handler: (context: TurnContext, state: TState, entities: TEntities, action?: string) => Promise<boolean>, allowOverrides?: boolean): this;
-    chain(context: TurnContext, state: TState, prompt?: string | PromptTemplate, options?: Partial<AIOptions<TState>>): Promise<boolean>;
-    completePrompt(context: TurnContext, state: TState, prompt: string | PromptTemplate, options?: Partial<AIOptions<TState>>): Promise<string | undefined>;
-    createSemanticFunction(name: string, template?: PromptTemplate, options?: Partial<AIOptions<TState>>): (context: TurnContext, state: TState) => Promise<any>;
-    doAction<TEntities = Record<string, any>>(context: TurnContext, state: TState, action: string, entities?: TEntities): Promise<boolean>;
+    action<TParameters extends Record<string, any> | undefined>(name: string | string[], handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>): this;
+    defaultAction<TParameters extends Record<string, any> | undefined>(name: string | string[], handler: (context: TurnContext, state: TState, parameters: TParameters, action?: string) => Promise<string>): this;
+    doAction<TParameters = Record<string, any>>(context: TurnContext, state: TState, action: string, parameters?: TParameters): Promise<string>;
     static readonly DoCommandActionName = "___DO___";
     static readonly FlaggedInputActionName = "___FlaggedInput___";
     static readonly FlaggedOutputActionName = "___FlaggedOutput___";
+    hasAction(action: string): boolean;
+    static readonly HttpErrorActionName = "___HttpError___";
     get moderator(): Moderator<TState>;
-    get options(): ConfiguredAIOptions<TState>;
+    // (undocumented)
     get planner(): Planner<TState>;
     static readonly PlanReadyActionName = "___PlanReady___";
-    get prompts(): PromptManager<TState>;
-    static readonly RateLimitedActionName = "___RateLimited___";
+    run(context: TurnContext, state: TState, start_time?: number, step_count?: number): Promise<boolean>;
     static readonly SayCommandActionName = "___SAY___";
+    static readonly StopCommandName = "STOP";
+    static readonly TooManyStepsActionName = "___TooManySteps___";
     static readonly UnknownActionName = "___UnknownAction___";
 }
 
 // @public
-export interface AIHistoryOptions {
-    assistantHistoryType: 'text' | 'planObject';
-    assistantPrefix: string;
-    lineSeparator: string;
-    maxTokens: number;
-    maxTurns: number;
-    trackHistory: boolean;
-    userPrefix: string;
-}
-
-// @public
 export interface AIOptions<TState extends TurnState> {
-    history?: Partial<AIHistoryOptions>;
+    allow_looping?: boolean;
+    max_actions?: number;
+    max_time?: number;
     moderator?: Moderator<TState>;
     planner: Planner<TState>;
-    prompt?: string | PromptTemplate | PromptSelector<TState>;
-    promptManager: PromptManager<TState>;
 }
 
 // @public
-export class Application<TState extends TurnState = DefaultTurnState> {
-    constructor(options?: ApplicationOptions<TState>);
+export class Application<TState extends TurnState = TurnState> {
+    constructor(options?: Partial<ApplicationOptions<TState>>);
     activity(type: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<void>): this;
+    get adapter(): BotAdapter;
     get adaptiveCards(): AdaptiveCards<TState>;
     addRoute(selector: RouteSelector, handler: RouteHandler<TState>, isInvokeRoute?: boolean): this;
     get ai(): AI<TState>;
-    continueConversationAsync(context: TurnContext, logic: (context: TurnContext) => Promise<void>): Promise<void>;
-    // (undocumented)
-    continueConversationAsync(conversationReference: Partial<ConversationReference>, logic: (context: TurnContext) => Promise<void>): Promise<void>;
-    // (undocumented)
-    continueConversationAsync(activity: Partial<Activity>, logic: (context: TurnContext) => Promise<void>): Promise<void>;
-    conversationUpdate(event: ConversationUpdateEvents | ConversationUpdateEvents[], handler: (context: TurnContext, state: TState) => Promise<void>): this;
+    get authentication(): AuthenticationManager<TState>;
+    conversationUpdate(event: ConversationUpdateEvents, handler: (context: TurnContext, state: TState) => Promise<void>): this;
+    error(handler: (context: TurnContext, error: Error) => Promise<void>): this;
+    fileConsentAccept(handler: (context: TurnContext, state: TState, fileConsentResponse: FileConsentCardResponse) => Promise<void>): this;
+    fileConsentDecline(handler: (context: TurnContext, state: TState, fileConsentResponse: FileConsentCardResponse) => Promise<void>): this;
+    getTokenOrStartSignIn(context: TurnContext, state: TState, settingName: string): Promise<string | undefined>;
+    // Warning: (ae-forgotten-export) The symbol "Meetings" needs to be exported by the entry point index.d.ts
+    get meetings(): Meetings<TState>;
     message(keyword: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<void>): this;
+    // (undocumented)
+    messageEventUpdate(event: TeamsMessageEvents, handler: (context: TurnContext, state: TState) => Promise<void>): this;
     get messageExtensions(): MessageExtensions<TState>;
-    messageReactions(event: MessageReactionEvents | MessageReactionEvents[], handler: (context: TurnContext, state: TState) => Promise<void>): this;
+    messageReactions(event: MessageReactionEvents, handler: (context: TurnContext, state: TState) => Promise<void>): this;
+    O365ConnectorCardAction(handler: (context: TurnContext, state: TState, query: O365ConnectorCardActionQuery) => Promise<void>): this;
     get options(): ApplicationOptions<TState>;
     run(turnContext: TurnContext): Promise<boolean>;
     sendProactiveActivity(context: TurnContext, activityOrText: string | Partial<Activity>, speak?: string, inputHint?: string): Promise<ResourceResponse | undefined>;
@@ -113,25 +181,142 @@ export class Application<TState extends TurnState = DefaultTurnState> {
     startTypingTimer(context: TurnContext): void;
     stopTypingTimer(): void;
     get taskModules(): TaskModules<TState>;
+    teamsReadReceipt(handler: (context: TurnContext, state: TState, readReceiptInfo: ReadReceiptInfo) => Promise<void>): this;
     turn(event: TurnEvents | TurnEvents[], handler: (context: TurnContext, state: TState) => Promise<boolean>): this;
 }
 
 // @public
-export interface ApplicationOptions<TState extends TurnState> {
-    adapter?: BotAdapter;
-    adaptiveCards?: AdaptiveCardsOptions;
-    ai?: AIOptions<TState>;
-    botAppId?: string;
-    longRunningMessages?: boolean;
-    removeRecipientMention?: boolean;
-    startTypingTimer?: boolean;
-    storage?: Storage_2;
-    taskModules?: TaskModulesOptions;
-    turnStateManager?: TurnStateManager<TState>;
+export class ApplicationBuilder<TState extends TurnState = TurnState> {
+    build(): Application<TState>;
+    setRemoveRecipientMention(removeRecipientMention: boolean): this;
+    setStartTypingTimer(startTypingTimer: boolean): this;
+    withAdaptiveCardOptions(adaptiveCardOptions: AdaptiveCardsOptions): this;
+    withAIOptions(aiOptions: AIOptions<TState>): this;
+    withAuthentication(adapter: TeamsAdapter, authenticationOptions: AuthenticationOptions): this;
+    withLongRunningMessages(adapter: TeamsAdapter, botAppId: string): this;
+    withStorage(storage: Storage_2): this;
+    withTaskModuleOptions(taskModuleOptions: TaskModulesOptions): this;
+    withTurnStateFactory(turnStateFactory: () => TState): this;
 }
 
 // @public
-export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> extends OpenAIModerator<TState> {
+export interface ApplicationOptions<TState extends TurnState> {
+    adapter?: TeamsAdapter;
+    adaptiveCards?: AdaptiveCardsOptions;
+    ai?: AIOptions<TState>;
+    authentication?: AuthenticationOptions;
+    botAppId?: string;
+    fileDownloaders?: InputFileDownloader<TState>[];
+    longRunningMessages: boolean;
+    removeRecipientMention: boolean;
+    startTypingTimer: boolean;
+    storage?: Storage_2;
+    taskModules?: TaskModulesOptions;
+    turnStateFactory: () => TState;
+}
+
+// @public
+export class AssistantMessage extends TemplateSection {
+    constructor(template: string, tokens?: number, assistantPrefix?: string);
+}
+
+// @public
+class AssistantsPlanner<TState extends TurnState = TurnState> implements Planner<TState> {
+    constructor(options: AssistantsPlannerOptions);
+    beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
+    continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
+    static createAssistant(apiKey: string, request: OpenAI.Beta.Assistants.AssistantCreateParams): Promise<OpenAI.Beta.Assistants.Assistant>;
+    // (undocumented)
+    protected createMessage(thread_id: string, body: OpenAI.Beta.Threads.Messages.MessageCreateParams): Promise<OpenAI.Beta.Threads.Messages.ThreadMessage>;
+    // (undocumented)
+    protected createRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run>;
+    // (undocumented)
+    protected createThread(request: OpenAI.Beta.Threads.ThreadCreateParams): Promise<OpenAI.Beta.Threads.Thread>;
+    // (undocumented)
+    protected listMessages(thread_id: string): Promise<OpenAI.Beta.Threads.Messages.ThreadMessagesPage>;
+    get openai(): OpenAI;
+    protected retrieveAssistant(): Promise<OpenAI.Beta.Assistants.Assistant>;
+    // (undocumented)
+    protected retrieveLastRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run | null>;
+    // (undocumented)
+    protected retrieveRun(thread_id: string, run_id: string): Promise<OpenAI.Beta.Threads.Runs.Run>;
+    // (undocumented)
+    protected submitToolOutputs(thread_id: string, run_id: string, tool_outputs: OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams): Promise<OpenAI.Beta.Threads.Runs.Run>;
+}
+
+// @public
+interface AssistantsPlannerOptions {
+    apiKey: string;
+    assistant_id: string;
+    assistants_state_variable?: string;
+    polling_interval?: number;
+}
+
+// @public
+export interface Augmentation<TContent = any> extends PromptResponseValidator<TContent> {
+    createPlanFromResponse(context: TurnContext_2, memory: Memory, response: PromptResponse<TContent>): Promise<Plan>;
+    createPromptSection(): PromptSection | undefined;
+}
+
+// @public
+export interface AugmentationConfig {
+    augmentation_type: 'none' | 'sequence' | 'monologue';
+    data_sources?: {
+        [name: string]: number;
+    };
+}
+
+// @public
+export class Authentication<TState extends TurnState> {
+    // Warning: (ae-forgotten-export) The symbol "MessageExtensionAuthenticationBase" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "BotAuthenticationBase" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "AdaptiveCardAuthenticationBase" needs to be exported by the entry point index.d.ts
+    constructor(app: Application<TState>, name: string, settings: OAuthSettings | TeamsSsoSettings, storage?: Storage_2, messageExtensionsAuth?: MessageExtensionAuthenticationBase, botAuth?: BotAuthenticationBase<TState>, adaptiveCardAuth?: AdaptiveCardAuthenticationBase);
+    isUserSignedIn(context: TurnContext): Promise<string | undefined>;
+    onUserSignInFailure(handler: (context: TurnContext, state: TState, error: AuthError) => Promise<void>): void;
+    onUserSignInSuccess(handler: (context: TurnContext, state: TState) => Promise<void>): void;
+    // Warning: (ae-forgotten-export) The symbol "TeamsSsoSettings" needs to be exported by the entry point index.d.ts
+    readonly settings: OAuthSettings | TeamsSsoSettings;
+    signInUser(context: TurnContext, state: TState): Promise<string | undefined>;
+    signOutUser(context: TurnContext, state: TState): Promise<void>;
+}
+
+// @public
+export class AuthenticationManager<TState extends TurnState> {
+    constructor(app: Application<TState>, options: AuthenticationOptions, storage?: Storage_2);
+    // (undocumented)
+    readonly default: string;
+    get(name: string): Authentication<TState>;
+    signOutUser(context: TurnContext, state: TState, settingName?: string): Promise<void>;
+    signUserIn(context: TurnContext, state: TState, settingName?: string): Promise<SignInResponse>;
+}
+
+// @public
+export interface AuthenticationOptions {
+    autoSignIn?: boolean | Selector;
+    default?: string;
+    settings: {
+        [key: string]: OAuthSettings | TeamsSsoSettings;
+    };
+}
+
+// @public (undocumented)
+export interface AuthenticatorResult {
+    accessToken: string;
+    expiresOn: Date;
+}
+
+// @public
+export class AuthError extends Error {
+    constructor(message?: string, reason?: AuthErrorReason);
+    readonly cause: AuthErrorReason;
+}
+
+// @public
+export type AuthErrorReason = 'invalidActivity' | 'completionWithoutToken' | 'other';
+
+// @public
+export class AzureContentSafetyModerator<TState extends TurnState = TurnState> extends OpenAIModerator<TState> {
     constructor(options: AzureOpenAIModeratorOptions);
     // Warning: (ae-forgotten-export) The symbol "AzureOpenAIClient" needs to be exported by the entry point index.d.ts
     protected createClient(options: OpenAIModeratorOptions): AzureOpenAIClient;
@@ -139,34 +324,66 @@ export class AzureOpenAIModerator<TState extends TurnState = DefaultTurnState> e
     //
     // (undocumented)
     protected createModeration(input: string): Promise<CreateModerationResponseResultsInner | undefined>;
-    reviewPlan(context: TurnContext, state: TState, plan: Plan): Promise<Plan>;
-    reviewPrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan | undefined>;
+    reviewInput(context: TurnContext, state: TState): Promise<Plan | undefined>;
+    reviewOutput(context: TurnContext, state: TState, plan: Plan): Promise<Plan>;
+}
+
+// @public
+export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
+    azureApiKey: string;
+    azureApiVersion?: string;
+    azureDeployment: string;
+    azureEndpoint: string;
+}
+
+// @public
+export interface AzureOpenAIModelOptions extends BaseOpenAIModelOptions {
+    azureApiKey: string;
+    azureApiVersion?: string;
+    azureDefaultDeployment: string;
+    azureEndpoint: string;
 }
 
 // @public
 export interface AzureOpenAIModeratorOptions extends OpenAIModeratorOptions {
-    // Warning: (ae-forgotten-export) The symbol "AzureOpenAIModeratorCategory" needs to be exported by the entry point index.d.ts
-    categories?: AzureOpenAIModeratorCategory[];
+    blocklistNames?: string[];
+    breakByBlocklists?: boolean;
+    // Warning: (ae-forgotten-export) The symbol "ContentSafetyHarmCategory" needs to be exported by the entry point index.d.ts
+    categories?: ContentSafetyHarmCategory[];
 }
 
 // @public
-export class AzureOpenAIPlanner<TState extends TurnState = DefaultTurnState> extends OpenAIPlanner<TState, AzureOpenAIPlannerOptions> {
-    // Warning: (ae-forgotten-export) The symbol "OpenAIClient" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
-    protected createClient(options: AzureOpenAIPlannerOptions): OpenAIClient;
+export interface BaseOpenAIEmbeddingsOptions {
+    logRequests?: boolean;
+    requestConfig?: AxiosRequestConfig;
+    retryPolicy?: number[];
 }
 
 // @public
-export interface AzureOpenAIPlannerOptions extends OpenAIPlannerOptions {
-    apiVersion?: string;
-    endpoint: string;
+export interface BaseOpenAIModelOptions {
+    logRequests?: boolean;
+    requestConfig?: AxiosRequestConfig;
+    retryPolicy?: number[];
+    useSystemMessages?: boolean;
+}
+
+// @public
+export interface ChatCompletionAction {
+    description?: string;
+    name: string;
+    parameters?: Schema;
 }
 
 // @public
 export interface CompletionConfig {
+    completion_type?: 'chat' | 'text';
     frequency_penalty: number;
+    include_history: boolean;
+    include_images: boolean;
+    include_input: boolean;
+    max_input_tokens: number;
     max_tokens: number;
+    model?: string;
     presence_penalty: number;
     stop_sequences?: string[];
     temperature: number;
@@ -175,78 +392,98 @@ export interface CompletionConfig {
 
 // @public
 export interface ConfiguredAIOptions<TState extends TurnState> {
-    history: AIHistoryOptions;
+    allow_looping: boolean;
+    max_steps: number;
+    max_time: number;
     moderator: Moderator<TState>;
     planner: Planner<TState>;
-    prompt?: string | PromptTemplate | ((Context: TurnContext, state: TState) => Promise<string | PromptTemplate>);
-    promptManager: PromptManager<TState>;
 }
 
 // @public
-export class ConversationHistory {
-    static addLine(state: TurnState, line: string, maxLines?: number): void;
-    static appendToLastLine(state: TurnState, text: string): void;
-    static clear(state: TurnState): void;
-    static getLastLine(state: TurnState): string;
-    static getLastSay(state: TurnState): string;
-    static hasMoreLines(state: TurnState): boolean;
-    static removeLastLine(state: TurnState): string | undefined;
-    static replaceLastLine(state: TurnState, line: string): void;
-    static replaceLastSay(state: TurnState, newResponse: string, assistantPrefix?: string): void;
-    static readonly StatePropertyName = "__history__";
-    static toArray(state: TurnState, maxTokens?: number): string[];
-    static toString(state: TurnState, maxTokens?: number, lineSeparator?: string): string;
+export interface ConfiguredLLMClientOptions<TContent = any> {
+    history_variable: string;
+    input_variable: string;
+    logRepairs: boolean;
+    max_history_messages: number;
+    max_repair_attempts: number;
+    model: PromptCompletionModel;
+    template: PromptTemplate;
+    tokenizer: Tokenizer;
+    validator: PromptResponseValidator<TContent>;
 }
 
 // @public
-export type ConversationUpdateEvents = 'channelCreated' | 'channelRenamed' | 'channelDeleted' | 'channelRestored' | 'membersAdded' | 'membersRemoved' | 'teamRenamed' | 'teamDeleted' | 'teamArchived' | 'teamUnarchived' | 'teamRestored';
+export interface ConfiguredPromptManagerOptions {
+    max_conversation_history_tokens: number;
+    max_history_messages: number;
+    max_input_tokens: number;
+    promptsFolder: string;
+    role: string;
+}
+
+// @public
+export class ConversationHistory extends PromptSectionBase {
+    constructor(variable: string, tokens?: number, required?: boolean, userPrefix?: string, assistantPrefix?: string, separator?: string);
+    // (undocumented)
+    readonly assistantPrefix: string;
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    // (undocumented)
+    renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    // (undocumented)
+    readonly userPrefix: string;
+    // (undocumented)
+    readonly variable: string;
+}
+
+// @public
+export type ConversationUpdateEvents = 'channelCreated' | 'channelRenamed' | 'channelDeleted' | 'channelRestored' | 'membersAdded' | 'membersRemoved' | 'teamRenamed' | 'teamDeleted' | 'teamHardDeleted' | 'teamArchived' | 'teamUnarchived' | 'teamRestored' | 'topicName' | 'historyDisclosed';
+
+// @public
+export interface DataSource {
+    readonly name: string;
+    renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+}
+
+// @public
+export class DataSourceSection extends PromptSectionBase {
+    constructor(dataSource: DataSource, tokens: number);
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>>;
+}
+
+// @public
+export class DefaultAugmentation implements Augmentation<string> {
+    createPlanFromResponse(context: TurnContext_2, memory: Memory, response: PromptResponse<string>): Promise<Plan>;
+    createPromptSection(): PromptSection | undefined;
+    validateResponse(context: TurnContext_2, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<string>>;
+}
 
 // @public
 export interface DefaultConversationState {
 }
 
 // @public
-export class DefaultModerator<TState extends TurnState = DefaultTurnState> implements Moderator<TState> {
-    reviewPlan(context: TurnContext_2, state: TState, plan: Plan): Promise<Plan>;
-    reviewPrompt(context: TurnContext_2, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan | undefined>;
+export class DefaultModerator<TState extends TurnState = TurnState> implements Moderator<TState> {
+    reviewInput(context: TurnContext_2, state: TState): Promise<Plan | undefined>;
+    reviewOutput(context: TurnContext_2, state: TState, plan: Plan): Promise<Plan>;
 }
 
 // @public
-export class DefaultPromptManager<TState extends TurnState = DefaultTurnState> implements PromptManager<TState> {
-    constructor(options: DefaultPromptManagerOptions | string);
-    addFunction(name: string, handler: (context: TurnContext, state: TState) => Promise<any>, allowOverrides?: boolean): this;
-    addPromptTemplate(name: string, template: PromptTemplate): this;
-    invokeFunction(context: TurnContext, state: TState, name: string): Promise<any>;
-    loadPromptTemplate(name: string): Promise<PromptTemplate>;
-    renderPrompt(context: TurnContext, state: TState, nameOrTemplate: string | PromptTemplate): Promise<PromptTemplate>;
-}
-
-// @public
-export interface DefaultPromptManagerOptions {
-    promptsFolder: string;
+export class DefaultResponseValidator<TValue = any> implements PromptResponseValidator<TValue> {
+    validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>>;
 }
 
 // @public
 export interface DefaultTempState {
-    history: string;
+    actionOutputs: Record<string, string>;
+    authTokens: {
+        [key: string]: string;
+    };
+    duplicateTokenExchange?: boolean;
     input: string;
-    output: string;
-}
-
-// @public
-export interface DefaultTurnState<TConversationState extends DefaultConversationState = DefaultConversationState, TUserState extends DefaultUserState = DefaultUserState, TTempState extends DefaultTempState = DefaultTempState> extends TurnState {
-    // (undocumented)
-    conversation: TurnStateEntry<TConversationState>;
-    // (undocumented)
-    temp: TurnStateEntry<TTempState>;
-    // (undocumented)
-    user: TurnStateEntry<TUserState>;
-}
-
-// @public
-export class DefaultTurnStateManager<TConversationState extends DefaultConversationState = DefaultConversationState, TUserState extends DefaultUserState = DefaultUserState, TTempState extends DefaultTempState = DefaultTempState> implements TurnStateManager<DefaultTurnState<TConversationState, TUserState, TTempState>> {
-    loadState(storage: Storage_2, context: TurnContext): Promise<DefaultTurnState<TConversationState, TUserState, TTempState>>;
-    saveState(storage: Storage_2, context: TurnContext, state: DefaultTurnState<TConversationState, TUserState, TTempState>): Promise<void>;
+    inputFiles: InputFile[];
+    lastOutput: string;
 }
 
 // @public
@@ -254,38 +491,305 @@ export interface DefaultUserState {
 }
 
 // @public
+export interface EmbeddingsModel {
+    createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse>;
+}
+
+// @public
+export interface EmbeddingsResponse {
+    message?: string;
+    output?: number[][];
+    status: EmbeddingsResponseStatus;
+}
+
+// @public
+export type EmbeddingsResponseStatus = 'success' | 'error' | 'rate_limited';
+
+// @public
+export interface FunctionCall {
+    arguments?: string;
+    name?: string;
+}
+
+// @public
+export class FunctionCallMessage extends PromptSectionBase {
+    constructor(function_call: FunctionCall, tokens?: number, assistantPrefix?: string);
+    readonly function_call: FunctionCall;
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+}
+
+// @public
+export class FunctionResponseMessage extends PromptSectionBase {
+    constructor(name: string, response: any, tokens?: number, functionPrefix?: string);
+    // (undocumented)
+    readonly name: string;
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    // (undocumented)
+    readonly response: any;
+}
+
+// @public
+export class GPT3Tokenizer implements Tokenizer {
+    // (undocumented)
+    decode(tokens: number[]): string;
+    // (undocumented)
+    encode(text: string): number[];
+}
+
+// @public
+export class GPTTokenizer implements Tokenizer {
+    // (undocumented)
+    decode(tokens: number[]): string;
+    // (undocumented)
+    encode(text: string): number[];
+}
+
+// @public
+export class GroupSection extends PromptSectionBase {
+    constructor(sections: PromptSection[], role?: string, tokens?: number, required?: boolean, separator?: string, textPrefix?: string);
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    // (undocumented)
+    readonly role: string;
+    // (undocumented)
+    readonly sections: PromptSection[];
+}
+
+// @public (undocumented)
+export interface ImageContentPart {
+    image_url: string | {
+        url: string;
+    };
+    type: 'image_url';
+}
+
+// @public
+export interface InnerMonologue {
+    action: {
+        name: string;
+        parameters?: Record<string, any>;
+    };
+    thoughts: {
+        thought: string;
+        reasoning: string;
+        plan: string;
+    };
+}
+
+// @public
+export const InnerMonologueSchema: Schema;
+
+// @public
+export interface InputFile {
+    content: Buffer;
+    contentType: string;
+    contentUrl?: string;
+}
+
+// @public
+export interface InputFileDownloader<TState extends TurnState = TurnState> {
+    downloadFiles(context: TurnContext, state: TState): Promise<InputFile[]>;
+}
+
+// @public
+export class JSONResponseValidator<TValue = Record<string, any>> implements PromptResponseValidator<TValue> {
+    constructor(schema?: Schema, missingJsonFeedback?: string, errorFeedback?: string);
+    errorFeedback: string;
+    missingJsonFeedback: string;
+    readonly schema?: Schema;
+    validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>>;
+}
+
+// @public
+export class LayoutEngine implements PromptSection {
+    constructor(sections: PromptSection[], tokens: number, required: boolean, separator: string);
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    // (undocumented)
+    renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    // (undocumented)
+    readonly required: boolean;
+    // (undocumented)
+    readonly sections: PromptSection[];
+    // (undocumented)
+    readonly separator: string;
+    // (undocumented)
+    readonly tokens: number;
+}
+
+// @public
+export class LLMClient<TContent = any> {
+    constructor(options: LLMClientOptions<TContent>);
+    addFunctionResultToHistory(memory: Memory, name: string, results: any): void;
+    completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions): Promise<PromptResponse<TContent>>;
+    readonly options: ConfiguredLLMClientOptions<TContent>;
+}
+
+// @public
+export interface LLMClientOptions<TContent = any> {
+    history_variable?: string;
+    input_variable?: string;
+    logRepairs?: boolean;
+    max_history_messages?: number;
+    max_repair_attempts?: number;
+    model: PromptCompletionModel;
+    template: PromptTemplate;
+    tokenizer?: Tokenizer;
+    validator?: PromptResponseValidator<TContent>;
+}
+
+// @public
+export interface Memory {
+    deleteValue(path: string): void;
+    getValue<TValue = unknown>(path: string): TValue;
+    hasValue(path: string): boolean;
+    setValue(path: string, value: unknown): void;
+}
+
+// @public
+export class MemoryFork implements Memory {
+    constructor(memory: Memory);
+    deleteValue(path: string): void;
+    getValue<TValue = unknown>(path: string): TValue;
+    hasValue(path: string): boolean;
+    setValue(path: string, value: unknown): void;
+}
+
+// @public
+export interface Message<TContent = string> {
+    content: TContent | undefined;
+    function_call?: FunctionCall;
+    name?: string;
+    role: string;
+}
+
+// @public (undocumented)
+export type MessageContentParts = TextContentPart | ImageContentPart;
+
+// @public
 export class MessageExtensions<TState extends TurnState> {
     constructor(app: Application<TState>);
-    anonymousQueryLink(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>): Application<TState>;
+    anonymousQueryLink(handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>): Application<TState>;
     botMessagePreviewEdit(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, previewActivity: Partial<Activity>) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>): Application<TState>;
     botMessagePreviewSend(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, previewActivity: Partial<Activity>) => Promise<void>): Application<TState>;
+    configureSettings<TData extends Record<string, any>>(handler: (context: TurnContext, state: TState, settings: TData) => Promise<void>): Application<TState>;
     fetchTask(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState) => Promise<TaskModuleTaskInfo | string>): Application<TState>;
+    handleOnButtonClicked<TData extends Record<string, any>>(handler: (context: TurnContext, state: TState, data: TData) => Promise<void>): Application<TState>;
     query<TParams extends Record<string, any> = Record<string, any>>(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, query: Query<TParams>) => Promise<MessagingExtensionResult>): Application<TState>;
-    queryLink(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>): Application<TState>;
+    queryLink(handler: (context: TurnContext, state: TState, url: string) => Promise<MessagingExtensionResult>): Application<TState>;
+    queryUrlSetting(handler: (context: TurnContext, state: TState) => Promise<MessagingExtensionResult>): Application<TState>;
     selectItem<TItem extends Record<string, any> = Record<string, any>>(handler: (context: TurnContext, state: TState, item: TItem) => Promise<MessagingExtensionResult>): Application<TState>;
     submitAction<TData extends Record<string, any>>(commandId: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, data: TData) => Promise<MessagingExtensionResult | TaskModuleTaskInfo | string | null | undefined>): Application<TState>;
+}
+
+// @public
+export enum MessageExtensionsInvokeNames {
+    ANONYMOUS_QUERY_LINK_INVOKE = "composeExtension/anonymousQueryLink",
+    CONFIGURE_SETTINGS = "composeExtension/setting",
+    FETCH_TASK_INVOKE = "composeExtension/fetchTask",
+    QUERY_CARD_BUTTON_CLICKED = "composeExtension/onCardButtonClicked",
+    QUERY_INVOKE = "composeExtension/query",
+    QUERY_LINK_INVOKE = "composeExtension/queryLink",
+    QUERY_SETTING_URL = "composeExtension/querySettingUrl",
+    SELECT_ITEM_INVOKE = "composeExtension/selectItem",
+    SUBMIT_ACTION_INVOKE = "composeExtension/submitAction"
 }
 
 // @public
 export type MessageReactionEvents = 'reactionsAdded' | 'reactionsRemoved';
 
 // @public
-export interface Moderator<TState extends TurnState> {
-    reviewPlan(context: TurnContext_2, state: TState, plan: Plan): Promise<Plan>;
-    reviewPrompt(context: TurnContext_2, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan | undefined>;
+export enum ModerationSeverity {
+    // (undocumented)
+    High = 6,
+    // (undocumented)
+    Low = 2,
+    // (undocumented)
+    Medium = 4,
+    // (undocumented)
+    Safe = 0
 }
 
 // @public
-export class OpenAIModerator<TState extends TurnState = DefaultTurnState> implements Moderator<TState> {
+export interface Moderator<TState extends TurnState = TurnState> {
+    reviewInput(context: TurnContext_2, state: TState): Promise<Plan | undefined>;
+    reviewOutput(context: TurnContext_2, state: TState, plan: Plan): Promise<Plan>;
+}
+
+// @public
+export class MonologueAugmentation implements Augmentation<InnerMonologue | undefined> {
+    constructor(actions: ChatCompletionAction[]);
+    createPlanFromResponse(context: TurnContext_2, memory: Memory, response: PromptResponse<InnerMonologue | undefined>): Promise<Plan>;
+    createPromptSection(): PromptSection | undefined;
+    validateResponse(context: TurnContext_2, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue | undefined>>;
+}
+
+// @public
+export type OAuthSettings = OAuthPromptSettings & {
+    tokenExchangeUri?: string;
+    enableSso?: boolean;
+};
+
+// @public
+export class OpenAIEmbeddings implements EmbeddingsModel {
+    constructor(options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions);
+    // Warning: (ae-forgotten-export) The symbol "CreateEmbeddingRequest" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "CreateEmbeddingResponse" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>>;
+    createEmbeddings(model: string, inputs: string | string[]): Promise<EmbeddingsResponse>;
+    readonly options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions;
+    protected post<TData>(url: string, body: object, retryCount?: number): Promise<AxiosResponse<TData>>;
+}
+
+// @public
+export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
+    apiKey: string;
+    endpoint?: string;
+    model: string;
+    organization?: string;
+}
+
+// @public
+export class OpenAIModel implements PromptCompletionModel {
+    constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions);
+    completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>>;
+    // (undocumented)
+    protected copyOptionsToRequest<TRequest>(target: Partial<TRequest>, src: any, fields: string[]): TRequest;
+    // Warning: (ae-forgotten-export) The symbol "CreateChatCompletionRequest" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "CreateChatCompletionResponse" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    protected createChatCompletion(request: CreateChatCompletionRequest, model: string): Promise<AxiosResponse<CreateChatCompletionResponse>>;
+    readonly options: OpenAIModelOptions | AzureOpenAIModelOptions;
+    // (undocumented)
+    protected post<TData>(url: string, body: object, retryCount?: number): Promise<AxiosResponse<TData>>;
+}
+
+// @public
+export interface OpenAIModelOptions extends BaseOpenAIModelOptions {
+    apiKey: string;
+    defaultModel: string;
+    endpoint?: string;
+    organization?: string;
+}
+
+// @public
+export class OpenAIModerator<TState extends TurnState = TurnState> implements Moderator<TState> {
     constructor(options: OpenAIModeratorOptions);
+    // Warning: (ae-forgotten-export) The symbol "OpenAIClient" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
     protected createClient(options: OpenAIModeratorOptions): OpenAIClient;
     // (undocumented)
     protected createModeration(input: string, model?: string): Promise<CreateModerationResponseResultsInner | undefined>;
     // (undocumented)
     get options(): OpenAIModeratorOptions;
-    reviewPlan(context: TurnContext, state: TState, plan: Plan): Promise<Plan>;
-    reviewPrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan | undefined>;
+    reviewInput(context: TurnContext, state: TState): Promise<Plan | undefined>;
+    reviewOutput(context: TurnContext, state: TState, plan: Plan): Promise<Plan>;
 }
 
 // @public
@@ -299,45 +803,19 @@ export interface OpenAIModeratorOptions {
 }
 
 // @public
-export class OpenAIPlanner<TState extends TurnState = DefaultTurnState, TOptions extends OpenAIPlannerOptions = OpenAIPlannerOptions> implements Planner<TState> {
-    constructor(options: TOptions);
-    completePrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<string>;
-    // (undocumented)
-    protected createClient(options: TOptions): OpenAIClient;
-    generatePlan(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan>;
-    get options(): TOptions;
-}
-
-// @public
-export interface OpenAIPlannerOptions {
-    apiKey: string;
-    defaultModel: string;
-    endpoint?: string;
-    logRequests?: boolean;
-    oneSayPerTurn?: boolean;
-    organization?: string;
-    useSystemMessage?: boolean;
-}
-
-// @public (undocumented)
-export interface ParsedCommandResult {
-    // (undocumented)
-    command?: PredictedCommand;
-    // (undocumented)
-    length: number;
-}
-
-// @public
 export interface Plan {
     commands: PredictedCommand[];
     type: 'plan';
 }
 
 // @public
-export interface Planner<TState extends TurnState> {
-    completePrompt(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<string | undefined>;
-    generatePlan(context: TurnContext, state: TState, prompt: PromptTemplate, options: ConfiguredAIOptions<TState>): Promise<Plan>;
+export interface Planner<TState extends TurnState = TurnState> {
+    beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
+    continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
 }
+
+// @public
+export const PlanSchema: Schema;
 
 // @public
 export interface PredictedCommand {
@@ -347,13 +825,13 @@ export interface PredictedCommand {
 // @public
 export interface PredictedDoCommand extends PredictedCommand {
     action: string;
-    entities: Record<string, any>;
+    parameters: Record<string, any>;
     type: 'DO';
 }
 
 // @public
 export interface PredictedDoCommandAndHandler<TState> extends PredictedDoCommand {
-    handler: (context: TurnContext, state: TState, entities?: Record<string, any>, action?: string) => Promise<boolean>;
+    handler: (context: TurnContext, state: TState, parameters?: Record<string, any>, action?: string) => Promise<string>;
 }
 
 // @public
@@ -362,28 +840,117 @@ export interface PredictedSayCommand extends PredictedCommand {
     type: 'SAY';
 }
 
+declare namespace preview {
+    export {
+        AssistantsPlannerOptions,
+        AssistantsPlanner
+    }
+}
+export { preview }
+
 // @public
-export interface PromptManager<TState extends TurnState> {
-    addFunction(name: string, handler: (context: TurnContext, state: TState) => Promise<any>, allowOverrides?: boolean): this;
-    addPromptTemplate(name: string, template: PromptTemplate): this;
-    invokeFunction(context: TurnContext, state: TState, name: string): Promise<any>;
-    renderPrompt(context: TurnContext, state: TState, nameOrTemplate: string | PromptTemplate): Promise<PromptTemplate>;
+export class Prompt extends LayoutEngine {
+    constructor(sections: PromptSection[], tokens?: number, required?: boolean, separator?: string);
 }
 
 // @public
-export type PromptSelector<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<string | PromptTemplate>;
+export interface PromptCompletionModel {
+    completePrompt(context: TurnContext_2, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>>;
+}
+
+// @public
+export type PromptFunction = (context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, args: string[]) => Promise<any>;
+
+// @public
+export interface PromptFunctions {
+    getFunction(name: string): PromptFunction;
+    hasFunction(name: string): boolean;
+    invokeFunction(name: string, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: string[]): Promise<any>;
+}
+
+// @public
+export class PromptManager implements PromptFunctions {
+    constructor(options: PromptManagerOptions);
+    addDataSource(dataSource: DataSource): this;
+    addFunction(name: string, fn: PromptFunction): this;
+    addPrompt(prompt: PromptTemplate): this;
+    getDataSource(name: string): DataSource;
+    getFunction(name: string): PromptFunction;
+    getPrompt(name: string): Promise<PromptTemplate>;
+    hasDataSource(name: string): boolean;
+    hasFunction(name: string): boolean;
+    hasPrompt(name: string): Promise<boolean>;
+    invokeFunction(name: string, context: TurnContext, memory: Memory, tokenizer: Tokenizer, args: string[]): Promise<any>;
+    get options(): ConfiguredPromptManagerOptions;
+}
+
+// @public
+export interface PromptManagerOptions {
+    max_conversation_history_tokens?: number;
+    max_history_messages?: number;
+    max_input_tokens?: number;
+    promptsFolder: string;
+    role?: string;
+}
+
+// @public
+export interface PromptResponse<TContent = unknown> {
+    error?: Error;
+    input?: Message<any>;
+    message?: Message<TContent>;
+    status: PromptResponseStatus;
+}
+
+// @public
+export type PromptResponseStatus = 'success' | 'error' | 'rate_limited' | 'invalid_response' | 'too_long';
+
+// @public
+export interface PromptResponseValidator<TValue = any> {
+    validateResponse(context: TurnContext, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<TValue>>;
+}
+
+// @public
+export interface PromptSection {
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    readonly required: boolean;
+    readonly tokens: number;
+}
+
+// @public
+export abstract class PromptSectionBase implements PromptSection {
+    constructor(tokens?: number, required?: boolean, separator?: string, textPrefix?: string);
+    static getMessageText(message: Message): string;
+    protected getTokenBudget(maxTokens: number): number;
+    abstract renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<any>[]>>;
+    renderAsText(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+    // (undocumented)
+    readonly required: boolean;
+    protected returnMessages(output: Message[], length: number, tokenizer: Tokenizer, maxTokens: number): RenderedPromptSection<Message[]>;
+    // (undocumented)
+    readonly separator: string;
+    // (undocumented)
+    readonly textPrefix: string;
+    // (undocumented)
+    readonly tokens: number;
+}
 
 // @public
 export interface PromptTemplate {
+    actions?: ChatCompletionAction[];
+    augmentation?: Augmentation;
     config: PromptTemplateConfig;
-    text: string;
+    name: string;
+    prompt: PromptSection;
 }
 
 // @public
 export interface PromptTemplateConfig {
+    augmentation?: AugmentationConfig;
     completion: CompletionConfig;
+    // @deprecated (undocumented)
     default_backends?: string[];
-    description: string;
+    description?: string;
     schema: number;
     type: 'completion';
 }
@@ -396,27 +963,63 @@ export interface Query<TParams extends Record<string, any>> {
 }
 
 // @public
-export class ResponseParser {
-    static parseAdaptiveCard(text?: string): Record<string, any> | undefined;
-    // (undocumented)
-    static parseDoCommand(tokens: string[]): ParsedCommandResult;
-    static parseJSON<T = Record<string, any>>(text?: string): T | undefined;
-    static parseResponse(text?: string): Plan;
-    // (undocumented)
-    static parseSayCommand(tokens: string[]): ParsedCommandResult;
-    // (undocumented)
-    static tokenizeText(text?: string): string[];
+export interface RenderedPromptSection<T> {
+    length: number;
+    output: T;
+    tooLong: boolean;
 }
 
 // @public
 export type RouteHandler<TState extends TurnState> = (context: TurnContext, state: TState) => Promise<void>;
 
 // @public
-export type RouteSelector = (context: TurnContext) => Promise<boolean>;
+export type RouteSelector = Selector;
+
+// @public
+export type Selector = (context: TurnContext) => Promise<boolean>;
+
+// @public
+export class SequenceAugmentation implements Augmentation<Plan | undefined> {
+    constructor(actions: ChatCompletionAction[]);
+    createPlanFromResponse(context: TurnContext_2, memory: Memory, response: PromptResponse<Plan | undefined>): Promise<Plan>;
+    createPromptSection(): PromptSection | undefined;
+    validateResponse(context: TurnContext_2, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<Plan | undefined>>;
+}
+
+// @public
+export type SignInResponse = {
+    status: SignInStatus;
+    error?: unknown;
+    cause?: AuthErrorReason;
+};
+
+// @public
+export type SignInStatus = 'pending' | 'complete' | 'error';
+
+// @public
+export class SystemMessage extends TemplateSection {
+    constructor(template: string, tokens?: number);
+}
+
+// @public (undocumented)
+export enum TaskModuleInvokeNames {
+    // (undocumented)
+    CONFIG_FETCH_INVOKE_NAME = "config/fetch",
+    // (undocumented)
+    CONFIG_SUBMIT_INVOKE_NAME = "config/submit",
+    // (undocumented)
+    DEFAULT_TASK_DATA_FILTER = "verb",
+    // (undocumented)
+    FETCH_INVOKE_NAME = "task/fetch",
+    // (undocumented)
+    SUBMIT_INVOKE_NAME = "task/submit"
+}
 
 // @public
 export class TaskModules<TState extends TurnState> {
     constructor(app: Application<TState>);
+    configFetch<TData extends Record<string, any>>(handler: (context: TurnContext, state: TState, data: TData) => Promise<BotConfigAuth | TaskModuleResponse>): Application<TState>;
+    configSubmit<TData extends Record<string, any>>(handler: (context: TurnContext, state: TState, data: TData) => Promise<BotConfigAuth | TaskModuleResponse>): Application<TState>;
     fetch<TData extends Record<string, any> = Record<string, any>>(verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string>): Application<TState>;
     submit<TData extends Record<string, any> = Record<string, any>>(verb: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[], handler: (context: TurnContext, state: TState, data: TData) => Promise<TaskModuleTaskInfo | string | null | undefined>): Application<TState>;
 }
@@ -427,28 +1030,189 @@ export interface TaskModulesOptions {
 }
 
 // @public
+export class TeamsAdapter extends CloudAdapter {
+    constructor(botFrameworkAuthConfig?: {
+        MicrosoftAppId?: string | undefined;
+        MicrosoftAppTenantId?: string | undefined;
+        OAuthApiEndpoint?: string | undefined;
+        BotOpenIdMetadata?: string | undefined;
+        ChannelService?: string | undefined;
+        ValidateAuthority?: string | boolean | undefined;
+        ToChannelFromBotLoginUrl?: string | undefined;
+        ToChannelFromBotOAuthScope?: string | undefined;
+        ToBotFromChannelTokenIssuer?: string | undefined;
+        OAuthUrl?: string | undefined;
+        ToBotFromChannelOpenIdMetadataUrl?: string | undefined;
+        ToBotFromEmulatorOpenIdMetadataUrl?: string | undefined;
+        CallerId?: string | undefined;
+        CertificateThumbprint?: string | undefined;
+        CertificatePrivateKey?: string | undefined;
+    } | undefined, credentialsFactory?: ServiceClientCredentialsFactory, authConfiguration?: AuthenticationConfiguration, connectorClientOptions?: ConnectorClientOptions);
+    // (undocumented)
+    readonly botFrameworkAuthConfig?: {
+        MicrosoftAppId?: string | undefined;
+        MicrosoftAppTenantId?: string | undefined;
+        OAuthApiEndpoint?: string | undefined;
+        BotOpenIdMetadata?: string | undefined;
+        ChannelService?: string | undefined;
+        ValidateAuthority?: string | boolean | undefined;
+        ToChannelFromBotLoginUrl?: string | undefined;
+        ToChannelFromBotOAuthScope?: string | undefined;
+        ToBotFromChannelTokenIssuer?: string | undefined;
+        OAuthUrl?: string | undefined;
+        ToBotFromChannelOpenIdMetadataUrl?: string | undefined;
+        ToBotFromEmulatorOpenIdMetadataUrl?: string | undefined;
+        CallerId?: string | undefined;
+        CertificateThumbprint?: string | undefined;
+        CertificatePrivateKey?: string | undefined;
+    } | undefined;
+    readonly credentialsFactory: ServiceClientCredentialsFactory;
+    // (undocumented)
+    process(req: Request_2, res: Response_2, logic: (context: TurnContext) => Promise<void>): Promise<void>;
+    // (undocumented)
+    process(req: Request_2, socket: INodeSocket, head: INodeBuffer, logic: (context: TurnContext) => Promise<void>): Promise<void>;
+    // (undocumented)
+    get userAgent(): string;
+}
+
+// @public
+export class TeamsAttachmentDownloader<TState extends TurnState = TurnState> implements InputFileDownloader<TState> {
+    constructor(options: TeamsAttachmentDownloaderOptions);
+    downloadFiles(context: TurnContext, state: TState): Promise<InputFile[]>;
+}
+
+// @public
+export interface TeamsAttachmentDownloaderOptions {
+    adapter: TeamsAdapter;
+    botAppId: string;
+}
+
+// @public
+export type TeamsMessageEvents = 'undeleteMessage' | 'softDeleteMessage' | 'editMessage';
+
+// Warning: (ae-internal-missing-underscore) The name "TeamsSsoPrompt" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class TeamsSsoPrompt extends Dialog {
+    constructor(dialogId: string, settingName: string, settings: TeamsSsoSettings, msal: ConfidentialClientApplication);
+    beginDialog(dc: any, options: any): Promise<any>;
+    continueDialog(dc: any): Promise<any>;
+}
+
+// @public
+export class TemplateSection extends PromptSectionBase {
+    constructor(template: string, role: string, tokens?: number, required?: boolean, separator?: string, textPrefix?: string);
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    // (undocumented)
+    readonly role: string;
+    // (undocumented)
+    readonly template: string;
+}
+
+// @public (undocumented)
+export interface TextContentPart {
+    text: string;
+    type: 'text';
+}
+
+// @public
+export class TextDataSource implements DataSource {
+    constructor(name: string, text: string);
+    get name(): string;
+    renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
+}
+
+// @public
+export class TextSection extends PromptSectionBase {
+    constructor(text: string, role: string, tokens?: number, required?: boolean, separator?: string, textPrefix?: string);
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message[]>>;
+    readonly role: string;
+    readonly text: string;
+}
+
+// @public
+export interface Tokenizer {
+    // (undocumented)
+    decode(tokens: number[]): string;
+    // (undocumented)
+    encode(text: string): number[];
+}
+
+// @public
+export interface TooManyStepsParameters {
+    max_steps: number;
+    max_time: number;
+    start_time: number;
+    step_count: number;
+}
+
+// @public
 export type TurnEvents = 'beforeTurn' | 'afterTurn';
 
 // @public
-export interface TurnState {
-    [key: string]: TurnStateEntry;
+export class TurnState<TConversationState = DefaultConversationState, TUserState = DefaultUserState, TTempState = DefaultTempState> implements Memory {
+    get conversation(): TConversationState;
+    set conversation(value: TConversationState);
+    deleteConversationState(): void;
+    deleteTempState(): void;
+    deleteUserState(): void;
+    deleteValue(path: string): void;
+    getScope(scope: string): TurnStateEntry | undefined;
+    getValue<TValue = unknown>(path: string): TValue;
+    hasValue(path: string): boolean;
+    get isLoaded(): boolean;
+    load(context: TurnContext, storage?: Storage_2): Promise<boolean>;
+    protected onComputeStorageKeys(context: TurnContext): Promise<Record<string, string>>;
+    save(context: TurnContext, storage?: Storage_2): Promise<void>;
+    setValue(path: string, value: unknown): void;
+    get temp(): TTempState;
+    set temp(value: TTempState);
+    get user(): TUserState;
+    set user(value: TUserState);
 }
 
 // @public
-export class TurnStateEntry<TValue extends Record<string, any> = Record<string, any>> {
-    constructor(value?: TValue, storageKey?: string);
+export class TurnStateEntry {
+    constructor(value?: Record<string, unknown>, storageKey?: string);
     delete(): void;
     get hasChanged(): boolean;
     get isDeleted(): boolean;
-    replace(value?: TValue): void;
+    replace(value?: Record<string, unknown>): void;
     get storageKey(): string | undefined;
-    get value(): TValue;
+    get value(): Record<string, unknown>;
 }
 
 // @public
-export interface TurnStateManager<TState extends TurnState> {
-    loadState(storage: Storage_2 | undefined, context: TurnContext): Promise<TState>;
-    saveState(storage: Storage_2 | undefined, context: TurnContext, state: TState): Promise<void>;
+export class UserInputMessage extends PromptSectionBase {
+    constructor(tokens?: number, inputVariable?: string, filesVariable?: string);
+    // (undocumented)
+    renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<any>[]>>;
+}
+
+// @public
+export class UserMessage extends TemplateSection {
+    constructor(template: string, tokens?: number, userPrefix?: string);
+}
+
+// @public
+export class Utilities {
+    static toString(tokenizer: Tokenizer, value: any, asJSON?: boolean): string;
+}
+
+// @public
+export interface ValidatedChatCompletionAction {
+    name: string;
+    parameters: Record<string, any>;
+}
+
+// @public
+export interface Validation<TValue = any> {
+    feedback?: string;
+    type: 'Validation';
+    valid: boolean;
+    value?: TValue;
 }
 
 // (No @packageDocumentation comment for this package)
