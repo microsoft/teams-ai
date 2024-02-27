@@ -57,7 +57,7 @@ steps:
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
     contents: |
-      python/packages/ai/dist
+      python/packages/ai/dist/*
     targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
