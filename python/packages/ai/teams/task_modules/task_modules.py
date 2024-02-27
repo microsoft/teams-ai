@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import re
-from typing import Awaitable, Callable, List, Pattern, Union
+from typing import Awaitable, Callable, Generic, List, Pattern, TypeVar, Union
 
 from botbuilder.core import TurnContext
 from botbuilder.core.serializer_helper import serializer_helper
@@ -24,20 +24,22 @@ from teams.state import TurnState
 FETCH_INVOKE_NAME = "task/fetch"
 SUBMIT_INVOKE_NAME = "task/submit"
 
+StateT = TypeVar("StateT", bound=TurnState)
 
-class TaskModules:
-    _route_registry: List[Route]
+
+class TaskModules(Generic[StateT]):
+    _route_registry: List[Route[StateT]]
     _task_data_filter: str
 
-    def __init__(self, route_registry: List[Route], task_data_filter: str) -> None:
+    def __init__(self, route_registry: List[Route[StateT]], task_data_filter: str) -> None:
         self._route_registry = route_registry
         self._task_data_filter = task_data_filter
 
     def fetch(
         self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]],
-        Callable[[TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str]]],
+        [Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]],
+        Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]],
     ]:
         """
         Adds a route for handling the initial fetch of the task module.
@@ -65,17 +67,15 @@ class TaskModules:
             )
 
         def __call__(
-            func: Callable[
-                [TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str]]
-            ]
-        ) -> Callable[[TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]:
-            async def __handler__(context: TurnContext, state: TurnState) -> bool:
+            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]
+        ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str]]]:
+            async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
                 result = await func(context, state, context.activity.value["data"])
                 await self._send_response(context, result)
                 return True
 
-            self._route_registry.append(Route(__selector__, __handler__, True))
+            self._route_registry.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
@@ -84,8 +84,8 @@ class TaskModules:
     def submit(
         self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]],
-        Callable[[TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]],
+        [Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]],
+        Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]],
     ]:
         """
         Adds a route for handling the submission of a task module.
@@ -114,18 +114,16 @@ class TaskModules:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]
+                [TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]
             ]
-        ) -> Callable[
-            [TurnContext, TurnState, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]
-        ]:
-            async def __handler__(context: TurnContext, state: TurnState) -> bool:
+        ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[TaskModuleTaskInfo, str, None]]]:
+            async def __handler__(context: TurnContext, state: StateT) -> bool:
                 # the selector already ensures data exists
                 result = await func(context, state, context.activity.value["data"])
                 await self._send_response(context, result)
                 return True
 
-            self._route_registry.append(Route(__selector__, __handler__, True))
+            self._route_registry.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__

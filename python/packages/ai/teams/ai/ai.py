@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from logging import Logger
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict, Generic, Optional, TypeVar
 
 from botbuilder.core import TurnContext
 from botframework.connector import Channels
@@ -20,8 +20,10 @@ from .moderators.moderator import Moderator
 from .planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .planners.planner import Planner
 
+StateT = TypeVar("StateT", bound=TurnState)
 
-class AI:
+
+class AI(Generic[StateT]):
     """
     ### AI System
 
@@ -31,7 +33,7 @@ class AI:
 
     _options: AIOptions
     _logger: Logger
-    _actions: Dict[str, ActionEntry] = {}
+    _actions: Dict[str, ActionEntry[StateT]] = {}
 
     @property
     def options(self) -> AIOptions:
@@ -49,26 +51,32 @@ class AI:
         self._options = options
         self._logger = logger
         self._actions = {
-            ActionTypes.UNKNOWN_ACTION: ActionEntry(
+            ActionTypes.UNKNOWN_ACTION: ActionEntry[StateT](
                 ActionTypes.UNKNOWN_ACTION, True, self._on_unknown_action
             ),
-            ActionTypes.FLAGGED_INPUT: ActionEntry(
+            ActionTypes.FLAGGED_INPUT: ActionEntry[StateT](
                 ActionTypes.FLAGGED_INPUT, True, self._on_flagged_input
             ),
-            ActionTypes.FLAGGED_OUTPUT: ActionEntry(
+            ActionTypes.FLAGGED_OUTPUT: ActionEntry[StateT](
                 ActionTypes.FLAGGED_OUTPUT, True, self._on_flagged_output
             ),
-            ActionTypes.HTTP_ERROR: ActionEntry(ActionTypes.HTTP_ERROR, True, self._on_http_error),
-            ActionTypes.PLAN_READY: ActionEntry(ActionTypes.PLAN_READY, True, self._on_plan_ready),
-            ActionTypes.DO_COMMAND: ActionEntry(ActionTypes.DO_COMMAND, True, self._on_do_command),
-            ActionTypes.SAY_COMMAND: ActionEntry(
+            ActionTypes.HTTP_ERROR: ActionEntry[StateT](
+                ActionTypes.HTTP_ERROR, True, self._on_http_error
+            ),
+            ActionTypes.PLAN_READY: ActionEntry[StateT](
+                ActionTypes.PLAN_READY, True, self._on_plan_ready
+            ),
+            ActionTypes.DO_COMMAND: ActionEntry[StateT](
+                ActionTypes.DO_COMMAND, True, self._on_do_command
+            ),
+            ActionTypes.SAY_COMMAND: ActionEntry[StateT](
                 ActionTypes.SAY_COMMAND, True, self._on_say_command
             ),
         }
 
     def action(
         self, name: Optional[str] = None, *, allow_overrides=False
-    ) -> Callable[[ActionHandler], ActionHandler]:
+    ) -> Callable[[ActionHandler[StateT]], ActionHandler[StateT]]:
         """
         Registers a new action event listener. This method can be used as either
         a decorator or a method.
@@ -90,7 +98,7 @@ class AI:
         are found `Default: False`
         """
 
-        def __call__(func: ActionHandler) -> ActionHandler:
+        def __call__(func: ActionHandler[StateT]) -> ActionHandler[StateT]:
             action_name = name
 
             if not action_name:
@@ -106,7 +114,7 @@ class AI:
                     """
                 )
 
-            self._actions[action_name] = ActionEntry(action_name, allow_overrides, func)
+            self._actions[action_name] = ActionEntry[StateT](action_name, allow_overrides, func)
             return func
 
         return __call__
@@ -114,7 +122,7 @@ class AI:
     async def run(
         self,
         context: TurnContext,
-        state: TurnState,
+        state: StateT,
         started_at: datetime = datetime.now(),
         step: int = 0,
     ) -> bool:
@@ -182,7 +190,7 @@ class AI:
     async def _on_unknown_action(
         self,
         context: ActionTurnContext,
-        _state: TurnState,
+        _state: StateT,
     ) -> str:
         self._logger.error(
             'An AI action named "%s" was predicted but no handler was registered', context.name
@@ -192,7 +200,7 @@ class AI:
     async def _on_flagged_input(
         self,
         context: ActionTurnContext,
-        _state: TurnState,
+        _state: StateT,
     ) -> str:
         self._logger.error(
             "The users input has been moderated but no handler was registered for %s", context.name
@@ -202,7 +210,7 @@ class AI:
     async def _on_flagged_output(
         self,
         context: ActionTurnContext,
-        _state: TurnState,
+        _state: StateT,
     ) -> str:
         self._logger.error(
             "The apps output has been moderated but no handler was registered for %s", context.name
@@ -212,7 +220,7 @@ class AI:
     async def _on_http_error(
         self,
         _context: ActionTurnContext[dict],
-        _state: TurnState,
+        _state: StateT,
     ) -> str:
         status = _context.data.get("status")
         message = _context.data.get("message")
@@ -226,14 +234,14 @@ class AI:
     async def _on_plan_ready(
         self,
         context: ActionTurnContext[Plan],
-        _state: TurnState,
+        _state: StateT,
     ) -> str:
         return "" if len(context.data.commands) > 0 else ActionTypes.STOP
 
     async def _on_do_command(
         self,
         context: ActionTurnContext[PredictedDoCommand],
-        state: TurnState,
+        state: StateT,
     ) -> str:
         action = self._actions.get(context.data.action)
         ctx = ActionTurnContext(context.data.action, context.data.parameters, context)
@@ -246,7 +254,7 @@ class AI:
     async def _on_say_command(
         self,
         context: ActionTurnContext[PredictedSayCommand],
-        _state: TurnState,
+        _state: StateT,
     ) -> str:
         response = context.data.response
 

@@ -6,7 +6,18 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import re
-from typing import Awaitable, Callable, List, Optional, Pattern, Tuple, Union
+from typing import (
+    Awaitable,
+    Callable,
+    Generic,
+    List,
+    Optional,
+    Pattern,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from aiohttp.web import Request, Response
 from botbuilder.core import Bot, TurnContext
@@ -34,8 +45,10 @@ from .task_modules import TaskModules
 from .teams_adapter import TeamsAdapter
 from .typing import Typing
 
+StateT = TypeVar("StateT", bound=TurnState)
 
-class Application(Bot):
+
+class Application(Bot, Generic[StateT]):
     """
     Application class for routing and processing incoming requests.
 
@@ -50,33 +63,35 @@ class Application(Bot):
 
     typing: Typing
 
-    _ai: Optional[AI]
-    _adaptive_card: AdaptiveCards
+    _ai: Optional[AI[StateT]]
+    _adaptive_card: AdaptiveCards[StateT]
     _options: ApplicationOptions
     _adapter: Optional[TeamsAdapter] = None
-    _before_turn: List[RouteHandler] = []
-    _after_turn: List[RouteHandler] = []
-    _routes: List[Route] = []
+    _before_turn: List[RouteHandler[StateT]] = []
+    _after_turn: List[RouteHandler[StateT]] = []
+    _routes: List[Route[StateT]] = []
     _error: Optional[Callable[[TurnContext, Exception], Awaitable[None]]] = None
-    _turn_state_factory: Optional[Callable[[], Awaitable[TurnState]]] = None
-    _message_extensions: MessageExtensions
-    _task_modules: TaskModules
-    _meetings: Meetings
+    _turn_state_factory: Optional[Callable[[], Awaitable[StateT]]] = None
+    _message_extensions: MessageExtensions[StateT]
+    _task_modules: TaskModules[StateT]
+    _meetings: Meetings[StateT]
 
     def __init__(self, options: ApplicationOptions = ApplicationOptions()) -> None:
         """
         Creates a new Application instance.
         """
         self.typing = Typing()
-        self._ai = AI(options.ai, logger=options.logger) if options.ai else None
+        self._ai = AI[StateT](options.ai, logger=options.logger) if options.ai else None
         self._options = options
         self._routes = []
-        self._message_extensions = MessageExtensions(self._routes)
-        self._adaptive_card = AdaptiveCards(
+        self._message_extensions = MessageExtensions[StateT](self._routes)
+        self._adaptive_card = AdaptiveCards[StateT](
             self._routes, options.adaptive_cards.action_submit_filer
         )
-        self._task_modules = TaskModules(self._routes, options.task_modules.task_data_filter)
-        self._meetings = Meetings(self._routes)
+        self._task_modules = TaskModules[StateT](
+            self._routes, options.task_modules.task_data_filter
+        )
+        self._meetings = Meetings[StateT](self._routes)
 
         if options.long_running_messages and (not options.adapter or not options.bot_app_id):
             raise ApplicationError(
@@ -106,7 +121,7 @@ class Application(Bot):
         return self._adapter
 
     @property
-    def ai(self) -> AI:
+    def ai(self) -> AI[StateT]:
         """
         This property is only available if the Application was configured with 'ai' options.
         An exception will be thrown if you attempt to access it otherwise.
@@ -129,34 +144,36 @@ class Application(Bot):
         return self._options
 
     @property
-    def message_extensions(self) -> MessageExtensions:
+    def message_extensions(self) -> MessageExtensions[StateT]:
         """
         Message Extensions
         """
         return self._message_extensions
 
     @property
-    def adaptive_cards(self) -> AdaptiveCards:
+    def adaptive_cards(self) -> AdaptiveCards[StateT]:
         """
         Access the application's adaptive cards functionalities.
         """
         return self._adaptive_card
 
     @property
-    def task_modules(self) -> TaskModules:
+    def task_modules(self) -> TaskModules[StateT]:
         """
         Access the application's task modules functionalities.
         """
         return self._task_modules
 
     @property
-    def meetings(self) -> Meetings:
+    def meetings(self) -> Meetings[StateT]:
         """
         Access the application's meetings functionalities.
         """
         return self._meetings
 
-    def activity(self, type: ActivityType) -> Callable[[RouteHandler], RouteHandler]:
+    def activity(
+        self, type: ActivityType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new activity event listener. This method can be used as either
         a decorator or a method.
@@ -179,13 +196,15 @@ class Application(Bot):
         def __selector__(context: TurnContext):
             return type == str(context.activity.type)
 
-        def __call__(func: RouteHandler) -> RouteHandler:
-            self._routes.append(Route(__selector__, func))
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def message(self, select: Union[str, Pattern[str]]) -> Callable[[RouteHandler], RouteHandler]:
+    def message(
+        self, select: Union[str, Pattern[str]]
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new message activity event listener. This method can be used as either
         a decorator or a method.
@@ -217,15 +236,15 @@ class Application(Bot):
             i = context.activity.text.find(select)
             return i > -1
 
-        def __call__(func: RouteHandler) -> RouteHandler:
-            self._routes.append(Route(__selector__, func))
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
     def conversation_update(
         self, type: ConversationUpdateType
-    ) -> Callable[[RouteHandler], RouteHandler]:
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new message activity event listener. This method can be used as either
         a decorator or a method.
@@ -265,13 +284,15 @@ class Application(Bot):
 
             return False
 
-        def __call__(func: RouteHandler) -> RouteHandler:
-            self._routes.append(Route(__selector__, func))
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def message_reaction(self, type: MessageReactionType) -> Callable[[RouteHandler], RouteHandler]:
+    def message_reaction(
+        self, type: MessageReactionType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new message activity event listener. This method can be used as either
         a decorator or a method.
@@ -307,13 +328,15 @@ class Application(Bot):
 
             return False
 
-        def __call__(func: RouteHandler) -> RouteHandler:
-            self._routes.append(Route(__selector__, func))
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
 
-    def message_update(self, type: MessageUpdateType) -> Callable[[RouteHandler], RouteHandler]:
+    def message_update(
+        self, type: MessageUpdateType
+    ) -> Callable[[RouteHandler[StateT]], RouteHandler[StateT]]:
         """
         Registers a new message activity event listener. This method can be used as either
         a decorator or a method.
@@ -359,8 +382,8 @@ class Application(Bot):
                 return False
             return False
 
-        def __call__(func: RouteHandler) -> RouteHandler:
-            self._routes.append(Route(__selector__, func))
+        def __call__(func: RouteHandler[StateT]) -> RouteHandler[StateT]:
+            self._routes.append(Route[StateT](__selector__, func))
             return func
 
         return __call__
@@ -368,8 +391,8 @@ class Application(Bot):
     def file_consent_accept(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]],
+        [Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]],
+        Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]],
     ]:
         """
         Registers a handler for when a file consent card is accepted by the user.
@@ -394,15 +417,15 @@ class Application(Bot):
             )
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route(__selector__, __handler__, True))
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
@@ -410,8 +433,8 @@ class Application(Bot):
     def file_consent_decline(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]],
+        [Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]],
+        Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]],
     ]:
         """
         Registers a handler for when a file consent card is declined by the user.
@@ -436,15 +459,15 @@ class Application(Bot):
             )
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, FileConsentCardResponse], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, FileConsentCardResponse], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route(__selector__, __handler__, True))
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
@@ -452,8 +475,8 @@ class Application(Bot):
     def o365_connector_card_action(
         self,
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]],
+        [Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]],
+        Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]],
     ]:
         """
         Registers a handler for when a O365 connector card action is received from the user.
@@ -476,20 +499,20 @@ class Application(Bot):
             )
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, O365ConnectorCardActionQuery], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: TurnState):
+            func: Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, O365ConnectorCardActionQuery], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT):
                 if not context.activity.value:
                     return False
                 await func(context, state, context.activity.value)
                 return True
 
-            self._routes.append(Route(__selector__, __handler__, True))
+            self._routes.append(Route[StateT](__selector__, __handler__, True))
             return func
 
         return __call__
 
-    def before_turn(self, func: RouteHandler) -> RouteHandler:
+    def before_turn(self, func: RouteHandler[StateT]) -> RouteHandler[StateT]:
         """
         Registers a new event listener that will be executed before turns.
         This method can be used as either a decorator or a method and
@@ -510,7 +533,7 @@ class Application(Bot):
         self._before_turn.append(func)
         return func
 
-    def after_turn(self, func: RouteHandler) -> RouteHandler:
+    def after_turn(self, func: RouteHandler[StateT]) -> RouteHandler[StateT]:
         """
         Registers a new event listener that will be executed after turns.
         This method can be used as either a decorator or a method and
@@ -556,7 +579,7 @@ class Application(Bot):
 
         return func
 
-    def turn_state_factory(self, func: Callable[[], Awaitable[TurnState]]):
+    def turn_state_factory(self, func: Callable[[], Awaitable[StateT]]):
         """
         Custom Turn State Factory
         """
@@ -599,14 +622,14 @@ class Application(Bot):
 
             # run before turn middleware
             for before_turn in self._before_turn:
-                is_ok = await before_turn(context, state)
+                is_ok = await before_turn(context, cast(StateT, state))
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
                     return
 
             # run activity handlers
-            is_ok, matches = await self._on_activity(context, state)
+            is_ok, matches = await self._on_activity(context, cast(StateT, state))
 
             if not is_ok:
                 await state.save(context, self._options.storage)
@@ -620,7 +643,7 @@ class Application(Bot):
                 and context.activity.type == ActivityTypes.message
                 and context.activity.text
             ):
-                is_ok = await self._ai.run(context, state)
+                is_ok = await self._ai.run(context, cast(StateT, state))
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
@@ -628,7 +651,7 @@ class Application(Bot):
 
             # run after turn middleware
             for after_turn in self._after_turn:
-                is_ok = await after_turn(context, state)
+                is_ok = await after_turn(context, cast(StateT, state))
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
@@ -640,7 +663,7 @@ class Application(Bot):
         finally:
             self.typing.stop()
 
-    async def _on_activity(self, context: TurnContext, state: TurnState) -> Tuple[bool, int]:
+    async def _on_activity(self, context: TurnContext, state: StateT) -> Tuple[bool, int]:
         matches = 0
 
         # ensure we handle invokes first
