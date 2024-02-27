@@ -61,7 +61,6 @@ If using OpenAI see:
 For Azure's moderator, see:
 - [AzureContentSafetyModerator.ts](./js/packages/teams-ai/src/moderators/AzureContentSafetyModerator.ts) 
 - [AzureContentSafetyModerator.cs](./dotnet/packages/Microsoft.TeamsAI/Microsoft.TeamsAI/AI/Moderator/AzureContentSafetyModerator.cs)
-
 - [azure_content_safety_moderator.py](./python/packages/ai/teams/ai/moderators/azure_content_safety_moderator.py)
 
 ### Predictive Engine to Map Intents to Actions
