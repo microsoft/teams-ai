@@ -33,11 +33,11 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Initializes a new instance of the TeamsSsoBotAuthentication class.
-     * @param app - The application object.
-     * @param settings - The settings for Teams SSO.
-     * @param settingName - The name of the setting.
-     * @param msal - The MSAL (Microsoft Authentication Library) object.
-     * @param storage - The storage object for storing state.
+     * @param {Application<TState>} app - The application object.
+     * @param {TeamsSsoSettings} settings - The settings for Teams SSO.
+     * @param {string} settingName - The name of the setting.
+     * @param {ConfidentialClientApplication} msal - The MSAL (Microsoft Authentication Library) object.
+     * @param {Storage} storage - The storage object for storing state.
      */
     public constructor(
         app: Application<TState>,
@@ -61,10 +61,10 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Run or continue the SSO dialog and returns the result.
-     * @param context - The turn context object.
-     * @param state - The turn state object.
-     * @param dialogStateProperty - The name of the dialog state property.
-     * @returns A promise that resolves to the dialog turn result containing the token response.
+     * @param {TurnContext} context - The turn context object.
+     * @param {TState} state - The turn state object.
+     * @param {string} dialogStateProperty - The name of the dialog state property.
+     * @returns {Promise<DialogTurnResult<TokenResponse>>} A promise that resolves to the dialog turn result containing the token response.
      */
     public async runDialog(
         context: TurnContext,
@@ -81,10 +81,10 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Continues the SSO dialog and returns the result.
-     * @param context - The turn context object.
-     * @param state - The turn state object.
-     * @param dialogStateProperty - The name of the dialog state property.
-     * @returns A promise that resolves to the dialog turn result containing the token response.
+     * @param {TurnContext} context - The turn context object.
+     * @param {TState} state - The turn state object.
+     * @param {string} dialogStateProperty - The name of the dialog state property.
+     * @returns {Promise<DialogTurnResult<TokenResponse>>} A promise that resolves to the dialog turn result containing the token response.
      */
     public async continueDialog(
         context: TurnContext,
@@ -97,8 +97,8 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Determines whether the token exchange activity should be processed by current authentication setting.
-     * @param context - The turn context object.
-     * @returns A promise that resolves to a boolean indicating whether the token exchange route should be processed by current class instance.
+     * @param {TurnContext} context - The turn context object.
+     * @returns {Promise<boolean>} A promise that resolves to a boolean indicating whether the token exchange route should be processed by current class instance.
      */
     protected async tokenExchangeRouteSelector(context: TurnContext): Promise<boolean> {
         return (
@@ -109,10 +109,10 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Creates the SSO dialog context.
-     * @param context - The turn context object.
-     * @param state - The turn state object.
-     * @param dialogStateProperty - The name of the dialog state property.
-     * @returns A promise that resolves to the dialog context object.
+     * @param {TurnContext} context - The turn context object.
+     * @param {TState} state - The turn state object.
+     * @param {string} dialogStateProperty - The name of the dialog state property.
+     * @returns {Promise<DialogContext>} A promise that resolves to the dialog context object.
      */
     private async createSsoDialogContext(
         context: TurnContext,
@@ -143,8 +143,8 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Checks if deduplication should be performed for token exchange.
-     * @param context - The turn context object.
-     * @returns A promise that resolves to a boolean indicating whether deduplication should be performed.
+     * @param {TurnContext} context - The turn context object.
+     * @returns {Promise<boolean>} A promise that resolves to a boolean indicating whether deduplication should be performed.
      */
     private async shouldDedup(context: TurnContext): Promise<boolean> {
         const storeItem = {
@@ -167,8 +167,8 @@ export class TeamsSsoBotAuthentication<TState extends TurnState> extends BotAuth
 
     /**
      * Gets the storage key for storing the token exchange state.
-     * @param context - The turn context object.
-     * @returns The storage key.
+     * @param {TurnContext} context - The turn context object.
+     * @returns {string} The storage key.
      * @throws Error if the context is invalid or the activity is not a token exchange invoke.
      */
     private getStorageKey(context: TurnContext): string {

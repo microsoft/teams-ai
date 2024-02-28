@@ -124,7 +124,7 @@ export class OpenAIModel implements PromptCompletionModel {
 
     /**
      * Creates a new `OpenAIModel` instance.
-     * @param options Options for configuring the model client.
+     * @param {OpenAIModelOptions} options - Options for configuring the model client.
      */
     public constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions) {
         // Check for azure config
@@ -173,12 +173,12 @@ export class OpenAIModel implements PromptCompletionModel {
 
     /**
      * Completes a prompt using OpenAI or Azure OpenAI.
-     * @param context Current turn context.
-     * @param memory An interface for accessing state values.
-     * @param functions Functions to use when rendering the prompt.
-     * @param tokenizer Tokenizer to use when rendering the prompt.
-     * @param template Prompt template to complete.
-     * @returns A `PromptResponse` with the status and message.
+     * @param {TurnContext} context - Current turn context.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {PromptFunctions} functions - Functions to use when rendering the prompt.
+     * @param {Tokenizer} tokenizer - Tokenizer to use when rendering the prompt.
+     * @param {PromptTemplate} template - Prompt template to complete.
+     * @returns {Promise<PromptResponse<string>>} A `PromptResponse` with the status and message.
      */
     public async completePrompt(
         context: TurnContext,
@@ -279,10 +279,12 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     /**
-     * @param target
-     * @param src
-     * @param fields
      * @private
+     * @template TRequest
+     * @param {Partial<TRequest>} target - The target TRequest.
+     * @param {any} src - The source object.
+     * @param {string[]} fields - List of fields to copy.
+     * @returns {TRequest} The TRequest
      */
     protected copyOptionsToRequest<TRequest>(target: Partial<TRequest>, src: any, fields: string[]): TRequest {
         for (const field of fields) {
@@ -295,9 +297,10 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     /**
-     * @param request
-     * @param model
      * @private
+     * @param {CreateChatCompletionRequest} request - The request for Chat Completion
+     * @param {string} model - The string name of the model.
+     * @returns {Promise<AxiosResponse<CreateChatCompletionResponse>>} A Promise containing the CreateChatCompletionResponse response.
      */
     protected createChatCompletion(
         request: CreateChatCompletionRequest,
@@ -318,10 +321,12 @@ export class OpenAIModel implements PromptCompletionModel {
     }
 
     /**
-     * @param url
-     * @param body
-     * @param retryCount
      * @private
+     * @template TData
+     * @param {string} url - Url to post to.
+     * @param {object} body - POST body.
+     * @param {number} retryCount - Number of allowed retries.
+     * @returns {Promise<AxiosResponse<TData>>} Promise containing the POST response.
      */
     protected async post<TData>(url: string, body: object, retryCount = 0): Promise<AxiosResponse<TData>> {
         // Initialize request config

@@ -80,6 +80,7 @@ export class SequenceAugmentation implements Augmentation<Plan | undefined> {
 
     /**
      * Creates an optional prompt section for the augmentation.
+     * @returns {PromptSection | undefined} The new PromptSection or undefined.
      */
     public createPromptSection(): PromptSection | undefined {
         return this._section;
@@ -87,12 +88,12 @@ export class SequenceAugmentation implements Augmentation<Plan | undefined> {
 
     /**
      * Validates a response to a prompt.
-     * @param context Context for the current turn of conversation with the user.
-     * @param memory An interface for accessing state values.
-     * @param tokenizer Tokenizer to use for encoding and decoding text.
-     * @param response Response to validate.
-     * @param remaining_attempts Number of remaining attempts to validate the response.
-     * @returns A `Validation` object.
+     * @param {TurnContext} context - Context for the current turn of conversation with the user.
+     * @param {Memory} memory - An interface for accessing state values.
+     * @param {Tokenizer} tokenizer - Tokenizer to use for encoding and decoding text.
+     * @param {PromptResponse<string>} response - Response to validate.
+     * @param {number} remaining_attempts - Number of remaining attempts to validate the response.
+     * @returns {Validation} A `Validation` object.
      */
     public async validateResponse(
         context: TurnContext,
@@ -172,10 +173,10 @@ export class SequenceAugmentation implements Augmentation<Plan | undefined> {
 
     /**
      * Creates a plan given validated response value.
-     * @param context Context for the current turn of conversation.
-     * @param memory An interface for accessing state variables.
-     * @param response The validated and transformed response for the prompt.
-     * @returns The created plan.
+     * @param {TurnContext} context - Context for the current turn of conversation.
+     * @param {Memory} memory - An interface for accessing state variables.
+     * @param {PromptResponse<Plan|undefined>} response - The validated and transformed response for the prompt.
+     * @returns {Promise<Plan>} The created plan.
      */
     public createPlanFromResponse(
         context: TurnContext,
