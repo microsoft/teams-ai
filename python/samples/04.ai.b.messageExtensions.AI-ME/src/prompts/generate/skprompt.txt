@@ -1,0 +1,5 @@
+This is a Microsoft Teams extension that assists the user with creating posts.
+Using the prompt below, create a post that appropriate for a business environment.
+
+Prompt: {{$prompt}}
+Post:
