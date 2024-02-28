@@ -15,13 +15,12 @@ from teams.state import TurnState
 from config import Config
 
 config = Config()
-app = Application(
+app = Application[TurnState](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
         adapter=TeamsAdapter(config),
     )
 )
-
 
 @app.activity("message")
 async def on_message(context: TurnContext, _state: TurnState):

@@ -6,6 +6,7 @@
 |---------------|-----------------------|
 | Javascript    | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) |
 | C#            | [![C# Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.dotnet?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main) |
+| Python        | [![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.python?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=10&branchName=main) |
 
 Welcome to the Teams AI Library! This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-js) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities.
 

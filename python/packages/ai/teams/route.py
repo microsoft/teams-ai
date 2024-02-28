@@ -5,18 +5,19 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Generic, TypeVar
 
 from botbuilder.core import TurnContext
 
 from .state import TurnState
 
-RouteHandler = Callable[[TurnContext, TurnState], Awaitable[bool]]
+StateT = TypeVar("StateT", bound=TurnState)
+RouteHandler = Callable[[TurnContext, StateT], Awaitable[bool]]
 
 
-class Route:
+class Route(Generic[StateT]):
     selector: Callable[[TurnContext], bool]
-    handler: RouteHandler
+    handler: RouteHandler[StateT]
     is_invoke: bool
 
     def __init__(

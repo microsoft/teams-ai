@@ -1,61 +1,13 @@
-# Teams AI
+# Teams AI Library
 
-SDK focused on building AI based applications for Microsoft Teams.
+Welcome to the Teams AI Library Python package! 
 
-## Development
+This SDK is specifically designed to assist you in creating bots capable of interacting with Teams and Microsoft 365 applications. It is constructed using the [Bot Framework SDK](https://github.com/microsoft/botbuilder-python) as its foundation, simplifying the process of developing bots that interact with Teams' artificial intelligence capabilities. See the [Teams AI repo README.md](https://github.com/microsoft/teams-ai), for general information.
 
-### Prerequisites
+## Getting Started
 
-[Install Poetry](https://python-poetry.org/docs/)
+To get started, take a look at the [getting started docs](https://github.com/microsoft/teams-ai/blob/main/getting-started/README.md).
 
-```bash
-$: pip install poetry
-```
+## Migration
 
-### Install Dependencies
-
-```bash
-$: poetry install
-```
-
-### Build
-
-```bash
-$: poetry build
-```
-
-### Test
-
-```bash
-$: poetry run test
-```
-
-### Lint
-
-```bash
-$: poetry run lint
-```
-
-## Format
-
-```bash
-$: poetry run fmt
-```
-
-## Clean
-
-```bash
-$: poetry run clean
-```
-
-### Install Local
-
-```bash
-$: pip install .
-```
-
-### Publish
-
-```bash
-$: poetry publish
-```
+If you're migrating an existing project, switching to add on the Teams AI Library layer is quick and simple. See the [migration guide](https://github.com/microsoft/teams-ai/blob/main/getting-started/MIGRATION/PYTHON.md).

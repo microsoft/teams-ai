@@ -61,9 +61,7 @@ class PromptManager(PromptFunctions):
         """
         return self._options
 
-    def function(
-        self, name: Optional[str] = None
-    ) -> Callable[[PromptFunction], PromptFunction,]:
+    def function(self, name: Optional[str] = None) -> Callable[[PromptFunction], PromptFunction]:
         """
         Registers a new prompt function event listener. This method can be used as either
         a decorator or a method.

@@ -18,7 +18,7 @@ routes = web.RouteTableDef()
 
 @routes.post("/api/messages")
 async def on_messages(req: web.Request) -> web.Response:
-    res = await app.adapter.process(req, app)
+    res = await app.process(req)
 
     if res:
         return res

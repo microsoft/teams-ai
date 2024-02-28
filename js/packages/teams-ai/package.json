@@ -12,6 +12,9 @@
         "teams",
         "ai"
     ],
+    "engines": {
+        "node": "^16 || ^18"
+    },
     "bugs": {
         "url": "https://github.com/microsoft/teams-ai/issues"
     },

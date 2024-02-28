@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import re
-from typing import Awaitable, Callable, List, Pattern, Union
+from typing import Awaitable, Callable, Generic, List, Pattern, TypeVar, Union
 
 from botbuilder.core import TurnContext
 from botbuilder.schema import (
@@ -27,8 +27,10 @@ ACTION_INVOKE_NAME = "adaptiveCard/action"
 ACTION_EXECUTE_TYPE = "Action.Execute"
 SEARCH_INVOKE_NAME = "application/search"
 
+StateT = TypeVar("StateT", bound=TurnState)
 
-class AdaptiveCards:
+
+class AdaptiveCards(Generic[StateT]):
     _route_registry: List[Route]
     _action_submit_filter: str
 
@@ -39,8 +41,8 @@ class AdaptiveCards:
     def action_execute(
         self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]]],
-        Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]],
+        [Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]],
+        Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]],
     ]:
         """
         Adds a route for handling Adaptive Card Action.Execute events.
@@ -84,9 +86,9 @@ class AdaptiveCards:
             return False
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]]
-        ) -> Callable[[TurnContext, TurnState, dict], Awaitable[Union[str, dict]]]:
-            async def __handler__(context: TurnContext, state: TurnState) -> bool:
+            func: Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]
+        ) -> Callable[[TurnContext, StateT, dict], Awaitable[Union[str, dict]]]:
+            async def __handler__(context: TurnContext, state: StateT) -> bool:
                 result = await func(context, state, context.activity.value["action"]["data"])
                 if context.turn_state.get(ActivityTypes.invoke_response) is None:
                     if isinstance(result, str):
@@ -108,7 +110,7 @@ class AdaptiveCards:
                     )
                 return True
 
-            self._route_registry.append(Route(__selector__, __handler__))
+            self._route_registry.append(Route[StateT](__selector__, __handler__))
             return func
 
         return __call__
@@ -116,8 +118,8 @@ class AdaptiveCards:
     def action_submit(
         self, verb: Union[str, Pattern[str], Callable[[TurnContext], bool]]
     ) -> Callable[
-        [Callable[[TurnContext, TurnState, dict], Awaitable[None]]],
-        Callable[[TurnContext, TurnState, dict], Awaitable[None]],
+        [Callable[[TurnContext, StateT, dict], Awaitable[None]]],
+        Callable[[TurnContext, StateT, dict], Awaitable[None]],
     ]:
         """
         Adds a route for handling Adaptive Card Action.Submit events.
@@ -160,13 +162,13 @@ class AdaptiveCards:
             return False
 
         def __call__(
-            func: Callable[[TurnContext, TurnState, dict], Awaitable[None]]
-        ) -> Callable[[TurnContext, TurnState, dict], Awaitable[None]]:
-            async def __handler__(context: TurnContext, state: TurnState) -> bool:
+            func: Callable[[TurnContext, StateT, dict], Awaitable[None]]
+        ) -> Callable[[TurnContext, StateT, dict], Awaitable[None]]:
+            async def __handler__(context: TurnContext, state: StateT) -> bool:
                 await func(context, state, context.activity.value)
                 return True
 
-            self._route_registry.append(Route(__selector__, __handler__))
+            self._route_registry.append(Route[StateT](__selector__, __handler__))
             return func
 
         return __call__
@@ -176,12 +178,12 @@ class AdaptiveCards:
     ) -> Callable[
         [
             Callable[
-                [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
+                [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
                 Awaitable[List[AdaptiveCardsSearchResult]],
             ]
         ],
         Callable[
-            [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
+            [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
             Awaitable[List[AdaptiveCardsSearchResult]],
         ],
     ]:
@@ -227,14 +229,14 @@ class AdaptiveCards:
 
         def __call__(
             func: Callable[
-                [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
+                [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
                 Awaitable[List[AdaptiveCardsSearchResult]],
             ]
         ) -> Callable[
-            [TurnContext, TurnState, Query[AdaptiveCardsSearchParams]],
+            [TurnContext, StateT, Query[AdaptiveCardsSearchParams]],
             Awaitable[List[AdaptiveCardsSearchResult]],
         ]:
-            async def __handler__(context: TurnContext, state: TurnState) -> bool:
+            async def __handler__(context: TurnContext, state: StateT) -> bool:
                 params = context.activity.value
                 # Flatten search parameters
                 query = Query[AdaptiveCardsSearchParams](
@@ -263,7 +265,7 @@ class AdaptiveCards:
                     )
                 return True
 
-            self._route_registry.append(Route(__selector__, __handler__))
+            self._route_registry.append(Route[StateT](__selector__, __handler__))
             return func
 
         return __call__
