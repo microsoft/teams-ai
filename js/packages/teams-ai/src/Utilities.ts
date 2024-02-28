@@ -26,7 +26,7 @@ export class Utilities {
                 // Return shorter version of object
                 const asYaml = stringify(value);
                 const asJSON = JSON.stringify(value);
-                if (tokenizer.encode(asYaml).length < tokenizer.encode(asJSON).length) {
+                if (tokenizer.encode(asYaml).length <= tokenizer.encode(asJSON).length) {
                     return asYaml;
                 } else {
                     return asJSON;

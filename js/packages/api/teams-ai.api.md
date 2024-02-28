@@ -48,6 +48,7 @@ export const ACTION_INVOKE_NAME = "adaptiveCard/action";
 // @public
 export class ActionAugmentationSection extends PromptSectionBase {
     constructor(actions: ChatCompletionAction[], callToAction: string);
+    // (undocumented)
     get actions(): Map<string, ChatCompletionAction>;
     renderAsMessages(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<Message<string>[]>>;
 }
@@ -226,21 +227,14 @@ class AssistantsPlanner<TState extends TurnState = TurnState> implements Planner
     beginTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
     continueTask(context: TurnContext, state: TState, ai: AI<TState>): Promise<Plan>;
     static createAssistant(apiKey: string, request: OpenAI.Beta.Assistants.AssistantCreateParams): Promise<OpenAI.Beta.Assistants.Assistant>;
-    // (undocumented)
     protected createMessage(thread_id: string, body: OpenAI.Beta.Threads.Messages.MessageCreateParams): Promise<OpenAI.Beta.Threads.Messages.ThreadMessage>;
-    // (undocumented)
     protected createRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run>;
-    // (undocumented)
     protected createThread(request: OpenAI.Beta.Threads.ThreadCreateParams): Promise<OpenAI.Beta.Threads.Thread>;
-    // (undocumented)
     protected listMessages(thread_id: string): Promise<OpenAI.Beta.Threads.Messages.ThreadMessagesPage>;
     get openai(): OpenAI;
     protected retrieveAssistant(): Promise<OpenAI.Beta.Assistants.Assistant>;
-    // (undocumented)
     protected retrieveLastRun(thread_id: string): Promise<OpenAI.Beta.Threads.Runs.Run | null>;
-    // (undocumented)
     protected retrieveRun(thread_id: string, run_id: string): Promise<OpenAI.Beta.Threads.Runs.Run>;
-    // (undocumented)
     protected submitToolOutputs(thread_id: string, run_id: string, tool_outputs: OpenAI.Beta.Threads.Runs.RunSubmitToolOutputsParams): Promise<OpenAI.Beta.Threads.Runs.Run>;
 }
 
@@ -455,6 +449,7 @@ export class DataSourceSection extends PromptSectionBase {
 // @public
 export class DefaultAugmentation implements Augmentation<string> {
     createPlanFromResponse(context: TurnContext_2, memory: Memory, response: PromptResponse<string>): Promise<Plan>;
+    // (undocumented)
     createPromptSection(): PromptSection | undefined;
     validateResponse(context: TurnContext_2, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<string>>;
 }
@@ -722,6 +717,7 @@ export interface Moderator<TState extends TurnState = TurnState> {
 export class MonologueAugmentation implements Augmentation<InnerMonologue | undefined> {
     constructor(actions: ChatCompletionAction[]);
     createPlanFromResponse(context: TurnContext_2, memory: Memory, response: PromptResponse<InnerMonologue | undefined>): Promise<Plan>;
+    // (undocumented)
     createPromptSection(): PromptSection | undefined;
     validateResponse(context: TurnContext_2, memory: Memory, tokenizer: Tokenizer, response: PromptResponse<string>, remaining_attempts: number): Promise<Validation<InnerMonologue | undefined>>;
 }
@@ -757,7 +753,6 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
 export class OpenAIModel implements PromptCompletionModel {
     constructor(options: OpenAIModelOptions | AzureOpenAIModelOptions);
     completePrompt(context: TurnContext, memory: Memory, functions: PromptFunctions, tokenizer: Tokenizer, template: PromptTemplate): Promise<PromptResponse<string>>;
-    // (undocumented)
     protected copyOptionsToRequest<TRequest>(target: Partial<TRequest>, src: any, fields: string[]): TRequest;
     // Warning: (ae-forgotten-export) The symbol "CreateChatCompletionRequest" needs to be exported by the entry point index.d.ts
     // Warning: (ae-forgotten-export) The symbol "CreateChatCompletionResponse" needs to be exported by the entry point index.d.ts
@@ -765,7 +760,6 @@ export class OpenAIModel implements PromptCompletionModel {
     // (undocumented)
     protected createChatCompletion(request: CreateChatCompletionRequest, model: string): Promise<AxiosResponse<CreateChatCompletionResponse>>;
     readonly options: OpenAIModelOptions | AzureOpenAIModelOptions;
-    // (undocumented)
     protected post<TData>(url: string, body: object, retryCount?: number): Promise<AxiosResponse<TData>>;
 }
 
@@ -1119,6 +1113,7 @@ export interface TextContentPart {
 // @public
 export class TextDataSource implements DataSource {
     constructor(name: string, text: string);
+    // (undocumented)
     get name(): string;
     renderData(context: TurnContext, memory: Memory, tokenizer: Tokenizer, maxTokens: number): Promise<RenderedPromptSection<string>>;
 }

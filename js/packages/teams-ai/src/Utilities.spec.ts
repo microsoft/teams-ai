@@ -21,8 +21,8 @@ describe('Utilities', () => {
         });
 
         it('should convert a simple object to yaml', () => {
-            const result = Utilities.toString(tokenizer, { abc: 1 });
-            assert.equal(result, 'abc: 1\n');
+            const result = Utilities.toString(tokenizer, { a: 1 });
+            assert.equal(result, 'a: 1\n');
         });
 
         it('should convert a deep object to JSON', () => {
