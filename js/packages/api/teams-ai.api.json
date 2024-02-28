@@ -1,7 +1,7 @@
 {
   "metadata": {
     "toolPackage": "@microsoft/api-extractor",
-    "toolVersion": "7.39.1",
+    "toolVersion": "7.41.0",
     "schemaVersion": 1011,
     "oldestForwardsCompatibleVersion": 1001,
     "tsdocConfig": {
@@ -280,7 +280,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@microsoft/teams-ai!ActionAugmentationSection#actions:member",
-              "docComment": "/**\n * Map of action names to actions.\n */\n",
+              "docComment": "/**\n * @returns {Map<string, ChatCompletionAction>} Map of action names to actions.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -324,7 +324,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!ActionAugmentationSection#renderAsMessages:member(1)",
-              "docComment": "/**\n * Renders the prompt section as a list of `Message` objects.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - Interface for accessing state variables.\n *\n * @param functions - Functions for rendering prompts.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns The rendered prompt section.\n */\n",
+              "docComment": "/**\n * Renders the prompt section as a list of `Message` objects.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - Interface for accessing state variables.\n *\n * @param functions - Functions for rendering prompts.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns {Promise<RenderedPromptSection<Message<string>[]>>} The rendered prompt section.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -641,7 +641,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!ActionPlanner#beginTask:member(1)",
-              "docComment": "/**\n * Starts a new task.\n *\n * @remarks\n *\n * This method is called when the AI system is ready to start a new task. The planner should generate a plan that the AI system will execute. Returning an empty plan signals that there is no work to be performed.\n *\n * The planner should take the users input from `state.temp.input`.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param ai - The AI system that is generating the plan.\n *\n * @returns The plan that was generated.\n */\n",
+              "docComment": "/**\n * Starts a new task.\n *\n * @remarks\n *\n * This method is called when the AI system is ready to start a new task. The planner should generate a plan that the AI system will execute. Returning an empty plan signals that there is no work to be performed.\n *\n * The planner should take the users input from `state.temp.input`.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param ai - The AI system that is generating the plan.\n *\n * @returns {Promise<Plan>} The plan that was generated.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -1276,7 +1276,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!ActionPlannerOptions#tokenizer:member",
-              "docComment": "/**\n * Optional tokenizer to use.\n *\n * @remarks\n *\n * If not specified, a new `GPT3Tokenizer` instance will be created.\n */\n",
+              "docComment": "/**\n * Optional tokenizer to use.\n *\n * @remarks\n *\n * If not specified, a new `GPTTokenizer` instance will be created.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -2606,7 +2606,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!AI#action:member(1)",
-              "docComment": "/**\n * Registers a handler for a named action.\n *\n * @remarks\n *\n * The AI systems planner returns plans that are made up of a series of commands or actions that should be performed. Registering a handler lets you provide code that should be run in response to one of the predicted actions.\n *\n * Plans support a DO command which specifies the name of an action to call and an optional set of entities that should be passed to the action. The internal plan executor will call the registered handler for the action passing in the current context, state, and entities.\n *\n * Additionally, the AI system itself uses actions to handle things like unknown actions, flagged input, and flagged output. You can override these actions by registering your own handler for them. The names of the built-in actions are available as static properties on the AI class.  @template TParameters Optional. The type of parameters that the action handler expects.\n *\n * @param name - Unique name of the action.  @callback handler\n *\n * @param handler - The code to execute when the _ is triggered.\n *\n * @param  - {TurnContext} handler.context The current turn context for the handler callback.\n *\n * @param  - {TState} handler.state The current turn state for the handler callback.\n *\n * @param  - {TParameters} handler.parameters Optional. Entities to pass to the action.\n *\n * @returns {this} The AI system instance for chaining purposes.\n */\n",
+              "docComment": "/**\n * Registers a handler for a named action.\n *\n * @remarks\n *\n * The AI systems planner returns plans that are made up of a series of commands or actions that should be performed. Registering a handler lets you provide code that should be run in response to one of the predicted actions.\n *\n * Plans support a DO command which specifies the name of an action to call and an optional set of entities that should be passed to the action. The internal plan executor will call the registered handler for the action passing in the current context, state, and entities.\n *\n * Additionally, the AI system itself uses actions to handle things like unknown actions, flagged input, and flagged output. You can override these actions by registering your own handler for them. The names of the built-in actions are available as static properties on the AI class.  @template TParameters Optional. The type of parameters that the action handler expects.\n *\n * @param name - Unique name of the action.  @callback handler\n *\n * @param handler - The code to execute when the action's name is triggered.\n *\n * @param  - {TurnContext} handler.context The current turn context for the handler callback.\n *\n * @param  - {TState} handler.state The current turn state for the handler callback.\n *\n * @param  - {TParameters} handler.parameters Optional. Entities to pass to the action.\n *\n * @returns {this} The AI system instance for chaining purposes.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -2714,7 +2714,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!AI#defaultAction:member(1)",
-              "docComment": "/**\n * Registers the default handler for a named action.\n *\n * @remarks\n *\n * Default handlers can be replaced by calling the action() method with the same name.  @template TParameters Optional. The type of parameters that the action handler expects.\n *\n * @param name - Unique name of the action.  @callback handler\n *\n * @param handler - The code to execute when the _ is triggered.\n *\n * @param  - {TurnContext} handler.context The current turn context for the handler callback.\n *\n * @param  - {TState} handler.state The current turn state for the handler callback.\n *\n * @returns {this} The AI system instance for chaining purposes.\n */\n",
+              "docComment": "/**\n * Registers the default handler for a named action.\n *\n * @remarks\n *\n * Default handlers can be replaced by calling the action() method with the same name.  @template TParameters Optional. The type of parameters that the action handler expects.\n *\n * @param name - Unique name of the action.  @callback handler\n *\n * @param handler - The code to execute when the action's name is triggered.\n *\n * @param  - {TurnContext} handler.context The current turn context for the handler callback.\n *\n * @param  - {TState} handler.state The current turn state for the handler callback.\n *\n * @returns {this} The AI system instance for chaining purposes.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -4179,6 +4179,81 @@
             },
             {
               "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!Application#error:member(1)",
+              "docComment": "/**\n * Sets the bot's error handler\n *\n * @param handler - Function to call when an error is encountered.\n *\n * @returns {this} The application instance for chaining purposes.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "error(handler: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TurnContext",
+                  "canonicalReference": "botbuilder-core!TurnContext:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", error: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Error",
+                  "canonicalReference": "!Error:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "this"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "handler",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 8
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "error"
+            },
+            {
+              "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!Application#fileConsentAccept:member(1)",
               "docComment": "/**\n * Registers a handler to process when a file consent card is accepted by the user.\n *\n * @param handler - Function to call when the route is triggered.\n *\n * @returns {this} The application instance for chaining purposes.\n */\n",
               "excerptTokens": [
@@ -4934,7 +5009,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!Application#sendProactiveActivity:member(1)",
-              "docComment": "/**\n * Sends a proactive activity to an existing conversation the bot is a member of.\n *\n * @remarks\n *\n * This method provides a simple way to send a proactive message to a conversation the bot is a member of.\n *\n * Use of the method requires you configure the Application with the `adapter` and `botAppId` options. An exception will be thrown if either is missing.\n *\n * @param context - Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.\n *\n * @param activityOrText - Activity or message to send to the conversation.\n *\n * @param speak - Optional. Text to speak for channels that support voice.\n *\n * @param inputHint - Optional. Input hint for channels that support voice.\n *\n * @returns A Resource response containing the ID of the activity that was sent.\n */\n",
+              "docComment": "/**\n * Sends a proactive activity to an existing conversation the bot is a member of.\n *\n * @remarks\n *\n * This method provides a simple way to send a proactive message to a conversation the bot is a member of.\n *\n * Use of the method requires you configure the Application with the `adapter.appId` options. An exception will be thrown if either is missing.\n *\n * @param context - Context of the conversation to proactively message. This can be derived from either a TurnContext, ConversationReference, or Activity.\n *\n * @param activityOrText - Activity or message to send to the conversation.\n *\n * @param speak - Optional. Text to speak for channels that support voice.\n *\n * @param inputHint - Optional. Input hint for channels that support voice.\n *\n * @returns A Resource response containing the ID of the activity that was sent.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -5661,7 +5736,7 @@
               "text": "> "
             }
           ],
-          "fileUrlPath": "src/Application.ts",
+          "fileUrlPath": "src/ApplicationBuilder.ts",
           "releaseTag": "Public",
           "typeParameters": [
             {
@@ -5925,8 +6000,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "BotAdapter",
-                  "canonicalReference": "botbuilder-core!BotAdapter:class"
+                  "text": "TeamsAdapter",
+                  "canonicalReference": "@microsoft/teams-ai!TeamsAdapter:class"
                 },
                 {
                   "kind": "Content",
@@ -5991,8 +6066,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "BotAdapter",
-                  "canonicalReference": "botbuilder-core!BotAdapter:class"
+                  "text": "TeamsAdapter",
+                  "canonicalReference": "@microsoft/teams-ai!TeamsAdapter:class"
                 },
                 {
                   "kind": "Content",
@@ -6234,7 +6309,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!ApplicationOptions#adapter:member",
-              "docComment": "/**\n * Optional. Bot adapter being used.\n *\n * @remarks\n *\n * If using the `longRunningMessages` option or calling the continueConversationAsync() method, this property is required.\n */\n",
+              "docComment": "/**\n * Optional. Options used to initialize your `BotAdapter`\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -6242,8 +6317,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "BotAdapter",
-                  "canonicalReference": "botbuilder-core!BotAdapter:class"
+                  "text": "TeamsAdapter",
+                  "canonicalReference": "@microsoft/teams-ai!TeamsAdapter:class"
                 },
                 {
                   "kind": "Content",
@@ -7989,6 +8064,79 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 6
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@microsoft/teams-ai!AuthenticatorResult:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface AuthenticatorResult "
+            }
+          ],
+          "fileUrlPath": "src/TeamsAttachmentDownloader.ts",
+          "releaseTag": "Public",
+          "name": "AuthenticatorResult",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@microsoft/teams-ai!AuthenticatorResult#accessToken:member",
+              "docComment": "/**\n * The value of the access token resulting from an authentication process.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "accessToken: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "accessToken",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@microsoft/teams-ai!AuthenticatorResult#expiresOn:member",
+              "docComment": "/**\n * The date and time of expiration relative to Coordinated Universal Time (UTC).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "expiresOn: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Date",
+                  "canonicalReference": "!Date:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "expiresOn",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
               }
             }
           ],
@@ -10079,7 +10227,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!ConfiguredPromptManagerOptions#max_conversation_history_tokens:member",
-              "docComment": "/**\n * Maximum number of tokens to of conversation history to include in prompts.\n */\n",
+              "docComment": "/**\n * Maximum number of tokens of conversation history to include in prompts.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10133,7 +10281,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!ConfiguredPromptManagerOptions#max_input_tokens:member",
-              "docComment": "/**\n * Maximum number of tokens user input to include in prompts.\n */\n",
+              "docComment": "/**\n * Maximum number of tokens of user input to include in prompts.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11150,7 +11298,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!DefaultAugmentation#createPlanFromResponse:member(1)",
-              "docComment": "/**\n * Creates a plan given validated response value.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - An interface for accessing state variables.\n *\n * @param response - The validated and transformed response for the prompt.\n *\n * @returns The created plan.\n */\n",
+              "docComment": "/**\n * Creates a plan given validated response value.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - An interface for accessing state variables.\n *\n * @param response - The validated and transformed response for the prompt.\n *\n * @returns {Promise<Plan>} The created plan.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11251,7 +11399,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!DefaultAugmentation#createPromptSection:member(1)",
-              "docComment": "/**\n * Creates an optional prompt section for the augmentation.\n */\n",
+              "docComment": "/**\n * @returns {PromptSection|undefined} Returns an optional prompt section for the augmentation.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11287,7 +11435,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!DefaultAugmentation#validateResponse:member(1)",
-              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns A `Validation` object.\n */\n",
+              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns {Validation} A `Validation` object.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11739,7 +11887,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!DefaultResponseValidator#validateResponse:member(1)",
-              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns {PromptResponseValidator<TValue>} A `Validation` object.\n */\n",
+              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns {Promise<Validation<TValue>>} A `Validation` object.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -13085,6 +13233,135 @@
         },
         {
           "kind": "Class",
+          "canonicalReference": "@microsoft/teams-ai!GPTTokenizer:class",
+          "docComment": "/**\n * Tokenizer that uses GPT's cl100k_base encoding. To use GPT-3 encoding, pass in an instance of GPT3Tokenizer.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class GPTTokenizer implements "
+            },
+            {
+              "kind": "Reference",
+              "text": "Tokenizer",
+              "canonicalReference": "@microsoft/teams-ai!Tokenizer:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/tokenizers/GPTTokenizer.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "GPTTokenizer",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!GPTTokenizer#decode:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "decode(tokens: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "tokens",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "decode"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!GPTTokenizer#encode:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "encode(text: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "text",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "encode"
+            }
+          ],
+          "implementsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 2
+            }
+          ]
+        },
+        {
+          "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!GroupSection:class",
           "docComment": "/**\n * A group of sections that will rendered as a single message.\n */\n",
           "excerptTokens": [
@@ -13990,36 +14267,6 @@
             },
             {
               "kind": "Property",
-              "canonicalReference": "@microsoft/teams-ai!JSONResponseValidator#instanceName:member",
-              "docComment": "/**\n * Optional. Substitution for the word \"instance\" to use in feedback messages.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "instanceName?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "instanceName",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false,
-              "isProtected": false,
-              "isAbstract": false
-            },
-            {
-              "kind": "Property",
               "canonicalReference": "@microsoft/teams-ai!JSONResponseValidator#missingJsonFeedback:member",
               "docComment": "/**\n * Feedback given when no JSON is returned.\n */\n",
               "excerptTokens": [
@@ -14736,7 +14983,7 @@
         {
           "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!LLMClient:class",
-          "docComment": "/**\n * LLMClient class that's used to complete prompts.\n *\n * @remarks\n *\n * Each wave, at a minimum needs to be configured with a `client`, `prompt`, and `prompt_options`.\n *\n * Configuring the wave to use a `validator` is optional but recommended. The primary benefit to using LLMClient is it's response validation and automatic response repair features. The validator acts as guard and guarantees that you never get an malformed response back from the model. At least not without it being flagged as an `invalid_response`.\n *\n * Using the `JSONResponseValidator`, for example, guarantees that you only ever get a valid object back from `completePrompt()`. In fact, you'll get back a fully parsed object and any additional response text from the model will be dropped. If you give the `JSONResponseValidator` a JSON Schema, you will get back a strongly typed and validated instance of an object in the returned `response.message.content`.\n *\n * When a validator detects a bad response from the model, it gives the model \"feedback\" as to the problem it detected with its response and more importantly an instruction that tells the model how it should repair the problem. This puts the wave into a special repair mode where it first forks the memory for the conversation and then has a side conversation with the model in an effort to get it to repair its response. By forking the conversation, this isolates the bad response and prevents it from contaminating the main conversation history. If the response can be repaired, the wave will un-fork the memory and use the repaired response in place of the original bad response. To the model it's as if it never made a mistake which is important for future turns with the model. If the response can't be repaired, a response status of `invalid_response` will be returned.\n *\n * When using a well designed validator, like the `JSONResponseValidator`, the wave can typically repair a bad response in a single additional model call. Sometimes it takes a couple of calls to effect a repair and occasionally it won't be able to repair it at all. If your prompt is well designed and you only occasionally see failed repair attempts, I'd recommend just calling the wave a second time. Given the stochastic nature of these models, there's a decent chance it won't make the same mistake on the second call. A well designed prompt coupled with a well designed validator should get the reliability of calling these models somewhere close to 99% reliable.\n *\n * This \"feedback\" technique works with all the GPT-3 generation of models and I've tested it with `text-davinci-003`, `gpt-3.5-turbo`, and `gpt-4`. There's a good chance it will work with other open source models like `LLaMA` and Googles `Bard` but I have yet to test it with those models.\n *\n * LLMClient supports OpenAI's functions feature and can validate the models response against the schema for the supported functions. When an LLMClient is configured with both a `OpenAIModel` and a `FunctionResponseValidator`, the model will be cloned and configured to send the validators configured list of functions with the request. There's no need to separately configure the models `functions` list, but if you do, the models functions list will be sent instead.  @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.\n */\n",
+          "docComment": "/**\n * Represents an LLM (Language Learning Model) client. This class provides methods for configuring and interacting with the LLM model.  @template TContent The type of message content returned for a 'success' response.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -14891,7 +15138,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!LLMClient#completePrompt:member(1)",
-              "docComment": "/**\n * Completes a prompt.\n *\n * @remarks\n *\n * The `input` parameter is optional but if passed in, will be assigned to memory using the configured `input_variable`. If it's not passed in an attempt will be made to read it from memory so passing it in or assigning to memory works. In either case, the `input` variable is only used when constructing a user message that, will be added to the conversation history and formatted like `{ role: 'user', content: input }`.\n *\n * It's important to note that if you want the users input sent to the model as part of the prompt, you will need to add a `UserMessage` section to your prompt. The wave does not do anything to modify your prompt, except when performing repairs and those changes are temporary.\n *\n * When the model successfully returns a valid (or repaired) response, a 'user' message (if input was detected) and 'assistant' message will be automatically added to the conversation history. You can disable that behavior by setting `max_history_messages` to `0`.\n *\n * The response returned by `completePrompt()` will be strongly typed by the validator you're using. The `DefaultResponseValidator` returns a `string` and the `JSONResponseValidator` will return either an `object` or if a JSON Schema is provided, an instance of `TContent`. When using a custom validator, the validator is return any type of content it likes.\n *\n * A successful response is indicated by `response.status == 'success'` and the content can be accessed via `response.message.content`. If a response is invalid it will have a `response.status == 'invalid_response'` and the `response.message` will be a string containing the validator feedback message. There are other status codes for various errors and in all cases except `success` the `response.message` will be of type `string`.  @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.\n *\n * @param context - Current turn context.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param functions - Functions to use when rendering the prompt.\n *\n * @returns A `PromptResponse` with the status and message.\n */\n",
+              "docComment": "/**\n * Completes a prompt.\n *\n * @remarks\n *\n * The `input` parameter is optional but if passed in, will be assigned to memory using the configured `input_variable`. If it's not passed in an attempt will be made to read it from memory so passing it in or assigning to memory works. In either case, the `input` variable is only used when constructing a user message that, will be added to the conversation history and formatted like `{ role: 'user', content: input }`.\n *\n * It's important to note that if you want the users input sent to the model as part of the prompt, you will need to add a `UserMessage` section to your prompt. The wave does not do anything to modify your prompt, except when performing repairs and those changes are temporary.\n *\n * When the model successfully returns a valid (or repaired) response, a 'user' message (if input was detected) and 'assistant' message will be automatically added to the conversation history. You can disable that behavior by setting `max_history_messages` to `0`.\n *\n * The response returned by `completePrompt()` will be strongly typed by the validator you're using. The `DefaultResponseValidator` returns a `string` and the `JSONResponseValidator` will return either an `object` or if a JSON Schema is provided, an instance of `TContent`. When using a custom validator, the validator is return any type of content it likes.\n *\n * A successful response is indicated by `response.status == 'success'` and the content can be accessed via `response.message.content`. If a response is invalid it will have a `response.status == 'invalid_response'` and the `response.message` will be a string containing the validator feedback message. There are other status codes for various errors and in all cases except `success` the `response.message` will be of type `string`.  @template TContent Optional. Type of message content returned for a 'success' response. The `response.message.content` field will be of type TContent. Defaults to `any`.\n *\n * @param context - Current turn context.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param functions - Functions to use when rendering the prompt.\n *\n * @returns {Promise<PromptResponse<TContent>>} A `PromptResponse` with the status and message.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -15253,7 +15500,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!LLMClientOptions#tokenizer:member",
-              "docComment": "/**\n * Optional. Tokenizer to use when rendering the prompt or counting tokens.\n *\n * @remarks\n *\n * If not specified a new instance of `GPT3Tokenizer` will be created.\n */\n",
+              "docComment": "/**\n * Optional. Tokenizer to use when rendering the prompt or counting tokens.\n *\n * @remarks\n *\n * If not specified, a new instance of `GPTTokenizer` will be created. GPT3Tokenizer can be passed in for gpt-3 models.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -15376,7 +15623,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "@microsoft/teams-ai!Memory#getValue:member(1)",
-              "docComment": "/**\n * Retrieves a value from the memory.\n *\n * @param path - Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.\n *\n * @returns The value or undefined if not found.\n */\n",
+              "docComment": "/**\n * Retrieves a value from the memory.  @template TValue Type of the value to retrieve.\n *\n * @param path - Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.\n *\n * @returns The value or undefined if not found.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -15657,7 +15904,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!MemoryFork#getValue:member(1)",
-              "docComment": "/**\n * Retrieves a value from the memory.\n *\n * @remarks\n *\n * The forked memory is checked first, then the original memory.\n *\n * @param path - Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.\n *\n * @returns {unknown | undefined} The value or undefined if not found.\n */\n",
+              "docComment": "/**\n * Retrieves a value from the memory.  @template TValue Type of the value to retrieve.\n *\n * @remarks\n *\n * The forked memory is checked first, then the original memory.\n *\n * @param path - Path to the value to retrieve in the form of `[scope].property`. If scope is omitted, the value is retrieved from the temporary scope.\n *\n * @returns {TValue | undefined} The value or undefined if not found.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18066,7 +18313,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!MonologueAugmentation#createPlanFromResponse:member(1)",
-              "docComment": "/**\n * Creates a plan given validated response value.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - An interface for accessing state variables.\n *\n * @param response - The validated and transformed response for the prompt.\n *\n * @returns The created plan.\n */\n",
+              "docComment": "/**\n * Creates a plan given validated response value.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - An interface for accessing state variables.\n *\n * @param response - The validated and transformed response for the prompt.\n *\n * @returns {Plan} The created plan.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18176,7 +18423,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!MonologueAugmentation#createPromptSection:member(1)",
-              "docComment": "/**\n * Creates an optional prompt section for the augmentation.\n */\n",
+              "docComment": "/**\n * @returns {PromptSection|undefined} Returns an optional prompt section for the augmentation.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18212,7 +18459,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!MonologueAugmentation#validateResponse:member(1)",
-              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns A `Validation` object.\n */\n",
+              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns {Validation} A `Validation` object.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18376,7 +18623,7 @@
             },
             {
               "kind": "Content",
-              "text": " & {\n    tokenExchangeUri?: string;\n}"
+              "text": " & {\n    tokenExchangeUri?: string;\n    enableSso?: boolean;\n}"
             },
             {
               "kind": "Content",
@@ -18973,7 +19220,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!OpenAIModel#completePrompt:member(1)",
-              "docComment": "/**\n * Completes a prompt using OpenAI or Azure OpenAI.\n *\n * @param context - Current turn context.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param functions - Functions to use when rendering the prompt.\n *\n * @param tokenizer - Tokenizer to use when rendering the prompt.\n *\n * @param template - Prompt template to complete.\n *\n * @returns A `PromptResponse` with the status and message.\n */\n",
+              "docComment": "/**\n * Completes a prompt using OpenAI or Azure OpenAI.\n *\n * @param context - Current turn context.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param functions - Functions to use when rendering the prompt.\n *\n * @param tokenizer - Tokenizer to use when rendering the prompt.\n *\n * @param template - Prompt template to complete.\n *\n * @returns {Promise<PromptResponse<string>>} A `PromptResponse` with the status and message.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -19104,7 +19351,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!OpenAIModel#copyOptionsToRequest:member(1)",
-              "docComment": "/**\n * @param target - \n *\n * @param src - \n *\n * @param fields -  @private\n */\n",
+              "docComment": "/**\n * @private  @template TRequest\n *\n * @param target - The target TRequest.\n *\n * @param src - The source object.\n *\n * @param fields - List of fields to copy.\n *\n * @returns {TRequest} The TRequest\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -19202,7 +19449,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!OpenAIModel#createChatCompletion:member(1)",
-              "docComment": "/**\n * @param request - \n *\n * @param model -  @private\n */\n",
+              "docComment": "/**\n * @private\n *\n * @param request - The request for Chat Completion\n *\n * @param model - The string name of the model.\n *\n * @returns {Promise<AxiosResponse<CreateChatCompletionResponse>>} A Promise containing the CreateChatCompletionResponse response.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -19330,7 +19577,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!OpenAIModel#post:member(1)",
-              "docComment": "/**\n * @param url - \n *\n * @param body - \n *\n * @param retryCount -  @private\n */\n",
+              "docComment": "/**\n * @private  @template TData\n *\n * @param url - Url to post to.\n *\n * @param body - POST body.\n *\n * @param retryCount - Number of allowed retries.\n *\n * @returns {Promise<AxiosResponse<TData>>} Promise containing the POST response.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -20995,7 +21242,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#beginTask:member(1)",
-                  "docComment": "/**\n * Starts a new task.\n *\n * @remarks\n *\n * This method is called when the AI system is ready to start a new task. The planner should generate a plan that the AI system will execute. Returning an empty plan signals that there is no work to be performed.\n *\n * The planner should take the users input from `state.temp.input`.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param ai - The AI system that is generating the plan.\n *\n * @returns The plan that was generated.\n */\n",
+                  "docComment": "/**\n * Starts a new task.\n *\n * @remarks\n *\n * This method is called when the AI system is ready to start a new task. The planner should generate a plan that the AI system will execute. Returning an empty plan signals that there is no work to be performed.\n *\n * The planner should take the users input from `state.temp.input`.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param ai - The AI system that is generating the plan.\n *\n * @returns {Promise<Plan>} The plan that was generated.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21095,7 +21342,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#continueTask:member(1)",
-                  "docComment": "/**\n * Continues the current task.\n *\n * @remarks\n *\n * This method is called when the AI system has finished executing the previous plan and is ready to continue the current task. The planner should generate a plan that the AI system will execute. Returning an empty plan signals that the task is completed and there is no work to be performed.\n *\n * The output from the last plan step that was executed is passed to the planner via `state.temp.input`.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param ai - The AI system that is generating the plan.\n *\n * @returns The plan that was generated.\n */\n",
+                  "docComment": "/**\n * Continues the current task.\n *\n * @remarks\n *\n * This method is called when the AI system has finished executing the previous plan and is ready to continue the current task. The planner should generate a plan that the AI system will execute. Returning an empty plan signals that the task is completed and there is no work to be performed.\n *\n * The output from the last plan step that was executed is passed to the planner via `state.temp.input`.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @param ai - The AI system that is generating the plan.\n *\n * @returns {Promise<Plan>} The plan that was generated.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21195,7 +21442,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner.createAssistant:member(1)",
-                  "docComment": "/**\n * Static helper method for programmatically creating an assistant.\n *\n * @param apiKey - OpenAI API key.\n *\n * @param request - Definition of the assistant to create.\n *\n * @returns The created assistant.\n */\n",
+                  "docComment": "/**\n * Static helper method for programmatically creating an assistant.\n *\n * @param apiKey - OpenAI API key.\n *\n * @param request - Definition of the assistant to create.\n *\n * @returns {Promise<OpenAI.Beta.Assistants.Assistant>} The created assistant.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21274,7 +21521,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#createMessage:member(1)",
-                  "docComment": "/**\n * @param thread_id - \n *\n * @param body -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param thread_id - The thread id\n *\n * @param body - Message body.\n *\n * @returns {Promise<OpenAI.Beta.Threads.Messages.ThreadMessage>} The thread message.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21353,7 +21600,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#createRun:member(1)",
-                  "docComment": "/**\n * @param thread_id -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param thread_id - The thread id to create Run.\n *\n * @returns {Promise<OpenAI.Beta.Threads.Runs.Run>} The created run.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21415,7 +21662,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#createThread:member(1)",
-                  "docComment": "/**\n * @param request -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param request - The Threads request.\n *\n * @returns {Promise<OpenAI.Beta.Threads.Thread>} The Thread.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21478,7 +21725,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#listMessages:member(1)",
-                  "docComment": "/**\n * @param thread_id -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param thread_id - The current thread id\n *\n * @returns {Promise<OpenAI.Beta.Threads.Messages.ThreadMessagesPage>} The list of messages.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21540,7 +21787,7 @@
                 {
                   "kind": "Property",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#openai:member",
-                  "docComment": "/**\n * Gets the OpenAI SDK instance being used.\n */\n",
+                  "docComment": "/**\n * Gets the OpenAI SDK instance being used.\n *\n * @returns {OpenAI} The OpenAI instance\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21571,7 +21818,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#retrieveAssistant:member(1)",
-                  "docComment": "/**\n * @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @returns {Promise<OpenAI.Beta.Assistants.Assistant>} - The assistant.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21616,7 +21863,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#retrieveLastRun:member(1)",
-                  "docComment": "/**\n * @param thread_id -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param thread_id - The thread id to retrieve the run.\n *\n * @returns {Promise<OpenAI.Beta.Threads.Runs.Run>} The retrieved run.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21678,7 +21925,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#retrieveRun:member(1)",
-                  "docComment": "/**\n * @param thread_id - \n *\n * @param run_id -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param thread_id - The thread id to retrieve the run.\n *\n * @param run_id - The run id to retrieve.\n *\n * @returns {OpenAI.Beta.Threads.Runs.Run} The retrieved run.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -21756,7 +22003,7 @@
                 {
                   "kind": "Method",
                   "canonicalReference": "@microsoft/teams-ai!preview.AssistantsPlanner#submitToolOutputs:member(1)",
-                  "docComment": "/**\n * @param thread_id - \n *\n * @param run_id - \n *\n * @param tool_outputs -  @private Exposed for unit testing.\n */\n",
+                  "docComment": "/**\n * @private Exposed for unit testing.\n *\n * @param thread_id - The current thread id.\n *\n * @param run_id - The current run id.\n *\n * @param tool_outputs - The run's tool output parameters.\n *\n * @returns {Promise<OpenAI.Beta.Threads.Run.Run>} The tool outputs.\n */\n",
                   "excerptTokens": [
                     {
                       "kind": "Content",
@@ -22012,7 +22259,7 @@
             {
               "kind": "Constructor",
               "canonicalReference": "@microsoft/teams-ai!Prompt:constructor(1)",
-              "docComment": "/**\n * Creates a new 'Prompt' instance.\n *\n * @param sections - Sections to render.\n *\n * @param tokens - Optional. Sizing strategy for this section. Defaults to `auto`.\n *\n * @param required - Optional. Indicates if this section is required. Defaults to `true`.\n *\n * @param separator - Optional. Separator to use between sections when rendering as text. Defaults to `\\n\\n`.\n */\n",
+              "docComment": "/**\n * Creates a new 'Prompt' instance.\n *\n * @param sections - Sections to render.\n *\n * @param tokens - Optional. Sizing strategy for this section. Defaults to -1, 'auto'.\n *\n * @param required - Optional. Indicates if this section is required. Defaults to `true`.\n *\n * @param separator - Optional. Separator to use between sections when rendering as text. Defaults to `\\n\\n`.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22572,7 +22819,7 @@
             {
               "kind": "Constructor",
               "canonicalReference": "@microsoft/teams-ai!PromptManager:constructor(1)",
-              "docComment": "/**\n * Creates a new 'PromptManager' instance.\n *\n * @param options - Options used to configure the prompt manager.\n */\n",
+              "docComment": "/**\n * Creates a new 'PromptManager' instance.\n *\n * @param options - Options used to configure the prompt manager.\n *\n * @returns {PromptManager} A new prompt manager instance.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22605,7 +22852,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#addDataSource:member(1)",
-              "docComment": "/**\n * Registers a new data source with the prompt manager.\n *\n * @param dataSource - Data source to add.\n *\n * @returns The prompt manager for chaining.\n */\n",
+              "docComment": "/**\n * Registers a new data source with the prompt manager.\n *\n * @param dataSource - Data source to add.\n *\n * @returns {this} The prompt manager for chaining.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22654,7 +22901,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#addFunction:member(1)",
-              "docComment": "/**\n * Registers a new prompt template function with the prompt manager.\n *\n * @param name - Name of the function to add.\n *\n * @param fn - Function to add.\n *\n * @returns The prompt manager for chaining.\n */\n",
+              "docComment": "/**\n * Registers a new prompt template function with the prompt manager.\n *\n * @param name - Name of the function to add.\n *\n * @param fn - Function to add.\n *\n * @returns {this} - The prompt manager for chaining.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22719,7 +22966,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#addPrompt:member(1)",
-              "docComment": "/**\n * Registers a new prompt template with the prompt manager.\n *\n * @param prompt - Prompt template to add.\n *\n * @returns The prompt manager for chaining.\n */\n",
+              "docComment": "/**\n * Registers a new prompt template with the prompt manager.\n *\n * @param prompt - Prompt template to add.\n *\n * @returns {this} The prompt manager for chaining.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22768,7 +23015,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#getDataSource:member(1)",
-              "docComment": "/**\n * Looks up a data source by name.\n *\n * @param name - Name of the data source to lookup.\n *\n * @returns The data source.\n */\n",
+              "docComment": "/**\n * Looks up a data source by name.\n *\n * @param name - Name of the data source to lookup.\n *\n * @returns {DataSource} The data source.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22817,7 +23064,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#getFunction:member(1)",
-              "docComment": "/**\n * Looks up a prompt template function by name.\n *\n * @param name - Name of the function to lookup.\n *\n * @returns The function.\n */\n",
+              "docComment": "/**\n * Looks up a prompt template function by name.\n *\n * @param name - Name of the function to lookup.\n *\n * @returns {PromptFunction} The function.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22866,7 +23113,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#getPrompt:member(1)",
-              "docComment": "/**\n * Loads a named prompt template from the filesystem.\n *\n * @remarks\n *\n * The template will be pre-parsed and cached for use when the template is rendered by name.\n *\n * Any augmentations will also be added to the template.\n *\n * @param name - Name of the prompt to load.\n *\n * @returns The loaded and parsed prompt template.\n */\n",
+              "docComment": "/**\n * Loads a named prompt template from the filesystem.\n *\n * @remarks\n *\n * The template will be pre-parsed and cached for use when the template is rendered by name.\n *\n * Any augmentations will also be added to the template.\n *\n * @param name - Name of the prompt to load.\n *\n * @returns {Promise<PromptTemplate>} The loaded and parsed prompt template.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22928,7 +23175,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#hasDataSource:member(1)",
-              "docComment": "/**\n * Checks for the existence of a named data source.\n *\n * @param name - Name of the data source to lookup.\n *\n * @returns True if the data source exists.\n */\n",
+              "docComment": "/**\n * Checks for the existence of a named data source.\n *\n * @param name - Name of the data source to lookup.\n *\n * @returns {boolean} True if the data source exists.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -22976,7 +23223,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#hasFunction:member(1)",
-              "docComment": "/**\n * Checks for the existence of a named prompt template function.\n *\n * @param name - Name of the function to lookup.\n *\n * @returns True if the function exists.\n */\n",
+              "docComment": "/**\n * Checks for the existence of a named prompt template function.\n *\n * @param name - Name of the function to lookup.\n *\n * @returns {boolean} True if the function exists.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -23024,7 +23271,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#hasPrompt:member(1)",
-              "docComment": "/**\n * Checks for the existence of a named prompt.\n *\n * @param name - Name of the prompt to load.\n *\n * @returns True if the prompt exists.\n */\n",
+              "docComment": "/**\n * Checks for the existence of a named prompt.\n *\n * @param name - Name of the prompt to load.\n *\n * @returns {boolean} True if the prompt exists.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -23077,7 +23324,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#invokeFunction:member(1)",
-              "docComment": "/**\n * Invokes a prompt template function by name.\n *\n * @param name - Name of the function to invoke.\n *\n * @param context - Turn context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use when rendering the prompt.\n *\n * @param args - Arguments to pass to the function.\n *\n * @returns Value returned by the function.\n */\n",
+              "docComment": "/**\n * Invokes a prompt template function by name.\n *\n * @param name - Name of the function to invoke.\n *\n * @param context - Turn context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use when rendering the prompt.\n *\n * @param args - Arguments to pass to the function.\n *\n * @returns {Promise<any>} Value returned by the function.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -23197,7 +23444,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@microsoft/teams-ai!PromptManager#options:member",
-              "docComment": "/**\n * Gets the configured prompt manager options.\n */\n",
+              "docComment": "/**\n * Gets the configured prompt manager options.\n *\n * @returns {ConfiguredPromptManagerOptions} The configured prompt manager options.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -23251,7 +23498,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!PromptManagerOptions#max_conversation_history_tokens:member",
-              "docComment": "/**\n * Optional. Maximum number of tokens to of conversation history to include in prompts.\n *\n * @remarks\n *\n * The default is to let conversation history consume the remainder of the prompts `max_input_tokens` budget. Setting this a value greater then 1 will override that and all prompts will use a fixed token budget.\n */\n",
+              "docComment": "/**\n * Optional. Maximum number of tokens of conversation history to include in prompts.\n *\n * @remarks\n *\n * The default is to let conversation history consume the remainder of the prompts `max_input_tokens` budget. Setting this to a value greater than 1 will override that and all prompts will use a fixed token budget.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -23305,7 +23552,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!PromptManagerOptions#max_input_tokens:member",
-              "docComment": "/**\n * Optional. Maximum number of tokens user input to include in prompts.\n *\n * @remarks\n *\n * This defaults to unlimited but can set to a value greater then `1` to limit the length of user input included in prompts. For example, if set to `100` then the any user input over 100 tokens in length will be truncated.\n */\n",
+              "docComment": "/**\n * Optional. Maximum number of tokens user input to include in prompts.\n *\n * @remarks\n *\n * This defaults to unlimited but can be set to a value greater than `1` to limit the length of user input included in prompts. For example, if set to `100` then the any user input over 100 tokens in length will be truncated.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -23332,7 +23579,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!PromptManagerOptions#promptsFolder:member",
-              "docComment": "/**\n * Path to the filesystem folder containing all the applications prompts.\n */\n",
+              "docComment": "/**\n * Path to the filesystem folder containing all the application's prompts.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24104,7 +24351,7 @@
             {
               "kind": "Constructor",
               "canonicalReference": "@microsoft/teams-ai!PromptSectionBase:constructor(1)",
-              "docComment": "/**\n * Creates a new 'PromptSectionBase' instance.\n *\n * @param tokens - Optional. Sizing strategy for this section. Defaults to `auto`.\n *\n * @param required - Optional. Indicates if this section is required. Defaults to `true`.\n *\n * @param separator - Optional. Separator to use between sections when rendering as text. Defaults to `\\n`.\n *\n * @param textPrefix - Optional. Prefix to use for text output. Defaults to `undefined`.\n */\n",
+              "docComment": "/**\n * Creates a new 'PromptSectionBase' instance.\n *\n * @param tokens - Optional. Sizing strategy for this section. Defaults to -1, 'auto'.\n *\n * @param required - Optional. Indicates if this section is required. Defaults to `true`.\n *\n * @param separator - Optional. Separator to use between sections when rendering as text. Defaults to `\\n`.\n *\n * @param textPrefix - Optional. Prefix to use for text output. Defaults to an empty string.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24184,7 +24431,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptSectionBase.getMessageText:member(1)",
-              "docComment": "/**\n * Returns the content of a message as a string.\n *\n * @param message - Message to get the text of.\n *\n * @returns The message content as a string.\n */\n",
+              "docComment": "/**\n * Returns the content of a message as a string.\n *\n * @param message - Message to get the text of.\n *\n * @returns {string} The message content as a string.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24233,7 +24480,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptSectionBase#getTokenBudget:member(1)",
-              "docComment": "/**\n * Calculates the token budget for the prompt section.\n *\n * @remarks\n *\n * If the section has a fixed length, the budget will be the minimum of the section's length and the maximum number of tokens. Otherwise, the budget will be the maximum number of tokens.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns The token budget for the prompt section.\n */\n",
+              "docComment": "/**\n * Calculates the token budget for the prompt section.\n *\n * @remarks\n *\n * If the section has a fixed length, the budget will be the minimum of the section's length and the maximum number of tokens. Otherwise, the budget will be the maximum number of tokens.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns {number} The token budget for the prompt section.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24281,7 +24528,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptSectionBase#renderAsMessages:member(1)",
-              "docComment": "/**\n * Renders the prompt section as a list of `Message` objects.\n *\n * @remarks\n *\n * MUST be implemented by derived classes.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - Interface for accessing state variables.\n *\n * @param functions - Functions for rendering prompts.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns The rendered prompt section.\n */\n",
+              "docComment": "/**\n * Renders the prompt section as a list of `Message` objects.\n *\n * @remarks\n *\n * MUST be implemented by derived classes.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - Interface for accessing state variables.\n *\n * @param functions - Functions for rendering prompts.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns {Promise<RenderedPromptSection<Message<any>[]>>} The rendered prompt section.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24420,7 +24667,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptSectionBase#renderAsText:member(1)",
-              "docComment": "/**\n * Renders the prompt section as a string of text.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - Interface for accessing state variables.\n *\n * @param functions - Functions for rendering prompts.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns The rendered prompt section.\n */\n",
+              "docComment": "/**\n * Renders the prompt section as a string of text.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - Interface for accessing state variables.\n *\n * @param functions - Functions for rendering prompts.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns {Promise<RenderedPromptSection<string>>} The rendered prompt section.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24580,7 +24827,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!PromptSectionBase#returnMessages:member(1)",
-              "docComment": "/**\n * Helper method for returning a list of messages from `renderAsMessages()`.\n *\n * @remarks\n *\n * If the section has a fixed length, the function will truncate the list of messages to fit within the token budget.\n *\n * @param output - List of messages to return.\n *\n * @param length - Total number of tokens consumed by the list of messages.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns The rendered prompt section.\n */\n",
+              "docComment": "/**\n * Helper method for returning a list of messages from `renderAsMessages()`.\n *\n * @remarks\n *\n * If the section has a fixed length, the function will truncate the list of messages to fit within the token budget.\n *\n * @param output - List of messages to return.\n *\n * @param length - Total number of tokens consumed by the list of messages.\n *\n * @param tokenizer - Tokenizer to use for encoding/decoding text.\n *\n * @param maxTokens - Maximum number of tokens allowed for the rendered prompt.\n *\n * @returns {RenderedPromptSection<Message[]>} The rendered prompt section.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25586,7 +25833,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!SequenceAugmentation#createPlanFromResponse:member(1)",
-              "docComment": "/**\n * Creates a plan given validated response value.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - An interface for accessing state variables.\n *\n * @param response - The validated and transformed response for the prompt.\n *\n * @returns The created plan.\n */\n",
+              "docComment": "/**\n * Creates a plan given validated response value.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param memory - An interface for accessing state variables.\n *\n * @param response - The validated and transformed response for the prompt.\n *\n * @returns {Promise<Plan>} The created plan.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25696,7 +25943,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!SequenceAugmentation#createPromptSection:member(1)",
-              "docComment": "/**\n * Creates an optional prompt section for the augmentation.\n */\n",
+              "docComment": "/**\n * Creates an optional prompt section for the augmentation.\n *\n * @returns {PromptSection | undefined} The new PromptSection or undefined.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25732,7 +25979,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!SequenceAugmentation#validateResponse:member(1)",
-              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns A `Validation` object.\n */\n",
+              "docComment": "/**\n * Validates a response to a prompt.\n *\n * @param context - Context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use for encoding and decoding text.\n *\n * @param response - Response to validate.\n *\n * @param remaining_attempts - Number of remaining attempts to validate the response.\n *\n * @returns {Validation} A `Validation` object.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26849,6 +27096,439 @@
         },
         {
           "kind": "Class",
+          "canonicalReference": "@microsoft/teams-ai!TeamsAdapter:class",
+          "docComment": "/**\n * An adapter that implements the Bot Framework Protocol and can be hosted in different cloud environments both public and private.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class TeamsAdapter extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "CloudAdapter",
+              "canonicalReference": "botbuilder!CloudAdapter:class"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/TeamsAdapter.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "TeamsAdapter",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAdapter:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `TeamsAdapter` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(botFrameworkAuthConfig?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        MicrosoftAppId?: string | undefined;\n        MicrosoftAppTenantId?: string | undefined;\n        OAuthApiEndpoint?: string | undefined;\n        BotOpenIdMetadata?: string | undefined;\n        ChannelService?: string | undefined;\n        ValidateAuthority?: string | boolean | undefined;\n        ToChannelFromBotLoginUrl?: string | undefined;\n        ToChannelFromBotOAuthScope?: string | undefined;\n        ToBotFromChannelTokenIssuer?: string | undefined;\n        OAuthUrl?: string | undefined;\n        ToBotFromChannelOpenIdMetadataUrl?: string | undefined;\n        ToBotFromEmulatorOpenIdMetadataUrl?: string | undefined;\n        CallerId?: string | undefined;\n        CertificateThumbprint?: string | undefined;\n        CertificatePrivateKey?: string | undefined;\n    } | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", credentialsFactory?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ServiceClientCredentialsFactory",
+                  "canonicalReference": "botframework-connector!ServiceClientCredentialsFactory:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", authConfiguration?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AuthenticationConfiguration",
+                  "canonicalReference": "botframework-connector!AuthenticationConfiguration:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", connectorClientOptions?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConnectorClientOptions",
+                  "canonicalReference": "botframework-connector!ConnectorClientOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "botFrameworkAuthConfig",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "credentialsFactory",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "authConfiguration",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": true
+                },
+                {
+                  "parameterName": "connectorClientOptions",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 8
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAdapter#botFrameworkAuthConfig:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly botFrameworkAuthConfig?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        MicrosoftAppId?: string | undefined;\n        MicrosoftAppTenantId?: string | undefined;\n        OAuthApiEndpoint?: string | undefined;\n        BotOpenIdMetadata?: string | undefined;\n        ChannelService?: string | undefined;\n        ValidateAuthority?: string | boolean | undefined;\n        ToChannelFromBotLoginUrl?: string | undefined;\n        ToChannelFromBotOAuthScope?: string | undefined;\n        ToBotFromChannelTokenIssuer?: string | undefined;\n        OAuthUrl?: string | undefined;\n        ToBotFromChannelOpenIdMetadataUrl?: string | undefined;\n        ToBotFromEmulatorOpenIdMetadataUrl?: string | undefined;\n        CallerId?: string | undefined;\n        CertificateThumbprint?: string | undefined;\n        CertificatePrivateKey?: string | undefined;\n    } | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "botFrameworkAuthConfig",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAdapter#credentialsFactory:member",
+              "docComment": "/**\n * The credentials factory used by the bot adapter to create a [ServiceClientCredentials](xref:botframework-connector.ServiceClientCredentials) object.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly credentialsFactory: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ServiceClientCredentialsFactory",
+                  "canonicalReference": "botframework-connector!ServiceClientCredentialsFactory:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "credentialsFactory",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAdapter#process:member(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "process(req: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Request",
+                  "canonicalReference": "botbuilder!Request:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", res: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Response",
+                  "canonicalReference": "botbuilder!Response:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", logic: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TurnContext",
+                  "canonicalReference": "botbuilder-core!TurnContext:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 11,
+                "endIndex": 13
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "req",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "res",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "logic",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 10
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "process"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAdapter#process:member(2)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "process(req: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Request",
+                  "canonicalReference": "botbuilder!Request:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", socket: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "INodeSocket",
+                  "canonicalReference": "botframework-streaming!INodeSocket:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", head: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "INodeBuffer",
+                  "canonicalReference": "botframework-streaming!INodeBuffer:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", logic: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TurnContext",
+                  "canonicalReference": "botbuilder-core!TurnContext:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 13,
+                "endIndex": 15
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 2,
+              "parameters": [
+                {
+                  "parameterName": "req",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "socket",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "head",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "logic",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 12
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "process"
+            },
+            {
+              "kind": "Property",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAdapter#userAgent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "get userAgent(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "userAgent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isStatic": false,
+              "isProtected": false,
+              "isAbstract": false
+            }
+          ],
+          "extendsTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "implementsTokenRanges": []
+        },
+        {
+          "kind": "Class",
           "canonicalReference": "@microsoft/teams-ai!TeamsAttachmentDownloader:class",
           "docComment": "/**\n * Downloads attachments from Teams using the bots access token.\n */\n",
           "excerptTokens": [
@@ -26943,7 +27623,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!TeamsAttachmentDownloader#downloadFiles:member(1)",
-              "docComment": "/**\n * Download any files relative to the current user's input.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n */\n",
+              "docComment": "/**\n * Download any files relative to the current user's input.  @template TState - Type of the state object passed to the `TurnContext.turnState` method.\n *\n * @param context - Context for the current turn of conversation.\n *\n * @param state - Application state for the current turn of conversation.\n *\n * @returns {Promise<InputFile[]>} Promise that resolves to an array of downloaded input files.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -27044,6 +27724,34 @@
           "members": [
             {
               "kind": "PropertySignature",
+              "canonicalReference": "@microsoft/teams-ai!TeamsAttachmentDownloaderOptions#adapter:member",
+              "docComment": "/**\n * ServiceClientCredentialsFactory\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "adapter: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TeamsAdapter",
+                  "canonicalReference": "@microsoft/teams-ai!TeamsAdapter:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "adapter",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
               "canonicalReference": "@microsoft/teams-ai!TeamsAttachmentDownloaderOptions#botAppId:member",
               "docComment": "/**\n * The Microsoft App ID of the bot.\n */\n",
               "excerptTokens": [
@@ -27064,33 +27772,6 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "botAppId",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@microsoft/teams-ai!TeamsAttachmentDownloaderOptions#botAppPassword:member",
-              "docComment": "/**\n * The Microsoft App Password of the bot.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "botAppPassword: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "botAppPassword",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -27616,7 +28297,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@microsoft/teams-ai!TextDataSource#name:member",
-              "docComment": "/**\n * Name of the data source.\n */\n",
+              "docComment": "/**\n * @returns {string} Name of the data source.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -27646,7 +28327,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!TextDataSource#renderData:member(1)",
-              "docComment": "/**\n * Renders the data source as a string of text.\n *\n * @param context - Turn context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use when rendering the data source.\n *\n * @param maxTokens - Maximum number of tokens allowed to be rendered.\n *\n * @returns The text to inject into the prompt as a `RenderedPromptSection` object.\n */\n",
+              "docComment": "/**\n * Renders the data source as a string of text.\n *\n * @param context - Turn context for the current turn of conversation with the user.\n *\n * @param memory - An interface for accessing state values.\n *\n * @param tokenizer - Tokenizer to use when rendering the data source.\n *\n * @param maxTokens - Maximum number of tokens allowed to be rendered.\n *\n * @returns {Promise<RenderedPromptSection<string>>} The text to inject into the prompt as a `RenderedPromptSection` object.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -28457,7 +29138,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@microsoft/teams-ai!TurnState#conversation:member",
-              "docComment": "/**\n * Gets the conversation state from the turn state.  @template TConversationState\n *\n * @returns {TConversationState} The conversation state.\n *\n * @throws\n *\n * Error if TurnState hasn't been loaded. Call loadState() first.\n */\n",
+              "docComment": "/**\n * Gets the conversation state from the turn state.  @template TConversationState\n *\n * @returns {TConversationState} The conversation state.\n *\n * @throws\n *\n * Error if TurnState hasn't been loaded. Call load() first.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -29097,7 +29778,7 @@
             {
               "kind": "Property",
               "canonicalReference": "@microsoft/teams-ai!TurnState#temp:member",
-              "docComment": "/**\n * Accessor for the temp state.\n *\n * @returns {TTempState} The temp TurnState.\n *\n * @throws\n *\n * Error if TurnState hasn't been loaded. Call loadState() first.\n */\n",
+              "docComment": "/**\n * Accessor for the temp state.\n *\n * @returns {TTempState} The temp TurnState.\n *\n * @throws\n *\n * Error if TurnState hasn't been loaded. Call load() first.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -29793,7 +30474,7 @@
             {
               "kind": "Method",
               "canonicalReference": "@microsoft/teams-ai!Utilities.toString:member(1)",
-              "docComment": "/**\n * Converts a value to a string.\n *\n * @remarks\n *\n * Dates are converted to ISO strings and Objects are converted to JSON or YAML, whichever is shorter.\n *\n * @param tokenizer - Tokenizer to use for encoding.\n *\n * @param value - Value to convert.\n *\n * @param asJSON - Optional. If true objects will always be converted to JSON instead of YAML. Defaults to false.\n *\n * @returns Converted value.\n */\n",
+              "docComment": "/**\n * Converts a value to a string.\n *\n * @remarks\n *\n * Dates are converted to ISO strings and Objects are converted to JSON or YAML, whichever is shorter.\n *\n * @param tokenizer - Tokenizer to use for encoding.\n *\n * @param value - Value to convert.\n *\n * @param asJSON - Optional. If true objects will always be converted to JSON instead of YAML. Defaults to false.\n *\n * @returns {string} Converted value.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

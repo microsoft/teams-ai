@@ -25,8 +25,8 @@ export class TextDataSource implements DataSource {
 
     /**
      * Creates a new `TextDataSource` instance.
-     * @param name Name of the data source.
-     * @param text Text to inject into the prompt.
+     * @param {string} name Name of the data source.
+     * @param {string} text Text to inject into the prompt.
      */
     public constructor(name: string, text: string) {
         this._name = name;
@@ -34,7 +34,7 @@ export class TextDataSource implements DataSource {
     }
 
     /**
-     * Name of the data source.
+     * @returns {string} Name of the data source.
      */
     public get name(): string {
         return this._name;
@@ -42,11 +42,11 @@ export class TextDataSource implements DataSource {
 
     /**
      * Renders the data source as a string of text.
-     * @param context Turn context for the current turn of conversation with the user.
-     * @param memory An interface for accessing state values.
-     * @param tokenizer Tokenizer to use when rendering the data source.
-     * @param maxTokens Maximum number of tokens allowed to be rendered.
-     * @returns The text to inject into the prompt as a `RenderedPromptSection` object.
+     * @param {TurnContext} context Turn context for the current turn of conversation with the user.
+     * @param {Memory} memory An interface for accessing state values.
+     * @param {Tokenizer} tokenizer Tokenizer to use when rendering the data source.
+     * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
+     * @returns {Promise<RenderedPromptSection<string>>} The text to inject into the prompt as a `RenderedPromptSection` object.
      */
     public renderData(
         context: TurnContext,

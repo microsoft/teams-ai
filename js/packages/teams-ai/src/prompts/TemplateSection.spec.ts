@@ -3,11 +3,11 @@ import { TemplateSection } from './TemplateSection';
 import { TestAdapter } from 'botbuilder';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 
 describe('TemplateSection', () => {
     const adapter = new TestAdapter();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const functions = new TestPromptManager()
         .addFunction('test', async (context, state, functions, tokenizer, args) => 'Hello World')
         .addFunction('test2', async (context, state, functions, tokenizer, args) => args[0])

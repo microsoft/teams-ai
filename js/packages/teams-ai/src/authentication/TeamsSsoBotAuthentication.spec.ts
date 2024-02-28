@@ -234,8 +234,8 @@ describe('TeamsSsoBotAuthentication', () => {
 
             /**
              *
-             * @param msg
-             * @param expected
+             * @param {Partial<Activity>} msg - The message to check
+             * @param {string} expected - The expected message
              */
             function assertResponse(msg: Partial<Activity>, expected: string) {
                 const response = JSON.parse(msg.text!);

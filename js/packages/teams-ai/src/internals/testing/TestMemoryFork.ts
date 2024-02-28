@@ -17,7 +17,10 @@ export class TestMemoryFork implements Memory {
      */
     public deleteValue(path: string): void {
         const { scope, name } = this.getScopeAndName(path);
-        if (this._fork.hasOwnProperty(scope) && this._fork[scope].hasOwnProperty(name)) {
+        if (
+            Object.prototype.hasOwnProperty.call(this._fork, scope) &&
+            Object.prototype.hasOwnProperty.call(this._fork[scope], name)
+        ) {
             delete this._fork[scope][name];
         }
     }
@@ -29,8 +32,8 @@ export class TestMemoryFork implements Memory {
      */
     public hasValue(path: string): boolean {
         const { scope, name } = this.getScopeAndName(path);
-        if (this._fork.hasOwnProperty(scope)) {
-            return this._fork[scope].hasOwnProperty(name);
+        if (Object.prototype.hasOwnProperty.call(this._fork, scope)) {
+            return Object.prototype.hasOwnProperty.call(this._fork[scope], name);
         }
 
         return false;
@@ -44,8 +47,8 @@ export class TestMemoryFork implements Memory {
      */
     public getValue<TValue = unknown>(path: string): TValue {
         const { scope, name } = this.getScopeAndName(path);
-        if (this._fork.hasOwnProperty(scope)) {
-            if (this._fork[scope].hasOwnProperty(name)) {
+        if (Object.prototype.hasOwnProperty.call(this._fork, scope)) {
+            if (Object.prototype.hasOwnProperty.call(this._fork[scope], name)) {
                 return this._fork[scope][name] as TValue;
             }
         }
@@ -61,7 +64,7 @@ export class TestMemoryFork implements Memory {
      */
     public setValue(path: string, value: unknown): void {
         const { scope, name } = this.getScopeAndName(path);
-        if (!this._fork.hasOwnProperty(scope)) {
+        if (!Object.prototype.hasOwnProperty.call(this._fork, scope)) {
             this._fork[scope] = {};
         }
 

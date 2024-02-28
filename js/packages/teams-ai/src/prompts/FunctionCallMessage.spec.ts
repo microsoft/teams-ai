@@ -4,7 +4,7 @@ import { FunctionCallMessage } from './FunctionCallMessage';
 import { FunctionCall } from './Message';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 
 describe('FunctionCallMessage', () => {
     const functionCall: FunctionCall = {
@@ -13,7 +13,7 @@ describe('FunctionCallMessage', () => {
     };
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a FunctionCallMessage', () => {
@@ -38,7 +38,7 @@ describe('FunctionCallMessage', () => {
                 assert.deepEqual(rendered.output, [
                     { role: 'assistant', content: undefined, function_call: functionCall }
                 ]);
-                assert.equal(rendered.length, 17);
+                assert.equal(rendered.length, 14);
                 assert.equal(rendered.tooLong, false);
             });
         });
