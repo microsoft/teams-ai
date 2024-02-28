@@ -114,7 +114,7 @@ For example in the `TeamsActivityHandler`:
 
 The `Application` equivalent:
 
-There are two ways to use our activity methods- (a) decorator and (b) method.
+There are two ways to use our activity methods -- (a) decorator and (b) method.
 
 ```python
     # Use this method as a decorator
