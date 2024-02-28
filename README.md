@@ -4,7 +4,7 @@
 
 | Name          | Status                | Package |
 |---------------|-----------------------|---------|
-| Javascript    | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) | [NPM](https://pypi.org/project/teams-ai/) |
+| Javascript    | [![Javascript Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.javascript?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=5&branchName=main) | [NPM](https://www.npmjs.com/package/@microsoft/teams-ai) |
 | C#            | [![C# Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.dotnet?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=4&branchName=main) | [NuGet](https://www.nuget.org/packages/Microsoft.Teams.AI) |
 | Python        | [![Build Status](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_apis/build/status%2Fteams-ai%2Fmicrosoft.teams-ai.python?branchName=main)](https://dev.azure.com/DomoreexpGithub/Github_Pipelines/_build/latest?definitionId=10&branchName=main) | [PyPI](https://pypi.org/project/teams-ai/) |
 
