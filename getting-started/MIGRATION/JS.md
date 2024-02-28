@@ -4,6 +4,7 @@ _**Navigation**_
 - [00.OVERVIEW](./README.md)
 - [**01.JS**](./JS.md)
 - [02.DOTNET](./DOTNET.md)
+- [03.PYTHON](./PYTHON.md)
 ___
 
 If you have a bot built using the JS BotFramework SDK, the following will help you update your bot to the Teams AI library.
