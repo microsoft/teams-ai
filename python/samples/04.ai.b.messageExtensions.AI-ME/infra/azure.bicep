@@ -22,8 +22,6 @@ param location string = resourceGroup().location
 param pythonVersion string = linuxFxVersion
 
 @secure()
-param openAIKey string = ''
-@secure()
 param azureOpenAIKey string = ''
 param azureOpenAIEndpoint string = ''
 
@@ -63,10 +61,6 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
         {
           name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
-        }
-        {
-          name: 'OPENAI_KEY'
-          value: openAIKey
         }
         {
           name: 'AZURE_OPENAI_KEY'

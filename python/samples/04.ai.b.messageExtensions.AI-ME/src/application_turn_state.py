@@ -3,10 +3,10 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from teams.state import TurnState, DefaultTempState, DefaultConversationState
-from teams.state.turn_state import TEMP_SCOPE, CONVERSATION_SCOPE
 from teams import ApplicationError
-from typing import Union
+from teams.state import DefaultTempState, TurnState
+from teams.state.turn_state import TEMP_SCOPE
+
 
 class TempState(DefaultTempState):
     @property
@@ -24,6 +24,7 @@ class TempState(DefaultTempState):
     @prompt.setter
     def prompt(self, value: str) -> None:
         self._dict["prompt"] = value
+
 
 class ApplicationTurnState(TurnState):
     @property

@@ -1,5 +1,4 @@
 {
     "python.terminal.activateEnvironment": true,
     "python.terminal.activateEnvInCurrentTerminal": true,
-    "python.analysis.typeCheckingMode": "basic",
 }

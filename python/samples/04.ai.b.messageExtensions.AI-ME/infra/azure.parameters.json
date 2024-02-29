@@ -20,9 +20,6 @@
     "linuxFxVersion": {
       "value": "PYTHON|3.11"
     },
-    "openAIKey":{
-      "value": "${{OPENAI_KEY}}"
-    },
     "azureOpenAIKey":{
       "value": "${{AZURE_OPENAI_KEY}}"
     },
