@@ -10,8 +10,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-fastapi = "^0.101.0"
-uvicorn = "^0.23.2"
 teams-ai = { path = "../../packages/ai", develop = true }
 python-dotenv = "^1.0.1"
 
