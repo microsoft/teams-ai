@@ -7,4 +7,5 @@
  */
 
 export * from './GPT3Tokenizer';
+export * from './GPTTokenizer';
 export * from './Tokenizer';

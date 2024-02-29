@@ -40,6 +40,11 @@ namespace Microsoft.Teams.AI.Tests.Application.Authentication.MessageExtensions
             }
             return Task.FromResult(_tokenExchangeResponse);
         }
+
+        public override bool IsSsoSignIn(ITurnContext context)
+        {
+            return context.Activity.Name == MessageExtensionsInvokeNames.QUERY_INVOKE_NAME;
+        }
     }
 
     internal sealed class TokenExchangeRequest

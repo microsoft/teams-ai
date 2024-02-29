@@ -14,7 +14,6 @@
         "plugin:import/typescript",
         "plugin:import/recommended",
         "plugin:jsdoc/recommended",
-        "plugin:security/recommended",
         "plugin:prettier/recommended" // Recommended to be last
     ],
     "plugins": ["@typescript-eslint", "jsdoc", "mocha", "only-warn", "prettier"],
@@ -48,6 +47,7 @@
         "no-async-promise-executor": "off",
         "no-constant-condition": "off",
         "no-extra-boolean-cast": "off",
+        "no-prototype-builtins": "off",
         "no-undef": "off", // Disabled due to conflicts with @typescript/eslint
         "no-unused-vars": "off", // Disabled due to conflicts with @typescript/eslint
         "prettier/prettier": "error"

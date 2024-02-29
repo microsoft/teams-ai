@@ -337,14 +337,7 @@ function createTaskSelector(
             const isTeams = context.activity.channelId == Channels.Msteams;
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             const data = context?.activity?.value?.data;
-            if (
-                isInvoke &&
-                isTeams &&
-                typeof data == 'object' &&
-                // eslint-disable-next-line security/detect-object-injection
-                typeof data[filterField] == 'string'
-            ) {
-                // eslint-disable-next-line security/detect-object-injection
+            if (isInvoke && isTeams && typeof data == 'object' && typeof data[filterField] == 'string') {
                 return Promise.resolve(verb.test(data[filterField]));
             } else {
                 return Promise.resolve(false);
@@ -355,10 +348,7 @@ function createTaskSelector(
         return (context: TurnContext) => {
             const isInvoke = context?.activity?.type == ActivityTypes.Invoke && context?.activity?.name == invokeName;
             const data = context?.activity?.value?.data;
-            return Promise.resolve(
-                // eslint-disable-next-line security/detect-object-injection
-                isInvoke && typeof data == 'object' && data[filterField] == verb
-            );
+            return Promise.resolve(isInvoke && typeof data == 'object' && data[filterField] == verb);
         };
     }
 }

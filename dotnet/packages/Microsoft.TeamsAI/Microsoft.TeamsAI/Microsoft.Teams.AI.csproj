@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <PackageId>Microsoft.Teams.AI</PackageId>
     <Product>Microsoft Teams AI SDK</Product>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>Microsoft</Authors>
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
@@ -45,7 +45,7 @@
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.21.1" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.57.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SharpToken" Version="1.2.14" />
+    <PackageReference Include="SharpToken" Version="1.2.17" />
     <PackageReference Include="System.Text.Json" Version="7.0.4" />
   </ItemGroup>
 

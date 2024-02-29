@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { TextDataSource } from './TextDataSource';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 
 describe('TextDataSource', () => {
     it('should construct and set the name', () => {
@@ -8,7 +8,7 @@ describe('TextDataSource', () => {
         assert.strictEqual(textDataSource.name, 'testname');
     });
 
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     it('renderData should return the trimmed text', async () => {
         const textDataSource = new TextDataSource('testname', 'Hello World!');
         const section = await textDataSource.renderData({} as any, {} as any, tokenizer, 1);

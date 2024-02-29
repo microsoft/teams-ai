@@ -474,6 +474,78 @@ namespace Microsoft.Teams.AI.Tests.AITests
             Assert.Equal(planMock.Object, result);
         }
 
+        [Fact]
+        public void Test_Get_Model()
+        {
+            // Arrange
+            var modelMock = new Mock<IPromptCompletionModel>();
+            var prompts = new PromptManager();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            var options = new ActionPlannerOptions<TurnState>(
+                modelMock.Object,
+                prompts,
+                (context, state, planner) => Task.FromResult(promptTemplate)
+            );
+            var planner = new ActionPlanner<TurnState>(options, new TestLoggerFactory());
+
+            // Act
+            var result = planner.Model;
+
+            // Assert
+            Assert.Equal(options.Model, result);
+        }
+
+        [Fact]
+        public void Test_Get_Prompts()
+        {
+            // Arrange
+            var modelMock = new Mock<IPromptCompletionModel>();
+            var prompts = new PromptManager();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            var options = new ActionPlannerOptions<TurnState>(
+                modelMock.Object,
+                prompts,
+                (context, state, planner) => Task.FromResult(promptTemplate)
+            );
+            var planner = new ActionPlanner<TurnState>(options, new TestLoggerFactory());
+
+            // Act
+            var result = planner.Prompts;
+
+            // Assert
+            Assert.Equal(options.Prompts, result);
+        }
+
+        [Fact]
+        public void Test_Get_DefaultPrompt()
+        {
+            // Arrange
+            var modelMock = new Mock<IPromptCompletionModel>();
+            var prompts = new PromptManager();
+            var promptTemplate = new PromptTemplate(
+                "prompt",
+                new(new() { })
+            );
+            var options = new ActionPlannerOptions<TurnState>(
+                modelMock.Object,
+                prompts,
+                (context, state, planner) => Task.FromResult(promptTemplate)
+            );
+            var planner = new ActionPlanner<TurnState>(options, new TestLoggerFactory());
+
+            // Act
+            var result = planner.DefaultPrompt;
+
+            // Assert
+            Assert.Equal(options.DefaultPrompt, result);
+        }
+
         private sealed class TestMemory : IMemory
         {
             public Dictionary<string, object> Values { get; set; } = new Dictionary<string, object>();

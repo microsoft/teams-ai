@@ -12,9 +12,10 @@ describe('AdaptiveCards', () => {
     let selector: RouteSelector;
     let handler: any;
     let addRouteStub: sinon.SinonStub;
-    let adapter = new TestAdapter();
+    let adapter: TestAdapter;
 
     beforeEach(() => {
+        adapter = new TestAdapter();
         app = new Application();
         adaptiveCards = new AdaptiveCards(app);
         selector = null as unknown as RouteSelector;

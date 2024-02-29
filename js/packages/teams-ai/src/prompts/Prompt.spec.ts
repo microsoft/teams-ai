@@ -4,12 +4,12 @@ import { Prompt } from './Prompt';
 import { TextSection } from './TextSection';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 
 describe('Prompt', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a Prompt', () => {
@@ -113,7 +113,7 @@ describe('Prompt', () => {
                 const prompt = new Prompt([new TextSection('Hello', 'user'), new TextSection('World', 'user')]);
                 const rendered = await prompt.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'Hello\n\nWorld');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -127,7 +127,7 @@ describe('Prompt', () => {
                 ]);
                 const rendered = await prompt.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'Hello\n\nWorld');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -163,7 +163,7 @@ describe('Prompt', () => {
                 ]);
                 const rendered = await prompt.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'Hello\n\nThere Big\n\nWorld');
-                assert.equal(rendered.length, 8);
+                assert.equal(rendered.length, 6);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -195,7 +195,7 @@ describe('Prompt', () => {
                 ]);
                 const rendered = await prompt.renderAsText(context, state, functions, tokenizer, 4);
                 assert.equal(rendered.output, 'Hello\n\nWorld');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -229,7 +229,7 @@ describe('Prompt', () => {
                 ]);
                 const rendered = await prompt.renderAsText(context, state, functions, tokenizer, 2);
                 assert.equal(rendered.output, 'Hello\n\nWorld');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, true);
             });
         });
