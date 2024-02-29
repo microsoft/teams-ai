@@ -22,15 +22,16 @@ from teams.ai.actions import ActionTurnContext
 from state import AppTurnState
 from teams.state import Memory
 
-from src.config import Config
+from config import Config
 
 config = Config()
 
-if config.OPENAI_KEY == "" and config.AZURE_OPENAI_KEY == "":
+if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     raise RuntimeError("Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.")
 
 MyActionTurnContext = ActionTurnContext[Dict[str, Any]]
 
+# Create AI components
 model: OpenAIModel
 
 if config.OPENAI_KEY:
@@ -61,6 +62,7 @@ planner = ActionPlanner(
                 )
             )
 
+# Define storage and application
 storage = MemoryStorage()
 app = Application[AppTurnState](
     ApplicationOptions(
@@ -83,17 +85,11 @@ async def on_get_light_status(
         functions: PromptFunctions, 
         tokenizer: Tokenizer, 
         args: List[str] ):
-    # return "on" if state.get_value("conversation.lightsOn") else "off"
-    return "on"
+    return "on" if state.get_value("conversation.lightsOn") else "off"
 
 prompts.add_function("get_light_status", on_get_light_status)
 
-# @app.message("/history")
-# async def on_history(context: TurnContext, state: AppTurnState):
-#     if "history" in state.conversation and state.conversation.history.len() > 0:
-#         await context.send_activity(state.conversation.history.to_str(2000, "cl100k_base", "\n\n"))
-#     return True
-
+# Register action handlers
 @app.ai.action("LightsOn")
 async def on_lights_on(
     context: MyActionTurnContext,
@@ -130,7 +126,7 @@ async def on_lights_status(
     _context: MyActionTurnContext,
     state: AppTurnState,
 ):
-    return "the ligths are on" if state.conversation.lights_on else "the lights are off"
+    return "the lights are on" if state.conversation.lights_on else "the lights are off"
 
 @app.error
 async def on_error(context: TurnContext, error: Exception):
