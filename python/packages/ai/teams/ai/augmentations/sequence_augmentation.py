@@ -116,6 +116,7 @@ class SequenceAugmentation(Augmentation[Plan]):
         if validation_result.value:
             print(validation_result.value)
             plan = Plan.from_dict(validation_result.value)
+            validation_result.value = plan
             print(plan)
 
             for index, command in enumerate(plan.commands):

@@ -146,24 +146,34 @@ class OpenAIModel(PromptCompletionModel):
         messages: List[chat.ChatCompletionMessageParam] = []
 
         for msg in res.output:
-            param: chat.ChatCompletionMessageParam = chat.ChatCompletionUserMessageParam(
+            param: Union[
+                chat.ChatCompletionUserMessageParam,
+                chat.ChatCompletionAssistantMessageParam,
+                chat.ChatCompletionSystemMessageParam,
+            ] = chat.ChatCompletionUserMessageParam(
                 role="user",
-                name=msg.name if msg.name is not None else "",
                 content=msg.content if msg.content is not None else "",
             )
+
+            if msg.name:
+                param["name"] = msg.name
 
             if msg.role == "assistant":
                 param = chat.ChatCompletionAssistantMessageParam(
                     role="assistant",
-                    name=msg.name if msg.name is not None else "",
-                    content=msg.content,
+                    content=msg.content if msg.content is not None else "",
                 )
+
+                if msg.name:
+                    param["name"] = msg.name
             elif msg.role == "system":
                 param = chat.ChatCompletionSystemMessageParam(
                     role="system",
-                    name=msg.name if msg.name is not None else "",
                     content=msg.content if msg.content is not None else "",
                 )
+
+                if msg.name:
+                    param["name"] = msg.name
 
             messages.append(param)
 

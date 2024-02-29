@@ -11,6 +11,7 @@ param botAadAppClientId string
 param botAadAppClientSecret string
 
 param webAppSKU string
+param linuxFxVersion string
 
 @maxLength(42)
 param botDisplayName string
@@ -18,46 +19,43 @@ param botDisplayName string
 param serverfarmsName string = resourceBaseName
 param webAppName string = resourceBaseName
 param location string = resourceGroup().location
+param pythonVersion string = linuxFxVersion
 
 // Compute resources for your Web App
 resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
-  kind: 'app'
+  kind: 'app,linux'
   location: location
   name: serverfarmsName
   sku: {
     name: webAppSKU
   }
+  properties:{
+    reserved: true
+  }
 }
 
 // Web App that hosts your bot
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
-  kind: 'app'
+  kind: 'app,linux'
   location: location
   name: webAppName
   properties: {
     serverFarmId: serverfarm.id
-    httpsOnly: true
     siteConfig: {
       alwaysOn: true
+      appCommandLine: 'gunicorn --bind 0.0.0.0 --worker-class aiohttp.worker.GunicornWebWorker --timeout 600 api:api'
+      linuxFxVersion: pythonVersion
       appSettings: [
         {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1' // Run Azure APP Service from a package file
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'true'
         }
         {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~16' // Set NodeJS version to 16.x for your site
-        }
-        {
-          name: 'RUNNING_ON_AZURE'
-          value: '1'
-        }
-        {
-          name: 'MicrosoftAppId'
+          name: 'BOT_ID'
           value: botAadAppClientId
         }
         {
-          name: 'MicrosoftAppPassword'
+          name: 'BOT_PASSWORD'
           value: botAadAppClientSecret
         }
       ]
