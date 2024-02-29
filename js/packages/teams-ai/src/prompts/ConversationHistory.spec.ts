@@ -2,13 +2,13 @@ import { strict as assert } from 'assert';
 import { ConversationHistory } from './ConversationHistory';
 import { TestAdapter } from 'botbuilder';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 
 describe('ConversationHistory', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const conversation = {
         history: [
             { role: 'user', content: 'Hello' },
@@ -104,7 +104,7 @@ describe('ConversationHistory', () => {
                 const section = new ConversationHistory('conversation.history', 100);
                 const rendered = await section.renderAsText(context, state, functions, tokenizer, 100);
                 assert.equal(rendered.output, 'user: Hello\nassistant: Hi');
-                assert.equal(rendered.length, 8);
+                assert.equal(rendered.length, 7);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -115,7 +115,7 @@ describe('ConversationHistory', () => {
                 const section = new ConversationHistory('conversation.history', 1);
                 const rendered = await section.renderAsText(context, state, functions, tokenizer, 4);
                 assert.equal(rendered.output, 'assistant: Hi');
-                assert.equal(rendered.length, 4);
+                assert.equal(rendered.length, 3);
                 assert.equal(rendered.tooLong, false);
             });
         });
@@ -148,7 +148,7 @@ describe('ConversationHistory', () => {
                 const section = new ConversationHistory('conversation.longHistory', 100, true);
                 const rendered = await section.renderAsText(context, state, functions, tokenizer, 2);
                 assert.equal(rendered.output, 'assistant: Sure, where would you like to go?');
-                assert.equal(rendered.length, 12);
+                assert.equal(rendered.length, 11);
                 assert.equal(rendered.tooLong, true);
             });
         });

@@ -53,10 +53,10 @@ export class TeamsSsoPrompt extends Dialog {
 
     /**
      * Creates a new instance of TeamsSsoPrompt.
-     * @param dialogId The ID of the dialog.
-     * @param settingName The name of the setting.
-     * @param settings The settings for Teams SSO.
-     * @param msal The MSAL (Microsoft Authentication Library) object.
+     * @param {string} dialogId - The ID of the dialog.
+     * @param {string} settingName - The name of the setting.
+     * @param {TeamsSsoSettings} settings - The settings for Teams SSO.
+     * @param {ConfidentialClientApplication} msal - The MSAL (Microsoft Authentication Library) object.
      */
     constructor(
         dialogId: string,
@@ -76,10 +76,10 @@ export class TeamsSsoPrompt extends Dialog {
      * Called when a prompt dialog is pushed onto the dialog stack and is being activated.
      * @remarks
      * If the task is successful, the result indicates whether the prompt is still
-     * @param options
      * active after the turn has been processed by the prompt.
-     * @param dc The DialogContext for the current turn of the conversation.
-     * @returns A `Promise` representing the result of current turn.
+     * @param {any} dc - The DialogContext for the current turn of the conversation.
+     * @param {any} options - The options for the dialog
+     * @returns {Promise<any>} A `Promise` representing the result of current turn.
      */
     public async beginDialog(dc: any, options: any): Promise<any> {
         const default_timeout = 900000;
@@ -124,8 +124,8 @@ export class TeamsSsoPrompt extends Dialog {
      * @remarks
      * If the task is successful, the result indicates whether the dialog is still
      * active after the turn has been processed by the dialog.
-     * @param dc The DialogContext for the current turn of the conversation.
-     * @returns A `Promise` representing the result of the turn after the dialog has processed the activity.
+     * @param {any} dc The DialogContext for the current turn of the conversation.
+     * @returns {Promise<any>} A `Promise` representing the result of the turn after the dialog has processed the activity.
      */
     public async continueDialog(dc: any): Promise<any> {
         const state = dc.activeDialog?.state;
@@ -289,6 +289,6 @@ export class TeamsSsoPrompt extends Dialog {
     }
 
     private isTokenExchangeRequest(obj: any): obj is TokenExchangeInvokeRequest {
-        return obj.hasOwnProperty('token');
+        return Object.prototype.hasOwnProperty.call(obj, 'token');
     }
 }

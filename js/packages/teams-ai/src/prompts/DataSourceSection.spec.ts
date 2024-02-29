@@ -4,13 +4,13 @@ import { DataSourceSection } from './DataSourceSection';
 import { TextDataSource } from '../dataSources/TextDataSource';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 
 describe('DataSourceSection', () => {
     const textDataSource = new TextDataSource('testname', 'Hello World!');
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a DataSourceSection', () => {

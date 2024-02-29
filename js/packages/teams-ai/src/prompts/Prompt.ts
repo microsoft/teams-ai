@@ -17,10 +17,10 @@ import { LayoutEngine } from './LayoutEngine';
 export class Prompt extends LayoutEngine {
     /**
      * Creates a new 'Prompt' instance.
-     * @param sections Sections to render.
-     * @param tokens Optional. Sizing strategy for this section. Defaults to `auto`.
-     * @param required Optional. Indicates if this section is required. Defaults to `true`.
-     * @param separator Optional. Separator to use between sections when rendering as text. Defaults to `\n\n`.
+     * @param {PromptSection[]} sections - Sections to render.
+     * @param {number} tokens - Optional. Sizing strategy for this section. Defaults to -1, 'auto'.
+     * @param {boolean} required - Optional. Indicates if this section is required. Defaults to `true`.
+     * @param {string} separator - Optional. Separator to use between sections when rendering as text. Defaults to `\n\n`.
      */
     public constructor(
         sections: PromptSection[],

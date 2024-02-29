@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 import { ChatCompletionAction, PromptResponse } from '../models';
@@ -10,7 +10,7 @@ import { MonologueAugmentation } from './MonologueAugmentation';
 describe('MonologueAugmentation', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const actions: ChatCompletionAction[] = [
         {
             name: 'test',

@@ -4,13 +4,13 @@ import { TestAdapter } from 'botbuilder';
 import { TestPromptManager } from '../internals/testing/TestPromptManager';
 import { TestTurnState } from '../internals/testing/TestTurnState';
 import { ChatCompletionAction, PromptResponse } from '../models';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { SequenceAugmentation } from './SequenceAugmentation';
 
 describe('SequenceAugmentation', () => {
     const adapter = new TestAdapter();
     const functions = new TestPromptManager();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const actions: ChatCompletionAction[] = [
         {
             name: 'test',

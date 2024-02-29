@@ -20,7 +20,8 @@ export class Meetings<TState extends TurnState = TurnState> {
 
     /**
      * Handles meeting start events for Microsoft Teams.
-     * @param {(context: TurnContext, state: TState, meeting: MeetingStartEventDetails)} handler - Function to call when the handler is triggered.
+     * @template TState
+     * @param {Function} handler - Function to call when the handler is triggered.
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public start(
@@ -46,7 +47,8 @@ export class Meetings<TState extends TurnState = TurnState> {
 
     /**
      * Handles meeting end events for Microsoft Teams.
-     * @param {(context: TurnContext, state: TState, meeting: MeetingEndEventDetails)} handler - Function to call when the handler is triggered.
+     * @template TState - The type of TurnState
+     * @param {Function} handler - Function to call when the handler is triggered.
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public end(
@@ -72,7 +74,8 @@ export class Meetings<TState extends TurnState = TurnState> {
 
     /**
      * Handles meeting participant join events for Microsoft Teams.
-     * @param {(context: TurnContext, state: TState, meeting: MeetingParticipantsEventDetails)} handler - Function to call when the handler is triggered.
+     * @template TState
+     * @param {Function} handler - Function to call when the handler is triggered.
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public participantsJoin(
@@ -98,7 +101,8 @@ export class Meetings<TState extends TurnState = TurnState> {
 
     /**
      * Handles meeting participant leave events for Microsoft Teams.
-     * @param {(context: TurnContext, state: TState, meeting: MeetingParticipantsEventDetails)} handler - Function to call when the handler is triggered.
+     * @template TState - The type of TurnState
+     * @param {Function} handler - Function to call when the handler is triggered.
      * @returns {Application<TState>} The application for chaining purposes.
      */
     public participantsLeave(

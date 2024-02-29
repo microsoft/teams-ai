@@ -1,12 +1,12 @@
 import { strict as assert } from 'assert';
 import { TestAdapter } from 'botbuilder';
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { DefaultResponseValidator } from './DefaultResponseValidator';
 
 describe('DefaultResponseValidator', () => {
     const adapter = new TestAdapter();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
 
     describe('constructor', () => {
         it('should create a DefaultResponseValidator', () => {
