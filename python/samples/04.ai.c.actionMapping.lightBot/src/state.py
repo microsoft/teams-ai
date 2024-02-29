@@ -9,8 +9,8 @@ from teams.state import DefaultConversationState, TurnState
 class AppConversationState(DefaultConversationState):
     lights_on: bool = False
 
-class AppTurnState(TurnState):
 
+class AppTurnState(TurnState):
     @property
     def conversation(self) -> DefaultConversationState:
         scope = self.get_scope("conversation")

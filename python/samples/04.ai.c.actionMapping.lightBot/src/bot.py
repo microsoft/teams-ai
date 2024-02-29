@@ -5,8 +5,8 @@ Licensed under the MIT License.
 Description: initialize the app and listen for `message` activitys
 """
 
-import sys
 import os
+import sys
 import time
 import traceback
 from typing import Any, Dict, List
@@ -14,20 +14,22 @@ from typing import Any, Dict, List
 from botbuilder.core import MemoryStorage, TurnContext
 from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
-from teams.ai.tokenizers import Tokenizer
-from teams.ai.prompts import PromptManager, PromptManagerOptions, PromptFunctions
-from teams.ai.planners import ActionPlanner, ActionPlannerOptions
-from teams.ai.models import OpenAIModel, OpenAIModelOptions, AzureOpenAIModelOptions
 from teams.ai.actions import ActionTurnContext
-from state import AppTurnState
+from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
+from teams.ai.planners import ActionPlanner, ActionPlannerOptions
+from teams.ai.prompts import PromptFunctions, PromptManager, PromptManagerOptions
+from teams.ai.tokenizers import Tokenizer
 from teams.state import Memory
 
 from config import Config
+from state import AppTurnState
 
 config = Config()
 
 if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
-    raise RuntimeError("Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.")
+    raise RuntimeError(
+        "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
+    )
 
 MyActionTurnContext = ActionTurnContext[Dict[str, Any]]
 
@@ -36,31 +38,22 @@ model: OpenAIModel
 
 if config.OPENAI_KEY:
     model = OpenAIModel(
-        OpenAIModelOptions(
-            api_key=config.OPENAI_KEY,
-            default_model="gpt-3.5-turbo"
-        ))
+        OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
+    )
 elif config.AZURE_OPENAI_KEY:
-     model = OpenAIModel(
+    model = OpenAIModel(
         AzureOpenAIModelOptions(
             api_key=config.AZURE_OPENAI_KEY,
             default_model="gpt-3.5-turbo",
             api_version="2023-03-15-preview",
-            endpoint=config.AZURE_OPENAI_ENDPOINT
-        ))
-prompts = PromptManager(
-    PromptManagerOptions(
-        prompts_folder=f"{os.getcwd()}/src/prompts"
+            endpoint=config.AZURE_OPENAI_ENDPOINT,
         )
     )
+prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/src/prompts"))
 
 planner = ActionPlanner(
-                ActionPlannerOptions(
-                    model=model,
-                    prompts=prompts,
-                    default_prompt='sequence'
-                )
-            )
+    ActionPlannerOptions(model=model, prompts=prompts, default_prompt="sequence")
+)
 
 # Define storage and application
 storage = MemoryStorage()
@@ -69,25 +62,28 @@ app = Application[AppTurnState](
         bot_app_id=config.APP_ID,
         storage=storage,
         adapter=TeamsAdapter(config),
-        ai=AIOptions(
-            planner=planner
-        ),
+        ai=AIOptions(planner=planner),
     )
 )
+
 
 @app.turn_state_factory
 async def turn_state_factory():
     return AppTurnState()
 
+# pylint: disable=unused-argument
 async def on_get_light_status(
-        context: TurnContext, 
-        state: Memory, 
-        functions: PromptFunctions, 
-        tokenizer: Tokenizer, 
-        args: List[str] ):
+    context: TurnContext,
+    state: Memory,
+    functions: PromptFunctions,
+    tokenizer: Tokenizer,
+    args: List[str],
+):
     return "on" if state.get_value("conversation.lightsOn") else "off"
 
+
 prompts.add_function("get_light_status", on_get_light_status)
+
 
 # Register action handlers
 @app.ai.action("LightsOn")
@@ -127,6 +123,7 @@ async def on_lights_status(
     state: AppTurnState,
 ):
     return "the lights are on" if state.conversation.lights_on else "the lights are off"
+
 
 @app.error
 async def on_error(context: TurnContext, error: Exception):
