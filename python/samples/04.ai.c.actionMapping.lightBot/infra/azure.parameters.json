@@ -16,6 +16,9 @@
     },
     "botDisplayName": {
       "value": "EchoBotInfra"
+    },
+    "linuxFxVersion": {
+      "value": "PYTHON|3.11"
     }
   }
 }

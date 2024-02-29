@@ -6,67 +6,93 @@ Description: initialize the app and listen for `message` activitys
 """
 
 import sys
+import os
 import time
 import traceback
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from botbuilder.core import MemoryStorage, TurnContext
-from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
-from botbuilder.schema import Activity
-from teams import ActionTurnContext, ActionTypes, Application, ApplicationOptions
+from teams import Application, ApplicationOptions, TeamsAdapter
+from teams.ai import AIOptions
+from teams.ai.tokenizers import Tokenizer
+from teams.ai.prompts import PromptManager, PromptManagerOptions, PromptFunctions
+from teams.ai.planners import ActionPlanner, ActionPlannerOptions
+from teams.ai.models import OpenAIModel, OpenAIModelOptions, AzureOpenAIModelOptions
+from teams.ai.actions import ActionTurnContext
+from state import AppTurnState
+from teams.state import Memory
 
 from src.config import Config
-from state import AppTurnState
 
 config = Config()
-storage = MemoryStorage()
 
-if config.OPEN_AI_KEY == "":
-    raise RuntimeError("OpenAIKey is a required environment variable")
+if config.OPENAI_KEY == "" and config.AZURE_OPENAI_KEY == "":
+    raise RuntimeError("Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.")
 
 MyActionTurnContext = ActionTurnContext[Dict[str, Any]]
+
+model: OpenAIModel
+
+if config.OPENAI_KEY:
+    model = OpenAIModel(
+        OpenAIModelOptions(
+            api_key=config.OPENAI_KEY,
+            default_model="gpt-3.5-turbo"
+        ))
+elif config.AZURE_OPENAI_KEY:
+     model = OpenAIModel(
+        AzureOpenAIModelOptions(
+            api_key=config.AZURE_OPENAI_KEY,
+            default_model="gpt-3.5-turbo",
+            api_version="2023-03-15-preview",
+            endpoint=config.AZURE_OPENAI_ENDPOINT
+        ))
+prompts = PromptManager(
+    PromptManagerOptions(
+        prompts_folder=f"{os.getcwd()}/src/prompts"
+        )
+    )
+
+planner = ActionPlanner(
+                ActionPlannerOptions(
+                    model=model,
+                    prompts=prompts,
+                    default_prompt='sequence'
+                )
+            )
+
+storage = MemoryStorage()
 app = Application[AppTurnState](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
         storage=storage,
-        auth=ConfigurationBotFrameworkAuthentication(Config),
-        # ai=AIOptions(
-        #     prompt="chatGPT",
-        #     planner=OpenAIPlanner(
-        #         OpenAIPlannerOptions(
-        #             api_key=config.open_ai_key,
-        #             default_model="gpt-3.5-turbo",
-        #             prompt_folder=f"{os.getcwd()}/src/prompts",
-        #         )
-        #     ),
-        #     history=AIHistoryOptions(assistant_history_type="text"),
-        # ),
+        adapter=TeamsAdapter(config),
+        ai=AIOptions(
+            planner=planner
+        ),
     )
 )
 
-
 @app.turn_state_factory
-async def on_state_factory(activity: Activity):
-    return await AppTurnState.from_activity(activity, storage)
+async def turn_state_factory():
+    return AppTurnState()
 
+async def on_get_light_status(
+        context: TurnContext, 
+        state: Memory, 
+        functions: PromptFunctions, 
+        tokenizer: Tokenizer, 
+        args: List[str] ):
+    # return "on" if state.get_value("conversation.lightsOn") else "off"
+    return "on"
 
-@app.message("/history")
-async def on_history(context: TurnContext, state: AppTurnState):
-    if state.conversation.history.len() > 0:
-        await context.send_activity(state.conversation.history.to_str(2000, "cl100k_base", "\n\n"))
-    return True
+prompts.add_function("get_light_status", on_get_light_status)
 
-
-@app.ai.function("getLightStatus")
-async def on_get_light_status(_context: TurnContext, state: AppTurnState):
-    return "on" if state.conversation.lights_on else "off"
-
-
-@app.ai.action(ActionTypes.FLAGGED_INPUT)
-async def on_flagged_input(context: TurnContext, _state: AppTurnState):
-    await context.send_activity("FLAGGED INPUT!!!")
-    return False
-
+# @app.message("/history")
+# async def on_history(context: TurnContext, state: AppTurnState):
+#     if "history" in state.conversation and state.conversation.history.len() > 0:
+#         await context.send_activity(state.conversation.history.to_str(2000, "cl100k_base", "\n\n"))
+#     return True
 
 @app.ai.action("LightsOn")
 async def on_lights_on(
@@ -75,7 +101,7 @@ async def on_lights_on(
 ):
     state.conversation.lights_on = True
     await context.send_activity("[lights on]")
-    return True
+    return "the lights are now on"
 
 
 @app.ai.action("LightsOff")
@@ -85,19 +111,27 @@ async def on_lights_off(
 ):
     state.conversation.lights_on = False
     await context.send_activity("[lights off]")
-    return True
+    return "the lights are now off"
 
 
 @app.ai.action("Pause")
 async def on_pause(
     context: MyActionTurnContext,
-    _state: AppTurnState,
+    state: AppTurnState,
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000
     await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
     time.sleep(time_ms)
-    return True
+    return "done pausing"
 
+
+@app.ai.action("LightStatus")
+async def on_lights_status(
+    context: MyActionTurnContext,
+    state: AppTurnState,
+):
+    await context.send_activity(str(state.conversation.lights_on))
+    return "the ligths are on" if state.conversation.lights_on else "the lights are off"
 
 @app.error
 async def on_error(context: TurnContext, error: Exception):

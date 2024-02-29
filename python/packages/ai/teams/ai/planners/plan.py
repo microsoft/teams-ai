@@ -5,6 +5,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Union
 
@@ -27,6 +28,9 @@ class PredictedDoCommand(DataClassJsonMixin):
     parameters: Dict[str, Any] = field(default_factory=dict)
     "Any parameters that the AI system should use to perform the action."
 
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
 
 @dataclass_json
 @dataclass
@@ -40,6 +44,9 @@ class PredictedSayCommand(DataClassJsonMixin):
 
     response: str = ""
     "The response that the AI system should say."
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
 
 PredictedCommand = Union[PredictedDoCommand, PredictedSayCommand]
@@ -57,6 +64,9 @@ class Plan:
 
     commands: List[PredictedCommand] = field(default_factory=list)
     "Array of predicted commands that the AI system should execute."
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
     @classmethod
     def from_dict(cls, dict: Dict[str, Any], *, infer_missing: bool = False) -> "Plan":

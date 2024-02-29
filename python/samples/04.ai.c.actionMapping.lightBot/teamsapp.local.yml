@@ -77,5 +77,9 @@ deploy:
     with:
       target: ./.env
       envs:
-        MicrosoftAppId: ${{BOT_ID}}
-        MicrosoftAppPassword: ${{SECRET_BOT_PASSWORD}}
+        BOT_ID: ${{BOT_ID}}
+        BOT_PASSWORD: ${{BOT_PASSWORD}}
+        OPENAI_KEY: ${{OPENAI_KEY}}
+        AZURE_OPENAI_KEY: ${{AZURE_OPENAI_KEY}}
+        AZURE_OPENAI_ENDPOINT: ${{AZURE_OPENAI_ENDPOINT}}
+

@@ -116,6 +116,7 @@ class SequenceAugmentation(Augmentation[Plan]):
         if validation_result.value:
             print(validation_result.value)
             plan = Plan.from_dict(validation_result.value)
+            validation_result.value = plan
             print(plan)
 
             for index, command in enumerate(plan.commands):
@@ -162,7 +163,7 @@ class SequenceAugmentation(Augmentation[Plan]):
                         + f"type of ${command.type}. Only use DO or SAY commands.",
                     )
 
-        # Return the validated monologue
+        # Return the validated monologue     
         return validation_result
 
     async def create_plan_from_response(

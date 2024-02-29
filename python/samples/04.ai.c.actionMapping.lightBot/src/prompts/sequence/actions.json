@@ -1,0 +1,30 @@
+[
+    {
+        "name": "LightsOn",
+        "description": "Turns on the lights"
+    },
+    {
+        "name": "LightsOff",
+        "description": "Turns off the lights"
+    },
+    {
+        "name": "Pause",
+        "description": "Delays for a period of time",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "number",
+                    "description": "The amount of time to delay in milliseconds"
+                }
+            },
+            "required": [
+                "time"
+            ]
+        }
+    },
+    {
+        "name": "LightStatus",
+        "description": "Gets the lights status"
+    }
+]

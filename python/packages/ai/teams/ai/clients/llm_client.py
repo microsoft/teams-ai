@@ -166,6 +166,8 @@ class LLMClient:
                 remaining_attempts=remaining_attempts,
             )
 
+            res.message.content = validation.value
+
             if not validation.valid:
                 fork = Memory(memory)
 

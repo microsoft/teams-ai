@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from botbuilder.core import TurnContext
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 from ....state import Memory
 from ...models.chat_completion_action import ChatCompletionAction
@@ -21,13 +22,14 @@ from .prompt_section_base import PromptSectionBase
 
 
 @dataclass
-class ActionValue:
+class ActionValue(yaml.YAMLObject):
     description: Optional[str] = None
     parameters: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None
 
 
+@dataclass_json
 @dataclass
-class ActionList:
+class ActionList(DataClassJsonMixin):
     actions: Dict[str, ActionValue]
 
 
@@ -76,7 +78,7 @@ class ActionAugmentationSection(PromptSectionBase):
                 )
 
         # Build augmentation text
-        self._text = f"{yaml.dump(action_list)}\n\n{call_to_action}"
+        self._text = f"{yaml.dump(action_list.to_dict())}\n\n{call_to_action}"
 
     async def render_as_messages(
         self,

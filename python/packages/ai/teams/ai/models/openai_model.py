@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from logging import Logger
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 
 import openai
 from botbuilder.core import TurnContext
@@ -164,6 +164,9 @@ class OpenAIModel(PromptCompletionModel):
                     name=msg.name if msg.name is not None else "",
                     content=msg.content if msg.content is not None else "",
                 )
+
+            if "name" in param and (param["name"] is None or param["name"] == ""):
+                del param["name"]
 
             messages.append(param)
 

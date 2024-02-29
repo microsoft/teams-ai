@@ -36,6 +36,10 @@ def to_string(tokenizer: Tokenizer, value: Any, as_json: bool = False) -> str:
     if hasattr(value, "isoformat") and callable(value.isoformat):
         # Used when the value is a datetime object
         return value.isoformat()
+    
+    if isinstance(value, object):
+        value = value.__dict__
+
     if as_json:
         return json.dumps(value)
 
