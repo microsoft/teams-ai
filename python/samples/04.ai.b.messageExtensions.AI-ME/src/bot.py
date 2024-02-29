@@ -8,15 +8,21 @@ Description: initialize the app and listen for `message` activitys
 import sys
 import traceback
 
-from botbuilder.core import TurnContext, MemoryStorage
+from botbuilder.core import TurnContext, MemoryStorage, MessageFactory
+from botbuilder.schema import Attachment
+from botbuilder.schema.teams import TaskModuleTaskInfo, MessagingExtensionResult
 from botbuilder.integration.aiohttp import ConfigurationBotFrameworkAuthentication
-from teams import Application, ApplicationOptions
+from teams import Application, ApplicationOptions,TeamsAdapter
 from teams.state import TurnState
 from teams.ai.models import OpenAIModel, OpenAIModelOptions, AzureOpenAIModelOptions
 from teams.ai.prompts import PromptManager, PromptManagerOptions
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 
 from config import Config
+from application_turn_state import ApplicationTurnState
+from cards.initial_view import create_initial_view
+from cards.edit_view import create_edit_view
+from cards.post_card import create_post_card
 
 config = Config()
 
@@ -35,13 +41,71 @@ planner = ActionPlanner(ActionPlannerOptions(model, prompts, "chat"))
 # Define storage and application
 storage = MemoryStorage()
 
-app = Application[TurnState](
+app = Application[ApplicationTurnState](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
-        auth=ConfigurationBotFrameworkAuthentication(config),
+        adapter=TeamsAdapter(config),
+        storage=storage,
+        long_running_messages=True
     )
 )
 
+# Implement Message Extension logic
+@app.message_extensions.fetch_task("CreatePost")
+async def create_post(context: TurnContext, _state: ApplicationTurnState):
+    # Return card as a TaskInfo object
+    card = create_initial_view()
+    return create_task_info(card)
+
+@app.message_extensions.submit_action("CreatePost")
+async def submit_create_post(context: TurnContext, state: ApplicationTurnState, data: dict):
+    try:
+        if data['verb'] == 'generate':
+            # Call GPT and return response view
+            return await update_post(context, state, 'generate', data)
+        elif data['verb'] == 'update':
+            # Call GPT and return an updated response view
+            return await update_post(context, state, 'update', data)
+        elif data['verb'] == 'preview':
+            # Preview the post as an adaptive card
+            card = create_post_card(data['post'])
+            activity = MessageFactory.attachment(card)
+            return MessagingExtensionResult(
+                type="botMessagePreview",
+                activity_preview=activity
+            )
+        elif data['verb'] == 'post':
+            attachments = [create_post_card(data['post'])] or None
+            # Drop the card into compose window
+            return MessagingExtensionResult(
+                type="result",
+                attachment_layout="list",
+                attachments=attachments
+            )
+    except Exception as err:
+        return f"Something went wrong: {str(err)}"
+
+def create_task_info(card: Attachment) -> TaskModuleTaskInfo:
+    return TaskModuleTaskInfo(
+        title= "create Post",
+        width= "medium",
+        height= "medium",
+        card= card
+    )
+
+async def update_post(context: TurnContext, state: ApplicationTurnState, prompt: str, data: dict) -> TaskModuleTaskInfo:
+    # Create new or updated post
+    state.temp.post = data['post']
+    state.temp.prompt = data['prompt']
+    response = await planner.complete_prompt(context, state, prompt)
+    if response.status != 'success':
+        raise Exception(f"The request to OpenAI had the following error: {response.error}")
+
+    # Return card
+    if response.message is None:
+        raise Exception("The response message is None")
+    card = create_edit_view(response.message.content, False)
+    return create_task_info(card)
 
 @app.activity("message")
 async def on_message(context: TurnContext, _state: TurnState):
