@@ -127,10 +127,9 @@ async def on_pause(
 
 @app.ai.action("LightStatus")
 async def on_lights_status(
-    context: MyActionTurnContext,
+    _context: MyActionTurnContext,
     state: AppTurnState,
 ):
-    await context.send_activity(str(state.conversation.lights_on))
     return "the ligths are on" if state.conversation.lights_on else "the lights are off"
 
 @app.error

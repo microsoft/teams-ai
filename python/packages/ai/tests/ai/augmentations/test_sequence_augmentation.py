@@ -11,6 +11,7 @@ from botbuilder.core import TurnContext
 from teams.ai.augmentations.sequence_augmentation import SequenceAugmentation
 from teams.ai.models.chat_completion_action import ChatCompletionAction
 from teams.ai.models.prompt_response import PromptResponse
+from teams.ai.planners import Plan
 from teams.ai.prompts.message import Message
 from teams.ai.prompts.prompt_functions import PromptFunctions
 from teams.ai.tokenizers.gpt_tokenizer import GPTTokenizer
@@ -196,11 +197,13 @@ class TestSequenceAugmentation(IsolatedAsyncioTestCase):
         )
         self.assertEqual(
             plan,
-            {
-                "type": "plan",
-                "commands": [
-                    {"type": "DO", "action": "test1", "parameters": {"foo": "bar"}},
-                    {"type": "SAY", "response": "hello world"},
-                ],
-            },
+            Plan.from_dict(
+                {
+                    "type": "plan",
+                    "commands": [
+                        {"type": "DO", "action": "test1", "parameters": {"foo": "bar"}},
+                        {"type": "SAY", "response": "hello world"},
+                    ],
+                }
+            ),
         )

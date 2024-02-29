@@ -51,7 +51,7 @@ class Memory:
         """
         scope, name = self._get_scope_and_name(path)
 
-        if scope in self._scopes and name in self._scopes[name]:
+        if scope in self._scopes and name in self._scopes[scope]:
             return True
 
         if self._parent:
@@ -72,7 +72,7 @@ class Memory:
         """
         scope, name = self._get_scope_and_name(path)
 
-        if scope in self._scopes and name in self._scopes[name]:
+        if scope in self._scopes and name in self._scopes[scope]:
             return self._scopes[scope][name]
 
         if self._parent:

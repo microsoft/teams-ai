@@ -3,13 +3,11 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import field
-
 from teams.state import DefaultConversationState, TurnState
 
 
 class AppConversationState(DefaultConversationState):
-    lights_on: bool = field(default=False)
+    lights_on: bool = False
 
 class AppTurnState(TurnState):
 

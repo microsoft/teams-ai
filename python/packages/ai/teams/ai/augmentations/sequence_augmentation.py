@@ -163,7 +163,7 @@ class SequenceAugmentation(Augmentation[Plan]):
                         + f"type of ${command.type}. Only use DO or SAY commands.",
                     )
 
-        # Return the validated monologue     
+        # Return the validated monologue
         return validation_result
 
     async def create_plan_from_response(
