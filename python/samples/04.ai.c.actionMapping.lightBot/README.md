@@ -1,90 +1,60 @@
-# <img src="../../../assets/icon.png" height="10%" width="10%" /> Light Bot
+# Teams Light Bot
 
 A conversational bot for Microsoft Teams, designed as an AI assistant. The bot connects to a third-party service to turn a light on or off.
 
 This sample illustrates more complex conversational bot behavior in Microsoft Teams. The bot is built to allow GPT to facilitate the conversation on its behalf as well as manually defined responses, and maps user intents to user defined actions.
 
-- [Concepts](#concepts)
-- [Prerequisites](#prerequisites)
-- [Run](#run)
-- [Development](#development)
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
-## Concepts
+<!-- code_chunk_output -->
 
-- Listening/Sending Activities
-- Error Handling
-- State Management
-- Prompt Templates
-- Actions
+- [Teams Light Bot](#teams-light-bot)
+  - [Interacting with the bot](#interacting-with-the-bot)
+  - [Setting up the sample](#setting-up-the-sample)
+  - [Testing the sample](#testing-the-sample)
+    - [Using Teams Toolkit for Visual Studio Code](#using-teams-toolkit-for-visual-studio-code)
 
-![Screenshot](./assets/screenshot_0.png)
+<!-- /code_chunk_output -->
 
-## Prerequisites
+## Interacting with the bot
 
-- Install [Python](https://www.python.org/downloads/) (>= 3.8)
-- Install [Python VSCode Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- Install [Teams Toolkit VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+You can interact with the bot by messaging it.
 
-## Run
+## Setting up the sample
 
-> To run samples we encourage the use of the [Teams Toolkit VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension), to run the project using `Teams Toolkit` click the `Debug` button and select a profile.
-![Teams Toolkit VSCode](./assets/screenshot_1.png)  
-![Teams Toolkit VSCode](./assets/screenshot_2.png)
+1. Clone the repository
 
-### Add Your App
+    ```bash
+    git clone https://github.com/Microsoft/teams-ai.git
+    ```
 
-When prompted, add your app in teams and start chatting!  
+1. Follow below instructions to run the sample
 
-![Teams Toolkit VSCode](./assets/screenshot_3.png)
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to continue setup and debugging, please continue below. To read about other options, skip to [Other ways to run the sample](#other-ways-to-run-the-sample).
 
-## Development
+## Testing the sample
 
-### Prerequisites
+The easiest and fastest way to get up and running is with Teams Toolkit as your development guide. To use Teams Toolkit to automate setup and debugging, please [continue below](#using-teams-toolkit-for-visual-studio-code).
 
-[Install Poetry](https://python-poetry.org/docs/)
+Otherwise, if you only want to run the bot locally and build manually, please jump to the [BotFramework Emulator](../README.md#testing-in-botframework-emulator) section.
+For different ways to test a sample see: [Multiple ways to test](../README.md#multiple-ways-to-test)
 
-```bash
-$: pip install poetry
-```
+### Using Teams Toolkit for Visual Studio Code 
 
-### Install Dependencies
+The simplest way to run this sample in Teams is to use Teams Toolkit for Visual Studio Code.
 
-```bash
-$: poetry install
-```
+1. Ensure you have downloaded and installed [Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
+2. Install the [Teams Toolkit extension](https://marketplace.visualstudio.com/items?itemName=TeamsDevApp.ms-teams-vscode-extension)
+3. Install the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+4. Install [Poetry](https://python-poetry.org/docs/#installation)
+5. Select **File > Open Folder** in VS Code and choose this sample's directory from the repo
+6. Using the extension, sign in with your Microsoft 365 account where you have permissions to upload custom apps
+7. Ensure that you have set up the sample from the previous step.
+8. Trigger **Python: Create Environment** from command palette and create a virtual environment
+9. Duplicate the `sample.env` in the `teams-ai/python/samples/04.ai.c.actionMapping.lightBot` folder. Rename the file to `.env`. 
+10. If you are using OpenAI then only keep the `OPENAI_KEY` and add in your key. Otherwise if you are using AzureOpenAI then only keep the `AZURE_OPENAI_KEY`, `AZURE_OPENAI_ENDPOINT` variables and fill them in appropriately. If you are using a previously deployed bot, fill in `BOT_ID` and `BOT_PASSWORD`.
+11. Update `config.json` and `bot.py` with your model deployment name.
+12. Select **Debug > Start Debugging** or **F5** to run the app in a Teams web client.
+13. In the browser that launches, select the **Add** button to install the app to Teams.
 
-## Start
-
-```bash
-$: poetry run start
-```
-
-### Build
-
-```bash
-$: poetry build
-```
-
-### Test
-
-```bash
-$: poetry run test
-```
-
-### Lint
-
-```bash
-$: poetry run lint
-```
-
-## Format
-
-```bash
-$: poetry run fmt
-```
-
-## Clean
-
-```bash
-$: poetry run clean
-```
+> If you do not have permission to upload custom apps (sideloading), Teams Toolkit will recommend creating and using a Microsoft 365 Developer Program account - a free program to get your own dev environment sandbox that includes Teams.

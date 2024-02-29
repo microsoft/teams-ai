@@ -3,26 +3,28 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from dataclasses import field
-from typing import Optional
-
-from botbuilder.core import Storage
-from botbuilder.schema import Activity
-from teams.ai.state import ConversationState, TurnState, UserState
+from teams.state import DefaultConversationState, TurnState
 
 
-class AppConversationState(ConversationState):
-    lights_on: bool = field(default=False)
+class AppConversationState(DefaultConversationState):
+    lights_on: bool = False
 
 
 class AppTurnState(TurnState):
-    conversation: AppConversationState
+    @property
+    def conversation(self) -> DefaultConversationState:
+        scope = self.get_scope("conversation")
 
-    @classmethod
-    async def from_activity(
-        cls, activity: Activity, storage: Optional[Storage] = None
-    ) -> "AppTurnState":
-        return cls(
-            conversation=await AppConversationState.from_activity(activity, storage),
-            user=await UserState.from_activity(activity, storage),
-        )
+        if scope is None:
+            raise RuntimeError("TurnState hasn't been loaded. Call load() first.")
+
+        return AppConversationState(scope.data)
+
+    @conversation.setter
+    def conversation(self, value: AppConversationState):
+        scope = self.get_scope("conversation")
+
+        if scope is None:
+            raise RuntimeError("TurnState hasn't been loaded. Call load() first.")
+
+        scope.replace(value.get_dict())
