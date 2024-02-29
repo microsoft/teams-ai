@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert';
 import { Utilities } from './Utilities';
-import { GPT3Tokenizer } from './tokenizers';
+import { GPTTokenizer } from './tokenizers';
 
 describe('Utilities', () => {
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     describe('toString', () => {
         it('should convert a number to a string', () => {
             const result = Utilities.toString(tokenizer, 1);

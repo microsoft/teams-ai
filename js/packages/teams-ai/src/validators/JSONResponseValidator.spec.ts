@@ -3,13 +3,13 @@ import * as sinon from 'sinon';
 import { TestAdapter } from 'botbuilder';
 
 import { TestTurnState } from '../internals/testing/TestTurnState';
-import { GPT3Tokenizer } from '../tokenizers';
+import { GPTTokenizer } from '../tokenizers';
 import { JSONResponseValidator } from './JSONResponseValidator';
 import { Schema, ValidationError } from 'jsonschema';
 
 describe('JSONResponseValidator', () => {
     const adapter = new TestAdapter();
-    const tokenizer = new GPT3Tokenizer();
+    const tokenizer = new GPTTokenizer();
     const schema: Schema = {
         type: 'object',
         properties: {

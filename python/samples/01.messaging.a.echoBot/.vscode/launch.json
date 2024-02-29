@@ -53,7 +53,7 @@
         },
         {
             "name": "Start",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/app.py",
             "console": "integratedTerminal",
