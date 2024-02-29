@@ -1,0 +1,69 @@
+import axios, { AxiosInstance } from 'axios';
+import { TurnContext } from 'botbuilder';
+
+import { PromptCompletionModel, PromptResponse } from '../models';
+import { Memory } from '../MemoryFork';
+import { Message, PromptFunctions, PromptTemplate } from '../prompts';
+import { Tokenizer } from '../tokenizers';
+
+export interface LlamaModelOptions {
+    apiKey: string;
+    defaultModel?: string;
+    endpoint?: string;
+}
+
+export class LlamaModel implements PromptCompletionModel {
+    private readonly _httpClient: AxiosInstance;
+
+    public constructor(public readonly options: LlamaModelOptions) {
+        // Create client
+        this._httpClient = axios.create({
+            validateStatus: (status) => status < 400 || status == 429,
+            headers: {
+                Authorization: `Bearer ${options.apiKey}`,
+                'Content-Type': 'application/json',
+                'User-Agent': '@microsoft/teams-ai-v1'
+            }
+        });
+    }
+
+    public async completePrompt(
+        context: TurnContext,
+        memory: Memory,
+        functions: PromptFunctions,
+        tokenizer: Tokenizer,
+        template: PromptTemplate
+    ): Promise<PromptResponse<string>> {
+        const max_input_tokens = template.config.completion.max_input_tokens;
+        const result = await template.prompt.renderAsMessages(context, memory, functions, tokenizer, max_input_tokens);
+
+        if (result.tooLong) {
+            return {
+                status: 'too_long',
+                error: new Error('The generated prompt length was too long')
+            };
+        }
+
+        let last: Message | undefined = result.output[result.output.length - 1];
+        if (last.role !== 'user') {
+            last = undefined;
+        }
+        // TODO: try catch
+        // TODO: make real interface
+        const res = await this._httpClient.post<{ generated_text: string }[]>(
+            'https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf',
+            {
+                inputs: last?.content
+            }
+        );
+
+        return {
+            status: 'success',
+            input: last,
+            message: {
+                role: 'assistant',
+                content: res.data.map((v) => v.generated_text).join('\n')
+            }
+        };
+    }
+}
