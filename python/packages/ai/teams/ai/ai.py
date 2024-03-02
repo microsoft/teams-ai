@@ -44,7 +44,7 @@ class AI(Generic[StateT]):
         return self._options.planner
 
     @property
-    def moderator(self) -> Moderator:
+    def moderator(self) -> Moderator[StateT]:
         return self._options.moderator
 
     def __init__(self, options: AIOptions, *, logger=Logger("teams.ai")) -> None:

@@ -19,7 +19,7 @@ from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOpt
 from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptFunctions, PromptManager, PromptManagerOptions
 from teams.ai.tokenizers import Tokenizer
-from teams.state import Memory
+from teams.state import MemoryBase
 
 from config import Config
 from state import AppTurnState
@@ -31,8 +31,6 @@ if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
         "Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set."
     )
 
-MyActionTurnContext = ActionTurnContext[Dict[str, Any]]
-
 # Create AI components
 model: OpenAIModel
 
@@ -40,7 +38,7 @@ if config.OPENAI_KEY:
     model = OpenAIModel(
         OpenAIModelOptions(api_key=config.OPENAI_KEY, default_model="gpt-3.5-turbo")
     )
-elif config.AZURE_OPENAI_KEY:
+elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
     model = OpenAIModel(
         AzureOpenAIModelOptions(
             api_key=config.AZURE_OPENAI_KEY,
@@ -49,46 +47,39 @@ elif config.AZURE_OPENAI_KEY:
             endpoint=config.AZURE_OPENAI_ENDPOINT,
         )
     )
+
 prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/src/prompts"))
-
-planner = ActionPlanner(
-    ActionPlannerOptions(model=model, prompts=prompts, default_prompt="sequence")
-)
-
-# Define storage and application
 storage = MemoryStorage()
 app = Application[AppTurnState](
     ApplicationOptions(
         bot_app_id=config.APP_ID,
         storage=storage,
         adapter=TeamsAdapter(config),
-        ai=AIOptions(planner=planner),
+        ai=AIOptions(planner=ActionPlanner(
+            ActionPlannerOptions(model=model, prompts=prompts, default_prompt="sequence")
+        )),
     )
 )
 
 
 @app.turn_state_factory
-async def turn_state_factory():
-    return AppTurnState()
+async def turn_state_factory(context: TurnContext):
+    return await AppTurnState.load(context, storage)
 
-# pylint: disable=unused-argument
+@prompts.function("get_light_status")
 async def on_get_light_status(
-    context: TurnContext,
-    state: Memory,
-    functions: PromptFunctions,
-    tokenizer: Tokenizer,
-    args: List[str],
+    _context: TurnContext,
+    state: MemoryBase,
+    _functions: PromptFunctions,
+    _tokenizer: Tokenizer,
+    _args: List[str],
 ):
-    return "on" if state.get_value("conversation.lightsOn") else "off"
+    return "on" if state.get("conversation.lightsOn") else "off"
 
 
-prompts.add_function("get_light_status", on_get_light_status)
-
-
-# Register action handlers
 @app.ai.action("LightsOn")
 async def on_lights_on(
-    context: MyActionTurnContext,
+    context: ActionTurnContext[Dict[str, Any]],
     state: AppTurnState,
 ):
     state.conversation.lights_on = True
@@ -98,7 +89,7 @@ async def on_lights_on(
 
 @app.ai.action("LightsOff")
 async def on_lights_off(
-    context: MyActionTurnContext,
+    context: ActionTurnContext[Dict[str, Any]],
     state: AppTurnState,
 ):
     state.conversation.lights_on = False
@@ -108,8 +99,8 @@ async def on_lights_off(
 
 @app.ai.action("Pause")
 async def on_pause(
-    context: MyActionTurnContext,
-    state: AppTurnState,
+    context: ActionTurnContext[Dict[str, Any]],
+    _state: AppTurnState,
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000
     await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
@@ -119,7 +110,7 @@ async def on_pause(
 
 @app.ai.action("LightStatus")
 async def on_lights_status(
-    _context: MyActionTurnContext,
+    _context: ActionTurnContext[Dict[str, Any]],
     state: AppTurnState,
 ):
     return "the lights are on" if state.conversation.lights_on else "the lights are off"

@@ -10,7 +10,7 @@ from typing import Generic, TypeVar, Union
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.prompt_response import PromptResponse
 from ..planners.plan import Plan
 from ..prompts.sections.prompt_section import PromptSection
@@ -37,14 +37,14 @@ class Augmentation(PromptResponseValidator, ABC, Generic[ValueT]):
 
     @abstractmethod
     async def create_plan_from_response(
-        self, turn_context: TurnContext, memory: Memory, response: PromptResponse[ValueT]
+        self, turn_context: TurnContext, memory: MemoryBase, response: PromptResponse[ValueT]
     ) -> Plan:
         """
         Creates a plan given validated response value.
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): An interface for accessing state variables.
+            memory (MemoryBase): An interface for accessing state variables.
             response (PromptResponse[ValueT]): Validated, transformed response for the prompt.
 
         Returns:

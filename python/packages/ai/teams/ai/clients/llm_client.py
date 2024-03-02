@@ -12,7 +12,7 @@ from typing import Any, List, Optional
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import Memory, MemoryBase
 from ..models import PromptCompletionModel, PromptResponse
 from ..prompts import (
     ConversationHistorySection,
@@ -91,12 +91,12 @@ class LLMClient:
 
         self._options = options
 
-    def add_function_result_to_history(self, memory: Memory, name: str, results: Any) -> None:
+    def add_function_result_to_history(self, memory: MemoryBase, name: str, results: Any) -> None:
         """
         Adds a result from a `function_call` to the history.
 
         Args:
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             name (str): Name of the function that was called.
             results (Any): Results returned by the function.
         """
@@ -117,7 +117,7 @@ class LLMClient:
     async def complete_prompt(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         functions: PromptFunctions,
         tokenizer: Tokenizer,
         template: PromptTemplate,
@@ -128,7 +128,7 @@ class LLMClient:
 
         Args:
             content (TurnContext): The turn context.
-            memory (Memory): An interface for accessing state values.
+            memory (MemoryBase): An interface for accessing state values.
             functions (PromptFunctions): Functions to use when rendering the prompt.
             tokenizer (Tokenizer): Tokenizer used when rendering the prompt or counting tokens.
             template (PromptTemplate): Prompt used for the conversation.
@@ -154,9 +154,7 @@ class LLMClient:
                 return res
 
             if not res.input:
-                res.input = Message(
-                    role="user", content=memory.get_value(self._options.input_variable)
-                )
+                res.input = Message(role="user", content=memory.get(self._options.input_variable))
 
             validation = await self._options.validator.validate_response(
                 context=context,
@@ -219,11 +217,13 @@ class LLMClient:
         except Exception as err:  # pylint: disable=broad-except
             return PromptResponse(status="error", error=str(err))
 
-    def _add_message_to_history(self, memory: Memory, variable: str, message: Message[Any]) -> None:
-        history: List[Message] = memory.get_value(variable) or []
+    def _add_message_to_history(
+        self, memory: MemoryBase, variable: str, message: Message[Any]
+    ) -> None:
+        history: List[Message] = memory.get(variable) or []
         history.append(message)
 
         if len(history) > self._options.max_history_messages:
             del history[0 : len(history) - self._options.max_history_messages]
 
-        memory.set_value(variable, history)
+        memory.set(variable, history)

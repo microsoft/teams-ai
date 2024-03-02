@@ -12,7 +12,7 @@ from typing import Awaitable, Callable, List, Optional, Union
 from botbuilder.core import TurnContext
 
 from ...app_error import ApplicationError
-from ...state import Memory, TurnState
+from ...state import MemoryBase, TurnState
 from ..augmentations.default_augmentation import DefaultAugmentation
 from ..clients import LLMClient, LLMClientOptions
 from ..models.prompt_completion_model import PromptCompletionModel
@@ -100,7 +100,7 @@ class ActionPlanner(Planner):
     async def complete_prompt(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         prompt: Union[str, PromptTemplate],
         validator: PromptResponseValidator = DefaultResponseValidator(),
     ) -> PromptResponse[str]:
@@ -109,7 +109,7 @@ class ActionPlanner(Planner):
 
         Args:
             context (TurnContext): The current turn context.
-            memory (Memory): A memory interface used to access state variables
+            memory (MemoryBase): A memory interface used to access state variables
                 (the turn state object implements this interface.)
             prompt (Union[str, PromptTemplate]): Name of the prompt to use or a prompt template.
             validator (Validator): Optional. A validator to use to validate
@@ -160,12 +160,12 @@ class ActionPlanner(Planner):
 
         async def __func__(
             _context: TurnContext,
-            memory: Memory,
+            memory: MemoryBase,
             _functions: PromptFunctions,
             _tokenizer: Tokenizer,
             args: List[str],
         ):
-            memory.set_value("temp.input", " ".join(args))
+            memory.set("temp.input", " ".join(args))
 
         self._options.prompts.add_function(name, __func__)
         return self

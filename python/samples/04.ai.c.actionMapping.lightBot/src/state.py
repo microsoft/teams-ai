@@ -3,28 +3,28 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from teams.state import DefaultConversationState, TurnState
+from typing import Optional
+
+from botbuilder.core import Storage, TurnContext
+from teams.state import TurnState, ConversationState, UserState, TempState
 
 
-class AppConversationState(DefaultConversationState):
+class AppConversationState(ConversationState):
     lights_on: bool = False
 
+    @classmethod
+    async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "AppConversationState":
+        state = await super().load(context, storage)
+        return cls(**state)
 
-class AppTurnState(TurnState):
-    @property
-    def conversation(self) -> DefaultConversationState:
-        scope = self.get_scope("conversation")
 
-        if scope is None:
-            raise RuntimeError("TurnState hasn't been loaded. Call load() first.")
+class AppTurnState(TurnState[AppConversationState, UserState, TempState]):
+    conversation: AppConversationState
 
-        return AppConversationState(scope.data)
-
-    @conversation.setter
-    def conversation(self, value: AppConversationState):
-        scope = self.get_scope("conversation")
-
-        if scope is None:
-            raise RuntimeError("TurnState hasn't been loaded. Call load() first.")
-
-        scope.replace(value.get_dict())
+    @classmethod
+    async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "AppTurnState":
+        return cls(
+            conversation=await AppConversationState.load(context, storage),
+            user=await UserState.load(context, storage),
+            temp=await TempState.load(context, storage),
+        )
