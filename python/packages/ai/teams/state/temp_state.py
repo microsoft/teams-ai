@@ -39,4 +39,5 @@ class TempState(State[Any]):
 
     @classmethod
     async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "TempState":
+        # pylint: disable=unused-argument
         return cls()
