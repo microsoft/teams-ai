@@ -3,7 +3,7 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the MIT License.
 """
 
-from typing import Optional
+from typing import Any, Dict, Optional
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock
 
@@ -40,7 +40,16 @@ class OtherState(State):
 
     @classmethod
     async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "OtherState":
-        return cls()
+        if not storage:
+            return cls(__key__="other")
+
+        data: Dict[str, Any] = await storage.read(["other"])
+
+        if "other" in data:
+            if isinstance(data["other"], StoreItem):
+                return cls(__key__="other", **data["other"].__dict__)
+            return cls(__key__="other", **data["other"])
+        return cls(__key__="other")
 
 
 class CustomTurnState(TurnState):
@@ -141,3 +150,22 @@ class TestCustomTurnState(IsolatedAsyncioTestCase):
 
         self.assertTrue("other" in turn_state)
         self.assertEqual(turn_state.other.test, 0)
+
+    async def test_should_json(self):
+        context = self.create_mock_context()
+        storage = MemoryStorage()
+        turn_state = await CustomTurnState.load(context, storage)
+
+        self.assertFalse("test" in turn_state.other)
+        turn_state.other.test = 100
+
+        await turn_state.save(context, storage)
+        turn_state = await CustomTurnState.load(context, storage)
+
+        self.assertTrue("other" in turn_state)
+        self.assertTrue("test" in turn_state.other)
+        self.assertEqual(turn_state.other.test, 100)
+        self.assertEqual(str(turn_state.other), '{"test": 100}')
+        self.assertEqual(
+            str(turn_state), '{"conversation": {}, "user": {}, "temp": {}, "other": {"test": 100}}'
+        )

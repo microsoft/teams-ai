@@ -622,14 +622,14 @@ class Application(Bot, Generic[StateT]):
 
             # run before turn middleware
             for before_turn in self._before_turn:
-                is_ok = await before_turn(context, cast(StateT, state))
+                is_ok = await before_turn(context, state)
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
                     return
 
             # run activity handlers
-            is_ok, matches = await self._on_activity(context, cast(StateT, state))
+            is_ok, matches = await self._on_activity(context, state)
 
             if not is_ok:
                 await state.save(context, self._options.storage)
@@ -643,7 +643,7 @@ class Application(Bot, Generic[StateT]):
                 and context.activity.type == ActivityTypes.message
                 and context.activity.text
             ):
-                is_ok = await self._ai.run(context, cast(StateT, state))
+                is_ok = await self._ai.run(context, state)
 
                 if not is_ok:
                     await state.save(context, self._options.storage)
@@ -651,7 +651,7 @@ class Application(Bot, Generic[StateT]):
 
             # run after turn middleware
             for after_turn in self._after_turn:
-                is_ok = await after_turn(context, cast(StateT, state))
+                is_ok = await after_turn(context, state)
 
                 if not is_ok:
                     await state.save(context, self._options.storage)

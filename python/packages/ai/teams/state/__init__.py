@@ -7,6 +7,7 @@ from .conversation_state import ConversationState
 from .memory import Memory, MemoryBase
 from .state import State, state
 from .temp_state import TempState
+from .todict import todict
 from .turn_state import TurnState
 from .user_state import UserState
 
@@ -19,4 +20,5 @@ __all__ = [
     "TurnState",
     "UserState",
     "TempState",
+    "todict",
 ]

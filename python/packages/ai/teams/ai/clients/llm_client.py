@@ -164,16 +164,14 @@ class LLMClient:
                 remaining_attempts=remaining_attempts,
             )
 
-            res.message.content = validation.value
+            if validation.value:
+                res.message.content = validation.value
 
             if not validation.valid:
                 fork = Memory(memory)
 
                 if self._options.logger:
                     self._options.logger.info(f"REPAIRING RESPONSE:\n{res.message.content or ''}")
-
-                if validation.value:
-                    res.message.content = validation.value
 
                 self._add_message_to_history(
                     fork, f"{self._options.history_variable}-repair", res.message

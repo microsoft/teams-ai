@@ -5,10 +5,13 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, overload
 
 from botbuilder.core import Storage, TurnContext
+
+from .todict import todict
 
 T = TypeVar("T")
 
@@ -58,7 +61,7 @@ def state(_cls: Optional[Type[T]] = None) -> Union[Callable[[Type[T]], Type[T]],
 
 class State(Dict[str, T], ABC):
     """
-    State Property
+    State
     """
 
     __key__: str
@@ -76,7 +79,7 @@ class State(Dict[str, T], ABC):
 
     async def save(self, _context: TurnContext, storage: Optional[Storage] = None) -> None:
         """
-        Saves The Property State to Storage
+        Saves The State to Storage
 
         Args:
             context (TurnContext): the turn context.
@@ -99,7 +102,7 @@ class State(Dict[str, T], ABC):
     @abstractmethod
     async def load(cls, context: TurnContext, storage: Optional[Storage] = None) -> "State[T]":
         """
-        Loads The Property State from Storage
+        Loads The State from Storage
 
         Args:
             context: (TurnContext): the turn context.
@@ -166,3 +169,6 @@ class State(Dict[str, T], ABC):
 
     def __iter__(self):
         return iter(self.__dict__)
+
+    def __str__(self) -> str:
+        return json.dumps(todict(self))

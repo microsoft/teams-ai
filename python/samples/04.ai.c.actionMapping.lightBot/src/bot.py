@@ -66,6 +66,11 @@ app = Application[AppTurnState](
 async def turn_state_factory(context: TurnContext):
     return await AppTurnState.load(context, storage)
 
+@app.after_turn
+async def on_after_turn(context: TurnContext, state: AppTurnState):
+    print(state)
+    return True
+
 @prompts.function("get_light_status")
 async def on_get_light_status(
     _context: TurnContext,
@@ -104,7 +109,7 @@ async def on_pause(
 ):
     time_ms = int(context.data["time"]) if context.data["time"] else 1000
     await context.send_activity(f"[pausing for {time_ms / 1000} seconds]")
-    time.sleep(time_ms)
+    time.sleep(time_ms / 1000)
     return "done pausing"
 
 

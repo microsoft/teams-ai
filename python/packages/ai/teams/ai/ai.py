@@ -249,7 +249,7 @@ class AI(Generic[StateT]):
         if not action:
             return await self._on_unknown_action(ctx, state)
 
-        return await action.invoke(context, state, context.data, context.name)
+        return await action.invoke(context, state, context.data.parameters, context.name)
 
     async def _on_say_command(
         self,
