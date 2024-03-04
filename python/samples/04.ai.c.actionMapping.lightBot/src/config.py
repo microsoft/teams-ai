@@ -16,6 +16,6 @@ class Config:
     PORT = 3978
     APP_ID = os.environ["BOT_ID"]
     APP_PASSWORD = os.environ["BOT_PASSWORD"]
-    OPENAI_KEY = os.environ["OPENAI_KEY"]
-    AZURE_OPENAI_KEY = os.environ["AZURE_OPENAI_KEY"]
-    AZURE_OPENAI_ENDPOINT = os.environ["AZURE_OPENAI_ENDPOINT"]
+    OPENAI_KEY = os.environ.get("OPENAI_KEY")
+    AZURE_OPENAI_KEY = os.environ.get("AZURE_OPENAI_KEY")
+    AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")

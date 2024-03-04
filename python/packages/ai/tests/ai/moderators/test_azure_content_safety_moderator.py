@@ -17,7 +17,7 @@ from teams.ai.moderators import (
     AzureContentSafetyModeratorOptions,
 )
 from teams.ai.planners import Plan, PredictedDoCommand, PredictedSayCommand
-from teams.state import TurnState
+from teams.state import ConversationState, TempState, TurnState, UserState
 
 
 class MockAsyncModerations:
@@ -167,8 +167,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="input", endpoint="")
         )
         context = self.create_mock_context()
-        state = TurnState()
-        await state.load(context)
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = await moderator.review_input(context=context, state=state)
         self.assertTrue(mock_async_openai.called)
         assert plan is not None
@@ -183,8 +182,7 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="both", endpoint="")
         )
         context = self.create_mock_context()
-        state = TurnState()
-        await state.load(context)
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = await moderator.review_input(context=context, state=state)
         self.assertTrue(mock_async_openai.called)
         assert plan is not None
@@ -211,9 +209,8 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="output", endpoint="")
         )
         context = self.create_mock_context()
-        state = TurnState()
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = Plan(commands=[PredictedSayCommand(response="test")])
-        await state.load(context)
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None
@@ -228,9 +225,8 @@ class TestAzureContentSafetyModerator(IsolatedAsyncioTestCase):
             options=AzureContentSafetyModeratorOptions(api_key="", moderate="both", endpoint="")
         )
         context = self.create_mock_context()
-        state = TurnState()
+        state = await TurnState[ConversationState, UserState, TempState].load(context)
         plan = Plan(commands=[PredictedSayCommand(response="test")])
-        await state.load(context)
         output = await moderator.review_output(context=context, state=state, plan=plan)
         self.assertTrue(mock_async_openai.called)
         assert output is not None

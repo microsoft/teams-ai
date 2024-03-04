@@ -9,7 +9,7 @@ from typing import Union
 
 from botbuilder.core import TurnContext
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.prompt_response import PromptResponse
 from ..planners.plan import Plan, PredictedSayCommand
 from ..prompts.sections.prompt_section import PromptSection
@@ -35,7 +35,7 @@ class DefaultAugmentation(Augmentation[str]):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
@@ -45,7 +45,7 @@ class DefaultAugmentation(Augmentation[str]):
 
         Args:
             context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): Interface for accessing state variables.
+            memory (MemoryBase): Interface for accessing state variables.
             tokenizer (Tokenizer): Tokenizer to use for encoding/decoding text.
             response (PromptResponse[str]): Response to validate.
             remaining_attempts (int): Nubmer of remaining attempts to validate the response.
@@ -56,14 +56,14 @@ class DefaultAugmentation(Augmentation[str]):
         return Validation(valid=True)
 
     async def create_plan_from_response(
-        self, turn_context: TurnContext, memory: Memory, response: PromptResponse[str]
+        self, turn_context: TurnContext, memory: MemoryBase, response: PromptResponse[str]
     ) -> Plan:
         """
         Creates a plan given validated response value.
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (Memory):  Interface for accessing state variables.
+            memory (MemoryBase):  Interface for accessing state variables.
             response (PromptResponse[str]): The validated and transformed response for the prompt.
 
         Returns:

@@ -169,7 +169,6 @@ class TestPromptManager(IsolatedAsyncioTestCase):
 
         self.assertEqual(prompt.name, "include_images")
         assert isinstance(prompt.prompt, Prompt)
-        print(prompt.prompt.sections)
         self.assertEqual(len(prompt.prompt.sections), 3)
         assert isinstance(prompt.prompt.sections[0], GroupSection)
         self.assertEqual(len(prompt.prompt.sections[0].sections), 2)

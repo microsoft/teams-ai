@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 from botbuilder.core import TurnContext
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 
-from ...state import Memory
+from ...state import MemoryBase
 from ..models.chat_completion_action import ChatCompletionAction
 from ..models.prompt_response import PromptResponse
 from ..planners.plan import (
@@ -156,7 +156,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
     async def validate_response(
         self,
         context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         tokenizer: Tokenizer,
         response: PromptResponse[str],
         remaining_attempts: int,
@@ -166,7 +166,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): Interface for accessing state variables.
+            memory (MemoryBase): Interface for accessing state variables.
             tokenizer (Tokenizer): Tokenizer to use for encoding/decoding text.
             response (PromptResponse[str]): Response to validate.
             remaining_attempts (int): Number of remaining attempts to validate the response.
@@ -214,7 +214,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
     async def create_plan_from_response(
         self,
         turn_context: TurnContext,
-        memory: Memory,
+        memory: MemoryBase,
         response: PromptResponse[InnerMonologue],
     ) -> Plan:
         """
@@ -222,7 +222,7 @@ class MonologueAugmentation(Augmentation[InnerMonologue]):
 
         Args:
             turn_context (TurnContext): Context for the current turn of conversation.
-            memory (Memory): Interface for accessing state variables.
+            memory (MemoryBase): Interface for accessing state variables.
             response (PromptResponse): Validated, transformed response for the prompt.
 
         Returns:

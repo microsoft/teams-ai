@@ -6,7 +6,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Generic, Literal, Optional, TypeVar
 
 import openai
 from botbuilder.core import TurnContext
@@ -15,6 +15,8 @@ from ...state import TurnState
 from ..actions import ActionTypes
 from ..planners.plan import Plan, PredictedDoCommand, PredictedSayCommand
 from .moderator import Moderator
+
+StateT = TypeVar("StateT", bound=TurnState)
 
 
 @dataclass
@@ -39,7 +41,7 @@ class OpenAIModeratorOptions:
     "Optional. OpenAI model to use. Default: text-moderation-latest"
 
 
-class OpenAIModerator(Moderator):
+class OpenAIModerator(Generic[StateT], Moderator[StateT]):
     """
     A moderator that uses OpenAI's moderation API to review prompts and plans for safety.
     """
@@ -74,7 +76,7 @@ class OpenAIModerator(Moderator):
             )
         )
 
-    async def review_input(self, context: TurnContext, state: TurnState) -> Optional[Plan]:
+    async def review_input(self, context: TurnContext, state: StateT) -> Optional[Plan]:
         if self._options.moderate == "output":
             return None
 
@@ -100,7 +102,7 @@ class OpenAIModerator(Moderator):
                 ]
             )
 
-    async def review_output(self, context: TurnContext, state: TurnState, plan: Plan) -> Plan:
+    async def review_output(self, context: TurnContext, state: StateT, plan: Plan) -> Plan:
         if self._options.moderate == "input":
             return plan
 
