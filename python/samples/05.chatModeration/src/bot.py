@@ -14,7 +14,7 @@ from teams import Application, ApplicationOptions, TeamsAdapter
 from teams.ai import AIOptions
 from teams.ai.actions import ActionTurnContext, ActionTypes
 from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
-from teams.ai.planners import ActionPlanner, ActionPlannerOptions, PredictedDoCommand
+from teams.ai.planners import ActionPlanner, ActionPlannerOptions
 from teams.ai.prompts import PromptManager, PromptManagerOptions
 from teams.state import TurnState
 from teams.ai.moderators import Moderator, OpenAIModerator, OpenAIModeratorOptions, AzureContentSafetyModerator, AzureContentSafetyModeratorOptions
@@ -25,8 +25,6 @@ config = Config()
 
 if config.OPENAI_KEY is None and config.AZURE_OPENAI_KEY is None:
     raise RuntimeError("Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.")
-
-MyActionTurnContext = ActionTurnContext[PredictedDoCommand]
 
 model: OpenAIModel
 moderator: Moderator
@@ -43,7 +41,7 @@ if config.OPENAI_KEY:
             moderate="both",
         )   
     )
-elif config.AZURE_OPENAI_KEY:
+elif config.AZURE_OPENAI_KEY and config.AZURE_OPENAI_ENDPOINT:
      model = OpenAIModel(
         AzureOpenAIModelOptions(
             api_key=config.AZURE_OPENAI_KEY,
@@ -89,22 +87,23 @@ app = Application[TurnState](
 
 @app.message("/reset")
 async def on_reset(context: TurnContext, state: TurnState):
-    state.delete_conversation_state()
+    del state.conversation
     await context.send_activity("Ok let's start this over")
     return True
 
 @app.ai.action(ActionTypes.FLAGGED_INPUT)
-async def on_flagged_input(context: MyActionTurnContext, state: TurnState):
+async def on_flagged_input(context: ActionTurnContext, state: TurnState):
     message = ""
-    if context.data and context.data.parameters["categories"]:
-        if context.data.parameters["categories"]["hate"]:
-            message += f"<strong>Hate speech</strong> detected. Severity: {context.data.parameters['category_scores']['hate']}. "
-        if context.data.parameters["categories"]["sexual"]:
-            message += f"<strong>Sexual content</strong> detected. Severity: {context.data.parameters['category_scores']['sexual']}. "
-        if context.data.parameters["categories"]["self_harm"]:
-            message += f"<strong>Self harm</strong> detected. Severity: {context.data.parameters['category_scores']['self_harm']}. "
-        if context.data.parameters["categories"]["violence"]:
-            message += f"<strong>Violence</strong> detected. Severity: {context.data.parameters['category_scores']['violence']}. "
+    if context.data:
+        data = context.data
+        if data["categories"]["hate"]:
+            message += f"<strong>Hate speech</strong> detected. Severity: {data['category_scores']['hate']}. "
+        if data["categories"]["sexual"]:
+            message += f"<strong>Sexual content</strong> detected. Severity: {data['category_scores']['sexual']}. "
+        if data["categories"]["self_harm"]:
+            message += f"<strong>Self harm</strong> detected. Severity: {data['category_scores']['self_harm']}. "
+        if data["categories"]["violence"]:
+            message += f"<strong>Violence</strong> detected. Severity: {data['category_scores']['violence']}. "
     await context.send_activity(f"I'm sorry your message was flagged due to triggering OpenAI’s content management policy. Reason: {message}")
     return ActionTypes.STOP
 
